@@ -1,0 +1,33 @@
+﻿@using RegistryWeb.Models.Entities;
+@model IEnumerable<FundsHistory>;
+@{
+    ViewData["Title"] = "FundsHistory";
+}
+
+<div class="row">
+    <div class="col-sm-6">123</div>
+    <div class="col-sm-6">456</div>
+</div>
+<div class="row">
+    <div class="col-sm-6">qwe</div>
+    <div class="col-sm-6">sdf</div>
+</div>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Номер протокола</th>
+            <th>Дата протокола</th>
+            <th>Тип найма</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ProtocolNumber</td>
+                <td>@item.ProtocolDate</td>
+                <td>@item.IdFundTypeNavigation.FundType</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,30 @@
+﻿@using RegistryWeb.Models.Entities;
+@model IEnumerable<OwnershipRights>;
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Номер в реестре</th>
+            <th>Номер</th>
+            <th>Дата</th>
+            <th>Наименование</th>
+            <th>Тип ограничения</th>
+            <th>Планируемая дата переселения</th>
+            <th>Планируемая дата сноса</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.IdOwnershipRight</td>
+                <td>@item.Number</td>
+                <td>@item.Date.Year</td>
+                <td>@item.Description</td>
+                <td>@item.IdOwnershipRightTypeNavigation.OwnershipRightType</td>
+                <td>@(item.ResettlePlanDate == null ? "" : item.ResettlePlanDate.Value.Year.ToString())</td>
+                <td>@(item.DemolishPlanDate == null ? "" : item.DemolishPlanDate.Value.Year.ToString())</td>
+            </tr>
+        }
+    </tbody>
+</table>

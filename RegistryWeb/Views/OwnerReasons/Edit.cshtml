@@ -1,0 +1,23 @@
+﻿@model RegistryWeb.ViewModel.OwnerReasonEditVM
+@{
+    ViewData["Title"] = "Редактирование основания собственности";
+}
+
+<h2>@ViewData["Title"]</h2>
+<form asp-controller="OwnerReasons" asp-action="Edit" asp-route-OwnerReason.idReason="@Model.OwnerReason.IdReason">
+    <div class="form-group">
+        <label asp-for="OwnerReason.IdReasonType" class="control-label">Название</label>
+        <select class="form-control" asp-for="OwnerReason.IdReasonType" asp-items="@{
+            new SelectList(Model.OwnerReasonTypes, "IdReasonType", "ReasonName")}"></select>
+
+        <label asp-for="OwnerReason.ReasonNumber" class="control-label">Номер</label>
+        <input type="text" asp-for="OwnerReason.ReasonNumber" class="form-control" />
+
+        <label asp-for="OwnerReason.ReasonDate" class="control-label">Дата</label>
+        <input type="date" asp-for="OwnerReason.ReasonDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <a class="btn btn-default" asp-controller="OwnerReasons" asp-action="Index">Назад</a>
+        <input type="submit" value="Изменить" class="btn btn-default" />
+    </div>
+</form>

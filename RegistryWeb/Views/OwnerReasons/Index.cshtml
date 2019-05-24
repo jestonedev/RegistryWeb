@@ -1,0 +1,38 @@
+﻿@model IEnumerable<RegistryWeb.Models.Entities.OwnerReasons>;
+@{
+    ViewData["Title"] = "Основания собственности";
+}
+
+<h2>@ViewData["Title"]</h2>
+<a class="btn btn-success" asp-controller="OwnerReasons" asp-action="Create">Добавить</a>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Реестровый номер</th>
+            <th>Тип</th>
+            <th>Номер основания</th>
+            <th>Дата основания</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>@item.IdReason</td>
+            <td>@item.IdReasonTypeNavigation.ReasonName</td>
+            <td>@item.ReasonNumber</td>
+            <td>
+                @(item.ReasonDate == null ? "" : item.ReasonDate.Value.ToShortDateString())
+            </td>
+            <td>
+                <a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
+                   asp-controller="OwnerReasons" asp-action="Edit" asp-route-IdReason="@item.IdReason"></a>
+                <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                   asp-controller="OwnerReasons" asp-action="Delete" asp-route-IdReason="@item.IdReason"></a>
+            </td>
+        </tr>
+        }
+        </tbody>
+</table>
+

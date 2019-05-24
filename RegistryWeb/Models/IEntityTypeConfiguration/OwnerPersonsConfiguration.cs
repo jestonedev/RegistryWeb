@@ -1,0 +1,74 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RegistryWeb.Models.Entities;
+
+
+namespace RegistryWeb.Models.IEntityTypeConfiguration
+{
+    public class OwnerPersonsConfiguration : IEntityTypeConfiguration<OwnerPersons>
+    {
+        private string nameDatebase;
+
+        public OwnerPersonsConfiguration(string nameDatebase)
+        {
+            this.nameDatebase = nameDatebase;
+        }
+
+        public void Configure(EntityTypeBuilder<OwnerPersons> builder)
+        {
+            builder.HasKey(e => e.IdOwnerPersons);
+
+            builder.ToTable("owner_persons", nameDatebase);
+
+            builder.HasIndex(e => e.IdOwnerProcess)
+                .HasName("FK_owner_persons_owner_processes_id_process");
+
+            builder.Property(e => e.IdOwnerPersons)
+                .HasColumnName("id_owner_persons")
+                .HasColumnType("int(11)");
+
+            builder.Property(e => e.Deleted)
+                .HasColumnName("deleted")
+                .HasColumnType("tinyint(1)")
+                .HasDefaultValueSql("0");
+
+            builder.Property(e => e.IdKinship)
+                .HasColumnName("id_kinship")
+                .HasColumnType("int(11)");
+
+            builder.Property(e => e.IdOwnerProcess)
+                .HasColumnName("id_owner_process")
+                .HasColumnType("int(11)");
+
+            builder.Property(e => e.Name)
+                .IsRequired()
+                .HasColumnName("name")
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            builder.Property(e => e.Patronymic)
+                .IsRequired()
+                .HasColumnName("patronymic")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.Surname)
+                .IsRequired()
+                .HasColumnName("surname")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.HasOne(d => d.IdOwnerProcessNavigation)
+                .WithMany(p => p.OwnerPersons)
+                .HasForeignKey(d => d.IdOwnerProcess)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_owner_persons_owner_processes_id_process");
+
+            //Фильтры по умолчанию
+            builder.HasQueryFilter(e => e.Deleted == 0);
+        }
+    }
+}

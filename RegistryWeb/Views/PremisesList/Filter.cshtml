@@ -1,0 +1,42 @@
+﻿@model RegistryWeb.ViewModel.PremisesListVM;
+
+<form asp-action="Index" method="get" class="r-filter-form">
+    <input type="hidden" asp-for="OrderOptions.OrderDirection" />
+    <input type="hidden" asp-for="OrderOptions.OrderField" />
+    <input type="hidden" asp-for="PageOptions.CurrentPage" />
+    <input type="hidden" asp-for="PageOptions.SizePage" />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="input-group">
+                <input type="text" class="form-control" asp-for="FilterOptions.Street" placeholder="Введите улицу" />
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">Найти</button>
+                    <a class="btn btn-success" asp-action="Create" asp-controller="Premise">Добавить</a>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+            <label class="control-label">Тип помещения: </label>
+            <select class="form-control" asp-for="FilterOptions.IdPremisesType" asp-items="@{
+                new SelectList(Model.PremisesTypes, "IdPremisesType", "PremisesType", Model.FilterOptions.IdPremisesType)}">
+                <option value="">Все типы</option>
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <label class="control-label">Текущее состояние: </label>
+            <select class="form-control" asp-for="FilterOptions.IdObjectState" asp-items="@{
+                new SelectList(Model.ObjectStates, "IdState", "StateNeutral", Model.FilterOptions.IdObjectState)}">
+                <option value="">Все состояния</option>
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <label class="control-label">Текущий фонд: </label>
+            <select class="form-control" asp-for="FilterOptions.IdFundType" asp-items="@{
+            new SelectList(Model.FundTypes, "IdFundType", "FundType", Model.FilterOptions.IdFundType)}">
+                <option value="">Все фонды</option>
+            </select>
+        </div>
+    </div>
+</form>

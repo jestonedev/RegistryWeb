@@ -1,0 +1,15 @@
+﻿@model RegistryWeb.Models.Entities.OwnerReasonTypes;
+@{
+    ViewData["Title"] = "Удаление типа оснований собственности";
+}
+<h2>@ViewData["Title"]</h2>
+<form asp-controller="OwnerReasonTypes" asp-action="Delete" asp-route-IdReasonType="@Model.IdReasonType">
+    <div class="form-group">
+        <label class="control-label">Название</label>
+        @Html.DisplayFor(ort => ort.ReasonName, new { @class = "form-control" });
+    </div>
+    <div class="form-group">
+        <a class="btn btn-default" asp-controller="OwnerReasonTypes" asp-action="Index">Назад</a>
+        <input type="submit" class="btn btn-danger" value="Удалить" />
+    </div>
+</form>

@@ -1,0 +1,17 @@
+﻿@model RegistryWeb.ViewModel.BuildingsListVM;
+
+<form asp-action="Index" method="get" class="r-filter-form">
+    <input type="hidden" asp-for="OrderOptions.OrderDirection" />
+    <input type="hidden" asp-for="OrderOptions.OrderField" />
+    <input type="hidden" asp-for="PageOptions.CurrentPage" />
+    <input type="hidden" asp-for="PageOptions.SizePage" />
+
+    <label class="control-label" for="">Улица: </label>
+    <input type="text" class="form-control" asp-for="FilterOptions.Street" placeholder="Введите улицу" />
+    <label class="control-label">Текущее состояние: </label>
+    <select class="form-control" asp-for="FilterOptions.IdObjectState" asp-items="@{
+        new SelectList(Model.ObjectStates, "IdState", "StateNeutral", Model.FilterOptions.IdObjectState)}">
+        <option value="">Все состояния</option>
+    </select>
+    <button class="btn btn-default r-index-search-button" type="submit">Найти</button>
+</form>

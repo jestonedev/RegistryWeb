@@ -1,0 +1,30 @@
+﻿@using RegistryWeb.ViewModel;
+@model PremiseVM;
+@{
+    ViewData["Title"] = "Помещение " + Model.Premise.IdPremises;
+}
+<h2>@ViewData["Title"]</h2>
+<div class="container">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#general" aria-controls="general" role="tab" data-toggle="tab">Общие сведения</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane fade in active" id="general">
+            <div class="row">
+                <dl class="col-sm-6">
+                    <dt>Адрес</dt>
+                    <dd>
+                        @Model.Premise.IdBuildingNavigation.IdStreetNavigation.StreetLong,
+                        д.@Model.Premise.IdBuildingNavigation.House,
+                        @Model.Premise.IdPremisesTypeNavigation.PremisesTypeShort@Model.Premise.PremisesNum
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+

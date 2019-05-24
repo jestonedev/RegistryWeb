@@ -1,0 +1,85 @@
+﻿@model RegistryWeb.ViewModel.PremisesListVM;
+@using RegistryWeb.ViewOptions;
+@using RegistryWeb.Models.Entities;
+@{
+    var headers = new[]
+    {
+        new
+        {
+            Name = "№ по реестру",
+            Field = "IdPremises"
+        },
+        new
+        {
+            Name = "Тип помещения",
+            Field = "PremisesType"
+        },
+        new
+        {
+            Name = "Текущее состояние",
+            Field = "ObjectState"
+        }
+    };
+    string GetTypeFund(Premises premise)
+    {
+        var fundsHistory = premise.FundsPremisesAssoc.Select(fpa => fpa.IdFundNavigation);
+        var fundHistory = fundsHistory
+            .FirstOrDefault(fh => fh.ExcludeRestrictionDate == null && fh.IdFund == fundsHistory.Max(f => f.IdFund));
+        if (fundHistory == null)
+            return "";
+        return fundHistory.IdFundTypeNavigation.FundType;
+    }
+}
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th class="r-table-header-cell">
+                <a href="#" data-order-field="IdPremises" data-order-direction="@OrderDirection.Ascending">
+                    № по реестру
+                </a>
+            </th>
+            <th>Адрес</th>
+            <th class="r-table-header-cell">
+                <a href="#" data-order-field="PremisesType" data-order-direction="@OrderDirection.Ascending">
+                    Тип помещения
+                </a>
+            </th>
+            <th>Кадастровый номер</th>
+            <th>Общая площадь</th>
+            <th class="r-table-header-cell">
+                <a href="#" data-order-field="ObjectState" data-order-direction="@OrderDirection.Ascending">
+                    Текущее состояние
+                </a>
+            </th>
+            <th>Текущий фонд</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Premises)
+        {
+            <tr>
+                <td>@item.IdPremises</td>
+                <td>
+                    @item.IdBuildingNavigation.IdStreetNavigation.StreetLong,
+                    д.@item.IdBuildingNavigation.House,
+                    @item.IdPremisesTypeNavigation.PremisesTypeShort@item.PremisesNum
+                </td>
+                <td>@item.IdPremisesTypeNavigation.PremisesType</td>
+                <td>@item.CadastralNum</td>
+                <td>@item.TotalArea</td>
+                <td>@item.IdStateNavigation.StateNeutral</td>
+                <td>@GetTypeFund(item)</td>
+                <td>
+                    <a class="btn btn-default oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                        asp-controller="Premise" asp-action="Index" asp-route-idpremises="@item.IdPremises"></a>
+                    <a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
+                        asp-controller="Premise" asp-action="Edit" asp-route-idpremises="@item.IdPremises"></a>
+                    <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                        asp-controller="Premise" asp-action="Delete" asp-route-idpremises="@item.IdPremises"></a>
+                    <a class="btn btn-default" title="История фондов" aria-label="История фондов"
+                        asp-controller="FundsHistory" asp-action="Index" asp-route-idpremises="@item.IdPremises">ф</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
