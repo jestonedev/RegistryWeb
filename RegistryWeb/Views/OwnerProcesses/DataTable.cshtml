@@ -15,7 +15,7 @@
             <tr>
                 <td>@item.IdProcess</td>
                 <td>@item.IdOwnerTypeNavigation.OwnerType1</td>
-                <td>++++</td>
+                <td>@await Component.InvokeAsync("GetAddressComponent", new { idProcess = item.IdProcess })</td>
                 <td>
                     <a class="btn btn-default oi oi-eye" title="Подробнее" aria-label="Подробнее"
                        asp-action="Details" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
