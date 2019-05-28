@@ -154,15 +154,17 @@ var subPremisesNumSelectListDisplay = function (address) {
 };
 
 var addressDelete = function (id) {
+    if ($('.addressBlock').length == 1)
+        return;
     $('.addressBlock').filter(function (index) {
         return $(this).attr('data-id') === id;
     }).remove();
     //Преобразование id к числу
-    recalculationId(+id);
+    recalculationAddressId(+id);
 }
 
 //id обязательно должно быть числом. Иначе некорректная работа
-var recalculationId = function (id) {
+var recalculationAddressId = function (id) {
     if (id == $('.addressBlock').length)
         return;
     for (var i = id; i < $('.addressBlock').length; i++) {

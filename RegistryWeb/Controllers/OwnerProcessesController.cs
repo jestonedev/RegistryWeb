@@ -44,9 +44,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddressChoiceOk(AddressController address)
+        public IActionResult OwnerReasonAdd(int id)
         {
-            return Content("<p>asdf</p>");
+            return ViewComponent("OwnerReasonComponent", new { id });
         }
 
         //public IActionResult Edit(int? idReasonType)

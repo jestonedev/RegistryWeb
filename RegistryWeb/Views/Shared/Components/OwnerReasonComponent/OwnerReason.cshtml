@@ -2,18 +2,23 @@
 @{
     var i = ViewBag.Id;
 }
-<div class="form-row ownerReasonBlock" style="border: 1px solid #000">
-    <div class="form-group">
-        <label class="control-label">Название</label>
-        <select class="form-control" name="OwnerReasons[].IdReasonType" asp-items="@{
+<div class="form-row ownerReasonBlock" data-id="@i">
+    <div  class="form-row col-md-11">
+        <div class="form-group col-md-4">
+            <label class="control-label">Название</label>
+            <select class="form-control" name="OwnerReasons[@i].IdReasonType" asp-items="@{
             new SelectList(Model, "IdReasonType", "ReasonName")}"></select>
+        </div>
+        <div class="form-group col-md-4">
+            <label class="control-label">Номер</label>
+            <input type="text" name="OwnerReasons[@i].ReasonNumber" class="form-control" />
+        </div>
+        <div class="form-group col-md-4">
+            <label class="control-label">Дата</label>
+            <input type="date" name="OwnerReasons[@i].ReasonDate" class="form-control" />
+        </div>
     </div>
-    <div class="form-group">
-        <label class="control-label">Номер</label>
-        <input type="text" name="OwnerReasons[@i].ReasonNumber" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label class="control-label">Дата</label>
-        <input type="date" name="OwnerReasons[@i].ReasonDate" class="form-control" />
+    <div class="col-md-1">
+        <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"></a>
     </div>
 </div>

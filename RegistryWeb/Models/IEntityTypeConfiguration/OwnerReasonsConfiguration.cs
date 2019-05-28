@@ -22,7 +22,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.ToTable("owner_reasons", nameDatebase);
 
-            builder.HasIndex(e => e.IdReason)
+            builder.HasIndex(e => e.IdProcess)
                 .HasName("FK_owner_reasons_id_process");
 
             builder.HasIndex(e => e.IdReasonType)
@@ -56,7 +56,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.HasOne(d => d.IdOwnerProcessesNavigation)
                 .WithMany(p => p.OwnerReasons)
-                .HasForeignKey(d => d.IdReason)
+                .HasForeignKey(d => d.IdProcess)
                 .HasConstraintName("FK_owner_reasons_id_process");
 
             builder.HasOne(d => d.IdReasonTypeNavigation)

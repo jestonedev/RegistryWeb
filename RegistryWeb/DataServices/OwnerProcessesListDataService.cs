@@ -111,9 +111,7 @@ namespace RegistryWeb.DataServices
         public OwnerProcessEditVM GetCreateViewModel()
         {
             var viewModel = new OwnerProcessEditVM();
-            viewModel.OwnerProcess = new OwnerProcesses();
             viewModel.OwnerTypes = registryContext.OwnerType;
-            viewModel.Addresses = new List<Address>() { new Address() };
 
             return viewModel;
         }
@@ -122,7 +120,7 @@ namespace RegistryWeb.DataServices
         {
             var ownerProcesses = viewModel.OwnerProcess;
             var entityEntry = registryContext.OwnerProcesses.Add(ownerProcesses);
-            var i = registryContext.SaveChanges();
+            registryContext.SaveChanges();
 
             foreach (var addr in viewModel.Addresses)
             {
@@ -153,22 +151,15 @@ namespace RegistryWeb.DataServices
                         registryContext.OwnerSubPremisesAssoc.Add(ownerSubPremisesAssoc);
                         break;
                 }
-                i = registryContext.SaveChanges();
+                registryContext.SaveChanges();
             }
-        }
 
-        private void Create(IList<Address> addresses, int idProcess)
-        {
-            
-                //registryContext.OwnerProcesses.Add(ownerProcesses);
-                //registryContext.SaveChanges();
-        }
-
-        public void GetStringAddress(Address addresses)
-        {
-            
-            //registryContext.OwnerProcesses.Add(ownerProcesses);
-            //registryContext.SaveChanges();
+            foreach (var reas in viewModel.OwnerReasons)
+            {
+                reas.IdProcess = ownerProcesses.IdProcess;
+                registryContext.OwnerReasons.Add(reas);
+                registryContext.SaveChanges();
+            }
         }
     }
 }

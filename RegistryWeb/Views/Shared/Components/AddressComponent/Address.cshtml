@@ -2,7 +2,7 @@
 @{ 
     var i = ViewBag.Id;
 }
-<div class="form-row addressBlock" data-id="@i" style="border: 1px solid #000">
+<div class="form-row addressBlock" data-id="@i">
     <div class="col-md-11">
         <div class="form-group">
             <input typeof="text" class="form-control street" />
@@ -39,10 +39,9 @@
                 <label class="control-label">Номер комнаты</label>
                 <select class="form-control subPremisesNum" name="Addresses[@i].IdSubPremise"></select>
             </div>
-            @*<div class="clearfix" />*@
         </div>
     </div>
-    <div class="col-md-1" style="border: 1px solid #000;">
+    <div class="col-md-1">
         <a class="btn btn-success oi oi-check" title="Ок" aria-label="Ок"></a>
         <a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"></a>
         <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"></a>

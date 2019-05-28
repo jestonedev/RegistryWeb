@@ -13,4 +13,15 @@
             }
         });
     });
+    $('#ownerReasonAdd').on("click", function () {
+        var id = $('.ownerReasonBlock').length;
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/OwnerProcesses/OwnerReasonAdd',
+            data: { id: id },
+            success: function (data) {
+                $('#ownerReasons').append(data);
+            }
+        });
+    });
 });
