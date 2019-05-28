@@ -29,19 +29,19 @@
 var typeAddressRadiobuttonChange = function (address) {
     var i = address.attr('data-id');
     //Здание
-    if ($('#radio1_' + i).is(':checked')) {
+    if ($(address).find('.typeAddress').val() == 1) {
         $('#premisesTypesGroup_' + i).hide();
         $('#premisesNumGroup_' + i).hide();
         $('#subPremisesNumGroup_' + i).hide();
     }
     //Помещение внутри здания
-    if ($('#radio2_' + i).is(':checked')) {
+    if ($(address).find('.typeAddress').val() == 2) {
         $('#premisesTypesGroup_' + i).show();
         $('#premisesNumGroup_' + i).show();
         $('#subPremisesNumGroup_' + i).hide();
     }
     //Квартира внутри помещения
-    if ($('#radio3_' + i).is(':checked')) {
+    if ($(address).find('.typeAddress').val() == 3) {
         $('#premisesTypesGroup_' + i).show();
         $('#premisesNumGroup_' + i).show();
         $('#subPremisesNumGroup_' + i).show();
@@ -61,7 +61,7 @@ var kladrStreetSelectListChange = function (address) {
 var builidngSelectListChange = function (address) {
     var i = address.attr('data-id');
     //Помещение внутри здания
-    if ($('#radio2_' + i).is(':checked') || $('#radio3_' + i).is(':checked')) {
+    if ($(address).find('.typeAddress').val() == 2 || $(address).find('.typeAddress').val() == 3) {
         premisesTypeSelectListDisplay(address);
         premisesTypesSelectListChange(address);
     }
@@ -76,7 +76,7 @@ var premisesTypesSelectListChange = function (address) {
 var premisesNumSelectListChange = function (address) {
     var i = address.attr('data-id');
     //Квартира внутри помещения
-    if ($('#radio3_' + i).is(':checked')) {
+    if ($(address).find('.typeAddress').val() == 3) {
         subPremisesNumSelectListDisplay(address);
     }
 }
@@ -153,9 +153,36 @@ var subPremisesNumSelectListDisplay = function (address) {
     });
 };
 
+var addressDelete = function (id) {
+    $('.addressBlock').filter(function (index) {
+        return $(this).attr('data-id') === id;
+    }).remove();
+    //Преобразование id к числу
+    recalculationId(+id);
+}
+
+//id обязательно должно быть числом. Иначе некорректная работа
+var recalculationId = function (id) {
+    if (id == $('.addressBlock').length)
+        return;
+    for (var i = id; i < $('.addressBlock').length; i++) {
+        var oldId = i + 1;
+        $('.addressBlock').get(i).setAttribute('data-id', i);
+        $('#premisesTypesGroup_' + oldId).attr('id', 'premisesTypesGroup_' + i);
+        $('#premisesNumGroup_' + oldId).attr('id', 'premisesNumGroup_' + i);
+        $('#subPremisesNumGroup_' + oldId).attr('id', 'subPremisesNumGroup_' + i);
+        $('select[name="Addresses[' + oldId + '].IdTypeAddress"]').attr('name', 'Addresses[' + i + '].IdTypeAddress');
+        $('select[name="Addresses[' + oldId + '].IdStreet"]').attr('name', 'Addresses[' + i + '].IdStreet');
+        $('select[name="Addresses[' + oldId + '].IdBuilding"]').attr('name', 'Addresses[' + i + '].IdBuilding');
+        $('select[name="Addresses[' + oldId + '].IdPremiseType"]').attr('name', 'Addresses[' + i + '].IdPremiseType');
+        $('select[name="Addresses[' + oldId + '].IdPremise"]').attr('name', 'Addresses[' + i + '].IdPremise');
+        $('select[name="Addresses[' + oldId + '].IdSubPremise"]').attr('name', 'Addresses[' + i + '].IdSubPremise');
+    }
+}
+
 $(function () {
     $('#addresses').change(function (event) {
-        var address = $(event.target).parents().filter('.address');
+        var address = $(event.target).parents().filter('.addressBlock');
         if ($(event.target).hasClass('typeAddress'))
             typeAddressRadiobuttonChange(address);
         if ($(event.target).hasClass('kladrStreets'))
@@ -167,8 +194,11 @@ $(function () {
         if ($(event.target).hasClass('premisesNum'))
             premisesNumSelectListChange(address);
     });
-
-    $('.typeAddress').checkboxradio({ icon: false });
-    typeAddressRadiobuttonChange($('.address'));
-    autocompleteStreet($('.address'));
+    $('#addresses').click(function (event) {
+        var id = $(event.target).parents().filter('.addressBlock').attr('data-id');
+        if ($(event.target).hasClass('oi-x'))
+            addressDelete(id);
+    });
+    typeAddressRadiobuttonChange($('.addressBlock'));
+    autocompleteStreet($('.addressBlock'));
 });

@@ -16,7 +16,7 @@ namespace RegistryWeb.ViewComponents
             this.registryContext = registryContext;
         }
 
-        public IViewComponentResult Invoke(int id)
+        public IViewComponentResult Invoke(int id = 0)
         {
             ViewBag.Id = id;
             return View("Address", registryContext.KladrStreets);
