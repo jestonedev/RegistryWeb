@@ -10,5 +10,7 @@ namespace RegistryWeb.ViewModel
         public IEnumerable<OwnerType> OwnerTypes { get; set; }
         public IList<Address> Addresses { get; set; }
         public IList<OwnerReasons> OwnerReasons { get; set; }
+        public IList<OwnerPersons> OwnerPersons { get; set; }
+        public IList<OwnerOrginfos> OwnerOrginfos { get; set; }
     }
 }

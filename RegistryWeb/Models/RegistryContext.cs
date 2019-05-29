@@ -30,6 +30,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<Kinships> Kinships { get; set; }
         public virtual DbSet<ObjectStates> ObjectStates { get; set; }
         public virtual DbSet<OwnerBuildingsAssoc> OwnerBuildingsAssoc { get; set; }
+        public virtual DbSet<OwnerOrginfos> OwnerOrginfos { get; set; }
         public virtual DbSet<OwnerPersons> OwnerPersons { get; set; }
         public virtual DbSet<OwnerPremisesAssoc> OwnerPremisesAssoc { get; set; }
         public virtual DbSet<OwnerProcesses> OwnerProcesses { get; set; }
@@ -85,6 +86,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new OwnerBuildingsAssocConfiguration(NameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerPremisesAssocConfiguration(NameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerSubPremisesAssocConfiguration(NameDatebase));
+            modelBuilder.ApplyConfiguration(new OwnerOrginfosConfiguration(NameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerPersonsConfiguration(NameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerProcessesConfiguration(NameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerReasonsConfiguration(NameDatebase));

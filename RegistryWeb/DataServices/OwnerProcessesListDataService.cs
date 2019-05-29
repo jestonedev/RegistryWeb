@@ -160,6 +160,22 @@ namespace RegistryWeb.DataServices
                 registryContext.OwnerReasons.Add(reas);
                 registryContext.SaveChanges();
             }
+
+
+            if (ownerProcesses.IdOwnerType == 1)
+                foreach (var pers in viewModel.OwnerPersons)
+                {
+                    pers.IdOwnerProcess = ownerProcesses.IdProcess;
+                    registryContext.OwnerPersons.Add(pers);
+                    registryContext.SaveChanges();
+                }
+            else
+                foreach (var org in viewModel.OwnerOrginfos)
+                {
+                    org.IdProcess = ownerProcesses.IdProcess;
+                    registryContext.OwnerOrginfos.Add(org);
+                    registryContext.SaveChanges();
+                }
         }
     }
 }

@@ -8,6 +8,7 @@ namespace RegistryWeb.Models.Entities
         public OwnerProcesses()
         {
             OwnerBuildingsAssoc = new HashSet<OwnerBuildingsAssoc>();
+            OwnerOrginfos = new HashSet<OwnerOrginfos>();
             OwnerPersons = new HashSet<OwnerPersons>();
             OwnerReasons = new HashSet<OwnerReasons>();
             OwnerPremisesAssoc = new HashSet<OwnerPremisesAssoc>();
@@ -25,6 +26,7 @@ namespace RegistryWeb.Models.Entities
 
         public virtual OwnerType IdOwnerTypeNavigation { get; set; }
         public virtual ICollection<OwnerBuildingsAssoc> OwnerBuildingsAssoc { get; set; }
+        public virtual ICollection<OwnerOrginfos> OwnerOrginfos { get; set; }
         public virtual ICollection<OwnerPersons> OwnerPersons { get; set; }
         public virtual ICollection<OwnerReasons> OwnerReasons { get; set; }
         public virtual ICollection<OwnerPremisesAssoc> OwnerPremisesAssoc { get; set; }

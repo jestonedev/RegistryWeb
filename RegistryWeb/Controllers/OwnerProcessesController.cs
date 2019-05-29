@@ -49,6 +49,17 @@ namespace RegistryWeb.Controllers
             return ViewComponent("OwnerReasonComponent", new { id });
         }
 
+        [HttpPost]
+        public IActionResult OwnerAdd(int idOwnerType, int id = 0)
+        {
+            //физ. лицо
+            if (idOwnerType == 1)
+                return ViewComponent("OwnerPersonComponent", new { id });
+                    
+            //юр. лицо или ип
+            return ViewComponent("OwnerOrginfoComponent", new { id });
+        }
+
         //public IActionResult Edit(int? idReasonType)
         //{
         //    if (idReasonType != null)

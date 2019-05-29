@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RegistryWeb.Models.Entities;
 
@@ -35,10 +32,6 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnType("tinyint(1)")
                 .HasDefaultValueSql("0");
 
-            builder.Property(e => e.IdKinship)
-                .HasColumnName("id_kinship")
-                .HasColumnType("int(11)");
-
             builder.Property(e => e.IdOwnerProcess)
                 .HasColumnName("id_owner_process")
                 .HasColumnType("int(11)");
@@ -46,7 +39,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.Property(e => e.Name)
                 .IsRequired()
                 .HasColumnName("name")
-                .HasMaxLength(50)
+                .HasMaxLength(255)
                 .IsUnicode(false);
 
             builder.Property(e => e.Patronymic)
