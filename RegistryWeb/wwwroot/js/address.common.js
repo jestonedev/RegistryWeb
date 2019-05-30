@@ -26,26 +26,8 @@
     });
 };
 
-var typeAddressRadiobuttonChange = function (address) {
-    var i = address.attr('data-id');
-    //Здание
-    if ($(address).find('.typeAddress').val() == 1) {
-        $('#premisesTypesGroup_' + i).hide();
-        $('#premisesNumGroup_' + i).hide();
-        $('#subPremisesNumGroup_' + i).hide();
-    }
-    //Помещение внутри здания
-    if ($(address).find('.typeAddress').val() == 2) {
-        $('#premisesTypesGroup_' + i).show();
-        $('#premisesNumGroup_' + i).show();
-        $('#subPremisesNumGroup_' + i).hide();
-    }
-    //Квартира внутри помещения
-    if ($(address).find('.typeAddress').val() == 3) {
-        $('#premisesTypesGroup_' + i).show();
-        $('#premisesNumGroup_' + i).show();
-        $('#subPremisesNumGroup_' + i).show();
-    }
+var typeAddressSelectListChange = function (address) {
+    addressListsDisplay(address);
     kladrStreetSelectListChange(address);
 }
 
@@ -81,6 +63,28 @@ var premisesNumSelectListChange = function (address) {
     }
 }
 
+
+var addressListsDisplay = function (address) {
+    var i = address.attr('data-id');
+    //Здание
+    if ($(address).find('.typeAddress').val() == 1) {
+        $('#premisesTypesGroup_' + i).hide();
+        $('#premisesNumGroup_' + i).hide();
+        $('#subPremisesNumGroup_' + i).hide();
+    }
+    //Помещение внутри здания
+    if ($(address).find('.typeAddress').val() == 2) {
+        $('#premisesTypesGroup_' + i).show();
+        $('#premisesNumGroup_' + i).show();
+        $('#subPremisesNumGroup_' + i).hide();
+    }
+    //Квартира внутри помещения
+    if ($(address).find('.typeAddress').val() == 3) {
+        $('#premisesTypesGroup_' + i).show();
+        $('#premisesNumGroup_' + i).show();
+        $('#subPremisesNumGroup_' + i).show();
+    }
+}
 
 var builidngSelectListDisplay = function (address) {
     var idStreet = $(address).find('.kladrStreets').val();
@@ -186,7 +190,7 @@ $(function () {
     $('#addresses').change(function (event) {
         var address = $(event.target).parents().filter('.addressBlock');
         if ($(event.target).hasClass('typeAddress'))
-            typeAddressRadiobuttonChange(address);
+            typeAddressSelectListChange(address);
         if ($(event.target).hasClass('kladrStreets'))
             kladrStreetSelectListChange(address);
         if ($(event.target).hasClass('house'))
@@ -201,6 +205,6 @@ $(function () {
         if ($(event.target).hasClass('oi-x'))
             addressDelete(id);
     });
-    typeAddressRadiobuttonChange($('.addressBlock'));
+    addressListsDisplay($('.addressBlock'));
     autocompleteStreet($('.addressBlock'));
 });

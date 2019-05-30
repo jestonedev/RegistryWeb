@@ -8,7 +8,7 @@
             success: function (data) {
                 $('#addresses').append(data);
                 var newAddress = $('.addressBlock').last();
-                typeAddressRadiobuttonChange(newAddress);
+                addressListsDisplay(newAddress);
                 autocompleteStreet(newAddress);
             }
         });
