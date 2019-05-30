@@ -10,9 +10,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace RegistryWeb.DataServices
 {
-    public class OwnerProcessesListDataService : ListDataService<OwnerProcessesListVM, OwnerProcessesListFilter>
+    public class OwnerProcessesDataService : ListDataService<OwnerProcessesListVM, OwnerProcessesListFilter>
     {
-        public OwnerProcessesListDataService(RegistryContext registryContext) : base(registryContext)
+        public OwnerProcessesDataService(RegistryContext registryContext) : base(registryContext)
         {
         }
 
@@ -103,10 +103,11 @@ namespace RegistryWeb.DataServices
         }
 
         public List<OwnerProcesses> GetQueryPage(IQueryable<OwnerProcesses> query, PageOptions pageOptions)
-            => query
-            .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
-            .Take(pageOptions.SizePage).ToList();
-
+        {
+            return query
+                .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
+                .Take(pageOptions.SizePage).ToList();
+        }
 
         public OwnerProcessVM CreateViewModel()
         {
@@ -124,11 +125,14 @@ namespace RegistryWeb.DataServices
         public OwnerProcessVM GetViewModel(int idProcess)
         {
             var viewModel = new OwnerProcessVM();
-            viewModel.OwnerProcess = registryContext.OwnerProcesses.First(op => op.IdProcess == idProcess);
+            viewModel.OwnerProcess = GetOwnerProcess(idProcess);
             viewModel.OwnerTypes = registryContext.OwnerType;
+            viewModel.OwnerReasons = viewModel.OwnerProcess.OwnerReasons.ToList();
+            viewModel.OwnerPersons = viewModel.OwnerProcess.OwnerPersons.ToList();
+            viewModel.OwnerOrginfos = viewModel.OwnerProcess.OwnerOrginfos.ToList();
 
             var addresses = new List<Address>();
-            foreach (var oba in registryContext.OwnerBuildingsAssoc.Where(o => o.IdProcess == idProcess))
+            foreach (var oba in viewModel.OwnerProcess.OwnerBuildingsAssoc)
             {
                 var address = new Address();
                 address.IdTypeAddress = 1;
@@ -137,7 +141,7 @@ namespace RegistryWeb.DataServices
                 address.IdBuilding = oba.IdBuilding;
                 addresses.Add(address);
             }
-            foreach (var opa in registryContext.OwnerPremisesAssoc.Where(o => o.IdProcess == idProcess))
+            foreach (var opa in viewModel.OwnerProcess.OwnerPremisesAssoc)
             {
                 var address = new Address();
                 address.IdTypeAddress = 2;
@@ -150,7 +154,7 @@ namespace RegistryWeb.DataServices
                 address.IdPremise = premise.IdPremises;
                 addresses.Add(address);
             }
-            foreach (var ospa in registryContext.OwnerSubPremisesAssoc.Where(o => o.IdProcess == idProcess))
+            foreach (var ospa in viewModel.OwnerProcess.OwnerSubPremisesAssoc)
             {
                 var address = new Address();
                 address.IdTypeAddress = 3;
@@ -168,14 +172,19 @@ namespace RegistryWeb.DataServices
             }
             viewModel.Addresses = addresses;
 
-            viewModel.OwnerReasons = registryContext.OwnerReasons
-                .Where(o => o.IdProcess == idProcess).ToList();
-            viewModel.OwnerPersons = registryContext.OwnerPersons
-                .Where(o => o.IdOwnerProcess == idProcess).ToList();
-            viewModel.OwnerOrginfos = registryContext.OwnerOrginfos
-                .Where(o => o.IdProcess == idProcess).ToList();
-
             return viewModel;
+        }
+
+        public OwnerProcesses GetOwnerProcess(int idProcess)
+        {
+            return registryContext.OwnerProcesses
+                .Include(op => op.OwnerBuildingsAssoc)
+                .Include(op => op.OwnerPremisesAssoc)
+                .Include(op => op.OwnerSubPremisesAssoc)
+                .Include(op => op.OwnerReasons)
+                .Include(op => op.OwnerPersons)
+                .Include(op => op.OwnerOrginfos)
+                .First(op => op.IdProcess == idProcess);
         }
 
         public void Create(OwnerProcessVM viewModel)
@@ -237,6 +246,37 @@ namespace RegistryWeb.DataServices
                     registryContext.OwnerOrginfos.Add(org);
                     registryContext.SaveChanges();
                 }
+        }
+
+        public void Delete(int idProcess)
+        {
+            var ownerProcesses = GetOwnerProcess(idProcess);
+            ownerProcesses.Deleted = 1;
+            foreach(var o in ownerProcesses.OwnerBuildingsAssoc)
+            {
+                o.Deleted = 1;
+            }
+            foreach (var o in ownerProcesses.OwnerPremisesAssoc)
+            {
+                o.Deleted = 1;
+            }
+            foreach (var o in ownerProcesses.OwnerSubPremisesAssoc)
+            {
+                o.Deleted = 1;
+            }
+            foreach (var o in ownerProcesses.OwnerReasons)
+            {
+                o.Deleted = 1;
+            }
+            foreach (var o in ownerProcesses.OwnerPersons)
+            {
+                o.Deleted = 1;
+            }
+            foreach (var o in ownerProcesses.OwnerOrginfos)
+            {
+                o.Deleted = 1;
+            }
+            registryContext.SaveChanges();
         }
     }
 }

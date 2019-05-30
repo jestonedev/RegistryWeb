@@ -1,0 +1,11 @@
+﻿@model RegistryWeb.Models.Entities.OwnerProcesses;
+@{
+    ViewData["Title"] = "Удаление основания собственности " + Model.IdProcess;
+}
+<form asp-controller="OwnerProcesses" asp-action="Delete" asp-route-idProcess="@Model.IdProcess">
+    <h2>Удалить основание собственности @Model.IdProcess?</h2>
+    <div class="form-group">
+        <a class="btn btn-default" asp-controller="OwnerProcesses" asp-action="Index">Назад</a>
+        <input type="submit" class="btn btn-danger" value="Удалить" />
+    </div>
+</form>

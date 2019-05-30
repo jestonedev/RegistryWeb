@@ -10,9 +10,9 @@ using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers
 {
-    public class OwnerProcessesController : ListController<OwnerProcessesListDataService>
+    public class OwnerProcessesController : ListController<OwnerProcessesDataService>
     {
-        public OwnerProcessesController(OwnerProcessesListDataService dataService) : base(dataService)
+        public OwnerProcessesController(OwnerProcessesDataService dataService) : base(dataService)
         {
         }
 
@@ -34,8 +34,12 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public IActionResult Create(OwnerProcessVM viewModel)
         {
-            dataService.Create(viewModel);
-            return RedirectToAction("Index");
+            if (viewModel != null)
+            {
+                dataService.Create(viewModel);
+                return RedirectToAction("Index");
+            }
+            return NotFound();
         }
 
         [HttpPost]
@@ -71,6 +75,30 @@ namespace RegistryWeb.Controllers
             return View("Details", viewModel);
         }
 
+        [HttpGet]
+        [ActionName("Delete")]
+        public IActionResult ConfirmDelete(int? idProcess)
+        {
+            if (idProcess != null)
+            {
+                var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
+                if (ownerProcess != null)
+                    return View(ownerProcess);
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        public IActionResult Delete(int? idProcess)
+        {
+            if (idProcess != null)
+            {
+                dataService.Delete(idProcess.Value);
+                return RedirectToAction("Index");
+            }
+            return NotFound();
+        }
+
         //public IActionResult Edit(int? idReasonType)
         //{
         //    if (idReasonType != null)
@@ -90,44 +118,12 @@ namespace RegistryWeb.Controllers
         //    return RedirectToAction("Index");
         //}
 
-        //[HttpGet]
-        //[ActionName("Delete")]
-        //public IActionResult ConfirmDelete(int? idReasonType)
-        //{
-        //    if (idReasonType != null)
-        //    {
-        //        var ownerReasonTypes = rc.OwnerReasonTypes.FirstOrDefault(ort => ort.IdReasonType == idReasonType);
-        //        if (ownerReasonTypes != null)
-        //            return View(ownerReasonTypes);
-        //    }
-        //    return NotFound();
-        //}
 
-        //[HttpPost]
-        //public IActionResult Delete(int? idReasonType)
-        //{
-        //    if (idReasonType != null)
-        //    {
-        //        var ownerReason = rc.OwnerReasons.FirstOrDefault(or => or.IdReasonType == idReasonType);
-        //        if (ownerReason == null)
-        //        {
-        //            var ownerReasonTypes = rc.OwnerReasonTypes.FirstOrDefault(ort => ort.IdReasonType == idReasonType);
-        //            if (ownerReasonTypes != null)
-        //            {
-        //                ownerReasonTypes.Deleted = 1;
-        //                rc.SaveChanges();
-        //                return RedirectToAction("Index");
-        //            }
-        //        }
-        //        return RedirectToAction("Error");
-        //    }
-        //    return NotFound();
-        //}
 
         public IActionResult Error()
         {
             @ViewData["TextError"] = "Тип используется в основаниях собственности!";
-            ViewData["Controller"] = "OwnerReasonTypes";
+            ViewData["Controller"] = "OwnerProcesses";
             return View("Error");
         }
     }

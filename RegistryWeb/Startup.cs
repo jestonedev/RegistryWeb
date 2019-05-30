@@ -40,7 +40,7 @@ namespace RegistryWeb
             services.AddTransient<PremisesListDataService>();
             services.AddTransient<PremiseDataService>();
             services.AddTransient<FundsHistoryDataService>();
-            services.AddTransient<OwnerProcessesListDataService>();
+            services.AddTransient<OwnerProcessesDataService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
