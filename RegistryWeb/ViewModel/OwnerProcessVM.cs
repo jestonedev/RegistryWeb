@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace RegistryWeb.ViewModel
 {
-    public class OwnerProcessEditVM
+    public class OwnerProcessVM
     {
         public OwnerProcesses OwnerProcess { get; set; }
         public IEnumerable<OwnerType> OwnerTypes { get; set; }

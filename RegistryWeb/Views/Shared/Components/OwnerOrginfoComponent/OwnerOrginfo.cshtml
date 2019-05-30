@@ -1,10 +1,11 @@
-﻿@{
+﻿@model RegistryWeb.Models.Entities.OwnerOrginfos;
+@{
     var i = ViewBag.Id;
 }
 <div class="form-row ownerBlock" data-id="@i">
     <div class="form-group col-md-11">
         <label class="control-label">Наименование</label>
-        <input type="text" name="OwnerOrginfos[@i].OrgName" class="form-control" />
+        <input type="text" asp-for="OrgName" name="OwnerOrginfos[@i].OrgName" class="form-control" />
     </div>
     <div class="col-md-1">
         <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"></a>

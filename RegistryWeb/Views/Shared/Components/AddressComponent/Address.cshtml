@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RegistryWeb.Models.Entities.KladrStreets>;
+﻿@model RegistryWeb.Models.Address;
 @{ 
     var i = ViewBag.Id;
 }
@@ -10,7 +10,7 @@
         <div class="form-row">
             <div class="col-md-3">
                 <label class="control-label">Тип адреса</label>
-                <select class="form-control typeAddress" name="Addresses[@i].IdTypeAddress">
+                <select class="form-control typeAddress" asp-for="IdTypeAddress" name="Addresses[@i].IdTypeAddress">
                     <option value="1">Здание</option>
                     <option value="2">Помещение внутри здания</option>
                     <option value="3">Квартира внутри помещения</option>
@@ -18,32 +18,34 @@
             </div>
             <div class="col-md-8">
                 <label class="control-label">Улица</label>
-                <select class="form-control kladrStreets" name="Addresses[@i].IdStreet" asp-items="@{
-                    new SelectList(Model, "IdStreet", "StreetName")}"></select>
+                <select class="form-control kladrStreets" asp-for="IdStreet" name="Addresses[@i].IdStreet" asp-items="@{
+                    new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName")}"></select>
             </div>
             <div class="col-md-1">
                 <label class="control-label">Дом</label>
-                <select class="form-control house" name="Addresses[@i].IdBuilding"></select>
+                <select class="form-control house" asp-for="IdBuilding" name="Addresses[@i].IdBuilding" asp-items="@{
+                    new SelectList(ViewBag.Buildings, "IdBuilding", "House")}"></select>
             </div>
         </div>
         <div class="form-row">
             <div class="col-md-4" id="premisesTypesGroup_@i">
                 <label class="control-label">Тип помещения</label>
-                <select class="form-control premisesTypes" name="Addresses[@i].IdPremiseType"></select>
+                <select class="form-control premisesTypes" asp-for="IdPremisesType" name="Addresses[@i].IdPremisesType" asp-items="@{
+                    new SelectList(ViewBag.PremisesTypes, "IdPremisesType", "PremisesType")}"></select>
             </div>
             <div class="col-md-4" id="premisesNumGroup_@i">
                 <label class="control-label premisesTypeAsNum">Номер квартиры</label>
-                <select class="form-control premisesNum" name="Addresses[@i].IdPremise"></select>
+                <select class="form-control premisesNum" asp-for="IdPremise" name="Addresses[@i].IdPremise" asp-items="@{
+                    new SelectList(ViewBag.Premises, "IdPremises", "PremisesNum")}"></select>
             </div>
             <div class="col-md-4" id="subPremisesNumGroup_@i">
                 <label class="control-label">Номер комнаты</label>
-                <select class="form-control subPremisesNum" name="Addresses[@i].IdSubPremise"></select>
+                <select class="form-control subPremisesNum" asp-for="IdSubPremise" name="Addresses[@i].IdSubPremise" asp-items="@{
+                    new SelectList(ViewBag.SubPremises, "IdSubPremises", "SubPremisesNum")}"></select>
             </div>
         </div>
     </div>
     <div class="col-md-1">
-        <a class="btn btn-success oi oi-check" title="Ок" aria-label="Ок"></a>
-        <a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"></a>
         <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"></a>
     </div>
 </div>

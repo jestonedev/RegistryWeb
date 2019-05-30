@@ -10,7 +10,7 @@ namespace RegistryWeb.Models
         public int IdTypeAddress { get; set; }
         public string IdStreet { get; set; }
         public int IdBuilding { get; set; }
-        public int IdPremiseType { get; set; }
+        public int IdPremisesType { get; set; }
         public int IdPremise { get; set; }
         public int IdSubPremise { get; set; }
     }

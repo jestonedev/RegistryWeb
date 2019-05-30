@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RegistryWeb.Models.Entities.OwnerReasonTypes>;
+﻿@model RegistryWeb.Models.Entities.OwnerReasons;
 @{
     var i = ViewBag.Id;
 }
@@ -6,16 +6,16 @@
     <div  class="form-row col-md-11">
         <div class="form-group col-md-4">
             <label class="control-label">Название</label>
-            <select class="form-control" name="OwnerReasons[@i].IdReasonType" asp-items="@{
-            new SelectList(Model, "IdReasonType", "ReasonName")}"></select>
+            <select class="form-control" asp-for="IdReasonType" name="OwnerReasons[@i].IdReasonType" asp-items="@{
+            new SelectList(ViewBag.OwnerReasonTypes, "IdReasonType", "ReasonName")}"></select>
         </div>
         <div class="form-group col-md-4">
             <label class="control-label">Номер</label>
-            <input type="text" name="OwnerReasons[@i].ReasonNumber" class="form-control" />
+            <input type="text" asp-for="ReasonNumber" name="OwnerReasons[@i].ReasonNumber" class="form-control" />
         </div>
         <div class="form-group col-md-4">
             <label class="control-label">Дата</label>
-            <input type="date" name="OwnerReasons[@i].ReasonDate" class="form-control" />
+            <input type="date" asp-for="ReasonDate" name="OwnerReasons[@i].ReasonDate" class="form-control" />
         </div>
     </div>
     <div class="col-md-1">

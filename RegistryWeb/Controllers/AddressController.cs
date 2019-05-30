@@ -43,12 +43,11 @@ namespace RegistryWeb.Controllers
         {
             if (idBuilding == 0)
                 return Content("");
-            var idPremisesTypes = registryContext.Premises
+            var premisesTypes = registryContext.Premises
+                .Include(p => p.IdPremisesTypeNavigation)
                 .Where(p => p.IdBuilding == idBuilding)
-                .Select(p => p.IdPremisesType)
+                .Select(p => p.IdPremisesTypeNavigation)
                 .Distinct();
-            var premisesTypes = registryContext.PremisesTypes.
-                Where(pt => idPremisesTypes.Contains(pt.IdPremisesType));
             StringBuilder str = new StringBuilder();
             foreach (var pt in premisesTypes)
                 str.Append("<option value=\"" + pt.IdPremisesType + "\">" + pt.PremisesType + "</option>");
@@ -71,7 +70,7 @@ namespace RegistryWeb.Controllers
             if (idPremisesType == 0 || idBuilding == 0)
                 return Content("");
             var premises = registryContext.Premises
-                .Where(p => p.IdBuilding == idBuilding && p.IdPremisesType == idPremisesType).ToList();
+                .Where(p => p.IdBuilding == idBuilding && p.IdPremisesType == idPremisesType);
             StringBuilder str = new StringBuilder();
             foreach (var p in premises)
                 str.Append("<option value=\"" + p.IdPremises + "\">" + p.PremisesNum + "</option>");
@@ -84,7 +83,7 @@ namespace RegistryWeb.Controllers
             if (idPremise == 0)
                 return Content("");
             var subPremises = registryContext.SubPremises
-                .Where(sp => sp.IdPremises == idPremise).ToList();
+                .Where(sp => sp.IdPremises == idPremise);
             StringBuilder str = new StringBuilder();
             foreach (var sp in subPremises)
                 str.Append("<option value=\"" + sp.IdSubPremises + "\">" + sp.SubPremisesNum + "</option>");

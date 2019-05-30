@@ -108,15 +108,77 @@ namespace RegistryWeb.DataServices
             .Take(pageOptions.SizePage).ToList();
 
 
-        public OwnerProcessEditVM GetCreateViewModel()
+        public OwnerProcessVM CreateViewModel()
         {
-            var viewModel = new OwnerProcessEditVM();
+            var viewModel = new OwnerProcessVM();
             viewModel.OwnerTypes = registryContext.OwnerType;
+
+            viewModel.OwnerProcess = new OwnerProcesses();
+            viewModel.Addresses = new List<Address>() { new Address() };
+            viewModel.OwnerReasons = new List<OwnerReasons>() { new OwnerReasons() };
+            viewModel.OwnerPersons = new List<OwnerPersons>() { new OwnerPersons() };
 
             return viewModel;
         }
 
-        public void Create(OwnerProcessEditVM viewModel)
+        public OwnerProcessVM GetViewModel(int idProcess)
+        {
+            var viewModel = new OwnerProcessVM();
+            viewModel.OwnerProcess = registryContext.OwnerProcesses.First(op => op.IdProcess == idProcess);
+            viewModel.OwnerTypes = registryContext.OwnerType;
+
+            var addresses = new List<Address>();
+            foreach (var oba in registryContext.OwnerBuildingsAssoc.Where(o => o.IdProcess == idProcess))
+            {
+                var address = new Address();
+                address.IdTypeAddress = 1;
+                address.IdStreet = registryContext.Buildings
+                    .First(b => b.IdBuilding == oba.IdBuilding).IdStreet;
+                address.IdBuilding = oba.IdBuilding;
+                addresses.Add(address);
+            }
+            foreach (var opa in registryContext.OwnerPremisesAssoc.Where(o => o.IdProcess == idProcess))
+            {
+                var address = new Address();
+                address.IdTypeAddress = 2;
+                var premise = registryContext.Premises
+                    .First(p => p.IdPremises == opa.IdPremises);
+                address.IdStreet = registryContext.Buildings
+                    .First(b => b.IdBuilding == premise.IdBuilding).IdStreet;
+                address.IdBuilding = premise.IdBuilding;
+                address.IdPremisesType = premise.IdPremisesType;
+                address.IdPremise = premise.IdPremises;
+                addresses.Add(address);
+            }
+            foreach (var ospa in registryContext.OwnerSubPremisesAssoc.Where(o => o.IdProcess == idProcess))
+            {
+                var address = new Address();
+                address.IdTypeAddress = 3;
+                var subPremise = registryContext.SubPremises
+                    .First(sp => sp.IdSubPremises == ospa.IdSubPremises);
+                var premise = registryContext.Premises
+                    .First(p => p.IdPremises == subPremise.IdPremises);
+                address.IdStreet = registryContext.Buildings
+                    .First(b => b.IdBuilding == premise.IdBuilding).IdStreet;
+                address.IdBuilding = premise.IdBuilding;
+                address.IdPremisesType = premise.IdPremisesType;
+                address.IdPremise = premise.IdPremises;
+                address.IdSubPremise = subPremise.IdSubPremises;
+                addresses.Add(address);
+            }
+            viewModel.Addresses = addresses;
+
+            viewModel.OwnerReasons = registryContext.OwnerReasons
+                .Where(o => o.IdProcess == idProcess).ToList();
+            viewModel.OwnerPersons = registryContext.OwnerPersons
+                .Where(o => o.IdOwnerProcess == idProcess).ToList();
+            viewModel.OwnerOrginfos = registryContext.OwnerOrginfos
+                .Where(o => o.IdProcess == idProcess).ToList();
+
+            return viewModel;
+        }
+
+        public void Create(OwnerProcessVM viewModel)
         {
             var ownerProcesses = viewModel.OwnerProcess;
             var entityEntry = registryContext.OwnerProcesses.Add(ownerProcesses);
@@ -160,7 +222,6 @@ namespace RegistryWeb.DataServices
                 registryContext.OwnerReasons.Add(reas);
                 registryContext.SaveChanges();
             }
-
 
             if (ownerProcesses.IdOwnerType == 1)
                 foreach (var pers in viewModel.OwnerPersons)

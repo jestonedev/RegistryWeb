@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RegistryWeb.Models.Entities;
 
 namespace RegistryWeb.ViewComponents
 {
@@ -7,10 +8,10 @@ namespace RegistryWeb.ViewComponents
         public OwnerPersonComponent()
         {}
 
-        public IViewComponentResult Invoke(int id = 0)
+        public IViewComponentResult Invoke(OwnerPersons ownerPerson, int id)
         {
             ViewBag.Id = id;
-            return View("OwnerPerson");
+            return View("OwnerPerson", ownerPerson);
         }
     }
 }

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.Models;
-using RegistryWeb.ViewModel;
+using RegistryWeb.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace RegistryWeb.ViewComponents
 {
@@ -16,10 +17,36 @@ namespace RegistryWeb.ViewComponents
             this.registryContext = registryContext;
         }
 
-        public IViewComponentResult Invoke(int id = 0)
+        public IViewComponentResult Invoke(Address address, int id)
         {
             ViewBag.Id = id;
-            return View("Address", registryContext.KladrStreets);
+            ViewBag.KladrStreets = registryContext.KladrStreets;
+            ViewBag.Buildings = new List<Buildings>();
+            ViewBag.PremisesTypes = new List<PremisesTypes>();
+            ViewBag.Premises = new List<Premises>();
+            ViewBag.SubPremises = new List<SubPremises>();
+
+            if (address.IdTypeAddress != 0)
+            { 
+                ViewBag.Buildings = registryContext.Buildings
+                    .Where(b => b.IdStreet == address.IdStreet);
+                if (address.IdTypeAddress == 2 || address.IdTypeAddress == 3)
+                {
+                    ViewBag.PremisesTypes = registryContext.Premises
+                        .Include(p => p.IdPremisesTypeNavigation)
+                        .Where(p => p.IdBuilding == address.IdBuilding)
+                        .Select(p => p.IdPremisesTypeNavigation)
+                        .Distinct();
+                    ViewBag.Premises = registryContext.Premises
+                        .Where(p => p.IdBuilding == address.IdBuilding && p.IdPremisesType == address.IdPremisesType);
+                    if (address.IdTypeAddress == 3)
+                    {
+                        ViewBag.SubPremises = registryContext.SubPremises
+                            .Where(sp => sp.IdSubPremises == address.IdSubPremise);
+                    }
+                }
+            }
+            return View("Address", address);
         }
     }
 }

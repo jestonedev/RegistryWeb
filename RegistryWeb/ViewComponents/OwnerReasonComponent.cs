@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.Models;
+using RegistryWeb.Models.Entities;
 
 namespace RegistryWeb.ViewComponents
 {
@@ -12,10 +13,11 @@ namespace RegistryWeb.ViewComponents
             this.registryContext = registryContext;
         }
 
-        public IViewComponentResult Invoke(int id = 0)
+        public IViewComponentResult Invoke(OwnerReasons ownerReason, int id)
         {
             ViewBag.Id = id;
-            return View("OwnerReason", registryContext.OwnerReasonTypes);
+            ViewBag.OwnerReasonTypes = registryContext.OwnerReasonTypes;
+            return View("OwnerReason", ownerReason);
         }
     }
 }

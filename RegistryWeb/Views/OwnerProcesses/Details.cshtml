@@ -1,50 +1,75 @@
-﻿@model RegistryWeb.ViewModel.OwnerProcessEditVM;
+﻿@model RegistryWeb.ViewModel.OwnerProcessVM;
 @{
     ViewData["Title"] = "Процесс собственности " + Model.OwnerProcess.IdProcess;
 }
 
 <h2>@ViewData["Title"]</h2>
-<form asp-controller="OwnerProcesses" asp-action="Create" method="post">
-    <div class="form-group">
-        <label class="control-label">Тип собственника</label>
-        <select class="form-control" asp-for="OwnerProcess.IdOwnerType" asp-items="@{
+<form>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label class="control-label">Тип собственника</label>
+            <select class="form-control" id="ownerType" asp-for="OwnerProcess.IdOwnerType" asp-items="@{
             new SelectList(Model.OwnerTypes, "IdOwnerType", "OwnerType1")}"></select>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="OwnerProcess.AnnulDate" class="control-label">Дата аннулирования</label>
+            <input type="date" asp-for="OwnerProcess.AnnulDate" class="form-control" />
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="OwnerProcess.AnnulDate" class="control-label">Дата аннулирования</label>
-        <input type="date" asp-for="OwnerProcess.AnnulDate" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="OwnerProcess.FromDate" class="control-label">Дата возникновения прав собственности</label>
-        <input type="date" asp-for="OwnerProcess.FromDate" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="OwnerProcess.ToDate" class="control-label">Дата прекращения прав собственности</label>
-        <input type="date" asp-for="OwnerProcess.ToDate" class="form-control" />
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label asp-for="OwnerProcess.FromDate" class="control-label">Дата возникновения прав собственности</label>
+            <input type="date" asp-for="OwnerProcess.FromDate" class="form-control" />
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="OwnerProcess.ToDate" class="control-label">Дата прекращения прав собственности</label>
+            <input type="date" asp-for="OwnerProcess.ToDate" class="form-control" />
+        </div>
     </div>
     <div class="form-group">
         <label asp-for="OwnerProcess.Comment" class="control-label">Комментарий</label>
-        <input type="text" asp-for="OwnerProcess.Comment" class="form-control" />
+        <textarea rows="3" asp-for="OwnerProcess.Comment" class="form-control"></textarea>
     </div>
     <div class="form-group" id="addresses">
-        <a class="btn btn-success" id="addressAdd">Добавить адрес</a>
+        <label class="control-label">Адрес</label>
         @for (var i = 0; i < Model.Addresses.Count(); i++)
         {
-            @await Component.InvokeAsync("AddressComponent", new { id = i })
+            @await Component.InvokeAsync("AddressComponent", new { address = Model.Addresses[i], id = i })
+        }
+    </div>
+    <div class="form-group" id="ownerReasons">
+        <label class="control-label">Основание</label>
+        @for (var i = 0; i < Model.OwnerReasons.Count(); i++)
+        {
+            @await Component.InvokeAsync("OwnerReasonComponent", new { ownerReason = Model.OwnerReasons[i], id = i })
+        }
+    </div>
+    <div class="form-group" id="owners">
+        <label class="control-label">Собственик</label>
+        @if (Model.OwnerProcess.IdOwnerType == 1)
+        {
+            @for (var i = 0; i < Model.OwnerPersons.Count(); i++)
+            {
+                @await Component.InvokeAsync("OwnerPersonComponent", new { ownerPerson = Model.OwnerPersons[i], id = i })
+            }
+        }
+        else
+        {
+            @for (var i = 0; i < Model.OwnerOrginfos.Count(); i++)
+            {
+                @await Component.InvokeAsync("OwnerOrginfoComponent", new { ownerOrginfo = Model.OwnerOrginfos[i], id = i })
+            }
         }
     </div>
     <div class="form-group">
-        <label class="control-label">Основания собственности</label>
-        @*@Html.Partial("OwnerReasons/Index", Model.OwnerProcess.OwnerReasons);*@
-    </div>
-    <div class="form-group">
         <a class="btn btn-default" asp-controller="OwnerProcesses" asp-action="Index">Назад</a>
-        <input type="submit" value="Создать" class="btn btn-success" />
     </div>
 </form>
 
 
 @section Scripts {
-    <script src="~/js/address.common.js" asp-append-version="true"></script>
-    <script src="~/js/addresses.add.js" asp-append-version="true"></script>
+    @*<script src="~/js/address.common.js" asp-append-version="true"></script>*@
+    <script src="~/js/ownerReason.common.js" asp-append-version="true"></script>
+    <script src="~/js/owner.common.js" asp-append-version="true"></script>
+    <script src="~/js/ownerProcess.create.js" asp-append-version="true"></script>
 }

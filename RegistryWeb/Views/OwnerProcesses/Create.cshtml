@@ -1,4 +1,4 @@
-﻿@model RegistryWeb.ViewModel.OwnerProcessEditVM;
+﻿@model RegistryWeb.ViewModel.OwnerProcessVM;
 @{
     ViewData["Title"] = "Создание процесса собственности";
 }
@@ -32,15 +32,15 @@
     </div>
     <div class="form-group" id="addresses">
         <a class="btn btn-success" id="addressAdd">Добавить адрес</a>
-        @await Component.InvokeAsync("AddressComponent")
+        @await Component.InvokeAsync("AddressComponent", new { address = Model.Addresses[0], id = 0 })
     </div>
     <div class="form-group" id="ownerReasons">
         <a class="btn btn-success" id="ownerReasonAdd">Добавить основание</a>
-        @await Component.InvokeAsync("OwnerReasonComponent")
+        @await Component.InvokeAsync("OwnerReasonComponent", new { ownerReason = Model.OwnerReasons[0], id = 0 })
     </div>
     <div class="form-group" id="owners">
         <a class="btn btn-success" id="ownerAdd">Добавить собственника</a>
-        @await Component.InvokeAsync("OwnerPersonComponent")
+        @await Component.InvokeAsync("OwnerPersonComponent", new { ownerPerson = Model.OwnerPersons[0], id = 0 })
     </div>
     <div class="form-group">
         <a class="btn btn-default" asp-controller="OwnerProcesses" asp-action="Index">Назад</a>

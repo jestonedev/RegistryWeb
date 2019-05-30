@@ -176,7 +176,7 @@ var recalculationAddressId = function (id) {
         $('select[name="Addresses[' + oldId + '].IdTypeAddress"]').attr('name', 'Addresses[' + i + '].IdTypeAddress');
         $('select[name="Addresses[' + oldId + '].IdStreet"]').attr('name', 'Addresses[' + i + '].IdStreet');
         $('select[name="Addresses[' + oldId + '].IdBuilding"]').attr('name', 'Addresses[' + i + '].IdBuilding');
-        $('select[name="Addresses[' + oldId + '].IdPremiseType"]').attr('name', 'Addresses[' + i + '].IdPremiseType');
+        $('select[name="Addresses[' + oldId + '].IdPremisesType"]').attr('name', 'Addresses[' + i + '].IdPremisesType');
         $('select[name="Addresses[' + oldId + '].IdPremise"]').attr('name', 'Addresses[' + i + '].IdPremise');
         $('select[name="Addresses[' + oldId + '].IdSubPremise"]').attr('name', 'Addresses[' + i + '].IdSubPremise');
     }

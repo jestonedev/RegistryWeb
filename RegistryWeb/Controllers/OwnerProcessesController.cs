@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
+using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.ViewModel;
 
@@ -27,11 +28,11 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Create()
         {
-            return View(dataService.GetCreateViewModel());
+            return View(dataService.CreateViewModel());
         }
 
         [HttpPost]
-        public IActionResult Create(OwnerProcessEditVM viewModel)
+        public IActionResult Create(OwnerProcessVM viewModel)
         {
             dataService.Create(viewModel);
             return RedirectToAction("Index");
@@ -40,13 +41,13 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public IActionResult AddressAdd(int id)
         {
-            return ViewComponent("AddressComponent", new { id });
+            return ViewComponent("AddressComponent", new { address = new Address(), id = id });
         }
 
         [HttpPost]
         public IActionResult OwnerReasonAdd(int id)
         {
-            return ViewComponent("OwnerReasonComponent", new { id });
+            return ViewComponent("OwnerReasonComponent", new { ownerReason = new OwnerReasons(), id = id });
         }
 
         [HttpPost]
@@ -54,10 +55,20 @@ namespace RegistryWeb.Controllers
         {
             //физ. лицо
             if (idOwnerType == 1)
-                return ViewComponent("OwnerPersonComponent", new { id });
+                return ViewComponent("OwnerPersonComponent", new { ownerPerson = new OwnerPersons(), id = id });
                     
             //юр. лицо или ип
-            return ViewComponent("OwnerOrginfoComponent", new { id });
+            return ViewComponent("OwnerOrginfoComponent", new { ownerOrginfo = new OwnerOrginfos(), id = id });
+        }
+
+        public IActionResult Details(int? idProcess)
+        {
+            if (idProcess == null)
+                return NotFound();
+            var viewModel = dataService.GetViewModel(idProcess.Value);
+            if (viewModel == null)
+                return NotFound();
+            return View("Details", viewModel);
         }
 
         //public IActionResult Edit(int? idReasonType)
