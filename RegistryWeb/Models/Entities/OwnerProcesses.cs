@@ -21,7 +21,6 @@ namespace RegistryWeb.Models.Entities
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public string Comment { get; set; }
-        public string OwnershipInfo { get; set; }
         public byte Deleted { get; set; }
 
         public virtual OwnerType IdOwnerTypeNavigation { get; set; }

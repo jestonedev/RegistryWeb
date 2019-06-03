@@ -6,16 +6,25 @@
     <input type="hidden" asp-for="PageOptions.CurrentPage" />
     <input type="hidden" asp-for="PageOptions.SizePage" />
 
-    <div class="form-group">
-        <label class="control-label" for="">Улица</label>
-        <input type="text" class="form-control" asp-for="FilterOptions.Street" placeholder="Введите улицу" />
-        <label class="control-label">Тип собственника</label>
-        <select class="form-control" asp-for="FilterOptions.IdProcessType" asp-items="@{
-        new SelectList(Model.OwnerTypes, "IdOwnerType", "OwnerType1", Model.FilterOptions.IdProcessType)}">
-            <option value="">Все состояния</option>
-        </select>
+    <div class="form-row">
+        <div class="form-group col-auto">
+            <a class="btn btn-success oi oi-plus" title="Добавить" aria-label="Добавить" asp-controller="OwnerProcesses" asp-action="Create"></a>
+        </div>
+        <div class="form-group col-2">
+            <input type="text" class="form-control" placeholder="№ по реестру" />
+        </div>
+        <div class="form-group col-2">
+            <select class="form-control" asp-for="FilterOptions.IdProcessType"
+                    asp-items="@{new SelectList(Model.OwnerTypes, "IdOwnerType", "OwnerType1", Model.FilterOptions.IdProcessType)}">
+                <option value="" selected>Тип собственника</option>
+            </select>
+        </div>
+        <div class="form-group col-6">
+            <input type="text" class="form-control" asp-for="FilterOptions.Street" placeholder="Улица" />
+        </div>
+        <div class="form-group col">
+            <button class="btn btn-block btn-secondary r-index-search-button" type="submit">Найти</button>
+        </div>
     </div>
-    <div class="form-group">
-        <button class="btn btn-default r-index-search-button" type="submit">Найти</button>
-    </div>
+        
 </form>

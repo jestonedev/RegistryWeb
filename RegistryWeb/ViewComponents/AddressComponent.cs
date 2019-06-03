@@ -17,9 +17,10 @@ namespace RegistryWeb.ViewComponents
             this.registryContext = registryContext;
         }
 
-        public IViewComponentResult Invoke(Address address, int id)
+        public IViewComponentResult Invoke(Address address, int id, string action)
         {
             ViewBag.Id = id;
+            ViewBag.Action = action;
             ViewBag.KladrStreets = registryContext.KladrStreets;
             ViewBag.Buildings = new List<Buildings>();
             ViewBag.PremisesTypes = new List<PremisesTypes>();

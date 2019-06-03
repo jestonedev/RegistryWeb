@@ -1,10 +1,11 @@
 ﻿$(function () {
+    var action = $('form').data('action');
     $('#addressAdd').on("click", function () {
         var id = $('.addressBlock').length;
         $.ajax({
             type: 'POST',
             url: window.location.origin + '/OwnerProcesses/AddressAdd',
-            data: { id: id },
+            data: { id: id, action: action },
             success: function (data) {
                 $('#addresses').append(data);
                 var newAddress = $('.addressBlock').last();
@@ -18,7 +19,7 @@
         $.ajax({
             type: 'POST',
             url: window.location.origin + '/OwnerProcesses/OwnerReasonAdd',
-            data: { id: id },
+            data: { id: id, action: action },
             success: function (data) {
                 $('#ownerReasons').append(data);
             }
@@ -34,7 +35,7 @@
         $.ajax({
             type: 'POST',
             url: window.location.origin + '/OwnerProcesses/OwnerAdd',
-            data: { idOwnerType: idOwnerType, id: id },
+            data: { idOwnerType: idOwnerType, id: id, action: action },
             success: function (data) {
                 $('#owners').append(data);
             }

@@ -55,23 +55,3 @@ html {
   height: 60px;
   line-height: 60px; /* Vertically center the text there */
 }
-
-/* ПАГИНАЦИЯ */
-.r-pagination {
-    margin: 0;
-}
-
-.pagination.r-pagination-dark .active > a {
-    background-color: #212529;
-    border-color: #32383e;
-    color: #fff;
-}
-
-.pagination.r-pagination-dark > li > a, .pagination.r-pagination-dark > li > span {
-    color: #32383e;
-}
-/* Конец ПАГИНАЦИЯ */
-
-.clearfix {
-    clear: both;
-}

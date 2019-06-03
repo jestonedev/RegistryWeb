@@ -41,12 +41,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.Property(e => e.Comment)
                 .HasColumnName("comment")
-                .HasMaxLength(255)
-                .IsUnicode(false);
-
-            builder.Property(e => e.OwnershipInfo)
-                .HasColumnName("ownership_info")
-                .HasMaxLength(255)
+                .HasMaxLength(65535)
                 .IsUnicode(false);
 
             builder.Property(e => e.Deleted)

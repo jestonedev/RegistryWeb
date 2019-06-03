@@ -4,11 +4,11 @@ using RegistryWeb.Models.Entities;
 
 namespace RegistryWeb.ViewComponents
 {
-    public class OwnerReasonComponent : ViewComponent
+    public class OwnerReasonAccordionComponent : ViewComponent
     {
         private RegistryContext registryContext;
 
-        public OwnerReasonComponent(RegistryContext registryContext)
+        public OwnerReasonAccordionComponent(RegistryContext registryContext)
         {
             this.registryContext = registryContext;
         }
@@ -18,7 +18,7 @@ namespace RegistryWeb.ViewComponents
             ViewBag.Id = id;
             ViewBag.Action = action;
             ViewBag.OwnerReasonTypes = registryContext.OwnerReasonTypes;
-            return View("OwnerReason", ownerReason);
+            return View("OwnerReasonAccordion", ownerReason);
         }
     }
 }

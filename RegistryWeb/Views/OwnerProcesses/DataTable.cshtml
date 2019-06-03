@@ -1,5 +1,4 @@
 ﻿@model RegistryWeb.ViewModel.OwnerProcessesListVM;
-<a class="btn btn-success" asp-controller="OwnerProcesses" asp-action="Create">Добавить</a>
 <table class="table table-hover">
     <thead>
         <tr>
@@ -13,16 +12,18 @@
         @foreach (var item in Model.OwnerProcesses)
         {
             <tr>
-                <td>@item.IdProcess</td>
-                <td>@item.IdOwnerTypeNavigation.OwnerType1</td>
-                <td>@await Component.InvokeAsync("GetAddressComponent", new { idProcess = item.IdProcess })</td>
-                <td>
-                    <a class="btn btn-default oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                       asp-action="Details" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
-                    <a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
-                       asp-action="Edit" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
-                    <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                       asp-action="Delete" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
+                <td class="align-middle">@item.IdProcess</td>
+                <td class="align-middle">@item.IdOwnerTypeNavigation.OwnerType1</td>
+                <td class="align-middle">@await Component.InvokeAsync("GetAddressComponent", new { idProcess = item.IdProcess })</td>
+                <td class="align-middle">
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                           asp-action="Details" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
+                        <a class="btn btn-primary oi oi-pencil" title="Изменить" aria-label="Изменить"
+                           asp-action="Edit" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
+                        <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                           asp-action="Delete" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
+                    </div>
                 </td>
             </tr>
         }

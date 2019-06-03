@@ -16,11 +16,13 @@ var recalculationOwnerId = function (id) {
         var oldId = i + 1;
         $('.ownerBlock').get(i).setAttribute('data-id', i);
         if ($('#ownerType').val() == 1) {
+            $('input[name="OwnerPersons[' + oldId + '].IdOwnerPersons"]').attr('name', 'OwnerPersons[' + i + '].IdOwnerPersons');
             $('input[name="OwnerPersons[' + oldId + '].Surname"]').attr('name', 'OwnerPersons[' + i + '].Surname');
             $('input[name="OwnerPersons[' + oldId + '].Name"]').attr('name', 'OwnerPersons[' + i + '].Name');
             $('input[name="OwnerPersons[' + oldId + '].Patronymic"]').attr('name', 'OwnerPersons[' + i + '].Patronymic');
             continue;
         }
+        $('input[name="OwnerOrginfos[' + oldId + '].IdOrginfo"]').attr('name', 'OwnerOrginfos[' + i + '].IdOrginfo');
         $('input[name="OwnerOrginfos[' + oldId + '].OrgName"]').attr('name', 'OwnerOrginfos[' + i + '].OrgName');
     }
 }

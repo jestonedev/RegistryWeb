@@ -31,8 +31,6 @@ namespace RegistryWeb.TagHelpers
 
             TagBuilder tag = new TagBuilder("ul");
             tag.AddCssClass("pagination");
-            tag.AddCssClass("r-pagination");
-            tag.AddCssClass("r-pagination-dark");
 
             var firstDisplayedPageIndex = PageModel.CurrentPage - 4 > 1 ? PageModel.CurrentPage - 4 : 1;
             var lastDisplayedPageIndex = firstDisplayedPageIndex + 8 > PageModel.TotalPages ? PageModel.TotalPages : firstDisplayedPageIndex + 8;
@@ -58,44 +56,24 @@ namespace RegistryWeb.TagHelpers
             output.Content.AppendHtml(tag);
         }
 
-        //TagBuilder CreateArrow(int page, IUrlHelper urlHelper, string text, bool isDisable)
-        //{
-        //    TagBuilder item = new TagBuilder("li");
-        //    TagBuilder arrow;
-        //    if (isDisable)
-        //    {
-        //        arrow = new TagBuilder("span");
-        //        item.AddCssClass("disabled");
-        //    }
-        //    else
-        //    {
-        //        arrow = new TagBuilder("a");
-        //        arrow.Attributes["href"] = urlHelper.Action(PageAction, new { page = page });
-        //    }
-        //    arrow.InnerHtml.Append(text);
-        //    arrow.AddCssClass("btn");
-        //    item.InnerHtml.AppendHtml(arrow);
-        //    return item;
-        //}
-
         TagBuilder CreateLinkTag(int page, IUrlHelper urlHelper)
         {
-            TagBuilder item = new TagBuilder("li");
-            TagBuilder link;
-            if (page == PageModel.CurrentPage)
-            {
-                item.AddCssClass("active");
-                link = new TagBuilder("span");
-            }
-            else
-            {
-                link = new TagBuilder("a");
-                link.AddCssClass("r-nav-page");
-                link.Attributes["data-page"] = page.ToString();
-                link.Attributes["href"] = "#";
-            }
+            TagBuilder link = new TagBuilder("a");
+            if (page == 1)
+                link.AddCssClass("mr-2");
+            if (page == PageModel.TotalPages)
+                link.AddCssClass("ml-2");
+            link.AddCssClass("page-link");
+            link.Attributes["data-page"] = page.ToString();
+            link.Attributes["href"] = "#";
             link.InnerHtml.Append(page.ToString());
+
+            TagBuilder item = new TagBuilder("li");
+            item.AddCssClass("page-item");
+            if (page == PageModel.CurrentPage)
+                item.AddCssClass("active");
             item.InnerHtml.AppendHtml(link);
+
             return item;
         }
     }

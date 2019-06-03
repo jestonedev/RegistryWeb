@@ -1,5 +1,5 @@
 ﻿var form = $("form.r-filter-form");
-$(".r-nav-page").on("click", function () {
+$(".page-link").on("click", function () {
 	form.find("input[name='PageOptions.CurrentPage']").val($(this).data("page"));
 	form.submit();
 });

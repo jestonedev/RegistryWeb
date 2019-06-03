@@ -1,0 +1,129 @@
+﻿@model RegistryWeb.ViewModel.OwnerProcessVM;
+@{
+    if (ViewBag.Action == "Create")
+    {
+        ViewData["Title"] = "Создание нового процесса собственности";
+    }
+    else
+    {
+        ViewData["Title"] = "Процесс собственности №" + Model.OwnerProcess.IdProcess;
+    }
+}
+
+<h2>@ViewData["Title"]</h2>
+<form asp-controller="OwnerProcesses" asp-action="@ViewBag.Action" data-action="@ViewBag.Action" method="post">
+    <input type="hidden" asp-for="OwnerProcess.IdProcess" />
+    <h3 class="mb-1 mt-3">Общая информация</h3>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label class="control-label">Тип собственника</label>
+            <select class="form-control" id="ownerType" asp-for="OwnerProcess.IdOwnerType"
+                    asp-items="@{new SelectList(Model.OwnerTypes, "IdOwnerType", "OwnerType1")}"></select>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="OwnerProcess.AnnulDate" class="control-label">Дата аннулирования</label>
+            <input type="date" asp-for="OwnerProcess.AnnulDate" class="form-control" />
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label asp-for="OwnerProcess.FromDate" class="control-label">Дата возникновения прав собственности</label>
+            <input type="date" asp-for="OwnerProcess.FromDate" class="form-control" />
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="OwnerProcess.ToDate" class="control-label">Дата прекращения прав собственности</label>
+            <input type="date" asp-for="OwnerProcess.ToDate" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="OwnerProcess.Comment" class="control-label">Комментарий</label>
+        <textarea rows="3" asp-for="OwnerProcess.Comment" class="form-control"></textarea>
+    </div>
+    <div id="addresses">
+        <div class="d-flex justify-content-between mb-1 mt-3">
+            <h3>Адреса</h3>
+            @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+            {
+                <a class="btn btn-success" title="Добавить адрес" aria-label="Добавить адрес" id="addressAdd" >Добавить</a>
+            }
+        </div>
+        @for (var i = 0; i < Model.Addresses.Count(); i++)
+        {
+            @await Component.InvokeAsync("AddressComponent",
+                new { address = Model.Addresses[i], id = i, action = ViewBag.Action })
+        }
+    </div>
+    <div id="ownerReasons">
+        <div class="d-flex justify-content-between mb-1 mt-3">
+            <h3>Основания найма</h3>
+            @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+            {
+            <a class="btn btn-success" title="Добавить основание" aria-label="Добавить основание" id="ownerReasonAdd">Добавить</a>
+            }
+        </div>
+        @for (var i = 0; i < Model.OwnerReasons.Count(); i++)
+        {
+            @await Component.InvokeAsync("OwnerReasonAccordionComponent",
+                new { ownerReason = Model.OwnerReasons[i], id = i, action = ViewBag.Action })
+        }
+    </div>
+    <div id="owners">
+        <div class="d-flex justify-content-between mb-1 mt-3">
+            <h3>Собственники</h3>
+            @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+            {
+            <a class="btn btn-success" title="Добавить собственника" aria-label="Добавить собственника" id="ownerAdd">Добавить</a>
+            }
+        </div>
+        @if (Model.OwnerProcess.IdOwnerType == 1)
+        {
+            @for (var i = 0; i < Model.OwnerPersons.Count(); i++)
+            {
+                @await Component.InvokeAsync("OwnerPersonComponent",
+                    new { ownerPerson = Model.OwnerPersons[i], id = i, action = ViewBag.Action })
+            }
+        }
+        else
+        {
+            @for (var i = 0; i < Model.OwnerOrginfos.Count(); i++)
+            {
+                @await Component.InvokeAsync("OwnerOrginfoComponent",
+                    new { ownerOrginfo = Model.OwnerOrginfos[i], id = i, action = ViewBag.Action })
+            }
+        }
+    </div>
+    <div class="btn-group mt-2" role="group" aria-label="Панель доступа">
+        <a class="btn btn-primary" asp-controller="OwnerProcesses" asp-action="Index">Назад</a>
+        @if (ViewBag.Action == "Create")
+        {
+            <input type="submit" value="Создать" class="btn btn-success" />
+        }
+        @if (ViewBag.Action == "Edit")
+        {
+            <input type="submit" value="Сохранить" class="btn btn-success" />
+        }
+        @if (ViewBag.Action == "Delete")
+        {
+            <input type="submit" value="Удалить" class="btn btn-danger" />
+        }
+    </div>
+</form>
+
+@section Scripts {
+    <script src="~/js/address.common.js" asp-append-version="true"></script>
+    <script src="~/js/ownerReason.common.js" asp-append-version="true"></script>
+    <script src="~/js/owner.common.js" asp-append-version="true"></script>
+    <script src="~/js/ownerProcess.common.js" asp-append-version="true"></script>
+    @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete") 
+    {
+        <script>
+            $(function () {
+                $('select').prop('disabled', true);
+                $('input').prop('disabled', true);
+                $('textarea').prop('disabled', true);
+                $('input[type="hidden"]').prop('disabled', false);
+                $('input[type="submit"]').prop('disabled', false);
+            })
+        </script>
+    }
+}

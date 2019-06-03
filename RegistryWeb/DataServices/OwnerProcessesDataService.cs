@@ -113,12 +113,11 @@ namespace RegistryWeb.DataServices
         {
             var viewModel = new OwnerProcessVM();
             viewModel.OwnerTypes = registryContext.OwnerType;
-
             viewModel.OwnerProcess = new OwnerProcesses();
             viewModel.Addresses = new List<Address>() { new Address() };
             viewModel.OwnerReasons = new List<OwnerReasons>() { new OwnerReasons() };
             viewModel.OwnerPersons = new List<OwnerPersons>() { new OwnerPersons() };
-
+            viewModel.OwnerOrginfos = new List<OwnerOrginfos>() { new OwnerOrginfos() };
             return viewModel;
         }
 
@@ -195,34 +194,7 @@ namespace RegistryWeb.DataServices
 
             foreach (var addr in viewModel.Addresses)
             {
-                switch (addr.IdTypeAddress)
-                {
-                    case 1:
-                        var ownerBuildingAssoc = new OwnerBuildingsAssoc()
-                        {
-                            IdProcess = ownerProcesses.IdProcess,
-                            IdBuilding = addr.IdBuilding
-                        };
-                        registryContext.OwnerBuildingsAssoc.Add(ownerBuildingAssoc);
-                        break;
-                    case 2:
-                        var ownerPremisesAssoc = new OwnerPremisesAssoc()
-                        {
-                            IdProcess = ownerProcesses.IdProcess,
-                            IdPremises = addr.IdPremise
-                        };
-                        registryContext.OwnerPremisesAssoc.Add(ownerPremisesAssoc);
-                        break;
-                    default:
-                        var ownerSubPremisesAssoc = new OwnerSubPremisesAssoc()
-                        {
-                            IdProcess = ownerProcesses.IdProcess,
-                            IdSubPremises = addr.IdSubPremise
-                        };
-                        registryContext.OwnerSubPremisesAssoc.Add(ownerSubPremisesAssoc);
-                        break;
-                }
-                registryContext.SaveChanges();
+                AddressCreate(addr, ownerProcesses.IdProcess);
             }
 
             foreach (var reas in viewModel.OwnerReasons)
@@ -275,6 +247,138 @@ namespace RegistryWeb.DataServices
             foreach (var o in ownerProcesses.OwnerOrginfos)
             {
                 o.Deleted = 1;
+            }
+            registryContext.SaveChanges();
+        }
+
+        public void Edit(OwnerProcessVM viewModel)
+        {
+            var ownerProcesses = GetOwnerProcess(viewModel.OwnerProcess.IdProcess);
+            registryContext.Update(viewModel.OwnerProcess);
+
+            //Добавление или Изменение
+            foreach (var vmReason in viewModel.OwnerReasons)
+            {
+                if (vmReason.IdProcess == 0)
+                {
+                    vmReason.IdProcess = ownerProcesses.IdProcess;
+                    registryContext.OwnerReasons.Add(vmReason);
+                    registryContext.SaveChanges();
+                }
+                else
+                    registryContext.OwnerReasons.Update(vmReason);
+            }
+            foreach (var vmPerson in viewModel.OwnerPersons)
+            {
+                if (vmPerson.IdOwnerProcess == 0)
+                {
+                    vmPerson.IdOwnerProcess = ownerProcesses.IdProcess;
+                    registryContext.OwnerPersons.Add(vmPerson);
+                    registryContext.SaveChanges();
+                }  
+                else
+                    registryContext.OwnerPersons.Update(vmPerson);
+            }
+            foreach (var vmOrgingo in viewModel.OwnerOrginfos)
+            {
+                if (vmOrgingo.IdProcess == 0)
+                {
+                    vmOrgingo.IdProcess = ownerProcesses.IdProcess;
+                    registryContext.OwnerOrginfos.Add(vmOrgingo);
+                    registryContext.SaveChanges();
+                }                    
+                else
+                    registryContext.OwnerOrginfos.Update(vmOrgingo);
+            }
+
+            //Удаление
+            foreach (var opReason in ownerProcesses.OwnerReasons)
+            {
+                if (viewModel.OwnerReasons.Contains(opReason) == false)
+                {
+                    opReason.Deleted = 1;
+                    registryContext.SaveChanges();
+                }
+            }
+            foreach (var opPerson in ownerProcesses.OwnerPersons)
+            {
+                if (viewModel.OwnerPersons.Contains(opPerson) == false)
+                {
+                    opPerson.Deleted = 1;
+                    registryContext.SaveChanges();
+                }
+            }
+            foreach (var opOrginfo in ownerProcesses.OwnerOrginfos)
+            {
+                if (viewModel.OwnerOrginfos.Contains(opOrginfo) == false)
+                {
+                    opOrginfo.Deleted = 1;
+                    registryContext.SaveChanges();
+                }
+            }
+
+            ////Адрес
+            //foreach (var addr in viewModel.Addresses)
+            //{
+            //    switch (addr.IdTypeAddress)
+            //    {
+            //        case 1:
+            //            var ownerBuildingAssoc = new OwnerBuildingsAssoc()
+            //            {
+            //                IdProcess = ownerProcesses.IdProcess,
+            //                IdBuilding = addr.IdBuilding
+            //            };
+            //            registryContext.OwnerBuildingsAssoc.Add(ownerBuildingAssoc);
+            //            break;
+            //        case 2:
+            //            var ownerPremisesAssoc = new OwnerPremisesAssoc()
+            //            {
+            //                IdProcess = ownerProcesses.IdProcess,
+            //                IdPremises = addr.IdPremise
+            //            };
+            //            registryContext.OwnerPremisesAssoc.Add(ownerPremisesAssoc);
+            //            break;
+            //        default:
+            //            var ownerSubPremisesAssoc = new OwnerSubPremisesAssoc()
+            //            {
+            //                IdProcess = ownerProcesses.IdProcess,
+            //                IdSubPremises = addr.IdSubPremise
+            //            };
+            //            registryContext.OwnerSubPremisesAssoc.Add(ownerSubPremisesAssoc);
+            //            break;
+            //    }
+            //    registryContext.SaveChanges();
+            //}
+        }
+
+        private void AddressCreate(Address addr, int idProcess)
+        {
+            switch (addr.IdTypeAddress)
+            {
+                case 1:
+                    var ownerBuildingAssoc = new OwnerBuildingsAssoc()
+                    {
+                        IdProcess = idProcess,
+                        IdBuilding = addr.IdBuilding
+                    };
+                    registryContext.OwnerBuildingsAssoc.Add(ownerBuildingAssoc);
+                    break;
+                case 2:
+                    var ownerPremisesAssoc = new OwnerPremisesAssoc()
+                    {
+                        IdProcess = idProcess,
+                        IdPremises = addr.IdPremise
+                    };
+                    registryContext.OwnerPremisesAssoc.Add(ownerPremisesAssoc);
+                    break;
+                default:
+                    var ownerSubPremisesAssoc = new OwnerSubPremisesAssoc()
+                    {
+                        IdProcess = idProcess,
+                        IdSubPremises = addr.IdSubPremise
+                    };
+                    registryContext.OwnerSubPremisesAssoc.Add(ownerSubPremisesAssoc);
+                    break;
             }
             registryContext.SaveChanges();
         }
