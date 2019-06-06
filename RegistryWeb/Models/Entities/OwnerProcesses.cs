@@ -7,12 +7,12 @@ namespace RegistryWeb.Models.Entities
     {
         public OwnerProcesses()
         {
-            OwnerBuildingsAssoc = new HashSet<OwnerBuildingsAssoc>();
-            OwnerOrginfos = new HashSet<OwnerOrginfos>();
-            OwnerPersons = new HashSet<OwnerPersons>();
-            OwnerReasons = new HashSet<OwnerReasons>();
-            OwnerPremisesAssoc = new HashSet<OwnerPremisesAssoc>();
-            OwnerSubPremisesAssoc = new HashSet<OwnerSubPremisesAssoc>();
+            OwnerBuildingsAssoc = new List<OwnerBuildingsAssoc>();
+            OwnerOrginfos = new List<OwnerOrginfos>();
+            OwnerPersons = new List<OwnerPersons>();
+            OwnerReasons = new List<OwnerReasons>();
+            OwnerPremisesAssoc = new List<OwnerPremisesAssoc>();
+            OwnerSubPremisesAssoc = new List<OwnerSubPremisesAssoc>();
         }
 
         public int IdProcess { get; set; }
@@ -24,11 +24,11 @@ namespace RegistryWeb.Models.Entities
         public byte Deleted { get; set; }
 
         public virtual OwnerType IdOwnerTypeNavigation { get; set; }
-        public virtual ICollection<OwnerBuildingsAssoc> OwnerBuildingsAssoc { get; set; }
-        public virtual ICollection<OwnerOrginfos> OwnerOrginfos { get; set; }
-        public virtual ICollection<OwnerPersons> OwnerPersons { get; set; }
-        public virtual ICollection<OwnerReasons> OwnerReasons { get; set; }
-        public virtual ICollection<OwnerPremisesAssoc> OwnerPremisesAssoc { get; set; }
-        public virtual ICollection<OwnerSubPremisesAssoc> OwnerSubPremisesAssoc { get; set; }
+        public virtual IList<OwnerBuildingsAssoc> OwnerBuildingsAssoc { get; set; }
+        public virtual IList<OwnerOrginfos> OwnerOrginfos { get; set; }
+        public virtual IList<OwnerPersons> OwnerPersons { get; set; }
+        public virtual IList<OwnerReasons> OwnerReasons { get; set; }
+        public virtual IList<OwnerPremisesAssoc> OwnerPremisesAssoc { get; set; }
+        public virtual IList<OwnerSubPremisesAssoc> OwnerSubPremisesAssoc { get; set; }
     }
 }

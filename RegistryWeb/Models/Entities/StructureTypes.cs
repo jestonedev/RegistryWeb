@@ -7,13 +7,13 @@ namespace RegistryWeb.Models.Entities
     {
         public StructureTypes()
         {
-            Buildings = new HashSet<Buildings>();
+            Buildings = new List<Buildings>();
         }
 
         public int IdStructureType { get; set; }
         public string StructureType { get; set; }
         public byte Deleted { get; set; }
 
-        public virtual ICollection<Buildings> Buildings { get; set; }
+        public virtual IList<Buildings> Buildings { get; set; }
     }
 }

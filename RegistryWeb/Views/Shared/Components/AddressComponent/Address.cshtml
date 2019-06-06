@@ -2,49 +2,72 @@
 @{ 
     var i = ViewBag.Id;
 }
-<div class="form-row addressBlock" data-id="@i">
-    <div class="col">
-        <div class="form-group">
-            <input typeof="text" class="form-control street" />
-        </div>
-        <div class="form-row">
-            <div class="col-3">
-                <label class="control-label">Тип адреса</label>
-                <select class="form-control typeAddress" asp-for="IdTypeAddress" name="Addresses[@i].IdTypeAddress">
-                    <option value="1">Здание</option>
-                    <option value="2">Помещение внутри здания</option>
-                    <option value="3">Квартира внутри помещения</option>
-                </select>
-            </div>
-            <div class="col-7">
-                <label class="control-label">Улица</label>
-                <select class="form-control kladrStreets" asp-for="IdStreet" name="Addresses[@i].IdStreet" asp-items="@{
-                    new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName")}"></select>
-            </div>
-            <div class="col-2">
-                <label class="control-label">Дом</label>
-                <select class="form-control house" asp-for="IdBuilding" name="Addresses[@i].IdBuilding" asp-items="@{
+<div class="form-row addressBlock @ViewBag.ClassAssoc mb-2 mt-2 border" data-id="@i">
+    @if (Model.IdTypeAddress == 1)
+    {
+        <input type="hidden" class="addressIdProcess" asp-for="IdProcess" name="OwnerBuildingsAssoc[@i].IdProcess" />
+        <input type="hidden" class="addressIdAssoc" asp-for="IdAssoc" name="OwnerBuildingsAssoc[@i].IdAssoc" />
+        <input type="hidden" class="addressId" asp-for="IdBuilding" name="OwnerBuildingsAssoc[@i].IdBuilding" />
+    }
+    @if (Model.IdTypeAddress == 2)
+    {
+        <input type="hidden" class="addressIdProcess" asp-for="IdProcess" name="OwnerPremisesAssoc[@i].IdProcess" />
+        <input type="hidden" class="addressIdAssoc" asp-for="IdAssoc" name="OwnerPremisesAssoc[@i].IdAssoc" />
+        <input type="hidden" class="addressId" asp-for="IdPremise" name="OwnerPremisesAssoc[@i].IdPremises" />
+    }
+    @if (Model.IdTypeAddress == 3)
+    {
+        <input type="hidden" class="addressIdProcess" asp-for="IdProcess" name="OwnerSubPremisesAssoc[@i].IdProcess" />
+        <input type="hidden" class="addressIdAssoc" asp-for="IdAssoc" name="OwnerSubPremisesAssoc[@i].IdAssoc" />
+        <input type="hidden" class="addressId" asp-for="IdSubPremise" name="OwnerSubPremisesAssoc[@i].IdSubPremises" />
+    }
+        <div class="col">
+            @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+            {
+                <div class="form-group mb-0">
+                    <input typeof="text" class="form-control street" />
+                </div>
+            }
+            <div class="form-row">
+                <div class="col-3">
+                    <label class="control-label">Тип адреса</label>
+                    <select class="form-control typeAddress" asp-for="IdTypeAddress">
+                        <option value="1">Здание</option>
+                        <option value="2">Помещение внутри здания</option>
+                        <option value="3">Квартира внутри помещения</option>
+                    </select>
+                </div>
+                <div class="col-7">
+                    <label class="control-label">Улица</label>
+                    <select class="form-control kladrStreets" asp-for="IdStreet" asp-items="@{
+                    new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName")}">
+                        <option disabled selected>Выберете улицу</option>
+                    </select>
+                </div>
+                <div class="col-2">
+                    <label class="control-label">Дом</label>
+                    <select class="form-control house" asp-for="IdBuilding" asp-items="@{
                     new SelectList(ViewBag.Buildings, "IdBuilding", "House")}"></select>
+                </div>
             </div>
-        </div>
-        <div class="form-row">
-            <div class="col" id="premisesTypesGroup_@i">
-                <label class="control-label">Тип помещения</label>
-                <select class="form-control premisesTypes" asp-for="IdPremisesType" name="Addresses[@i].IdPremisesType" asp-items="@{
+            <div class="form-row">
+                <div class="col premisesTypesGroup">
+                    <label class="control-label">Тип помещения</label>
+                    <select class="form-control premisesTypes" asp-for="IdPremisesType" asp-items="@{
                     new SelectList(ViewBag.PremisesTypes, "IdPremisesType", "PremisesType")}"></select>
-            </div>
-            <div class="col" id="premisesNumGroup_@i">
-                <label class="control-label premisesTypeAsNum">Номер квартиры</label>
-                <select class="form-control premisesNum" asp-for="IdPremise" name="Addresses[@i].IdPremise" asp-items="@{
+                </div>
+                <div class="col premisesNumGroup">
+                    <label class="control-label premisesTypeAsNum">Номер квартиры</label>
+                    <select class="form-control premisesNum" asp-for="IdPremise" asp-items="@{
                     new SelectList(ViewBag.Premises, "IdPremises", "PremisesNum")}"></select>
-            </div>
-            <div class="col" id="subPremisesNumGroup_@i">
-                <label class="control-label">Номер комнаты</label>
-                <select class="form-control subPremisesNum" asp-for="IdSubPremise" name="Addresses[@i].IdSubPremise" asp-items="@{
+                </div>
+                <div class="col subPremisesNumGroup">
+                    <label class="control-label">Номер комнаты</label>
+                    <select class="form-control subPremisesNum" asp-for="IdSubPremise" asp-items="@{
                     new SelectList(ViewBag.SubPremises, "IdSubPremises", "SubPremisesNum")}"></select>
+                </div>
             </div>
         </div>
-    </div>
     @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
     {
         <div class="col-1">

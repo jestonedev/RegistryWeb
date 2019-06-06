@@ -7,13 +7,13 @@ namespace RegistryWeb.Models.Entities
     {
         public OwnershipRightTypes()
         {
-            OwnershipRights = new HashSet<OwnershipRights>();
+            OwnershipRights = new List<OwnershipRights>();
         }
 
         public int IdOwnershipRightType { get; set; }
         public string OwnershipRightType { get; set; }
         public byte Deleted { get; set; }
 
-        public virtual ICollection<OwnershipRights> OwnershipRights { get; set; }
+        public virtual IList<OwnershipRights> OwnershipRights { get; set; }
     }
 }

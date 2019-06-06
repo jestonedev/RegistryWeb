@@ -7,12 +7,12 @@ namespace RegistryWeb.Models.Entities
     {
         public PremisesKinds()
         {
-            Premises = new HashSet<Premises>();
+            Premises = new List<Premises>();
         }
 
         public int IdPremisesKind { get; set; }
         public string PremisesKind { get; set; }
 
-        public virtual ICollection<Premises> Premises { get; set; }
+        public virtual IList<Premises> Premises { get; set; }
     }
 }

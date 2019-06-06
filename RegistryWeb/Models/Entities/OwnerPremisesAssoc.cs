@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class OwnerPremisesAssoc
+    public partial class OwnerPremisesAssoc : IAddressAssoc
     {
         public int IdAssoc { get; set; }
         public int IdPremises { get; set; }

@@ -7,12 +7,12 @@ namespace RegistryWeb.Models.Entities
     {
         public FundTypes()
         {
-            FundsHistory = new HashSet<FundsHistory>();
+            FundsHistory = new List<FundsHistory>();
         }
 
         public int IdFundType { get; set; }
         public string FundType { get; set; }
 
-        public virtual ICollection<FundsHistory> FundsHistory { get; set; }
+        public virtual IList<FundsHistory> FundsHistory { get; set; }
     }
 }

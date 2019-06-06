@@ -7,6 +7,8 @@ namespace RegistryWeb.Models
 {
     public class Address
     {
+        public int IdProcess { get; set; }
+        public int IdAssoc { get; set; }
         public int IdTypeAddress { get; set; }
         public string IdStreet { get; set; }
         public int IdBuilding { get; set; }

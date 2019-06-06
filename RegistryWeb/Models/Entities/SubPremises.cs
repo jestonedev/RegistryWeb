@@ -7,8 +7,8 @@ namespace RegistryWeb.Models.Entities
     {
         public SubPremises()
         {
-            FundsSubPremisesAssoc = new HashSet<FundsSubPremisesAssoc>();
-            OwnerSubPremisesAssoc = new HashSet<OwnerSubPremisesAssoc>();
+            FundsSubPremisesAssoc = new List<FundsSubPremisesAssoc>();
+            OwnerSubPremisesAssoc = new List<OwnerSubPremisesAssoc>();
         }
 
         public int IdSubPremises { get; set; }
@@ -27,7 +27,7 @@ namespace RegistryWeb.Models.Entities
 
         public virtual Premises IdPremisesNavigation { get; set; }
         public virtual ObjectStates IdStateNavigation { get; set; }
-        public virtual ICollection<FundsSubPremisesAssoc> FundsSubPremisesAssoc { get; set; }
-        public virtual ICollection<OwnerSubPremisesAssoc> OwnerSubPremisesAssoc { get; set; }
+        public virtual IList<FundsSubPremisesAssoc> FundsSubPremisesAssoc { get; set; }
+        public virtual IList<OwnerSubPremisesAssoc> OwnerSubPremisesAssoc { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿@model RegistryWeb.ViewModel.OwnerProcessVM;
+﻿@model RegistryWeb.Models.Entities.OwnerProcesses;
 @{
     if (ViewBag.Action == "Create")
     {
@@ -6,51 +6,61 @@
     }
     else
     {
-        ViewData["Title"] = "Процесс собственности №" + Model.OwnerProcess.IdProcess;
+        ViewData["Title"] = "Процесс собственности №" + Model.IdProcess;
     }
 }
 
 <h2>@ViewData["Title"]</h2>
 <form asp-controller="OwnerProcesses" asp-action="@ViewBag.Action" data-action="@ViewBag.Action" method="post">
-    <input type="hidden" asp-for="OwnerProcess.IdProcess" />
+    <input type="hidden" asp-for="IdProcess" />
     <h3 class="mb-1 mt-3">Общая информация</h3>
     <div class="form-row">
         <div class="form-group col-md-6">
             <label class="control-label">Тип собственника</label>
-            <select class="form-control" id="ownerType" asp-for="OwnerProcess.IdOwnerType"
-                    asp-items="@{new SelectList(Model.OwnerTypes, "IdOwnerType", "OwnerType1")}"></select>
+            <select class="form-control" id="ownerType" asp-for="IdOwnerType"
+                    asp-items="@{new SelectList(ViewBag.OwnerTypes, "IdOwnerType", "OwnerType1")}"></select>
         </div>
         <div class="form-group col-md-6">
-            <label asp-for="OwnerProcess.AnnulDate" class="control-label">Дата аннулирования</label>
-            <input type="date" asp-for="OwnerProcess.AnnulDate" class="form-control" />
+            <label asp-for="AnnulDate" class="control-label">Дата аннулирования</label>
+            <input type="date" asp-for="AnnulDate" class="form-control" />
         </div>
     </div>
     <div class="form-row">
         <div class="form-group col-md-6">
-            <label asp-for="OwnerProcess.FromDate" class="control-label">Дата возникновения прав собственности</label>
-            <input type="date" asp-for="OwnerProcess.FromDate" class="form-control" />
+            <label asp-for="FromDate" class="control-label">Дата возникновения прав собственности</label>
+            <input type="date" asp-for="FromDate" class="form-control" />
         </div>
         <div class="form-group col-md-6">
-            <label asp-for="OwnerProcess.ToDate" class="control-label">Дата прекращения прав собственности</label>
-            <input type="date" asp-for="OwnerProcess.ToDate" class="form-control" />
+            <label asp-for="ToDate" class="control-label">Дата прекращения прав собственности</label>
+            <input type="date" asp-for="ToDate" class="form-control" />
         </div>
     </div>
     <div class="form-group">
-        <label asp-for="OwnerProcess.Comment" class="control-label">Комментарий</label>
-        <textarea rows="3" asp-for="OwnerProcess.Comment" class="form-control"></textarea>
+        <label asp-for="Comment" class="control-label">Комментарий</label>
+        <textarea rows="3" asp-for="Comment" class="form-control"></textarea>
     </div>
     <div id="addresses">
         <div class="d-flex justify-content-between mb-1 mt-3">
             <h3>Адреса</h3>
             @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
             {
-                <a class="btn btn-success" title="Добавить адрес" aria-label="Добавить адрес" id="addressAdd" >Добавить</a>
+                <a class="btn btn-success" title="Добавить адрес" aria-label="Добавить адрес" id="addressAdd">Добавить</a>
             }
         </div>
-        @for (var i = 0; i < Model.Addresses.Count(); i++)
+        @for (var i = 0; i < Model.OwnerBuildingsAssoc.Count(); i++)
         {
             @await Component.InvokeAsync("AddressComponent",
-                new { address = Model.Addresses[i], id = i, action = ViewBag.Action })
+                new { addressAssoc = Model.OwnerBuildingsAssoc[i], id = i, action = ViewBag.Action })
+        }
+        @for (var i = 0; i < Model.OwnerPremisesAssoc.Count(); i++)
+        {
+            @await Component.InvokeAsync("AddressComponent",
+                new { addressAssoc = Model.OwnerPremisesAssoc[i], id = i, action = ViewBag.Action })
+        }
+        @for (var i = 0; i < Model.OwnerSubPremisesAssoc.Count(); i++)
+        {
+            @await Component.InvokeAsync("AddressComponent",
+                new { addressAssoc = Model.OwnerSubPremisesAssoc[i], id = i, action = ViewBag.Action })
         }
     </div>
     <div id="ownerReasons">
@@ -58,12 +68,12 @@
             <h3>Основания найма</h3>
             @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
             {
-            <a class="btn btn-success" title="Добавить основание" aria-label="Добавить основание" id="ownerReasonAdd">Добавить</a>
+                <a class="btn btn-success" title="Добавить основание" aria-label="Добавить основание" id="ownerReasonAdd">Добавить</a>
             }
         </div>
         @for (var i = 0; i < Model.OwnerReasons.Count(); i++)
         {
-            @await Component.InvokeAsync("OwnerReasonAccordionComponent",
+            @await Component.InvokeAsync("OwnerReasonComponent",
                 new { ownerReason = Model.OwnerReasons[i], id = i, action = ViewBag.Action })
         }
     </div>
@@ -75,7 +85,7 @@
             <a class="btn btn-success" title="Добавить собственника" aria-label="Добавить собственника" id="ownerAdd">Добавить</a>
             }
         </div>
-        @if (Model.OwnerProcess.IdOwnerType == 1)
+        @if (Model.IdOwnerType == 1)
         {
             @for (var i = 0; i < Model.OwnerPersons.Count(); i++)
             {

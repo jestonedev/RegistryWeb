@@ -9,13 +9,13 @@ namespace RegistryWeb.Models.Entities
     {
         public KladrStreets()
         {
-            Buildings = new HashSet<Buildings>();
+            Buildings = new List<Buildings>();
         }
 
         public string IdStreet { get; set; }
         public string StreetName { get; set; }
         public string StreetLong { get; set; }
 
-        public virtual ICollection<Buildings> Buildings { get; set; }
+        public virtual IList<Buildings> Buildings { get; set; }
     }
 }

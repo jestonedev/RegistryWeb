@@ -7,10 +7,10 @@ namespace RegistryWeb.Models.Entities
     {
         public Premises()
         {
-            FundsPremisesAssoc = new HashSet<FundsPremisesAssoc>();
-            OwnerPremisesAssoc = new HashSet<OwnerPremisesAssoc>();
-            OwnershipPremisesAssoc = new HashSet<OwnershipPremisesAssoc>();
-            SubPremises = new HashSet<SubPremises>();
+            FundsPremisesAssoc = new List<FundsPremisesAssoc>();
+            OwnerPremisesAssoc = new List<OwnerPremisesAssoc>();
+            OwnershipPremisesAssoc = new List<OwnershipPremisesAssoc>();
+            SubPremises = new List<SubPremises>();
         }
 
         public int IdPremises { get; set; }
@@ -42,9 +42,9 @@ namespace RegistryWeb.Models.Entities
         public virtual PremisesKinds IdPremisesKindNavigation { get; set; }
         public virtual PremisesTypes IdPremisesTypeNavigation { get; set; }
         public virtual ObjectStates IdStateNavigation { get; set; }
-        public virtual ICollection<FundsPremisesAssoc> FundsPremisesAssoc { get; set; }
-        public virtual ICollection<OwnerPremisesAssoc> OwnerPremisesAssoc { get; set; }
-        public virtual ICollection<OwnershipPremisesAssoc> OwnershipPremisesAssoc { get; set; }
-        public virtual ICollection<SubPremises> SubPremises { get; set; }
+        public virtual IList<FundsPremisesAssoc> FundsPremisesAssoc { get; set; }
+        public virtual IList<OwnerPremisesAssoc> OwnerPremisesAssoc { get; set; }
+        public virtual IList<OwnershipPremisesAssoc> OwnershipPremisesAssoc { get; set; }
+        public virtual IList<SubPremises> SubPremises { get; set; }
     }
 }

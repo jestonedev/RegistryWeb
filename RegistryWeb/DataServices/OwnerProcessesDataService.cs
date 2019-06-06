@@ -109,70 +109,20 @@ namespace RegistryWeb.DataServices
                 .Take(pageOptions.SizePage).ToList();
         }
 
-        public OwnerProcessVM CreateViewModel()
+        public OwnerProcesses CreateOwnerProcess()
         {
-            var viewModel = new OwnerProcessVM();
-            viewModel.OwnerTypes = registryContext.OwnerType;
-            viewModel.OwnerProcess = new OwnerProcesses();
-            viewModel.Addresses = new List<Address>() { new Address() };
-            viewModel.OwnerReasons = new List<OwnerReasons>() { new OwnerReasons() };
-            viewModel.OwnerPersons = new List<OwnerPersons>() { new OwnerPersons() };
-            viewModel.OwnerOrginfos = new List<OwnerOrginfos>() { new OwnerOrginfos() };
-            return viewModel;
+            var ownerProcess = new OwnerProcesses() { IdOwnerType = 1 };
+            ownerProcess.OwnerBuildingsAssoc = new List<OwnerBuildingsAssoc>() { new OwnerBuildingsAssoc() };
+            ownerProcess.OwnerPremisesAssoc = new List<OwnerPremisesAssoc>();
+            ownerProcess.OwnerSubPremisesAssoc = new List<OwnerSubPremisesAssoc>();
+            ownerProcess.OwnerReasons = new List<OwnerReasons>() { new OwnerReasons() };
+            ownerProcess.OwnerPersons = new List<OwnerPersons>() { new OwnerPersons() };
+            ownerProcess.OwnerOrginfos = new List<OwnerOrginfos>() { new OwnerOrginfos() };
+            return ownerProcess;
         }
 
-        public OwnerProcessVM GetViewModel(int idProcess)
-        {
-            var viewModel = new OwnerProcessVM();
-            viewModel.OwnerProcess = GetOwnerProcess(idProcess);
-            viewModel.OwnerTypes = registryContext.OwnerType;
-            viewModel.OwnerReasons = viewModel.OwnerProcess.OwnerReasons.ToList();
-            viewModel.OwnerPersons = viewModel.OwnerProcess.OwnerPersons.ToList();
-            viewModel.OwnerOrginfos = viewModel.OwnerProcess.OwnerOrginfos.ToList();
-
-            var addresses = new List<Address>();
-            foreach (var oba in viewModel.OwnerProcess.OwnerBuildingsAssoc)
-            {
-                var address = new Address();
-                address.IdTypeAddress = 1;
-                address.IdStreet = registryContext.Buildings
-                    .First(b => b.IdBuilding == oba.IdBuilding).IdStreet;
-                address.IdBuilding = oba.IdBuilding;
-                addresses.Add(address);
-            }
-            foreach (var opa in viewModel.OwnerProcess.OwnerPremisesAssoc)
-            {
-                var address = new Address();
-                address.IdTypeAddress = 2;
-                var premise = registryContext.Premises
-                    .First(p => p.IdPremises == opa.IdPremises);
-                address.IdStreet = registryContext.Buildings
-                    .First(b => b.IdBuilding == premise.IdBuilding).IdStreet;
-                address.IdBuilding = premise.IdBuilding;
-                address.IdPremisesType = premise.IdPremisesType;
-                address.IdPremise = premise.IdPremises;
-                addresses.Add(address);
-            }
-            foreach (var ospa in viewModel.OwnerProcess.OwnerSubPremisesAssoc)
-            {
-                var address = new Address();
-                address.IdTypeAddress = 3;
-                var subPremise = registryContext.SubPremises
-                    .First(sp => sp.IdSubPremises == ospa.IdSubPremises);
-                var premise = registryContext.Premises
-                    .First(p => p.IdPremises == subPremise.IdPremises);
-                address.IdStreet = registryContext.Buildings
-                    .First(b => b.IdBuilding == premise.IdBuilding).IdStreet;
-                address.IdBuilding = premise.IdBuilding;
-                address.IdPremisesType = premise.IdPremisesType;
-                address.IdPremise = premise.IdPremises;
-                address.IdSubPremise = subPremise.IdSubPremises;
-                addresses.Add(address);
-            }
-            viewModel.Addresses = addresses;
-
-            return viewModel;
-        }
+        public IEnumerable<OwnerType> GetOwnerTypes
+            => registryContext.OwnerType.AsNoTracking();
 
         public OwnerProcesses GetOwnerProcess(int idProcess)
         {
@@ -183,46 +133,26 @@ namespace RegistryWeb.DataServices
                 .Include(op => op.OwnerReasons)
                 .Include(op => op.OwnerPersons)
                 .Include(op => op.OwnerOrginfos)
+                .AsNoTracking()
                 .First(op => op.IdProcess == idProcess);
         }
 
-        public void Create(OwnerProcessVM viewModel)
+        public void Create(OwnerProcesses ownerProcess)
         {
-            var ownerProcesses = viewModel.OwnerProcess;
-            var entityEntry = registryContext.OwnerProcesses.Add(ownerProcesses);
+            registryContext.OwnerProcesses.Add(ownerProcess);
             registryContext.SaveChanges();
-
-            foreach (var addr in viewModel.Addresses)
-            {
-                AddressCreate(addr, ownerProcesses.IdProcess);
-            }
-
-            foreach (var reas in viewModel.OwnerReasons)
-            {
-                reas.IdProcess = ownerProcesses.IdProcess;
-                registryContext.OwnerReasons.Add(reas);
-                registryContext.SaveChanges();
-            }
-
-            if (ownerProcesses.IdOwnerType == 1)
-                foreach (var pers in viewModel.OwnerPersons)
-                {
-                    pers.IdOwnerProcess = ownerProcesses.IdProcess;
-                    registryContext.OwnerPersons.Add(pers);
-                    registryContext.SaveChanges();
-                }
-            else
-                foreach (var org in viewModel.OwnerOrginfos)
-                {
-                    org.IdProcess = ownerProcesses.IdProcess;
-                    registryContext.OwnerOrginfos.Add(org);
-                    registryContext.SaveChanges();
-                }
         }
 
         public void Delete(int idProcess)
         {
-            var ownerProcesses = GetOwnerProcess(idProcess);
+            var ownerProcesses = registryContext.OwnerProcesses
+                .Include(op => op.OwnerBuildingsAssoc)
+                .Include(op => op.OwnerPremisesAssoc)
+                .Include(op => op.OwnerSubPremisesAssoc)
+                .Include(op => op.OwnerReasons)
+                .Include(op => op.OwnerPersons)
+                .Include(op => op.OwnerOrginfos)
+                .First(op => op.IdProcess == idProcess);
             ownerProcesses.Deleted = 1;
             foreach(var o in ownerProcesses.OwnerBuildingsAssoc)
             {
@@ -251,135 +181,52 @@ namespace RegistryWeb.DataServices
             registryContext.SaveChanges();
         }
 
-        public void Edit(OwnerProcessVM viewModel)
+        public void Edit(OwnerProcesses newOwnerProcess)
         {
-            var ownerProcesses = GetOwnerProcess(viewModel.OwnerProcess.IdProcess);
-            registryContext.Update(viewModel.OwnerProcess);
-
-            //Добавление или Изменение
-            foreach (var vmReason in viewModel.OwnerReasons)
-            {
-                if (vmReason.IdProcess == 0)
-                {
-                    vmReason.IdProcess = ownerProcesses.IdProcess;
-                    registryContext.OwnerReasons.Add(vmReason);
-                    registryContext.SaveChanges();
-                }
-                else
-                    registryContext.OwnerReasons.Update(vmReason);
-            }
-            foreach (var vmPerson in viewModel.OwnerPersons)
-            {
-                if (vmPerson.IdOwnerProcess == 0)
-                {
-                    vmPerson.IdOwnerProcess = ownerProcesses.IdProcess;
-                    registryContext.OwnerPersons.Add(vmPerson);
-                    registryContext.SaveChanges();
-                }  
-                else
-                    registryContext.OwnerPersons.Update(vmPerson);
-            }
-            foreach (var vmOrgingo in viewModel.OwnerOrginfos)
-            {
-                if (vmOrgingo.IdProcess == 0)
-                {
-                    vmOrgingo.IdProcess = ownerProcesses.IdProcess;
-                    registryContext.OwnerOrginfos.Add(vmOrgingo);
-                    registryContext.SaveChanges();
-                }                    
-                else
-                    registryContext.OwnerOrginfos.Update(vmOrgingo);
-            }
-
             //Удаление
-            foreach (var opReason in ownerProcesses.OwnerReasons)
+            var oldOwnerProcess = GetOwnerProcess(newOwnerProcess.IdProcess);
+            foreach (var or in oldOwnerProcess.OwnerReasons)
             {
-                if (viewModel.OwnerReasons.Contains(opReason) == false)
+                if (newOwnerProcess.OwnerReasons.Select(owr => owr.IdReason).Contains(or.IdReason) == false)
                 {
-                    opReason.Deleted = 1;
-                    registryContext.SaveChanges();
+                    or.Deleted = 1;
+                    newOwnerProcess.OwnerReasons.Add(or);
                 }
             }
-            foreach (var opPerson in ownerProcesses.OwnerPersons)
+            foreach (var op in oldOwnerProcess.OwnerPersons)
             {
-                if (viewModel.OwnerPersons.Contains(opPerson) == false)
+                if (newOwnerProcess.OwnerPersons.Select(owp => owp.IdOwnerPersons).Contains(op.IdOwnerPersons) == false)
                 {
-                    opPerson.Deleted = 1;
-                    registryContext.SaveChanges();
+                    op.Deleted = 1;
+                    newOwnerProcess.OwnerPersons.Add(op);
                 }
             }
-            foreach (var opOrginfo in ownerProcesses.OwnerOrginfos)
+            foreach (var oba in oldOwnerProcess.OwnerBuildingsAssoc)
             {
-                if (viewModel.OwnerOrginfos.Contains(opOrginfo) == false)
+                if (newOwnerProcess.OwnerBuildingsAssoc.Select(owba => owba.IdAssoc).Contains(oba.IdAssoc) == false)
                 {
-                    opOrginfo.Deleted = 1;
-                    registryContext.SaveChanges();
+                    oba.Deleted = 1;
+                    newOwnerProcess.OwnerBuildingsAssoc.Add(oba);
                 }
             }
-
-            ////Адрес
-            //foreach (var addr in viewModel.Addresses)
-            //{
-            //    switch (addr.IdTypeAddress)
-            //    {
-            //        case 1:
-            //            var ownerBuildingAssoc = new OwnerBuildingsAssoc()
-            //            {
-            //                IdProcess = ownerProcesses.IdProcess,
-            //                IdBuilding = addr.IdBuilding
-            //            };
-            //            registryContext.OwnerBuildingsAssoc.Add(ownerBuildingAssoc);
-            //            break;
-            //        case 2:
-            //            var ownerPremisesAssoc = new OwnerPremisesAssoc()
-            //            {
-            //                IdProcess = ownerProcesses.IdProcess,
-            //                IdPremises = addr.IdPremise
-            //            };
-            //            registryContext.OwnerPremisesAssoc.Add(ownerPremisesAssoc);
-            //            break;
-            //        default:
-            //            var ownerSubPremisesAssoc = new OwnerSubPremisesAssoc()
-            //            {
-            //                IdProcess = ownerProcesses.IdProcess,
-            //                IdSubPremises = addr.IdSubPremise
-            //            };
-            //            registryContext.OwnerSubPremisesAssoc.Add(ownerSubPremisesAssoc);
-            //            break;
-            //    }
-            //    registryContext.SaveChanges();
-            //}
-        }
-
-        private void AddressCreate(Address addr, int idProcess)
-        {
-            switch (addr.IdTypeAddress)
+            foreach (var opa in oldOwnerProcess.OwnerPremisesAssoc)
             {
-                case 1:
-                    var ownerBuildingAssoc = new OwnerBuildingsAssoc()
-                    {
-                        IdProcess = idProcess,
-                        IdBuilding = addr.IdBuilding
-                    };
-                    registryContext.OwnerBuildingsAssoc.Add(ownerBuildingAssoc);
-                    break;
-                case 2:
-                    var ownerPremisesAssoc = new OwnerPremisesAssoc()
-                    {
-                        IdProcess = idProcess,
-                        IdPremises = addr.IdPremise
-                    };
-                    registryContext.OwnerPremisesAssoc.Add(ownerPremisesAssoc);
-                    break;
-                default:
-                    var ownerSubPremisesAssoc = new OwnerSubPremisesAssoc()
-                    {
-                        IdProcess = idProcess,
-                        IdSubPremises = addr.IdSubPremise
-                    };
-                    registryContext.OwnerSubPremisesAssoc.Add(ownerSubPremisesAssoc);
-                    break;
+                if (newOwnerProcess.OwnerPremisesAssoc.Select(owpa => owpa.IdAssoc).Contains(opa.IdAssoc) == false)
+                {
+                    opa.Deleted = 1;
+                    newOwnerProcess.OwnerPremisesAssoc.Add(opa);
+                }
             }
+            foreach (var ospa in oldOwnerProcess.OwnerSubPremisesAssoc)
+            {
+                if (newOwnerProcess.OwnerSubPremisesAssoc.Select(owspa => owspa.IdAssoc).Contains(ospa.IdAssoc) == false)
+                {
+                    ospa.Deleted = 1;
+                    newOwnerProcess.OwnerSubPremisesAssoc.Add(ospa);
+                }
+            }
+            //Добавление и радактирование
+            registryContext.OwnerProcesses.Update(newOwnerProcess);
             registryContext.SaveChanges();
         }
     }

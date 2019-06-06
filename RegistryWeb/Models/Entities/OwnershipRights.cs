@@ -7,8 +7,8 @@ namespace RegistryWeb.Models.Entities
     {
         public OwnershipRights()
         {
-            OwnershipBuildingsAssoc = new HashSet<OwnershipBuildingsAssoc>();
-            OwnershipPremisesAssoc = new HashSet<OwnershipPremisesAssoc>();
+            OwnershipBuildingsAssoc = new List<OwnershipBuildingsAssoc>();
+            OwnershipPremisesAssoc = new List<OwnershipPremisesAssoc>();
         }
 
         public int IdOwnershipRight { get; set; }
@@ -21,7 +21,7 @@ namespace RegistryWeb.Models.Entities
         public byte Deleted { get; set; }
 
         public virtual OwnershipRightTypes IdOwnershipRightTypeNavigation { get; set; }
-        public virtual ICollection<OwnershipBuildingsAssoc> OwnershipBuildingsAssoc { get; set; }
-        public virtual ICollection<OwnershipPremisesAssoc> OwnershipPremisesAssoc { get; set; }
+        public virtual IList<OwnershipBuildingsAssoc> OwnershipBuildingsAssoc { get; set; }
+        public virtual IList<OwnershipPremisesAssoc> OwnershipPremisesAssoc { get; set; }
     }
 }

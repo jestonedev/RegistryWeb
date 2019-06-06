@@ -29,16 +29,16 @@ namespace RegistryWeb.Controllers
         public IActionResult Create()
         {
             ViewBag.Action = "Create";
-            return View("OwnerProcess", dataService.CreateViewModel());
+            ViewBag.OwnerTypes = dataService.GetOwnerTypes;
+            return View("OwnerProcess", dataService.CreateOwnerProcess());
         }
 
         [HttpPost]
-        public IActionResult Create(OwnerProcessVM viewModel)
+        public IActionResult Create(OwnerProcesses ownerProcess)
         {
-
-            if (viewModel != null)
+            if (ownerProcess != null)
             {
-                dataService.Create(viewModel);
+                dataService.Create(ownerProcess);
                 return RedirectToAction("Index");
             }
             return NotFound();
@@ -47,7 +47,7 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public IActionResult AddressAdd(int id, string action)
         {
-            return ViewComponent("AddressComponent", new { address = new Address(), id, action });
+            return ViewComponent("AddressComponent", new { addressAssoc = new OwnerBuildingsAssoc(), id, action });
         }
 
         [HttpPost]
@@ -71,11 +71,12 @@ namespace RegistryWeb.Controllers
         {
             if (idProcess == null)
                 return NotFound();
-            var viewModel = dataService.GetViewModel(idProcess.Value);
-            if (viewModel == null)
+            var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
+            if (ownerProcess == null)
                 return NotFound();
             ViewBag.Action = "Details";
-            return View("OwnerProcess", viewModel);
+            ViewBag.OwnerTypes = dataService.GetOwnerTypes;
+            return View("OwnerProcess", ownerProcess);
         }
 
         [HttpGet, ActionName("Delete")]
@@ -83,19 +84,20 @@ namespace RegistryWeb.Controllers
         {
             if (idProcess == null)
                 return NotFound();
-            var viewModel = dataService.GetViewModel(idProcess.Value);
-            if (viewModel == null)
+            var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
+            if (ownerProcess == null)
                 return NotFound();
             ViewBag.Action = "Delete";
-            return View("OwnerProcess", viewModel);
+            ViewBag.OwnerTypes = dataService.GetOwnerTypes;
+            return View("OwnerProcess", ownerProcess);
         }
 
         [HttpPost]
-        public IActionResult Delete(OwnerProcessVM viewModel)
+        public IActionResult Delete(OwnerProcesses ownerProcess)
         {
-            if (viewModel != null)
+            if (ownerProcess != null)
             {
-                dataService.Delete(viewModel.OwnerProcess.IdProcess);
+                dataService.Delete(ownerProcess.IdProcess);
                 return RedirectToAction("Index");
             }
             return NotFound();
@@ -106,19 +108,20 @@ namespace RegistryWeb.Controllers
         {
             if (idProcess == null)
                 return NotFound();
-            var viewModel = dataService.GetViewModel(idProcess.Value);
-            if (viewModel == null)
+            var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
+            if (ownerProcess == null)
                 return NotFound();
             ViewBag.Action = "Edit";
-            return View("OwnerProcess", viewModel);
+            ViewBag.OwnerTypes = dataService.GetOwnerTypes;
+            return View("OwnerProcess", ownerProcess);
         }
 
         [HttpPost]
-        public IActionResult Edit(OwnerProcessVM viewModel)
+        public IActionResult Edit(OwnerProcesses ownerProcess)
         {
-            if (viewModel != null)
+            if (ownerProcess != null)
             {
-                dataService.Edit(viewModel);
+                dataService.Edit(ownerProcess);
                 return RedirectToAction("Index");
             }
             return NotFound();

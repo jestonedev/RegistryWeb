@@ -7,12 +7,12 @@ namespace RegistryWeb.Models.Entities
     {
         public PremisesComments()
         {
-            Premises = new HashSet<Premises>();
+            Premises = new List<Premises>();
         }
 
         public int IdPremisesComment { get; set; }
         public string PremisesCommentText { get; set; }
 
-        public virtual ICollection<Premises> Premises { get; set; }
+        public virtual IList<Premises> Premises { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿$(function () {
     var action = $('form').data('action');
     $('#addressAdd').on("click", function () {
-        var id = $('.addressBlock').length;
+        var id = $('.buildingBlock').length;
         $.ajax({
             type: 'POST',
             url: window.location.origin + '/OwnerProcesses/AddressAdd',

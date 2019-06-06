@@ -7,7 +7,7 @@ namespace RegistryWeb.Models.Entities
     {
         public RentTypes()
         {
-            RentTypeCategories = new HashSet<RentTypeCategories>();
+            RentTypeCategories = new List<RentTypeCategories>();
         }
 
         public int IdRentType { get; set; }
@@ -15,6 +15,6 @@ namespace RegistryWeb.Models.Entities
         public string RentTypeShort { get; set; }
         public string RentTypeGenetive { get; set; }
 
-        public virtual ICollection<RentTypeCategories> RentTypeCategories { get; set; }
+        public virtual IList<RentTypeCategories> RentTypeCategories { get; set; }
     }
 }

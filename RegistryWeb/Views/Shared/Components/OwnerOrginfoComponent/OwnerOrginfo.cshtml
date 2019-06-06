@@ -3,6 +3,7 @@
     var i = ViewBag.Id;
 }
 <div class="form-row ownerBlock" data-id="@i">
+    <input type="hidden" asp-for="IdProcess" name="OwnerOrginfos[@i].IdProcess" />
     <input type="hidden" asp-for="IdOrginfo" name="OwnerOrginfos[@i].IdOrginfo" />
     <div class="form-group col">
         <label class="control-label">Наименование</label>

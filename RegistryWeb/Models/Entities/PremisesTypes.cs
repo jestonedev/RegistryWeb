@@ -7,7 +7,7 @@ namespace RegistryWeb.Models.Entities
     {
         public PremisesTypes()
         {
-            Premises = new HashSet<Premises>();
+            Premises = new List<Premises>();
         }
 
         public int IdPremisesType { get; set; }
@@ -15,6 +15,6 @@ namespace RegistryWeb.Models.Entities
         public string PremisesTypeAsNum { get; set; }
         public string PremisesTypeShort { get; set; }
 
-        public virtual ICollection<Premises> Premises { get; set; }
+        public virtual IList<Premises> Premises { get; set; }
     }
 }

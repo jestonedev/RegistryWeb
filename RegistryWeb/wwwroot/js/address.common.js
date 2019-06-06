@@ -14,7 +14,6 @@
             });
         },
         select: function (event, ui) {
-            var i = $(address).attr('data-id');
             $(address).find('.kladrStreets').val(ui.item.idStreet);
             kladrStreetSelectListChange(address);
         },
@@ -27,8 +26,52 @@
 };
 
 var typeAddressSelectListChange = function (address) {
+    recalculationTypeAddressChange(address);
     addressListsDisplay(address);
     kladrStreetSelectListChange(address);
+}
+
+var recalculationTypeAddressChange = function (address) {
+    var addresses = $('.addressBlock');
+    var id = addresses.index(address);
+    
+    var oldClass = "";
+    if (address.hasClass('buildingBlock'))
+        oldClass = "buildingBlock";
+    else if (address.hasClass('premiseBlock'))
+        oldClass = "premiseBlock";
+    else if (address.hasClass('subPremiseBlock'))
+        oldClass = "subPremiseBlock";
+    address.removeClass(oldClass);
+
+    var newIdTypeAddr = address.find('.typeAddress').val();
+    var newClass = "";
+    if (newIdTypeAddr == 1)
+        newClass = "buildingBlock";
+    else if (newIdTypeAddr == 2)
+        newClass = "premiseBlock";
+    else if (newIdTypeAddr == 3)
+        newClass = "subPremiseBlock";
+    address.addClass(newClass);
+
+    var indOld = -1;
+    var indNew = -1;
+    for (var i = 0; i < addresses.length; i++) {
+        if (addresses[i].classList.contains(oldClass)) {
+            indOld++;
+            if (i > id) {
+                addresses[i].setAttribute('data-id', indOld);
+                recalculationId(addresses[i], indOld, oldClass);
+            }
+        }
+        if (addresses[i].classList.contains(newClass)) {
+            indNew++;
+            if (i >= id) {
+                addresses[i].setAttribute('data-id', indNew);
+                recalculationId(addresses[i], indNew, newClass);
+            }
+        }
+    }
 }
 
 var kladrStreetSelectListChange = function (address) {
@@ -41,8 +84,10 @@ var kladrStreetSelectListChange = function (address) {
 };
 
 var builidngSelectListChange = function (address) {
-    var i = address.attr('data-id');
-    //Помещение внутри здания
+    if ($(address).find('.typeAddress').val() == 1) {
+        $(address).find('.addressIdAssoc').val(0);
+        $(address).find('.addressId').val($(address).find('.house').val());
+    }
     if ($(address).find('.typeAddress').val() == 2 || $(address).find('.typeAddress').val() == 3) {
         premisesTypeSelectListDisplay(address);
         premisesTypesSelectListChange(address);
@@ -56,33 +101,42 @@ var premisesTypesSelectListChange = function (address) {
 };
 
 var premisesNumSelectListChange = function (address) {
-    var i = address.attr('data-id');
-    //Квартира внутри помещения
+    if ($(address).find('.typeAddress').val() == 2) {
+        $(address).find('.addressIdAssoc').val(0);
+        $(address).find('.addressId').val($(address).find('.premisesNum').val());
+    }
     if ($(address).find('.typeAddress').val() == 3) {
         subPremisesNumSelectListDisplay(address);
+        subPremisesNumSelectListChange(address);
+    }
+}
+
+var subPremisesNumSelectListChange = function (address) {
+    if ($(address).find('.typeAddress').val() == 3) {
+        $(address).find('.addressIdAssoc').val(0);
+        $(address).find('.addressId').val($(address).find('.subPremisesNum').val());
     }
 }
 
 
 var addressListsDisplay = function (address) {
-    var i = address.attr('data-id');
     //Здание
     if ($(address).find('.typeAddress').val() == 1) {
-        $('#premisesTypesGroup_' + i).hide();
-        $('#premisesNumGroup_' + i).hide();
-        $('#subPremisesNumGroup_' + i).hide();
+        $(address).find('.premisesTypesGroup').hide();
+        $(address).find('.premisesNumGroup').hide();
+        $(address).find('.subPremisesNumGroup').hide();
     }
     //Помещение внутри здания
     if ($(address).find('.typeAddress').val() == 2) {
-        $('#premisesTypesGroup_' + i).show();
-        $('#premisesNumGroup_' + i).show();
-        $('#subPremisesNumGroup_' + i).hide();
+        $(address).find('.premisesTypesGroup').show();
+        $(address).find('.premisesNumGroup').show();
+        $(address).find('.subPremisesNumGroup').hide();
     }
     //Квартира внутри помещения
     if ($(address).find('.typeAddress').val() == 3) {
-        $('#premisesTypesGroup_' + i).show();
-        $('#premisesNumGroup_' + i).show();
-        $('#subPremisesNumGroup_' + i).show();
+        $(address).find('.premisesTypesGroup').show();
+        $(address).find('.premisesNumGroup').show();
+        $(address).find('.subPremisesNumGroup').show();
     }
 }
 
@@ -157,33 +211,46 @@ var subPremisesNumSelectListDisplay = function (address) {
     });
 };
 
-var addressDelete = function (id) {
+var addressDelete = function (address) {
     if ($('.addressBlock').length == 1)
         return;
-    $('.addressBlock').filter(function (index) {
-        return $(this).attr('data-id') === id;
-    }).remove();
-    //Преобразование id к числу
-    recalculationAddressId(+id);
+    var id = +address.attr('data-id'); //Преобразование id к числу
+    var idTypeAddress = address.find('.typeAddress').val();
+    address.remove();
+    var className = "";
+    if (idTypeAddress == 1)
+        className = "buildingBlock";
+    else if (idTypeAddress == 2)
+        className = "premiseBlock";
+    else if (idTypeAddress == 3)
+        className = "subPremiseBlock";
+    var list = $('.' + className);
+    if (id == list.length)
+        return;
+    for (var i = id; i < list.length; i++) {
+        list[i].setAttribute('data-id', i);
+        recalculationId(list[i], i, className);
+    }
 }
 
-//id обязательно должно быть числом. Иначе некорректная работа
-var recalculationAddressId = function (id) {
-    if (id == $('.addressBlock').length)
-        return;
-    for (var i = id; i < $('.addressBlock').length; i++) {
-        var oldId = i + 1;
-        $('.addressBlock').get(i).setAttribute('data-id', i);
-        $('#premisesTypesGroup_' + oldId).attr('id', 'premisesTypesGroup_' + i);
-        $('#premisesNumGroup_' + oldId).attr('id', 'premisesNumGroup_' + i);
-        $('#subPremisesNumGroup_' + oldId).attr('id', 'subPremisesNumGroup_' + i);
-        $('select[name="Addresses[' + oldId + '].IdTypeAddress"]').attr('name', 'Addresses[' + i + '].IdTypeAddress');
-        $('select[name="Addresses[' + oldId + '].IdStreet"]').attr('name', 'Addresses[' + i + '].IdStreet');
-        $('select[name="Addresses[' + oldId + '].IdBuilding"]').attr('name', 'Addresses[' + i + '].IdBuilding');
-        $('select[name="Addresses[' + oldId + '].IdPremisesType"]').attr('name', 'Addresses[' + i + '].IdPremisesType');
-        $('select[name="Addresses[' + oldId + '].IdPremise"]').attr('name', 'Addresses[' + i + '].IdPremise');
-        $('select[name="Addresses[' + oldId + '].IdSubPremise"]').attr('name', 'Addresses[' + i + '].IdSubPremise');
+var recalculationId = function (address, id, className) {
+    var addressAssoc = "";
+    var idAddressAssoc = "";
+    if (className == "buildingBlock") {
+        addressAssoc = "OwnerBuildingsAssoc";
+        idAddressAssoc = "IdBuilding";
     }
+    else if (className == "premiseBlock") {
+        addressAssoc = "OwnerPremisesAssoc";
+        idAddressAssoc = "IdPremises";
+    }
+    else if (className == "subPremiseBlock") {
+        addressAssoc = "OwnerSubPremisesAssoc";
+        idAddressAssoc = "IdSubPremises";
+    }
+    $(address).find('.addressIdProcess').attr('name', addressAssoc + '[' + id + '].IdProcess');
+    $(address).find('.addressIdAssoc').attr('name', addressAssoc + '[' + id + '].IdAssoc');
+    $(address).find('.addressId').attr('name', addressAssoc + '[' + id + '].' + idAddressAssoc);
 }
 
 $(function () {
@@ -199,12 +266,17 @@ $(function () {
             premisesTypesSelectListChange(address);
         if ($(event.target).hasClass('premisesNum'))
             premisesNumSelectListChange(address);
+        if ($(event.target).hasClass('subPremisesNum'))
+            subPremisesNumSelectListChange(address);
     });
     $('#addresses').click(function (event) {
-        var id = $(event.target).parents().filter('.addressBlock').attr('data-id');
-        if ($(event.target).hasClass('oi-x'))
-            addressDelete(id);
+        if ($(event.target).hasClass('oi-x')) {
+            var address = $(event.target).parents().filter('.addressBlock');
+            addressDelete(address);
+        }
     });
-    addressListsDisplay($('.addressBlock'));
-    autocompleteStreet($('.addressBlock'));
+    for (var i = 0; i < $('.addressBlock').length; i++) {
+        addressListsDisplay($('.addressBlock')[i]);
+        autocompleteStreet($('.addressBlock')[i]);
+    }
 });

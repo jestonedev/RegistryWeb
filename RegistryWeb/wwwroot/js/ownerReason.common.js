@@ -19,16 +19,17 @@ var recalculationOwnerReasonId = function (id) {
         var div = $('#headingOwnerReason_' + oldId);
         div.attr('id', 'headingOwnerReason_' + i);
         var a = div.find('a').first();
+        a.empty();
         a.append('Основание ' + (i + 1));
         a.attr('data-target', '#collapseOwnerReason_' + i);
         a.attr('aria-controls', '#collapseOwnerReason_' + i);
 
         div = $('#collapseOwnerReason_' + oldId);
-        console.log(div);
         div.attr('id', 'collapseOwnerReason_' + i);
         div.attr('aria-labelledby', 'headingOwnerReason_' + i);
 
-        $('select[name="OwnerReasons[' + oldId + '].IdReason"]').attr('name', 'OwnerReasons[' + i + '].IdReason');
+        $('input[name="OwnerReasons[' + oldId + '].IdProcess"]').attr('name', 'OwnerReasons[' + i + '].IdProcess');
+        $('input[name="OwnerReasons[' + oldId + '].IdReason"]').attr('name', 'OwnerReasons[' + i + '].IdReason');
         $('select[name="OwnerReasons[' + oldId + '].IdReasonType"]').attr('name', 'OwnerReasons[' + i + '].IdReasonType');
         $('input[name="OwnerReasons[' + oldId + '].ReasonNumber"]').attr('name', 'OwnerReasons[' + i + '].ReasonNumber');
         $('input[name="OwnerReasons[' + oldId + '].ReasonDate"]').attr('name', 'OwnerReasons[' + i + '].ReasonDate');

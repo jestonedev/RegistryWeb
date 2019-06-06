@@ -7,10 +7,10 @@ namespace RegistryWeb.Models.Entities
     {
         public Buildings()
         {
-            FundsBuildingsAssoc = new HashSet<FundsBuildingsAssoc>();
-            OwnerBuildingsAssoc = new HashSet<OwnerBuildingsAssoc>();
-            OwnershipBuildingsAssoc = new HashSet<OwnershipBuildingsAssoc>();
-            Premises = new HashSet<Premises>();
+            FundsBuildingsAssoc = new List<FundsBuildingsAssoc>();
+            OwnerBuildingsAssoc = new List<OwnerBuildingsAssoc>();
+            OwnershipBuildingsAssoc = new List<OwnershipBuildingsAssoc>();
+            Premises = new List<Premises>();
         }
 
         public int IdBuilding { get; set; }
@@ -56,9 +56,9 @@ namespace RegistryWeb.Models.Entities
         public virtual ObjectStates IdStateNavigation { get; set; }
         public virtual StructureTypes IdStructureTypeNavigation { get; set; }
         public virtual KladrStreets IdStreetNavigation { get; set; }
-        public virtual ICollection<FundsBuildingsAssoc> FundsBuildingsAssoc { get; set; }
-        public virtual ICollection<OwnerBuildingsAssoc> OwnerBuildingsAssoc { get; set; }
-        public virtual ICollection<OwnershipBuildingsAssoc> OwnershipBuildingsAssoc { get; set; }
-        public virtual ICollection<Premises> Premises { get; set; }
+        public virtual IList<FundsBuildingsAssoc> FundsBuildingsAssoc { get; set; }
+        public virtual IList<OwnerBuildingsAssoc> OwnerBuildingsAssoc { get; set; }
+        public virtual IList<OwnershipBuildingsAssoc> OwnershipBuildingsAssoc { get; set; }
+        public virtual IList<Premises> Premises { get; set; }
     }
 }

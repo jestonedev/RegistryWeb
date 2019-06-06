@@ -7,13 +7,13 @@ namespace RegistryWeb.Models.Entities
     {
         public OwnerReasonTypes()
         {
-            OwnerReasons = new HashSet<OwnerReasons>();
+            OwnerReasons = new List<OwnerReasons>();
         }
 
         public int IdReasonType { get; set; }
         public string ReasonName { get; set; }
         public byte Deleted { get; set; }
 
-        public virtual ICollection<OwnerReasons> OwnerReasons { get; set; }
+        public virtual IList<OwnerReasons> OwnerReasons { get; set; }
     }
 }

@@ -7,9 +7,9 @@ namespace RegistryWeb.Models.Entities
     {
         public FundsHistory()
         {
-            FundsBuildingsAssoc = new HashSet<FundsBuildingsAssoc>();
-            FundsPremisesAssoc = new HashSet<FundsPremisesAssoc>();
-            FundsSubPremisesAssoc = new HashSet<FundsSubPremisesAssoc>();
+            FundsBuildingsAssoc = new List<FundsBuildingsAssoc>();
+            FundsPremisesAssoc = new List<FundsPremisesAssoc>();
+            FundsSubPremisesAssoc = new List<FundsSubPremisesAssoc>();
         }
 
         public int IdFund { get; set; }
@@ -26,8 +26,8 @@ namespace RegistryWeb.Models.Entities
         public byte? Deleted { get; set; }
 
         public virtual FundTypes IdFundTypeNavigation { get; set; }
-        public virtual ICollection<FundsBuildingsAssoc> FundsBuildingsAssoc { get; set; }
-        public virtual ICollection<FundsPremisesAssoc> FundsPremisesAssoc { get; set; }
-        public virtual ICollection<FundsSubPremisesAssoc> FundsSubPremisesAssoc { get; set; }
+        public virtual IList<FundsBuildingsAssoc> FundsBuildingsAssoc { get; set; }
+        public virtual IList<FundsPremisesAssoc> FundsPremisesAssoc { get; set; }
+        public virtual IList<FundsSubPremisesAssoc> FundsSubPremisesAssoc { get; set; }
     }
 }
