@@ -7,6 +7,8 @@
         public string Surname { get; set; }
         public string Name { get; set; }
         public string Patronymic { get; set; }
+        public int NumeratorShare { get; set; }
+        public int DenominatorShare { get; set; }
         public byte Deleted { get; set; }
 
         public virtual OwnerProcesses IdOwnerProcessNavigation { get; set; }

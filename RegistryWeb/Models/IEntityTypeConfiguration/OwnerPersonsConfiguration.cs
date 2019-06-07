@@ -54,6 +54,14 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
+            builder.Property(e => e.NumeratorShare)
+                .HasColumnName("numerator_share")
+                .HasColumnType("int(11)");
+
+            builder.Property(e => e.DenominatorShare)
+                .HasColumnName("denominator_share")
+                .HasColumnType("int(11)");
+
             builder.HasOne(d => d.IdOwnerProcessNavigation)
                 .WithMany(p => p.OwnerPersons)
                 .HasForeignKey(d => d.IdOwnerProcess)
