@@ -2,36 +2,23 @@
 @{
     var i = ViewBag.Id;
 }
-<div class="card ownerReasonBlock" data-id="@i">
-    <div class="card-header" id="headingOwnerReason_@i">
-        <h5 class="mb-0">
-            <a href="#" class="btn btn-link" data-toggle="collapse" data-target="#collapseOwnerReason_@i" aria-expanded="false" aria-controls="collapseOwnerReason_@i">
-                Основание @(i+1)
-            </a>
-            @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-            {
-                <a class="btn btn-danger float-right oi oi-x" title="Удалить" aria-label="Удалить"></a>
-            }
-        </h5>
-    </div>
-
-    <div id="collapseOwnerReason_@i" class="collapse" aria-labelledby="headingOwnerReason_@i" data-parent="#ownerReasons">
-        <div class="card-body form-row">
-            <input type="hidden" asp-for="IdProcess" name="OwnerReasons[@i].IdProcess" />
-            <input type="hidden" asp-for="IdReason" name="OwnerReasons[@i].IdReason" />
-            <div class="form-group col">
-                <label class="control-label">Название</label>
-                <select class="form-control" asp-for="IdReasonType" name="OwnerReasons[@i].IdReasonType" asp-items="@{
-            new SelectList(ViewBag.OwnerReasonTypes, "IdReasonType", "ReasonName")}"></select>
-            </div>
-            <div class="form-group col">
-                <label class="control-label">Номер</label>
-                <input type="text" asp-for="ReasonNumber" name="OwnerReasons[@i].ReasonNumber" class="form-control" />
-            </div>
-            <div class="form-group col">
-                <label class="control-label">Дата</label>
-                <input type="date" asp-for="ReasonDate" name="OwnerReasons[@i].ReasonDate" class="form-control" />
-            </div>
-        </div>
-    </div>
-</div>
+<tr class="ownerReasonBlock" data-id="@i">
+    <input type="hidden" asp-for="IdProcess" name="OwnerReasons[@i].IdProcess" />
+    <input type="hidden" asp-for="IdReason" name="OwnerReasons[@i].IdReason" />
+    <td class="align-middle">
+        <select class="form-control" asp-for="IdReasonType" name="OwnerReasons[@i].IdReasonType" asp-items="@{
+                    new SelectList(ViewBag.OwnerReasonTypes, "IdReasonType", "ReasonName")}"></select>
+    </td>
+    <td class="align-middle">
+        <input type="text" asp-for="ReasonNumber" name="OwnerReasons[@i].ReasonNumber" class="form-control" />
+    </td>
+    <td class="align-middle">
+        <input type="date" asp-for="ReasonDate" name="OwnerReasons[@i].ReasonDate" class="form-control" />
+    </td>
+    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+    {
+        <td class="align-middle">
+            <a class="btn btn-danger close" title="Удалить" aria-label="Удалить">&#10006;</a>
+        </td>
+    }
+</tr>

@@ -63,19 +63,42 @@
                 new { addressAssoc = Model.OwnerSubPremisesAssoc[i], id = i, action = ViewBag.Action })
         }
     </div>
-    <div id="ownerReasons">
-        <div class="d-flex justify-content-between mb-1 mt-3">
-            <h3>Основания найма</h3>
-            @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-            {
-                <a class="btn btn-success" title="Добавить основание" aria-label="Добавить основание" id="ownerReasonAdd">Добавить</a>
-            }
+    <div>
+        <div class="card-header" id="headingOwnerReasons">
+            <div class="d-flex justify-content-between">
+                <h3>Основания собственности</h3>
+                <div class="btn-group">
+                    <a href="#" class="btn btn-primary" data-toggle="collapse" data-target="#collapseOwnerReasons" aria-expanded="false" aria-controls="collapseOwnerReasons">˅</a>
+                    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                    {
+                    <a class="btn btn-success" title="Добавить основание" aria-label="Добавить основание" id="ownerReasonAdd">&#10010;</a>
+                    }
+                </div>
+            </div>
         </div>
-        @for (var i = 0; i < Model.OwnerReasons.Count(); i++)
-        {
-            @await Component.InvokeAsync("OwnerReasonComponent",
-                new { ownerReason = Model.OwnerReasons[i], id = i, action = ViewBag.Action })
-        }
+        <div id="collapseOwnerReasons" class="collapse" aria-labelledby="headingOwnerReasons">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Номер</th>
+                        <th>Дата</th>
+                        @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                        {
+                            <th></th>
+                        }
+                    </tr>
+                </thead>
+                <tbody id="ownerReasons">
+                    @for (var i = 0; i < Model.OwnerReasons.Count(); i++)
+                    {
+                        @await Component.InvokeAsync("OwnerReasonComponent",
+                            new { ownerReason = Model.OwnerReasons[i], id = i, action = ViewBag.Action })
+                    }
+                </tbody>
+            </table>
+            
+        </div>
     </div>
     <div id="owners">
         <div class="d-flex justify-content-between mb-1 mt-3">
