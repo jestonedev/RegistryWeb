@@ -14,7 +14,12 @@
             <tr>
                 <td class="align-middle">@item.IdProcess</td>
                 <td class="align-middle">@item.IdOwnerTypeNavigation.OwnerType1</td>
-                <td class="align-middle">@await Component.InvokeAsync("GetAddressComponent", new { idProcess = item.IdProcess })</td>
+                <td class="align-middle">
+                    @foreach (var address in Model.Addresses[item.IdProcess])
+                    {
+                        <p>@address</p>
+                    }
+                </td>
                 <td class="align-middle">
                     <div class="btn-group" role="group" aria-label="Панель доступа">
                         <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"

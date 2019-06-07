@@ -19,7 +19,6 @@ namespace RegistryWeb.DataServices
         public override OwnerProcessesListVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, OwnerProcessesListFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
-            viewModel.OwnerTypes = registryContext.OwnerType;
             return viewModel;
         }
 
@@ -36,14 +35,70 @@ namespace RegistryWeb.DataServices
             var count = query.Count();
             viewModel.PageOptions.Rows = count;
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
-            viewModel.OwnerProcesses = GetQueryPage(query, viewModel.PageOptions);
+            viewModel.OwnerProcesses = GetQueryPage(query, viewModel.PageOptions).ToList();
+            viewModel.Addresses = GetAddresses(viewModel.OwnerProcesses);
             return viewModel;
         }
 
         public IQueryable<OwnerProcesses> GetQuery()
         {
             return registryContext.OwnerProcesses
-                .Include(op => op.IdOwnerTypeNavigation);
+                .Include(op => op.IdOwnerTypeNavigation)
+                .AsNoTracking();
+        }
+
+        private Dictionary<int, IEnumerable<string>> GetAddresses(IEnumerable<OwnerProcesses> ownerProcesses)
+        {
+            var addresses = new Dictionary<int, IEnumerable<string>>();
+            var ownerBuildingsAssoc = registryContext.OwnerBuildingsAssoc
+                .Include(oba => oba.IdBuildingNavigation)
+                    .ThenInclude(b => b.IdStreetNavigation)
+                .ToList();
+            var ownerPremisesAssoc = registryContext.OwnerPremisesAssoc
+                .Include(opa => opa.IdPremisesNavigation)
+                    .ThenInclude(p => p.IdBuildingNavigation)
+                        .ThenInclude(b => b.IdStreetNavigation)
+                .Include(opa => opa.IdPremisesNavigation)
+                    .ThenInclude(p => p.IdPremisesTypeNavigation)
+                .ToList();
+            var ownerSubPremisesAssoc = registryContext.OwnerSubPremisesAssoc
+                .Include(ospa => ospa.IdSubPremisesNavigation)
+                    .ThenInclude(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdBuildingNavigation)
+                            .ThenInclude(b => b.IdStreetNavigation)
+                .Include(ospa => ospa.IdSubPremisesNavigation)
+                    .ThenInclude(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdPremisesTypeNavigation)
+                .ToList();                
+            foreach (var ownerProcess in ownerProcesses)
+            {
+                var curOwnerProcessAddresses = new List<string>();
+                foreach (var oba in ownerBuildingsAssoc.Where(oba => oba.IdProcess == ownerProcess.IdProcess))
+                {
+                    curOwnerProcessAddresses.Add(
+                        oba.IdBuildingNavigation.IdStreetNavigation.StreetName +
+                        ", д." + oba.IdBuildingNavigation.House);
+                }
+                foreach (var opa in ownerPremisesAssoc.Where(opa => opa.IdProcess == ownerProcess.IdProcess))
+                {
+                    curOwnerProcessAddresses.Add(
+                        opa.IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation.StreetName +
+                        ", д." + opa.IdPremisesNavigation.IdBuildingNavigation.House + ", " +
+                        opa.IdPremisesNavigation.IdPremisesTypeNavigation.PremisesTypeShort +
+                        opa.IdPremisesNavigation.PremisesNum);
+                }
+                foreach (var ospa in ownerSubPremisesAssoc.Where(ospa => ospa.IdProcess == ownerProcess.IdProcess))
+                {
+                    curOwnerProcessAddresses.Add(
+                        ospa.IdSubPremisesNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation.StreetName
+                        + ", д." + ospa.IdSubPremisesNavigation.IdPremisesNavigation.IdBuildingNavigation.House + ", " +
+                        ospa.IdSubPremisesNavigation.IdPremisesNavigation.IdPremisesTypeNavigation.PremisesTypeShort +
+                        ospa.IdSubPremisesNavigation.IdPremisesNavigation.PremisesNum +
+                        ", к." + ospa.IdSubPremisesNavigation.SubPremisesNum);
+                }
+                addresses.Add(ownerProcess.IdProcess, curOwnerProcessAddresses);
+            }
+            return addresses;
         }
 
         private IQueryable<OwnerProcesses> GetQueryFilter(IQueryable<OwnerProcesses> query, OwnerProcessesListFilter filterOptions)
@@ -102,11 +157,11 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
-        public List<OwnerProcesses> GetQueryPage(IQueryable<OwnerProcesses> query, PageOptions pageOptions)
+        public IQueryable<OwnerProcesses> GetQueryPage(IQueryable<OwnerProcesses> query, PageOptions pageOptions)
         {
             return query
                 .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
-                .Take(pageOptions.SizePage).ToList();
+                .Take(pageOptions.SizePage);
         }
 
         public OwnerProcesses CreateOwnerProcess()

@@ -45,8 +45,7 @@ namespace RegistryWeb.ViewComponents
                         .Distinct()
                         .AsNoTracking();
                     ViewBag.Premises = registryContext.Premises
-                        .Where(p => p.IdBuilding == address.IdBuilding && p.IdPremisesType == address.IdPremisesType)
-                        .AsNoTracking();
+                        .Where(p => p.IdBuilding == address.IdBuilding && p.IdPremisesType == address.IdPremisesType);
                     ViewBag.ClassAssoc = "premiseBlock";
                     if (address.IdTypeAddress == 3)
                     {

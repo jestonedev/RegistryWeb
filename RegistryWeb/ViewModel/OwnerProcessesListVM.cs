@@ -10,6 +10,6 @@ namespace RegistryWeb.ViewModel
     public class OwnerProcessesListVM : ListVM<OwnerProcessesListFilter>
     {
         public IEnumerable<OwnerProcesses> OwnerProcesses { get; set; }
-        public IEnumerable<OwnerType> OwnerTypes { get; set; }
+        public Dictionary<int, IEnumerable<string>> Addresses { get; set; }
     }
 }
