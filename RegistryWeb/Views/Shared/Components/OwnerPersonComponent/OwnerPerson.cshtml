@@ -2,37 +2,31 @@
 @{
     var i = ViewBag.Id;
 }
-<div class="form-row ownerBlock" data-id="@i">
+<tr class="ownerBlock" data-id="@i">
     <input type="hidden" asp-for="IdOwnerProcess" name="OwnerPersons[@i].IdOwnerProcess" />
     <input type="hidden" asp-for="IdOwnerPersons" name="OwnerPersons[@i].IdOwnerPersons" />
-    <div class="form-row col">
-        <div class="form-group col-2">
-            <label class="control-label">Доля</label>
-            <div class="input-group">
-                <input type="text" asp-for="NumeratorShare" name="OwnerPersons[@i].NumeratorShare" class="form-control" />
-                <div class="input-group-prepend input-group-append">
-                    <span class="input-group-text">/</span>
-                </div>
-                <input type="text" asp-for="DenominatorShare" name="OwnerPersons[@i].DenominatorShare" class="form-control" />
+    <td class="align-middle">
+        <div class="input-group">
+            <input type="text" asp-for="NumeratorShare" name="OwnerPersons[@i].NumeratorShare" class="form-control" />
+            <div class="input-group-prepend input-group-append">
+                <span class="input-group-text">/</span>
             </div>
+            <input type="text" asp-for="DenominatorShare" name="OwnerPersons[@i].DenominatorShare" class="form-control" />
         </div>
-        <div class="form-group col">
-            <label class="control-label">Фамилия</label>
-            <input type="text" asp-for="Surname" name="OwnerPersons[@i].Surname" class="form-control" />
-        </div>
-        <div class="form-group col">
-            <label class="control-label">Имя</label>
-            <input type="text" asp-for="Name" name="OwnerPersons[@i].Name" class="form-control" />
-        </div>
-        <div class="form-group col">
-            <label class="control-label">Отчество</label>
-            <input type="text" asp-for="Patronymic" name="OwnerPersons[@i].Patronymic" class="form-control" />
-        </div>
-    </div>
+    </td>
+    <td class="align-middle">
+        <input type="text" asp-for="Surname" name="OwnerPersons[@i].Surname" class="form-control" />
+    </td>
+    <td class="align-middle">
+        <input type="text" asp-for="Name" name="OwnerPersons[@i].Name" class="form-control" />
+    </td>
+    <td class="align-middle">
+        <input type="text" asp-for="Patronymic" name="OwnerPersons[@i].Patronymic" class="form-control" />
+    </td>
     @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
     {
-        <div class="col-1">
-            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"></a>
-        </div>
+        <td class="align-middle">
+            <a class="btn btn-danger close" title="Удалить" aria-label="Удалить">&#10006;</a>
+        </td>
     }
-</div>
+</tr>

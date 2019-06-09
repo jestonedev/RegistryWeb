@@ -21,6 +21,8 @@ var recalculationOwnerId = function (id) {
             $('input[name="OwnerPersons[' + oldId + '].Surname"]').attr('name', 'OwnerPersons[' + i + '].Surname');
             $('input[name="OwnerPersons[' + oldId + '].Name"]').attr('name', 'OwnerPersons[' + i + '].Name');
             $('input[name="OwnerPersons[' + oldId + '].Patronymic"]').attr('name', 'OwnerPersons[' + i + '].Patronymic');
+            $('input[name="OwnerPersons[' + oldId + '].NumeratorShare"]').attr('name', 'OwnerPersons[' + i + '].NumeratorShare');
+            $('input[name="OwnerPersons[' + oldId + '].DenominatorShare"]').attr('name', 'OwnerPersons[' + i + '].DenominatorShare');
             continue;
         }
         $('input[name="OwnerOrginfos[' + oldId + '].IdProcess"]').attr('name', 'OwnerOrginfos[' + i + '].IdProcess');
@@ -32,7 +34,7 @@ var recalculationOwnerId = function (id) {
 $(function () {
     $('#owners').click(function (event) {
         var id = $(event.target).parents().filter('.ownerBlock').attr('data-id');
-        if ($(event.target).hasClass('oi-x'))
+        if ($(event.target).hasClass('close'))
             ownerDelete(id);
     });
 });

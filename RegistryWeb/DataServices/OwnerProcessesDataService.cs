@@ -256,6 +256,14 @@ namespace RegistryWeb.DataServices
                     newOwnerProcess.OwnerPersons.Add(op);
                 }
             }
+            foreach (var oo in oldOwnerProcess.OwnerOrginfos)
+            {
+                if (newOwnerProcess.OwnerOrginfos.Select(owo => owo.IdOrginfo).Contains(oo.IdOrginfo) == false)
+                {
+                    oo.Deleted = 1;
+                    newOwnerProcess.OwnerOrginfos.Add(oo);
+                }
+            }
             foreach (var oba in oldOwnerProcess.OwnerBuildingsAssoc)
             {
                 if (newOwnerProcess.OwnerBuildingsAssoc.Select(owba => owba.IdAssoc).Contains(oba.IdAssoc) == false)

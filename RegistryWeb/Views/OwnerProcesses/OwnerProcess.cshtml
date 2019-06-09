@@ -63,68 +63,96 @@
                 new { addressAssoc = Model.OwnerSubPremisesAssoc[i], id = i, action = ViewBag.Action })
         }
     </div>
-    <div>
-        <div class="card-header" id="headingOwnerReasons">
-            <div class="d-flex justify-content-between">
-                <h3>Основания собственности</h3>
-                <div class="btn-group">
-                    <a href="#" class="btn btn-primary" data-toggle="collapse" data-target="#collapseOwnerReasons" aria-expanded="false" aria-controls="collapseOwnerReasons">˅</a>
-                    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-                    {
+
+    <div class="card-header" id="headingOwnerReasons">
+        <div class="d-flex justify-content-between">
+            <h3>Основания собственности</h3>
+            <div class="btn-group">
+                @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                {
                     <a class="btn btn-success" title="Добавить основание" aria-label="Добавить основание" id="ownerReasonAdd">&#10010;</a>
-                    }
-                </div>
+                }
+                <a href="#" class="btn btn-primary" data-toggle="collapse" data-target="#collapseOwnerReasons" aria-expanded="true" aria-controls="collapseOwnerReasons">˅</a>
             </div>
         </div>
-        <div id="collapseOwnerReasons" class="collapse" aria-labelledby="headingOwnerReasons">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Название</th>
-                        <th>Номер</th>
-                        <th>Дата</th>
-                        @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-                        {
-                            <th></th>
-                        }
-                    </tr>
-                </thead>
-                <tbody id="ownerReasons">
-                    @for (var i = 0; i < Model.OwnerReasons.Count(); i++)
+    </div>
+    <div id="collapseOwnerReasons" class="collapse show" aria-labelledby="headingOwnerReasons">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Номер</th>
+                    <th>Дата</th>
+                    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
                     {
-                        @await Component.InvokeAsync("OwnerReasonComponent",
-                            new { ownerReason = Model.OwnerReasons[i], id = i, action = ViewBag.Action })
+                        <th></th>
                     }
-                </tbody>
-            </table>
-            
-        </div>
+                </tr>
+            </thead>
+            <tbody id="ownerReasons">
+                @for (var i = 0; i < Model.OwnerReasons.Count(); i++)
+                {
+                    @await Component.InvokeAsync("OwnerReasonComponent",
+                        new { ownerReason = Model.OwnerReasons[i], id = i, action = ViewBag.Action })
+                }
+            </tbody>
+        </table>
     </div>
-    <div id="owners">
-        <div class="d-flex justify-content-between mb-1 mt-3">
+
+    <div class="card-header" id="headingOwnerPersons">
+        <div class="d-flex justify-content-between">
             <h3>Собственники</h3>
-            @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-            {
-            <a class="btn btn-success" title="Добавить собственника" aria-label="Добавить собственника" id="ownerAdd">Добавить</a>
-            }
+            <div class="btn-group">
+                @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                {
+                    <a class="btn btn-success" title="Добавить собственника" aria-label="Добавить собственника" id="ownerAdd">&#10010;</a>
+                }
+                <a href="#" class="btn btn-primary" data-toggle="collapse" data-target="#collapseOwnerPersons" aria-expanded="true" aria-controls="collapseOwnerPersons">˅</a>
+            </div>
         </div>
-        @if (Model.IdOwnerType == 1)
-        {
-            @for (var i = 0; i < Model.OwnerPersons.Count(); i++)
-            {
-                @await Component.InvokeAsync("OwnerPersonComponent",
-                    new { ownerPerson = Model.OwnerPersons[i], id = i, action = ViewBag.Action })
-            }
-        }
-        else
-        {
-            @for (var i = 0; i < Model.OwnerOrginfos.Count(); i++)
-            {
-                @await Component.InvokeAsync("OwnerOrginfoComponent",
-                    new { ownerOrginfo = Model.OwnerOrginfos[i], id = i, action = ViewBag.Action })
-            }
-        }
     </div>
+    <div id="collapseOwnerPersons" class="collapse show" aria-labelledby="headingOwnerPersons">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Доля</th>
+                    @if (Model.IdOwnerType == 1)
+                    {
+                        <th>Фамилия</th>
+                        <th>Имя</th>
+                        <th>Отчество</th>
+                    }
+                    else
+                    {
+                        <th>Наименование</th>
+                    }
+                    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                    {
+                        <th></th>
+                    }
+                </tr>
+            </thead>
+            <tbody id="owners">
+                @if (Model.IdOwnerType == 1)
+                {
+                    @for (var i = 0; i < Model.OwnerPersons.Count(); i++)
+                    {
+                        @await Component.InvokeAsync("OwnerPersonComponent",
+                            new { ownerPerson = Model.OwnerPersons[i], id = i, action = ViewBag.Action })
+                    }
+                }
+                else
+                {
+                    @for (var i = 0; i < Model.OwnerOrginfos.Count(); i++)
+                    {
+                        @await Component.InvokeAsync("OwnerOrginfoComponent",
+                            new { ownerOrginfo = Model.OwnerOrginfos[i], id = i, action = ViewBag.Action })
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
     <div class="btn-group mt-2" role="group" aria-label="Панель доступа">
         <a class="btn btn-primary" asp-controller="OwnerProcesses" asp-action="Index">Назад</a>
         @if (ViewBag.Action == "Create")

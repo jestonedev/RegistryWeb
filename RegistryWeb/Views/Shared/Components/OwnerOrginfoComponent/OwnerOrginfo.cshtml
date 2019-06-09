@@ -2,17 +2,16 @@
 @{
     var i = ViewBag.Id;
 }
-<div class="form-row ownerBlock" data-id="@i">
+<tr class="ownerBlock" data-id="@i">
     <input type="hidden" asp-for="IdProcess" name="OwnerOrginfos[@i].IdProcess" />
     <input type="hidden" asp-for="IdOrginfo" name="OwnerOrginfos[@i].IdOrginfo" />
-    <div class="form-group col">
-        <label class="control-label">Наименование</label>
+    <td class="align-middle">
         <input type="text" asp-for="OrgName" name="OwnerOrginfos[@i].OrgName" class="form-control" />
-    </div>
+    </td>
     @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
     {
-        <div class="col-1">
-            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"></a>
-        </div>
+        <td class="align-middle">
+            <a class="btn btn-danger close" title="Удалить" aria-label="Удалить">&#10006;</a>
+        </td>
     }
-</div>
+</tr>
