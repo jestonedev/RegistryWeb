@@ -5,6 +5,15 @@
 <tr class="ownerBlock" data-id="@i">
     <input type="hidden" asp-for="IdProcess" name="OwnerOrginfos[@i].IdProcess" />
     <input type="hidden" asp-for="IdOrginfo" name="OwnerOrginfos[@i].IdOrginfo" />
+    <td class="align-middle" width="150">
+        <div class="input-group">
+            <input type="text" asp-for="NumeratorShare" name="OwnerOrginfos[@i].NumeratorShare" class="form-control" />
+            <div class="input-group-prepend input-group-append">
+                <span class="input-group-text">/</span>
+            </div>
+            <input type="text" asp-for="DenominatorShare" name="OwnerOrginfos[@i].DenominatorShare" class="form-control" />
+        </div>
+    </td>
     <td class="align-middle">
         <input type="text" asp-for="OrgName" name="OwnerOrginfos[@i].OrgName" class="form-control" />
     </td>
