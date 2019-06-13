@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace RegistryWeb.Models.Entities
 {
@@ -16,8 +17,10 @@ namespace RegistryWeb.Models.Entities
         }
 
         public int IdProcess { get; set; }
+        [Range(1, 3)]
         public int IdOwnerType { get; set; }
         public DateTime? AnnulDate { get; set; }
+        [Required(ErrorMessage = "Поле «Дата возникновения прав собственности» является обязательным для заполнения")]
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public string Comment { get; set; }

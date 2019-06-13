@@ -3,17 +3,23 @@
     var i = ViewBag.Id;
 }
 <tr class="ownerReasonBlock" data-id="@i">
-    <input type="hidden" asp-for="IdProcess" name="OwnerReasons[@i].IdProcess" />
-    <input type="hidden" asp-for="IdReason" name="OwnerReasons[@i].IdReason" />
+    <input type="hidden" asp-for="IdProcess" id="OwnerReasons_@(i)__IdProcess" name="OwnerReasons[@i].IdProcess" />
+    <input type="hidden" asp-for="IdReason" id="OwnerReasons_@(i)__IdReason" name="OwnerReasons[@i].IdReason" />
     <td class="align-middle">
         <select class="form-control" asp-for="IdReasonType" name="OwnerReasons[@i].IdReasonType" asp-items="@{
                     new SelectList(ViewBag.OwnerReasonTypes, "IdReasonType", "ReasonName")}"></select>
     </td>
     <td class="align-middle">
-        <input type="text" asp-for="ReasonNumber" name="OwnerReasons[@i].ReasonNumber" class="form-control" />
+        <input type="text" asp-for="ReasonNumber"
+               id="OwnerReasons_@(i)__ReasonNumber" name="OwnerReasons[@i].ReasonNumber" class="form-control"
+               data-val="true" data-val-required="Поле «Номер» является обязательным для заполнения"  />
+        <span class="text-danger field-validation-valid" data-valmsg-for="OwnerReasons[@i].ReasonNumber" data-valmsg-replace="true"></span>
     </td>
     <td class="align-middle">
-        <input type="date" asp-for="ReasonDate" name="OwnerReasons[@i].ReasonDate" class="form-control" />
+        <input type="date" asp-for="ReasonDate"
+               id="OwnerReasons_@(i)__ReasonDate" name="OwnerReasons[@i].ReasonDate" class="form-control"
+               data-val="true" data-val-required="Поле «Дата» является обязательным для заполнения"  />
+        <span class="text-danger field-validation-valid" data-valmsg-for="OwnerReasons[@i].ReasonDate" data-valmsg-replace="true"></span>
     </td>
     @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
     {

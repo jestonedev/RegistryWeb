@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.Models.Entities;
+using System.Collections.Generic;
 
 namespace RegistryWeb.ViewComponents
 {

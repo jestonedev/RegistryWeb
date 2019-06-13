@@ -1,4 +1,11 @@
-﻿$(function () {
+﻿var refreshValidation = function () {
+    var form = $("#r-ownerprocess-form")
+        .removeData("validator")
+        .removeData("unobtrusiveValidation");
+    $.validator.unobtrusive.parse(form);
+    form.validate();
+}
+$(function () {
     var action = $('form').data('action');
     $('#addressAdd').on("click", function () {
         var id = $('.buildingBlock').length;
@@ -22,6 +29,7 @@
             data: { id: id, action: action },
             success: function (data) {
                 $('#ownerReasons').append(data);
+                refreshValidation();
             }
         });
     });
@@ -38,6 +46,7 @@
             data: { idOwnerType: idOwnerType, id: id, action: action },
             success: function (data) {
                 $('#owners').append(data);
+                refreshValidation();
             }
         });
     });

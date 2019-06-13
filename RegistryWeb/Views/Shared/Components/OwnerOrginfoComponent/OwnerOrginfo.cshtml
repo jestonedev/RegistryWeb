@@ -1,21 +1,30 @@
 ﻿@model RegistryWeb.Models.Entities.OwnerOrginfos;
 @{
-    var i = ViewBag.Id;
+    int i = ViewBag.Id;
 }
 <tr class="ownerBlock" data-id="@i">
-    <input type="hidden" asp-for="IdProcess" name="OwnerOrginfos[@i].IdProcess" />
-    <input type="hidden" asp-for="IdOrginfo" name="OwnerOrginfos[@i].IdOrginfo" />
+    <input type="hidden" asp-for="IdProcess" id="OwnerOrginfos_@(i)__IdProcess" name="OwnerOrginfos[@i].IdProcess" />
+    <input type="hidden" asp-for="IdOrginfo" id="OwnerOrginfos_@(i)__IdOrginfo" name="OwnerOrginfos[@i].IdOrginfo" />
     <td class="align-middle" width="150">
         <div class="input-group">
-            <input type="text" asp-for="NumeratorShare" name="OwnerOrginfos[@i].NumeratorShare" class="form-control" />
+            <input type="text" asp-for="NumeratorShare"
+             id="OwnerOrginfos_@(i)__NumeratorShare" name="OwnerOrginfos[@i].NumeratorShare" class="form-control"
+             data-val="true" data-val-range="Поле «Числитель» должно лежать между 1 и 1024" data-val-range-max="1024" data-val-range-min="1" data-val-required="Поле «Числитель» является обязательным для заполнения" />
+            <span class="text-danger field-validation-valid" data-valmsg-for="OwnerOrginfos[@i].NumeratorShare" data-valmsg-replace="true"></span>
             <div class="input-group-prepend input-group-append">
                 <span class="input-group-text">/</span>
             </div>
-            <input type="text" asp-for="DenominatorShare" name="OwnerOrginfos[@i].DenominatorShare" class="form-control" />
+            <input type="text" asp-for="DenominatorShare"
+             id="OwnerOrginfos_@(i)__DenominatorShare" name="OwnerOrginfos[@i].DenominatorShare" class="form-control"
+             data-val="true" data-val-range="Поле «Знаменатель» должно лежать между 1 и 1024" data-val-range-max="1024" data-val-range-min="1" data-val-required="Поле «Знаменатель» является обязательным для заполнения" />
+            <span class="text-danger field-validation-valid" data-valmsg-for="OwnerOrginfos[@i].DenominatorShare" data-valmsg-replace="true"></span>
         </div>
     </td>
     <td class="align-middle">
-        <input type="text" asp-for="OrgName" name="OwnerOrginfos[@i].OrgName" class="form-control" />
+        <input type="text" asp-for="OrgName"
+         id="OwnerOrginfos_@(i)__OrgName" name="OwnerOrginfos[@i].OrgName" class="form-control"
+         data-val="true" data-val-required="Поле «Наименование» является обязательным для заполнения" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="OwnerOrginfos[@i].OrgName" data-valmsg-replace="true"></span>
     </td>
     @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
     {

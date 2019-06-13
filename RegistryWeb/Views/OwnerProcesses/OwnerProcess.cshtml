@@ -11,9 +11,10 @@
 }
 
 <h2>@ViewData["Title"]</h2>
-<form asp-controller="OwnerProcesses" asp-action="@ViewBag.Action" data-action="@ViewBag.Action" method="post">
+<form asp-controller="OwnerProcesses" asp-action="@ViewBag.Action" id="r-ownerprocess-form" data-action="@ViewBag.Action" method="post">
     <input type="hidden" asp-for="IdProcess" />
     <h3 class="mb-1 mt-3">Общая информация</h3>
+    <div class="validation text-danger" asp-validation-summary="All"></div>
     <div class="form-row">
         <div class="form-group col-md-6">
             <label class="control-label">Тип собственника</label>
@@ -29,6 +30,7 @@
         <div class="form-group col-md-6">
             <label asp-for="FromDate" class="control-label">Дата возникновения прав собственности</label>
             <input type="date" asp-for="FromDate" class="form-control" />
+            <span asp-validation-for="FromDate" class="text-danger"></span>
         </div>
         <div class="form-group col-md-6">
             <label asp-for="ToDate" class="control-label">Дата прекращения прав собственности</label>
@@ -171,20 +173,22 @@
 </form>
 
 @section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/js/address.common.js" asp-append-version="true"></script>
     <script src="~/js/ownerReason.common.js" asp-append-version="true"></script>
     <script src="~/js/owner.common.js" asp-append-version="true"></script>
     <script src="~/js/ownerProcess.common.js" asp-append-version="true"></script>
-    @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete") 
+    @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
     {
         <script>
             $(function () {
                 $('select').prop('disabled', true);
-                $('input').prop('disabled', true);
-                $('textarea').prop('disabled', true);
-                $('input[type="hidden"]').prop('disabled', false);
-                $('input[type="submit"]').prop('disabled', false);
-            })
+            $('input').prop('disabled', true);
+            $('textarea').prop('disabled', true);
+            $('input[type="hidden"]').prop('disabled', false);
+            $('input[type="submit"]').prop('disabled', false);
+        })
         </script>
     }
 }

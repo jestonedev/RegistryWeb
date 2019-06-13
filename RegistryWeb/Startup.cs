@@ -8,6 +8,8 @@ using RegistryWeb.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using RegistryWeb.DataServices;
 using RegistryWeb.Models;
+using System.Globalization;
+using System.Collections.Generic;
 
 namespace RegistryWeb
 {
@@ -23,11 +25,11 @@ namespace RegistryWeb
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(options =>
+            services.Configure<RequestLocalizationOptions>(options =>
             {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("ru-RU");
+                options.SupportedCultures = new List<CultureInfo> { new CultureInfo("ru-RU") };
+                options.RequestCultureProviders.Clear();
             });
 
             string connection = Configuration.GetConnectionString("DefaultConnection");

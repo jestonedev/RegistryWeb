@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
@@ -29,9 +30,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Create()
         {
-            ViewBag.Action = "Create";
-            ViewBag.OwnerTypes = dataService.GetOwnerTypes;
-            return View("OwnerProcess", dataService.CreateOwnerProcess());
+            return GetOwnerProcessView(dataService.CreateOwnerProcess());
         }
 
         [HttpPost]
@@ -39,8 +38,12 @@ namespace RegistryWeb.Controllers
         {
             if (ownerProcess != null)
             {
-                dataService.Create(ownerProcess);
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    dataService.Create(ownerProcess);
+                    return RedirectToAction("Index");
+                }
+                return GetOwnerProcessView(ownerProcess);
             }
             return NotFound();
         }
@@ -63,7 +66,7 @@ namespace RegistryWeb.Controllers
             //физ. лицо
             if (idOwnerType == 1)
                 return ViewComponent("OwnerPersonComponent", new { ownerPerson = new OwnerPersons(), id, action });
-                    
+
             //юр. лицо или ип
             return ViewComponent("OwnerOrginfoComponent", new { ownerOrginfo = new OwnerOrginfos(), id, action });
         }
@@ -75,12 +78,10 @@ namespace RegistryWeb.Controllers
             var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
             if (ownerProcess == null)
                 return NotFound();
-            ViewBag.Action = "Details";
-            ViewBag.OwnerTypes = dataService.GetOwnerTypes;
-            return View("OwnerProcess", ownerProcess);
+            return GetOwnerProcessView(ownerProcess);
         }
 
-        [HttpGet, ActionName("Delete")]
+        [HttpGet]
         public IActionResult ConfirmDelete(int? idProcess)
         {
             if (idProcess == null)
@@ -88,9 +89,7 @@ namespace RegistryWeb.Controllers
             var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
             if (ownerProcess == null)
                 return NotFound();
-            ViewBag.Action = "Delete";
-            ViewBag.OwnerTypes = dataService.GetOwnerTypes;
-            return View("OwnerProcess", ownerProcess);
+            return GetOwnerProcessView(ownerProcess);
         }
 
         [HttpPost]
@@ -104,17 +103,15 @@ namespace RegistryWeb.Controllers
             return NotFound();
         }
 
-        [HttpGet, ActionName("Edit")]
-        public IActionResult ConfirmEdit(int? idProcess)
+        [HttpGet]
+        public IActionResult Edit(int? idProcess)
         {
             if (idProcess == null)
                 return NotFound();
             var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
             if (ownerProcess == null)
                 return NotFound();
-            ViewBag.Action = "Edit";
-            ViewBag.OwnerTypes = dataService.GetOwnerTypes;
-            return View("OwnerProcess", ownerProcess);
+            return GetOwnerProcessView(ownerProcess);
         }
 
         [HttpPost]
@@ -122,10 +119,21 @@ namespace RegistryWeb.Controllers
         {
             if (ownerProcess != null)
             {
-                dataService.Edit(ownerProcess);
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    dataService.Edit(ownerProcess);
+                    return RedirectToAction("Index");
+                }
+                return GetOwnerProcessView(ownerProcess);
             }
             return NotFound();
+        }
+
+        public IActionResult GetOwnerProcessView(OwnerProcesses ownerProcess, [CallerMemberName]string action = "")
+        {
+            ViewBag.Action = action;
+            ViewBag.OwnerTypes = dataService.GetOwnerTypes;
+            return View("OwnerProcess", ownerProcess);
         }
 
         public IActionResult Error()
