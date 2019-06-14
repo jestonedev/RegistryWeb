@@ -10,19 +10,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace RegistryWeb.DataServices
 {
-    public class OwnerProcessesDataService : ListDataService<OwnerProcessesListVM, OwnerProcessesListFilter>
+    public class OwnerProcessesDataService : ListDataService<OwnerProcessesVM, OwnerProcessesListFilter>
     {
         public OwnerProcessesDataService(RegistryContext registryContext) : base(registryContext)
         {
         }
 
-        public override OwnerProcessesListVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, OwnerProcessesListFilter filterOptions)
+        public override OwnerProcessesVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, OwnerProcessesListFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
             return viewModel;
         }
 
-        public OwnerProcessesListVM GetViewModel(
+        public OwnerProcessesVM GetViewModel(
             OrderOptions orderOptions,
             PageOptions pageOptions,
             OwnerProcessesListFilter filterOptions)
@@ -44,7 +44,8 @@ namespace RegistryWeb.DataServices
         {
             return registryContext.OwnerProcesses
                 .Include(op => op.IdOwnerTypeNavigation)
-                .AsNoTracking();
+                .AsNoTracking()
+                .OrderBy(op => op.IdProcess);
         }
 
         private Dictionary<int, IEnumerable<string>> GetAddresses(IEnumerable<OwnerProcesses> ownerProcesses)

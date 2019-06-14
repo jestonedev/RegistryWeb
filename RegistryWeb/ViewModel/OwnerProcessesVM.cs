@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RegistryWeb.ViewModel
 {
-    public class OwnerProcessesListVM : ListVM<OwnerProcessesListFilter>
+    public class OwnerProcessesVM : ListVM<OwnerProcessesListFilter>
     {
         public IEnumerable<OwnerProcesses> OwnerProcesses { get; set; }
         public Dictionary<int, IEnumerable<string>> Addresses { get; set; }

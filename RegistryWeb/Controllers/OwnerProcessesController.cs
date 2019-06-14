@@ -17,7 +17,7 @@ namespace RegistryWeb.Controllers
         {
         }
 
-        public IActionResult Index(OwnerProcessesListVM viewModel)
+        public IActionResult Index(OwnerProcessesVM viewModel)
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();

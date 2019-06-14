@@ -4,13 +4,13 @@ using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers
 {
-    public class PremisesListController : ListController<PremisesListDataService>
+    public class BuildingsController : ListController<BuildingsListDataService>
     {
-        public PremisesListController(PremisesListDataService dataService) : base(dataService)
+        public BuildingsController(BuildingsListDataService dataService) : base(dataService)
         {
         }
 
-        public IActionResult Index(PremisesListVM viewModel)
+        public IActionResult Index(BuildingsListVM viewModel)
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();

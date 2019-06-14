@@ -38,10 +38,7 @@ namespace RegistryWeb
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddTransient<BuildingsListDataService>();
-            services.AddTransient<BuildingDataService>();
             services.AddTransient<PremisesListDataService>();
-            services.AddTransient<PremiseDataService>();
-            services.AddTransient<FundsHistoryDataService>();
             services.AddTransient<OwnerProcessesDataService>();
         }
 

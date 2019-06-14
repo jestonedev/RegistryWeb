@@ -1,20 +1,5 @@
 ﻿@model RegistryWeb.ViewModel.BuildingsListVM;
 @using RegistryWeb.ViewOptions;
-@{
-    var headers = new[]
-    {
-        new
-        {
-            Name = "№ по реестру",
-            Field = "IdBuilding"
-        },
-        new
-        {
-            Name = "Текущее состояние",
-            Field = "ObjectState"
-        }
-    };
-}
 <table class="table table-hover">
     <thead>
         <tr>
@@ -51,12 +36,12 @@
                 <td>@item.NumPremises</td>
                 <td>@item.IdHeatingTypeNavigation.HeatingType1</td>
                 <td>
-                    <a class="btn btn-default oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                    @*<a class="btn btn-default oi oi-eye" title="Подробнее" aria-label="Подробнее"
                        asp-action="Details" asp-controller="Building" asp-route-idBuilding="@item.IdBuilding"></a>
                     <a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
                        asp-action="Edit" asp-controller="Building" asp-route-idBuilding="@item.IdBuilding"></a>
                     <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                       asp-action="Delete" asp-controller="Building" asp-route-idBuilding="@item.IdBuilding"></a>
+                       asp-action="Delete" asp-controller="Building" asp-route-idBuilding="@item.IdBuilding"></a>*@
                 </td>
             </tr>
         }

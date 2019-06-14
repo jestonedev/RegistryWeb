@@ -28,16 +28,17 @@
             <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                 <ul class="navbar-nav flex-grow-1">
                     <li class="nav-item">
-                        <a a class="nav-link" asp-area="" asp-controller="BuildingsList" asp-action="Index">Здания</a>
+                        <a a class="nav-link" asp-area="" asp-controller="Buildings" asp-action="Index">Здания</a>
                     </li>
                     <li class="nav-item">
-                        <a a class="nav-link" asp-area="" asp-controller="PremisesList" asp-action="Index">Помещения</a>
+                        <a a class="nav-link" asp-area="" asp-controller="Premises" asp-action="Index">Помещения</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownOwners" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Собственность</a>
-                        <div class="dropdown-menu"  aria-labelledby="navbarDropdownOwners">
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownOwners">
                             <a class="dropdown-item" asp-area="" asp-controller="OwnerProcesses" asp-action="Index">Процессы собственности</a>
                             <a class="dropdown-item" asp-area="" asp-controller="OwnerReasonTypes" asp-action="Index">Типы оснований</a>
+                            <a class="dropdown-item" asp-area="" asp-controller="OwnerReports" asp-action="Index">Отчеты</a>
                         </div>
                     </li>
                 </ul>
