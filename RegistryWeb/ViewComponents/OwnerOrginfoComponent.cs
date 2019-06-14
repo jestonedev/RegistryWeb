@@ -9,7 +9,7 @@ namespace RegistryWeb.ViewComponents
         public OwnerOrginfoComponent()
         { }
 
-        public IViewComponentResult Invoke(OwnerOrginfos ownerOrginfo, int id, string action)
+        public IViewComponentResult Invoke(OwnerOrginfo ownerOrginfo, int id, string action)
         {
             ViewBag.Id = id;
             ViewBag.Action = action;

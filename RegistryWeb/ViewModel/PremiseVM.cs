@@ -8,7 +8,7 @@ namespace RegistryWeb.ViewModel
 { 
     public class PremiseVM
     {
-        public Premises Premise { get; set; }
-        public IEnumerable<OwnershipRights> OwnershipRights { get; set; }
+        public Premise Premise { get; set; }
+        public IEnumerable<OwnershipRight> OwnershipRights { get; set; }
     }
 }

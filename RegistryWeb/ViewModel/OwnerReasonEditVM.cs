@@ -8,7 +8,7 @@ namespace RegistryWeb.ViewModel
 {
     public class OwnerReasonEditVM
     {
-        public OwnerReasons OwnerReason { get;  set; }
-        public IEnumerable<OwnerReasonTypes> OwnerReasonTypes { get; set; }
+        public OwnerReason OwnerReason { get;  set; }
+        public IEnumerable<OwnerReasonType> OwnerReasonTypes { get; set; }
     }
 }

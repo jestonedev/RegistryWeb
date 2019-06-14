@@ -7,13 +7,13 @@ namespace RegistryWeb.Models.Entities
     {
         public HeatingType()
         {
-            Buildings = new List<Buildings>();
+            Buildings = new List<Building>();
         }
 
         public int IdHeatingType { get; set; }
         public string HeatingType1 { get; set; }
         public byte? Deleted { get; set; }
 
-        public virtual IList<Buildings> Buildings { get; set; }
+        public virtual IList<Building> Buildings { get; set; }
     }
 }

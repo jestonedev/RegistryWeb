@@ -19,7 +19,7 @@
         <div class="form-group col">
             <label class="control-label">Тип помещения: </label>
             <select class="form-control" asp-for="FilterOptions.IdPremisesType" asp-items="@{
-                new SelectList(Model.PremisesTypes, "IdPremisesType", "PremisesType", Model.FilterOptions.IdPremisesType)}">
+                new SelectList(Model.PremisesTypes, "IdPremisesType", "PremisesTypeName", Model.FilterOptions.IdPremisesType)}">
                 <option value="">Все типы</option>
             </select>
         </div>
@@ -33,7 +33,7 @@
         <div class="form-group col">
             <label class="control-label">Текущий фонд: </label>
             <select class="form-control" asp-for="FilterOptions.IdFundType" asp-items="@{
-                new SelectList(Model.FundTypes, "IdFundType", "FundType", Model.FilterOptions.IdFundType)}">
+                new SelectList(Model.FundTypes, "IdFundType", "FundTypeName", Model.FilterOptions.IdFundType)}">
                 <option value="">Все фонды</option>
             </select>
         </div>

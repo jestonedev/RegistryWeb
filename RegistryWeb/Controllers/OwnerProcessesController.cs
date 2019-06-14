@@ -34,7 +34,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(OwnerProcesses ownerProcess)
+        public IActionResult Create(OwnerProcess ownerProcess)
         {
             if (ownerProcess != null)
             {
@@ -51,13 +51,13 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public IActionResult AddressAdd(int id, string action)
         {
-            return ViewComponent("AddressComponent", new { addressAssoc = new OwnerBuildingsAssoc(), id, action });
+            return ViewComponent("AddressComponent", new { addressAssoc = new OwnerBuildingAssoc(), id, action });
         }
 
         [HttpPost]
         public IActionResult OwnerReasonAdd(int id, string action)
         {
-            return ViewComponent("OwnerReasonComponent", new { ownerReason = new OwnerReasons(), id, action });
+            return ViewComponent("OwnerReasonComponent", new { ownerReason = new OwnerReason(), id, action });
         }
 
         [HttpPost]
@@ -65,10 +65,10 @@ namespace RegistryWeb.Controllers
         {
             //физ. лицо
             if (idOwnerType == 1)
-                return ViewComponent("OwnerPersonComponent", new { ownerPerson = new OwnerPersons(), id, action });
+                return ViewComponent("OwnerPersonComponent", new { ownerPerson = new OwnerPerson(), id, action });
 
             //юр. лицо или ип
-            return ViewComponent("OwnerOrginfoComponent", new { ownerOrginfo = new OwnerOrginfos(), id, action });
+            return ViewComponent("OwnerOrginfoComponent", new { ownerOrginfo = new OwnerOrginfo(), id, action });
         }
 
         public IActionResult Details(int? idProcess)
@@ -82,7 +82,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpGet]
-        public IActionResult ConfirmDelete(int? idProcess)
+        public IActionResult Delete(int? idProcess)
         {
             if (idProcess == null)
                 return NotFound();
@@ -93,7 +93,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(OwnerProcesses ownerProcess)
+        public IActionResult Delete(OwnerProcess ownerProcess)
         {
             if (ownerProcess != null)
             {
@@ -115,7 +115,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(OwnerProcesses ownerProcess)
+        public IActionResult Edit(OwnerProcess ownerProcess)
         {
             if (ownerProcess != null)
             {
@@ -129,7 +129,7 @@ namespace RegistryWeb.Controllers
             return NotFound();
         }
 
-        public IActionResult GetOwnerProcessView(OwnerProcesses ownerProcess, [CallerMemberName]string action = "")
+        public IActionResult GetOwnerProcessView(OwnerProcess ownerProcess, [CallerMemberName]string action = "")
         {
             ViewBag.Action = action;
             ViewBag.OwnerTypes = dataService.GetOwnerTypes;

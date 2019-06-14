@@ -3,21 +3,23 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th class="r-table-header-cell">
-                <a href="#" data-order-field="IdBuilding" data-order-direction="@OrderDirection.Ascending">
-                    № по реестру
-                </a>
-            </th>
+            @*<th class="r-table-header-cell">
+            <a href="#" data-order-field="IdBuilding" data-order-direction="@OrderDirection.Ascending">
+                № по реестру
+            </a>
+        </th>*@
+            <th>№ по реестру</th>
             <th>Адрес</th>
             <th>Этажность</th>
             <th>Кадастровый номер</th>
             <th>Общая площадь</th>
             <th>Тип сторения (материал)</th>
-            <th class="r-table-header-cell">
+            <th>Текущее состояние</th>
+            @*<th class="r-table-header-cell">
                 <a href="#" data-order-field="ObjectState" data-order-direction="@OrderDirection.Ascending">
                     Текущее состояние
                 </a>
-            </th>
+            </th>*@
             <th>Всего помещений</th>
             <th>Тип отопления</th>
         </tr>
@@ -31,7 +33,7 @@
                 <td>@item.Floors</td>
                 <td>@item.CadastralNum</td>
                 <td>@item.TotalArea</td>
-                <td>@item.IdStructureTypeNavigation.StructureType</td>
+                <td>@item.IdStructureTypeNavigation.StructureTypeName</td>
                 <td>@item.IdStateNavigation.StateNeutral</td>
                 <td>@item.NumPremises</td>
                 <td>@item.IdHeatingTypeNavigation.HeatingType1</td>

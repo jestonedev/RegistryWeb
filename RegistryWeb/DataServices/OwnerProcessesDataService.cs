@@ -40,7 +40,7 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
-        public IQueryable<OwnerProcesses> GetQuery()
+        public IQueryable<OwnerProcess> GetQuery()
         {
             return registryContext.OwnerProcesses
                 .Include(op => op.IdOwnerTypeNavigation)
@@ -48,7 +48,7 @@ namespace RegistryWeb.DataServices
                 .OrderBy(op => op.IdProcess);
         }
 
-        private Dictionary<int, IEnumerable<string>> GetAddresses(IEnumerable<OwnerProcesses> ownerProcesses)
+        private Dictionary<int, IEnumerable<string>> GetAddresses(IEnumerable<OwnerProcess> ownerProcesses)
         {
             var addresses = new Dictionary<int, IEnumerable<string>>();
             var ownerBuildingsAssoc = registryContext.OwnerBuildingsAssoc
@@ -102,7 +102,7 @@ namespace RegistryWeb.DataServices
             return addresses;
         }
 
-        private IQueryable<OwnerProcesses> GetQueryFilter(IQueryable<OwnerProcesses> query, OwnerProcessesListFilter filterOptions)
+        private IQueryable<OwnerProcess> GetQueryFilter(IQueryable<OwnerProcess> query, OwnerProcessesListFilter filterOptions)
         {
             //if (!string.IsNullOrEmpty(filterOptions.Street))
             //{
@@ -132,7 +132,7 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
-        private IQueryable<OwnerProcesses> GetQueryOrder(IQueryable<OwnerProcesses> query, OrderOptions orderOptions)
+        private IQueryable<OwnerProcess> GetQueryOrder(IQueryable<OwnerProcess> query, OrderOptions orderOptions)
         {
             //if (string.IsNullOrEmpty(orderOptions.OrderField) || orderOptions.OrderField == "IdPremises")
             //{
@@ -158,29 +158,29 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
-        public IQueryable<OwnerProcesses> GetQueryPage(IQueryable<OwnerProcesses> query, PageOptions pageOptions)
+        public IQueryable<OwnerProcess> GetQueryPage(IQueryable<OwnerProcess> query, PageOptions pageOptions)
         {
             return query
                 .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
                 .Take(pageOptions.SizePage);
         }
 
-        public OwnerProcesses CreateOwnerProcess()
+        public OwnerProcess CreateOwnerProcess()
         {
-            var ownerProcess = new OwnerProcesses() { IdOwnerType = 1 };
-            ownerProcess.OwnerBuildingsAssoc = new List<OwnerBuildingsAssoc>() { new OwnerBuildingsAssoc() };
-            ownerProcess.OwnerPremisesAssoc = new List<OwnerPremisesAssoc>();
-            ownerProcess.OwnerSubPremisesAssoc = new List<OwnerSubPremisesAssoc>();
-            ownerProcess.OwnerReasons = new List<OwnerReasons>() { new OwnerReasons() };
-            ownerProcess.OwnerPersons = new List<OwnerPersons>() { new OwnerPersons() };
-            ownerProcess.OwnerOrginfos = new List<OwnerOrginfos>() { new OwnerOrginfos() };
+            var ownerProcess = new OwnerProcess() { IdOwnerType = 1 };
+            ownerProcess.OwnerBuildingsAssoc = new List<OwnerBuildingAssoc>() { new OwnerBuildingAssoc() };
+            ownerProcess.OwnerPremisesAssoc = new List<OwnerPremiseAssoc>();
+            ownerProcess.OwnerSubPremisesAssoc = new List<OwnerSubPremiseAssoc>();
+            ownerProcess.OwnerReasons = new List<OwnerReason>() { new OwnerReason() };
+            ownerProcess.OwnerPersons = new List<OwnerPerson>() { new OwnerPerson() };
+            ownerProcess.OwnerOrginfos = new List<OwnerOrginfo>() { new OwnerOrginfo() };
             return ownerProcess;
         }
 
         public IEnumerable<OwnerType> GetOwnerTypes
             => registryContext.OwnerType.AsNoTracking();
 
-        public OwnerProcesses GetOwnerProcess(int idProcess)
+        public OwnerProcess GetOwnerProcess(int idProcess)
         {
             return registryContext.OwnerProcesses
                 .Include(op => op.OwnerBuildingsAssoc)
@@ -193,7 +193,7 @@ namespace RegistryWeb.DataServices
                 .First(op => op.IdProcess == idProcess);
         }
 
-        public void Create(OwnerProcesses ownerProcess)
+        public void Create(OwnerProcess ownerProcess)
         {
             registryContext.OwnerProcesses.Add(ownerProcess);
             registryContext.SaveChanges();
@@ -237,7 +237,7 @@ namespace RegistryWeb.DataServices
             registryContext.SaveChanges();
         }
 
-        public void Edit(OwnerProcesses newOwnerProcess)
+        public void Edit(OwnerProcess newOwnerProcess)
         {
             //Удаление
             var oldOwnerProcess = GetOwnerProcess(newOwnerProcess.IdProcess);

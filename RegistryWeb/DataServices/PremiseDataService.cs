@@ -28,7 +28,7 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
-        public IQueryable<Premises> GetQuery(int idPremise)
+        public IQueryable<Premise> GetQuery(int idPremise)
         {
             return rc.Premises
                 .Include(p => p.IdBuildingNavigation)

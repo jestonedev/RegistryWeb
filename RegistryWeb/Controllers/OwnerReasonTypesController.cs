@@ -30,7 +30,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(OwnerReasonTypes ownerReasonTypes)
+        public IActionResult Create(OwnerReasonType ownerReasonTypes)
         {
             rc.OwnerReasonTypes.Add(ownerReasonTypes);
             rc.SaveChanges();
@@ -49,7 +49,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(OwnerReasonTypes ownerReasonTypes)
+        public IActionResult Edit(OwnerReasonType ownerReasonTypes)
         {
             rc.OwnerReasonTypes.Update(ownerReasonTypes);
             rc.SaveChanges();

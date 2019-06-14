@@ -23,10 +23,10 @@ namespace RegistryWeb.ViewComponents
             ViewBag.Action = action;
             ViewBag.ClassAssoc = "buildingBlock";
             ViewBag.KladrStreets = registryContext.KladrStreets.AsNoTracking();
-            ViewBag.Buildings = new List<Buildings>();
-            ViewBag.PremisesTypes = new List<PremisesTypes>();
-            ViewBag.Premises = new List<Premises>();
-            ViewBag.SubPremises = new List<SubPremises>();
+            ViewBag.Buildings = new List<Building>();
+            ViewBag.PremisesTypes = new List<PremisesType>();
+            ViewBag.Premises = new List<Premise>();
+            ViewBag.SubPremises = new List<SubPremise>();
 
             var address = GetAddress(addressAssoc);
 
@@ -62,9 +62,9 @@ namespace RegistryWeb.ViewComponents
         private Address GetAddress(IAddressAssoc addressAssoc)
         {
             var address = new Address();
-            if (addressAssoc is OwnerBuildingsAssoc)
+            if (addressAssoc is OwnerBuildingAssoc)
             {
-                var oba = (OwnerBuildingsAssoc)addressAssoc;
+                var oba = (OwnerBuildingAssoc)addressAssoc;
                 address.IdProcess = oba.IdProcess;
                 address.IdAssoc = oba.IdAssoc;
                 address.IdTypeAddress = 1;
@@ -77,9 +77,9 @@ namespace RegistryWeb.ViewComponents
                 address.IdStreet = building.IdStreet;
                 address.IdBuilding = building.IdBuilding;
             }
-            if (addressAssoc is OwnerPremisesAssoc)
+            if (addressAssoc is OwnerPremiseAssoc)
             {
-                var opa = (OwnerPremisesAssoc)addressAssoc;
+                var opa = (OwnerPremiseAssoc)addressAssoc;
                 address.IdProcess = opa.IdProcess;
                 address.IdAssoc = opa.IdAssoc;
                 address.IdTypeAddress = 2;
@@ -92,9 +92,9 @@ namespace RegistryWeb.ViewComponents
                 address.IdPremisesType = premise.IdPremisesType;
                 address.IdPremise = premise.IdPremises;
             }
-            if (addressAssoc is OwnerSubPremisesAssoc)
+            if (addressAssoc is OwnerSubPremiseAssoc)
             {
-                var ospa = (OwnerSubPremisesAssoc)addressAssoc;
+                var ospa = (OwnerSubPremiseAssoc)addressAssoc;
                 address.IdProcess = ospa.IdProcess;
                 address.IdAssoc = ospa.IdAssoc;
                 address.IdTypeAddress = 3;

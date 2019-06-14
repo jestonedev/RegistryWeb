@@ -5,7 +5,7 @@ namespace RegistryWeb.ViewModel
 { 
     public class BuildingVM
     {
-        public Buildings Building { get; set; }
-        public IEnumerable<OwnershipRights> OwnershipRights { get; set; }
+        public Building Building { get; set; }
+        public IEnumerable<OwnershipRight> OwnershipRights { get; set; }
     }
 }

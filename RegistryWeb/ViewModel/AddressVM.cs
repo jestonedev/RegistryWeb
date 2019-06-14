@@ -9,7 +9,7 @@ namespace RegistryWeb.ViewModel
 {
     public class AddressVM
     {
-        public IEnumerable<KladrStreets> KladrStreets { get; set; }
+        public IEnumerable<KladrStreet> KladrStreets { get; set; }
         public IEnumerable<Address> Addresses { get; set; }
     }
 }

@@ -6,10 +6,10 @@ namespace RegistryWeb.ViewModel
 {
     public class PremisesListVM : ListVM<PremisesListFilter>
     {
-        public IEnumerable<Premises> Premises { get; set; }
-        public IEnumerable<PremisesTypes> PremisesTypes { get; set; }
-        public IEnumerable<ObjectStates> ObjectStates { get; set; }
-        public IEnumerable<FundTypes> FundTypes { get; set; }
+        public IEnumerable<Premise> Premises { get; set; }
+        public IEnumerable<PremisesType> PremisesTypes { get; set; }
+        public IEnumerable<ObjectState> ObjectStates { get; set; }
+        public IEnumerable<FundType> FundTypes { get; set; }
         //public PremisesListFilterVM PremisesListFilterVM { get; set; }
         //public PremisesListSortVM PremisesListSortVM { get; set; }
 

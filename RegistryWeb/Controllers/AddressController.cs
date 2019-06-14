@@ -50,7 +50,7 @@ namespace RegistryWeb.Controllers
                 .Distinct();
             StringBuilder str = new StringBuilder();
             foreach (var pt in premisesTypes)
-                str.Append("<option value=\"" + pt.IdPremisesType + "\">" + pt.PremisesType + "</option>");
+                str.Append("<option value=\"" + pt.IdPremisesType + "\">" + pt.PremisesTypeName + "</option>");
             return Content(str.ToString());
         }
 

@@ -41,7 +41,7 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
-        public IQueryable<Premises> GetQuery()
+        public IQueryable<Premise> GetQuery()
         {
             return registryContext.Premises
                 .Include(p => p.IdBuildingNavigation)
@@ -79,7 +79,7 @@ namespace RegistryWeb.DataServices
         //        };
         //}
 
-        private IQueryable<Premises> GetQueryFilter(IQueryable<Premises> query, PremisesListFilter filterOptions)
+        private IQueryable<Premise> GetQueryFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
         {
             if (!string.IsNullOrEmpty(filterOptions.Street))
             {
@@ -109,7 +109,7 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
-        private bool FilterTypeFund(Premises premise, PremisesListFilter filterOptions)
+        private bool FilterTypeFund(Premise premise, PremisesListFilter filterOptions)
         {
             var fundsHistory = premise.FundsPremisesAssoc.Select(fpa => fpa.IdFundNavigation);
             var fundHistory = fundsHistory
@@ -117,7 +117,7 @@ namespace RegistryWeb.DataServices
             return fundHistory == null ? false : fundHistory.IdFundTypeNavigation.IdFundType == filterOptions.IdFundType.Value;
         }
 
-        private IQueryable<Premises> GetQueryOrder(IQueryable<Premises> query, OrderOptions orderOptions)
+        private IQueryable<Premise> GetQueryOrder(IQueryable<Premise> query, OrderOptions orderOptions)
         {
             if (string.IsNullOrEmpty(orderOptions.OrderField) || orderOptions.OrderField == "IdPremises")
             {
@@ -129,9 +129,9 @@ namespace RegistryWeb.DataServices
             if(orderOptions.OrderField == "PremisesType")
             {
                 if (orderOptions.OrderDirection == OrderDirection.Ascending)
-                    return query.OrderBy(p => p.IdPremisesTypeNavigation.PremisesType);
+                    return query.OrderBy(p => p.IdPremisesTypeNavigation.PremisesTypeName);
                 else
-                    return query.OrderByDescending(p => p.IdPremisesTypeNavigation.PremisesType);
+                    return query.OrderByDescending(p => p.IdPremisesTypeNavigation.PremisesTypeName);
             }
             if (orderOptions.OrderField == "ObjectState")
             {
@@ -143,17 +143,17 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
-        public List<Premises> GetQueryPage(IQueryable<Premises> query, PageOptions pageOptions)
+        public List<Premise> GetQueryPage(IQueryable<Premise> query, PageOptions pageOptions)
             => query
             .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
             .Take(pageOptions.SizePage).ToList();
 
 
-        private IQueryable<Premises> GetQueryOrderMask(
-            IQueryable<Premises> query,
+        private IQueryable<Premise> GetQueryOrderMask(
+            IQueryable<Premise> query,
             bool compare,
             OrderOptions orderOptions,
-            Expression<Func<Premises, int>> expression)
+            Expression<Func<Premise, int>> expression)
         {
             //query = GetQueryOrderMask(
             //    query,

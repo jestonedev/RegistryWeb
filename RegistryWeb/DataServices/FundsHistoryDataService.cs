@@ -16,13 +16,13 @@ namespace RegistryWeb.DataServices
             this.rc = rc;
         }
 
-        public IEnumerable<FundsHistory> GetViewModel(int idPremises)
+        public IEnumerable<FundHistory> GetViewModel(int idPremises)
         {
             var fundsHistory = GetQuery(idPremises);
             return fundsHistory;
         }
 
-        public IEnumerable<FundsHistory> GetQuery(int idPremises)
+        public IEnumerable<FundHistory> GetQuery(int idPremises)
         {
             return rc.FundsPremisesAssoc
                 .Include(fpa => fpa.IdFundNavigation)

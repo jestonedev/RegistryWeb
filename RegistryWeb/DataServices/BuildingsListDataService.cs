@@ -38,7 +38,7 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
-        public IQueryable<Buildings> GetQuery()
+        public IQueryable<Building> GetQuery()
         {
             return registryContext.Buildings
                 .Include(b => b.IdStreetNavigation)
@@ -48,7 +48,7 @@ namespace RegistryWeb.DataServices
                 .Where(b => b.Deleted == 0)
                 .OrderBy(b => b.IdBuilding);
         }
-        private IQueryable<Buildings> GetQueryFilter(IQueryable<Buildings> query, BuildingsListFilter filterOptions)
+        private IQueryable<Building> GetQueryFilter(IQueryable<Building> query, BuildingsListFilter filterOptions)
         {
             if (!string.IsNullOrEmpty(filterOptions.Street))
             {
@@ -61,7 +61,7 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
-        private IQueryable<Buildings> GetQueryOrder(IQueryable<Buildings> query, OrderOptions orderOptions)
+        private IQueryable<Building> GetQueryOrder(IQueryable<Building> query, OrderOptions orderOptions)
         {
             if (string.IsNullOrEmpty(orderOptions.OrderField) || orderOptions.OrderField == "IdBuilding")
             {
@@ -80,7 +80,7 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
-        public List<Buildings> GetQueryPage(IQueryable<Buildings> query, PageOptions pageOptions)
+        public List<Building> GetQueryPage(IQueryable<Building> query, PageOptions pageOptions)
             => query
             .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
             .Take(pageOptions.SizePage).ToList();

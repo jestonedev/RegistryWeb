@@ -5,7 +5,7 @@ namespace RegistryWeb.ViewModel
 {
     public class BuildingsListVM : ListVM<BuildingsListFilter>
     {
-        public IEnumerable<Buildings> Buildings { get; set; }
-        public IEnumerable<ObjectStates> ObjectStates { get; set; }
+        public IEnumerable<Building> Buildings { get; set; }
+        public IEnumerable<ObjectState> ObjectStates { get; set; }
     }
 }

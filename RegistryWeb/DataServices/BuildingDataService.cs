@@ -26,7 +26,7 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
-        public IQueryable<Buildings> GetQuery(int idBuilding)
+        public IQueryable<Building> GetQuery(int idBuilding)
         {
             return rc.Buildings
                 .Include(b => b.IdStreetNavigation)
@@ -36,7 +36,7 @@ namespace RegistryWeb.DataServices
                 .Where(b => b.IdBuilding == idBuilding);
         }
 
-        public IQueryable<OwnershipRights> GetQueryOwnershipRights(int idBuilding)
+        public IQueryable<OwnershipRight> GetQueryOwnershipRights(int idBuilding)
         {
             return 
                 (from or in rc.OwnershipRights

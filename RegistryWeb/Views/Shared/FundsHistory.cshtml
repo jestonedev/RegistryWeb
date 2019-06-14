@@ -1,5 +1,5 @@
 ﻿@using RegistryWeb.Models.Entities;
-@model IEnumerable<FundsHistory>;
+@model IEnumerable<FundHistory>;
 @{
     ViewData["Title"] = "FundsHistory";
 }
@@ -26,7 +26,7 @@
             <tr>
                 <td>@item.ProtocolNumber</td>
                 <td>@item.ProtocolDate</td>
-                <td>@item.IdFundTypeNavigation.FundType</td>
+                <td>@item.IdFundTypeNavigation.FundTypeName</td>
             </tr>
         }
     </tbody>
