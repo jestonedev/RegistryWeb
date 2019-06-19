@@ -1,6 +1,6 @@
-﻿@model RegistryWeb.Models.Address;
+﻿@model RegistryWeb.Models.ProcessAddress;
 @{ 
-    var i = ViewBag.Id;
+    int i = ViewBag.Id;
 }
 <div class="form-row addressBlock @ViewBag.ClassAssoc mb-2 mt-2 border" data-id="@i">
     @if (Model.IdTypeAddress == 1)
@@ -54,7 +54,7 @@
                 <div class="col premisesTypesGroup">
                     <label class="control-label">Тип помещения</label>
                     <select class="form-control premisesTypes" asp-for="IdPremisesType" asp-items="@{
-                    new SelectList(ViewBag.PremisesTypes, "IdPremisesType", "PremisesType")}"></select>
+                    new SelectList(ViewBag.PremisesTypes, "IdPremisesType", "PremisesTypeName")}"></select>
                 </div>
                 <div class="col premisesNumGroup">
                     <label class="control-label premisesTypeAsNum">Номер квартиры</label>

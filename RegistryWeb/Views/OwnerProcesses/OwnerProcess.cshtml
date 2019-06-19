@@ -118,16 +118,11 @@
             <thead>
                 <tr>
                     <th>Доля</th>
-                    @if (Model.IdOwnerType == 1)
-                    {
-                        <th>Фамилия</th>
-                        <th>Имя</th>
-                        <th>Отчество</th>
-                    }
-                    else
-                    {
-                        <th>Наименование</th>
-                    }
+                    <th class="ownerPersonHeader">Фамилия</th>
+                    <th class="ownerPersonHeader">Имя</th>
+                    <th class="ownerPersonHeader">Отчество</th>
+                    <th class="ownerOrginfoHeader">Наименование</th>
+
                     @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
                     {
                         <th></th>

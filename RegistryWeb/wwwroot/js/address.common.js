@@ -17,11 +17,7 @@
             $(address).find('.kladrStreets').val(ui.item.idStreet);
             kladrStreetSelectListChange(address);
         },
-        minLength: 3,
-        messages: {
-            noResults: '',
-            results: ''
-        }
+        minLength: 3
     });
 };
 

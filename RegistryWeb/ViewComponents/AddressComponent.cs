@@ -59,9 +59,9 @@ namespace RegistryWeb.ViewComponents
             return View("Address", address);
         }
 
-        private Address GetAddress(IAddressAssoc addressAssoc)
+        private ProcessAddress GetAddress(IAddressAssoc addressAssoc)
         {
-            var address = new Address();
+            var address = new ProcessAddress();
             if (addressAssoc is OwnerBuildingAssoc)
             {
                 var oba = (OwnerBuildingAssoc)addressAssoc;

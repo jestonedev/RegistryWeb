@@ -5,7 +5,23 @@
     $.validator.unobtrusive.parse(form);
     form.validate();
 }
+var ownerHeaderChange = function () {
+    if ($('#ownerType').val() == 1) {
+        $('.ownerPersonHeader').show();
+        $('.ownerOrginfoHeader').hide();
+    }
+    else { //2 или 3
+        $('.ownerPersonHeader').hide();
+        $('.ownerOrginfoHeader').show();
+    }
+}
 $(function () {
+    ownerHeaderChange();
+    $('#ownerType').change(function () {
+        $('.ownerBlock').remove();
+        ownerHeaderChange();
+        $('#ownerAdd').click();
+    });
     var action = $('form').data('action');
     $('#addressAdd').on("click", function () {
         var id = $('.buildingBlock').length;
@@ -32,10 +48,6 @@ $(function () {
                 refreshValidation();
             }
         });
-    });
-    $('#ownerType').change(function () {
-        $('.ownerBlock').remove();
-        $('#ownerAdd').click();
     });
     $('#ownerAdd').on("click", function () {
         var id = $('.ownerBlock').length;

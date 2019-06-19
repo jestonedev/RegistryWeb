@@ -10,13 +10,43 @@ using Microsoft.EntityFrameworkCore;
 
 namespace RegistryWeb.DataServices
 {
-    public class OwnerProcessesDataService : ListDataService<OwnerProcessesVM, OwnerProcessesListFilter>
+    public class OwnerProcessesDataService : ListDataService<OwnerProcessesVM, OwnerProcessesFilter>
     {
+        private readonly IQueryable<OwnerBuildingAssoc> ownerBuildingsAssoc;
+        private readonly IQueryable<OwnerPremiseAssoc> ownerPremisesAssoc;
+        private readonly IQueryable<OwnerSubPremiseAssoc> ownerSubPremisesAssoc;
+
         public OwnerProcessesDataService(RegistryContext registryContext) : base(registryContext)
         {
+            ownerBuildingsAssoc = registryContext.OwnerBuildingsAssoc
+                .Include(oba => oba.IdBuildingNavigation)
+                    .ThenInclude(b => b.IdStreetNavigation)
+                .Include(oba => oba.IdProcessNavigation)
+                    .ThenInclude(op => op.IdOwnerTypeNavigation)                                                   
+                .AsNoTracking();
+            ownerPremisesAssoc = registryContext.OwnerPremisesAssoc
+                .Include(opa => opa.IdPremisesNavigation)
+                    .ThenInclude(p => p.IdBuildingNavigation)
+                        .ThenInclude(b => b.IdStreetNavigation)
+                .Include(opa => opa.IdPremisesNavigation)
+                    .ThenInclude(p => p.IdPremisesTypeNavigation)
+                .Include(oba => oba.IdProcessNavigation)
+                    .ThenInclude(op => op.IdOwnerTypeNavigation)
+                .AsNoTracking();
+            ownerSubPremisesAssoc = registryContext.OwnerSubPremisesAssoc
+                .Include(ospa => ospa.IdSubPremisesNavigation)
+                    .ThenInclude(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdBuildingNavigation)
+                            .ThenInclude(b => b.IdStreetNavigation)
+                .Include(ospa => ospa.IdSubPremisesNavigation)
+                    .ThenInclude(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdPremisesTypeNavigation)
+                .Include(oba => oba.IdProcessNavigation)
+                    .ThenInclude(op => op.IdOwnerTypeNavigation)
+                .AsNoTracking();
         }
 
-        public override OwnerProcessesVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, OwnerProcessesListFilter filterOptions)
+        public override OwnerProcessesVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, OwnerProcessesFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
             return viewModel;
@@ -25,7 +55,7 @@ namespace RegistryWeb.DataServices
         public OwnerProcessesVM GetViewModel(
             OrderOptions orderOptions,
             PageOptions pageOptions,
-            OwnerProcessesListFilter filterOptions)
+            OwnerProcessesFilter filterOptions)
         {
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
             var query = GetQuery();
@@ -44,43 +74,25 @@ namespace RegistryWeb.DataServices
         {
             return registryContext.OwnerProcesses
                 .Include(op => op.IdOwnerTypeNavigation)
-                .AsNoTracking()
-                .OrderBy(op => op.IdProcess);
+                .AsNoTracking();
         }
 
         private Dictionary<int, IEnumerable<string>> GetAddresses(IEnumerable<OwnerProcess> ownerProcesses)
         {
             var addresses = new Dictionary<int, IEnumerable<string>>();
-            var ownerBuildingsAssoc = registryContext.OwnerBuildingsAssoc
-                .Include(oba => oba.IdBuildingNavigation)
-                    .ThenInclude(b => b.IdStreetNavigation)
-                .ToList();
-            var ownerPremisesAssoc = registryContext.OwnerPremisesAssoc
-                .Include(opa => opa.IdPremisesNavigation)
-                    .ThenInclude(p => p.IdBuildingNavigation)
-                        .ThenInclude(b => b.IdStreetNavigation)
-                .Include(opa => opa.IdPremisesNavigation)
-                    .ThenInclude(p => p.IdPremisesTypeNavigation)
-                .ToList();
-            var ownerSubPremisesAssoc = registryContext.OwnerSubPremisesAssoc
-                .Include(ospa => ospa.IdSubPremisesNavigation)
-                    .ThenInclude(sp => sp.IdPremisesNavigation)
-                        .ThenInclude(p => p.IdBuildingNavigation)
-                            .ThenInclude(b => b.IdStreetNavigation)
-                .Include(ospa => ospa.IdSubPremisesNavigation)
-                    .ThenInclude(sp => sp.IdPremisesNavigation)
-                        .ThenInclude(p => p.IdPremisesTypeNavigation)
-                .ToList();                
+            var buildingsAssoc = ownerBuildingsAssoc.ToList();
+            var premisesAssoc = ownerPremisesAssoc.ToList();
+            var subPremisesAssoc = ownerSubPremisesAssoc.ToList();
             foreach (var ownerProcess in ownerProcesses)
             {
                 var curOwnerProcessAddresses = new List<string>();
-                foreach (var oba in ownerBuildingsAssoc.Where(oba => oba.IdProcess == ownerProcess.IdProcess))
+                foreach (var oba in buildingsAssoc.Where(oba => oba.IdProcess == ownerProcess.IdProcess))
                 {
                     curOwnerProcessAddresses.Add(
                         oba.IdBuildingNavigation.IdStreetNavigation.StreetName +
                         ", д." + oba.IdBuildingNavigation.House);
                 }
-                foreach (var opa in ownerPremisesAssoc.Where(opa => opa.IdProcess == ownerProcess.IdProcess))
+                foreach (var opa in premisesAssoc.Where(opa => opa.IdProcess == ownerProcess.IdProcess))
                 {
                     curOwnerProcessAddresses.Add(
                         opa.IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation.StreetName +
@@ -88,7 +100,7 @@ namespace RegistryWeb.DataServices
                         opa.IdPremisesNavigation.IdPremisesTypeNavigation.PremisesTypeShort +
                         opa.IdPremisesNavigation.PremisesNum);
                 }
-                foreach (var ospa in ownerSubPremisesAssoc.Where(ospa => ospa.IdProcess == ownerProcess.IdProcess))
+                foreach (var ospa in subPremisesAssoc.Where(ospa => ospa.IdProcess == ownerProcess.IdProcess))
                 {
                     curOwnerProcessAddresses.Add(
                         ospa.IdSubPremisesNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation.StreetName
@@ -102,59 +114,108 @@ namespace RegistryWeb.DataServices
             return addresses;
         }
 
-        private IQueryable<OwnerProcess> GetQueryFilter(IQueryable<OwnerProcess> query, OwnerProcessesListFilter filterOptions)
-        {
-            //if (!string.IsNullOrEmpty(filterOptions.Street))
-            //{
-            //    query = query.Where(p => p.IdBuildingNavigation.IdStreetNavigation.StreetLong.ToLowerInvariant().Contains(filterOptions.Street.ToLowerInvariant()));
-            //}
-            //if (filterOptions.IdPremisesType.HasValue)
-            //{
-            //    query = query.Where(p => p.IdPremisesTypeNavigation.IdPremisesType == filterOptions.IdPremisesType.Value);
-            //}
-            //if (filterOptions.IdObjectState.HasValue)
-            //{
-            //    query = query.Where(p => p.IdStateNavigation.IdState == filterOptions.IdObjectState.Value);
-            //}
-            //if (filterOptions.IdFundType.HasValue)
-            //{
-            //    var idPremises = registryContext.FundsPremisesAssoc
-            //        .Include(fpa => fpa.IdPremisesNavigation)
-            //        .Include(fpa => fpa.IdFundNavigation)
-            //            .ThenInclude(fh => fh.IdFundTypeNavigation)
-            //        .Where(fpa =>
-            //            fpa.IdFundNavigation.ExcludeRestrictionDate == null &&
-            //            fpa.IdFundNavigation.IdFundType == filterOptions.IdFundType.Value)
-            //        .Select(fpa => fpa.IdPremises);
-
-            //    query = query.Where(p => idPremises.Contains(p.IdPremises));
-            //}
+        private IQueryable<OwnerProcess> GetQueryFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
+        { 
+            query = AddressFilter(query, filterOptions);
+            query = OwnerTypeFilter(query, filterOptions);
+            query = IdProcessFilter(query, filterOptions);
             return query;
+        }
+
+        private IQueryable<OwnerProcess> AddressFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
+        {
+            if (filterOptions.Address.AddressType == AddressTypes.None ||
+                string.IsNullOrWhiteSpace(filterOptions.Address.Id) ||
+                string.IsNullOrWhiteSpace(filterOptions.Address.Text))
+                return query;
+            if (filterOptions.Address.AddressType == AddressTypes.Street)
+            {
+                var idBuildingProcesses = ownerBuildingsAssoc.Include(r => r.IdProcessNavigation.IdOwnerTypeNavigation)
+                    .Where(oba => oba.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id))
+                    .Select(oba => oba.IdProcess);
+                var idPremiseProcesses = ownerPremisesAssoc
+                    .Where(opa => opa.IdPremisesNavigation.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id))
+                    .Select(opa => opa.IdProcess);
+                var idSubPremiseProcesses = ownerSubPremisesAssoc
+                    .Where(ospa => ospa.IdSubPremisesNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id))
+                    .Select(ospa => ospa.IdProcess);
+                var idProcesses = idBuildingProcesses.Union(idPremiseProcesses).Union(idSubPremiseProcesses);
+                //query.Join(idProcesses, q => q.IdProcess, idProc => idProc, (q, idProc) => q);
+                return
+                    from q in query
+                    join idProcess in idProcesses on q.IdProcess equals idProcess
+                    select q;
+            }
+            int id = 0;
+            if (!int.TryParse(filterOptions.Address.Id, out id))
+                return query;
+            if (filterOptions.Address.AddressType == AddressTypes.Building)
+            {
+                var idBuildingProcesses = ownerBuildingsAssoc
+                    .Where(oba => oba.IdBuilding == id)
+                    .Select(oba => oba.IdProcess);
+                var idPremiseProcesses = ownerPremisesAssoc
+                    .Where(opa => opa.IdPremisesNavigation.IdBuilding == id)
+                    .Select(opa => opa.IdProcess);
+                var idSubPremiseProcesses = ownerSubPremisesAssoc
+                    .Where(ospa => ospa.IdSubPremisesNavigation.IdPremisesNavigation.IdBuilding == id)
+                    .Select(ospa => ospa.IdProcess);
+                var idProcesses = idBuildingProcesses.Union(idPremiseProcesses).Union(idSubPremiseProcesses);
+                return
+                    from q in query
+                    join idProcess in idProcesses on q.IdProcess equals idProcess
+                    select q;
+            }
+            if (filterOptions.Address.AddressType == AddressTypes.Premise)
+            {
+                var idPremiseProcesses = ownerPremisesAssoc
+                    .Where(opa => opa.IdPremisesNavigation.IdPremises == id)
+                    .Select(opa => opa.IdProcess);
+                var idSubPremiseProcesses = ownerSubPremisesAssoc
+                    .Where(ospa => ospa.IdSubPremisesNavigation.IdPremisesNavigation.IdPremises == id)
+                    .Select(ospa => ospa.IdProcess);
+                var idProcesses = idPremiseProcesses.Union(idSubPremiseProcesses);
+                return
+                    from q in query
+                    join idProcess in idProcesses on q.IdProcess equals idProcess
+                    select q;
+            }
+            if (filterOptions.Address.AddressType == AddressTypes.SubPremise)
+            {
+                var idProcesses = ownerSubPremisesAssoc
+                    .Where(ospa => ospa.IdSubPremisesNavigation.IdSubPremises == id)
+                    .Select(ospa => ospa.IdProcess);
+                return
+                    from q in query
+                    join idProcess in idProcesses on q.IdProcess equals idProcess
+                    select q;
+            }
+            return query;
+        }
+
+        private IQueryable<OwnerProcess> OwnerTypeFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
+        {
+            if (filterOptions.IdOwnerType == null || filterOptions.IdOwnerType.Value == 0)
+                return query;
+            return query.Where(p => p.IdOwnerType == filterOptions.IdOwnerType.Value);
+        }
+
+        private IQueryable<OwnerProcess> IdProcessFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
+        {
+            if (filterOptions.IdProcess == null || filterOptions.IdProcess.Value == 0)
+                return query;
+            return query.Where(p => p.IdProcess == filterOptions.IdProcess.Value);
         }
 
         private IQueryable<OwnerProcess> GetQueryOrder(IQueryable<OwnerProcess> query, OrderOptions orderOptions)
         {
-            //if (string.IsNullOrEmpty(orderOptions.OrderField) || orderOptions.OrderField == "IdPremises")
-            //{
-            //    if (orderOptions.OrderDirection == OrderDirection.Ascending)
-            //        return query.OrderBy(p => p.IdPremises);
-            //    else
-            //        return query.OrderByDescending(p => p.IdPremises);
-            //}
-            //if (orderOptions.OrderField == "PremisesType")
-            //{
-            //    if (orderOptions.OrderDirection == OrderDirection.Ascending)
-            //        return query.OrderBy(p => p.IdPremisesTypeNavigation.PremisesType);
-            //    else
-            //        return query.OrderByDescending(p => p.IdPremisesTypeNavigation.PremisesType);
-            //}
-            //if (orderOptions.OrderField == "ObjectState")
-            //{
-            //    if (orderOptions.OrderDirection == OrderDirection.Ascending)
-            //        return query.OrderBy(p => p.IdStateNavigation.StateNeutral);
-            //    else
-            //        return query.OrderByDescending(p => p.IdStateNavigation.StateNeutral);
-            //}
+            if (string.IsNullOrEmpty(orderOptions.OrderField) || orderOptions.OrderField == "IdProcess")
+            {
+                if (orderOptions.OrderDirection == OrderDirection.Ascending)
+                    return query.OrderBy(p => p.IdProcess);
+                else
+                    return query.OrderByDescending(p => p.IdProcess);
+            }
             return query;
         }
 

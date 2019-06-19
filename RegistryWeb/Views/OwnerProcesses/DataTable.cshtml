@@ -1,8 +1,19 @@
-﻿@model RegistryWeb.ViewModel.OwnerProcessesVM;
+﻿@using RegistryWeb.ViewOptions;
+@model RegistryWeb.ViewModel.OwnerProcessesVM;
 <table class="table table-hover">
     <thead>
         <tr>
-            <th>№ по реестру</th>
+            <th>
+                № по реестру
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Ascending)
+                {
+                    <a href="#" class="oi oi-sort-descending sort " data-order-field="IdProcess" data-order-direction="1"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort" data-order-field="IdProcess" data-order-direction="0"></a>
+                }
+            </th>
             <th>Тип собственника</th>
             <th>Адрес</th>
             <th></th>

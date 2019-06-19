@@ -1,30 +1,33 @@
 ﻿@model RegistryWeb.ViewModel.OwnerProcessesVM;
-
 <form asp-action="Index" method="get" class="r-filter-form">
     <input type="hidden" asp-for="OrderOptions.OrderDirection" />
     <input type="hidden" asp-for="OrderOptions.OrderField" />
     <input type="hidden" asp-for="PageOptions.CurrentPage" />
     <input type="hidden" asp-for="PageOptions.SizePage" />
+    <input type="hidden" asp-for="FilterOptions.Address.AddressType" />
+    <input type="hidden" asp-for="FilterOptions.Address.Id" />
 
     <div class="form-row">
         <div class="form-group col-auto">
             <a class="btn btn-success oi oi-plus" title="Добавить" aria-label="Добавить" asp-controller="OwnerProcesses" asp-action="Create"></a>
         </div>
         <div class="form-group col-2">
-            <input type="text" class="form-control" placeholder="№ по реестру" />
+            <input type="text" class="form-control" placeholder="№ по реестру" asp-for="FilterOptions.IdProcess"/>
         </div>
         <div class="form-group col-2">
-            <select class="form-control" asp-for="FilterOptions.IdProcessType"
-                    asp-items="@{new SelectList(ViewBag.OwnerTypes, "IdOwnerType", "OwnerType1", Model.FilterOptions.IdProcessType)}">
-                <option value="" selected>Тип собственника</option>
+            <select class="form-control" asp-for="FilterOptions.IdOwnerType"
+                    asp-items="@{new SelectList(ViewBag.OwnerTypes, "IdOwnerType", "OwnerType1", Model.FilterOptions.IdOwnerType)}">
+                <option value="" selected>Все собственники</option>
             </select>
         </div>
-        <div class="form-group col-6">
-            <input type="text" class="form-control" asp-for="FilterOptions.Street" placeholder="Улица" />
+        <div class="input-group col-6">
+            <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" placeholder="Адрес" />
+            <div class="input-group-append h-auto d-inline-block">
+                <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
+            </div>
         </div>
         <div class="form-group col">
-            <button class="btn btn-block btn-secondary r-index-search-button" type="submit">Найти</button>
+            <a class="btn btn-block btn-secondary" id="r-search-btn">Найти</a>
         </div>
     </div>
-        
 </form>
