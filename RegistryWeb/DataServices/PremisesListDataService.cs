@@ -144,10 +144,12 @@ namespace RegistryWeb.DataServices
         }
 
         public List<Premise> GetQueryPage(IQueryable<Premise> query, PageOptions pageOptions)
-            => query
-            .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
-            .Take(pageOptions.SizePage).ToList();
-
+        {
+            var result = query;
+            result = result.Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage);
+            result = result.Take(pageOptions.SizePage);
+            return result.ToList();
+        }
 
         private IQueryable<Premise> GetQueryOrderMask(
             IQueryable<Premise> query,

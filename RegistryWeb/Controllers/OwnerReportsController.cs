@@ -5,20 +5,25 @@ using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using RegistryWeb.SecurityServices;
 
 namespace RegistryWeb.Controllers
 {
     public class OwnerReportsController : Controller
     {
-        protected readonly IConfiguration config;
+        private readonly IConfiguration config;
+        private readonly SecurityService securityService;
 
-        public OwnerReportsController(IConfiguration config)
+        public OwnerReportsController(IConfiguration config, SecurityService securityService)
         {
             this.config = config;
+            this.securityService = securityService;
         }
 
         public IActionResult Index()
         {
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+                return View("NotAccess");
             return View();
         }
 

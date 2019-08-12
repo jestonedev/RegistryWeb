@@ -2,13 +2,15 @@
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.Models.Entities;
+using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers
 {
     public class OwnerProcessesController : ListController<OwnerProcessesDataService>
     {
-        public OwnerProcessesController(OwnerProcessesDataService dataService) : base(dataService)
+        public OwnerProcessesController(OwnerProcessesDataService dataService, SecurityService securityService)
+            : base(dataService, securityService)
         {
         }
 
@@ -16,7 +18,10 @@ namespace RegistryWeb.Controllers
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+                return View("NotAccess");
             ViewBag.OwnerTypes = dataService.GetOwnerTypes;
+            ViewBag.SecurityService = securityService;
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
@@ -25,22 +30,24 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Create()
         {
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
             return GetOwnerProcessView(dataService.CreateOwnerProcess());
         }
 
         [HttpPost]
         public IActionResult Create(OwnerProcess ownerProcess)
         {
-            if (ownerProcess != null)
+            if (ownerProcess == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
-                {
-                    dataService.Create(ownerProcess);
-                    return RedirectToAction("Index");
-                }
-                return GetOwnerProcessView(ownerProcess);
+                dataService.Create(ownerProcess);
+                return RedirectToAction("Index");
             }
-            return NotFound();
+            return GetOwnerProcessView(ownerProcess);
         }
 
         [HttpPost]
@@ -70,6 +77,8 @@ namespace RegistryWeb.Controllers
         {
             if (idProcess == null)
                 return NotFound();
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+                return View("NotAccess");
             var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
             if (ownerProcess == null)
                 return NotFound();
@@ -81,6 +90,8 @@ namespace RegistryWeb.Controllers
         {
             if (idProcess == null)
                 return NotFound();
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
             var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
             if (ownerProcess == null)
                 return NotFound();
@@ -90,12 +101,12 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public IActionResult Delete(OwnerProcess ownerProcess)
         {
-            if (ownerProcess != null)
-            {
-                dataService.Delete(ownerProcess.IdProcess);
-                return RedirectToAction("Index");
-            }
-            return NotFound();
+            if (ownerProcess == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
+            dataService.Delete(ownerProcess.IdProcess);
+            return RedirectToAction("Index");            
         }
 
         [HttpGet]
@@ -103,6 +114,8 @@ namespace RegistryWeb.Controllers
         {
             if (idProcess == null)
                 return NotFound();
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
             var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
             if (ownerProcess == null)
                 return NotFound();
@@ -112,16 +125,17 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public IActionResult Edit(OwnerProcess ownerProcess)
         {
-            if (ownerProcess != null)
+            if (ownerProcess == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
-                {
-                    dataService.Edit(ownerProcess);
-                    return RedirectToAction("Index");
-                }
-                return GetOwnerProcessView(ownerProcess);
+                dataService.Edit(ownerProcess);
+                return RedirectToAction("Index");
             }
-            return NotFound();
+            return GetOwnerProcessView(ownerProcess);
+            
         }
 
         public IActionResult GetOwnerProcessView(OwnerProcess ownerProcess, [CallerMemberName]string action = "")

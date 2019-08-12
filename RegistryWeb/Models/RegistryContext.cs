@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.Models.IEntityTypeConfiguration;
 
@@ -6,15 +7,16 @@ namespace RegistryWeb.Models
 {
     public partial class RegistryContext : DbContext
     {
-        private string NameDatebase = "registry_test";
+        private string nameDatebase;
 
         public RegistryContext()
         {
         }
 
-        public RegistryContext(DbContextOptions<RegistryContext> options)
+        public RegistryContext(DbContextOptions<RegistryContext> options, IConfiguration config)
             : base(options)
         {
+            nameDatebase = config.GetValue<string>("Database");
         }
 
         public virtual DbSet<Building> Buildings { get; set; }
@@ -51,6 +53,15 @@ namespace RegistryWeb.Models
         public virtual DbSet<StructureType> StructureTypes { get; set; }
         public virtual DbSet<SubPremise> SubPremises { get; set; }
 
+        //Права доступа
+        public virtual DbSet<AclPrivilege> AclPrivileges { get; set; }
+        public virtual DbSet<AclPrivilegeType> AclPrivilegeTypes { get; set; }
+        public virtual DbSet<AclRole> AclRoles { get; set; }
+        public virtual DbSet<AclRolePrivilege> AclRolePrivileges { get; set; }
+        public virtual DbSet<AclUser> AclUsers { get; set; }
+        public virtual DbSet<AclUserPrivilege> AclUserPrivileges { get; set; }
+        public virtual DbSet<AclUserRole> AclUserRoles { get; set; }
+
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
 
@@ -67,38 +78,46 @@ namespace RegistryWeb.Models
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.3-servicing-35854");
 
-            modelBuilder.ApplyConfiguration(new DocumentTypeConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new DocumentIssuedByConfiguration(NameDatebase));
+            modelBuilder.ApplyConfiguration(new AclPrivilegeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new AclPrivilegeTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new AclRoleConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new AclRolePrivilegeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new AclUserConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new AclUserPrivilegeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new AclUserRoleConfiguration(nameDatebase));
 
-            modelBuilder.ApplyConfiguration(new BuildingConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new PremiseConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new SubPremiseConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new HeatingTypeConfiguration(NameDatebase));
+            modelBuilder.ApplyConfiguration(new DocumentTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new DocumentIssuedByConfiguration(nameDatebase));
 
-            modelBuilder.ApplyConfiguration(new OwnershipRightConfiguration(NameDatebase));            
-            modelBuilder.ApplyConfiguration(new OwnershipBuildingAssocConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new OwnershipPremiseAssocConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new OwnershipRightTypeConfiguration(NameDatebase));
+            modelBuilder.ApplyConfiguration(new BuildingConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PremiseConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new SubPremiseConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new HeatingTypeConfiguration(nameDatebase));
 
-            modelBuilder.ApplyConfiguration(new FundBuildingAssocConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new FundPremiseAssocConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new FundSubPremiseAssocConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new FundHistoryConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new FundTypeConfiguration(NameDatebase));
+            modelBuilder.ApplyConfiguration(new OwnershipRightConfiguration(nameDatebase));            
+            modelBuilder.ApplyConfiguration(new OwnershipBuildingAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new OwnershipPremiseAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new OwnershipRightTypeConfiguration(nameDatebase));
 
-            modelBuilder.ApplyConfiguration(new OwnerBuildingAssocConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new OwnerPremiseAssocConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new OwnerSubPremiseAssocConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new OwnerOrginfoConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new OwnerPersonConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new OwnerProcessConfiguration(NameDatebase));
-            modelBuilder.ApplyConfiguration(new OwnerReasonConfiguration(NameDatebase));
+            modelBuilder.ApplyConfiguration(new FundBuildingAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new FundPremiseAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new FundSubPremiseAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new FundHistoryConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new FundTypeConfiguration(nameDatebase));
+
+            modelBuilder.ApplyConfiguration(new OwnerBuildingAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new OwnerPremiseAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new OwnerSubPremiseAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new OwnerOrginfoConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new OwnerPersonConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new OwnerProcessConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new OwnerReasonConfiguration(nameDatebase));
 
             modelBuilder.Entity<DocumentResidence>(entity =>
             {
                 entity.HasKey(e => e.IdDocumentResidence);
 
-                entity.ToTable("documents_residence", NameDatebase);
+                entity.ToTable("documents_residence", nameDatebase);
 
                 entity.Property(e => e.IdDocumentResidence)
                     .HasColumnName("id_document_residence")
@@ -123,7 +142,7 @@ namespace RegistryWeb.Models
             {
                 entity.HasKey(e => e.IdKinship);
 
-                entity.ToTable("kinships", NameDatebase);
+                entity.ToTable("kinships", nameDatebase);
 
                 entity.Property(e => e.IdKinship)
                     .HasColumnName("id_kinship")
@@ -140,7 +159,7 @@ namespace RegistryWeb.Models
             {
                 entity.HasKey(e => e.IdState);
 
-                entity.ToTable("object_states", NameDatebase);
+                entity.ToTable("object_states", nameDatebase);
 
                 entity.Property(e => e.IdState)
                     .HasColumnName("id_state")
@@ -163,7 +182,7 @@ namespace RegistryWeb.Models
             {
                 entity.HasKey(e => e.IdReasonType);
 
-                entity.ToTable("owner_reason_types", NameDatebase);
+                entity.ToTable("owner_reason_types", nameDatebase);
 
                 entity.Property(e => e.IdReasonType)
                     .HasColumnName("id_reason_type")
@@ -188,7 +207,7 @@ namespace RegistryWeb.Models
             {
                 entity.HasKey(e => e.IdOwnerType);
 
-                entity.ToTable("owner_type", NameDatebase);
+                entity.ToTable("owner_type", nameDatebase);
 
                 entity.Property(e => e.IdOwnerType)
                     .HasColumnName("id_owner_type")
@@ -213,7 +232,7 @@ namespace RegistryWeb.Models
             {
                 entity.HasKey(e => e.IdPremisesComment);
 
-                entity.ToTable("premises_comments", NameDatebase);
+                entity.ToTable("premises_comments", nameDatebase);
 
                 entity.Property(e => e.IdPremisesComment)
                     .HasColumnName("id_premises_comment")
@@ -230,7 +249,7 @@ namespace RegistryWeb.Models
             {
                 entity.HasKey(e => e.IdPremisesKind);
 
-                entity.ToTable("premises_kinds", NameDatebase);
+                entity.ToTable("premises_kinds", nameDatebase);
 
                 entity.Property(e => e.IdPremisesKind)
                     .HasColumnName("id_premises_kind")
@@ -246,7 +265,7 @@ namespace RegistryWeb.Models
             {
                 entity.HasKey(e => e.IdPremisesType);
 
-                entity.ToTable("premises_types", NameDatebase);
+                entity.ToTable("premises_types", nameDatebase);
 
                 entity.Property(e => e.IdPremisesType)
                     .HasColumnName("id_premises_type")
@@ -273,7 +292,7 @@ namespace RegistryWeb.Models
             {
                 entity.HasKey(e => e.IdRentTypeCategory);
 
-                entity.ToTable("rent_type_categories", NameDatebase);
+                entity.ToTable("rent_type_categories", nameDatebase);
 
                 entity.HasIndex(e => e.IdRentType)
                     .HasName("FK_rent_type_categories_id_rent_type");
@@ -303,7 +322,7 @@ namespace RegistryWeb.Models
             {
                 entity.HasKey(e => e.IdRentType);
 
-                entity.ToTable("rent_types", NameDatebase);
+                entity.ToTable("rent_types", nameDatebase);
 
                 entity.Property(e => e.IdRentType)
                     .HasColumnName("id_rent_type")
@@ -332,7 +351,7 @@ namespace RegistryWeb.Models
             {
                 entity.HasKey(e => e.IdStructureType);
 
-                entity.ToTable("structure_types", NameDatebase);
+                entity.ToTable("structure_types", nameDatebase);
 
                 entity.Property(e => e.IdStructureType)
                     .HasColumnName("id_structure_type")
@@ -358,7 +377,7 @@ namespace RegistryWeb.Models
             {
                 entity.HasKey(e => e.IdStreet);
 
-                entity.ToTable("v_kladr_streets", NameDatebase);
+                entity.ToTable("v_kladr_streets", nameDatebase);
 
                 entity.Property(e => e.IdStreet)
                     .HasColumnName("id_street")

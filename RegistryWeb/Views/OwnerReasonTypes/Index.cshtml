@@ -1,10 +1,15 @@
-﻿@model IEnumerable<RegistryWeb.Models.Entities.OwnerReasonType>;
+﻿@using RegistryWeb.SecurityServices;
+@model IEnumerable<RegistryWeb.Models.Entities.OwnerReasonType>;
 @{
     ViewData["Title"] = "Типы оснований собственности";
+    var securityService = (SecurityService)ViewData["SecurityService"];
 }
 
 <h2>@ViewData["Title"]</h2>
-<a class="btn btn-success" asp-controller="OwnerReasonTypes" asp-action="Create">Добавить</a>
+@if (securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
+{
+    <a class="btn btn-success" asp-controller="OwnerReasonTypes" asp-action="Create">Добавить</a>
+}
 <table class="table table-hover">
     <thead>
         <tr>
@@ -18,13 +23,16 @@
             <tr>
                 <td>@item.ReasonName</td>
                 <td>
-                    <a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
-                       asp-controller="OwnerReasonTypes" asp-action="Edit" asp-route-IdReasonType="@item.IdReasonType"></a>
-                    <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                       asp-controller="OwnerReasonTypes" asp-action="Delete" asp-route-IdReasonType="@item.IdReasonType"></a>
+                    @if (securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
+                    {
+                        <a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
+                           asp-controller="OwnerReasonTypes" asp-action="Edit" asp-route-IdReasonType="@item.IdReasonType"></a>
+                        <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                           asp-controller="OwnerReasonTypes" asp-action="Delete" asp-route-IdReasonType="@item.IdReasonType"></a>
+                    }
                 </td>
             </tr>
         }
-        </tbody>
+    </tbody>
 </table>
 

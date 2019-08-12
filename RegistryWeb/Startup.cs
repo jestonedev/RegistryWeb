@@ -10,6 +10,7 @@ using RegistryWeb.DataServices;
 using RegistryWeb.Models;
 using System.Globalization;
 using System.Collections.Generic;
+using RegistryWeb.SecurityServices;
 
 namespace RegistryWeb
 {
@@ -40,6 +41,9 @@ namespace RegistryWeb
             services.AddTransient<BuildingsListDataService>();
             services.AddTransient<PremisesListDataService>();
             services.AddTransient<OwnerProcessesDataService>();
+            services.AddHttpContextAccessor();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddTransient<SecurityService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
