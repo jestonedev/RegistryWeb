@@ -22,8 +22,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.ToTable("owner_premises_assoc", nameDatebase);
 
-            builder.HasIndex(e => e.IdPremises)
-                .HasName("FK_owner_premises_assoc_id_premises");
+            builder.HasIndex(e => e.IdPremise)
+                .HasName("FK_owner_premises_assoc_id_premise");
 
             builder.HasIndex(e => e.IdProcess)
                 .HasName("FK_owner_premises_assoc_id_process");
@@ -37,8 +37,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnType("tinyint(1)")
                 .HasDefaultValueSql("0");
 
-            builder.Property(e => e.IdPremises)
-                .HasColumnName("id_premises")
+            builder.Property(e => e.IdPremise)
+                .HasColumnName("id_premise")
                 .HasColumnType("int(11)");
 
             builder.Property(e => e.IdProcess)
@@ -47,8 +47,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.HasOne(d => d.IdPremisesNavigation)
                 .WithMany(p => p.OwnerPremisesAssoc)
-                .HasForeignKey(d => d.IdPremises)
-                .HasConstraintName("FK_owner_premises_assoc_id_premises");
+                .HasForeignKey(d => d.IdPremise)
+                .HasConstraintName("FK_owner_premises_assoc_id_premise");
 
             builder.HasOne(d => d.IdProcessNavigation)
                 .WithMany(p => p.OwnerPremisesAssoc)

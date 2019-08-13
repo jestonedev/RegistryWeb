@@ -6,7 +6,7 @@ namespace RegistryWeb.Models.Entities
     public partial class OwnerSubPremiseAssoc : IAddressAssoc
     {
         public int IdAssoc { get; set; }
-        public int IdSubPremises { get; set; }
+        public int IdSubPremise { get; set; }
         public int IdProcess { get; set; }
         public byte Deleted { get; set; }
 

@@ -3,8 +3,8 @@
     int i = ViewBag.Id;
 }
 <tr class="ownerBlock" data-id="@i">
-    <input type="hidden" asp-for="IdProcess" id="OwnerPersons_@(i)__IdOwnerProcess" name="OwnerPersons[@i].IdOwnerProcess"/>
-    <input type="hidden" asp-for="IdPerson" id="OwnerPersons_@(i)__IdOwnerPersons" name="OwnerPersons[@i].IdOwnerPersons"/>
+    <input type="hidden" asp-for="IdProcess" id="OwnerPersons_@(i)__IdProcess" name="OwnerPersons[@i].IdProcess"/>
+    <input type="hidden" asp-for="IdPerson" id="OwnerPersons_@(i)__IdPerson" name="OwnerPersons[@i].IdPerson"/>
     @*<td class="align-middle"  width="150">
         <div class="input-group">
             <input type="text" asp-for="NumeratorShare"

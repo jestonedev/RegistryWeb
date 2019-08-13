@@ -35,8 +35,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.Property(e => e.AnnulDate).HasColumnName("annul_date");
 
-            builder.Property(e => e.Comment)
-               .HasColumnName("comment")
+            builder.Property(e => e.AnnulComment)
+               .HasColumnName("annul_comment")
                .HasMaxLength(255)
                .IsUnicode(false);
 

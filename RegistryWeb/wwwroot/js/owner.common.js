@@ -16,13 +16,13 @@ var recalculationOwnerId = function (id) {
         var oldId = i + 1;
         list[i].setAttribute('data-id', i);
         if (idOwnerType == 1) {
-            $('#OwnerPersons_' + oldId + '__IdOwnerProcess')
-                .attr('name', 'OwnerPersons[' + i + '].IdOwnerProcess')
-                .attr('id', 'OwnerPersons_' + i + '__IdOwnerProcess');
+            $('#OwnerPersons_' + oldId + '__IdProcess')
+                .attr('name', 'OwnerPersons[' + i + '].IdProcess')
+                .attr('id', 'OwnerPersons_' + i + '__IdProcess');
 
-            $('#OwnerPersons_' + oldId + '__IdOwnerPersons')
-                .attr('name', 'OwnerPersons[' + i + '].IdOwnerPersons')
-                .attr('id', 'OwnerPersons_' + i + '__IdOwnerPersons');
+            $('#OwnerPersons_' + oldId + '__IdPerson')
+                .attr('name', 'OwnerPersons[' + i + '].IdPerson')
+                .attr('id', 'OwnerPersons_' + i + '__IdPerson');
 
             $('#OwnerPersons_' + oldId + '__Surname')
                 .attr('id', 'OwnerPersons_' + i + '__Surname')

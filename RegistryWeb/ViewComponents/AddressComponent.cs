@@ -86,7 +86,7 @@ namespace RegistryWeb.ViewComponents
                 var premise = registryContext.Premises
                     .Include(p => p.IdBuildingNavigation)
                     .AsNoTracking()
-                    .First(p => p.IdPremises == opa.IdPremises);
+                    .First(p => p.IdPremises == opa.IdPremise);
                 address.IdStreet = premise.IdBuildingNavigation.IdStreet;
                 address.IdBuilding = premise.IdBuilding;
                 address.IdPremisesType = premise.IdPremisesType;
@@ -102,7 +102,7 @@ namespace RegistryWeb.ViewComponents
                     .Include(sp => sp.IdPremisesNavigation)
                         .ThenInclude(p => p.IdBuildingNavigation)
                     .AsNoTracking()
-                    .First(sp => sp.IdSubPremises == ospa.IdSubPremises);
+                    .First(sp => sp.IdSubPremises == ospa.IdSubPremise);
                 address.IdStreet = subPremise.IdPremisesNavigation.IdBuildingNavigation.IdStreet;
                 address.IdBuilding = subPremise.IdPremisesNavigation.IdBuilding;
                 address.IdPremisesType = subPremise.IdPremisesNavigation.IdPremisesType;

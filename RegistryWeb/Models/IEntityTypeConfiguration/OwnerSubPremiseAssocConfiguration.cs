@@ -25,8 +25,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.HasIndex(e => e.IdProcess)
                 .HasName("FK_owner_sub_premises_assoc_id_process");
 
-            builder.HasIndex(e => e.IdSubPremises)
-                .HasName("FK_owner_sub_premises_assoc_id_sub_premises");
+            builder.HasIndex(e => e.IdSubPremise)
+                .HasName("FK_owner_sub_premises_assoc_id_sub_premise");
 
             builder.Property(e => e.IdAssoc)
                 .HasColumnName("id_assoc")
@@ -41,8 +41,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_process")
                 .HasColumnType("int(11)");
 
-            builder.Property(e => e.IdSubPremises)
-                .HasColumnName("id_sub_premises")
+            builder.Property(e => e.IdSubPremise)
+                .HasColumnName("id_sub_premise")
                 .HasColumnType("int(11)");
 
             builder.HasOne(d => d.IdProcessNavigation)
@@ -52,8 +52,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.HasOne(d => d.IdSubPremisesNavigation)
                 .WithMany(p => p.OwnerSubPremisesAssoc)
-                .HasForeignKey(d => d.IdSubPremises)
-                .HasConstraintName("FK_owner_sub_premises_assoc_id_sub_premises");
+                .HasForeignKey(d => d.IdSubPremise)
+                .HasConstraintName("FK_owner_sub_premises_assoc_id_sub_premise");
 
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);

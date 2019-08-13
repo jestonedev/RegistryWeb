@@ -238,11 +238,11 @@ var recalculationId = function (address, id, className) {
     }
     else if (className == "premiseBlock") {
         addressAssoc = "OwnerPremisesAssoc";
-        idAddressAssoc = "IdPremises";
+        idAddressAssoc = "IdPremise";
     }
     else if (className == "subPremiseBlock") {
         addressAssoc = "OwnerSubPremisesAssoc";
-        idAddressAssoc = "IdSubPremises";
+        idAddressAssoc = "IdSubPremise";
     }
     $(address).find('.addressIdProcess').attr('name', addressAssoc + '[' + id + '].IdProcess');
     $(address).find('.addressIdAssoc').attr('name', addressAssoc + '[' + id + '].IdAssoc');

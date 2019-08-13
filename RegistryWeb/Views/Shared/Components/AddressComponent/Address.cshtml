@@ -13,13 +13,13 @@
     {
         <input type="hidden" class="addressIdProcess" asp-for="IdProcess" name="OwnerPremisesAssoc[@i].IdProcess" />
         <input type="hidden" class="addressIdAssoc" asp-for="IdAssoc" name="OwnerPremisesAssoc[@i].IdAssoc" />
-        <input type="hidden" class="addressId" asp-for="IdPremise" name="OwnerPremisesAssoc[@i].IdPremises" />
+        <input type="hidden" class="addressId" asp-for="IdPremise" name="OwnerPremisesAssoc[@i].IdPremise" />
     }
     @if (Model.IdTypeAddress == 3)
     {
         <input type="hidden" class="addressIdProcess" asp-for="IdProcess" name="OwnerSubPremisesAssoc[@i].IdProcess" />
         <input type="hidden" class="addressIdAssoc" asp-for="IdAssoc" name="OwnerSubPremisesAssoc[@i].IdAssoc" />
-        <input type="hidden" class="addressId" asp-for="IdSubPremise" name="OwnerSubPremisesAssoc[@i].IdSubPremises" />
+        <input type="hidden" class="addressId" asp-for="IdSubPremise" name="OwnerSubPremisesAssoc[@i].IdSubPremise" />
     }
         <div class="col">
             @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
