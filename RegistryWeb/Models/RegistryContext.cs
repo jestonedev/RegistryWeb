@@ -53,6 +53,9 @@ namespace RegistryWeb.Models
         public virtual DbSet<StructureType> StructureTypes { get; set; }
         public virtual DbSet<SubPremise> SubPremises { get; set; }
 
+        //Журнал изменений
+        public virtual DbSet<ChangeLog> ChangeLogs { get; set; }
+
         //Права доступа
         public virtual DbSet<AclPrivilege> AclPrivileges { get; set; }
         public virtual DbSet<AclPrivilegeType> AclPrivilegeTypes { get; set; }
@@ -77,6 +80,8 @@ namespace RegistryWeb.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.3-servicing-35854");
+
+            modelBuilder.ApplyConfiguration(new ChangeLogConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new AclPrivilegeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new AclPrivilegeTypeConfiguration(nameDatebase));

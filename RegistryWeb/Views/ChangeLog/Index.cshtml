@@ -1,0 +1,17 @@
+﻿@model RegistryWeb.ViewModel.ChangeLogsVM;
+@{
+    ViewData["Title"] = "Журнал изменений";
+    var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
+        "(" + Model.PageOptions.TotalRows + ")" :
+        "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
+}
+
+<h2>@ViewData["Title"] @text</h2>
+
+@Html.Partial("Filter", Model)
+@Html.Partial("DataTable", Model)
+<page-link page-model="Model.PageOptions" page-action="Index"></page-link>
+
+@section Scripts {
+    <script src="~/js/index.common.js" asp-append-version="true"></script>
+}

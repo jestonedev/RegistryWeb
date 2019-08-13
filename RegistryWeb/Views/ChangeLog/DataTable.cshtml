@@ -1,0 +1,33 @@
+﻿@model RegistryWeb.ViewModel.ChangeLogsVM;
+@using RegistryWeb.ViewOptions;
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>№ по журналу</th>
+            <th>Имя таблицы</th>
+            <th>Реестровый номер изменяемой записи в таблице</th>
+            <th>Имя изменяемого поля</th>
+            <th>Старое значеие поля</th>
+            <th>Новое значеие поля</th>
+            <th>Тип операции</th>
+            <th>Время операции</th>
+            <th>Пользователь</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ChangeLogs)
+        {
+            <tr>
+                <td>@item.IdRecord</td>
+                <td>@item.TableName</td>
+                <td>@item.IdKey</td>
+                <td>@item.FieldName</td>
+                <td>@item.FieldOldValue</td>
+                <td>@item.FieldNewValue</td>
+                <td>@item.OperationType</td>
+                <td>@item.OperationTime</td>
+                <td>@item.UserName</td>
+            </tr>
+        }
+    </tbody>
+</table>
