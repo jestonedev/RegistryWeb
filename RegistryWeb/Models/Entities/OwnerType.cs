@@ -8,6 +8,7 @@ namespace RegistryWeb.Models.Entities
         public OwnerType()
         {
             OwnerProcesses = new List<OwnerProcess>();
+            OwnerReasons = new List<OwnerReason>();
         }
 
         public int IdOwnerType { get; set; }
@@ -15,5 +16,6 @@ namespace RegistryWeb.Models.Entities
         public byte Deleted { get; set; }
 
         public virtual IList<OwnerProcess> OwnerProcesses { get; set; }
+        public virtual ICollection<OwnerReason> OwnerReasons { get; set; }
     }
 }

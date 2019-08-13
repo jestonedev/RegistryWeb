@@ -16,15 +16,15 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
         public void Configure(EntityTypeBuilder<OwnerPerson> builder)
         {
-            builder.HasKey(e => e.IdOwnerPersons);
+            builder.HasKey(e => e.IdPerson);
 
             builder.ToTable("owner_persons", nameDatebase);
 
-            builder.HasIndex(e => e.IdOwnerProcess)
+            builder.HasIndex(e => e.IdProcess)
                 .HasName("FK_owner_persons_owner_processes_id_process");
 
-            builder.Property(e => e.IdOwnerPersons)
-                .HasColumnName("id_owner_persons")
+            builder.Property(e => e.IdPerson)
+                .HasColumnName("id_person")
                 .HasColumnType("int(11)");
 
             builder.Property(e => e.Deleted)
@@ -32,8 +32,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnType("tinyint(1)")
                 .HasDefaultValueSql("0");
 
-            builder.Property(e => e.IdOwnerProcess)
-                .HasColumnName("id_owner_process")
+            builder.Property(e => e.IdProcess)
+                .HasColumnName("id_process")
                 .HasColumnType("int(11)");
 
             builder.Property(e => e.Name)
@@ -54,19 +54,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
-            builder.Property(e => e.NumeratorShare)
-                .HasColumnName("numerator_share")
-                .HasColumnType("int(11)");
-
-            builder.Property(e => e.DenominatorShare)
-                .HasColumnName("denominator_share")
-                .HasColumnType("int(11)");
-
             builder.HasOne(d => d.IdOwnerProcessNavigation)
                 .WithMany(p => p.OwnerPersons)
-                .HasForeignKey(d => d.IdOwnerProcess)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_owner_persons_owner_processes_id_process");
+                .HasForeignKey(d => d.IdProcess)
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);

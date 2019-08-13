@@ -33,16 +33,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.Property(e => e.OrgName)
                 .IsRequired()
                 .HasColumnName("org_name")
-                .HasMaxLength(50)
+                .HasMaxLength(255)
                 .IsUnicode(false);
-
-            builder.Property(e => e.NumeratorShare)
-                .HasColumnName("numerator_share")
-                .HasColumnType("int(11)");
-
-            builder.Property(e => e.DenominatorShare)
-                .HasColumnName("denominator_share")
-                .HasColumnType("int(11)");
 
             builder.Property(e => e.Deleted)
                 .HasColumnName("deleted")
@@ -51,9 +43,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.HasOne(d => d.IdOwnerProcessNavigation)
                 .WithMany(p => p.OwnerOrginfos)
-                .HasForeignKey(d => d.IdProcess)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_owner_orginfo_owner_processes_id_process");
+                .HasForeignKey(d => d.IdProcess);
 
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);

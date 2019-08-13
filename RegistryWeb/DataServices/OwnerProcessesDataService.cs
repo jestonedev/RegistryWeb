@@ -233,7 +233,7 @@ namespace RegistryWeb.DataServices
             ownerProcess.OwnerBuildingsAssoc = new List<OwnerBuildingAssoc>() { new OwnerBuildingAssoc() };
             ownerProcess.OwnerPremisesAssoc = new List<OwnerPremiseAssoc>();
             ownerProcess.OwnerSubPremisesAssoc = new List<OwnerSubPremiseAssoc>();
-            ownerProcess.OwnerReasons = new List<OwnerReason>() { new OwnerReason() };
+            //ownerProcess.OwnerReasons = new List<OwnerReason>() { new OwnerReason() };
             ownerProcess.OwnerPersons = new List<OwnerPerson>() { new OwnerPerson() };
             ownerProcess.OwnerOrginfos = new List<OwnerOrginfo>() { new OwnerOrginfo() };
             return ownerProcess;
@@ -248,7 +248,7 @@ namespace RegistryWeb.DataServices
                 .Include(op => op.OwnerBuildingsAssoc)
                 .Include(op => op.OwnerPremisesAssoc)
                 .Include(op => op.OwnerSubPremisesAssoc)
-                .Include(op => op.OwnerReasons)
+                //.Include(op => op.OwnerReasons)
                 .Include(op => op.OwnerPersons)
                 .Include(op => op.OwnerOrginfos)
                 .AsNoTracking()
@@ -267,7 +267,7 @@ namespace RegistryWeb.DataServices
                 .Include(op => op.OwnerBuildingsAssoc)
                 .Include(op => op.OwnerPremisesAssoc)
                 .Include(op => op.OwnerSubPremisesAssoc)
-                .Include(op => op.OwnerReasons)
+                //.Include(op => op.OwnerReasons)
                 .Include(op => op.OwnerPersons)
                 .Include(op => op.OwnerOrginfos)
                 .First(op => op.IdProcess == idProcess);
@@ -284,10 +284,10 @@ namespace RegistryWeb.DataServices
             {
                 o.Deleted = 1;
             }
-            foreach (var o in ownerProcesses.OwnerReasons)
-            {
-                o.Deleted = 1;
-            }
+            //foreach (var o in ownerProcesses.OwnerReasons)
+            //{
+            //    o.Deleted = 1;
+            //}
             foreach (var o in ownerProcesses.OwnerPersons)
             {
                 o.Deleted = 1;
@@ -303,17 +303,17 @@ namespace RegistryWeb.DataServices
         {
             //Удаление
             var oldOwnerProcess = GetOwnerProcess(newOwnerProcess.IdProcess);
-            foreach (var or in oldOwnerProcess.OwnerReasons)
-            {
-                if (newOwnerProcess.OwnerReasons.Select(owr => owr.IdReason).Contains(or.IdReason) == false)
-                {
-                    or.Deleted = 1;
-                    newOwnerProcess.OwnerReasons.Add(or);
-                }
-            }
+            //foreach (var or in oldOwnerProcess.OwnerReasons)
+            //{
+            //    if (newOwnerProcess.OwnerReasons.Select(owr => owr.IdReason).Contains(or.IdReason) == false)
+            //    {
+            //        or.Deleted = 1;
+            //        newOwnerProcess.OwnerReasons.Add(or);
+            //    }
+            //}
             foreach (var op in oldOwnerProcess.OwnerPersons)
             {
-                if (newOwnerProcess.OwnerPersons.Select(owp => owp.IdOwnerPersons).Contains(op.IdOwnerPersons) == false)
+                if (newOwnerProcess.OwnerPersons.Select(owp => owp.IdPerson).Contains(op.IdPerson) == false)
                 {
                     op.Deleted = 1;
                     newOwnerProcess.OwnerPersons.Add(op);

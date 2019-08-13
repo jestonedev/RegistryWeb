@@ -35,9 +35,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.Property(e => e.AnnulDate).HasColumnName("annul_date");
 
-            builder.Property(e => e.FromDate).HasColumnName("from_date");
-
-            builder.Property(e => e.ToDate).HasColumnName("to_date");
+            builder.Property(e => e.Comment)
+               .HasColumnName("comment")
+               .HasMaxLength(255)
+               .IsUnicode(false);
 
             builder.Property(e => e.Comment)
                 .HasColumnName("comment")

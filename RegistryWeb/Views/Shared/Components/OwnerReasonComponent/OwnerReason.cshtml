@@ -3,7 +3,7 @@
     var i = ViewBag.Id;
 }
 <tr class="ownerReasonBlock" data-id="@i">
-    <input type="hidden" asp-for="IdProcess" id="OwnerReasons_@(i)__IdProcess" name="OwnerReasons[@i].IdProcess" />
+    <input type="hidden" asp-for="IdOwner" id="OwnerReasons_@(i)__IdProcess" name="OwnerReasons[@i].IdProcess" />
     <input type="hidden" asp-for="IdReason" id="OwnerReasons_@(i)__IdReason" name="OwnerReasons[@i].IdReason" />
     <td class="align-middle">
         <select class="form-control" asp-for="IdReasonType" name="OwnerReasons[@i].IdReasonType" asp-items="@{

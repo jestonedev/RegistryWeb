@@ -93,10 +93,11 @@ namespace RegistryWeb.Models
 
             modelBuilder.ApplyConfiguration(new DocumentTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new DocumentIssuedByConfiguration(nameDatebase));
-
+            
             modelBuilder.ApplyConfiguration(new BuildingConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremiseConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new SubPremiseConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ObjectStateConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new HeatingTypeConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new OwnershipRightConfiguration(nameDatebase));            
@@ -117,6 +118,8 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new OwnerPersonConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerReasonConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new OwnerTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new OwnerReasonTypeConfiguration(nameDatebase));
 
             modelBuilder.Entity<DocumentResidence>(entity =>
             {
@@ -158,79 +161,6 @@ namespace RegistryWeb.Models
                     .HasColumnName("kinship")
                     .HasMaxLength(255)
                     .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<ObjectState>(entity =>
-            {
-                entity.HasKey(e => e.IdState);
-
-                entity.ToTable("object_states", nameDatebase);
-
-                entity.Property(e => e.IdState)
-                    .HasColumnName("id_state")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.StateFemale)
-                    .IsRequired()
-                    .HasColumnName("state_female")
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.StateNeutral)
-                    .IsRequired()
-                    .HasColumnName("state_neutral")
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<OwnerReasonType>(entity =>
-            {
-                entity.HasKey(e => e.IdReasonType);
-
-                entity.ToTable("owner_reason_types", nameDatebase);
-
-                entity.Property(e => e.IdReasonType)
-                    .HasColumnName("id_reason_type")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.Deleted)
-                    .HasColumnName("deleted")
-                    .HasColumnType("tinyint(1)")
-                    .HasDefaultValueSql("0");
-
-                entity.Property(e => e.ReasonName)
-                    .IsRequired()
-                    .HasColumnName("reason_name")
-                    .HasMaxLength(150)
-                    .IsUnicode(false);
-
-                //Фильтры по умолчанию
-                entity.HasQueryFilter(e => e.Deleted == 0);
-            });
-
-            modelBuilder.Entity<OwnerType>(entity =>
-            {
-                entity.HasKey(e => e.IdOwnerType);
-
-                entity.ToTable("owner_type", nameDatebase);
-
-                entity.Property(e => e.IdOwnerType)
-                    .HasColumnName("id_owner_type")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.Deleted)
-                    .HasColumnName("deleted")
-                    .HasColumnType("tinyint(1)")
-                    .HasDefaultValueSql("0");
-
-                entity.Property(e => e.OwnerType1)
-                    .IsRequired()
-                    .HasColumnName("owner_type")
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                //Фильтры по умолчанию
-                entity.HasQueryFilter(e => e.Deleted == 0);
             });
 
             modelBuilder.Entity<PremisesComment>(entity =>
