@@ -7,7 +7,6 @@ namespace RegistryWeb.Models.Entities
     {
         public int IdReason { get; set; }
         public int IdOwner { get; set; }
-        public int IdOwnerType { get; set; }
         [Required(ErrorMessage = "Поле «Числитель» является обязательным для заполнения")]
         [Range(1, 1024, ErrorMessage = "Поле «Числитель» должно лежать между {1} и {2}")]
         public int NumeratorShare { get; set; } = 1;
@@ -23,9 +22,7 @@ namespace RegistryWeb.Models.Entities
         public DateTime? ReasonDate { get; set; }
         public byte Deleted { get; set; }
 
-        public virtual OwnerPerson IdPersonNavigation { get; set; }
-        public virtual OwnerOrginfo IdOrginfoNavigation { get; set; }
-        public virtual OwnerType IdOwnerTypeNavigation { get; set; }
+        public virtual Owner IdOwnerNavigation { get; set; }
         public virtual OwnerReasonType IdReasonTypeNavigation { get; set; }
     }
 }

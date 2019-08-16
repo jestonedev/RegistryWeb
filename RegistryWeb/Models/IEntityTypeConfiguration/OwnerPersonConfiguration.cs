@@ -16,25 +16,14 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
         public void Configure(EntityTypeBuilder<OwnerPerson> builder)
         {
-            builder.HasKey(e => e.IdPerson);
+            builder.HasKey(e => e.IdOwner);
 
             builder.ToTable("owner_persons", nameDatebase);
 
-            builder.HasIndex(e => e.IdProcess)
-                .HasName("FK_owner_persons_owner_processes_id_process");
-
-            builder.Property(e => e.IdPerson)
-                .HasColumnName("id_person")
-                .HasColumnType("int(11)");
-
-            builder.Property(e => e.Deleted)
-                .HasColumnName("deleted")
-                .HasColumnType("tinyint(1)")
-                .HasDefaultValueSql("0");
-
-            builder.Property(e => e.IdProcess)
-                .HasColumnName("id_process")
-                .HasColumnType("int(11)");
+            builder.Property(e => e.IdOwner)
+                .HasColumnName("id_owner")
+                .HasColumnType("int(11)")
+                .ValueGeneratedNever();
 
             builder.Property(e => e.Name)
                 .IsRequired()
@@ -54,13 +43,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
-            builder.HasOne(d => d.IdOwnerProcessNavigation)
-                .WithMany(p => p.OwnerPersons)
-                .HasForeignKey(d => d.IdProcess)
+            builder.HasOne(d => d.IdOwnerNavigation)
+                .WithOne(p => p.OwnerPerson)
+                .HasForeignKey<OwnerPerson>(d => d.IdOwner)
                 .OnDelete(DeleteBehavior.ClientSetNull);
-
-            //Фильтры по умолчанию
-            builder.HasQueryFilter(e => e.Deleted == 0);
         }
     }
 }

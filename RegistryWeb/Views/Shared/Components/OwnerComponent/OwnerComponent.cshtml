@@ -1,0 +1,53 @@
+﻿@using RegistryWeb.Models.Entities;
+@model RegistryWeb.Models.IOwner;
+@{
+    int i = ViewBag.Id;
+    //var owner = Model is OwnerPerson;
+}
+@*<tr class="ownerBlock" data-id="@i">
+    <input type="hidden" asp-for="" id="OwnerPersons_@(i)__IdProcess" name="OwnerPersons[@i].IdProcess" />
+    <input type="hidden" asp-for="IdPerson" id="OwnerPersons_@(i)__IdPerson" name="OwnerPersons[@i].IdPerson" />
+    <td class="align-middle"  width="150">
+        <div class="input-group">
+            <input type="text" asp-for="NumeratorShare"
+                    id="OwnerPersons_@(i)__NumeratorShare" name="OwnerPersons[@i].NumeratorShare" class="form-control"
+                    data-val="true" data-val-range="Поле «Числитель» должно лежать между 1 и 1024" data-val-range-max="1024" data-val-range-min="1" data-val-required="Поле «Числитель» является обязательным для заполнения"  />
+            <span class="text-danger field-validation-valid" data-valmsg-for="OwnerPersons[@i].NumeratorShare" data-valmsg-replace="true"></span>
+            <div class="input-group-prepend input-group-append">
+                <span class="input-group-text">/</span>
+            </div>
+            <input type="text" asp-for="DenominatorShare"
+                    id="OwnerPersons_@(i)__DenominatorShare" name="OwnerPersons[@i].DenominatorShare" class="form-control"
+                    data-val="true" data-val-range="Поле «Знаменатель» должно лежать между 1 и 1024" data-val-range-max="1024" data-val-range-min="1" data-val-required="Поле «Знаменатель» является обязательным для заполнения" />
+            <span class="text-danger field-validation-valid" data-valmsg-for="OwnerPersons[@i].DenominatorShare" data-valmsg-replace="true"></span>
+        </div>
+    </td>
+    <td class="align-middle">
+        <select class="form-control" id="ownerType" asp-for="IdOwnerType"
+                asp-items="@{new SelectList(ViewBag.OwnerTypes, "IdOwnerType", "OwnerType1")}"></select>
+    </td>
+    <td class="align-middle">
+        <input type="text" asp-for="Surname"
+               id="OwnerPersons_@(i)__Surname" name="OwnerPersons[@i].Surname" class="form-control"
+               data-val="true" data-val-required="Поле «Фамилия» является обязательным для заполнения" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="OwnerPersons[@i].Surname" data-valmsg-replace="true"></span>
+    </td>
+    <td class="align-middle">
+        <input type="text" asp-for="Name"
+               id="OwnerPersons_@(i)__Name" name="OwnerPersons[@i].Name" class="form-control"
+               data-val="true" data-val-required="Поле «Имя» является обязательным для заполнения" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="OwnerPersons[@i].Name" data-valmsg-replace="true"></span>
+    </td>
+    <td class="align-middle">
+        <input type="text" asp-for="Patronymic"
+               id="OwnerPersons_@(i)__Patronymic" name="OwnerPersons[@i].Patronymic" class="form-control"
+               data-val="true" data-val-required="Поле «Отчество» является обязательным для заполнения" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="OwnerPersons[@i].Patronymic" data-valmsg-replace="true"></span>
+    </td>
+    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+    {
+        <td class="align-middle">
+            <a class="btn btn-danger close" title="Удалить" aria-label="Удалить">&#10006;</a>
+        </td>
+    }
+</tr>*@

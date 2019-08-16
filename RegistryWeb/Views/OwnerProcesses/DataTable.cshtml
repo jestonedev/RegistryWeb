@@ -18,7 +18,6 @@
                     <a href="#" class="oi oi-sort-ascending sort" data-order-field="IdProcess" data-order-direction="0"></a>
                 }
             </th>
-            <th>Тип собственника</th>
             <th>Адрес</th>
             <th></th>
         </tr>
@@ -28,7 +27,6 @@
         {
             <tr>
                 <td class="align-middle">@item.IdProcess</td>
-                <td class="align-middle">@item.IdOwnerTypeNavigation.OwnerType1</td>
                 <td class="align-middle">
                     @foreach (var address in Model.Addresses[item.IdProcess])
                     {

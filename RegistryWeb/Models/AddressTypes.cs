@@ -11,6 +11,6 @@ namespace RegistryWeb.Models
         Street = 1,      // Улица
         Building = 2,    // Здание
         Premise = 3,     // Помещение внутри здания
-        SubPremise = 4   // Квартира внутри помещения
+        SubPremise = 4   // Комната внутри помещения
     }
 }

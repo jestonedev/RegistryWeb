@@ -20,10 +20,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.ToTable("owner_reasons", nameDatebase);
 
             builder.HasIndex(e => e.IdOwner)
-                .HasName("FK_owner_reasons_id_orginfo"); ;
-
-            builder.HasIndex(e => e.IdOwnerType)
-                .HasName("FK_owner_reasons_id_owner_type");
+                .HasName("FK_owner_reasons_owners_id_owner");
 
             builder.HasIndex(e => e.IdReasonType)
                 .HasName("FK_owner_reasons_id_reason_type");
@@ -34,10 +31,6 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.Property(e => e.IdOwner)
                 .HasColumnName("id_owner")
-                .HasColumnType("int(11)");
-
-            builder.Property(e => e.IdOwnerType)
-                .HasColumnName("id_owner_type")
                 .HasColumnType("int(11)");
 
             builder.Property(e => e.NumeratorShare)
@@ -66,21 +59,9 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnType("tinyint(1)")
                 .HasDefaultValueSql("0");
 
-            builder.HasOne(d => d.IdOrginfoNavigation)
+            builder.HasOne(d => d.IdOwnerNavigation)
                 .WithMany(p => p.OwnerReasons)
-                .HasForeignKey(d => d.IdOwner)
-                .HasConstraintName("FK_owner_reasons_id_orginfo");
-
-            builder.HasOne(d => d.IdPersonNavigation)
-                .WithMany(p => p.OwnerReasons)
-                .HasForeignKey(d => d.IdOwner)
-                .HasConstraintName("FK_owner_reasons_id_person");
-
-            builder.HasOne(d => d.IdOwnerTypeNavigation)
-                .WithMany(p => p.OwnerReasons)
-                .HasForeignKey(d => d.IdOwnerType)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_owner_reasons_id_owner_type");
+                .HasForeignKey(d => d.IdOwner);
 
             builder.HasOne(d => d.IdReasonTypeNavigation)
                 .WithMany(p => p.OwnerReasons)

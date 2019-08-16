@@ -22,15 +22,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.ToTable("owner_processes", nameDatebase);
 
-            builder.HasIndex(e => e.IdOwnerType)
-                .HasName("FK_owner_processes_owner_type_id_owner_type");
-
             builder.Property(e => e.IdProcess)
                 .HasColumnName("id_process")
-                .HasColumnType("int(11)");
-
-            builder.Property(e => e.IdOwnerType)
-                .HasColumnName("id_owner_type")
                 .HasColumnType("int(11)");
 
             builder.Property(e => e.AnnulDate).HasColumnName("annul_date");
@@ -49,11 +42,6 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("deleted")
                 .HasColumnType("tinyint(1)")
                 .HasDefaultValueSql("0");
-
-            builder.HasOne(d => d.IdOwnerTypeNavigation)
-                .WithMany(p => p.OwnerProcesses)
-                .HasForeignKey(d => d.IdOwnerType)
-                .OnDelete(DeleteBehavior.ClientSetNull);
 
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);
