@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class OwnerOrginfo : IOwner
+    public partial class OwnerOrginfo
     {
         public int IdOwner { get; set; }
         [Required(ErrorMessage = "Поле «Наименование» является обязательным для заполнения")]

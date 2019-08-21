@@ -64,79 +64,31 @@
             }
         }
     </div>
-
-    @*<div class="card-header" id="headingOwnerReasons">
-            <div class="d-flex justify-content-between">
-                <h3>Основания собственности</h3>
-                <div class="btn-group">
-                    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-                    {
-                        <a class="btn btn-success" title="Добавить основание" aria-label="Добавить основание" id="ownerReasonAdd">&#10010;</a>
-                    }
-                    <a href="#" class="btn btn-primary" data-toggle="collapse" data-target="#collapseOwnerReasons" aria-expanded="true" aria-controls="collapseOwnerReasons">˅</a>
-                </div>
-            </div>
-        </div>
-        <div id="collapseOwnerReasons" class="collapse show" aria-labelledby="headingOwnerReasons">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Название</th>
-                        <th>Номер</th>
-                        <th>Дата</th>
-                        @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-                        {
-                            <th></th>
-                        }
-                    </tr>
-                </thead>
-                <tbody id="ownerReasons">
-                    @for (var i = 0; i < Model.OwnerReasons.Count(); i++)
-                    {
-                        @await Component.InvokeAsync("OwnerReasonComponent",
-                            new { ownerReason = Model.OwnerReasons[i], id = i, action = ViewBag.Action })
-                    }
-                </tbody>
-            </table>
-        </div>*@
-    <div class="card-header" id="headingOwnerPersons">
+    <div class="card-header" id="headingOwners">
         <div class="d-flex justify-content-between">
             <h3>Собственники</h3>
-                <div class="btn-group">
-                    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-                    {
-                        <a class="form-control btn btn-success" title="Добавить собственника" aria-label="Добавить собственника" id="ownerAdd">&#10010;</a>
-                    }
-                    <a href="#" class="form-control btn btn-primary" data-toggle="collapse" data-target="#collapseOwnerPersons" aria-expanded="true" aria-controls="collapseOwnerPersons"><b>&#8744;</b></a>
-                </div>
+            <div class="btn-group">
+                @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                {
+                    <div class="btn-group">
+                        <a class="form-control">Добавить:</a>
+                        <a class="form-control btn btn-success ownerAdd" title="Добавить физическое лицо" data-id-owner-type="1">ФЗ</a>
+                        <a class="form-control btn btn-success ownerAdd" title="Добавить юридическое лицо" data-id-owner-type="2">ЮЗ</a>
+                        <a class="form-control btn btn-success ownerAdd" title="Добавить индивидуального предпринимателя" data-id-owner-type="3">ИП</a>
+                    </div>
+                }
+                <a href="#" class="form-control btn btn-primary" data-toggle="collapse" data-target="#collapseOwners" aria-expanded="true" aria-controls="collapseOwners"><b>&#8744;</b></a>
+            </div>
         </div>
     </div>
-    <div id="collapseOwnerPersons" class="collapse show" aria-labelledby="headingOwnerPersons">
+    <div id="collapseOwners" class="collapse show" aria-labelledby="headingOwners">
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Тип</th>
+                    <th width="100px">Тип</th>
+                    <th width="100px">Документы</th>
+                    <th width="50px">Доля</th>
                     <th>Данные</th>
-                    <th>Имя</th>
-                    <th>Отчество</th>
-                    <th>Наименование</th>
-
-                    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-                    {
-                        <th></th>
-                    }
-                </tr>
-            </thead>
-        </table>
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th class="ownerPersonHeader">Тип</th>
-                    <th class="ownerPersonHeader">Фамилия</th>
-                    <th class="ownerPersonHeader">Имя</th>
-                    <th class="ownerPersonHeader">Отчество</th>
-                    <th class="ownerOrginfoHeader">Наименование</th>
-
                     @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
                     {
                         <th></th>
@@ -144,25 +96,16 @@
                 </tr>
             </thead>
             <tbody id="owners">
-                @*@if (Model.OwnerPersons != null)
+                @if (Model.Owners != null)
                 {
-                    @for (var i = 0; i < Model.OwnerPersons.Count(); i++)
+                    @for (var i = 0; i < Model.Owners.Count(); i++)
                     {
-                        @await Component.InvokeAsync("OwnerPersonComponent",
-                            new { ownerPerson = Model.OwnerPersons[i], id = i, action = ViewBag.Action })
+                        @await Component.InvokeAsync("OwnerComponent",
+                            new { owner = Model.Owners[i], id = i, action = ViewBag.Action })
                     }
                 }
-                @if (Model.OwnerOrginfos != null)
-                {
-                    @for (var i = 0; i < Model.OwnerOrginfos.Count(); i++)
-                    {
-                        @await Component.InvokeAsync("OwnerOrginfoComponent",
-                            new { ownerOrginfo = Model.OwnerOrginfos[i], id = i, action = ViewBag.Action })
-                    }
-                }*@
             </tbody>
         </table>
-        <table class="table table-bordered"></table>
     </div>
     <div class="form-group">
         <label asp-for="Comment" class="control-label">Комментарий</label>
@@ -177,16 +120,15 @@
     <script src="~/js/ownerReason.common.js" asp-append-version="true"></script>
     <script src="~/js/owner.common.js" asp-append-version="true"></script>
     <script src="~/js/ownerProcess.common.js" asp-append-version="true"></script>
-    @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
-    {
+    @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete") {
         <script>
             $(function () {
                 $('select').prop('disabled', true);
-            $('input').prop('disabled', true);
-            $('textarea').prop('disabled', true);
-            $('input[type="hidden"]').prop('disabled', false);
-            $('input[type="submit"]').prop('disabled', false);
-        })
+                $('input').prop('disabled', true);
+                $('textarea').prop('disabled', true);
+                $('input[type="hidden"]').prop('disabled', false);
+                $('input[type="submit"]').prop('disabled', false);
+            })
         </script>
     }
 }

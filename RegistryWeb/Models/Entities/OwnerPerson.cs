@@ -2,7 +2,7 @@
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class OwnerPerson : IOwner
+    public partial class OwnerPerson
     {
         public int IdOwner { get; set; }
         [Required(ErrorMessage = "Поле «Фамилия» является обязательным для заполнения")]

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 
@@ -6,10 +7,14 @@ namespace RegistryWeb.ViewComponents
 {
     public class OwnerComponent : ViewComponent
     {
-        public OwnerComponent()
-        {}
+        private RegistryContext registryContext;
 
-        public IViewComponentResult Invoke(IOwner owner, int id, string action)
+        public OwnerComponent(RegistryContext registryContext)
+        {
+            this.registryContext = registryContext;
+        }
+
+        public IViewComponentResult Invoke(Owner owner, int id, string action)
         {
             ViewBag.Id = id;
             ViewBag.Action = action;

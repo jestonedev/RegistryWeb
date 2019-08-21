@@ -5,23 +5,7 @@
     $.validator.unobtrusive.parse(form);
     form.validate();
 }
-var ownerHeaderChange = function () {
-    if ($('#ownerType').val() == 1) {
-        $('.ownerPersonHeader').show();
-        $('.ownerOrginfoHeader').hide();
-    }
-    else { //2 или 3
-        $('.ownerPersonHeader').hide();
-        $('.ownerOrginfoHeader').show();
-    }
-}
 $(function () {
-    ownerHeaderChange();
-    $('#ownerType').change(function () {
-        $('.ownerBlock').remove();
-        ownerHeaderChange();
-        $('#ownerAdd').click();
-    });
     var action = $('form').data('action');
     $('#addressAdd').on("click", function () {
         var id = $('.buildingBlock').length;
@@ -37,21 +21,9 @@ $(function () {
             }
         });
     });
-    $('#ownerReasonAdd').on("click", function () {
-        var id = $('.ownerReasonBlock').length;
-        $.ajax({
-            type: 'POST',
-            url: window.location.origin + '/OwnerProcesses/OwnerReasonAdd',
-            data: { id: id, action: action },
-            success: function (data) {
-                $('#ownerReasons').append(data);
-                refreshValidation();
-            }
-        });
-    });
-    $('#ownerAdd').on("click", function () {
+    $('.ownerAdd').on("click", function () {
         var id = $('.ownerBlock').length;
-        var idOwnerType = $('#ownerType').val();
+        var idOwnerType = $(this).data('idOwnerType');
         $.ajax({
             type: 'POST',
             url: window.location.origin + '/OwnerProcesses/OwnerAdd',

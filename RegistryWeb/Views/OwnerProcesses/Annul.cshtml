@@ -8,7 +8,10 @@
     <input type="hidden" asp-for="IdProcess" />
     <input type="hidden" asp-for="Comment" />
     <input type="hidden" asp-for="Deleted" />
-    <button type="submit" class="btn btn-danger">Аннулировать</button>
+    <div class="btn-group" role="group">
+        <a class="btn btn-primary" asp-controller="OwnerProcesses" asp-action="Edit" asp-route-idProcess="@Model.IdProcess">Назад</a>
+        <button type="submit" class="btn btn-danger">Аннулировать</button>
+    </div>
     <div class="form-group">
         <label for="AnnulDate">Дата аннулирования</label>
         <input type="date" class="form-control" asp-for="AnnulDate">

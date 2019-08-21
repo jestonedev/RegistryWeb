@@ -14,9 +14,10 @@ namespace RegistryWeb.ViewComponents
             this.registryContext = registryContext;
         }
 
-        public IViewComponentResult Invoke(OwnerReason ownerReason, int id, string action)
+        public IViewComponentResult Invoke(OwnerReason ownerReason, int iOwner, int iReason, string action)
         {
-            ViewBag.Id = id;
+            ViewBag.IOwner = iOwner;
+            ViewBag.IReason = iReason;
             ViewBag.Action = action;
             ViewBag.OwnerReasonTypes = registryContext.OwnerReasonTypes;
             return View("OwnerReason", ownerReason);

@@ -51,6 +51,9 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .WithMany(p => p.Owners)
                 .HasForeignKey(d => d.IdProcess)
                 .HasConstraintName("FK_owners_id_process");
+
+            //Фильтры по умолчанию
+            builder.HasQueryFilter(e => e.Deleted == 0);
         }
     }
 }

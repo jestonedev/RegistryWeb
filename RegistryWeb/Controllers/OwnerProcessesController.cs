@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.Models.Entities;
@@ -57,20 +58,22 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult OwnerReasonAdd(int id, string action)
+        public IActionResult OwnerAdd(int idOwnerType, int id, string action)
         {
-            return ViewComponent("OwnerReasonComponent", new { ownerReason = new OwnerReason(), id, action });
+            var owner = new Owner() { IdOwnerType = idOwnerType };
+            owner.IdOwnerTypeNavigation = dataService.GetOwnerType(idOwnerType);
+            owner.OwnerReasons = new List<OwnerReason>() { new OwnerReason() };
+            if (idOwnerType == 1)
+                owner.OwnerPerson = new OwnerPerson();
+            if (idOwnerType == 2 || idOwnerType == 3)
+                owner.OwnerOrginfo = new OwnerOrginfo();
+            return ViewComponent("OwnerComponent", new { owner, id, action });
         }
 
         [HttpPost]
-        public IActionResult OwnerAdd(int idOwnerType, int id, string action)
+        public IActionResult OwnerReasonAdd(int iOwner, int iReason, string action)
         {
-            //физ. лицо
-            if (idOwnerType == 1)
-                return ViewComponent("OwnerPersonComponent", new { ownerPerson = new OwnerPerson(), id, action });
-
-            //юр. лицо или ип
-            return ViewComponent("OwnerOrginfoComponent", new { ownerOrginfo = new OwnerOrginfo(), id, action });
+            return ViewComponent("OwnerReasonComponent", new { ownerReason = new OwnerReason(), iOwner, iReason, action });
         }
 
         public IActionResult Details(int? idProcess)
