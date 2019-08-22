@@ -5,9 +5,18 @@
     $.validator.unobtrusive.parse(form);
     form.validate();
 }
+var ownersToggle = function () {
+    if ($(this).html() === '∧') {
+        $(this).html('∨');
+    }
+    else {
+        $(this).html('∧');
+    }
+    $('#ownersTable').toggle();
+}
 $(function () {
     var action = $('form').data('action');
-    $('#addressAdd').on("click", function () {
+    $('#addressAdd').click(function () {
         var id = $('.buildingBlock').length;
         $.ajax({
             type: 'POST',
@@ -21,7 +30,7 @@ $(function () {
             }
         });
     });
-    $('.ownerAdd').on("click", function () {
+    $('.ownerAdd').click(function () {
         var id = $('.ownerBlock').length;
         var idOwnerType = $(this).data('idOwnerType');
         $.ajax({
@@ -34,4 +43,5 @@ $(function () {
             }
         });
     });
+    $('#ownersToggle').click(ownersToggle);
 });

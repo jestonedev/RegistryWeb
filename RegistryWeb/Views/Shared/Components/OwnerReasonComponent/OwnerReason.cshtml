@@ -4,36 +4,36 @@
     var j = ViewBag.IReason;
 }
 <tr class="reasonBlock" data-i-owner="@i" data-i-reason="@j">
-    <input type="hidden" asp-for="IdOwner" id="Owners_@(i)__OwnerReasons_@(j)__IdProcess" name="Owners[@i].OwnerReasons[@j].IdProcess" />
     <input type="hidden" asp-for="IdReason" id="Owners_@(i)__OwnerReasons_@(j)__IdReason" name="Owners[@i].OwnerReasons[@j].IdReason" />
+    <input type="hidden" asp-for="IdOwner" id="Owners_@(i)__OwnerReasons_@(j)__IdOwner" name="Owners[@i].OwnerReasons[@j].IdOwner" />
     <td></td>
     <td class="align-middle" colspan="3">
         <div class="row">
             <div class="input-group col-2">
-                <input type="text" asp-for="NumeratorShare" class="form-control"
-                       id="Owners_@(i)__OwnerReasons_@(j)__NumeratorShare" name="Owners[@i].OwnerReasons[@j].NumeratorShare" 
+                <input type="text" asp-for="NumeratorShare" class="form-control" title="Числитель" 
+                       id="Owners_@(i)__OwnerReasons_@(j)__NumeratorShare" name="Owners[@i].OwnerReasons[@j].NumeratorShare"
                        data-val="true" data-val-range="Поле «Числитель» должно лежать между 1 и 1024" data-val-range-max="1024" data-val-range-min="1" data-val-required="Поле «Числитель» является обязательным для заполнения" />
-                <span class="text-danger field-validation-valid" data-valmsg-for="OwnerPersons[@j].NumeratorShare" data-valmsg-replace="true"></span>
+                @*<span class="text-danger field-validation-valid" data-valmsg-for="Owners[@i].OwnerReasons[@j].NumeratorShare" data-valmsg-replace="true"></span>*@
                 <div class="input-group-prepend input-group-append">
                     <span class="input-group-text">/</span>
                 </div>
-                <input type="text" asp-for="DenominatorShare" class="form-control"
+                <input type="text" asp-for="DenominatorShare" class="form-control" title="Знаменатель"
                        id="Owners_@(i)__OwnerReasons_@(j)__DenominatorShare" name="Owners[@i].OwnerReasons[@j].DenominatorShare"
                        data-val="true" data-val-range="Поле «Знаменатель» должно лежать между 1 и 1024" data-val-range-max="1024" data-val-range-min="1" data-val-required="Поле «Знаменатель» является обязательным для заполнения" />
-                <span class="text-danger field-validation-valid" data-valmsg-for="OwnerPersons[@j].DenominatorShare" data-valmsg-replace="true"></span>
+                @*<span class="text-danger field-validation-valid" data-valmsg-for="Owners[@i].OwnerReasons[@j].DenominatorShare" data-valmsg-replace="true"></span>*@
             </div>
             <div class="col-4">
-                <select asp-for="IdReasonType" class="form-control"
+                <select asp-for="IdReasonType" class="form-control" title="Тип документа основания"
                         id="Owners_@(i)__OwnerReasons_@(j)__IdReasonType" name="Owners[@i].OwnerReasons[@j].IdReasonType" asp-items="@{
                     new SelectList(ViewBag.OwnerReasonTypes, "IdReasonType", "ReasonName")}"></select>
             </div>
             <div class="col">
-                <input type="text" asp-for="ReasonNumber" class="form-control"
+                <input type="text" asp-for="ReasonNumber" class="form-control" placeholder="Номер документа" title="Номер документа"
                        id="Owners_@(i)__OwnerReasons_@(j)__ReasonNumber" name="Owners[@i].OwnerReasons[@j].ReasonNumber"
                        data-val="true" data-val-required="Поле «Номер» является обязательным для заполнения" />
             </div>
             <div class="col">
-                <input type="date" asp-for="ReasonDate" class="form-control"
+                <input type="date" asp-for="ReasonDate" class="form-control" title="Дата документа"
                        id="Owners_@(i)__OwnerReasons_@(j)__ReasonDate" name="Owners[@i].OwnerReasons[@j].ReasonDate"
                        data-val="true" data-val-required="Поле «Дата» является обязательным для заполнения" />
             </div>
@@ -42,7 +42,7 @@
     <td>
         @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
         {
-            <a class="btn btn-danger close" title="Удалить" aria-label="Удалить">&#10006;</a>
+            <a class="btn btn-danger reasonDelete" title="Удалить" aria-label="Удалить">&#10006;</a>
         }
     </td>
 </tr>
