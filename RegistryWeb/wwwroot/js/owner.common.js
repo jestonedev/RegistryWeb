@@ -63,6 +63,13 @@ var recalculationOwnerId = function (id) {
 
 var reasonToggle = function (owner) {
     var iOwner = +owner.attr('data-i-owner');
+    var reasonToggle = owner.find('.reasonToggle');
+    if (reasonToggle.html() === '∨') {
+        reasonToggle.html('∧');
+    }
+    else {
+        reasonToggle.html('∨');
+    }
     $('.reasonBlock[data-i-owner="' + iOwner + '"]').toggle();
 }
 
@@ -71,12 +78,21 @@ var reasonAdd = function (owner) {
     var reasons = $('.reasonBlock[data-i-owner="' + iOwner + '"]');
     var iReason = reasons.length;
     var action = $('form').attr('data-action');
+
     $.ajax({
         type: 'POST',
         url: window.location.origin + '/OwnerProcesses/OwnerReasonAdd',
         data: { iOwner: iOwner, iReason: iReason, action: action },
         success: function (data) {
-            $(reasons[iReason-1]).after(data);
+            if (iReason == 0) {
+                owner.after(data);
+            }
+            else {
+                $(reasons[iReason - 1]).after(data);
+            }
+            if (owner.find('.reasonToggle').html() === '∧') {
+                $('.reasonBlock[data-i-owner="' + iOwner + '"]').last().hide();
+            }
             refreshValidation();
         }
     });

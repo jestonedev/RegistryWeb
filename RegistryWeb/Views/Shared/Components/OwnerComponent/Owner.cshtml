@@ -1,4 +1,5 @@
-﻿@model RegistryWeb.Models.Entities.Owner;
+﻿@using RegistryWeb.Models;
+@model RegistryWeb.Models.Entities.Owner;
 @{
     int i = ViewBag.Id;
 }
@@ -6,7 +7,7 @@
     <input type="hidden" asp-for="IdOwner" id="Owners_@(i)__IdOwner" name="Owners[@i].IdOwner" />
     <input type="hidden" asp-for="IdProcess" id="Owners_@(i)__IdProcess" name="Owners[@i].IdProcess" />
     <input type="hidden" asp-for="IdOwnerType" id="Owners_@(i)__IdOwnerType" name="Owners[@i].IdOwnerType" />
-    <td class="align-middle align-content-center">
+    <td class="align-middle text-center">
         @Html.DisplayFor(modelItem => Model.IdOwnerTypeNavigation.OwnerType1)
     </td>
     <td class="align-middle text-center">
@@ -18,7 +19,15 @@
             }
         </div>
     </td>
-    <td class="align-middle">
+    <td class="align-middle text-center">
+        @if (ViewBag.Action != "Create" && Model.OwnerReasons.Count() > 0)
+        {
+            @(Model.OwnerReasons
+                .Select(r => new Fraction(r.NumeratorShare,r.DenominatorShare))
+                .Aggregate((x, y) => x + y)
+                .Reduce()
+                .ToString())
+        }
     </td>
     <td class="align-middle">
         <div class="row">
@@ -55,8 +64,11 @@
         </td>
     }
 </tr>
-@for (var j = 0; j < Model.OwnerReasons.Count(); j++)
+@if (Model.OwnerReasons != null)
 {
-    @await Component.InvokeAsync("OwnerReasonComponent",
-        new { ownerReason = Model.OwnerReasons[j], iOwner = i, iReason = j, action = ViewBag.Action })
+    @for (var j = 0; j < Model.OwnerReasons.Count(); j++)
+    {
+        @await Component.InvokeAsync("OwnerReasonComponent",
+            new { ownerReason = Model.OwnerReasons[j], iOwner = i, iReason = j, action = ViewBag.Action })
+    }
 }
