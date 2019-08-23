@@ -250,21 +250,21 @@ namespace RegistryWeb.DataServices
 
         internal OwnerProcess GetOwnerProcess(int idProcess)
         {
-            var owners = registryContext.Owners
-                .Include(ow => ow.IdOwnerTypeNavigation)
-                .Include(ow => ow.IdOwnerProcessNavigation)
-                    .ThenInclude(pr => pr.OwnerBuildingsAssoc)
-                .Include(ow => ow.IdOwnerProcessNavigation)
-                    .ThenInclude(pr => pr.OwnerPremisesAssoc)
-                .Include(ow => ow.IdOwnerProcessNavigation)
-                    .ThenInclude(pr => pr.OwnerSubPremisesAssoc)
-                .Include(ow => ow.OwnerOrginfo)
-                .Include(ow => ow.OwnerPerson)
-                .Include(ow => ow.OwnerReasons)
-                .Where(ow => ow.IdProcess == idProcess)
+            var ownerProcess = registryContext.OwnerProcesses
+                .Include(op => op.OwnerBuildingsAssoc)
+                .Include(op => op.OwnerPremisesAssoc)
+                .Include(op => op.OwnerSubPremisesAssoc)
+                .Include(op => op.Owners)
+                    .ThenInclude(ow => ow.IdOwnerTypeNavigation)
+                .Include(op => op.Owners)
+                    .ThenInclude(ow => ow.OwnerPerson)
+                .Include(op => op.Owners)
+                    .ThenInclude(ow => ow.OwnerOrginfo)
+                .Include(op => op.Owners)
+                    .ThenInclude(ow => ow.OwnerReasons)
                 .AsNoTracking()
-                .ToList();
-            return owners.FirstOrDefault().IdOwnerProcessNavigation;
+                .FirstOrDefault(op => op.IdProcess == idProcess);
+            return ownerProcess;
         }
 
         internal void Create(OwnerProcess ownerProcess)
@@ -280,7 +280,8 @@ namespace RegistryWeb.DataServices
                 .Include(op => op.OwnerPremisesAssoc)
                 .Include(op => op.OwnerSubPremisesAssoc)
                 .Include(op => op.Owners)
-                .First(op => op.IdProcess == idProcess);
+                    .ThenInclude(ow => ow.OwnerReasons)
+                .FirstOrDefault(op => op.IdProcess == idProcess);
             ownerProcesses.Deleted = 1;
             foreach(var o in ownerProcesses.OwnerBuildingsAssoc)
             {
@@ -294,9 +295,13 @@ namespace RegistryWeb.DataServices
             {
                 o.Deleted = 1;
             }
-            foreach (var o in ownerProcesses.Owners)
+            foreach (var owner in ownerProcesses.Owners)
             {
-                o.Deleted = 1;
+                owner.Deleted = 1;
+                foreach (var reason in owner.OwnerReasons)
+                {
+                    reason.Deleted = 1;
+                }
             }
             registryContext.SaveChanges();
         }
@@ -305,20 +310,30 @@ namespace RegistryWeb.DataServices
         {
             //Удаление
             var oldOwnerProcess = GetOwnerProcess(newOwnerProcess.IdProcess);
-            //foreach (var or in oldOwnerProcess.OwnerReasons)
-            //{
-            //    if (newOwnerProcess.OwnerReasons.Select(owr => owr.IdReason).Contains(or.IdReason) == false)
-            //    {
-            //        or.Deleted = 1;
-            //        newOwnerProcess.OwnerReasons.Add(or);
-            //    }
-            //}
-            foreach (var owner in oldOwnerProcess.Owners)
+            foreach (var oldOwner in oldOwnerProcess.Owners)
             {
-                if (newOwnerProcess.Owners.Select(owp => owp.IdOwner).Contains(owner.IdOwner) == false)
+                if (newOwnerProcess.Owners.Select(owp => owp.IdOwner).Contains(oldOwner.IdOwner) == false)
                 {
-                    owner.Deleted = 1;
-                    newOwnerProcess.Owners.Add(owner);
+                    oldOwner.Deleted = 1;
+                    //случай, когда удаляется собственник. Все его документы должны удалиться автоматом
+                    foreach (var oldReason in oldOwner.OwnerReasons)
+                    {
+                        oldReason.Deleted = 1;
+                    }
+                    newOwnerProcess.Owners.Add(oldOwner);
+                }
+                else
+                {
+                    //случай, когда удаляется документ.
+                    var newOwner = newOwnerProcess.Owners.FirstOrDefault(ow => ow.IdOwner == oldOwner.IdOwner);
+                    foreach (var oldReason in oldOwner.OwnerReasons)
+                    {
+                        if (newOwner.OwnerReasons.Select(or => or.IdReason).Contains(oldReason.IdReason) == false)
+                        {
+                            oldReason.Deleted = 1;
+                            newOwner.OwnerReasons.Add(oldReason);
+                        }
+                    }
                 }
             }
             foreach (var oba in oldOwnerProcess.OwnerBuildingsAssoc)

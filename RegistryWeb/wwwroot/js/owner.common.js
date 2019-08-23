@@ -184,6 +184,6 @@ $(function () {
             var owner = $(event.target).parents().filter('.ownerBlock')
             reasonAdd(owner);
         }
-        
+        //event.preventDefault(); Чтобы при добавлении новых собственников или договоров экран не прыгал вверх. Но не работает окно даты.
     });
 });
