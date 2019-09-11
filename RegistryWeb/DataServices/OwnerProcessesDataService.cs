@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using RegistryWeb.SecurityServices;
-using RegistryWeb.Models.Enums;
+using RegistryWeb.Log;
 
 namespace RegistryWeb.DataServices
 {
@@ -17,10 +17,11 @@ namespace RegistryWeb.DataServices
         private readonly IQueryable<OwnerBuildingAssoc> ownerBuildingsAssoc;
         private readonly IQueryable<OwnerPremiseAssoc> ownerPremisesAssoc;
         private readonly IQueryable<OwnerSubPremiseAssoc> ownerSubPremisesAssoc;
-        protected readonly SecurityService securityService;
+        protected readonly LogOwnerProcessHelper logHelper;
 
         public OwnerProcessesDataService(RegistryContext registryContext, SecurityService securityService) : base(registryContext)
         {
+            logHelper = new LogOwnerProcessHelper(registryContext, securityService);
 
             ownerBuildingsAssoc = registryContext.OwnerBuildingsAssoc
                 .Include(oba => oba.IdBuildingNavigation)
@@ -274,20 +275,7 @@ namespace RegistryWeb.DataServices
         {
             registryContext.OwnerProcesses.Add(ownerProcess);
             registryContext.SaveChanges();
-        }
-
-        internal LogOwnerProcess CreateLog(LogObjects logObject, LogTypes logType, OwnerProcess newOwnerProcess, OwnerProcess oldOwnerProcess = null)
-        {
-            var dateOperation = DateTime.Now;
-            var user = securityService.User;
-            var log = new LogOwnerProcess();
-            log.IdProcess = newOwnerProcess.IdProcess;
-            log.Date = dateOperation;
-            log.IdUser = user.IdUser;
-            log.IdUserNavigation = user;
-            log.IdLogObject = (int)logObject;
-            log.IdLogType = (int)logType;
-            return log;
+            logHelper.CreateLog(LogTypes.Create, ownerProcess);
         }
 
         internal void Delete(int idProcess)
