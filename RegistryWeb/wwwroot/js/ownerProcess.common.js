@@ -5,17 +5,47 @@
     $.validator.unobtrusive.parse(form);
     form.validate();
 }
-var ownersToggle = function () {
-    if ($(this).html() === '∧') {
-        $(this).html('∨');
+var arrowAnimation = function (arrow) {
+    if (arrow.html() === '∧') {
+        arrow.html('∨');
     }
     else {
-        $(this).html('∧');
+        arrow.html('∧');
     }
+}
+var ownersToggle = function () {
+    arrowAnimation($(this));
     $('#ownersTable').toggle();
+}
+var commentToggle = function () {
+    arrowAnimation($(this));
+    $('#Comment').toggle();
+}
+var addressesToggle = function () {
+    arrowAnimation($(this));
+    $('#addresses').toggle();
+}
+var ownerProcessToggle = function () {
+    arrowAnimation($(this));
+    $('#ownerProcess').toggle();
+}
+var annulOwnerProcessToggle = function () {
+    arrowAnimation($(this));
+    $('#annulOwnerProcess').toggle();
+}
+var annulOwnerProcessCheckboxChange = function () {
+    $('#annulOwnerProcessCard').toggle();
+    $('#annulBadge').toggle();
+    $('#AnnulDate').val("");
+    $('#AnnulComment').val("");
+    
 }
 $(function () {
     var action = $('form').data('action');
+    if ($('#AnnulDate').val() === "") {
+        $('#annulOwnerProcessCard').hide();
+        $('#annulBadge').hide();
+    }
     $('#addressAdd').click(function () {
         var id = $('.buildingBlock').length;
         $.ajax({
@@ -44,4 +74,10 @@ $(function () {
         });
     });
     $('#ownersToggle').click(ownersToggle);
+    $('#commentToggle').click(commentToggle);
+    $('#addressesToggle').click(addressesToggle);
+    $('#ownerProcessToggle').click(ownerProcessToggle);
+    $('#annulOwnerProcessToggle').click(annulOwnerProcessToggle);
+    $('#annulOwnerProcessCheckbox').change(annulOwnerProcessCheckboxChange);
+    
 });

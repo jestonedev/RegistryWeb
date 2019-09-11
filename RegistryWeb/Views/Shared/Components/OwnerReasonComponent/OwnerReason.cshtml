@@ -39,10 +39,10 @@
             </div>
         </div>
     </td>
+    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+    {
     <td>
-        @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-        {
-            <a class="btn btn-danger reasonDelete" title="Удалить" aria-label="Удалить">&#10006;</a>
-        }
+        <a class="btn btn-danger reasonDelete" title="Удалить" aria-label="Удалить">&#10006;</a>
     </td>
+    }
 </tr>

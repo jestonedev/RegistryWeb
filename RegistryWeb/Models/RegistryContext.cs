@@ -56,6 +56,10 @@ namespace RegistryWeb.Models
 
         //Журнал изменений
         public virtual DbSet<ChangeLog> ChangeLogs { get; set; }
+        public virtual DbSet<LogObject> LogObjects { get; set; }
+        public virtual DbSet<LogType> LogTypes { get; set; }
+        public virtual DbSet<LogOwnerProcess> LogOwnerProcesses { get; set; }
+        public virtual DbSet<LogOwnerProcessValue> LogOwnerProcessesValue { get; set; }
 
         //Права доступа
         public virtual DbSet<AclPrivilege> AclPrivileges { get; set; }
@@ -69,20 +73,16 @@ namespace RegistryWeb.Models
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            //if (!optionsBuilder.IsConfigured)
-            //{
-            //    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-            //    optionsBuilder.UseMySQL("");
-            //}
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.3-servicing-35854");
 
             modelBuilder.ApplyConfiguration(new ChangeLogConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new LogOwnerProcessConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new LogOwnerProcessValueConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new LogObjectConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new LogTypeConfiguration(nameDatebase));
+            
 
             modelBuilder.ApplyConfiguration(new AclPrivilegeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new AclPrivilegeTypeConfiguration(nameDatebase));

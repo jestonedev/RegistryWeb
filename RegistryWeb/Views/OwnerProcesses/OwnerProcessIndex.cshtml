@@ -1,0 +1,37 @@
+﻿@model RegistryWeb.ViewModel.OwnerProcessVM;
+@{
+    if (ViewBag.Action == "Create")
+    {
+        ViewData["Title"] = "Создание нового процесса собственности";
+    }
+    else
+    {
+        ViewData["Title"] = "Процесс собственности №" + Model.OwnerProcess.IdProcess;
+    }
+}
+@Html.Partial("OwnerProcess", Model.OwnerProcess)
+@if (ViewBag.Action != "Delete")
+{
+    @Html.Partial("OwnerProcessLog", Model.Log)
+}
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/address.common.js" asp-append-version="true"></script>
+    <script src="~/js/owner.common.js" asp-append-version="true"></script>
+    <script src="~/js/ownerProcess.common.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap4-toggle/js/bootstrap4-toggle.min.js"></script>
+    <link href="~/lib/bootstrap4-toggle/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    {
+        <script>
+            $(function () {
+                $('select').prop('disabled', true);
+                $('input').prop('disabled', true);
+                $('textarea').prop('disabled', true);
+                $('input[type="hidden"]').prop('disabled', false);
+                $('input[type="submit"]').prop('disabled', false);
+            })
+        </script>
+    }
+}

@@ -140,36 +140,13 @@ namespace RegistryWeb.Controllers
             return GetOwnerProcessView(ownerProcess);
         }
 
-        [HttpGet]
-        public IActionResult Annul(int? idProcess)
-        {
-            if (idProcess == null)
-                return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
-                return View("NotAccess");
-            var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
-            ownerProcess.AnnulDate = System.DateTime.Now.Date;
-            if (ownerProcess == null)
-                return NotFound();
-            return View(ownerProcess);
-        }
-
-        [HttpPost]
-        public IActionResult Annul(OwnerProcess ownerProcess)
-        {
-            if (ownerProcess == null)
-                return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
-                return View("NotAccess");
-            dataService.Annul(ownerProcess);
-            return RedirectToAction("Index");
-        }
-
         public IActionResult GetOwnerProcessView(OwnerProcess ownerProcess, [CallerMemberName]string action = "")
         {
             ViewBag.Action = action;
-            ViewBag.OwnerTypes = dataService.GetOwnerTypes;
-            return View("OwnerProcess", ownerProcess);
+            var ownerProcessVM = new OwnerProcessVM();
+            ownerProcessVM.OwnerProcess = ownerProcess;
+            ownerProcessVM.Log = dataService.GetProcessLog(ownerProcess.IdProcess);
+            return View("OwnerProcessIndex", ownerProcessVM);
         }
 
         public IActionResult Error()

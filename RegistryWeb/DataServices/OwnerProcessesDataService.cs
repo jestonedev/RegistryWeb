@@ -7,7 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
+using RegistryWeb.SecurityServices;
+using RegistryWeb.Models.Enums;
 
 namespace RegistryWeb.DataServices
 {
@@ -16,13 +17,15 @@ namespace RegistryWeb.DataServices
         private readonly IQueryable<OwnerBuildingAssoc> ownerBuildingsAssoc;
         private readonly IQueryable<OwnerPremiseAssoc> ownerPremisesAssoc;
         private readonly IQueryable<OwnerSubPremiseAssoc> ownerSubPremisesAssoc;
+        protected readonly SecurityService securityService;
 
-        public OwnerProcessesDataService(RegistryContext registryContext) : base(registryContext)
+        public OwnerProcessesDataService(RegistryContext registryContext, SecurityService securityService) : base(registryContext)
         {
+
             ownerBuildingsAssoc = registryContext.OwnerBuildingsAssoc
                 .Include(oba => oba.IdBuildingNavigation)
                     .ThenInclude(b => b.IdStreetNavigation)
-                .Include(oba => oba.IdProcessNavigation)                                              
+                .Include(oba => oba.IdProcessNavigation)
                 .AsNoTracking();
             ownerPremisesAssoc = registryContext.OwnerPremisesAssoc
                 .Include(opa => opa.IdPremisesNavigation)
@@ -111,7 +114,7 @@ namespace RegistryWeb.DataServices
         }
 
         private IQueryable<OwnerProcess> GetQueryFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
-        { 
+        {
             query = AddressFilter(query, filterOptions);
             query = OwnerTypeFilter(query, filterOptions);
             query = IdProcessFilter(query, filterOptions);
@@ -273,6 +276,20 @@ namespace RegistryWeb.DataServices
             registryContext.SaveChanges();
         }
 
+        internal LogOwnerProcess CreateLog(LogObjects logObject, LogTypes logType, OwnerProcess newOwnerProcess, OwnerProcess oldOwnerProcess = null)
+        {
+            var dateOperation = DateTime.Now;
+            var user = securityService.User;
+            var log = new LogOwnerProcess();
+            log.IdProcess = newOwnerProcess.IdProcess;
+            log.Date = dateOperation;
+            log.IdUser = user.IdUser;
+            log.IdUserNavigation = user;
+            log.IdLogObject = (int)logObject;
+            log.IdLogType = (int)logType;
+            return log;
+        }
+
         internal void Delete(int idProcess)
         {
             var ownerProcesses = registryContext.OwnerProcesses
@@ -283,7 +300,7 @@ namespace RegistryWeb.DataServices
                     .ThenInclude(ow => ow.OwnerReasons)
                 .FirstOrDefault(op => op.IdProcess == idProcess);
             ownerProcesses.Deleted = 1;
-            foreach(var o in ownerProcesses.OwnerBuildingsAssoc)
+            foreach (var o in ownerProcesses.OwnerBuildingsAssoc)
             {
                 o.Deleted = 1;
             }
@@ -314,6 +331,7 @@ namespace RegistryWeb.DataServices
             {
                 if (newOwnerProcess.Owners.Select(owp => owp.IdOwner).Contains(oldOwner.IdOwner) == false)
                 {
+                    registryContext.Entry(oldOwner).State = EntityState.Modified;
                     oldOwner.Deleted = 1;
                     //случай, когда удаляется собственник. Все его документы должны удалиться автоматом
                     foreach (var oldReason in oldOwner.OwnerReasons)
@@ -365,10 +383,80 @@ namespace RegistryWeb.DataServices
             registryContext.SaveChanges();
         }
 
-        internal void Annul(OwnerProcess newOwnerProcess)
+        internal IQueryable<GroupChangeLog> GetProcessLog(int idProcess)
         {
-            registryContext.OwnerProcesses.Update(newOwnerProcess);
-            registryContext.SaveChanges();
+            var ownerProcesses =
+                from log in registryContext.ChangeLogs
+                where log.TableName == "owner_processes" && log.IdKey == idProcess
+                group log by new { time = log.OperationTime, table = log.TableName } into gr
+                select new GroupChangeLog
+                {
+                    OperationTime = gr.Key.time,
+                    TableName = gr.Key.table,
+                    Logs = from l in gr select l
+                };
+
+            var ownersIdKey =
+                from log in registryContext.ChangeLogs
+                where log.TableName == "owners" 
+                    && log.FieldName == "id_process"
+                    && log.FieldNewValue == idProcess.ToString()
+                select log.IdKey;
+            var ownerReasonsIdKey =
+                from log in registryContext.ChangeLogs
+                where log.TableName == "owner_reasons"
+                    && log.FieldName == "id_owner"
+                    && ownersIdKey.Contains(int.Parse(log.FieldNewValue))
+                select log.IdKey;
+            //var ownerPremisesAssocIdKey = from log in registryContext.ChangeLogs
+            //    where log.TableName == "owner_premises_assoc"
+            //        && log.FieldName == "id_process"
+            //        && log.FieldNewValue == idProcess.ToString()
+            //    select log.IdKey;
+            //var ownerBuildingsAssocIdKey = from log in registryContext.ChangeLogs
+            //    where log.TableName == "owner_buildings_assoc"
+            //        && log.FieldName == "id_process"
+            //        && log.FieldNewValue == idProcess.ToString()
+            //    select log.IdKey;
+            //var ownerSubPremisesAssocIdKey = from log in registryContext.ChangeLogs
+            //    where log.TableName == "owner_sub_premises_assoc"
+            //        && log.FieldName == "id_process"
+            //        && log.FieldNewValue == idProcess.ToString()
+            //    select log.IdKey;
+            //var ownerOrginfoIdKey = from log in registryContext.ChangeLogs
+            //    where log.TableName == "owner_orginfo"
+            //        && log.FieldName == "id_owner"
+            //        && ownersIdKey.Contains(int.Parse(log.FieldNewValue))
+            //    select log.IdKey;
+            //var ownerPersonsIdKey = from log in registryContext.ChangeLogs
+            //    where log.TableName == "owner_persons"
+            //        && log.FieldName == "id_owner"
+            //        && ownersIdKey.Contains(int.Parse(log.FieldNewValue))
+            //    select log.IdKey;
+
+            var owners =
+                from log in registryContext.ChangeLogs
+                where log.TableName == "owners" && ownersIdKey.Contains(log.IdKey)
+                group log by new { time = log.OperationTime, table = log.TableName } into gr
+                select new GroupChangeLog
+                {
+                    OperationTime = gr.Key.time,
+                    TableName = gr.Key.table,
+                    Logs = from l in gr select l
+                };
+            var ownerReasons =
+                from log in registryContext.ChangeLogs
+                where log.TableName == "owner_reasons" && ownerReasonsIdKey.Contains(log.IdKey)
+                group log by new { time = log.OperationTime, table = log.TableName } into gr
+                select new GroupChangeLog
+                {
+                    OperationTime = gr.Key.time,
+                    TableName = gr.Key.table,
+                    Logs = from l in gr select l
+                };
+
+            var result = ownerProcesses.Union(owners).Union(ownerReasons).OrderBy(l => l.OperationTime);
+            return result;
         }
     }
 }

@@ -1,127 +1,139 @@
 ﻿@model RegistryWeb.Models.Entities.OwnerProcess;
-@{
-    if (ViewBag.Action == "Create")
-    {
-        ViewData["Title"] = "Создание нового процесса собственности";
-    }
-    else
-    {
-        ViewData["Title"] = "Процесс собственности №" + Model.IdProcess;
-    }
+@{ 
+    var annulChecked = Model.AnnulDate == null ? "checked" : "";
 }
-
-<h2>@ViewData["Title"]</h2>
 <form asp-controller="OwnerProcesses" asp-action="@ViewBag.Action" id="r-ownerprocess-form" data-action="@ViewBag.Action" method="post">
-    <input type="hidden" asp-for="IdProcess" />
-    <div class="btn-group mt-2" role="group" aria-label="Панель доступа">
-        <a class="btn btn-primary" asp-controller="OwnerProcesses" asp-action="Index">Назад</a>
-        @if (ViewBag.Action == "Create")
-        {
-            <input type="submit" value="Создать" class="btn btn-success" />
-        }
-        @if (ViewBag.Action == "Edit")
-        {
-            <input type="submit" value="Сохранить" class="btn btn-success" />
-            <a class="btn btn-danger" asp-controller="OwnerProcesses" asp-action="Annul" asp-route-idProcess="@Model.IdProcess">Аннулировать</a>
-        }
-        @if (ViewBag.Action == "Delete")
-        {
-            <input type="submit" value="Удалить" class="btn btn-danger" />
-        }
-    </div>
-    <div class="validation text-danger" asp-validation-summary="All"></div>
-
-    <div id="addresses">
-        <div class="d-flex justify-content-between mb-1 mt-3">
-            <h3>Адреса</h3>
-            @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-            {
-                <a class="btn btn-success" title="Добавить адрес" aria-label="Добавить адрес" id="addressAdd">Добавить</a>
-            }
-        </div>
-        @if (Model.OwnerBuildingsAssoc != null)
-        {
-            @for (var i = 0; i < Model.OwnerBuildingsAssoc.Count(); i++)
-            {
-                @await Component.InvokeAsync("AddressComponent",
-                         new { addressAssoc = Model.OwnerBuildingsAssoc[i], id = i, action = ViewBag.Action })
-            }
-        }
-        @if (Model.OwnerPremisesAssoc != null)
-        {
-            @for (var i = 0; i < Model.OwnerPremisesAssoc.Count(); i++)
-            {
-                @await Component.InvokeAsync("AddressComponent",
-                         new { addressAssoc = Model.OwnerPremisesAssoc[i], id = i, action = ViewBag.Action })
-            }
-        }
-        @if (Model.OwnerSubPremisesAssoc != null)
-        {
-            @for (var i = 0; i < Model.OwnerSubPremisesAssoc.Count(); i++)
-            {
-                @await Component.InvokeAsync("AddressComponent",
-                         new { addressAssoc = Model.OwnerSubPremisesAssoc[i], id = i, action = ViewBag.Action })
-            }
-        }
-    </div>
-    <div class="card-header d-flex justify-content-between">
-        <h3>Собственники</h3>
-        <div class="btn-group" role="group">
-            @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-            {
-            <a class="form-control">Добавить:</a>
-            <a class="form-control btn btn-success ownerAdd" title="Добавить физическое лицо" data-id-owner-type="1">ФЗ</a>
-            <a class="form-control btn btn-success ownerAdd" title="Добавить юридическое лицо" data-id-owner-type="2">ЮЗ</a>
-            <a class="form-control btn btn-success ownerAdd" title="Добавить индивидуального предпринимателя" data-id-owner-type="3">ИП</a>
-            }
-            <a id="ownersToggle" class="form-control btn btn-primary" title="Развернуть список собственников" style="font-weight:bold;">∧</a>
-        </div>
-    </div>
-    <table class="table table-bordered" id="ownersTable">
-        <thead>
-            <tr>
-                <th width="100px">Тип</th>
-                <th width="100px">Документы</th>
-                <th width="50px">Доля</th>
-                <th>Данные</th>
-                @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <div class="form-check form-check-inline">
+                <input id="annulOwnerProcessCheckbox" class="form-check-input" type="checkbox" @annulChecked data-toggle="toggle" data-on=" " data-off=" " data-onstyle="success" data-offstyle="danger">
+                <label class="form-check-label h2 ml-2">@ViewData["Title"]</label>
+                <sup class="badge badge-danger ml-2" id="annulBadge">Аннулирован</sup>
+            </div>
+            <div class="btn-group" role="group" aria-label="Панель доступа">
+                <a class="form-control btn btn-primary" asp-controller="OwnerProcesses" asp-action="Index">Назад</a>
+                @if (ViewBag.Action == "Create")
                 {
-                    <th></th>
+                    <input type="submit" value="Создать" class="form-control btn btn-success" />
                 }
-            </tr>
-        </thead>
-        <tbody id="owners">
-            @if (Model.Owners != null)
-            {
-                @for (var i = 0; i < Model.Owners.Count(); i++)
+                @if (ViewBag.Action == "Edit")
                 {
-                    @await Component.InvokeAsync("OwnerComponent",
-                        new { owner = Model.Owners[i], id = i, action = ViewBag.Action })
+                    <input type="submit" value="Сохранить" class="form-control btn btn-success" />
                 }
-            }
-        </tbody>
-    </table>
-    <div class="form-group">
-        <label asp-for="Comment" class="control-label">Комментарий</label>
-        <textarea rows="3" asp-for="Comment" class="form-control"></textarea>
-    </div>
+                @if (ViewBag.Action == "Delete")
+                {
+                    <input type="submit" value="Удалить" class="form-control btn btn-danger" />
+                }
+                <a href="#" id="ownerProcessToggle" class="form-control btn btn-primary" title="Развернуть процесс собственности" style="font-weight:bold;">∧</a>
+            </div>
+        </div>
+        <div class="card-body" id="ownerProcess">
+            <input type="hidden" asp-for="IdProcess" />
+            <div class="validation text-danger" asp-validation-summary="All"></div>
+            <div class="card" id="annulOwnerProcessCard">
+                <div class="card-header d-flex justify-content-between">
+                    <h3>Завершение процесса</h3>
+                    <div>
+                        <a href="#" id="annulOwnerProcessToggle" class="form-control btn btn-primary" title="Развернуть панель аннулирования" style="font-weight:bold;">∧</a>
+                    </div>
+                </div>
+                <div id="annulOwnerProcess" class="card-body row">
+                    <div class="col-2">
+                        <input type="date" class="form-control" placeholder="Дата аннулирования" title="Дата аннулирования"
+                               asp-for="AnnulDate" />
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" placeholder="Причина аннулирования" title="Причина аннулирования"
+                               asp-for="AnnulComment" />
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h3>Адреса</h3>
+                    <div class="btn-group" role="group">
+                        @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                        {
+                            <a href="#" id="addressAdd" class="form-control btn btn-success" title="Добавить адрес">&#10010;</a>
+                        }
+                        <a href="#" id="addressesToggle" class="form-control btn btn-primary" title="Развернуть коментарий" style="font-weight:bold;">∧</a>
+                    </div>
+                </div>
+                <div id="addresses" class="card-body">
+                    @if (Model.OwnerBuildingsAssoc != null)
+                    {
+                        @for (var i = 0; i < Model.OwnerBuildingsAssoc.Count(); i++)
+                        {
+                            @await Component.InvokeAsync("AddressComponent",
+                                     new { addressAssoc = Model.OwnerBuildingsAssoc[i], id = i, action = ViewBag.Action })
+                        }
+                    }
+                    @if (Model.OwnerPremisesAssoc != null)
+                    {
+                        @for (var i = 0; i < Model.OwnerPremisesAssoc.Count(); i++)
+                        {
+                            @await Component.InvokeAsync("AddressComponent",
+                                     new { addressAssoc = Model.OwnerPremisesAssoc[i], id = i, action = ViewBag.Action })
+                        }
+                    }
+                    @if (Model.OwnerSubPremisesAssoc != null)
+                    {
+                        @for (var i = 0; i < Model.OwnerSubPremisesAssoc.Count(); i++)
+                        {
+                            @await Component.InvokeAsync("AddressComponent",
+                                     new { addressAssoc = Model.OwnerSubPremisesAssoc[i], id = i, action = ViewBag.Action })
+                        }
+                    }
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h3>Собственники</h3>
+                    <div class="btn-group" role="group">
+                        @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                        {
+                            <a class="form-control">Добавить:</a>
+                            <a href="#" class="form-control btn btn-success ownerAdd" title="Добавить физическое лицо" data-id-owner-type="1">ФЗ</a>
+                            <a href="#" class="form-control btn btn-success ownerAdd" title="Добавить юридическое лицо" data-id-owner-type="2">ЮЗ</a>
+                            <a href="#" class="form-control btn btn-success ownerAdd" title="Добавить индивидуального предпринимателя" data-id-owner-type="3">ИП</a>
+                        }
+                        <a href="#" id="ownersToggle" class="form-control btn btn-primary" title="Развернуть список собственников" style="font-weight:bold;">∧</a>
+                    </div>
+                </div>
+                <table class="table table-bordered" id="ownersTable">
+                    <thead>
+                        <tr>
+                            <th width="100px">Тип</th>
+                            <th width="100px">Документы</th>
+                            <th width="50px">Доля</th>
+                            <th>Данные</th>
+                            @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                            {
+                                <th></th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody id="owners">
+                        @if (Model.Owners != null)
+                        {
+                            @for (var i = 0; i < Model.Owners.Count(); i++)
+                            {
+                                @await Component.InvokeAsync("OwnerComponent",
+                                    new { owner = Model.Owners[i], id = i, action = ViewBag.Action })
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h3 for="Comment">Комментарий</h3>
+                    <div class="btn-group" role="group">
+                        <a href="#" id="commentToggle" class="form-control btn btn-primary" title="Развернуть коментарий" style="font-weight:bold;">∧</a>
+                    </div>
+                </div>
+                <textarea rows="3" asp-for="Comment" class="form-control card-body"></textarea>
+            </div>
+        </div>
+        </div>
 </form>
-
-@section Scripts {
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-    <script src="~/js/address.common.js" asp-append-version="true"></script>
-    <script src="~/js/owner.common.js" asp-append-version="true"></script>
-    <script src="~/js/ownerProcess.common.js" asp-append-version="true"></script>
-    @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete") {
-        <script>
-            $(function () {
-                $('select').prop('disabled', true);
-                $('input').prop('disabled', true);
-                $('textarea').prop('disabled', true);
-                $('input[type="hidden"]').prop('disabled', false);
-                $('input[type="submit"]').prop('disabled', false);
-            })
-        </script>
-    }
-}

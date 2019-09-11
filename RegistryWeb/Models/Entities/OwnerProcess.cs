@@ -15,7 +15,6 @@ namespace RegistryWeb.Models.Entities
         }
 
         public int IdProcess { get; set; }
-        [Range(1, 3)]
         public DateTime? AnnulDate { get; set; }
         public string AnnulComment { get; set; }
         public string Comment { get; set; }

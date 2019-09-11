@@ -2,7 +2,7 @@
 @{ 
     int i = ViewBag.Id;
 }
-<div class="form-row addressBlock @ViewBag.ClassAssoc mb-2 mt-2 border" data-id="@i">
+<div class="form-row addressBlock @ViewBag.ClassAssoc" data-id="@i">
     @if (Model.IdTypeAddress == 1)
     {
         <input type="hidden" class="addressIdProcess" asp-for="IdProcess" name="OwnerBuildingsAssoc[@i].IdProcess" />

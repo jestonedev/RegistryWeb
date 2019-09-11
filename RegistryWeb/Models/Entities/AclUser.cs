@@ -11,6 +11,7 @@ namespace RegistryWeb.Models.Entities
         {
             AclUserPrivileges = new List<AclUserPrivilege>();
             AclUserRoles = new List<AclUserRole>();
+            LogOwnerProcesses = new List<LogOwnerProcess>();
         }
 
         public int IdUser { get; set; }
@@ -19,5 +20,6 @@ namespace RegistryWeb.Models.Entities
 
         public virtual IList<AclUserPrivilege> AclUserPrivileges { get; set; }
         public virtual IList<AclUserRole> AclUserRoles { get; set; }
+        public virtual IList<LogOwnerProcess> LogOwnerProcesses { get; set; }
     }
 }
