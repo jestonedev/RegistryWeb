@@ -47,13 +47,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
-            builder.Property(e => e.OldValue)
-                .HasColumnName("old_value")
-                .HasMaxLength(255)
-                .IsUnicode(false);
-
-            builder.Property(e => e.NewValue)
-                .HasColumnName("new_value")
+            builder.Property(e => e.Value)
+                .HasColumnName("value")
                 .HasMaxLength(255)
                 .IsUnicode(false);
 

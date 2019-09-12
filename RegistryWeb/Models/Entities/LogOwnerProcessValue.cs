@@ -12,8 +12,7 @@ namespace RegistryWeb.Models.Entities
         public string Talble { get; set; }
         public int IdKey { get; set; }
         public string Field { get; set; }
-        public string OldValue { get; set; }
-        public string NewValue { get; set; }
+        public string Value { get; set; }
 
         public virtual LogOwnerProcess IdLogNavigation { get; set; }
     }
