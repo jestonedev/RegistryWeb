@@ -17,66 +17,135 @@ namespace RegistryWeb.Log
             this.securityService = securityService;
         }
 
-        public void CreateLog(LogTypes logType, OwnerProcess newOwnerProcess, OwnerProcess oldOwnerProcess = null)
+        public void CreateLog(LogTypes logType, OwnerProcess ownerProcess, OwnerProcess oldOwnerProcess = null)
         {
             var time = DateTime.Now;
             var user = securityService.User;
-            var idProcess = newOwnerProcess.IdProcess;
+            var idProcess = ownerProcess.IdProcess;
+
+            var addressLogType = (logType == LogTypes.Create) ? LogTypes.Add : LogTypes.Edit;
             if (logType == LogTypes.Create)
             {
-                CreateLogOwnerProcess(idProcess, time, user, LogTypes.Create, LogObjects.OwnerProcess, newOwnerProcess);
-                foreach (var oba in newOwnerProcess.OwnerBuildingsAssoc)
+                
+                CreateLogOwnerProcess(idProcess, time, user, LogTypes.Create, ownerProcess);
+                foreach (var oba in ownerProcess.OwnerBuildingsAssoc)
                 {
-                    CreateLogOwnerProcess(idProcess, time, user, LogTypes.Add, LogObjects.Address, oba);
+                    CreateLogOwnerProcess(idProcess, time, user, LogTypes.Add, oba);
                 }
-                foreach (var opa in newOwnerProcess.OwnerPremisesAssoc)
+                foreach (var opa in ownerProcess.OwnerPremisesAssoc)
                 {
-                    CreateLogOwnerProcess(idProcess, time, user, LogTypes.Add, LogObjects.Address, opa);
+                    CreateLogOwnerProcess(idProcess, time, user, LogTypes.Add, opa);
                 }
-                foreach (var ospa in newOwnerProcess.OwnerSubPremisesAssoc)
+                foreach (var ospa in ownerProcess.OwnerSubPremisesAssoc)
                 {
-                    CreateLogOwnerProcess(idProcess, time, user, LogTypes.Add, LogObjects.Address, ospa);
+                    CreateLogOwnerProcess(idProcess, time, user, LogTypes.Add, ospa);
                 }
-                foreach (var owner in newOwnerProcess.Owners)
+                //foreach (var owner in ownerProcess.Owners)
+                //{
+                //    CreateLogOwnerProcess(idProcess, time, user, LogTypes.Create, LogObjects.Owner, owner);
+                //    foreach (var reason in owner.OwnerReasons)
+                //    {
+                //        CreateLogOwnerProcess(idProcess, time, user, LogTypes.Create, LogObjects.Reason, reason);
+                //    }
+                //}
+            }
+            if (logType == LogTypes.Edit)
+            {
+
+            }
+            if (logType == LogTypes.Delete)
+            {
+                CreateLogOwnerProcess(idProcess, time, user, LogTypes.Delete, ownerProcess);
+                foreach (var oba in ownerProcess.OwnerBuildingsAssoc)
                 {
-                    CreateLogOwnerProcess(idProcess, time, user, LogTypes.Create, LogObjects.Owner, owner);
-                    foreach (var reason in owner.OwnerReasons)
-                    {
-                        CreateLogOwnerProcess(idProcess, time, user, LogTypes.Create, LogObjects.Reason, reason);
-                    }
+                    CreateLogOwnerProcess(idProcess, time, user, LogTypes.Delete, oba);
+                }
+                foreach (var opa in ownerProcess.OwnerPremisesAssoc)
+                {
+                    CreateLogOwnerProcess(idProcess, time, user, LogTypes.Delete, opa);
+                }
+                foreach (var ospa in ownerProcess.OwnerSubPremisesAssoc)
+                {
+                    CreateLogOwnerProcess(idProcess, time, user, LogTypes.Delete, ospa);
                 }
             }
         }
 
-        private void CreateLogOwnerProcess(int idProcess, DateTime time, AclUser user, LogTypes logType, LogObjects logObject, object newObject, object oldObject = null)
+        //OwnerProcess
+        private void CreateLogOwnerProcess(int idProcess, DateTime time, AclUser user, LogTypes logType, OwnerProcess ownerProcess)
         {
             var log = new LogOwnerProcess();
             log.IdProcess = idProcess;
             log.Date = time;
             log.IdUser = user.IdUser;
             log.IdUserNavigation = user;
-            log.IdLogObject = (int)logObject;
+            log.IdLogObject = (int)LogObjects.OwnerProcess;
             log.IdLogType = (int)logType;
-            log.LogOwnerProcessesValue = CreateLogOwnerProcessesValues(logObject, newObject, oldObject);
+            log.Talble = "owner_processes";
+            log.IdKey = idProcess;
+            if (logType == LogTypes.Create || logType == LogTypes.Edit || logType == LogTypes.Annul)
+                log.LogOwnerProcessesValue = CreateLogOwnerProcessesValues(ownerProcess);
             registryContext.LogOwnerProcesses.Add(log);
             registryContext.SaveChanges();
         }
 
-        private List<LogOwnerProcessValue> CreateLogOwnerProcessesValues(LogObjects logObject, object newObject, object oldObject)
+        //Address
+        private void CreateLogOwnerProcess(int idProcess, DateTime time, AclUser user, LogTypes logType, IAddressAssoc addressAssoc)
+        {
+            var log = new LogOwnerProcess();
+            log.IdProcess = idProcess;
+            log.Date = time;
+            log.IdUser = user.IdUser;
+            log.IdUserNavigation = user;
+            log.IdLogObject = (int)LogObjects.Address;
+            log.IdLogType = (int)logType;
+            log.Talble = addressAssoc.GetTable();
+            log.IdKey = addressAssoc.IdAssoc;
+            if (logType == LogTypes.Add || logType == LogTypes.Edit)
+                log.LogOwnerProcessesValue = CreateLogOwnerProcessesValues(addressAssoc);
+            registryContext.LogOwnerProcesses.Add(log);
+            registryContext.SaveChanges();
+        }
+
+
+        //OwnerProcess
+        private List<LogOwnerProcessValue> CreateLogOwnerProcessesValues(OwnerProcess ownerProcess)
         {
             var logValues = new List<LogOwnerProcessValue>();
+
             var logValue = new LogOwnerProcessValue();
-            if (logObject == LogObjects.OwnerProcess)
-            {
-                var ownerProcess = newObject as OwnerProcess;
-                logValue = new LogOwnerProcessValue();
-                logValue.Talble = "owner_processes";
-                logValue.IdKey = ownerProcess.IdProcess;
-                logValue.Field = "annul_date";
-                logValue.NewValue = ownerProcess.AnnulDate.ToString();
-                logValue.OldValue = null;
-                logValues.Add(logValue);
-            }
+            logValue.Field = "annul_date";
+            logValue.Value = ownerProcess.AnnulDate.ToString();
+            logValues.Add(logValue);
+
+            logValue = new LogOwnerProcessValue();
+            logValue.Field = "annul_comment";
+            logValue.Value = ownerProcess.AnnulComment;
+            logValues.Add(logValue);
+
+            logValue = new LogOwnerProcessValue();
+            logValue.Field = "comment";
+            logValue.Value = ownerProcess.Comment;
+            logValues.Add(logValue);
+
+            return logValues;
+        }
+
+        //Address
+        private List<LogOwnerProcessValue> CreateLogOwnerProcessesValues(IAddressAssoc addressAssoc)
+        {
+            var logValues = new List<LogOwnerProcessValue>();
+
+            var logValue = new LogOwnerProcessValue();
+            logValue.Field = addressAssoc.GetFieldAdress();
+            logValue.Value = addressAssoc.GetValueAddress().ToString();
+            logValues.Add(logValue);
+
+            logValue = new LogOwnerProcessValue();
+            logValue.Field = "id_process";
+            logValue.Value = addressAssoc.IdProcess.ToString();
+            logValues.Add(logValue);
+
             return logValues;
         }
     }

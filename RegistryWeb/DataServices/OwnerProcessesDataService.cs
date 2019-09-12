@@ -280,27 +280,27 @@ namespace RegistryWeb.DataServices
 
         internal void Delete(int idProcess)
         {
-            var ownerProcesses = registryContext.OwnerProcesses
+            var ownerProcess = registryContext.OwnerProcesses
                 .Include(op => op.OwnerBuildingsAssoc)
                 .Include(op => op.OwnerPremisesAssoc)
                 .Include(op => op.OwnerSubPremisesAssoc)
                 .Include(op => op.Owners)
                     .ThenInclude(ow => ow.OwnerReasons)
                 .FirstOrDefault(op => op.IdProcess == idProcess);
-            ownerProcesses.Deleted = 1;
-            foreach (var o in ownerProcesses.OwnerBuildingsAssoc)
+            ownerProcess.Deleted = 1;
+            foreach (var o in ownerProcess.OwnerBuildingsAssoc)
             {
                 o.Deleted = 1;
             }
-            foreach (var o in ownerProcesses.OwnerPremisesAssoc)
+            foreach (var o in ownerProcess.OwnerPremisesAssoc)
             {
                 o.Deleted = 1;
             }
-            foreach (var o in ownerProcesses.OwnerSubPremisesAssoc)
+            foreach (var o in ownerProcess.OwnerSubPremisesAssoc)
             {
                 o.Deleted = 1;
             }
-            foreach (var owner in ownerProcesses.Owners)
+            foreach (var owner in ownerProcess.Owners)
             {
                 owner.Deleted = 1;
                 foreach (var reason in owner.OwnerReasons)
@@ -309,6 +309,7 @@ namespace RegistryWeb.DataServices
                 }
             }
             registryContext.SaveChanges();
+            logHelper.CreateLog(LogTypes.Delete, ownerProcess);
         }
 
         internal void Edit(OwnerProcess newOwnerProcess)
@@ -369,6 +370,7 @@ namespace RegistryWeb.DataServices
             //Добавление и радактирование
             registryContext.OwnerProcesses.Update(newOwnerProcess);
             registryContext.SaveChanges();
+            logHelper.CreateLog(LogTypes.Delete, newOwnerProcess);
         }
 
         internal IQueryable<GroupChangeLog> GetProcessLog(int idProcess)
@@ -384,18 +386,18 @@ namespace RegistryWeb.DataServices
                     Logs = from l in gr select l
                 };
 
-            var ownersIdKey =
-                from log in registryContext.ChangeLogs
-                where log.TableName == "owners" 
-                    && log.FieldName == "id_process"
-                    && log.FieldNewValue == idProcess.ToString()
-                select log.IdKey;
-            var ownerReasonsIdKey =
-                from log in registryContext.ChangeLogs
-                where log.TableName == "owner_reasons"
-                    && log.FieldName == "id_owner"
-                    && ownersIdKey.Contains(int.Parse(log.FieldNewValue))
-                select log.IdKey;
+            //var ownersIdKey =
+            //    from log in registryContext.ChangeLogs
+            //    where log.TableName == "owners" 
+            //        && log.FieldName == "id_process"
+            //        && log.FieldNewValue == idProcess.ToString()
+            //    select log.IdKey;
+            //var ownerReasonsIdKey =
+            //    from log in registryContext.ChangeLogs
+            //    where log.TableName == "owner_reasons"
+            //        && log.FieldName == "id_owner"
+            //        && ownersIdKey.Contains(int.Parse(log.FieldNewValue))
+            //    select log.IdKey;
             //var ownerPremisesAssocIdKey = from log in registryContext.ChangeLogs
             //    where log.TableName == "owner_premises_assoc"
             //        && log.FieldName == "id_process"
@@ -422,29 +424,29 @@ namespace RegistryWeb.DataServices
             //        && ownersIdKey.Contains(int.Parse(log.FieldNewValue))
             //    select log.IdKey;
 
-            var owners =
-                from log in registryContext.ChangeLogs
-                where log.TableName == "owners" && ownersIdKey.Contains(log.IdKey)
-                group log by new { time = log.OperationTime, table = log.TableName } into gr
-                select new GroupChangeLog
-                {
-                    OperationTime = gr.Key.time,
-                    TableName = gr.Key.table,
-                    Logs = from l in gr select l
-                };
-            var ownerReasons =
-                from log in registryContext.ChangeLogs
-                where log.TableName == "owner_reasons" && ownerReasonsIdKey.Contains(log.IdKey)
-                group log by new { time = log.OperationTime, table = log.TableName } into gr
-                select new GroupChangeLog
-                {
-                    OperationTime = gr.Key.time,
-                    TableName = gr.Key.table,
-                    Logs = from l in gr select l
-                };
+            //var owners =
+            //    from log in registryContext.ChangeLogs
+            //    where log.TableName == "owners" && ownersIdKey.Contains(log.IdKey)
+            //    group log by new { time = log.OperationTime, table = log.TableName } into gr
+            //    select new GroupChangeLog
+            //    {
+            //        OperationTime = gr.Key.time,
+            //        TableName = gr.Key.table,
+            //        Logs = from l in gr select l
+            //    };
+            //var ownerReasons =
+            //    from log in registryContext.ChangeLogs
+            //    where log.TableName == "owner_reasons" && ownerReasonsIdKey.Contains(log.IdKey)
+            //    group log by new { time = log.OperationTime, table = log.TableName } into gr
+            //    select new GroupChangeLog
+            //    {
+            //        OperationTime = gr.Key.time,
+            //        TableName = gr.Key.table,
+            //        Logs = from l in gr select l
+            //    };
 
-            var result = ownerProcesses.Union(owners).Union(ownerReasons).OrderBy(l => l.OperationTime);
-            return result;
+            //var result = ownerProcesses.Union(owners).Union(ownerReasons).OrderBy(l => l.OperationTime);
+            return ownerProcesses;
         }
     }
 }
