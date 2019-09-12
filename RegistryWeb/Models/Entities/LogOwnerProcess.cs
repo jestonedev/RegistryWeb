@@ -18,6 +18,8 @@ namespace RegistryWeb.Models.Entities
         public int IdUser { get; set; }
         public int IdLogObject { get; set; }
         public int IdLogType { get; set; }
+        public string Talble { get; set; }
+        public int IdKey { get; set; }
 
         public virtual LogObject IdLogObjectNavigation { get; set; }
         public virtual LogType IdLogTypeNavigation { get; set; }

@@ -31,16 +31,6 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_log")
                 .HasColumnType("int(11)");
 
-            builder.Property(e => e.Talble)
-                .IsRequired()
-                .HasColumnName("talble")
-                .HasMaxLength(255)
-                .IsUnicode(false);
-
-            builder.Property(e => e.IdKey)
-                .HasColumnName("id_key")
-                .HasColumnType("int(11)");
-
             builder.Property(e => e.Field)
                 .IsRequired()
                 .HasColumnName("field")

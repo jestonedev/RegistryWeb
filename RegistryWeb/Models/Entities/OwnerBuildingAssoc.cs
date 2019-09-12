@@ -12,5 +12,9 @@ namespace RegistryWeb.Models.Entities
 
         public virtual Building IdBuildingNavigation { get; set; }
         public virtual OwnerProcess IdProcessNavigation { get; set; }
+
+        public string GetTable() => "owner_buildings_assoc";
+        public string GetFieldAdress() => "id_building";
+        public int GetValueAddress() => IdBuilding;
     }
 }

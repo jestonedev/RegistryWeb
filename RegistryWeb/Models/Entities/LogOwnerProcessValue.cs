@@ -9,8 +9,7 @@ namespace RegistryWeb.Models.Entities
     {
         public int Id { get; set; }
         public int IdLog { get; set; }
-        public string Talble { get; set; }
-        public int IdKey { get; set; }
+        
         public string Field { get; set; }
         public string Value { get; set; }
 
