@@ -7,10 +7,10 @@ namespace RegistryWeb.Log
 {
     public enum LogTypes
     {
-        Create,
-        Add,
-        Edit,
-        Annul,
-        Delete
+        Create = 1,
+        Add = 2,
+        Edit = 3,
+        Annul = 4,
+        Delete = 5
     }
 }

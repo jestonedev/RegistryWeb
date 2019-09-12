@@ -7,9 +7,9 @@ namespace RegistryWeb.Log
 {
     public enum LogObjects
     {
-        OwnerProcess,
-        Address,
-        Owner,
-        Reason
+        OwnerProcess = 1,
+        Address = 2,
+        Owner = 3,
+        Reason = 4
     }
 }
