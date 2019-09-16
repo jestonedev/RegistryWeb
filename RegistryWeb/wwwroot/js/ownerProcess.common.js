@@ -38,7 +38,10 @@ var annulOwnerProcessCheckboxChange = function () {
     $('#annulBadge').toggle();
     $('#AnnulDate').val("");
     $('#AnnulComment').val("");
-    
+}
+var logToggle = function () {
+    arrowAnimation($(this));
+    $('#logTable').toggle();
 }
 $(function () {
     var action = $('form').data('action');
@@ -79,5 +82,5 @@ $(function () {
     $('#ownerProcessToggle').click(ownerProcessToggle);
     $('#annulOwnerProcessToggle').click(annulOwnerProcessToggle);
     $('#annulOwnerProcessCheckbox').change(annulOwnerProcessCheckboxChange);
-    
+    $('#logToggle').click(logToggle);
 });

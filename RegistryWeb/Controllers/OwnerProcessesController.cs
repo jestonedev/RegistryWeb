@@ -145,7 +145,7 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = action;
             var ownerProcessVM = new OwnerProcessVM();
             ownerProcessVM.OwnerProcess = ownerProcess;
-            ownerProcessVM.Log = dataService.GetProcessLog(ownerProcess.IdProcess);
+            ownerProcessVM.Logs = dataService.GetProcessLog(ownerProcess.IdProcess);
             return View("OwnerProcessIndex", ownerProcessVM);
         }
 

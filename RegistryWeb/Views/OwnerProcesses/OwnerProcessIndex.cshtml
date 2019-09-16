@@ -10,9 +10,9 @@
     }
 }
 @Html.Partial("OwnerProcess", Model.OwnerProcess)
-@if (ViewBag.Action != "Delete")
+@if (ViewBag.Action == "Details" || ViewBag.Action == "Edit")
 {
-    @Html.Partial("OwnerProcessLog", Model.Log)
+    @Html.Partial("OwnerProcessLog", Model.Logs)
 }
 @section Scripts {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>

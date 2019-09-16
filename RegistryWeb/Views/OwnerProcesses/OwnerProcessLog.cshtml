@@ -1,64 +1,10 @@
-﻿@using RegistryWeb.Models;
-@model IQueryable<GroupChangeLog>;
-@{ 
-    var r = Model;
-}
+﻿@model IEnumerable<RegistryWeb.Models.Entities.LogOwnerProcess>;
 <div class="card">
     <div class="card-header d-flex justify-content-between">
         <h3 for="Comment">Журнал изменений</h3>
         <div class="btn-group" role="group">
-            <a href="#" id="changeLogToggle" class="form-control btn btn-primary" title="Развернуть журнал изменений" style="font-weight:bold;">∧</a>
+            <a href="#" id="logToggle" class="form-control btn btn-primary" title="Развернуть журнал изменений" style="font-weight:bold;">∧</a>
         </div>
     </div>
-    <change-log elements="Model" class="table table-bordered card-body" id="changeLog"></change-log>
-    @*<table class="table table-bordered card-body" id="changeLog">
-        <thead>
-            <tr>
-                <th width="170px">Дата</th>
-                <th>Пользователь</th>
-                <th>Операция</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var groupChangeLog in Model)
-            {
-                <tr>
-                    <td>@groupChangeLog.Key</td>
-                    <td>@groupChangeLog.FirstOrDefault().UserName</td>
-                    <td>
-                        @{
-                            var type = groupChangeLog.FirstOrDefault().OperationType;
-                            var typeResult = "";
-                            if (type == "DELETE")
-                            {
-                                typeResult = "Удаление";
-                            }
-                            if (type == "INSERT")
-                            {
-                                typeResult = "Создание";
-                            }
-                            if (type == "UPDATE")
-                            {
-                                typeResult = "Изменение";
-                            }
-
-                        }
-                        @typeResult
-                    </td>
-                    <td></td>
-                </tr>
-                @if (type == "UPDATE")
-                {
-                    @foreach (var changeLog in groupChangeLog)
-                    {
-                        <tr>
-                            <td></td>
-                            <td colspan="3">@changeLog.FieldName</td>
-                        </tr>
-                    }
-                }
-             }
-        </tbody>
-    </table>*@
+    <log-owner-process elements="Model" class="table table-bordered card-body" id="logTable"></log-owner-process>
 </div>
