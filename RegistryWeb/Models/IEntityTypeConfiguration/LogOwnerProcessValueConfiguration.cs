@@ -31,10 +31,20 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_log")
                 .HasColumnType("int(11)");
 
+            builder.Property(e => e.Table)
+                .IsRequired()
+                .HasColumnName("table")
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            builder.Property(e => e.IdKey)
+                .HasColumnName("id_key")
+                .HasColumnType("int(11)");
+
             builder.Property(e => e.Field)
                 .IsRequired()
                 .HasColumnName("field")
-                .HasMaxLength(255)
+                .HasMaxLength(50)
                 .IsUnicode(false);
 
             builder.Property(e => e.Value)

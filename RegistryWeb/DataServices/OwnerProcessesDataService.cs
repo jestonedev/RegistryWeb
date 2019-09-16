@@ -370,7 +370,7 @@ namespace RegistryWeb.DataServices
             //Добавление и радактирование
             registryContext.OwnerProcesses.Update(newOwnerProcess);
             registryContext.SaveChanges();
-            logHelper.CreateLog(LogTypes.Delete, newOwnerProcess);
+            logHelper.CreateLog(LogTypes.Edit, newOwnerProcess);
         }
 
         internal IQueryable<GroupChangeLog> GetProcessLog(int idProcess)

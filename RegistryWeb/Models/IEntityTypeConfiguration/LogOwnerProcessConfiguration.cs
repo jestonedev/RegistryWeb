@@ -51,16 +51,6 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_log_type")
                 .HasColumnType("int(11)");
 
-            builder.Property(e => e.Talble)
-                .IsRequired()
-                .HasColumnName("talble")
-                .HasMaxLength(50)
-                .IsUnicode(false);
-
-            builder.Property(e => e.IdKey)
-                .HasColumnName("id_key")
-                .HasColumnType("int(11)");
-
             builder.HasOne(d => d.IdLogObjectNavigation)
                 .WithMany(p => p.LogOwnerProcesses)
                 .HasForeignKey(d => d.IdLogObject)
