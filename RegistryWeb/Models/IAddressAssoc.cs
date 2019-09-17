@@ -14,5 +14,6 @@ namespace RegistryWeb.Models
         string GetTable();
         string GetFieldAdress();
         int GetValueAddress();
+        string GetAddress();
     }
 }

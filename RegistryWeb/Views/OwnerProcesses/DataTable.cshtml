@@ -28,9 +28,17 @@
             <tr>
                 <td class="align-middle">@item.IdProcess</td>
                 <td class="align-middle">
-                    @foreach (var address in Model.Addresses[item.IdProcess])
+                    @foreach (var oba in item.OwnerBuildingsAssoc)
                     {
-                        <p>@address</p>
+                        <p>@oba.GetAddress()</p>
+                    }
+                    @foreach (var opa in item.OwnerPremisesAssoc)
+                    {
+                        <p>@opa.GetAddress()</p>
+                    }
+                    @foreach (var ospa in item.OwnerSubPremisesAssoc)
+                    {
+                        <p>@ospa.GetAddress()</p>
                     }
                 </td>
                 <td class="align-middle">

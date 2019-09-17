@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace RegistryWeb.Models.Entities
 {
@@ -16,5 +16,17 @@ namespace RegistryWeb.Models.Entities
         public string GetTable() => "owner_buildings_assoc";
         public string GetFieldAdress() => "id_building";
         public int GetValueAddress() => IdBuilding;
+
+        public string GetAddress()
+        {
+            if (IdBuildingNavigation == null)
+                throw new System.Exception("IdBuildingNavigation не подгружен");
+            if (IdBuildingNavigation.IdStreetNavigation == null)
+                throw new System.Exception("IdStreetNavigation не подгружен");
+            var address = 
+                IdBuildingNavigation.IdStreetNavigation.StreetName + ", д." +
+                IdBuildingNavigation.House;
+            return address;
+        }
     }
 }
