@@ -35,7 +35,7 @@ namespace RegistryWeb.TagHelpers
             {
                 tr = new TagBuilder("tr");
                 tr.InnerHtml.AppendHtml("<td>" + log.Date + "</td>");
-                tr.InnerHtml.AppendHtml("<td>" + log.IdUserNavigation.UserName + "</td>");
+                tr.InnerHtml.AppendHtml("<td>" + log.IdUserNavigation.UserDescription + "</td>");
                 tr.InnerHtml.AppendHtml("<td>" + log.IdLogTypeNavigation.Name + "</td>");
                 tr.InnerHtml.AppendHtml("<td>" + log.IdLogObjectNavigation.Name + "</td>");
                 tr.InnerHtml.AppendHtml("<td></td>");

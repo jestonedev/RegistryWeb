@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace RegistryWeb.Models.Entities
 {
@@ -18,6 +16,8 @@ namespace RegistryWeb.Models.Entities
         public int IdUser { get; set; }
         public int IdLogObject { get; set; }
         public int IdLogType { get; set; }
+        public string Table { get; set; }
+        public int IdKey { get; set; }
 
         public virtual LogObject IdLogObjectNavigation { get; set; }
         public virtual LogType IdLogTypeNavigation { get; set; }
