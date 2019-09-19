@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace RegistryWeb.Models.Entities
 {
-    public class Owner
+    public class Owner : IEquatable<Owner>
     {
         public Owner()
         {
@@ -22,5 +21,21 @@ namespace RegistryWeb.Models.Entities
         public virtual OwnerOrginfo OwnerOrginfo { get; set; }
         public virtual OwnerPerson OwnerPerson { get; set; }
         public virtual IList<OwnerReason> OwnerReasons { get; set; }
+
+        public bool Equals(Owner o)
+        {
+            if (o == null)
+                return false;
+            if (ReferenceEquals(this, o))
+                return true;
+            var tmp = true;
+            if (OwnerOrginfo != null)
+                tmp = tmp && OwnerOrginfo.Equals(o.OwnerOrginfo);
+            if (OwnerPerson != null)
+                tmp = tmp && OwnerPerson.Equals(o.OwnerPerson);
+            return IdOwner == o.IdOwner && IdProcess == o.IdProcess &&
+                IdOwnerType == o.IdOwnerType && Deleted == o.Deleted &&
+                OwnerReasons.SequenceEqual(o.OwnerReasons) && tmp;
+        }
     }
 }

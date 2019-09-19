@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class OwnerProcess
+    public partial class OwnerProcess : IEquatable<OwnerProcess>
     {
         public OwnerProcess()
         {
@@ -24,5 +24,19 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<OwnerPremiseAssoc> OwnerPremisesAssoc { get; set; }
         public virtual IList<OwnerSubPremiseAssoc> OwnerSubPremisesAssoc { get; set; }
         public virtual IList<Owner> Owners { get; set; }
+
+        public bool Equals(OwnerProcess op)
+        {
+            if (op == null)
+                return false;
+            if (ReferenceEquals(this, op))
+                return true;
+            return IdProcess == op.IdProcess && AnnulDate == op.AnnulDate &&
+                AnnulComment == op.AnnulComment && Comment == op.Comment && Deleted == op.Deleted &&
+                OwnerBuildingsAssoc.SequenceEqual(op.OwnerBuildingsAssoc) &&
+                OwnerPremisesAssoc.SequenceEqual(op.OwnerPremisesAssoc) &&
+                OwnerSubPremisesAssoc.SequenceEqual(op.OwnerSubPremisesAssoc) &&
+                Owners.SequenceEqual(op.Owners);
+        }
     }
 }

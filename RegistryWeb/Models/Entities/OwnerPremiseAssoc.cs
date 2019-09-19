@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Linq;
+﻿using System;
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class OwnerPremiseAssoc : IAddressAssoc
+    public partial class OwnerPremiseAssoc : IAddressAssoc, IEquatable<OwnerPremiseAssoc>
     {
         public int IdAssoc { get; set; }
         public int IdPremise { get; set; }
@@ -20,19 +19,29 @@ namespace RegistryWeb.Models.Entities
         public string GetAddress()
         {
             if (IdPremisesNavigation == null)
-                throw new System.Exception("IdPremisesNavigation не подгружен");
+                throw new Exception("IdPremisesNavigation не подгружен");
             if (IdPremisesNavigation.IdPremisesTypeNavigation == null)
-                throw new System.Exception("IdPremisesTypeNavigation не подгружен");
+                throw new Exception("IdPremisesTypeNavigation не подгружен");
             if (IdPremisesNavigation.IdBuildingNavigation == null)
-                throw new System.Exception("IdBuildingNavigation не подгружен");
+                throw new Exception("IdBuildingNavigation не подгружен");
             if (IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation == null)
-                throw new System.Exception("IdStreetNavigation не подгружен");
+                throw new Exception("IdStreetNavigation не подгружен");
             var address =
                 IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation.StreetName + ", д." +
                 IdPremisesNavigation.IdBuildingNavigation.House + ", " +
                 IdPremisesNavigation.IdPremisesTypeNavigation.PremisesTypeShort +
                 IdPremisesNavigation.PremisesNum;
             return address;
+        }
+
+        public bool Equals(OwnerPremiseAssoc opa)
+        {
+            if (opa == null)
+                return false;
+            if (ReferenceEquals(this, opa))
+                return true;
+            return IdAssoc == opa.IdAssoc && IdPremise == opa.IdPremise &&
+                IdProcess == opa.IdProcess && Deleted == opa.Deleted;
         }
     }
 }

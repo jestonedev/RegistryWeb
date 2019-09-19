@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Linq;
+﻿using System;
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class OwnerBuildingAssoc : IAddressAssoc
+    public partial class OwnerBuildingAssoc : IAddressAssoc, IEquatable<OwnerBuildingAssoc>
     {
         public int IdAssoc { get; set; }
         public int IdBuilding { get; set; }
@@ -20,13 +19,23 @@ namespace RegistryWeb.Models.Entities
         public string GetAddress()
         {
             if (IdBuildingNavigation == null)
-                throw new System.Exception("IdBuildingNavigation не подгружен");
+                throw new Exception("IdBuildingNavigation не подгружен");
             if (IdBuildingNavigation.IdStreetNavigation == null)
-                throw new System.Exception("IdStreetNavigation не подгружен");
+                throw new Exception("IdStreetNavigation не подгружен");
             var address = 
                 IdBuildingNavigation.IdStreetNavigation.StreetName + ", д." +
                 IdBuildingNavigation.House;
             return address;
+        }
+
+        public bool Equals(OwnerBuildingAssoc oba)
+        {
+            if (oba == null)
+                return false;
+            if (ReferenceEquals(this, oba))
+                return true;
+            return IdAssoc == oba.IdAssoc && IdBuilding == oba.IdBuilding &&
+                IdProcess == oba.IdProcess && Deleted == oba.Deleted;
         }
     }
 }

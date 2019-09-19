@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Linq;
+﻿using System;
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class OwnerSubPremiseAssoc : IAddressAssoc
+    public partial class OwnerSubPremiseAssoc : IAddressAssoc, IEquatable<OwnerSubPremiseAssoc>
     {
         public int IdAssoc { get; set; }
         public int IdSubPremise { get; set; }
@@ -20,15 +19,15 @@ namespace RegistryWeb.Models.Entities
         public string GetAddress()
         {
             if (IdSubPremisesNavigation == null)
-                throw new System.Exception("IdSubPremisesNavigation не подгружен");
+                throw new Exception("IdSubPremisesNavigation не подгружен");
             if (IdSubPremisesNavigation.IdPremisesNavigation == null)
-                throw new System.Exception("IdPremisesNavigation не подгружен");
+                throw new Exception("IdPremisesNavigation не подгружен");
             if (IdSubPremisesNavigation.IdPremisesNavigation.IdPremisesTypeNavigation == null)
-                throw new System.Exception("IdPremisesTypeNavigation не подгружен");
+                throw new Exception("IdPremisesTypeNavigation не подгружен");
             if (IdSubPremisesNavigation.IdPremisesNavigation.IdBuildingNavigation == null)
-                throw new System.Exception("IdBuildingNavigation не подгружен");
+                throw new Exception("IdBuildingNavigation не подгружен");
             if (IdSubPremisesNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation == null)
-                throw new System.Exception("IdStreetNavigation не подгружен");
+                throw new Exception("IdStreetNavigation не подгружен");
             var address =
                 IdSubPremisesNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation.StreetName +
                 ", д." + IdSubPremisesNavigation.IdPremisesNavigation.IdBuildingNavigation.House + ", " +
@@ -36,6 +35,16 @@ namespace RegistryWeb.Models.Entities
                 IdSubPremisesNavigation.IdPremisesNavigation.PremisesNum + ", к." +
                 IdSubPremisesNavigation.SubPremisesNum;
             return address;
+        }
+
+        public bool Equals(OwnerSubPremiseAssoc ospa)
+        {
+            if (ospa == null)
+                return false;
+            if (ReferenceEquals(this, ospa))
+                return true;
+            return IdAssoc == ospa.IdAssoc && IdSubPremise == ospa.IdSubPremise &&
+                IdProcess == ospa.IdProcess && Deleted == ospa.Deleted;
         }
     }
 }

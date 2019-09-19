@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class OwnerReason
+    public partial class OwnerReason : IEquatable<OwnerReason>
     {
         public int IdReason { get; set; }
         public int IdOwner { get; set; }
@@ -24,5 +24,17 @@ namespace RegistryWeb.Models.Entities
 
         public virtual Owner IdOwnerNavigation { get; set; }
         public virtual OwnerReasonType IdReasonTypeNavigation { get; set; }
+
+        public bool Equals(OwnerReason or)
+        {
+            if (or == null)
+                return false;
+            if (ReferenceEquals(this, or))
+                return true;
+            return IdReason == or.IdReason && IdOwner == or.IdOwner &&
+                NumeratorShare == or.NumeratorShare && DenominatorShare == or.DenominatorShare &&
+                IdReasonType == or.IdReasonType && ReasonNumber == or.ReasonNumber &&
+                ReasonDate == or.ReasonDate && Deleted == or.Deleted;
+        }
     }
 }
