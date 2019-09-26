@@ -6,5 +6,36 @@
             <a href="#" id="logToggle" class="form-control btn btn-primary" title="Развернуть журнал изменений" style="font-weight:bold;">∧</a>
         </div>
     </div>
-    <log-owner-process elements="Model" class="table table-bordered card-body" id="logTable"></log-owner-process>
+    @*<log-owner-process elements="Model" class="table table-bordered card-body" id="logTable"></log-owner-process>*@
+
+    <table class="table table-bordered card-body" id="logTable">
+        <thead>
+            <tr>
+                <th width="170px">Дата</th>
+                <th>Пользователь</th>
+                <th>Операция</th>
+                <th>Объект</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in Model)
+            {
+                <tr>
+                    <td>@log.Date</td>
+                    <td>@log.IdUserNavigation.UserDescription</td>
+                    <td>@log.IdLogTypeNavigation.Name</td>
+                    <td>@log.IdLogObjectNavigation.Name</td>
+                    <td></td>
+                </tr>
+                @foreach (var logValue in log.LogOwnerProcessesValue)
+                {
+                <tr>
+                    <td></td>
+                    <td colspan="4">@logValue.Field=@logValue.Value</td>
+                </tr>
+                }
+            }
+        </tbody>
+    </table>
 </div>

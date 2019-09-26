@@ -36,5 +36,15 @@ namespace RegistryWeb.Models.Entities
                 IdReasonType == or.IdReasonType && ReasonNumber == or.ReasonNumber &&
                 ReasonDate == or.ReasonDate && Deleted == or.Deleted;
         }
+
+        public bool IsEdit(OwnerReason or)
+        {
+            if (or == null)
+                throw new NullReferenceException();
+            return IdReason != or.IdReason || IdOwner != or.IdOwner ||
+                NumeratorShare != or.NumeratorShare || DenominatorShare != or.DenominatorShare ||
+                IdReasonType != or.IdReasonType || ReasonNumber != or.ReasonNumber ||
+                ReasonDate != or.ReasonDate || Deleted != or.Deleted;
+        }
     }
 }

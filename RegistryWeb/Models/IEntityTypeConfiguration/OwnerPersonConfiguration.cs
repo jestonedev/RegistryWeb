@@ -32,7 +32,6 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .IsUnicode(false);
 
             builder.Property(e => e.Patronymic)
-                .IsRequired()
                 .HasColumnName("patronymic")
                 .HasMaxLength(255)
                 .IsUnicode(false);

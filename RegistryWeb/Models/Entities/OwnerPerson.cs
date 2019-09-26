@@ -10,7 +10,6 @@ namespace RegistryWeb.Models.Entities
         public string Surname { get; set; }
         [Required(ErrorMessage = "Поле «Имя» является обязательным для заполнения")]
         public string Name { get; set; }
-        [Required(ErrorMessage = "Поле «Отчество» является обязательным для заполнения")]
         public string Patronymic { get; set; }
 
         public virtual Owner IdOwnerNavigation { get; set; }
@@ -23,6 +22,14 @@ namespace RegistryWeb.Models.Entities
                 return true;
             return IdOwner == op.IdOwner && Surname == op.Surname &&
                 Name == op.Name && Patronymic == op.Patronymic;
+        }
+
+        public bool IsEdit(OwnerPerson ownerPerson)
+        {
+            if (ownerPerson == null)
+                throw new NullReferenceException();
+            return IdOwner != ownerPerson.IdOwner || Surname != ownerPerson.Surname ||
+                Name != ownerPerson.Name || Patronymic != ownerPerson.Patronymic;
         }
     }
 }

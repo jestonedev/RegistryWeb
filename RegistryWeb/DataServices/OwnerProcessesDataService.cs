@@ -7,19 +7,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using RegistryWeb.SecurityServices;
-using RegistryWeb.Log;
 
 namespace RegistryWeb.DataServices
 {
     public class OwnerProcessesDataService : ListDataService<OwnerProcessesVM, OwnerProcessesFilter>
     {
         private IEnumerable<OwnerProcess> ownerProcesses;
-        protected readonly LogOwnerProcessHelper logHelper;
 
-        public OwnerProcessesDataService(RegistryContext registryContext, SecurityService securityService) : base(registryContext)
+        public OwnerProcessesDataService(RegistryContext registryContext) : base(registryContext)
         {
-            logHelper = new LogOwnerProcessHelper(registryContext, securityService);
         }
 
         public override OwnerProcessesVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, OwnerProcessesFilter filterOptions)
@@ -47,11 +43,11 @@ namespace RegistryWeb.DataServices
 
         private IEnumerable<OwnerProcess> GetQuery()
         {
-            var onwerProcesses = registryContext.OwnerProcesses
+            var ownerProcesses = registryContext.OwnerProcesses
                 .Include(op => op.OwnerBuildingsAssoc)
                 .Include(op => op.OwnerPremisesAssoc)
                 .Include(op => op.OwnerSubPremisesAssoc);
-            foreach (var op in onwerProcesses)
+            foreach (var op in ownerProcesses)
             {
                 foreach (var oba in op.OwnerBuildingsAssoc)
                 {
@@ -74,7 +70,7 @@ namespace RegistryWeb.DataServices
                     registryContext.Entry(ospa.IdSubPremisesNavigation.IdPremisesNavigation.IdBuildingNavigation).Reference(e => e.IdStreetNavigation).Load();
                 }
             }
-            return onwerProcesses.ToList();
+            return ownerProcesses.ToList();
         }
 
         private IEnumerable<OwnerProcess> GetQueryFilter(IEnumerable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
@@ -204,7 +200,6 @@ namespace RegistryWeb.DataServices
         {
             registryContext.OwnerProcesses.Add(ownerProcess);
             registryContext.SaveChanges();
-            logHelper.CreateLog(LogTypes.Create, ownerProcess);
         }
 
         internal void Delete(int idProcess)
@@ -238,7 +233,6 @@ namespace RegistryWeb.DataServices
                 }
             }
             registryContext.SaveChanges();
-            logHelper.CreateLog(LogTypes.Delete, ownerProcess);
         }
 
         internal void Edit(OwnerProcess newOwnerProcess)
@@ -254,6 +248,7 @@ namespace RegistryWeb.DataServices
                     //случай, когда удаляется собственник. Все его документы должны удалиться автоматом
                     foreach (var oldReason in oldOwner.OwnerReasons)
                     {
+                        registryContext.Entry(oldReason).Property(p => p.Deleted).IsModified = true;
                         oldReason.Deleted = 1;
                     }
                     newOwnerProcess.Owners.Add(oldOwner);
@@ -299,7 +294,6 @@ namespace RegistryWeb.DataServices
             //Добавление и радактирование
             registryContext.OwnerProcesses.Update(newOwnerProcess);
             registryContext.SaveChanges();
-            logHelper.CreateLog(LogTypes.Edit, newOwnerProcess, oldOwnerProcess);
         }
 
         internal IEnumerable<LogOwnerProcess> GetProcessLog(int idProcess)

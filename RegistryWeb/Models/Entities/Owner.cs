@@ -37,5 +37,18 @@ namespace RegistryWeb.Models.Entities
                 IdOwnerType == o.IdOwnerType && Deleted == o.Deleted &&
                 OwnerReasons.SequenceEqual(o.OwnerReasons) && tmp;
         }
+
+        public bool IsEdit(Owner o)
+        {
+            if (o == null)
+                throw new NullReferenceException();
+            var tmp = false;
+            if (OwnerOrginfo != null)
+                tmp = tmp && OwnerOrginfo.IsEdit(o.OwnerOrginfo);
+            if (OwnerPerson != null)
+                tmp = tmp && OwnerPerson.IsEdit(o.OwnerPerson);
+            return IdOwner != o.IdOwner || IdProcess != o.IdProcess ||
+                IdOwnerType != o.IdOwnerType || Deleted != o.Deleted || tmp;
+        }
     }
 }

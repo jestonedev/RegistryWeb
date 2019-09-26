@@ -2,6 +2,7 @@
 using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RegistryWeb.ViewComponents
 {

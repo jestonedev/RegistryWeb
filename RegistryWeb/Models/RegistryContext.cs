@@ -2,21 +2,40 @@
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.Models.IEntityTypeConfiguration;
+using RegistryWeb.SecurityServices;
 
 namespace RegistryWeb.Models
 {
     public partial class RegistryContext : DbContext
     {
         private string nameDatebase;
+        private IdentityNameService inService;
 
         public RegistryContext()
         {
         }
 
-        public RegistryContext(DbContextOptions<RegistryContext> options, IConfiguration config)
+        public RegistryContext(DbContextOptions<RegistryContext> options, IdentityNameService inService, IConfiguration config)
             : base(options)
         {
             nameDatebase = config.GetValue<string>("Database");
+            this.inService = inService;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+     {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var user = inService.GetUser();
+                var password = "!24@Vasy";
+                var connectionString =
+                    "Server=db01;" + 
+                    "UserId=" + user + ";" +
+                    "Password=" + password + ";" +
+                    "Database=" + nameDatebase + ";";
+                //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseMySQL(connectionString);
+            }
         }
 
         public virtual DbSet<Building> Buildings { get; set; }

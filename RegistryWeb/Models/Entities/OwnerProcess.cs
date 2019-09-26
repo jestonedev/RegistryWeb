@@ -38,5 +38,19 @@ namespace RegistryWeb.Models.Entities
                 OwnerSubPremisesAssoc.SequenceEqual(op.OwnerSubPremisesAssoc) &&
                 Owners.SequenceEqual(op.Owners);
         }
+
+        public bool IsEdit(OwnerProcess op)
+        {
+            if (op == null)
+                throw new NullReferenceException();
+            return IdProcess == op.IdProcess && Comment == op.Comment && Deleted == op.Deleted;
+        }
+
+        public bool IsAnnul(OwnerProcess op)
+        {
+            if (op == null)
+                throw new NullReferenceException();
+            return AnnulDate == null;
+        }
     }
 }
