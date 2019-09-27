@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.Models.Entities;
@@ -8,6 +9,7 @@ using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers
 {
+    [Authorize]
     public class OwnerProcessesController : ListController<OwnerProcessesDataService>
     {
         public OwnerProcessesController(OwnerProcessesDataService dataService, SecurityService securityService)

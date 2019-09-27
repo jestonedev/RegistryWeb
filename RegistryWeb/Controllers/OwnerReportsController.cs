@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.SecurityServices;
 
 namespace RegistryWeb.Controllers
 {
+    [Authorize]
     public class OwnerReportsController : Controller
     {
         private readonly IConfiguration config;

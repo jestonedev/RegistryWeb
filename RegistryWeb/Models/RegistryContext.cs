@@ -19,23 +19,26 @@ namespace RegistryWeb.Models
             : base(options)
         {
             nameDatebase = config.GetValue<string>("Database");
+            var username = config.GetValue<string>("USERNAME");
             this.inService = inService;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-     {
-            if (!optionsBuilder.IsConfigured)
-            {
-                var user = inService.GetUser();
-                var password = "!24@Vasy";
-                var connectionString =
-                    "Server=db01;" + 
-                    "UserId=" + user + ";" +
-                    "Password=" + password + ";" +
-                    "Database=" + nameDatebase + ";";
-                //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseMySQL(connectionString);
-            }
+        {
+            //if (!optionsBuilder.IsConfigured)
+            //{
+            //    var user = inService.GetUser();
+            //    var password = "!24@Vasy";
+            //    var connectionString = 
+            //        "Server=db01;" + 
+            //        "UserId=" + user + ";" +
+            //        "Password=" + password + ";" +
+            //        "Database=" + nameDatebase + ";";
+            
+
+            //    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+            //    optionsBuilder.UseMySQL(conn);
+            //}
         }
 
         public virtual DbSet<Building> Buildings { get; set; }

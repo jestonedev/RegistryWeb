@@ -13,21 +13,25 @@ var arrowAnimation = function (arrow) {
         arrow.html('∧');
     }
 }
-var ownersToggle = function () {
+var ownersToggle = function (e) {
     arrowAnimation($(this));
     $('#ownersTable').toggle();
+    e.preventDefault();
 }
-var commentToggle = function () {
+var commentToggle = function (e) {
     arrowAnimation($(this));
     $('#Comment').toggle();
+    e.preventDefault();
 }
-var addressesToggle = function () {
+var addressesToggle = function (e) {
     arrowAnimation($(this));
     $('#addresses').toggle();
+    e.preventDefault();
 }
-var ownerProcessToggle = function () {
+var ownerProcessToggle = function (e) {
     arrowAnimation($(this));
     $('#ownerProcess').toggle();
+    e.preventDefault();
 }
 var annulOwnerProcessToggle = function () {
     arrowAnimation($(this));
@@ -39,9 +43,19 @@ var annulOwnerProcessCheckboxChange = function () {
     $('#AnnulDate').val("");
     $('#AnnulComment').val("");
 }
-var logToggle = function () {
+var logToggle = function (e) {
     arrowAnimation($(this));
     $('#logTable').toggle();
+    e.preventDefault();
+}
+var logValueToggle = function (e) {
+    arrowAnimation($(this));
+    var ind = $(this).data('ind');
+    console.log(ind);
+    $('.logValue')
+        .filter(function () { return $(this).data('ind') === ind; })
+        .toggle();
+    e.preventDefault();
 }
 $(function () {
     var action = $('form').data('action');
@@ -49,7 +63,7 @@ $(function () {
         $('#annulOwnerProcessCard').hide();
         $('#annulBadge').hide();
     }
-    $('#addressAdd').click(function () {
+    $('#addressAdd').click(function (e) {
         var id = $('.buildingBlock').length;
         $.ajax({
             type: 'POST',
@@ -62,8 +76,9 @@ $(function () {
                 autocompleteStreet(newAddress);
             }
         });
+        e.preventDefault();
     });
-    $('.ownerAdd').click(function () {
+    $('.ownerAdd').click(function (e) {
         var id = $('.ownerBlock').length;
         var idOwnerType = $(this).data('idOwnerType');
         $.ajax({
@@ -75,7 +90,10 @@ $(function () {
                 refreshValidation();
             }
         });
+        e.preventDefault();
     });
+    $('.logValue').hide();
+    $('#logTable').hide();
     $('#ownersToggle').click(ownersToggle);
     $('#commentToggle').click(commentToggle);
     $('#addressesToggle').click(addressesToggle);
@@ -83,4 +101,5 @@ $(function () {
     $('#annulOwnerProcessToggle').click(annulOwnerProcessToggle);
     $('#annulOwnerProcessCheckbox').change(annulOwnerProcessCheckboxChange);
     $('#logToggle').click(logToggle);
+    $('.logValueToggle').click(logValueToggle);
 });

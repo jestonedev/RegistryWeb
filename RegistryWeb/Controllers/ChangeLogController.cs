@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers
 {
+    [Authorize]
     public class ChangeLogController : ListController<ChangeLogsDataService>
     {
         public ChangeLogController(ChangeLogsDataService dataService, SecurityService securityService)

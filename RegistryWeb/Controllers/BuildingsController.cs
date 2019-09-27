@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers
 {
+    [Authorize]
     public class BuildingsController : ListController<BuildingsListDataService>
     {
         public BuildingsController(BuildingsListDataService dataService, SecurityService securityService)

@@ -4,19 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.Models;
 using System.Linq;
 using RegistryWeb.SecurityServices;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RegistryWeb.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
-        private SecurityService securityService;
-        public HomeController(SecurityService securityService)
-        {
-            this.securityService = securityService;
-        }
-
         public IActionResult Index()
         {
+            var name = User.Identity.Name;
             return View();
         }
     }

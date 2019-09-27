@@ -11,6 +11,7 @@ using RegistryWeb.Models;
 using System.Globalization;
 using System.Collections.Generic;
 using RegistryWeb.SecurityServices;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace RegistryWeb
 {
@@ -32,8 +33,13 @@ namespace RegistryWeb
                 options.SupportedCultures = new List<CultureInfo> { new CultureInfo("ru-RU") };
                 options.RequestCultureProviders.Clear();
             });
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => //CookieAuthenticationOptions
+                {
+                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+                });
 
-            string connection = Configuration.GetConnectionString("DefaultConnection");
+            //string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<RegistryContext>(); //options => options.UseMySQL(connection)
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -64,7 +70,7 @@ namespace RegistryWeb
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {

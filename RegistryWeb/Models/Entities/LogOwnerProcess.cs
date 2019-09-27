@@ -23,5 +23,13 @@ namespace RegistryWeb.Models.Entities
         public virtual LogType IdLogTypeNavigation { get; set; }
         public virtual AclUser IdUserNavigation { get; set; }
         public virtual IList<LogOwnerProcessValue> LogOwnerProcessesValue { get; set; }
+
+        public IList<LogOwnerProcessValue> GetDisplayLogsValue()
+        {
+            var displayLogsValue = new List<LogOwnerProcessValue>();
+            if (IdLogType == 1 || IdLogType == 2 || IdLogType == 5)
+                return displayLogsValue;
+            return displayLogsValue;
+        }
     }
 }

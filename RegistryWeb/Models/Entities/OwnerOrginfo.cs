@@ -19,12 +19,5 @@ namespace RegistryWeb.Models.Entities
                 return true;
             return IdOwner == oo.IdOwner && OrgName == oo.OrgName;
         }
-
-        public bool IsEdit(OwnerOrginfo ownerOrginfo)
-        {
-            if (ownerOrginfo == null)
-                throw new NullReferenceException();
-            return IdOwner != ownerOrginfo.IdOwner || OrgName != ownerOrginfo.OrgName;
-        }
     }
 }

@@ -23,13 +23,5 @@ namespace RegistryWeb.Models.Entities
             return IdOwner == op.IdOwner && Surname == op.Surname &&
                 Name == op.Name && Patronymic == op.Patronymic;
         }
-
-        public bool IsEdit(OwnerPerson ownerPerson)
-        {
-            if (ownerPerson == null)
-                throw new NullReferenceException();
-            return IdOwner != ownerPerson.IdOwner || Surname != ownerPerson.Surname ||
-                Name != ownerPerson.Name || Patronymic != ownerPerson.Patronymic;
-        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistryWeb.Models;
@@ -9,6 +10,7 @@ using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers
 {
+    [Authorize]
     public class AddressController : Controller
     {
         private RegistryContext registryContext;
