@@ -9,36 +9,24 @@ namespace RegistryWeb.Models
     public partial class RegistryContext : DbContext
     {
         private string nameDatebase;
-        private IdentityNameService inService;
+        public static string ConnString;
 
         public RegistryContext()
         {
         }
 
-        public RegistryContext(DbContextOptions<RegistryContext> options, IdentityNameService inService, IConfiguration config)
+        public RegistryContext(DbContextOptions<RegistryContext> options, IConfiguration config)
             : base(options)
         {
             nameDatebase = config.GetValue<string>("Database");
-            var username = config.GetValue<string>("USERNAME");
-            this.inService = inService;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //if (!optionsBuilder.IsConfigured)
-            //{
-            //    var user = inService.GetUser();
-            //    var password = "!24@Vasy";
-            //    var connectionString = 
-            //        "Server=db01;" + 
-            //        "UserId=" + user + ";" +
-            //        "Password=" + password + ";" +
-            //        "Database=" + nameDatebase + ";";
-            
-
-            //    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-            //    optionsBuilder.UseMySQL(conn);
-            //}
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseMySQL(ConnString);
+            }
         }
 
         public virtual DbSet<Building> Buildings { get; set; }

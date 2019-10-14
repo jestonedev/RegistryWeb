@@ -8,6 +8,10 @@ using RegistryWeb.Models;
 using RegistryWeb.ViewModel;
 using MySql.Data.MySqlClient;
 using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace RegistryWeb.Controllers
 {
@@ -27,11 +31,10 @@ namespace RegistryWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Login(LoginVM model)
+        public async Task<IActionResult> Login(LoginVM model)
         {
             if (ModelState.IsValid)
-            {
-                
+            {                
                 var connectionString =
                     "Server=db01;" +
                     "UserId=" + model.User + ";" +
@@ -42,6 +45,8 @@ namespace RegistryWeb.Controllers
                     var conn = new MySqlConnection(connectionString);
                     conn.Open();
                     conn.Close();
+                    RegistryContext.ConnString = connectionString;
+                    Authenticate(model.User);
                 }
                 catch
                 {
@@ -50,6 +55,25 @@ namespace RegistryWeb.Controllers
                 return RedirectToAction("Index", "Home");
             }
             return View(model);
+        }
+
+        private async Task Authenticate(string userName)
+        {
+            // создаем один claim
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
+            };
+            // создаем объект ClaimsIdentity
+            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+            // установка аутентификационных куки
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+        }
+ 
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Account");
         }
     }
 }
