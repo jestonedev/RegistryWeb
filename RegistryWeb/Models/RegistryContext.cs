@@ -1,23 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.Models.IEntityTypeConfiguration;
-using RegistryWeb.SecurityServices;
 
 namespace RegistryWeb.Models
 {
     public partial class RegistryContext : DbContext
     {
         private string nameDatebase;
-        public static string ConnString;
+        private string connString;
 
         public RegistryContext()
         {
         }
 
-        public RegistryContext(DbContextOptions<RegistryContext> options, IConfiguration config)
+        public RegistryContext(DbContextOptions<RegistryContext> options, IConfiguration config, IHttpContextAccessor httpContextAccessor)
             : base(options)
         {
+            connString = httpContextAccessor.HttpContext.User.FindFirst("connString").Value;
             nameDatebase = config.GetValue<string>("Database");
         }
 
@@ -25,7 +26,7 @@ namespace RegistryWeb.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseMySQL(ConnString);
+                optionsBuilder.UseMySQL(connString);
             }
         }
 

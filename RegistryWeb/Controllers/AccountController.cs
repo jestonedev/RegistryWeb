@@ -45,8 +45,7 @@ namespace RegistryWeb.Controllers
                     var conn = new MySqlConnection(connectionString);
                     conn.Open();
                     conn.Close();
-                    RegistryContext.ConnString = connectionString;
-                    Authenticate(model.User);
+                    Authenticate(model.User, connectionString);
                 }
                 catch
                 {
@@ -57,12 +56,13 @@ namespace RegistryWeb.Controllers
             return View(model);
         }
 
-        private async Task Authenticate(string userName)
+        private async Task Authenticate(string userName, string connString)
         {
             // создаем один claim
             var claims = new List<Claim>
             {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
+                new Claim(ClaimsIdentity.DefaultNameClaimType, userName),
+                new Claim("connString", connString, ClaimValueTypes.String)
             };
             // создаем объект ClaimsIdentity
             ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
