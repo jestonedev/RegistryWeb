@@ -1,0 +1,99 @@
+﻿@using RegistryWeb.Models.Entities;
+@model IList<LogOwnerProcess>;
+@{ 
+    string Display(LogOwnerProcessValue logValue)
+    {
+        switch (logValue.Field)
+        {
+            case "annul_date":
+                return "Дата аннулирования: " + logValue.Value;
+            case "annul_comment":
+                return "Причина аннулирования: " + logValue.Value;
+            case "comment":
+                return "Коментарий: " + logValue.Value;
+            case "id_building":
+                return (ViewBag.Buildings as IQueryable<Building>)
+                    .SingleOrDefault(b => logValue.Value.Equals(b.IdBuilding.ToString()))
+                    .GetAddress();
+            case "id_premise":
+                return (ViewBag.Premises as IQueryable<Premise>)
+                    .SingleOrDefault(p => logValue.Value.Equals(p.IdPremises.ToString()))
+                    .GetAddress();
+            case "id_sub_premise":
+                return (ViewBag.SubPremises as IQueryable<SubPremise>)
+                    .SingleOrDefault(sp => logValue.Value.Equals(sp.IdSubPremises.ToString()))
+                    .GetAddress();
+            case "id_owner_type":
+                return "Тип собственника: " + (@ViewBag.OwnerTypes as IQueryable<OwnerType>)
+                    .SingleOrDefault(ot => logValue.Value.Equals(ot.IdOwnerType.ToString()))
+                    .OwnerType1;
+            case "surname":
+                return "Фамилия: " + logValue.Value;
+            case "name":
+            case "org_name":
+                return "Имя: " + logValue.Value;
+            case "patronymic":
+                return "Отчетсво: " + logValue.Value;
+            case "id_owner":
+                return "Договор по Собственнику №" + logValue.Value;
+            case "numerator_share":
+                return "Числитель: " + logValue.Value;
+            case "denominator_share":
+                return "Знаменатель: " + logValue.Value;
+            case "id_reason_type":
+                return "Тип документа: " + (@ViewBag.ReasonTypes as IQueryable<OwnerReasonType>)
+                    .SingleOrDefault(rt => logValue.Value.Equals(rt.IdReasonType.ToString()))
+                    .ReasonName;
+            case "reason_number":
+                return "Номер документа: " + logValue.Value;
+            case "reason_date":
+                return "Дата документа: " + logValue.Value;
+            default:
+                return logValue.Field + ": " + logValue.Value;
+        }
+    }
+}
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <h3 for="Comment">Журнал изменений</h3>
+        <div class="btn-group" role="group">
+            <a href="#" id="logToggle" class="form-control btn btn-primary" title="Развернуть журнал изменений" style="font-weight:bold;">∨</a>
+        </div>
+    </div>
+    <table class="table table-bordered card-body" id="logTable">
+        <thead>
+            <tr>
+                <th width="170px">Дата</th>
+                <th>Пользователь</th>
+                <th>Операция</th>
+                <th>Объект</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Model.Count(); i++)
+            {
+                var log = Model[i];
+                <tr>
+                    <td>@log.Date</td>
+                    <td>@log.IdUserNavigation.UserDescription</td>
+                    <td>@log.IdLogTypeNavigation.Name</td>
+                    <td>@log.IdLogObjectNavigation.Name №@log.IdKey.ToString()</td>
+                    <td>
+                        @if (log.LogOwnerProcessesValue.Count() > 0)
+                        {
+                            <a href="#" class="form-control btn btn-primary logValueToggle" data-ind="@i" style="font-weight:bold;">∨</a>
+                        }
+                    </td>
+                </tr>
+                @foreach (var logValue in log.LogOwnerProcessesValue)
+                {
+                    <tr class="logValue" data-ind="@i">
+                        <td></td>
+                        <td colspan="4">@Display(logValue)</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

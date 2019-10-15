@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class Premise
+    public partial class Premise : IAddress
     {
         public Premise()
         {
@@ -46,5 +46,20 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<OwnerPremiseAssoc> OwnerPremisesAssoc { get; set; }
         public virtual IList<OwnershipPremiseAssoc> OwnershipPremisesAssoc { get; set; }
         public virtual IList<SubPremise> SubPremises { get; set; }
+
+        public string GetAddress()
+        {
+            if (IdPremisesTypeNavigation == null)
+                throw new Exception("IdPremisesTypeNavigation не подгружен");
+            if (IdBuildingNavigation == null)
+                throw new Exception("IdBuildingNavigation не подгружен");
+            if (IdBuildingNavigation.IdStreetNavigation == null)
+                throw new Exception("IdStreetNavigation не подгружен");
+            var address =
+                IdBuildingNavigation.IdStreetNavigation.StreetName + ", д." +
+                IdBuildingNavigation.House + ", " +
+                IdPremisesTypeNavigation.PremisesTypeShort + PremisesNum;
+            return address;
+        }
     }
 }

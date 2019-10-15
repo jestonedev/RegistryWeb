@@ -23,7 +23,7 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
-            ViewBag.OwnerTypes = dataService.GetOwnerTypes;
+            ViewBag.OwnerTypes = dataService.GetOwnerTypes();
             ViewBag.SecurityService = securityService;
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,

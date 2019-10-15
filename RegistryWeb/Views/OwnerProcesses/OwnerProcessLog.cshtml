@@ -1,4 +1,5 @@
-﻿@model IEnumerable<RegistryWeb.Models.Entities.LogOwnerProcess>;
+﻿@model IList<RegistryWeb.Models.Entities.LogOwnerProcess>;
+
 <div class="card">
     <div class="card-header d-flex justify-content-between">
         <h3 for="Comment">Журнал изменений</h3>
@@ -21,8 +22,7 @@
         <tbody>
             @for (var i = 0; i < Model.Count(); i++)
             {
-                var log = Model.ElementAt(i);
-
+                var log = Model[i];
                 <tr>
                     <td>@log.Date</td>
                     <td>@log.IdUserNavigation.UserDescription</td>
@@ -30,15 +30,14 @@
                     <td>@log.IdLogObjectNavigation.Name</td>
                     <td><a href="#" class="form-control btn btn-primary logValueToggle" data-ind="@i" style="font-weight:bold;">∨</a></td>
                 </tr>
-
                 @foreach (var logValue in log.LogOwnerProcessesValue)
                 {
                     <tr class="logValue" data-ind="@i">
                         <td></td>
-                        <td colspan="4">@logValue.Field=@logValue.Value</td>
+                        <td colspan="4">@logValue.Field = @logValue.Value</td>
                     </tr>
                 }
             }
-            </tbody>
+        </tbody>
     </table>
 </div>

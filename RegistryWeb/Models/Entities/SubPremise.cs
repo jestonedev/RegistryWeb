@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class SubPremise
+    public partial class SubPremise : IAddress
     {
         public SubPremise()
         {
@@ -29,5 +29,23 @@ namespace RegistryWeb.Models.Entities
         public virtual ObjectState IdStateNavigation { get; set; }
         public virtual IList<FundSubPremiseAssoc> FundsSubPremisesAssoc { get; set; }
         public virtual IList<OwnerSubPremiseAssoc> OwnerSubPremisesAssoc { get; set; }
+
+        public string GetAddress()
+        {
+            if (IdPremisesNavigation == null)
+                throw new Exception("IdPremisesNavigation не подгружен");
+            if (IdPremisesNavigation.IdPremisesTypeNavigation == null)
+                throw new Exception("IdPremisesTypeNavigation не подгружен");
+            if (IdPremisesNavigation.IdBuildingNavigation == null)
+                throw new Exception("IdBuildingNavigation не подгружен");
+            if (IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation == null)
+                throw new Exception("IdStreetNavigation не подгружен");
+            var address =
+                IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation.StreetName +
+                ", д." + IdPremisesNavigation.IdBuildingNavigation.House + ", " +
+                IdPremisesNavigation.IdPremisesTypeNavigation.PremisesTypeShort +
+                IdPremisesNavigation.PremisesNum + ", к." + SubPremisesNum;
+            return address;
+        }
     }
 }

@@ -12,7 +12,8 @@
 @Html.Partial("OwnerProcess", Model.OwnerProcess)
 @if (ViewBag.Action == "Details" || ViewBag.Action == "Edit")
 {
-    @Html.Partial("OwnerProcessLog", Model.Logs)
+    @*@Html.Partial("OwnerProcessLog", Model.Logs)*@
+    @await Component.InvokeAsync("OwnerProcessLogComponent", Model.Logs)
 }
 @section Scripts {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>

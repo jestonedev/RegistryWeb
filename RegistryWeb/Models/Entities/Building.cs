@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class Building
+    public partial class Building : IAddress
     {
         public Building()
         {
@@ -60,5 +60,13 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<OwnerBuildingAssoc> OwnerBuildingsAssoc { get; set; }
         public virtual IList<OwnershipBuildingAssoc> OwnershipBuildingsAssoc { get; set; }
         public virtual IList<Premise> Premises { get; set; }
+
+        public string GetAddress()
+        {
+            if (IdStreetNavigation == null)
+                throw new Exception("IdStreetNavigation не подгружен");
+            var address = IdStreetNavigation.StreetName + ", д." + House;
+            return address;
+        }
     }
 }

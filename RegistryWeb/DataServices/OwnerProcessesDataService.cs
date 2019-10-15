@@ -171,7 +171,7 @@ namespace RegistryWeb.DataServices
             return ownerProcess;
         }
 
-        internal IEnumerable<OwnerType> GetOwnerTypes
+        internal IEnumerable<OwnerType> GetOwnerTypes()
             => registryContext.OwnerType.AsNoTracking();
 
         internal OwnerType GetOwnerType(int idOwnerType)
@@ -296,7 +296,7 @@ namespace RegistryWeb.DataServices
             registryContext.SaveChanges();
         }
 
-        internal IEnumerable<LogOwnerProcess> GetProcessLog(int idProcess)
+        internal IList<LogOwnerProcess> GetProcessLog(int idProcess)
         {
             var logs =
                 registryContext.LogOwnerProcesses

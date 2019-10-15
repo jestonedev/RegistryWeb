@@ -9,6 +9,6 @@ namespace RegistryWeb.ViewModel
     public class OwnerProcessVM
     {
         public OwnerProcess OwnerProcess { get; set; }
-        public IEnumerable<LogOwnerProcess> Logs { get; set; }
+        public IList<LogOwnerProcess> Logs { get; set; }
     }
 }

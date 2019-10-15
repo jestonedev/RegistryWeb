@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace RegistryWeb.Models
 {
-    public interface IAddressAssoc
+    public interface IAddressAssoc : IAddress
     {
         int IdAssoc { get; set; }
         int IdProcess { get; set; }
@@ -14,6 +14,5 @@ namespace RegistryWeb.Models
         string GetTable();
         string GetFieldAdress();
         int GetValueAddress();
-        string GetAddress();
     }
 }
