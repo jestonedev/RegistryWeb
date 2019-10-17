@@ -25,36 +25,41 @@
     <tbody>
         @foreach (var item in Model.OwnerProcesses)
         {
-            <tr>
-                <td class="align-middle">@item.IdProcess</td>
-                <td class="align-middle">
-                    @foreach (var oba in item.OwnerBuildingsAssoc)
-                    {
-                        <p>@oba.GetAddress()</p>
-                    }
-                    @foreach (var opa in item.OwnerPremisesAssoc)
-                    {
-                        <p>@opa.GetAddress()</p>
-                    }
-                    @foreach (var ospa in item.OwnerSubPremisesAssoc)
-                    {
-                        <p>@ospa.GetAddress()</p>
-                    }
-                </td>
-                <td class="align-middle">
-                    <div class="btn-group" role="group" aria-label="Панель доступа">
-                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                            asp-action="Details" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
-                        @if (securityService.HasPrivilege(Privileges.OwnerWrite))
+            var annulStyle = "";
+            @if (item.AnnulDate != null)
+            {
+                annulStyle = "style=\"background-color:lightpink;\" title=\"Аннулирован\"";
+            }
+                <tr @Html.Raw(annulStyle)>
+                    <td class="align-middle">@item.IdProcess</td>
+                    <td class="align-middle">
+                        @foreach (var oba in item.OwnerBuildingsAssoc)
                         {
-                            <a class="btn btn-primary oi oi-pencil" title="Изменить" aria-label="Изменить"
-                                asp-action="Edit" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
-                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                                asp-action="Delete" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
+                            <p>@oba.GetAddress()</p>
                         }
-                    </div>
-                </td>
-            </tr>
+                        @foreach (var opa in item.OwnerPremisesAssoc)
+                        {
+                            <p>@opa.GetAddress()</p>
+                        }
+                        @foreach (var ospa in item.OwnerSubPremisesAssoc)
+                        {
+                            <p>@ospa.GetAddress()</p>
+                        }
+                    </td>
+                    <td class="align-middle">
+                        <div class="btn-group" role="group" aria-label="Панель доступа">
+                            <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                               asp-action="Details" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
+                            @if (securityService.HasPrivilege(Privileges.OwnerWrite))
+                            {
+                                <a class="btn btn-primary oi oi-pencil" title="Изменить" aria-label="Изменить"
+                                   asp-action="Edit" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
+                                <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                                   asp-action="Delete" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
+                            }
+                        </div>
+                    </td>
+                </tr>
         }
     </tbody>
 </table>

@@ -78,6 +78,7 @@ namespace RegistryWeb.DataServices
             query = AddressFilter(query, filterOptions);
             query = OwnerTypeFilter(query, filterOptions);
             query = IdProcessFilter(query, filterOptions);
+            query = IdProcessTypeFilter(query, filterOptions);
             return query;
         }
 
@@ -136,6 +137,18 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IdProcess == null || filterOptions.IdProcess.Value == 0)
                 return query;
             return query.Where(p => p.IdProcess == filterOptions.IdProcess.Value);
+        }
+
+        private IEnumerable<OwnerProcess> IdProcessTypeFilter(IEnumerable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
+        {
+            //Все
+            if (filterOptions.IdProcessType == 0)
+                return query;
+            // Действующие
+            if (filterOptions.IdProcessType == 1)
+                return query.Where(p => p.AnnulDate == null);
+            // 2 Аннулированные
+            return query.Where(p => p.AnnulDate != null);
         }
 
         private IEnumerable<OwnerProcess> GetQueryOrder(IEnumerable<OwnerProcess> query, OrderOptions orderOptions)
@@ -300,6 +313,7 @@ namespace RegistryWeb.DataServices
         {
             var logs =
                 registryContext.LogOwnerProcesses
+                .Include(l => l.IdUserNavigation)
                 .Include(l => l.LogOwnerProcessesValue)
                 .Include(l => l.IdLogObjectNavigation)
                 .Include(l => l.IdLogTypeNavigation)

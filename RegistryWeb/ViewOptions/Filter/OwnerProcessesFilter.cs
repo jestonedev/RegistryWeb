@@ -16,6 +16,7 @@ namespace RegistryWeb.ViewOptions.Filter
 
         public Address Address { get; set; }
         public int? IdOwnerType { get; set; }
+        public int IdProcessType { get; set; } //все/действующие/аннулированые
         public int? IdProcess { get; set; }
     }
 }

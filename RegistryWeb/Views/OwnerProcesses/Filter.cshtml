@@ -9,19 +9,26 @@
 
     <div class="form-row">
         <div class="form-group col-auto">
-            <a class="btn btn-success oi oi-plus" title="Добавить" aria-label="Добавить" asp-controller="OwnerProcesses" asp-action="Create"></a>
+            <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="OwnerProcesses" asp-action="Create">&#10010;</a>
+        </div>
+        <div class="form-group col">
+            <input type="text" class="form-control" title="№ по реестру" placeholder="№ по реестру" asp-for="FilterOptions.IdProcess" />
         </div>
         <div class="form-group col-2">
-            <input type="text" class="form-control" placeholder="№ по реестру" asp-for="FilterOptions.IdProcess"/>
+            <select class="form-control" asp-for="FilterOptions.IdProcessType" title="Тип (все/действующие/аннулированные)">
+                <option value="0" selected>Действ + Аннул</option>
+                <option value="1">Действующие</option>
+                <option value="2">Аннулированные</option>
+            </select>
         </div>
         <div class="form-group col-2">
-            <select class="form-control" asp-for="FilterOptions.IdOwnerType"
+            <select class="form-control" asp-for="FilterOptions.IdOwnerType" title="Тип собственников"
                     asp-items="@{new SelectList(ViewBag.OwnerTypes, "IdOwnerType", "OwnerType1", Model.FilterOptions.IdOwnerType)}">
                 <option value="" selected>Все собственники</option>
             </select>
         </div>
-        <div class="input-group col-6">
-            <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" placeholder="Адрес" />
+        <div class="input-group col-5">
+            <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
             <div class="input-group-append h-auto d-inline-block">
                 <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
             </div>
