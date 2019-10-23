@@ -39,8 +39,15 @@ namespace RegistryWeb
                     options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
                 });
 
-            //string connection = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<RegistryContext>(); //options => options.UseMySQL(connection)
+            if (Configuration.GetValue<string>("IsNeorProfileSql") == "true")
+            {
+                string connection = Configuration.GetConnectionString("DefaultConnection");
+                services.AddDbContext<RegistryContext>(options => options.UseMySQL(connection));
+            }
+            else
+            {
+                services.AddDbContext<RegistryContext>();
+            }
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 

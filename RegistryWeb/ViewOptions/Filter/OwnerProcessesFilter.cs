@@ -18,5 +18,15 @@ namespace RegistryWeb.ViewOptions.Filter
         public int? IdOwnerType { get; set; }
         public int IdProcessType { get; set; } //все/действующие/аннулированые
         public int? IdProcess { get; set; }
+
+        public bool IsEmpty()
+        {
+            return (Address.AddressType == AddressTypes.None ||
+                string.IsNullOrWhiteSpace(Address.Id) ||
+                string.IsNullOrWhiteSpace(Address.Text)) &&
+                (IdOwnerType == null || IdOwnerType.Value == 0) &&
+                (IdProcess == null || IdProcess.Value == 0) &&
+                IdProcessType == 0;
+        }
     }
 }
