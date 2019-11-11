@@ -37,7 +37,7 @@ namespace RegistryWeb.Controllers
             {                
                 var connectionString =
                     "Server=db01;" +
-                    "UserId=" + model.User + ";" +
+                    "User=" + model.User + ";" +
                     "Password=" + model.Password + ";" +
                     "Database=" + config.GetValue<string>("Database") + ";";
                 try 
@@ -47,9 +47,9 @@ namespace RegistryWeb.Controllers
                     conn.Close();
                     Authenticate(model.User, connectionString);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    return Content("Ошибка соединения");
+                    return Content("Ошибка соединения\n"+ex.Message);
                 }
                 return RedirectToAction("Index", "Home");
             }

@@ -381,7 +381,8 @@ namespace RegistryWeb.DataServices
                 .Include(l => l.LogOwnerProcessesValue)
                 .Include(l => l.IdLogObjectNavigation)
                 .Include(l => l.IdLogTypeNavigation)
-                .Where(l => l.IdProcess == idProcess);
+                .Where(l => l.IdProcess == idProcess)
+                .OrderByDescending(l => l.Date);
             if (logs == null)
                 return new List<LogOwnerProcess>();
             return logs.ToList();
