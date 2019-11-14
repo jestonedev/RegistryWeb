@@ -20,7 +20,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
         {
             builder.HasKey(e => e.IdLogType);
 
-            builder.ToTable("log_types", "registry_test_1");
+            builder.ToTable("log_types", nameDatebase);
 
             builder.Property(e => e.IdLogType)
                 .HasColumnName("id_log_type")
