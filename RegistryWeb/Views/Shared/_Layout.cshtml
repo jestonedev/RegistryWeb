@@ -42,8 +42,9 @@
                     </li>
                 </ul>
             </div>
-            <div class="ml-auto">
-                <a asp-controller="Account" asp-action="Logout">@User.Identity.Name</a>
+            <div class="ml-auto align-middle">
+                <a asp-controller="PersonalSetting" asp-action="Details" class="btn btn-link">@User.Identity.Name</a>
+                <a asp-controller="Account" asp-action="Logout" class="btn text-danger">&#9211;</a>
             </div>
         </div>
     </nav>

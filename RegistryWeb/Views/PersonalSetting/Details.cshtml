@@ -1,0 +1,19 @@
+﻿@model RegistryWeb.Models.Entities.PersonalSetting;
+@{
+    ViewData["Title"] = "Персональные настройки";
+}
+
+<h2>@ViewData["Title"]</h2>
+<form asp-controller="PersonalSetting" asp-action="Save" method="post">
+    <input type="hidden" asp-for="IdUser">
+    <input type="hidden" asp-for="IdUserNavigation.IdUser">
+    <div class="form-group">
+        <label for="IdUserNavigation.UserName">ФИО</label>
+        <input asp-for="IdUserNavigation.UserDescription" class="form-control">
+    </div>
+    <div class="form-group">
+        <label for="SqlDriver">Драйвер для отчетов</label>
+        <input asp-for="SqlDriver" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-success">Сохранить</button>
+</form>

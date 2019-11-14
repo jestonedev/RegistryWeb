@@ -11,6 +11,7 @@ namespace RegistryWeb.SecurityServices
     public class SecurityService
     {
         public AclUser User { get; set; }
+        public PersonalSetting PersonalSetting { get; set; }
         public List<AclPrivilege> Privileges { get; set; }
         public uint PrivelegesFlagValue { get; set; }
 
@@ -22,6 +23,7 @@ namespace RegistryWeb.SecurityServices
             this.httpContextAccessor = httpContextAccessor;
             this.registryContext = registryContext;
             User = GetUser();
+            PersonalSetting = GetPersonalSetting();
             Privileges = GetUserPriveleges();
             var pr = Privileges.Select(p => p.PrivilegeMask).ToList();
             if (Privileges.Count() == 0)
@@ -39,7 +41,16 @@ namespace RegistryWeb.SecurityServices
         private AclUser GetUser()
         {
             var userName = httpContextAccessor.HttpContext.User.Identity.Name.ToLowerInvariant();
-            return registryContext.AclUsers.FirstOrDefault(u => u.UserName.ToLowerInvariant() == userName);
+            return registryContext.AclUsers
+                .AsNoTracking()
+                .SingleOrDefault(u => u.UserName.ToLowerInvariant() == userName);
+        }
+
+        private PersonalSetting GetPersonalSetting()
+        {
+            return registryContext.PersonalSettings
+                .AsNoTracking()
+                .SingleOrDefault(ps => ps.IdUserNavigation == User);
         }
 
         private List<AclPrivilege> GetUserPriveleges()
@@ -48,6 +59,7 @@ namespace RegistryWeb.SecurityServices
                 return new List<AclPrivilege>();
             var p1 = registryContext.AclUserPrivileges
                 .Include(up => up.IdAclPrivilegeNavigation)
+                .AsNoTracking()
                 .Where(up => up.IdUser == User.IdUser)
                 .Select(up => up.IdAclPrivilegeNavigation);
             var p2 = from userRole in registryContext.AclUserRoles.Where(ur => ur.IdUser == User.IdUser)
