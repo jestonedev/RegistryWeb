@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace RegistryWeb.Models.Entities
 {
@@ -8,6 +7,7 @@ namespace RegistryWeb.Models.Entities
         public RentType()
         {
             RentTypeCategories = new List<RentTypeCategory>();
+            TenancyProcesses = new List<TenancyProcess>();
         }
 
         public int IdRentType { get; set; }
@@ -16,5 +16,6 @@ namespace RegistryWeb.Models.Entities
         public string RentTypeGenetive { get; set; }
 
         public virtual IList<RentTypeCategory> RentTypeCategories { get; set; }
+        public IList<TenancyProcess> TenancyProcesses { get; set; }
     }
 }

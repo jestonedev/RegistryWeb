@@ -31,6 +31,8 @@ namespace RegistryWeb.Models
         }
 
         public virtual DbSet<Building> Buildings { get; set; }
+        public virtual DbSet<Premise> Premises { get; set; }
+        public virtual DbSet<SubPremise> SubPremises { get; set; }
         public virtual DbSet<DocumentType> DocumentTypes { get; set; }
         public virtual DbSet<DocumentIssuedBy> DocumentsIssuedBy { get; set; }
         public virtual DbSet<DocumentResidence> DocumentsResidence { get; set; }
@@ -40,30 +42,39 @@ namespace RegistryWeb.Models
         public virtual DbSet<FundPremiseAssoc> FundsPremisesAssoc { get; set; }
         public virtual DbSet<FundSubPremiseAssoc> FundsSubPremisesAssoc { get; set; }
         public virtual DbSet<HeatingType> HeatingTypes { get; set; }
-        public virtual DbSet<Kinship> Kinships { get; set; }
-        public virtual DbSet<ObjectState> ObjectStates { get; set; }
-        public virtual DbSet<OwnerBuildingAssoc> OwnerBuildingsAssoc { get; set; }
-        public virtual DbSet<Owner> Owners { get; set; }
-        public virtual DbSet<OwnerOrginfo> OwnerOrginfos { get; set; }
-        public virtual DbSet<OwnerPerson> OwnerPersons { get; set; }
-        public virtual DbSet<OwnerPremiseAssoc> OwnerPremisesAssoc { get; set; }
-        public virtual DbSet<OwnerProcess> OwnerProcesses { get; set; }
-        public virtual DbSet<OwnerReasonType> OwnerReasonTypes { get; set; }
-        public virtual DbSet<OwnerReason> OwnerReasons { get; set; }
-        public virtual DbSet<OwnerSubPremiseAssoc> OwnerSubPremisesAssoc { get; set; }
-        public virtual DbSet<OwnerType> OwnerType { get; set; }
+        public virtual DbSet<ObjectState> ObjectStates { get; set; }        
         public virtual DbSet<OwnershipBuildingAssoc> OwnershipBuildingsAssoc { get; set; }
         public virtual DbSet<OwnershipPremiseAssoc> OwnershipPremisesAssoc { get; set; }
         public virtual DbSet<OwnershipRightType> OwnershipRightTypes { get; set; }
         public virtual DbSet<OwnershipRight> OwnershipRights { get; set; }
-        public virtual DbSet<Premise> Premises { get; set; }
         public virtual DbSet<PremisesComment> PremisesComments { get; set; }
         public virtual DbSet<PremisesKind> PremisesKinds { get; set; }
         public virtual DbSet<PremisesType> PremisesTypes { get; set; }
-        public virtual DbSet<RentTypeCategory> RentTypeCategories { get; set; }
-        public virtual DbSet<RentType> RentTypes { get; set; }
+        
         public virtual DbSet<StructureType> StructureTypes { get; set; }
-        public virtual DbSet<SubPremise> SubPremises { get; set; }
+
+        //Собственники
+        public virtual DbSet<Owner> Owners { get; set; }
+        public virtual DbSet<OwnerType> OwnerType { get; set; }
+        public virtual DbSet<OwnerOrginfo> OwnerOrginfos { get; set; }
+        public virtual DbSet<OwnerPerson> OwnerPersons { get; set; }
+        public virtual DbSet<OwnerProcess> OwnerProcesses { get; set; }
+        public virtual DbSet<OwnerReasonType> OwnerReasonTypes { get; set; }
+        public virtual DbSet<OwnerReason> OwnerReasons { get; set; }
+        public virtual DbSet<OwnerBuildingAssoc> OwnerBuildingsAssoc { get; set; }
+        public virtual DbSet<OwnerPremiseAssoc> OwnerPremisesAssoc { get; set; }
+        public virtual DbSet<OwnerSubPremiseAssoc> OwnerSubPremisesAssoc { get; set; }
+
+        //Нанимателия        
+        public virtual DbSet<TenancyPerson> TenancyPersons { get; set; }
+        public virtual DbSet<TenancyProcess> TenancyProcesses { get; set; }
+        public virtual DbSet<TenancyReason> TenancyReasons { get; set; }
+        public virtual DbSet<RentTypeCategory> RentTypeCategories { get; set; }
+        public virtual DbSet<Kinship> Kinships { get; set; }
+        public virtual DbSet<RentType> RentTypes { get; set; }
+        public virtual DbSet<TenancyBuildingAssoc> TenancyBuildingsAssoc { get; set; }
+        public virtual DbSet<TenancyPremiseAssoc> TenancyPremisesAssoc { get; set; }
+        public virtual DbSet<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
 
         //Журнал изменений
         public virtual DbSet<ChangeLog> ChangeLogs { get; set; }
@@ -114,6 +125,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new SubPremiseConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ObjectStateConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new HeatingTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PremisesCommentConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new OwnershipRightConfiguration(nameDatebase));            
             modelBuilder.ApplyConfiguration(new OwnershipBuildingAssocConfiguration(nameDatebase));
@@ -136,6 +148,16 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new OwnerReasonConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerReasonTypeConfiguration(nameDatebase));
+      
+            modelBuilder.ApplyConfiguration(new TenancyPersonConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KinshipConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancyProcessConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancyReasonConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new RentTypeCategoryConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new RentTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancyBuildingAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancyPremiseAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancySubPremiseAssocConfiguration(nameDatebase));
 
             modelBuilder.Entity<DocumentResidence>(entity =>
             {
@@ -160,40 +182,6 @@ namespace RegistryWeb.Models
 
                 //Фильтры по умолчанию
                 entity.HasQueryFilter(e => e.Deleted == 0);
-            });
-
-            modelBuilder.Entity<Kinship>(entity =>
-            {
-                entity.HasKey(e => e.IdKinship);
-
-                entity.ToTable("kinships", nameDatebase);
-
-                entity.Property(e => e.IdKinship)
-                    .HasColumnName("id_kinship")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.KinshipName)
-                    .IsRequired()
-                    .HasColumnName("kinship")
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<PremisesComment>(entity =>
-            {
-                entity.HasKey(e => e.IdPremisesComment);
-
-                entity.ToTable("premises_comments", nameDatebase);
-
-                entity.Property(e => e.IdPremisesComment)
-                    .HasColumnName("id_premises_comment")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.PremisesCommentText)
-                    .IsRequired()
-                    .HasColumnName("premises_comment_text")
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<PremisesKind>(entity =>
@@ -235,65 +223,6 @@ namespace RegistryWeb.Models
 
                 entity.Property(e => e.PremisesTypeShort)
                     .HasColumnName("premises_type_short")
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<RentTypeCategory>(entity =>
-            {
-                entity.HasKey(e => e.IdRentTypeCategory);
-
-                entity.ToTable("rent_type_categories", nameDatebase);
-
-                entity.HasIndex(e => e.IdRentType)
-                    .HasName("FK_rent_type_categories_id_rent_type");
-
-                entity.Property(e => e.IdRentTypeCategory)
-                    .HasColumnName("id_rent_type_category")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.IdRentType)
-                    .HasColumnName("id_rent_type")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.RentTypeCategoryName)
-                    .IsRequired()
-                    .HasColumnName("rent_type_category")
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.HasOne(d => d.IdRentTypeNavigation)
-                    .WithMany(p => p.RentTypeCategories)
-                    .HasForeignKey(d => d.IdRentType)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_rent_type_categories_id_rent_type");
-            });
-
-            modelBuilder.Entity<RentType>(entity =>
-            {
-                entity.HasKey(e => e.IdRentType);
-
-                entity.ToTable("rent_types", nameDatebase);
-
-                entity.Property(e => e.IdRentType)
-                    .HasColumnName("id_rent_type")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.RentTypeName)
-                    .IsRequired()
-                    .HasColumnName("rent_type")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.RentTypeGenetive)
-                    .IsRequired()
-                    .HasColumnName("rent_type_genetive")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.RentTypeShort)
-                    .IsRequired()
-                    .HasColumnName("rent_type_short")
                     .HasMaxLength(10)
                     .IsUnicode(false);
             });
