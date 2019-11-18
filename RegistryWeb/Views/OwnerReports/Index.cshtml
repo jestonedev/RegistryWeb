@@ -3,4 +3,38 @@
 }
 
 <h2>@ViewData["Title"]</h2>
-<a asp-action="Reestr">Реестр жилых и (или) не жилых помещений МКД на @DateTime.Now.ToString("dd.MM.yyyy")</a>
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <h3><a href="#" class="toggleReportStatistic" data-id="1">Реестр жилых и (или) не жилых помещений МКД на @DateTime.Now.ToString("dd.MM.yyyy")</a></h3>
+        <a asp-action="Reestr" class="btn btn-link">Скачать</a>
+    </div>
+    <table class="table table-bordered card-text reportStatistic" data-id="1">
+        <thead>
+            <tr>
+                <th>Дата актуализации</th>
+                <th>Количество МКД</th>
+                <th>Количество помещений</th>
+                <th>Мун. помещений</th>
+                <th>Част. помещений</th>
+                <th>Количество жителей</th>
+                <th>Общая S помещений</th>
+                <th>Жилая S помещенийй</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="date_S"></td>
+                <td class="countMKD_S"></td>
+                <td class="S"></td>
+                <td class="S"></td>
+                <td class="S"></td>
+                <td class="S"></td>
+                <td class="S"></td>
+                <td class="S"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+@section Scripts {
+    <script src="~/js/index.OwnerReports.js" asp-append-version="true"></script>
+}
