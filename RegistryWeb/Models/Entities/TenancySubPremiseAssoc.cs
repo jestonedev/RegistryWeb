@@ -8,7 +8,7 @@
         public double? RentTotalArea { get; set; }
         public byte Deleted { get; set; }
 
-        public virtual TenancyProcess IdProcessNavigation { get; set; }
-        public virtual SubPremise IdSubPremiseNavigation { get; set; }
+        public virtual TenancyProcess ProcessNavigation { get; set; }
+        public virtual SubPremise SubPremiseNavigation { get; set; }
     }
 }

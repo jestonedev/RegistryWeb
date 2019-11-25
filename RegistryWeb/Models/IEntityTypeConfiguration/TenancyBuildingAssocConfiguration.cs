@@ -46,11 +46,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.Property(e => e.RentTotalArea).HasColumnName("rent_total_area");
 
-            builder.HasOne(d => d.IdBuildingNavigation)
+            builder.HasOne(d => d.BuildingNavigation)
                 .WithMany(p => p.TenancyBuildingsAssoc)
                 .HasForeignKey(d => d.IdBuilding);
 
-            builder.HasOne(d => d.IdProcessNavigation)
+            builder.HasOne(d => d.ProcessNavigation)
                 .WithMany(p => p.TenancyBuildingsAssoc)
                 .HasForeignKey(d => d.IdProcess)
                 .HasConstraintName("FK_tenancy_buildings_assoc_tenancy_contracts_id_contract");

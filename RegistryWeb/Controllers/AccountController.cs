@@ -34,12 +34,21 @@ namespace RegistryWeb.Controllers
         public async Task<IActionResult> Login(LoginVM model)
         {
             if (ModelState.IsValid)
-            {                
+            {
+                var server = "db01";
+                var port = "3306";
+                if (config.GetValue<bool>("IsNeorProfileSql"))
+                {
+                    server = "localhost";
+                    port = "4040";
+                }
                 var connectionString =
-                    "Server=db01;" +
-                    "User=" + model.User + ";" +
-                    "Password=" + model.Password + ";" +
-                    "Database=" + config.GetValue<string>("Database") + ";";
+                    "server=" + server + ";" +
+                    "port=" + port + ";" +
+                    "user=" + model.User + ";" +
+                    "password=" + model.Password + ";" +
+                    "database=" + config.GetValue<string>("Database") + ";";
+                    //"convert zero datetime=true;";
                 try 
                 {
                     var conn = new MySqlConnection(connectionString);

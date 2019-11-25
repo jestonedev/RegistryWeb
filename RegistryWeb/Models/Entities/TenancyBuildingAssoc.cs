@@ -14,7 +14,7 @@ namespace RegistryWeb.Models.Entities
         public double? RentLivingArea { get; set; }
         public byte Deleted { get; set; }
 
-        public virtual Building IdBuildingNavigation { get; set; }
-        public virtual TenancyProcess IdProcessNavigation { get; set; }
+        public virtual Building BuildingNavigation { get; set; }
+        public virtual TenancyProcess ProcessNavigation { get; set; }
     }
 }

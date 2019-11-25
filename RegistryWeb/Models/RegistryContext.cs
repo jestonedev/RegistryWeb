@@ -96,10 +96,17 @@ namespace RegistryWeb.Models
 
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
+        public virtual DbSet<TenancyActiveProcess> TenancyActiveProcesses { get; set; }
+        public virtual DbSet<OwnerActiveProcess> OwnerActiveProcesses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.3-servicing-35854");
+
+            //SQL-Views
+            modelBuilder.ApplyConfiguration(new KladrStreetConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancyActiveProcessConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new OwnerActiveProcessConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new ChangeLogConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LogOwnerProcessConfiguration(nameDatebase));
@@ -250,29 +257,6 @@ namespace RegistryWeb.Models
 
                 //Фильтры по умолчанию
                 entity.HasQueryFilter(e => e.Deleted == 0);
-            });
-
-            //SQL-Views
-            modelBuilder.Entity<KladrStreet>(entity =>
-            {
-                entity.HasKey(e => e.IdStreet);
-
-                entity.ToTable("v_kladr_streets", nameDatebase);
-
-                entity.Property(e => e.IdStreet)
-                    .HasColumnName("id_street")
-                    .HasMaxLength(17)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.StreetName)
-                    .HasColumnName("street_name")
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.StreetLong)
-                    .HasColumnName("street_long")
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
             });
         }
     }

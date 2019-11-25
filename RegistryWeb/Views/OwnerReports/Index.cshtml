@@ -5,8 +5,11 @@
 <h2>@ViewData["Title"]</h2>
 <div class="card">
     <div class="card-header d-flex justify-content-between">
-        <h3><a href="#" class="toggleReportStatistic" data-id="1">Реестр жилых и (или) не жилых помещений МКД на @DateTime.Now.ToString("dd.MM.yyyy")</a></h3>
-        <a asp-action="Reestr" class="btn btn-link">Скачать</a>
+        <h3>Реестр жилых и (или) не жилых помещений МКД на @DateTime.Now.ToString("dd.MM.yyyy")</h3>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary toggleReportStatistic" data-id="1">Статистика</button>
+            <a asp-action="Reestr" class="btn btn-primary">Скачать</a>
+        </div>                
     </div>
     <table class="table table-bordered card-text reportStatistic" data-id="1">
         <thead>
@@ -25,12 +28,12 @@
             <tr>
                 <td class="date_S"></td>
                 <td class="countMKD_S"></td>
-                <td class="S"></td>
-                <td class="S"></td>
-                <td class="S"></td>
-                <td class="S"></td>
-                <td class="S"></td>
-                <td class="S"></td>
+                <td class="countPremAndSubPrem_S"></td>
+                <td class="countTenancy_S"></td>
+                <td class="countOwner_S"></td>
+                <td class="countInhabitant_S"></td>
+                <td class="totalAreaSum_S"></td>
+                <td class="livingAreaSum_S"></td>
             </tr>
         </tbody>
     </table>

@@ -20,6 +20,7 @@ namespace RegistryWeb.Models.Entities
         public string Comment { get; set; }
         public byte Deleted { get; set; }
 
+        public virtual OwnerActiveProcess OwnerActiveProcessNavigation { get; set; }
         public virtual IList<OwnerBuildingAssoc> OwnerBuildingsAssoc { get; set; }
         public virtual IList<OwnerPremiseAssoc> OwnerPremisesAssoc { get; set; }
         public virtual IList<OwnerSubPremiseAssoc> OwnerSubPremisesAssoc { get; set; }

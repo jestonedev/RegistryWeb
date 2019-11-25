@@ -9,7 +9,7 @@
         public double? RentLivingArea { get; set; }
         public byte Deleted { get; set; }
 
-        public virtual Premise IdPremiseNavigation { get; set; }
-        public virtual TenancyProcess IdProcessNavigation { get; set; }
+        public virtual Premise PremiseNavigation { get; set; }
+        public virtual TenancyProcess ProcessNavigation { get; set; }
     }
 }

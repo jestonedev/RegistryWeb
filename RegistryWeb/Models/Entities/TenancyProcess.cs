@@ -34,6 +34,7 @@ namespace RegistryWeb.Models.Entities
         public string SubTenancyNum { get; set; }
         public byte Deleted { get; set; }
 
+        public virtual TenancyActiveProcess TenancyActiveContractNavigation { get; set; }
         public virtual RentTypeCategory IdRentTypeCategoryNavigation { get; set; }
         public virtual RentType IdRentTypeNavigation { get; set; }
         public virtual IList<TenancyBuildingAssoc> TenancyBuildingsAssoc { get; set; }
