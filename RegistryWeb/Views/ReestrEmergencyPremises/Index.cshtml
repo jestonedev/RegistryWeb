@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Реестр жилых и (или) не жилых помещений МКД на " + DateTime.Now.ToString("dd.MM.yyyy");
+}
+
+<h2>@ViewData["Title"]</h2>
+<div class="mb-2">
+    <div class="row">
+        <div class="col">
+            <button type="button" class="form-control btn btn-primary" id="actualizationReestr">Актуализировать</button>
+        </div>
+        <div class="col">
+            <button type="button" class="form-control btn btn-primary" id="toggleReestrStatistic">Статистика</button>
+        </div>
+        <div class="col">
+            <a asp-controller="OwnerReports" asp-action="Reestr" asp-route-thisController="ReestrEmergencyPremises" class="form-control btn btn-primary">Скачать</a>
+        </div>
+    </div>
+</div>
+<table class="table table-bordered mb-2" id="reestrStatistic">
+    <thead>
+        <tr>
+            <th>Дата актуализации</th>
+            <th>Количество МКД</th>
+            <th>Количество помещений</th>
+            <th>Мун. помещений</th>
+            <th>Част. помещений</th>
+            <th>Количество жителей</th>
+            <th>Общая S помещений</th>
+            <th>Жилая S помещенийй</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="date_S"></td>
+            <td class="countMKD_S"></td>
+            <td class="countPremAndSubPrem_S"></td>
+            <td class="countTenancy_S"></td>
+            <td class="countOwner_S"></td>
+            <td class="countInhabitant_S"></td>
+            <td class="totalAreaSum_S"></td>
+            <td class="livingAreaSum_S"></td>
+        </tr>
+    </tbody>
+</table>
+@section Scripts {
+    <script src="~/js/index.ReestrEmergencyPremises.js" asp-append-version="true"></script>
+}
