@@ -1,0 +1,21 @@
+﻿@model RegistryWeb.ViewModel.LoginVM;
+@{
+    ViewData["Title"] = "Реформа ЖКХ";
+}
+
+<h2>@ViewData["Title"]</h2>
+<form asp-action="Login" asp-controller="ReformaGKH" asp-anti-forgery="true">
+    <div class="row">
+        <div class="col">
+            <input asp-for="User" type="text" class="form-control" placeholder="Логин">
+            <span asp-validation-for="User" />
+        </div>
+        <div class="col">
+            <input asp-for="Password" type="password" class="form-control" placeholder="Пароль">
+            <span asp-validation-for="Password" />
+        </div>
+        <div class="col">
+            <input type="submit" asp-action="LoginIn" class="form-control btn btn-primary" value="Авторизоваться" />
+        </div>
+    </div>
+</form>

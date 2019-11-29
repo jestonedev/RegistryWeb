@@ -137,10 +137,5 @@ namespace RegistryWeb.Controllers
             livingAreaSum = Math.Round(livingAreaSum, 2);
             return Json(new { date, countMKD, countTenancy, countOwner, countInhabitant, totalAreaSum, livingAreaSum });
         }
-
-        private bool ContainsN(string num)
-        {
-            return num.Trim().LastOrDefault() == 'н';
-        }
     }
 }

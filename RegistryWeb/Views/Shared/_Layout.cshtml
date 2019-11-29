@@ -38,13 +38,14 @@
                             <a class="dropdown-item" asp-area="" asp-controller="OwnerProcesses" asp-action="Index">Процессы собственности</a>
                             <a class="dropdown-item" asp-area="" asp-controller="OwnerReasonTypes" asp-action="Index">Типы оснований</a>
                             <a class="dropdown-item" asp-area="" asp-controller="OwnerReports" asp-action="Index">Отчеты</a>
+                            <a class="dropdown-item" asp-area="" asp-controller="ReformaGKH" asp-action="Index">Реформа ЖКХ</a>
                         </div>
                     </li>
                 </ul>
             </div>
             <div class="ml-auto align-middle">
                 <a asp-controller="PersonalSetting" asp-action="Details" class="btn btn-link">@User.Identity.Name</a>
-                <a asp-controller="Account" asp-action="Logout" class="btn text-danger">&#9211;</a>
+                <a asp-controller="Account" asp-action="Logout" class="btn text-danger oi oi-power-standby"></a>
             </div>
         </div>
     </nav>
