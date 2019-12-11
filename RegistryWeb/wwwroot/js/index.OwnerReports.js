@@ -10,7 +10,7 @@
             $.ajax({
                 async: true,
                 type: 'POST',
-                url: window.location.origin + '/ReestrEmergencyPremises/ReestrStatistic',
+                url: window.location.origin + '/OwnerReports/ReestrStatistic',
                 success: function (data) {
                     reestrStatistic.find('.date_S').empty();
                     reestrStatistic.find('.countMKD_S').empty();

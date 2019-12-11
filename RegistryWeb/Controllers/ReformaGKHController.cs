@@ -9,12 +9,12 @@ using System.Linq;
 using RegistryWeb.DataServices;
 using RegistryWeb.ViewModel;
 using System;
+using RegistryWeb.Models.Api;
 
 namespace RegistryWeb.Controllers
 {
     public class ReformaGKHController : Controller
-    {        
-        private string sessionGuid;
+    {
         private readonly ReformaGKHService reformaGKH;
         private readonly SecurityService securityService;
         private WebProxy proxy;
@@ -33,7 +33,21 @@ namespace RegistryWeb.Controllers
         {
             if (!securityService.HasPrivilege(Privileges.OwnerReadWrite))
                 return View("NotAccess");
+            ViewData["SessionGuid"] = TokenApiStorage.SessionGuid;
             return View();
+        }
+
+        private WebRequest sendRequest(string xmlString)
+        {
+            var request = WebRequest.Create(reformaGKH.ApiUrl);
+            request.Proxy = proxy;
+            request.Method = "POST";
+            request.ContentType = "application/xml";
+            byte[] byteArray = Encoding.UTF8.GetBytes(xmlString);
+            request.ContentLength = byteArray.Length;
+            var dataStream = request.GetRequestStream();
+            dataStream.Write(byteArray, 0, byteArray.Length);
+            return request;
         }
 
         public IActionResult LoginIn(LoginVM model)
@@ -42,30 +56,45 @@ namespace RegistryWeb.Controllers
             {
                 try
                 {
-                    var request = WebRequest.Create(reformaGKH.ApiUrl);
-                    request.Proxy = proxy;
-                    request.Method = "POST";
-                    string data = reformaGKH.GetXmlLogin(model.User, model.Password);
-                    byte[] byteArray = Encoding.UTF8.GetBytes(data);
-                    request.ContentType = "application/xml";
-                    request.ContentLength = byteArray.Length;
-                    var dataStream = request.GetRequestStream();
-                    dataStream.Write(byteArray, 0, byteArray.Length);
+                    TokenApiStorage.User = model.User;
+                    TokenApiStorage.Password = model.Password;
+                    var loginXmlStr = reformaGKH.Login(model.User, model.Password);
+                    var request = sendRequest(loginXmlStr);
 
                     var response = (HttpWebResponse)request.GetResponse();
                     var stream = response.GetResponseStream();
                     var reader = new StreamReader(stream, Encoding.UTF8);
                     var xDoc = XDocument.Load(reader);
-                    sessionGuid = xDoc.Descendants("LoginResult").Single().Value;
+                    TokenApiStorage.SessionGuid = xDoc.Descendants("LoginResult").Single().Value;
                     response.Close();
-                    return Content(sessionGuid);
                 }
                 catch (Exception ex)
                 {
                     return Content("Ошибка! \n" + ex.Message);
                 }
             }
-            return View(model);
+            ViewData["SessionGuid"] = TokenApiStorage.SessionGuid;
+            return View("Index",model);
+        }
+
+        public IActionResult GetReportingPeriodList()
+        {
+            try
+            {
+                var data = reformaGKH.GetReportingPeriodList(TokenApiStorage.SessionGuid);
+                var request = sendRequest(data);
+
+                var response = (HttpWebResponse)request.GetResponse();
+                var stream = response.GetResponseStream();
+                var reader = new StreamReader(stream, Encoding.UTF8);
+                var xDoc = XDocument.Load(reader);
+            }
+            catch (Exception ex)
+            {
+                return Content("Ошибка! \n" + ex.Message);
+            }
+            ViewData["SessionGuid"] = TokenApiStorage.SessionGuid;
+            return View("Index");
         }
     }
 }

@@ -21,10 +21,9 @@ namespace RegistryWeb.DataServices
             ApiUrl = config.GetValue<string>("ApiUrl");
             soapenv = "http://schemas.xmlsoap.org/soap/envelope/";
             api = ApiUrl;
-            
         }
 
-        public string GetXmlLogin(string login, string password)
+        public string Login(string login, string password)
         {
             var xDoc = new XDocument(
                 new XElement(soapenv + "Envelope",
@@ -36,6 +35,40 @@ namespace RegistryWeb.DataServices
                             new XElement("login", login),
                             new XElement("password", password)
                         )
+                    )
+                )
+            );
+            return xDoc.ToString();
+        }
+
+        public string GetReportingPeriodList(string sessionGuid)
+        {
+            var xDoc = new XDocument(
+                new XElement(soapenv + "Envelope",
+                    new XAttribute(XNamespace.Xmlns + "soapenv", "http://schemas.xmlsoap.org/soap/envelope/"),
+                    new XAttribute(XNamespace.Xmlns + "api", ApiUrl),
+                    new XElement(soapenv + "Header",
+                        new XElement("authenticate", sessionGuid)
+                    ),
+                    new XElement(soapenv + "Body",
+                        new XElement(api + "GetReportingPeriodList")
+                    )
+                )
+            );
+            return xDoc.ToString();
+        }
+
+        public string GetHouseProfile(string sessionGuid)
+        {
+            var xDoc = new XDocument(
+                new XElement(soapenv + "Envelope",
+                    new XAttribute(XNamespace.Xmlns + "soapenv", "http://schemas.xmlsoap.org/soap/envelope/"),
+                    new XAttribute(XNamespace.Xmlns + "api", ApiUrl),
+                    new XElement(soapenv + "Header",
+                        new XElement("authenticate", sessionGuid)
+                    ),
+                    new XElement(soapenv + "Body",
+                        new XElement(api + "GetReportingPeriodList")
                     )
                 )
             );
