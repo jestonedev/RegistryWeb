@@ -1,13 +1,13 @@
 ﻿using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 namespace RegistryWeb.Models.Api
 {
-    [DataContract]
     public enum ReportingPeriodStateEnum
     {
-        [EnumMember(Value = "1")]
+        [XmlEnum(Name = "1")]
         Current = 1,
-        [EnumMember(Value = "2")]
+        [XmlEnum(Name = "2")]
         Archive
     }
 }

@@ -1,9 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RegistryWeb.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace RegistryWeb.DataServices
@@ -27,7 +23,7 @@ namespace RegistryWeb.DataServices
         {
             var xDoc = new XDocument(
                 new XElement(soapenv + "Envelope",
-                    new XAttribute(XNamespace.Xmlns + "soapenv", "http://schemas.xmlsoap.org/soap/envelope/"),
+                    new XAttribute(XNamespace.Xmlns + "soapenv", soapenv.NamespaceName),
                     new XAttribute(XNamespace.Xmlns + "api", ApiUrl),
                     new XElement(soapenv + "Header"),
                     new XElement(soapenv + "Body",
@@ -45,7 +41,7 @@ namespace RegistryWeb.DataServices
         {
             var xDoc = new XDocument(
                 new XElement(soapenv + "Envelope",
-                    new XAttribute(XNamespace.Xmlns + "soapenv", "http://schemas.xmlsoap.org/soap/envelope/"),
+                    new XAttribute(XNamespace.Xmlns + "soapenv", soapenv.NamespaceName),
                     new XAttribute(XNamespace.Xmlns + "api", ApiUrl),
                     new XElement(soapenv + "Header",
                         new XElement("authenticate", sessionGuid)
@@ -58,17 +54,20 @@ namespace RegistryWeb.DataServices
             return xDoc.ToString();
         }
 
-        public string GetHouseProfile(string sessionGuid)
+        public string GetHouseProfileActual(string sessionGuid, int house_id, int reporting_period_id)
         {
             var xDoc = new XDocument(
                 new XElement(soapenv + "Envelope",
-                    new XAttribute(XNamespace.Xmlns + "soapenv", "http://schemas.xmlsoap.org/soap/envelope/"),
+                    new XAttribute(XNamespace.Xmlns + "soapenv", soapenv.NamespaceName),
                     new XAttribute(XNamespace.Xmlns + "api", ApiUrl),
                     new XElement(soapenv + "Header",
                         new XElement("authenticate", sessionGuid)
                     ),
                     new XElement(soapenv + "Body",
-                        new XElement(api + "GetReportingPeriodList")
+                        new XElement(api + "GetHouseProfileActual",
+                            new XElement("house_id", house_id),
+                            new XElement("reporting_period_id", reporting_period_id)
+                        )
                     )
                 )
             );

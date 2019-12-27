@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 namespace RegistryWeb.Models.Api
 {
-    [DataContract]
+    [XmlRoot]
     public class ReportingPeriod
     {
-        [DataMember(Name= "id")]
+        [XmlElement(ElementName ="id")]
         public int Id { get; set; }
-        [DataMember(Name = "date_start")]
+        [XmlElement(ElementName = "date_start")]
         public DateTime DateStart { get; set; }
-        [DataMember(Name = "date_end")]
+        [XmlElement(ElementName = "date_end")]
         public DateTime DateEnd { get; set; }
-        [DataMember(Name = "name")]
+        [XmlElement(ElementName = "name")]
         public string Name { get; set; }
-        [DataMember(Name = "state")]
+        [XmlElement(ElementName = "state")]
         public ReportingPeriodStateEnum State { get; set; }
-        [DataMember(Name = "is_988")]
+        [XmlElement(ElementName = "is_988")]
         public bool Is988 { get; set; }
     }
 }
