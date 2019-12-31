@@ -1,12 +1,17 @@
-﻿namespace RegistryWeb.Models.Api
+﻿using System.Xml.Serialization;
+
+namespace RegistryWeb.Models.Api
 {
+    [XmlRoot]
     public class HouseReportClaimsToConsumers
     {
-        //sent_claims_count
-        int SentClaimsCount { get; set; } //Направлено претензий потребителям- должникам, ед.
-        //filed_actions_count
-        int FiledActionsCount { get; set; } //Направлено исковых заявлений, ед.
-        //received_cash_amount
-        double ReceivedCashAmount { get; set; } //Получено денежных средств по результатам претензионно-исковой работы, ед.
+        [XmlElement(ElementName = "sent_claims_count")]
+        public int SentClaimsCount { get; set; } //Направлено претензий потребителям- должникам, ед.
+
+        [XmlElement(ElementName = "filed_actions_count")]
+        public int FiledActionsCount { get; set; } //Направлено исковых заявлений, ед.
+
+        [XmlElement(ElementName = "received_cash_amount")]
+        public double ReceivedCashAmount { get; set; } //Получено денежных средств по результатам претензионно-исковой работы, ед.
     }
 }

@@ -2,7 +2,7 @@
 
 namespace RegistryWeb.Models.Api
 {
-    internal class HouseService
+    public class HouseService
     {
         //id
         int Id { get; set; }

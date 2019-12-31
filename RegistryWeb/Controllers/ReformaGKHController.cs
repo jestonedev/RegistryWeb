@@ -91,8 +91,10 @@ namespace RegistryWeb.Controllers
         {
             try
             {
-                var r2 = ApiTest.GetPeriodListResult();
-                var xDoc = Serialize<PeriodListResult>(r2);
+                var entity1 = ApiTest.GetHouseProfileActualResult();
+                var xDoc = Serialize<HouseProfileActualResult>(entity1);
+                xDoc.Save(@"D:\houseProfileActualResult.xml");
+                var entity2 = Deserialize<HouseProfileActualResult>(xDoc);
             }
             catch (Exception ex)
             {
@@ -147,6 +149,11 @@ namespace RegistryWeb.Controllers
             {
                 var data = reformaGKH.GetHouseProfileActual(TokenApiStorage.SessionGuid, 7947873, 465);
                 var xDoc = GetResponseSoap(data);
+                var list = xDoc.Descendants("GetHouseProfileActualResult").SingleOrDefault();
+                xDoc = new XDocument(new XElement("HouseProfileActualResult",
+                    new XAttribute(XNamespace.Xmlns + "xsi", list.GetNamespaceOfPrefix("xsi")),
+                    list.Elements()));
+                var entity = Deserialize<HouseProfileActualResult>(xDoc);
             }
             catch (Exception ex)
             {

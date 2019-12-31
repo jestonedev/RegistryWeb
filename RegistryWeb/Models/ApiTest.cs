@@ -42,13 +42,20 @@ namespace RegistryWeb.Models
         {
             var hpar = new HouseProfileActualResult();
             hpar.HouseId = 7947873;
-            hpar.FullAddress = null;
+            hpar.FullAddress = GetFullAddress();
             hpar.Stage = HouseStageEnum.Exploited;
             hpar.Inn = null;
             hpar.LastUpdate = DateTime.Parse("2015-05-22T20:42:02+03:00");
-            hpar.HouseProfileData = null;
-            hpar.FilesInfo = GetFileInfo();
+            hpar.HouseProfileData = GetHouseProfileData988();
+            hpar.FilesInfo = null; // GetFileInfo();
             return hpar;
+        }
+
+        public static HouseProfileData988 GetHouseProfileData988()
+        {
+            var hpd = new HouseProfileData988();
+            hpd.Report = GetHouseReport();
+            return hpd;
         }
 
         public static FileInfo GetFileInfo()
@@ -61,5 +68,62 @@ namespace RegistryWeb.Models
             fileInfo.CreateDate = new DateTime(2019, 12, 27);
             return fileInfo;
         }
+
+        public static FullAddress GetFullAddress()
+        {
+            var ad = new FullAddress();
+            ad.RegionGuid = "6466c988-7ce3-45e5-8b97-90ae16cb1249";
+            ad.RegionFormalName = "Иркутская";
+            ad.RegionShortName = "обл";
+            ad.RegionCode = "3800000000000";
+            ad.AreaGuid = "";
+            ad.AreaFormalName = "";
+            ad.AreaShortName = "";
+            ad.AreaCode = "";
+            ad.City1Guid = "bdf6b629-b33e-4cfa-b4b2-7f693e1d821c";
+            ad.City1FormalName = "Братск";
+            ad.City1ShortName = "г";
+            ad.City1Code = "3800000500000";
+            ad.City2Guid = "0620d65c-c7d5-44e2-965d-00a11a28c7c2";
+            ad.City2FormalName = "Центральный";
+            ad.City2ShortName = "жилрайон";
+            ad.City2Code = "3800000504100";
+            ad.City3Guid = null;
+            ad.City3FormalName = null;
+            ad.City3ShortName = null;
+            ad.City3Code = null;
+            ad.StreetGuid = "f90b0f50-2b1e-4571-8f19-4f486422d24c";
+            ad.StreetFormalName = "Баркова";
+            ad.StreetShortName = "ул";
+            ad.StreetCode = "38000005041000500";
+            ad.AdditionalTerritory = null;
+            ad.AdditionalTerritoryFormalName = null;
+            ad.AdditionalTerritoryShortName = null;
+            ad.AdditionalTerritoryCode = null;
+            ad.Houseguid = "8044c3ac-9d1f-4c7f-94f9-4ab2fae2e2a5";
+            ad.HouseNumber = "35";
+            ad.Building = "";
+            ad.Block = "";
+            ad.Letter = "";
+            ad.Structure = "";            
+            return ad;
+        }
+
+        public static HouseReport GetHouseReport()
+        {
+            var report = new HouseReport();
+            report.Common = GetHouseReportCommon();
+            report.CommunalService = null;
+            report.ClaimsToConsumers = null;
+            report.HouseReportQualityOfWorkClaims = null;
+            return report;
+        }
+
+        public static HouseReportCommon GetHouseReportCommon()
+        {
+            var hrc = new HouseReportCommon();
+            return hrc;
+        }
+
     }
 }
