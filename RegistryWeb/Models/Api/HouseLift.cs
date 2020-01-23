@@ -8,7 +8,7 @@ namespace RegistryWeb.Models.Api
         [XmlElement(ElementName = "id", IsNullable = true)]
         public int? Id { get; set; }
 
-        [XmlElement(ElementName = "Porch_number", IsNullable = true)]
+        [XmlElement(ElementName = "porch_number", IsNullable = true)]
         public string PorchNumber { get; set; } //Номер подъезда
 
         [XmlElement(ElementName = "type", IsNullable = true)]

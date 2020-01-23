@@ -39,7 +39,7 @@ namespace RegistryWeb.Models.Api
         public string City2Code { get; set; } //Код внутригородской территории из КЛАДР 4.0.
         [XmlElement(ElementName = "city3_guid", IsNullable = true)]
         public string City3Guid { get; set; } //Идентификатор населенного пункта (GUID по ФИАС, aolevel = 6).
-        [XmlElement(ElementName = "City3_formal_name", IsNullable = true)]
+        [XmlElement(ElementName = "city3_formal_name", IsNullable = true)]
         public string City3FormalName { get; set; } //Формализованное наименование населенного пункта (ФИАС)
         [XmlElement(ElementName = "city3_short_name", IsNullable = true)]
         public string City3ShortName { get; set; } //Краткое наименование населенного пункта (ФИАС)

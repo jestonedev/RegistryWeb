@@ -9,7 +9,7 @@ namespace RegistryWeb.Models.Api
         [XmlElement(ElementName = "id", IsNullable = true)]
         public int? Id { get; set; }
 
-        [XmlElement(ElementName = "Communal_resource_type", IsNullable = true)]
+        [XmlElement(ElementName = "communal_resource_type", IsNullable = true)]
         public HouseCommunalServiceTypeEnum? CommunalResourceType { get; set; }
 
         [XmlElement(ElementName = "availability", IsNullable = true)]
@@ -18,16 +18,16 @@ namespace RegistryWeb.Models.Api
         [XmlElement(ElementName = "meter_type", IsNullable = true)]
         public HouseMeterTypeEnum? MeterType { get; set; }
 
-        [XmlElement(ElementName = "Unit_of_measurement", IsNullable = true)]
+        [XmlElement(ElementName = "unit_of_measurement", IsNullable = true)]
         public UnitOfMeasureEnum? UnitOfMeasurement { get; set; }
 
-        [XmlElement(ElementName = "Commissioning_date", IsNullable = true)]
+        [XmlElement(ElementName = "commissioning_date", IsNullable = true)]
         public DateTime? CommissioningDate { get; set; }
 
-        [XmlElement(ElementName = "Calibration_date", IsNullable = true)]
+        [XmlElement(ElementName = "calibration_date", IsNullable = true)]
         public DateTime? CalibrationDate { get; set; }
 
-        [XmlElement(ElementName = "Is_default", IsNullable = true)]
+        [XmlElement(ElementName = "is_default", IsNullable = true)]
         public bool? IsDefault { get; set; }
     }
 }

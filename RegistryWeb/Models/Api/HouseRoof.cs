@@ -8,7 +8,7 @@ namespace RegistryWeb.Models.Api
         [XmlElement(ElementName = "id", IsNullable = true)]
         public int? Id { get; set; } //Идентификатор крыши
 
-        [XmlElement(ElementName = "Roof_type", IsNullable = true)]
+        [XmlElement(ElementName = "roof_type", IsNullable = true)]
         public HouseRoofTypeEnum? RoofType { get; set; } //Идентификатор типа крыши 
 
         [XmlElement(ElementName = "roofing_type", IsNullable = true)]
