@@ -1,24 +1,35 @@
-﻿namespace RegistryWeb.Models.Api
+﻿using System.Xml.Serialization;
+
+namespace RegistryWeb.Models.Api
 {
+    [XmlRoot]
     public class HouseCommunalServiceVolumesReport
     {
-        //unit_of_measurement
-        UnitOfMeasureEnum UnitOfMeasurement { get; set; }
-        //total_volume
-        double TotalVolume { get; set; } //Общий объем потребления (нат. показ)
-        //accrued_consumer
-        double AccruedConsumer { get; set; } //Начислено потребителям, руб.
-        //paid_by_consumers_amount
-        double PaidByConsumersAmount { get; set; } //Оплачено потребителями, руб.
-        //consumer_arrears
-        double ConsumerArrears { get; set; } //Задолженность потребителей, руб.
-        //cash_to_provider_payment
-        double CashToProviderPayment { get; set; } //Начислено поставщиком (поставщиками) коммунального ресурса, руб.
-        //paid_to_supplier_amount
-        double PaidToSupplierAmount { get; set; } //Оплачено поставщику (поставщикам) коммунального ресурса, руб.
-        //arrear_to_supplier_amount
-        double ArrearToSupplierAmount { get; set; } //Задолженность перед поставщиком (поставщиками) коммунального ресурса, руб.
-        //total_penalties
-        double TotalPenalties { get; set; } //Суммы пени и штрафов, уплаченные поставщику (поставщикам) коммунального ресурса, руб.
+        [XmlElement(ElementName = "unit_of_measurement", IsNullable = true)]
+        public UnitOfMeasureEnum? UnitOfMeasurement { get; set; }
+
+        [XmlElement(ElementName = "total_volume", IsNullable = true)]
+        public double? TotalVolume { get; set; } //Общий объем потребления (нат. показ)
+
+        [XmlElement(ElementName = "accrued_consumer", IsNullable = true)]
+        public double? AccruedConsumer { get; set; } //Начислено потребителям, руб.
+
+        [XmlElement(ElementName = "paid_by_consumers_amount", IsNullable = true)]
+        public double? PaidByConsumersAmount { get; set; } //Оплачено потребителями, руб.
+
+        [XmlElement(ElementName = "consumer_arrears", IsNullable = true)]
+        public double? ConsumerArrears { get; set; } //Задолженность потребителей, руб.
+
+        [XmlElement(ElementName = "cash_to_provider_payment", IsNullable = true)]
+        public double? CashToProviderPayment { get; set; } //Начислено поставщиком (поставщиками) коммунального ресурса, руб.
+
+        [XmlElement(ElementName = "paid_to_supplier_amount", IsNullable = true)]
+        public double? PaidToSupplierAmount { get; set; } //Оплачено поставщику (поставщикам) коммунального ресурса, руб.
+
+        [XmlElement(ElementName = "arrear_to_supplier_amount", IsNullable = true)]
+        public double? ArrearToSupplierAmount { get; set; } //Задолженность перед поставщиком (поставщиками) коммунального ресурса, руб.
+
+        [XmlElement(ElementName = "total_penalties", IsNullable = true)]
+        public double? TotalPenalties { get; set; } //Суммы пени и штрафов, уплаченные поставщику (поставщикам) коммунального ресурса, руб.
     }
 }

@@ -1,10 +1,14 @@
-﻿namespace RegistryWeb.Models.Api
+﻿using System.Xml.Serialization;
+
+namespace RegistryWeb.Models.Api
 {
+    [XmlRoot]
     public class HouseCadastralNumber
     {
-        //id
-        int Id { get; set; } //Идентификатор кадастрового номера
-        //cadastral_number
-        string CadastralNumber { get; set; } //Кадастровый номер
+        [XmlElement(ElementName = "id", IsNullable = true)]
+        public int? Id { get; set; } //Идентификатор кадастрового номера
+
+        [XmlElement(ElementName = "cadastral_number", IsNullable = true)]
+        public string CadastralNumber { get; set; } //Кадастровый номер
     }
 }

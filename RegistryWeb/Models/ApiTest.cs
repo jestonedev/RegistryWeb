@@ -55,7 +55,24 @@ namespace RegistryWeb.Models
         {
             var hpd = new HouseProfileData988();
             hpd.Report = GetHouseReport();
+            hpd.Roofs = GetHouseRoofs();
             return hpd;
+        }
+
+        public static List<HouseRoof> GetHouseRoofs()
+        {            
+            var e1 = new HouseRoof();
+            e1.Id = 0;
+            e1.RoofingType = HouseRoofingTypeEnum.MetalTile;
+            e1.RoofType = HouseRoofTypeEnum.Flat;
+            var e2 = new HouseRoof();
+            e2.Id = 1;
+            e2.RoofingType = HouseRoofingTypeEnum.ProfiledFlooring;
+            e2.RoofType = HouseRoofTypeEnum.Pitched;
+            var list = new List<HouseRoof>();
+            list.Add(e1);
+            list.Add(e2);
+            return list;
         }
 
         public static FileInfo GetFileInfo()

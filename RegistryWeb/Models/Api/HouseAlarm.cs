@@ -1,18 +1,24 @@
 ﻿using System;
+using System.Xml.Serialization;
 
 namespace RegistryWeb.Models.Api
 {
+    [XmlRoot]
     public class HouseAlarm
     {
-        //document_date
-        DateTime DocumentDate { get; set; } //Дата документа признания дома аварийным
-        //document_number
-        string DocumentNumber { get; set; } //Номер документа признания дома аварийным
-        //reason
-        AlarmReasonEnum Reason { get; set; } //Причина признания дома аварийным 
-        //reason_other
-        string ReasonOther { get; set; } //Причина признания дома аварийным (иная). Заполняется если reason = 6.
-        //failure
-        HouseAlarmFailure Failure { get; set; } //Информация при отказе от аварийности дома 
+        [XmlElement(ElementName = "document_date", IsNullable = true)]
+        public DateTime? DocumentDate { get; set; } //Дата документа признания дома аварийным
+
+        [XmlElement(ElementName = "document_number", IsNullable = true)]
+        public string DocumentNumber { get; set; } //Номер документа признания дома аварийным
+
+        [XmlElement(ElementName = "reason", IsNullable = true)]
+        public AlarmReasonEnum? Reason { get; set; } //Причина признания дома аварийным 
+
+        [XmlElement(ElementName = "reason_other", IsNullable = true)]
+        public string ReasonOther { get; set; } //Причина признания дома аварийным (иная). Заполняется если reason = 6.
+
+        [XmlElement(ElementName = "failure", IsNullable = true)]
+        public HouseAlarmFailure Failure { get; set; } //Информация при отказе от аварийности дома 
     }
 }

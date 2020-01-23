@@ -1,12 +1,17 @@
-﻿namespace RegistryWeb.Models.Api
+﻿using System.Xml.Serialization;
+
+namespace RegistryWeb.Models.Api
 {
+    [XmlRoot]
     public class HouseAdditionalEquipment
     {
-        //id
-        int Id { get; set; }
-        //type
-        string Type { get; set; }
-        //description
-        string Description { get; set; }
+        [XmlElement(ElementName = "id", IsNullable = true)]
+        public int? Id { get; set; }
+
+        [XmlElement(ElementName = "type", IsNullable = true)]
+        public string Type { get; set; }
+
+        [XmlElement(ElementName = "description", IsNullable = true)]
+        public string Description { get; set; }
     }
 }

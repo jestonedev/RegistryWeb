@@ -1,16 +1,21 @@
 ﻿using System;
+using System.Xml.Serialization;
 
 namespace RegistryWeb.Models.Api
 {
+    [XmlRoot]
     public class HouseCommunalServiceNormativeAct
     {
-        //id
-        int Id { get; set; }
-        //document_date
-        DateTime DocumentDate { get; set; } //Дата нормативного правового акта, устанавливающего норматив потребления коммунальной услуги
-        //document_number
-        string DocumentNumber { get; set; } //Номер нормативного правового акта, устанавливающего норматив потребления коммунальной услуги
-        //document_organization_name
-        string DocumentOrganizationName { get; set; } //Наименование принявшего акт органа
+        [XmlElement(ElementName = "id", IsNullable = true)]
+        public int? Id { get; set; }
+
+        [XmlElement(ElementName = "document_date", IsNullable = true)]
+        public DateTime? DocumentDate { get; set; } //Дата нормативного правового акта, устанавливающего норматив потребления коммунальной услуги
+
+        [XmlElement(ElementName = "document_number", IsNullable = true)]
+        public string DocumentNumber { get; set; } //Номер нормативного правового акта, устанавливающего норматив потребления коммунальной услуги
+
+        [XmlElement(ElementName = "document_organization_name", IsNullable = true)]
+        public string DocumentOrganizationName { get; set; } //Наименование принявшего акт органа
     }
 }

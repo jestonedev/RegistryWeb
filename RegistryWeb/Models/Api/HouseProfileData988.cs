@@ -110,85 +110,76 @@ namespace RegistryWeb.Models.Api
         public HouseHotWaterTypeEnum? HotWaterType { get; set; } //Идентификатор типа системы горячего водоснабжения
 
         [XmlElement(ElementName = "cold_water_type", IsNullable = true)]
-        [XmlIgnore]
-        public HouseColdWaterTypeEnum ColdWaterType { get; set; } //Идентификатор типа системы холодного водоснабжения
+        public HouseColdWaterTypeEnum? ColdWaterType { get; set; } //Идентификатор типа системы холодного водоснабжения
 
         [XmlElement(ElementName = "sewerage_type", IsNullable = true)]
-        [XmlIgnore]
-        public HouseSewerageTypeEnum SewerageType { get; set; } //Идентификатор типа системы водоотведения
+        public HouseSewerageTypeEnum? SewerageType { get; set; } //Идентификатор типа системы водоотведения
 
         [XmlElement(ElementName = "sewerage_cesspools_volume", IsNullable = true)]
         public double? SewerageSesspoolsVolume { get; set; } //Объем выгребных ям, куб.м
 
         [XmlElement(ElementName = "gas_type", IsNullable = true)]
-        [XmlIgnore]
-        public HouseGasTypeEnum GasType { get; set; } //Идентификатор типа системы газоснабжения
+        public HouseGasTypeEnum? GasType { get; set; } //Идентификатор типа системы газоснабжения
 
         [XmlElement(ElementName = "ventilation_type", IsNullable = true)]
-        [XmlIgnore]
-        public HouseVentilationTypeEnum VentilationType { get; set; } //Идентификатор типа системы вентиляции
+        public HouseVentilationTypeEnum? VentilationType { get; set; } //Идентификатор типа системы вентиляции
 
         [XmlElement(ElementName = "firefighting_type", IsNullable = true)]
-        [XmlIgnore]
-        public HouseFirefightingTypeEnum FirefightingType { get; set; } //Идентификатор типа системы пожаротушения
+        public HouseFirefightingTypeEnum? FirefightingType { get; set; } //Идентификатор типа системы пожаротушения
 
         [XmlElement(ElementName = "drainage_type", IsNullable = true)]
-        [XmlIgnore]
-        public HouseDrainageTypeEnum DrainageType { get; set; } //Идентификатор типа системы пожаротушения
+        public HouseDrainageTypeEnum? DrainageType { get; set; } //Идентификатор типа системы пожаротушения
 
-        [XmlElement(ElementName = "cadastral_numbers")]
-        [XmlIgnore]
+        [XmlArray(ElementName = "cadastral_numbers", IsNullable = true)]
+        [XmlArrayItem(ElementName = "item")]
         public List<HouseCadastralNumber> CadastralNumbers { get; set; } //Кадастровый номер
 
-        [XmlElement(ElementName = "facades")]
-        [XmlIgnore]
+        [XmlArray(ElementName = "facades", IsNullable = true)]
+        [XmlArrayItem(ElementName = "item")]
         public List<HouseFacade> Facades { get; set; } //Фасад
 
-        [XmlElement(ElementName = "roofs")]
-        [XmlIgnore]
+        [XmlArray(ElementName = "roofs", IsNullable = true)]
+        [XmlArrayItem(ElementName = "item")]
         public List<HouseRoof> Roofs { get; set; } //Крыша
 
-        [XmlElement(ElementName = "additional_equipments")]
-        [XmlIgnore]
+        [XmlArray(ElementName = "additional_equipments", IsNullable = true)]
+        [XmlArrayItem(ElementName = "item")]
         public List<HouseAdditionalEquipment> AdditionalEquipments { get; set; } //Иное оборудование/конструктивный элемент
 
-        [XmlElement(ElementName = "metering_devices")]
-        [XmlIgnore]
+        [XmlArray(ElementName = "metering_devices", IsNullable = true)]
+        [XmlArrayItem(ElementName = "item")]
         public List<HouseMeteringDevice> MeteringDevices { get; set; } //Общедомовые приборы учета
 
-        [XmlElement(ElementName = "lifts")]
-        [XmlIgnore]
+        [XmlArray(ElementName = "lifts", IsNullable = true)]
+        [XmlArrayItem(ElementName = "item")]
         public List<HouseLift> Lifts { get; set; } //Лифт
 
-        [XmlElement(ElementName = "management_contract")]
-        [XmlIgnore]
+        [XmlElement(ElementName = "management_contract", IsNullable = true)]
         public HouseManagementContract ManagementContract { get; set; } //Управление
 
-        [XmlElement(ElementName = "services")]
-        [XmlIgnore]
+        [XmlArray(ElementName = "services", IsNullable = true)]
+        [XmlArrayItem(ElementName = "item")]
         public List<HouseService> Services { get; set; } //Работы (услуги) по содержанию
 
-        [XmlElement(ElementName = "communal_services")]
-        [XmlIgnore]
+        [XmlArray(ElementName = "communal_services", IsNullable = true)]
+        [XmlArrayItem(ElementName = "item")]
         public List<HouseCommunalService> CommunalServices { get; set; } //Коммунальные услуги
 
-        [XmlElement(ElementName = "common_properties")]
-        [XmlIgnore]
+        [XmlArray(ElementName = "common_properties", IsNullable = true)]
+        [XmlArrayItem(ElementName = "item")]
         public List<HouseCommonProperty> CommonProperties { get; set; } //Общее имущество
 
         [XmlElement(ElementName = "overhaul", IsNullable = true)]
-        [XmlIgnore]
         public HouseOverhaul Overhaul { get; set; } //Сведения о КР
 
-        [XmlElement(ElementName = "common_meetings")]
-        [XmlIgnore]
+        [XmlArray(ElementName = "common_meetings", IsNullable = true)]
+        [XmlArrayItem(ElementName = "item")]
         public List<HouseCommonMeeting> CommonMeetings { get; set; } //Общие собрания собственников дома
 
-        [XmlElement(ElementName = "report")]
+        [XmlElement(ElementName = "report", IsNullable = true)]
         public HouseReport Report { get; set; } //Отчет по управлению
 
         [XmlElement(ElementName = "alarm_info", IsNullable = true)]
-        [XmlIgnore]
         public HouseAlarm AlarmInfo { get; set; } //Информация при признании дома аварийным. При признании дома аварийным необходимо заполнить информацию из Таблица 152, для отказа от аварийности дополнительно заполнить информацию из Таблица 154. Пока дом аварийный – редактирование информации по аварийности доступно, если есть отказ от аварийности, то редактирование информации недоступно. Для повторного признания дома аварийным необходимо изменить хотя бы одно поле из Таблица 152, включая изменение идентификатора файла. При условии, что одновременно заполнены данные двух таблиц, произойдет  признание дома аварийным и сразу же отказ от аварийности.
     }
 }

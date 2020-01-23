@@ -1,14 +1,20 @@
-﻿namespace RegistryWeb.Models.Api
+﻿using System.Xml.Serialization;
+
+namespace RegistryWeb.Models.Api
 {
+    [XmlRoot]
     public class HouseLift
     {
-        //id
-        int Id { get; set; }
-        //Porch_number
-        string PorchNumber { get; set; } //Номер подъезда
-        //type
-        HouseLiftTypeEnum Type { get; set; } //Идентификатор типа лифта 
-        //commissioning_year
-        int CommissioningYear { get; set; } //Год ввода в эксплуатацию (Формат: ‘2015’)
+        [XmlElement(ElementName = "id", IsNullable = true)]
+        public int? Id { get; set; }
+
+        [XmlElement(ElementName = "Porch_number", IsNullable = true)]
+        public string PorchNumber { get; set; } //Номер подъезда
+
+        [XmlElement(ElementName = "type", IsNullable = true)]
+        public HouseLiftTypeEnum? Type { get; set; } //Идентификатор типа лифта 
+
+        [XmlElement(ElementName = "commissioning_year", IsNullable = true)]
+        public int? CommissioningYear { get; set; } //Год ввода в эксплуатацию (Формат: ‘2015’)
     }
 }
