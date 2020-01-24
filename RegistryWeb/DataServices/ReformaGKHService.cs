@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RegistryWeb.Models;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-using RegistryWeb.Models.Api;
 
 namespace RegistryWeb.DataServices
 {
@@ -14,12 +14,14 @@ namespace RegistryWeb.DataServices
         private XNamespace soapenv;
         private XNamespace api;
         private readonly RegistryContext registryContext;
+        private readonly TokenApiStorage storage;
         public string ApiUrl { get; private set; }
         private WebProxy proxy;
 
-        public ReformaGKHService(RegistryContext registryContext, IConfiguration config)
+        public ReformaGKHService(RegistryContext registryContext, IConfiguration config, TokenApiStorage storage)
         {
             this.registryContext = registryContext;
+            this.storage = storage;
             ApiUrl = config.GetValue<string>("ApiUrl");
             soapenv = "http://schemas.xmlsoap.org/soap/envelope/";
             api = ApiUrl;
@@ -76,6 +78,8 @@ namespace RegistryWeb.DataServices
 
         public XDocument Login(string login, string password)
         {
+            storage.User = login;
+            storage.Password = password;
             var xDoc = new XDocument(
                 new XElement(soapenv + "Envelope",
                     new XAttribute(XNamespace.Xmlns + "soapenv", soapenv.NamespaceName),
@@ -90,17 +94,18 @@ namespace RegistryWeb.DataServices
                 )
             );
             xDoc = GetResponseSoap(xDoc.ToString());
+            storage.SessionGuid = xDoc.Descendants("LoginResult").Single().Value;
             return xDoc;
         }
 
-        public XDocument GetReportingPeriodList(string sessionGuid)
+        public XDocument GetReportingPeriodList()
         {
             var xDoc = new XDocument(
                 new XElement(soapenv + "Envelope",
                     new XAttribute(XNamespace.Xmlns + "soapenv", soapenv.NamespaceName),
                     new XAttribute(XNamespace.Xmlns + "api", ApiUrl),
                     new XElement(soapenv + "Header",
-                        new XElement("authenticate", sessionGuid)
+                        new XElement("authenticate", storage.SessionGuid)
                     ),
                     new XElement(soapenv + "Body",
                         new XElement(api + "GetReportingPeriodList")
@@ -111,14 +116,14 @@ namespace RegistryWeb.DataServices
             return xDoc;
         }
 
-        public XDocument GetHouseProfileActual(string sessionGuid, int houseId, int reportingPeriodId)
+        public XDocument GetHouseProfileActual(int houseId, int reportingPeriodId)
         {
             var xDoc = new XDocument(
                 new XElement(soapenv + "Envelope",
                     new XAttribute(XNamespace.Xmlns + "soapenv", soapenv.NamespaceName),
                     new XAttribute(XNamespace.Xmlns + "api", ApiUrl),
                     new XElement(soapenv + "Header",
-                        new XElement("authenticate", sessionGuid)
+                        new XElement("authenticate", storage.SessionGuid)
                     ),
                     new XElement(soapenv + "Body",
                         new XElement(api + "GetHouseProfileActual",

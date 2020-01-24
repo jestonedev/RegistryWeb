@@ -51,6 +51,7 @@ namespace RegistryWeb
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<SecurityService>();
             services.AddTransient<ReformaGKHService>();
+            services.AddSingleton<TokenApiStorage>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

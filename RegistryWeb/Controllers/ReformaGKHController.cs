@@ -13,19 +13,21 @@ namespace RegistryWeb.Controllers
     public class ReformaGKHController : Controller
     {
         private readonly ReformaGKHService reformaGKH;
-        private readonly SecurityService securityService;   
+        private readonly SecurityService securityService;
+        private readonly TokenApiStorage storage;
 
-        public ReformaGKHController(ReformaGKHService reformaGKH, SecurityService securityService)
+        public ReformaGKHController(ReformaGKHService reformaGKH, SecurityService securityService, TokenApiStorage storage)
         {
             this.reformaGKH = reformaGKH;
             this.securityService = securityService;
+            this.storage = storage;
         }
 
         public IActionResult Index()
         {
             if (!securityService.HasPrivilege(Privileges.OwnerReadWrite))
                 return View("NotAccess");
-            ViewData["SessionGuid"] = TokenApiStorage.SessionGuid;
+            ViewData["SessionGuid"] = storage.SessionGuid;
             return View();
         }
 
@@ -42,7 +44,7 @@ namespace RegistryWeb.Controllers
             {
                 return Content("Ошибка! \n" + ex.Message);
             }
-            ViewData["SessionGuid"] = TokenApiStorage.SessionGuid;
+            ViewData["SessionGuid"] = storage.SessionGuid;
             return View("Index");
         }
 
@@ -52,17 +54,14 @@ namespace RegistryWeb.Controllers
             {
                 try
                 {
-                    TokenApiStorage.User = model.User;
-                    TokenApiStorage.Password = model.Password;
                     var xDoc = reformaGKH.Login(model.User, model.Password);
-                    TokenApiStorage.SessionGuid = xDoc.Descendants("LoginResult").Single().Value;
                 }
                 catch (Exception ex)
                 {
                     return Content("Ошибка! \n" + ex.Message);
                 }
             }
-            ViewData["SessionGuid"] = TokenApiStorage.SessionGuid;
+            ViewData["SessionGuid"] = storage.SessionGuid;
             return View("Index",model);
         }
 
@@ -70,7 +69,7 @@ namespace RegistryWeb.Controllers
         {
             try
             {
-                var xDoc = reformaGKH.GetReportingPeriodList(TokenApiStorage.SessionGuid);
+                var xDoc = reformaGKH.GetReportingPeriodList();
                 var list = xDoc.Descendants("GetReportingPeriodListResult").SingleOrDefault();
                 xDoc = new XDocument(new XElement("PeriodListResult", list));
                 var pr = reformaGKH.Deserialize<PeriodListResult>(xDoc);
@@ -79,7 +78,7 @@ namespace RegistryWeb.Controllers
             {
                 return Content("Ошибка! \n" + ex.Message);
             }
-            ViewData["SessionGuid"] = TokenApiStorage.SessionGuid;
+            ViewData["SessionGuid"] = storage.SessionGuid;
             return View("Index");
         }
 
@@ -87,7 +86,7 @@ namespace RegistryWeb.Controllers
         {
             try
             {
-                var xDoc = reformaGKH.GetHouseProfileActual(TokenApiStorage.SessionGuid, 7947873, 465);
+                var xDoc = reformaGKH.GetHouseProfileActual(7947873, 465);
                 var list = xDoc.Descendants("GetHouseProfileActualResult").SingleOrDefault();
                 xDoc = new XDocument(new XElement("HouseProfileActualResult",
                     new XAttribute(XNamespace.Xmlns + "xsi", list.GetNamespaceOfPrefix("xsi")),
@@ -98,7 +97,7 @@ namespace RegistryWeb.Controllers
             {
                 return Content("Ошибка! \n" + ex.Message);
             }
-            ViewData["SessionGuid"] = TokenApiStorage.SessionGuid;
+            ViewData["SessionGuid"] = storage.SessionGuid;
             return View("Index");
         }
     }
