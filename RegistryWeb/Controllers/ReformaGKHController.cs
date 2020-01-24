@@ -54,8 +54,7 @@ namespace RegistryWeb.Controllers
                 {
                     TokenApiStorage.User = model.User;
                     TokenApiStorage.Password = model.Password;
-                    var data = reformaGKH.Login(model.User, model.Password);
-                    var xDoc = reformaGKH.GetResponseSoap(data);
+                    var xDoc = reformaGKH.Login(model.User, model.Password);
                     TokenApiStorage.SessionGuid = xDoc.Descendants("LoginResult").Single().Value;
                 }
                 catch (Exception ex)
@@ -71,8 +70,7 @@ namespace RegistryWeb.Controllers
         {
             try
             {
-                var data = reformaGKH.GetReportingPeriodList(TokenApiStorage.SessionGuid);
-                var xDoc = reformaGKH.GetResponseSoap(data);
+                var xDoc = reformaGKH.GetReportingPeriodList(TokenApiStorage.SessionGuid);
                 var list = xDoc.Descendants("GetReportingPeriodListResult").SingleOrDefault();
                 xDoc = new XDocument(new XElement("PeriodListResult", list));
                 var pr = reformaGKH.Deserialize<PeriodListResult>(xDoc);
@@ -89,8 +87,7 @@ namespace RegistryWeb.Controllers
         {
             try
             {
-                var data = reformaGKH.GetHouseProfileActual(TokenApiStorage.SessionGuid, 7947873, 465);
-                var xDoc = reformaGKH.GetResponseSoap(data);
+                var xDoc = reformaGKH.GetHouseProfileActual(TokenApiStorage.SessionGuid, 7947873, 465);
                 var list = xDoc.Descendants("GetHouseProfileActualResult").SingleOrDefault();
                 xDoc = new XDocument(new XElement("HouseProfileActualResult",
                     new XAttribute(XNamespace.Xmlns + "xsi", list.GetNamespaceOfPrefix("xsi")),

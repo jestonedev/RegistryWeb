@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using RegistryWeb.Models.Api;
 
 namespace RegistryWeb.DataServices
 {
@@ -28,7 +29,7 @@ namespace RegistryWeb.DataServices
             };
         }
 
-        public XDocument GetResponseSoap(string xmlString)
+        private XDocument GetResponseSoap(string xmlString)
         {
             var request = WebRequest.Create(ApiUrl);
             request.Proxy = proxy;
@@ -73,7 +74,7 @@ namespace RegistryWeb.DataServices
             return xDoc;
         }
 
-        public string Login(string login, string password)
+        public XDocument Login(string login, string password)
         {
             var xDoc = new XDocument(
                 new XElement(soapenv + "Envelope",
@@ -88,10 +89,11 @@ namespace RegistryWeb.DataServices
                     )
                 )
             );
-            return xDoc.ToString();
+            xDoc = GetResponseSoap(xDoc.ToString());
+            return xDoc;
         }
 
-        public string GetReportingPeriodList(string sessionGuid)
+        public XDocument GetReportingPeriodList(string sessionGuid)
         {
             var xDoc = new XDocument(
                 new XElement(soapenv + "Envelope",
@@ -105,10 +107,11 @@ namespace RegistryWeb.DataServices
                     )
                 )
             );
-            return xDoc.ToString();
+            xDoc = GetResponseSoap(xDoc.ToString());
+            return xDoc;
         }
 
-        public string GetHouseProfileActual(string sessionGuid, int house_id, int reporting_period_id)
+        public XDocument GetHouseProfileActual(string sessionGuid, int houseId, int reportingPeriodId)
         {
             var xDoc = new XDocument(
                 new XElement(soapenv + "Envelope",
@@ -119,13 +122,14 @@ namespace RegistryWeb.DataServices
                     ),
                     new XElement(soapenv + "Body",
                         new XElement(api + "GetHouseProfileActual",
-                            new XElement("house_id", house_id),
-                            new XElement("reporting_period_id", reporting_period_id)
+                            new XElement("house_id", houseId),
+                            new XElement("reporting_period_id", reportingPeriodId)
                         )
                     )
                 )
             );
-            return xDoc.ToString();
+            xDoc = GetResponseSoap(xDoc.ToString());
+            return xDoc;
         }
     }
 }
