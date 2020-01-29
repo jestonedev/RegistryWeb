@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RegistryWeb.Models;
+using RegistryWeb.Models.Api;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -116,7 +117,7 @@ namespace RegistryWeb.DataServices
             return xDoc;
         }
 
-        public XDocument GetHouseProfileActual(int houseId, int reportingPeriodId)
+        public XDocument GetHouseProfileActual(int houseId)
         {
             var xDoc = new XDocument(
                 new XElement(soapenv + "Envelope",
@@ -127,8 +128,7 @@ namespace RegistryWeb.DataServices
                     ),
                     new XElement(soapenv + "Body",
                         new XElement(api + "GetHouseProfileActual",
-                            new XElement("house_id", houseId),
-                            new XElement("reporting_period_id", reportingPeriodId)
+                            new XElement("house_id", houseId)
                         )
                     )
                 )

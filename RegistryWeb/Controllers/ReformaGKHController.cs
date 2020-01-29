@@ -86,7 +86,7 @@ namespace RegistryWeb.Controllers
         {
             try
             {
-                var xDoc = reformaGKH.GetHouseProfileActual(7947873, 465);
+                var xDoc = reformaGKH.GetHouseProfileActual(8939273);
                 var list = xDoc.Descendants("GetHouseProfileActualResult").SingleOrDefault();
                 xDoc = new XDocument(new XElement("HouseProfileActualResult",
                     new XAttribute(XNamespace.Xmlns + "xsi", list.GetNamespaceOfPrefix("xsi")),
