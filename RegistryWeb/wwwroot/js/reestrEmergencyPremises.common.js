@@ -2,6 +2,10 @@
     var reestrStatistic = $('#reestrStatistic');
     var toggleReestrStatistic = $('#toggleReestrStatistic');
     reestrStatistic.hide();
+    $('.page-link').click(function () {
+        $('input[name="PageOptions.CurrentPage"]').val($(this).data("page"));
+        $("form.r-filter-form").submit();
+    });
     toggleReestrStatistic.click(function (event) {
         if (reestrStatistic.is(":hidden")) {
             toggleReestrStatistic
@@ -10,7 +14,7 @@
             $.ajax({
                 async: true,
                 type: 'POST',
-                url: window.location.origin + '/OwnerReports/ReestrStatistic',
+                url: window.location.origin + '/ReestrEmergencyPremises/ReestrStatistic',
                 success: function (data) {
                     reestrStatistic.find('.date_S').empty();
                     reestrStatistic.find('.countMKD_S').empty();

@@ -12,18 +12,6 @@ namespace RegistryWeb.Models.Entities
         public virtual Building IdBuildingNavigation { get; set; }
         public virtual OwnerProcess IdProcessNavigation { get; set; }
 
-        public string GetAddress()
-        {
-            if (IdBuildingNavigation == null)
-                throw new Exception("IdBuildingNavigation не подгружен");
-            if (IdBuildingNavigation.IdStreetNavigation == null)
-                throw new Exception("IdStreetNavigation не подгружен");
-            var address = 
-                IdBuildingNavigation.IdStreetNavigation.StreetName + ", д." +
-                IdBuildingNavigation.House;
-            return address;
-        }
-
         public bool Equals(OwnerBuildingAssoc oba)
         {
             if (oba == null)

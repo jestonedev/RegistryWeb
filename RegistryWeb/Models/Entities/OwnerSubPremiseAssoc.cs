@@ -12,27 +12,6 @@ namespace RegistryWeb.Models.Entities
         public virtual OwnerProcess IdProcessNavigation { get; set; }
         public virtual SubPremise IdSubPremisesNavigation { get; set; }
 
-        public string GetAddress()
-        {
-            if (IdSubPremisesNavigation == null)
-                throw new Exception("IdSubPremisesNavigation не подгружен");
-            if (IdSubPremisesNavigation.IdPremisesNavigation == null)
-                throw new Exception("IdPremisesNavigation не подгружен");
-            if (IdSubPremisesNavigation.IdPremisesNavigation.IdPremisesTypeNavigation == null)
-                throw new Exception("IdPremisesTypeNavigation не подгружен");
-            if (IdSubPremisesNavigation.IdPremisesNavigation.IdBuildingNavigation == null)
-                throw new Exception("IdBuildingNavigation не подгружен");
-            if (IdSubPremisesNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation == null)
-                throw new Exception("IdStreetNavigation не подгружен");
-            var address =
-                IdSubPremisesNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation.StreetName +
-                ", д." + IdSubPremisesNavigation.IdPremisesNavigation.IdBuildingNavigation.House + ", " +
-                IdSubPremisesNavigation.IdPremisesNavigation.IdPremisesTypeNavigation.PremisesTypeShort +
-                IdSubPremisesNavigation.IdPremisesNavigation.PremisesNum + ", к." +
-                IdSubPremisesNavigation.SubPremisesNum;
-            return address;
-        }
-
         public bool Equals(OwnerSubPremiseAssoc ospa)
         {
             if (ospa == null)

@@ -85,15 +85,15 @@ namespace RegistryWeb.DataServices
                 var curOwnerProcessAddresses = new List<string>();
                 foreach (var oba in buildingsAssoc.Where(oba => oba.IdProcess == ownerProcess.IdProcess))
                 {
-                    curOwnerProcessAddresses.Add(oba.GetAddress());
+                    curOwnerProcessAddresses.Add(oba.IdBuildingNavigation.GetAddress());
                 }
                 foreach (var opa in premisesAssoc.Where(opa => opa.IdProcess == ownerProcess.IdProcess))
                 {
-                    curOwnerProcessAddresses.Add(opa.GetAddress());
+                    curOwnerProcessAddresses.Add(opa.IdPremisesNavigation.GetAddress());
                 }
                 foreach (var ospa in subPremisesAssoc.Where(ospa => ospa.IdProcess == ownerProcess.IdProcess))
                 {
-                    curOwnerProcessAddresses.Add(ospa.GetAddress());
+                    curOwnerProcessAddresses.Add(ospa.IdSubPremisesNavigation.GetAddress());
                 }
                 addresses.Add(ownerProcess.IdProcess, curOwnerProcessAddresses);
             }

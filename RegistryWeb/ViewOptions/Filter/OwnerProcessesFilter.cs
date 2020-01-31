@@ -21,7 +21,7 @@ namespace RegistryWeb.ViewOptions.Filter
 
         public bool IsEmpty()
         {
-            return (Address.AddressType == AddressTypes.None ||
+            return (Address == null || Address.AddressType == AddressTypes.None ||
                 string.IsNullOrWhiteSpace(Address.Id) ||
                 string.IsNullOrWhiteSpace(Address.Text)) &&
                 (IdOwnerType == null || IdOwnerType.Value == 0) &&

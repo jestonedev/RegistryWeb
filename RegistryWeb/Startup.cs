@@ -47,10 +47,11 @@ namespace RegistryWeb
             services.AddTransient<PremisesListDataService>();
             services.AddTransient<OwnerProcessesDataService>();
             services.AddTransient<ChangeLogsDataService>();
-            services.AddHttpContextAccessor();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<SecurityService>();
             services.AddTransient<ReformaGKHService>();
+            services.AddTransient<ReestrEmergencyPremisesDataService>();
+            services.AddHttpContextAccessor();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<TokenApiStorage>();
         }
 

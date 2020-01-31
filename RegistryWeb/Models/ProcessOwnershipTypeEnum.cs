@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 
 namespace RegistryWeb.Models
 {
-    public interface IAddressAssoc
+    public enum ProcessOwnershipTypeEnum
     {
+        Private, //частный
+        Municipal //муниципальный
     }
 }
