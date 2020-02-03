@@ -1,97 +1,18 @@
 ﻿@model RegistryWeb.ViewModel.ReestrEmergencyPremisesVM;
 @{
     ViewData["Title"] = "Реестр жилых и (или) не жилых помещений МКД, признанных аварийными на " + DateTime.Now.ToString("dd.MM.yyyy");
+    var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
+        "(" + Model.PageOptions.TotalRows + ")" :
+        "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
 }
 
-<h2>@ViewData["Title"]</h2>
-<div class="btn-group" role="group">
-    <button type="button" class="btn btn-primary" id="toggleReestrStatistic">Статистика</button>
-    <a asp-action="Reestr" class="btn btn-primary">Скачать</a>
-</div>
+<h2>@ViewData["Title"] @text</h2>
 
-<table class="table table-bordered" id="reestrStatistic">
-    <thead>
-        <tr>
-            <th>Дата актуализации</th>
-            <th>Количество МКД</th>
-            <th>Количество помещений</th>
-            <th>Мун. помещений</th>
-            <th>Част. помещений</th>
-            <th>Количество жителей</th>
-            <th>Общая S помещений</th>
-            <th>Жилая S помещенийй</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td class="date_S"></td>
-            <td class="countMKD_S"></td>
-            <td class="countPremAndSubPrem_S"></td>
-            <td class="countTenancy_S"></td>
-            <td class="countOwner_S"></td>
-            <td class="countInhabitant_S"></td>
-            <td class="totalAreaSum_S"></td>
-            <td class="livingAreaSum_S"></td>
-        </tr>
-    </tbody>
-</table>
-<form asp-action="Index" method="get" class="r-filter-form">
-    <input type="hidden" asp-for="OrderOptions.OrderDirection" />
-    <input type="hidden" asp-for="OrderOptions.OrderField" />
-    <input type="hidden" asp-for="PageOptions.CurrentPage" />
-    <input type="hidden" asp-for="PageOptions.SizePage" />
-    <input type="hidden" asp-for="FilterOptions.Address.AddressType" />
-    <input type="hidden" asp-for="FilterOptions.Address.Id" />
-
-    @*<div class="form-row">
-        <div class="input-group col">
-            <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
-            <div class="input-group-append h-auto d-inline-block">
-                <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
-            </div>
-        </div>
-        <div class="form-group col-2">
-            <a class="btn btn-block btn-secondary" id="r-search-btn">Найти</a>
-        </div>
-    </div>*@
-</form>
-<table class="table table-bordered" id="reestr">
-    <thead>
-        <tr>
-            <th>Адрес</th>
-            <th>Форма собственности</th>
-            <th>Наниматель / Собственник</th>
-            <th>Общая S помещений</th>
-            <th>Жилая S помещенийй</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Reestr)
-        {
-            <tr>
-                <td>@Html.Raw(item.Addresses.Aggregate((x, y) => x + ";<br />" + y))</td>
-                <td>
-                    @if (item.Type == ProcessOwnershipTypeEnum.Private)
-                    { <p>Частная</p>}
-                    else
-                    {<p>Муниципальная</p>}
-                </td>
-                <td>@Html.Raw(@item.Persons.Split(',').Aggregate((x, y) => x + ";<br />" + y))</td>
-                <td>@item.TotalArea</td>
-                <td>@item.LivingArea</td>
-                <td>
-                    @if (@item.Type == ProcessOwnershipTypeEnum.Private)
-                    {
-                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                           asp-action="Details" asp-controller="OwnerProcesses" asp-route-idProcess="@item.Id"></a>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@Html.Partial("StatisticDownload", Model)
+@Html.Partial("Filter", Model)
+@Html.Partial("DataTable", Model)
 <page-link page-model="Model.PageOptions" page-action="Index"></page-link>
+
 @section Scripts {
     <script src="~/js/reestrEmergencyPremises.common.js" asp-append-version="true"></script>
 }

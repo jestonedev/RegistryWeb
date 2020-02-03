@@ -1,0 +1,31 @@
+﻿@model RegistryWeb.ViewModel.ReestrEmergencyPremisesVM;
+<div class="btn-group" role="group">
+    <button type="button" class="btn btn-primary" id="toggleReestrStatistic">Статистика</button>
+    <a asp-action="Reestr" class="btn btn-primary">Скачать</a>
+</div>
+<table class="table table-bordered" id="reestrStatistic">
+    <thead>
+        <tr>
+            <th>Дата актуализации</th>
+            <th>Количество МКД</th>
+            <th>Количество помещений</th>
+            <th>Мун. помещений</th>
+            <th>Част. помещений</th>
+            <th>Количество жителей</th>
+            <th>Общая S помещений</th>
+            <th>Жилая S помещенийй</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="date_S"></td>
+            <td class="countMKD_S"></td>
+            <td class="countPremAndSubPrem_S"></td>
+            <td class="countTenancy_S"></td>
+            <td class="countOwner_S"></td>
+            <td class="countInhabitant_S"></td>
+            <td class="totalAreaSum_S"></td>
+            <td class="livingAreaSum_S"></td>
+        </tr>
+    </tbody>
+</table>
