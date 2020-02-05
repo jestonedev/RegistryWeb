@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace RegistryWeb.Models.Entities
 {
-    public class TenancyBuildingAssoc
+    public class TenancyBuildingAssoc : IBuildingAssoc
     {
         public int IdAssoc { get; set; }
         public int IdBuilding { get; set; }

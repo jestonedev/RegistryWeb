@@ -45,7 +45,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_process")
                 .HasColumnType("int(11)");
 
-            builder.HasOne(d => d.IdPremisesNavigation)
+            builder.HasOne(d => d.PremiseNavigation)
                 .WithMany(p => p.OwnerPremisesAssoc)
                 .HasForeignKey(d => d.IdPremise)
                 .HasConstraintName("FK_owner_premises_assoc_id_premise");

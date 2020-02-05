@@ -2,7 +2,7 @@
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class OwnerSubPremiseAssoc : IAddressAssoc, IEquatable<OwnerSubPremiseAssoc>
+    public partial class OwnerSubPremiseAssoc : ISubPremiseAssoc, IAddressAssoc, IEquatable<OwnerSubPremiseAssoc>
     {
         public int IdAssoc { get; set; }
         public int IdSubPremise { get; set; }
@@ -10,7 +10,7 @@ namespace RegistryWeb.Models.Entities
         public byte Deleted { get; set; }
 
         public virtual OwnerProcess IdProcessNavigation { get; set; }
-        public virtual SubPremise IdSubPremisesNavigation { get; set; }
+        public virtual SubPremise SubPremiseNavigation { get; set; }
 
         public bool Equals(OwnerSubPremiseAssoc ospa)
         {

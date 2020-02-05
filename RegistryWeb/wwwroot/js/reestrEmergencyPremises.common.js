@@ -2,6 +2,9 @@
     var reestrStatistic = $('#reestrStatistic');
     var toggleReestrStatistic = $('#toggleReestrStatistic');
     reestrStatistic.hide();
+    $('#r-search-btn').click(function () {
+        $("form.r-filter-form").submit();
+    });
     $('.page-link').click(function () {
         $('input[name="PageOptions.CurrentPage"]').val($(this).data("page"));
         $("form.r-filter-form").submit();

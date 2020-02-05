@@ -5,6 +5,7 @@
             <th width="380px" class="align-middle">Адрес</th>
             <th width="120px" class="align-middle">Форма собственности</th>
             <th width="300px" class="align-middle">Наниматель / Собственник</th>
+            <th class="align-middle">Количество комнат</th>
             <th class="align-middle">Общая S помещений</th>
             <th class="align-middle">Жилая S помещенийй</th>
             <th width="70px"></th>
@@ -17,6 +18,7 @@
                 <td class="align-middle">@Html.Raw(item.Addresses.Aggregate((x, y) => x + ";<br />" + y))</td>
                 <td class="align-middle">@item.Type.GetRuName()</td>
                 <td class="align-middle">@Html.Raw(@item.Persons.Split(',').Aggregate((x, y) => x + ";<br />" + y))</td>
+                <td class="align-middle">@item.NumRooms</td>
                 <td class="align-middle">@item.TotalArea</td>
                 <td class="align-middle">@item.LivingArea</td>
                 <td class="align-middle">

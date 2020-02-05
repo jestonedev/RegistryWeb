@@ -6,8 +6,21 @@ using System.Threading.Tasks;
 
 namespace RegistryWeb.ViewOptions.Filter
 {
-    public class ReestrEmergencyPremisesFilter : FilterOptions
+    public class ReestrEmergencyPremisesFilter : FilterAddressOptions
     {
-        public Address Address { get; set; }
+        public ReestrEmergencyPremisesFilter() : base()
+        {
+        }
+
+        public ProcessOwnershipTypeEnum ProcessOwnershipType { get; set; }
+        public string Persons { get; set; }
+
+        public bool IsEmpty()
+        {
+            return IsAddressEmpty() &&
+                ProcessOwnershipType == ProcessOwnershipTypeEnum.All &&
+                string.IsNullOrWhiteSpace(Persons);
+        }
+        
     }
 }

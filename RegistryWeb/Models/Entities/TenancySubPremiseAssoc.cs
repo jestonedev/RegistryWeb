@@ -1,6 +1,6 @@
 ﻿namespace RegistryWeb.Models.Entities
 {
-    public class TenancySubPremiseAssoc
+    public class TenancySubPremiseAssoc : ISubPremiseAssoc
     {
         public int IdAssoc { get; set; }
         public int IdSubPremise { get; set; }

@@ -50,7 +50,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasForeignKey(d => d.IdProcess)
                 .HasConstraintName("FK_owner_sub_premises_assoc_id_process");
 
-            builder.HasOne(d => d.IdSubPremisesNavigation)
+            builder.HasOne(d => d.SubPremiseNavigation)
                 .WithMany(p => p.OwnerSubPremisesAssoc)
                 .HasForeignKey(d => d.IdSubPremise)
                 .HasConstraintName("FK_owner_sub_premises_assoc_id_sub_premise");

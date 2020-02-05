@@ -11,6 +11,7 @@ namespace RegistryWeb.Models
         public IEnumerable<string> Addresses { get; set; }
         public string Persons { get; set; }
         public ProcessOwnershipTypeEnum Type { get; set; }
+        public int NumRooms { get; set; }
         public double TotalArea { get; set; }
         public double LivingArea { get; set; }
     }
