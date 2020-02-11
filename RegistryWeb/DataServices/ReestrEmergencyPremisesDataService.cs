@@ -12,73 +12,19 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace RegistryWeb.DataServices
 {
     public class ReestrEmergencyPremisesDataService : ListDataService<ReestrEmergencyPremisesVM, ReestrEmergencyPremisesFilter>
     {
-        private readonly IQueryable<OwnerBuildingAssoc> ownerBuildingsAssoc;
-        private readonly IQueryable<OwnerPremiseAssoc> ownerPremisesAssoc;
-        private readonly IQueryable<OwnerSubPremiseAssoc> ownerSubPremisesAssoc;
-
-        private readonly IQueryable<TenancyBuildingAssoc> tenancyBuildingsAssoc;
-        private readonly IQueryable<TenancyPremiseAssoc> tenancyPremisesAssoc;
-        private readonly IQueryable<TenancySubPremiseAssoc> tenancySubPremisesAssoc;
-
         private readonly string connString;
         private readonly string activityManagerPath;
 
+        private IEnumerable<ProcessOwnership> tenancyProcessesReestr;
+        private IEnumerable<ProcessOwnership> onwerProcessesReestr;
+
         public ReestrEmergencyPremisesDataService(RegistryContext registryContext, IConfiguration config, IHttpContextAccessor httpContextAccessor) : base(registryContext)
         {
-            ownerBuildingsAssoc = registryContext.OwnerBuildingsAssoc
-                .Include(oba => oba.BuildingNavigation)
-                    .ThenInclude(b => b.IdStreetNavigation)
-                .Include(oba => oba.IdProcessNavigation)
-                .AsNoTracking();
-            ownerPremisesAssoc = registryContext.OwnerPremisesAssoc
-                .Include(opa => opa.PremiseNavigation)
-                    .ThenInclude(p => p.IdBuildingNavigation)
-                        .ThenInclude(b => b.IdStreetNavigation)
-                .Include(opa => opa.PremiseNavigation)
-                    .ThenInclude(p => p.IdPremisesTypeNavigation)
-                .Include(oba => oba.IdProcessNavigation)
-                .AsNoTracking();
-            ownerSubPremisesAssoc = registryContext.OwnerSubPremisesAssoc
-                .Include(ospa => ospa.SubPremiseNavigation)
-                    .ThenInclude(sp => sp.IdPremisesNavigation)
-                        .ThenInclude(p => p.IdBuildingNavigation)
-                            .ThenInclude(b => b.IdStreetNavigation)
-                .Include(ospa => ospa.SubPremiseNavigation)
-                    .ThenInclude(sp => sp.IdPremisesNavigation)
-                        .ThenInclude(p => p.IdPremisesTypeNavigation)
-                .Include(oba => oba.IdProcessNavigation)
-                .AsNoTracking();
-
-            tenancyBuildingsAssoc = registryContext.TenancyBuildingsAssoc
-                .Include(oba => oba.BuildingNavigation)
-                    .ThenInclude(b => b.IdStreetNavigation)
-                .Include(oba => oba.ProcessNavigation)
-                .AsNoTracking();
-            tenancyPremisesAssoc = registryContext.TenancyPremisesAssoc
-                .Include(opa => opa.PremiseNavigation)
-                    .ThenInclude(p => p.IdBuildingNavigation)
-                        .ThenInclude(b => b.IdStreetNavigation)
-                .Include(opa => opa.PremiseNavigation)
-                    .ThenInclude(p => p.IdPremisesTypeNavigation)
-                .Include(oba => oba.ProcessNavigation)
-                .AsNoTracking();
-            tenancySubPremisesAssoc = registryContext.TenancySubPremisesAssoc
-                .Include(ospa => ospa.SubPremiseNavigation)
-                    .ThenInclude(sp => sp.IdPremisesNavigation)
-                        .ThenInclude(p => p.IdBuildingNavigation)
-                            .ThenInclude(b => b.IdStreetNavigation)
-                .Include(ospa => ospa.SubPremiseNavigation)
-                    .ThenInclude(sp => sp.IdPremisesNavigation)
-                        .ThenInclude(p => p.IdPremisesTypeNavigation)
-                .Include(oba => oba.ProcessNavigation)
-                .AsNoTracking();
-
             connString = httpContextAccessor.HttpContext.User.FindFirst("connString").Value;
             activityManagerPath = config.GetValue<string>("ActivityManagerPath");
         }
@@ -96,59 +42,170 @@ namespace RegistryWeb.DataServices
         {
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
             var mkd = GetEmergencyMKD();
-            var tenancyProcessesReestr = GetTenancyProcessesReestr(mkd);
-            var onwerProcessesReestr = GetOwnerProcessesReestr(mkd);
+            tenancyProcessesReestr = GetTenancyProcessesReestr(mkd);
+            onwerProcessesReestr = GetOwnerProcessesReestr(mkd);
             var reestr = tenancyProcessesReestr.Union(onwerProcessesReestr);
-            viewModel.PageOptions.TotalRows = reestr.Count();
             reestr = ReestrFilter(reestr, viewModel.FilterOptions);
             var count = reestr.Count();
-            viewModel.PageOptions.Rows = count;
-            if (!viewModel.FilterOptions.IsEmpty())
-                viewModel.PageOptions.CurrentPage = 1;
+            viewModel.PageOptions.Rows = count;                
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+            if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
+                viewModel.PageOptions.CurrentPage = 1;
             viewModel.Reestr = GetReestrPage(reestr, viewModel.PageOptions).ToList();
             return viewModel;
         }
 
-        private IQueryable<ProcessOwnership> ReestrFilter(IQueryable<ProcessOwnership> reestr, ReestrEmergencyPremisesFilter filterOptions)
+        private IEnumerable<ProcessOwnership> ReestrFilter(IEnumerable<ProcessOwnership> reestr, ReestrEmergencyPremisesFilter filterOptions)
         {
             if (!filterOptions.IsEmpty())
             {
                 reestr = ProcessOwnershipTypeFilter(reestr, filterOptions);
                 reestr = PersonsFilter(reestr, filterOptions);
-                reestr = AddressFilter(reestr, filterOptions);
+                reestr = AddressFilter2(reestr, filterOptions);
             }
             return reestr;
         }
 
-        private IQueryable<ProcessOwnership> ProcessOwnershipTypeFilter(IQueryable<ProcessOwnership> reestr, ReestrEmergencyPremisesFilter filterOptions)
+        private IEnumerable<ProcessOwnership> ProcessOwnershipTypeFilter(IEnumerable<ProcessOwnership> reestr, ReestrEmergencyPremisesFilter filterOptions)
         {
             if (filterOptions.ProcessOwnershipType == ProcessOwnershipTypeEnum.All)
                 return reestr;
             return reestr.Where(r => r.Type == filterOptions.ProcessOwnershipType);
         }
 
-        private IQueryable<ProcessOwnership> PersonsFilter(IQueryable<ProcessOwnership> reestr, ReestrEmergencyPremisesFilter filterOptions)
+        private IEnumerable<ProcessOwnership> PersonsFilter(IEnumerable<ProcessOwnership> reestr, ReestrEmergencyPremisesFilter filterOptions)
         {
             if (string.IsNullOrWhiteSpace(filterOptions.Persons))
                 return reestr;
             return reestr.Where(p => p.Persons.ToLower().Contains(filterOptions.Persons.Trim().ToLower()));
         }
 
-        private IQueryable<ProcessOwnership> AddressFilter(IQueryable<ProcessOwnership> reestr, ReestrEmergencyPremisesFilter filterOptions)
+        private IEnumerable<ProcessOwnership> AddressFilter2(IEnumerable<ProcessOwnership> reestr, ReestrEmergencyPremisesFilter filterOptions)
         {
             if (filterOptions.IsAddressEmpty())
                 return reestr;
+            int id = 0;
+            int.TryParse(filterOptions.Address.Id, out id);
+            var tenancyProcess = (
+                from tp in registryContext.TenancyProcesses
+                join tba in registryContext.TenancyBuildingsAssoc
+                    on tp.IdProcess equals tba.IdProcess into TbaL
+                from subTbaL in TbaL.DefaultIfEmpty()
+                join tpa in registryContext.TenancyPremisesAssoc
+                    on tp.IdProcess equals tpa.IdProcess into TpaL
+                from subTpaL in TpaL.DefaultIfEmpty()
+                join tspa in registryContext.TenancySubPremisesAssoc
+                    on tp.IdProcess equals tspa.IdProcess into TspaL
+                from subTspaL in TspaL.DefaultIfEmpty()
+                where
+                    subTbaL != null && subTbaL.BuildingNavigation.IdStreet.Equals(filterOptions.Address.Id) ||
+                    subTpaL != null && subTpaL.PremiseNavigation.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id) ||
+                    subTspaL != null && subTspaL.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id) ||
+                    subTbaL != null && subTbaL.BuildingNavigation.IdBuilding == id ||
+                    subTpaL != null && subTpaL.PremiseNavigation.IdBuildingNavigation.IdBuilding == id ||
+                    subTspaL != null && subTspaL.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdBuilding == id ||
+                    subTpaL != null && subTpaL.PremiseNavigation.IdPremises == id ||
+                    subTspaL != null && subTspaL.SubPremiseNavigation.IdPremisesNavigation.IdPremises == id ||
+                    subTspaL != null && subTspaL.SubPremiseNavigation.IdSubPremises == id
+                select tp).ToList();
+            var ownerProcess = (
+                from op in registryContext.OwnerProcesses
+                join oba in registryContext.OwnerBuildingsAssoc
+                    on op.IdProcess equals oba.IdProcess into ObaL
+                from subObaL in ObaL.DefaultIfEmpty()
+                join opa in registryContext.OwnerPremisesAssoc
+                    on op.IdProcess equals opa.IdProcess into OpaL
+                from subOpaL in OpaL.DefaultIfEmpty()
+                join ospa in registryContext.OwnerSubPremisesAssoc
+                    on op.IdProcess equals ospa.IdProcess into OspaL
+                from subOspaL in OspaL.DefaultIfEmpty()
+                where                    
+                    subObaL != null && subObaL.BuildingNavigation.IdStreet.Equals(filterOptions.Address.Id) ||
+                    subOpaL != null && subOpaL.PremiseNavigation.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id) ||
+                    subOspaL != null && subOspaL.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id) ||
+                    subObaL != null && subObaL.BuildingNavigation.IdBuilding == id ||
+                    subOpaL != null && subOpaL.PremiseNavigation.IdBuildingNavigation.IdBuilding == id ||
+                    subOspaL != null && subOspaL.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdBuilding == id ||
+                    subOpaL != null && subOpaL.PremiseNavigation.IdPremises == id ||
+                    subOspaL != null && subOspaL.SubPremiseNavigation.IdPremisesNavigation.IdPremises == id ||
+                    subOspaL != null && subOspaL.SubPremiseNavigation.IdSubPremises == id
+                select op).ToList();
+            var pr1 =
+                from r in reestr
+                join tp in tenancyProcess
+                    on r.Id equals tp.IdProcess
+                where r.Type == ProcessOwnershipTypeEnum.Municipal
+                select r;
+            var pr2 =
+                from r in reestr
+                join op in ownerProcess
+                    on r.Id equals op.IdProcess
+                where r.Type == ProcessOwnershipTypeEnum.Private
+                select r;
+            var pr = pr1.Union(pr2);
+            return pr;
+        }
+
+        private IEnumerable<ProcessOwnership> AddressFilter(IEnumerable<ProcessOwnership> reestr, ReestrEmergencyPremisesFilter filterOptions)
+        {
+            if (filterOptions.IsAddressEmpty())
+                return reestr;
+            var ownerBuildingsAssoc = registryContext.OwnerBuildingsAssoc
+                .Include(oba => oba.BuildingNavigation)
+                    .ThenInclude(b => b.IdStreetNavigation)
+                .Include(oba => oba.IdProcessNavigation)
+                .AsNoTracking();
+            var ownerPremisesAssoc = registryContext.OwnerPremisesAssoc
+                .Include(opa => opa.PremiseNavigation)
+                    .ThenInclude(p => p.IdBuildingNavigation)
+                        .ThenInclude(b => b.IdStreetNavigation)
+                .Include(opa => opa.PremiseNavigation)
+                    .ThenInclude(p => p.IdPremisesTypeNavigation)
+                .Include(oba => oba.IdProcessNavigation)
+                .AsNoTracking();
+            var ownerSubPremisesAssoc = registryContext.OwnerSubPremisesAssoc
+                .Include(ospa => ospa.SubPremiseNavigation)
+                    .ThenInclude(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdBuildingNavigation)
+                            .ThenInclude(b => b.IdStreetNavigation)
+                .Include(ospa => ospa.SubPremiseNavigation)
+                    .ThenInclude(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdPremisesTypeNavigation)
+                .Include(oba => oba.IdProcessNavigation)
+                .AsNoTracking();
+            var tenancyBuildingsAssoc = registryContext.TenancyBuildingsAssoc
+                .Include(oba => oba.BuildingNavigation)
+                    .ThenInclude(b => b.IdStreetNavigation)
+                .Include(oba => oba.ProcessNavigation)
+                .AsNoTracking();
+            var tenancyPremisesAssoc = registryContext.TenancyPremisesAssoc
+                .Include(opa => opa.PremiseNavigation)
+                    .ThenInclude(p => p.IdBuildingNavigation)
+                        .ThenInclude(b => b.IdStreetNavigation)
+                .Include(opa => opa.PremiseNavigation)
+                    .ThenInclude(p => p.IdPremisesTypeNavigation)
+                .Include(oba => oba.ProcessNavigation)
+                .AsNoTracking();
+            var tenancySubPremisesAssoc = registryContext.TenancySubPremisesAssoc
+                .Include(ospa => ospa.SubPremiseNavigation)
+                    .ThenInclude(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdBuildingNavigation)
+                            .ThenInclude(b => b.IdStreetNavigation)
+                .Include(ospa => ospa.SubPremiseNavigation)
+                    .ThenInclude(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdPremisesTypeNavigation)
+                .Include(oba => oba.ProcessNavigation)
+                .AsNoTracking();
             if (filterOptions.ProcessOwnershipType == ProcessOwnershipTypeEnum.Private)
-                return GetAddressFilter(reestr, filterOptions, ownerBuildingsAssoc, ownerPremisesAssoc, ownerSubPremisesAssoc);
+                return GetAddressFilter(reestr, ProcessOwnershipTypeEnum.Private, filterOptions, ownerBuildingsAssoc, ownerPremisesAssoc, ownerSubPremisesAssoc);
             if (filterOptions.ProcessOwnershipType == ProcessOwnershipTypeEnum.Municipal)
-                return GetAddressFilter(reestr, filterOptions, tenancyBuildingsAssoc, tenancyPremisesAssoc, tenancySubPremisesAssoc);
-            var ownerReestr = GetAddressFilter(reestr, filterOptions, ownerBuildingsAssoc, ownerPremisesAssoc, ownerSubPremisesAssoc);
-            var tenancyReestr = GetAddressFilter(reestr, filterOptions, tenancyBuildingsAssoc, tenancyPremisesAssoc, tenancySubPremisesAssoc);
+                return GetAddressFilter(reestr, ProcessOwnershipTypeEnum.Municipal, filterOptions, tenancyBuildingsAssoc, tenancyPremisesAssoc, tenancySubPremisesAssoc);
+            var ownerReestr = GetAddressFilter(reestr, ProcessOwnershipTypeEnum.Private, filterOptions, ownerBuildingsAssoc, ownerPremisesAssoc, ownerSubPremisesAssoc);
+            var tenancyReestr = GetAddressFilter(reestr, ProcessOwnershipTypeEnum.Municipal, filterOptions, tenancyBuildingsAssoc, tenancyPremisesAssoc, tenancySubPremisesAssoc);
             return ownerReestr.Union(tenancyReestr);
         }
 
-        private IQueryable<ProcessOwnership> GetAddressFilter(IQueryable<ProcessOwnership> reestr, ReestrEmergencyPremisesFilter filterOptions,
+        private IEnumerable<ProcessOwnership> GetAddressFilter(IEnumerable<ProcessOwnership> reestr, ProcessOwnershipTypeEnum type, ReestrEmergencyPremisesFilter filterOptions,
             IQueryable<IBuildingAssoc> buildingsAssoc, IQueryable<IPremiseAssoc> premisesAssoc, IQueryable<ISubPremiseAssoc> subPremisesAssoc)
         {
             if (filterOptions.Address.AddressType == AddressTypes.Street)
@@ -163,11 +220,12 @@ namespace RegistryWeb.DataServices
                     .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id))
                     .Select(ospa => ospa.IdProcess);
                 var idProcesses = idBuildingProcesses.Union(idPremiseProcesses).Union(idSubPremiseProcesses);
-                //query.Join(idProcesses, q => q.IdProcess, idProc => idProc, (q, idProc) => q);
-                return
+                var results = (
                     from r in reestr
                     join idProcess in idProcesses on r.Id equals idProcess
-                    select r;
+                    where r.Type == type
+                    select r).ToList();
+                return results;
             }
             int id = 0;
             if (!int.TryParse(filterOptions.Address.Id, out id))
@@ -184,10 +242,12 @@ namespace RegistryWeb.DataServices
                     .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuilding == id)
                     .Select(ospa => ospa.IdProcess);
                 var idProcesses = idBuildingProcesses.Union(idPremiseProcesses).Union(idSubPremiseProcesses);
-                return
+                var results = (
                     from r in reestr
                     join idProcess in idProcesses on r.Id equals idProcess
-                    select r;
+                    where r.Type == type
+                    select r).ToList();
+                return results;
             }
             if (filterOptions.Address.AddressType == AddressTypes.Premise)
             {
@@ -198,25 +258,29 @@ namespace RegistryWeb.DataServices
                     .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdPremises == id)
                     .Select(ospa => ospa.IdProcess);
                 var idProcesses = idPremiseProcesses.Union(idSubPremiseProcesses);
-                return
+                var results = (
                     from r in reestr
                     join idProcess in idProcesses on r.Id equals idProcess
-                    select r;
+                    where r.Type == type
+                    select r).ToList();
+                return results;
             }
             if (filterOptions.Address.AddressType == AddressTypes.SubPremise)
             {
                 var idProcesses = subPremisesAssoc
                     .Where(ospa => ospa.SubPremiseNavigation.IdSubPremises == id)
                     .Select(ospa => ospa.IdProcess);
-                return
-                    from q in reestr
-                    join idProcess in idProcesses on q.Id equals idProcess
-                    select q;
+                var results = (
+                    from r in reestr
+                    join idProcess in idProcesses on r.Id equals idProcess
+                    where r.Type == type
+                    select r).ToList();
+                return results;
             }
             return reestr;
         }
 
-        private IQueryable<ProcessOwnership> GetReestrPage(IQueryable<ProcessOwnership> reestr, PageOptions pageOptions)
+        private IEnumerable<ProcessOwnership> GetReestrPage(IEnumerable<ProcessOwnership> reestr, PageOptions pageOptions)
         {
             return reestr
                 .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
@@ -251,7 +315,7 @@ namespace RegistryWeb.DataServices
             }
         }
 
-        internal IQueryable<Building> GetEmergencyMKD()
+        internal List<Building> GetEmergencyMKD()
         {
             var numbers = new int[] { 1, 2, 6, 7 };
             var mkd = (
@@ -275,10 +339,10 @@ namespace RegistryWeb.DataServices
                 where ttt.owr.IdOwnershipRightType == 7
                 select b
             );
-            return mkd;
+            return mkd.ToList();
         }
 
-        internal IQueryable<ProcessOwnership> GetTenancyProcessesReestr(IEnumerable<Building> mkd)
+        internal List<ProcessOwnership> GetTenancyProcessesReestr(IEnumerable<Building> mkd)
         {
             var tap1 =
                 from tap in registryContext.TenancyActiveProcesses
@@ -345,11 +409,11 @@ namespace RegistryWeb.DataServices
                     NumRooms = procGr.Sum(sp => sp.numRooms),
                     TotalArea = procGr.Sum(sp => sp.totalArea),
                     LivingArea = procGr.Sum(sp => sp.livingArea)
-                };        
-            return tap1.Union(tap2);
+                };
+            return tap1.Union(tap2).ToList();
         }
 
-        internal IQueryable<ProcessOwnership> GetOwnerProcessesReestr(IEnumerable<Building> mkd)
+        internal List<ProcessOwnership> GetOwnerProcessesReestr(IEnumerable<Building> mkd)
         {
             var oap1 =
                 from oap in registryContext.OwnerActiveProcesses
@@ -417,7 +481,7 @@ namespace RegistryWeb.DataServices
                     TotalArea = procGr.Sum(sp => sp.totalArea),
                     LivingArea = procGr.Sum(sp => sp.livingArea)
                 };
-            return oap1.Union(oap2);
+            return oap1.Union(oap2).ToList();
         }
     }
 }
