@@ -20,8 +20,8 @@ namespace RegistryWeb.DataServices
         private readonly string connString;
         private readonly string activityManagerPath;
 
-        private IEnumerable<ProcessOwnership> tenancyProcessesReestr;
-        private IEnumerable<ProcessOwnership> onwerProcessesReestr;
+        private List<ProcessOwnership> tenancyProcessesReestr;
+        private List<ProcessOwnership> onwerProcessesReestr;
 
         public ReestrEmergencyPremisesDataService(RegistryContext registryContext, IConfiguration config, IHttpContextAccessor httpContextAccessor) : base(registryContext)
         {
@@ -107,7 +107,7 @@ namespace RegistryWeb.DataServices
                     subTpaL != null && subTpaL.PremiseNavigation.IdPremises == id ||
                     subTspaL != null && subTspaL.SubPremiseNavigation.IdPremisesNavigation.IdPremises == id ||
                     subTspaL != null && subTspaL.SubPremiseNavigation.IdSubPremises == id
-                select tp).ToList();
+                select tp);
             var ownerProcess = (
                 from op in registryContext.OwnerProcesses
                 join oba in registryContext.OwnerBuildingsAssoc
@@ -119,7 +119,7 @@ namespace RegistryWeb.DataServices
                 join ospa in registryContext.OwnerSubPremisesAssoc
                     on op.IdProcess equals ospa.IdProcess into OspaL
                 from subOspaL in OspaL.DefaultIfEmpty()
-                where                    
+                where
                     subObaL != null && subObaL.BuildingNavigation.IdStreet.Equals(filterOptions.Address.Id) ||
                     subOpaL != null && subOpaL.PremiseNavigation.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id) ||
                     subOspaL != null && subOspaL.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id) ||
@@ -129,7 +129,7 @@ namespace RegistryWeb.DataServices
                     subOpaL != null && subOpaL.PremiseNavigation.IdPremises == id ||
                     subOspaL != null && subOspaL.SubPremiseNavigation.IdPremisesNavigation.IdPremises == id ||
                     subOspaL != null && subOspaL.SubPremiseNavigation.IdSubPremises == id
-                select op).ToList();
+                select op);
             var pr1 =
                 from r in reestr
                 join tp in tenancyProcess
@@ -224,7 +224,7 @@ namespace RegistryWeb.DataServices
                     from r in reestr
                     join idProcess in idProcesses on r.Id equals idProcess
                     where r.Type == type
-                    select r).ToList();
+                    select r);
                 return results;
             }
             int id = 0;
@@ -246,7 +246,7 @@ namespace RegistryWeb.DataServices
                     from r in reestr
                     join idProcess in idProcesses on r.Id equals idProcess
                     where r.Type == type
-                    select r).ToList();
+                    select r);
                 return results;
             }
             if (filterOptions.Address.AddressType == AddressTypes.Premise)
@@ -262,7 +262,7 @@ namespace RegistryWeb.DataServices
                     from r in reestr
                     join idProcess in idProcesses on r.Id equals idProcess
                     where r.Type == type
-                    select r).ToList();
+                    select r);
                 return results;
             }
             if (filterOptions.Address.AddressType == AddressTypes.SubPremise)
@@ -274,7 +274,7 @@ namespace RegistryWeb.DataServices
                     from r in reestr
                     join idProcess in idProcesses on r.Id equals idProcess
                     where r.Type == type
-                    select r).ToList();
+                    select r);
                 return results;
             }
             return reestr;
@@ -342,7 +342,7 @@ namespace RegistryWeb.DataServices
             return mkd.ToList();
         }
 
-        internal List<ProcessOwnership> GetTenancyProcessesReestr(IEnumerable<Building> mkd)
+        internal List<ProcessOwnership> GetTenancyProcessesReestr(List<Building> mkd)
         {
             var tap1 =
                 from tap in registryContext.TenancyActiveProcesses
@@ -413,7 +413,7 @@ namespace RegistryWeb.DataServices
             return tap1.Union(tap2).ToList();
         }
 
-        internal List<ProcessOwnership> GetOwnerProcessesReestr(IEnumerable<Building> mkd)
+        internal List<ProcessOwnership> GetOwnerProcessesReestr(List<Building> mkd)
         {
             var oap1 =
                 from oap in registryContext.OwnerActiveProcesses
