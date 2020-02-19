@@ -20,9 +20,6 @@ namespace RegistryWeb.DataServices
         private readonly string connString;
         private readonly string activityManagerPath;
 
-        private List<ProcessOwnership> tenancyProcessesReestr;
-        private List<ProcessOwnership> onwerProcessesReestr;
-
         public ReestrEmergencyPremisesDataService(RegistryContext registryContext, IConfiguration config, IHttpContextAccessor httpContextAccessor) : base(registryContext)
         {
             connString = httpContextAccessor.HttpContext.User.FindFirst("connString").Value;
@@ -42,9 +39,10 @@ namespace RegistryWeb.DataServices
         {
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
             var mkd = GetEmergencyMKD();
-            tenancyProcessesReestr = GetTenancyProcessesReestr(mkd);
-            onwerProcessesReestr = GetOwnerProcessesReestr(mkd);
+            var tenancyProcessesReestr = GetTenancyProcessesReestr(mkd);
+            var onwerProcessesReestr = GetOwnerProcessesReestr(mkd);
             var reestr = tenancyProcessesReestr.Union(onwerProcessesReestr);
+            viewModel.PageOptions.TotalRows = reestr.Count();
             reestr = ReestrFilter(reestr, viewModel.FilterOptions);
             var count = reestr.Count();
             viewModel.PageOptions.Rows = count;                
@@ -295,6 +293,24 @@ namespace RegistryWeb.DataServices
                 var p = new Process();
                 var configXml = activityManagerPath + "templates\\registry_web\\owners\\reestr.xml";
                 var destFileName = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", "reestr_" + Guid.NewGuid().ToString() + ".docx");
+
+                //var mkd = GetEmergencyMKD();
+                //var idsTenancyProcessesReestr = GetTenancyProcessesReestr(mkd)
+                //    .Select(t => t.Id.ToString())
+                //    .Aggregate((k, m) =>  k + "," + m);
+                //var fileName1 = Path.GetTempFileName();
+                //using (var sw = new StreamWriter(fileName1))
+                //    sw.Write(idsTenancyProcessesReestr);
+                //var idsTmpFileTenancy = fileName1;
+                //var idsOnwerProcessesReestr = GetOwnerProcessesReestr(mkd)
+                //    .Select(t => t.Id.ToString())
+                //    .Aggregate((k, m) => k + "," + m);
+                //var fileName2 = Path.GetTempFileName();
+                //using (var sw = new StreamWriter(fileName2))
+                //    sw.Write(idsTenancyProcessesReestr);
+                //var idsTmpFileOnwer = fileName2;
+                //var ids = "\" idsTmpFileTenancy=\"" + idsTmpFileTenancy + "\" idsTmpFileOnwer=\"" + idsTmpFileOnwer;
+
                 p.StartInfo.UseShellExecute = false;
                 p.StartInfo.FileName = activityManagerPath + "ActivityManager.exe";
                 p.StartInfo.Arguments = " config=\"" + configXml + "\" destFileName=\"" + destFileName +

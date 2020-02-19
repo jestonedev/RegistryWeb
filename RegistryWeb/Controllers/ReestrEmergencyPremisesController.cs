@@ -64,7 +64,7 @@ namespace RegistryWeb.Controllers
             var mkd = dataService.GetEmergencyMKD();
             var tenancyProcessesReestr = dataService.GetTenancyProcessesReestr(mkd);
             var onwerProcessesReestr = dataService.GetOwnerProcessesReestr(mkd);
-            var reestr = tenancyProcessesReestr.Union(onwerProcessesReestr).ToList();
+            var reestr = tenancyProcessesReestr.Union(onwerProcessesReestr);
             var date = @DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
             var countMKD = mkd.Count();
             var countTenancy = tenancyProcessesReestr.Count();
