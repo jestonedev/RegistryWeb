@@ -20,7 +20,7 @@ namespace RegistryWeb.Models.Entities
         public DateTime? DemolishPlanDate { get; set; }
         public byte Deleted { get; set; }
 
-        public virtual OwnershipRightType IdOwnershipRightTypeNavigation { get; set; }
+        public virtual OwnershipRightType OwnershipRightTypeNavigation { get; set; }
         public virtual IList<OwnershipBuildingAssoc> OwnershipBuildingsAssoc { get; set; }
         public virtual IList<OwnershipPremiseAssoc> OwnershipPremisesAssoc { get; set; }
     }

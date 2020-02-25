@@ -9,7 +9,7 @@ namespace RegistryWeb.Models.Entities
         public int IdOwnershipRight { get; set; }
         public byte Deleted { get; set; }
 
-        public virtual OwnershipRight IdOwnershipRightNavigation { get; set; }
-        public virtual Premise IdPremisesNavigation { get; set; }
+        public virtual OwnershipRight OwnershipRightNavigation { get; set; }
+        public virtual Premise PremisesNavigation { get; set; }
     }
 }

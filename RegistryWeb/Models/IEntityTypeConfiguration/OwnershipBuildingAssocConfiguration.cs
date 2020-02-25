@@ -38,7 +38,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnType("tinyint(1)")
                 .HasDefaultValueSql("0");
 
-            builder.HasOne(d => d.IdOwnershipRightNavigation)
+            builder.HasOne(d => d.OwnershipRightNavigation)
                 .WithMany(p => p.OwnershipBuildingsAssoc)
                 .HasForeignKey(d => d.IdOwnershipRight)
                 .OnDelete(DeleteBehavior.ClientSetNull);

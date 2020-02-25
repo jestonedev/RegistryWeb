@@ -60,7 +60,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("resettle_plan_date")
                 .HasColumnType("date");
 
-            builder.HasOne(d => d.IdOwnershipRightTypeNavigation)
+            builder.HasOne(d => d.OwnershipRightTypeNavigation)
                 .WithMany(p => p.OwnershipRights)
                 .HasForeignKey(d => d.IdOwnershipRightType)
                 .OnDelete(DeleteBehavior.ClientSetNull)

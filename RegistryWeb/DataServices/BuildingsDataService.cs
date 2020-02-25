@@ -10,21 +10,21 @@ using System;
 
 namespace RegistryWeb.DataServices
 {
-    public class BuildingsListDataService : ListDataService<BuildingsListVM, BuildingsListFilter>
+    public class BuildingsDataService : ListDataService<BuildingsVM, BuildingsFilter>
     {
-        public BuildingsListDataService(RegistryContext registryContext) : base(registryContext) { }
+        public BuildingsDataService(RegistryContext registryContext) : base(registryContext) { }
 
-        public override BuildingsListVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, BuildingsListFilter filterOptions)
+        public override BuildingsVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, BuildingsFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
             viewModel.ObjectStates = registryContext.ObjectStates;
             return viewModel;
         }
 
-        public BuildingsListVM GetViewModel(
+        public BuildingsVM GetViewModel(
             OrderOptions orderOptions,
             PageOptions pageOptions,
-            BuildingsListFilter filterOptions)
+            BuildingsFilter filterOptions)
         {
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
             var query = GetQuery();
@@ -34,7 +34,7 @@ namespace RegistryWeb.DataServices
             var count = query.Count();
             viewModel.PageOptions.Rows = count;
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
-            viewModel.Buildings = GetQueryPage(query, viewModel.PageOptions);
+            viewModel.Buildings = GetQueryPage(query, viewModel.PageOptions).ToList();
             return viewModel;
         }
 
@@ -48,7 +48,7 @@ namespace RegistryWeb.DataServices
                 .Where(b => b.Deleted == 0)
                 .OrderBy(b => b.IdBuilding);
         }
-        private IQueryable<Building> GetQueryFilter(IQueryable<Building> query, BuildingsListFilter filterOptions)
+        private IQueryable<Building> GetQueryFilter(IQueryable<Building> query, BuildingsFilter filterOptions)
         {
             if (!string.IsNullOrEmpty(filterOptions.Street))
             {
@@ -80,9 +80,41 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
-        public List<Building> GetQueryPage(IQueryable<Building> query, PageOptions pageOptions)
-            => query
+        public IQueryable<Building> GetQueryPage(IQueryable<Building> query, PageOptions pageOptions)
+        {
+            return query
             .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
-            .Take(pageOptions.SizePage).ToList();
+            .Take(pageOptions.SizePage);
+        }
+
+        public Building GetBuilding(int idBuilding)
+        {
+            return registryContext.Buildings
+                .Include(b => b.IdStreetNavigation)
+                .Include(b => b.IdHeatingTypeNavigation)
+                .Include(b => b.IdStateNavigation)
+                .Include(b => b.IdStructureTypeNavigation)
+                .SingleOrDefault(b => b.IdBuilding == idBuilding);
+        }
+
+        public IEnumerable<ObjectState> ObjectStates
+        {
+            get => registryContext.ObjectStates.AsNoTracking();
+        }
+
+        public IEnumerable<StructureType> StructureTypes
+        {
+            get => registryContext.StructureTypes.AsNoTracking();
+        }
+
+        public IEnumerable<KladrStreet> KladrStreets
+        {
+            get => registryContext.KladrStreets.AsNoTracking();
+        }
+
+        public IEnumerable<HeatingType> HeatingTypes
+        {
+            get => registryContext.HeatingTypes.AsNoTracking();
+        }
     }
 }

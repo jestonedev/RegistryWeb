@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace RegistryWeb.ViewOptions.Filter
 {
-    public class BuildingsListFilter : FilterOptions
+    public class BuildingsFilter : FilterOptions
     {
         public string Street { get; set; }
         public int? IdObjectState { get; set; }

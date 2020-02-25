@@ -38,12 +38,12 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnType("tinyint(1)")
                 .HasDefaultValueSql("0");
 
-            builder.HasOne(d => d.IdOwnershipRightNavigation)
+            builder.HasOne(d => d.OwnershipRightNavigation)
                 .WithMany(p => p.OwnershipPremisesAssoc)
                 .HasForeignKey(d => d.IdOwnershipRight)
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
-            builder.HasOne(d => d.IdPremisesNavigation)
+            builder.HasOne(d => d.PremisesNavigation)
                 .WithMany(p => p.OwnershipPremisesAssoc)
                 .HasForeignKey(d => d.IdPremises);
 

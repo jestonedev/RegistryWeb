@@ -142,7 +142,7 @@ namespace RegistryWeb.Controllers
             return GetOwnerProcessView(ownerProcess);
         }
 
-        public IActionResult GetOwnerProcessView(OwnerProcess ownerProcess, [CallerMemberName]string action = "")
+        private IActionResult GetOwnerProcessView(OwnerProcess ownerProcess, [CallerMemberName]string action = "")
         {
             ViewBag.Action = action;
             var ownerProcessVM = new OwnerProcessVM();

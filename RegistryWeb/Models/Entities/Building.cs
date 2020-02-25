@@ -30,23 +30,23 @@ namespace RegistryWeb.Models.Entities
         public decimal CadastralCost { get; set; }
         public decimal BalanceCost { get; set; }
         public int StartupYear { get; set; }
-        public byte Improvement { get; set; }
-        public byte Elevator { get; set; }
-        public byte? RubbishChute { get; set; }
+        public bool Improvement { get; set; }
+        public bool Elevator { get; set; }
+        public bool? RubbishChute { get; set; }
         public double? Wear { get; set; }
         public string Description { get; set; }
         public DateTime? StateDate { get; set; }
-        public byte? Plumbing { get; set; }
-        public byte? HotWaterSupply { get; set; }
-        public byte? Canalization { get; set; }
-        public byte? Electricity { get; set; }
-        public byte? RadioNetwork { get; set; }
+        public bool? Plumbing { get; set; }
+        public bool? HotWaterSupply { get; set; }
+        public bool? Canalization { get; set; }
+        public bool? Electricity { get; set; }
+        public bool? RadioNetwork { get; set; }
         public int? IdHeatingType { get; set; }
         public string BtiRooms { get; set; }
         public string HousingCooperative { get; set; }
         public DateTime RegDate { get; set; }
         public decimal RentCoefficient { get; set; }
-        public byte IsMemorial { get; set; }
+        public bool IsMemorial { get; set; }
         public DateTime? DemolishedFactDate { get; set; }
         public string LandCadastralNum { get; set; }
         public DateTime? LandCadastralDate { get; set; }
