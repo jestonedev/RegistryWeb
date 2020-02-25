@@ -17,11 +17,9 @@ namespace RegistryWeb.ViewComponents
             this.registryContext = registryContext;
         }
 
-        public IViewComponentResult Invoke(int idBuilding, int id, string action)
+        public IViewComponentResult Invoke(int idBuilding, string action)
         {
-            ViewBag.Id = id;
             ViewBag.Action = action;
-            //ViewBag.OwnershipRightTypes = registryContext.OwnershipRightTypes;
             var model = GetQueryOwnershipRights(idBuilding);
             return View("OwnershipRights", model);
         }
@@ -30,9 +28,9 @@ namespace RegistryWeb.ViewComponents
         {
             return registryContext.OwnershipBuildingsAssoc
                 .Include(oba => oba.OwnershipRightNavigation)
-                    .ThenInclude(or => or.OwnershipRightTypeNavigation)
                 .Where(oba => oba.IdBuilding == idBuilding)
                 .Select(oba => oba.OwnershipRightNavigation)
+                .Include(or => or.OwnershipRightTypeNavigation)
                 .OrderBy(or => or.Date);
         }
     }
