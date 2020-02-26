@@ -31,7 +31,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public JsonResult AutocompleteFilterOptionsAddress(string text)
+        public JsonResult AutocompleteFilterOptionsAddress(string text, bool isBuldings = false)
         {
             var addressWords = text.Trim().Split(' ');
             var street = addressWords[0].ToLowerInvariant();
@@ -62,7 +62,7 @@ namespace RegistryWeb.Controllers
                             b.IdBuilding.ToString(),
                             string.Concat(b.IdStreetNavigation.StreetName, ", д.", b.House)));
                 }
-                else
+                else if (!isBuldings)
                 {
                     var premiseNum = addressWords[2].ToLowerInvariant();
                     if (addressWords.Length == 3)

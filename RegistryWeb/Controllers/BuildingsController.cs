@@ -22,10 +22,18 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
+            ViewBag.ObjectStates = dataService.ObjectStates;
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
                 viewModel.FilterOptions));
+        }
+
+        public IActionResult BuildingReports(BuildingsVM viewModel)
+        {
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+                return View("NotAccess");
+            return View("NotAccess");
         }
 
         public IActionResult Details(int? idBuilding)
@@ -39,7 +47,6 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             return GetBuildingView(building);
         }
-
 
         public IActionResult GetBuildingView(Building building, [CallerMemberName]string action = "")
         {

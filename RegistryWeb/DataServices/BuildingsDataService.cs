@@ -17,7 +17,6 @@ namespace RegistryWeb.DataServices
         public override BuildingsVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, BuildingsFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
-            viewModel.ObjectStates = registryContext.ObjectStates;
             return viewModel;
         }
 
@@ -42,21 +41,44 @@ namespace RegistryWeb.DataServices
         {
             return registryContext.Buildings
                 .Include(b => b.IdStreetNavigation)
-                .Include(b => b.IdHeatingTypeNavigation)
                 .Include(b => b.IdStateNavigation)
-                .Include(b => b.IdStructureTypeNavigation)
                 .Where(b => b.Deleted == 0)
                 .OrderBy(b => b.IdBuilding);
         }
+
         private IQueryable<Building> GetQueryFilter(IQueryable<Building> query, BuildingsFilter filterOptions)
         {
-            if (!string.IsNullOrEmpty(filterOptions.Street))
+            if (!filterOptions.IsEmpty())
             {
-                query = query.Where(b => b.IdStreetNavigation.StreetLong.ToLowerInvariant().Contains(filterOptions.Street.ToLowerInvariant()));
+                query = AddressFilter(query, filterOptions);
+                query = ObjectStateFilter(query, filterOptions);
             }
-            if (filterOptions.IdObjectState.HasValue)
+            return query;
+        }
+
+        private IQueryable<Building> ObjectStateFilter(IQueryable<Building> query, BuildingsFilter filterOptions)
+        {
+            if (filterOptions.IdObjectState.HasValue && filterOptions.IdObjectState.Value != 0)
             {
-                query = query.Where(b =>b.IdStateNavigation.IdState == filterOptions.IdObjectState.Value);
+                query = query.Where(b => b.IdStateNavigation.IdState == filterOptions.IdObjectState.Value);
+            }
+            return query;
+        }
+
+        private IQueryable<Building> AddressFilter(IQueryable<Building> query, BuildingsFilter filterOptions)
+        {
+            if (filterOptions.IsAddressEmpty())
+                return query;
+            if (filterOptions.Address.AddressType == AddressTypes.Street)
+            {
+                return query.Where(q => q.IdStreet.Equals(filterOptions.Address.Id));
+            }
+            int id = 0;
+            if (!int.TryParse(filterOptions.Address.Id, out id))
+                return query;
+            if (filterOptions.Address.AddressType == AddressTypes.Building)
+            {
+                return query.Where(q => q.IdBuilding == id);
             }
             return query;
         }

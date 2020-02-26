@@ -5,9 +5,14 @@ using System.Threading.Tasks;
 
 namespace RegistryWeb.ViewOptions.Filter
 {
-    public class BuildingsFilter : FilterOptions
+    public class BuildingsFilter : FilterAddressOptions
     {
-        public string Street { get; set; }
         public int? IdObjectState { get; set; }
+
+        public bool IsEmpty()
+        {
+            return IsAddressEmpty() &&
+                (IdObjectState == null || IdObjectState.Value == 0);
+        }
     }
 }
