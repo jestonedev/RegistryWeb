@@ -25,7 +25,6 @@
 	});
 }
 var reestrStatisticToggle = function (event) {
-	console.log($(this));
 	var reestrStatistic = $('#reestrStatistic');
 	var toggleReestrStatistic = $('#toggleReestrStatistic');
 	if (reestrStatistic.is(":hidden")) {
