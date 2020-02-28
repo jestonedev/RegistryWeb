@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using RegistryWeb.SecurityServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System;
 
 namespace RegistryWeb
 {
@@ -43,6 +44,14 @@ namespace RegistryWeb
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.Cookie.Name = ".RegistryWeb.Session";
+                options.IdleTimeout = TimeSpan.FromSeconds(3600);
+                options.Cookie.IsEssential = true;
+            });
+
             services.AddTransient<BuildingsDataService>();
             services.AddTransient<PremisesListDataService>();
             services.AddTransient<OwnerProcessesDataService>();
@@ -72,6 +81,7 @@ namespace RegistryWeb
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseAuthentication();
+            app.UseSession();
 
             app.UseMvc(routes =>
             {

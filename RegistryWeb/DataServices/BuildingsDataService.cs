@@ -119,6 +119,13 @@ namespace RegistryWeb.DataServices
                 .SingleOrDefault(b => b.IdBuilding == idBuilding);
         }
 
+        public IEnumerable<Building> GetBuildings(List<int> ids)
+        {
+            return registryContext.Buildings
+                .Include(b => b.IdStreetNavigation)
+                .Where(b => ids.Contains(b.IdBuilding));
+        }
+
         public IEnumerable<ObjectState> ObjectStates
         {
             get => registryContext.ObjectStates.AsNoTracking();

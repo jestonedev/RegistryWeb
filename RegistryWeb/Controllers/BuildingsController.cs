@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
+using RegistryWeb.Extensions;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace RegistryWeb.Controllers
@@ -29,11 +32,66 @@ namespace RegistryWeb.Controllers
                 viewModel.FilterOptions));
         }
 
-        public IActionResult BuildingReports(BuildingsVM viewModel)
+        public IActionResult BuildingReports()
         {
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
-            return View("NotAccess");
+            if (HttpContext.Session.Keys.Contains("idBuildings"))
+            {
+                var ids = HttpContext.Session.Get<List<int>>("idBuildings");
+                if (ids.Any())
+                {
+                    var buildings = dataService.GetBuildings(ids);
+                    return View("BuildingReports", buildings);
+                }
+            }
+            return View("BuildingReports", new List<Building>());
+        }
+
+        //[HttpPost]
+        //public IActionResult BuildingReports()
+        //{
+        //    if (!securityService.HasPrivilege(Privileges.RegistryRead))
+        //        return View("NotAccess");
+            
+        //    return View("BuildingReports");
+        //}
+
+        [HttpPost]
+        public void SessionIdBuildings(int idBuilding, bool isCheck)
+        {
+            List<int> ids;
+            if (HttpContext.Session.Keys.Contains("idBuildings"))
+            {
+                ids = HttpContext.Session.Get<List<int>>("idBuildings");
+            }
+            else
+            {
+                ids = new List<int>();
+            }
+            if (isCheck)
+            {
+                ids.Add(idBuilding);
+            }
+            else if(ids.Any())
+            {
+                ids.Remove(idBuilding);
+            }
+            HttpContext.Session.Set("idBuildings", ids);
+        }
+
+        public IActionResult SessionIdBuildingsClear()
+        {
+            HttpContext.Session.Remove("idBuildings");
+            return BuildingReports();
+        }
+
+        public IActionResult SessionIdBuildingRemove(int idBuilding)
+        {
+            var ids = HttpContext.Session.Get<List<int>>("idBuildings");
+            ids.Remove(idBuilding);
+            HttpContext.Session.Set("idBuildings", ids);
+            return BuildingReports();
         }
 
         public IActionResult Details(int? idBuilding)
@@ -58,10 +116,10 @@ namespace RegistryWeb.Controllers
             return View("Building", building);
         }
 
-        public IActionResult Error()
+        public IActionResult Error(string message = "")
         {
-            //ViewData["TextError"] = "Тип используется в основаниях собственности!";
-            ViewData["Controller"] = "OwnerProcesses";
+            ViewData["TextError"] = message;
+            ViewData["Controller"] = "Buildings";
             return View("Error");
         }
     }

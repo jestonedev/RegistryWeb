@@ -47,11 +47,21 @@ var formSubmit = function () {
 	$('#FilterOptions_Address_Text').prop("disabled", false);
 	$("form.r-filter-form").submit();
 };
+
 $(function () {
 	autocompleteFilterOptionsAddress();
 	$('#FilterOptions_Address_Text').focusout(focusOutFilterOptionsAddress);
 	$('#addressFilterClearBtn').click(addressFilterClear);
-	$('#r-search-btn').click(formSubmit);
+    $('#r-search-btn').click(formSubmit);
+
+    $('.idBuildingCheckbox').click(function (e) {
+        var id = +$(this).data('id');
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/Buildings/SessionIdBuildings',
+            data: { idBuilding: id, isCheck: $(this).prop('checked') }
+        });
+    });
 	//$("a.sort").click(function () {
 	//	$('input[name="OrderOptions.OrderField"]').val($(this).data("order-field"));
 	//	$('input[name="OrderOptions.OrderDirection"]').val($(this).data("order-direction"));
