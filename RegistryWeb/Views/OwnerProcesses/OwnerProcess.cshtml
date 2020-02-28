@@ -1,6 +1,8 @@
-﻿@model RegistryWeb.Models.Entities.OwnerProcess;
-@{ 
+﻿@using RegistryWeb.Extensions;
+@model RegistryWeb.Models.Entities.OwnerProcess;
+@{
     var annulChecked = Model.AnnulDate == null ? "checked" : "";
+    var controller = Context.Session.Get<string>("Controller");
 }
 <form asp-controller="OwnerProcesses" asp-action="@ViewBag.Action" id="r-ownerprocess-form" data-action="@ViewBag.Action" method="post">
     <div class="card">
@@ -11,7 +13,7 @@
                 <sup class="badge badge-danger ml-2" id="annulBadge">Аннулирован</sup>
             </div>
             <div class="btn-group" role="group" aria-label="Панель доступа">
-                <a class="form-control btn btn-primary" asp-controller="OwnerProcesses" asp-action="Index">Назад</a>
+                <a class="form-control btn btn-primary" asp-controller="@controller" asp-action="Index" asp-route-isBack="true">Назад</a>
                 @if (ViewBag.Action == "Create")
                 {
                     <input type="submit" value="Создать" class="form-control btn btn-success" />
@@ -135,5 +137,5 @@
                 <textarea rows="3" asp-for="Comment" class="form-control card-body"></textarea>
             </div>
         </div>
-        </div>
+    </div>
 </form>

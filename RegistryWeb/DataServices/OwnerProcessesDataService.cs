@@ -61,9 +61,9 @@ namespace RegistryWeb.DataServices
             query = GetQueryOrder(query, viewModel.OrderOptions);
             var count = query.Count();
             viewModel.PageOptions.Rows = count;
-            if (!viewModel.FilterOptions.IsEmpty())
-                viewModel.PageOptions.CurrentPage = 1;
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+            if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
+                viewModel.PageOptions.CurrentPage = 1;
             viewModel.OwnerProcesses = GetQueryPage(query, viewModel.PageOptions).ToList();
             viewModel.Addresses = GetAddresses(viewModel.OwnerProcesses);
             return viewModel;

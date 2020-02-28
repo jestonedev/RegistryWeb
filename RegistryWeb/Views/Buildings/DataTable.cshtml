@@ -2,7 +2,11 @@
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.Extensions;
 @{ 
-    var ids = Context.Session.Get<List<int>>("idBuildings");
+    var ids = Context.Session.Get<List<int>>("idBuildings") ?? new List<int>();
+    Context.Session.Set("Controller", "Buildings");
+    Context.Session.Set("OrderOptions",Model.OrderOptions);
+    Context.Session.Set("FilterOptions", Model.FilterOptions);
+    Context.Session.Set("PageOptions", Model.PageOptions);
     var check = "";
 }
 <table class="table table-hover">

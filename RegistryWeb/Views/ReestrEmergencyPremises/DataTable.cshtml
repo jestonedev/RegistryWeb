@@ -1,5 +1,11 @@
 ﻿@using RegistryWeb.Extensions;
 @model RegistryWeb.ViewModel.ReestrEmergencyPremisesVM;
+@{
+    Context.Session.Set("Controller", "ReestrEmergencyPremises");
+    Context.Session.Set("OrderOptions", Model.OrderOptions);
+    Context.Session.Set("FilterOptions", Model.FilterOptions);
+    Context.Session.Set("PageOptions", Model.PageOptions);
+}
 <table class="table table-bordered" id="reestr">
     <thead>
         <tr>

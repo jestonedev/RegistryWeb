@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.DataServices;
+using RegistryWeb.Extensions;
 using RegistryWeb.Models;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
+using RegistryWeb.ViewOptions;
+using RegistryWeb.ViewOptions.Filter;
 
 namespace RegistryWeb.Controllers
 {
@@ -31,10 +29,22 @@ namespace RegistryWeb.Controllers
             this.registryContext = registryContext;
         }
 
-        public IActionResult Index(ReestrEmergencyPremisesVM viewModel)
+        public IActionResult Index(ReestrEmergencyPremisesVM viewModel, bool isBack = false)
         {
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
+            if (isBack)
+            {
+                viewModel.OrderOptions = HttpContext.Session.Get<OrderOptions>("OrderOptions");
+                viewModel.PageOptions = HttpContext.Session.Get<PageOptions>("PageOptions");
+                viewModel.FilterOptions = HttpContext.Session.Get<ReestrEmergencyPremisesFilter>("FilterOptions");
+            }
+            else
+            {
+                HttpContext.Session.Remove("OrderOptions");
+                HttpContext.Session.Remove("PageOptions");
+                HttpContext.Session.Remove("FilterOptions");
+            }
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
@@ -80,7 +90,7 @@ namespace RegistryWeb.Controllers
         public IActionResult Error(string msg)
         {
             ViewData["TextError"] = new HtmlString(msg);
-            ViewData["Controller"] = "OwnerReports";
+            ViewData["Controller"] = "ReestrEmergencyPremises";
             return View("Error");
         }
     }

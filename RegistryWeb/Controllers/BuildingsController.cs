@@ -5,6 +5,8 @@ using RegistryWeb.Extensions;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
+using RegistryWeb.ViewOptions;
+using RegistryWeb.ViewOptions.Filter;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -19,12 +21,24 @@ namespace RegistryWeb.Controllers
         {
         }
 
-        public IActionResult Index(BuildingsVM viewModel)
+        public IActionResult Index(BuildingsVM viewModel, bool isBack = false)
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
+            if (isBack)
+            {
+                viewModel.OrderOptions = HttpContext.Session.Get<OrderOptions>("OrderOptions");
+                viewModel.PageOptions = HttpContext.Session.Get<PageOptions>("PageOptions");
+                viewModel.FilterOptions = HttpContext.Session.Get<BuildingsFilter>("FilterOptions");
+            }
+            else
+            {
+                HttpContext.Session.Remove("OrderOptions");
+                HttpContext.Session.Remove("PageOptions");
+                HttpContext.Session.Remove("FilterOptions");
+            }
             ViewBag.ObjectStates = dataService.ObjectStates;
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,

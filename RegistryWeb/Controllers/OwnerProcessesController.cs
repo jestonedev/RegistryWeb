@@ -3,9 +3,12 @@ using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
+using RegistryWeb.Extensions;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
+using RegistryWeb.ViewOptions;
+using RegistryWeb.ViewOptions.Filter;
 
 namespace RegistryWeb.Controllers
 {
@@ -17,12 +20,24 @@ namespace RegistryWeb.Controllers
         {
         }
 
-        public IActionResult Index(OwnerProcessesVM viewModel)
+        public IActionResult Index(OwnerProcessesVM viewModel, bool isBack = false)
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
+            if (isBack)
+            {
+                viewModel.OrderOptions = HttpContext.Session.Get<OrderOptions>("OrderOptions");
+                viewModel.PageOptions = HttpContext.Session.Get<PageOptions>("PageOptions");
+                viewModel.FilterOptions = HttpContext.Session.Get<OwnerProcessesFilter>("FilterOptions");
+            }
+            else
+            {
+                HttpContext.Session.Remove("OrderOptions");
+                HttpContext.Session.Remove("PageOptions");
+                HttpContext.Session.Remove("FilterOptions");
+            }
             ViewBag.OwnerTypes = dataService.GetOwnerTypes();
             ViewBag.SecurityService = securityService;
             return View(dataService.GetViewModel(
