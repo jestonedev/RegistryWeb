@@ -166,12 +166,5 @@ namespace RegistryWeb.Controllers
                 ownerProcessVM.Logs = dataService.GetProcessLog(ownerProcess.IdProcess);
             return View("OwnerProcessIndex", ownerProcessVM);
         }
-
-        public IActionResult Error()
-        {
-            //ViewData["TextError"] = "Тип используется в основаниях собственности!";
-            ViewData["Controller"] = "OwnerProcesses";
-            return View("Error");
-        }
     }
 }

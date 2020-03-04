@@ -12,7 +12,7 @@ using RegistryWeb.SecurityServices;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
-    public class OwnerReasonTypesController : Controller
+    public class OwnerReasonTypesController : RegistryBaseController
     {
         private readonly RegistryContext rc;
         private readonly SecurityService securityService;
@@ -107,14 +107,7 @@ namespace RegistryWeb.Controllers
                     return RedirectToAction("Index");
                 }
             }
-            return RedirectToAction("Error");
-        }
-
-        public IActionResult Error()
-        {
-            @ViewData["TextError"] = "Тип используется в основаниях собственности!";
-            ViewData["Controller"] = "OwnerReasonTypes";
-            return View("Error");
+            return Error("Тип используется в основаниях собственности!");
         }
     }
 }

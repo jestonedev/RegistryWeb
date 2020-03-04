@@ -7,12 +7,26 @@ using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 using System.Collections.Generic;
 using System;
+using System.IO;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using System.Text;
+using System.Diagnostics;
 
 namespace RegistryWeb.DataServices
 {
     public class BuildingsDataService : ListDataService<BuildingsVM, BuildingsFilter>
     {
-        public BuildingsDataService(RegistryContext registryContext) : base(registryContext) { }
+        private readonly string sqlDriver;
+        private readonly string connString;
+        private readonly string activityManagerPath;
+
+        public BuildingsDataService(RegistryContext registryContext, IConfiguration config, IHttpContextAccessor httpContextAccessor) : base(registryContext)
+        {
+            sqlDriver = config.GetValue<string>("SqlDriver");
+            connString = httpContextAccessor.HttpContext.User.FindFirst("connString").Value;
+            activityManagerPath = config.GetValue<string>("ActivityManagerPath");            
+        }
 
         public override BuildingsVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, BuildingsFilter filterOptions)
         {
@@ -144,6 +158,39 @@ namespace RegistryWeb.DataServices
         public IEnumerable<HeatingType> HeatingTypes
         {
             get => registryContext.HeatingTypes.AsNoTracking();
+        }
+
+        public byte[] Forma1(List<int> ids)
+        {
+            var logStr = new StringBuilder();
+            try
+            {
+                var p = new Process();
+                var configXml = activityManagerPath + "templates\\registry_web\\owners\\forma1.xml";
+                var destFileName = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", "forma1" + Guid.NewGuid().ToString() + ".docx");
+
+                var fileName = Path.GetTempFileName();
+                using (var sw = new StreamWriter(fileName))
+                    sw.Write(ids.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y));
+
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.FileName = activityManagerPath + "ActivityManager.exe";
+                p.StartInfo.Arguments = " config=\"" + configXml + "\" destFileName=\"" + destFileName +
+                    "\" idsTmpFile=\"" + fileName + "\" connectionString=\"Driver={" + sqlDriver + "};" + connString + "\"";
+                logStr.Append("<dl>\n<dt>Arguments\n<dd>" + p.StartInfo.Arguments + "\n");
+                p.StartInfo.CreateNoWindow = true;
+                p.Start();
+                p.WaitForExit();
+                var file = File.ReadAllBytes(destFileName);
+                File.Delete(destFileName);
+                File.Delete(fileName);
+                return file;
+            }
+            catch (Exception ex)
+            {
+                logStr.Append("<dl>\n<dt>Error\n<dd>" + ex.Message + "\n</dl>");
+                throw new Exception(logStr.ToString());
+            }
         }
     }
 }

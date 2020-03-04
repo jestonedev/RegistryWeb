@@ -17,11 +17,14 @@ namespace RegistryWeb.DataServices
 {
     public class ReestrEmergencyPremisesDataService : ListDataService<ReestrEmergencyPremisesVM, ReestrEmergencyPremisesFilter>
     {
+
+        private readonly string sqlDriver;
         private readonly string connString;
         private readonly string activityManagerPath;
 
         public ReestrEmergencyPremisesDataService(RegistryContext registryContext, IConfiguration config, IHttpContextAccessor httpContextAccessor) : base(registryContext)
         {
+            sqlDriver = config.GetValue<string>("SqlDriver");
             connString = httpContextAccessor.HttpContext.User.FindFirst("connString").Value;
             activityManagerPath = config.GetValue<string>("ActivityManagerPath");
         }
@@ -285,7 +288,7 @@ namespace RegistryWeb.DataServices
                 .Take(pageOptions.SizePage);
         }
 
-        internal byte[] GetFileReestr(string sqlDriver)
+        internal byte[] GetFileReestr()
         {
             var logStr = new StringBuilder();
             try

@@ -10,7 +10,7 @@ using RegistryWeb.Models;
 
 namespace RegistryWeb.Controllers
 {
-    public class ReformaGKHController : Controller
+    public class ReformaGKHController : RegistryBaseController
     {
         private readonly ReformaGKHService reformaGKH;
         private readonly SecurityService securityService;

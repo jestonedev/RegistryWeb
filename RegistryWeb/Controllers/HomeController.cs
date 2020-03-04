@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
-    public class HomeController : Controller
+    public class HomeController : RegistryBaseController
     {
         public IActionResult Index()
         {

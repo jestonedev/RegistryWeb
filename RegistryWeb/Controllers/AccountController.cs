@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace RegistryWeb.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : RegistryBaseController
     {
         private IConfiguration config;
         public AccountController(IConfiguration config)

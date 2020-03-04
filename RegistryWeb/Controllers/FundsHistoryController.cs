@@ -7,7 +7,7 @@ using RegistryWeb.DataServices;
 
 namespace RegistryWeb.Controllers
 {
-    public class FundsHistoryController : Controller
+    public class FundsHistoryController : RegistryBaseController
     {
         private readonly FundsHistoryDataService dataService;
 

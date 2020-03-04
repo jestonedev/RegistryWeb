@@ -16,17 +16,15 @@ using RegistryWeb.ViewOptions.Filter;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
-    public class ReestrEmergencyPremisesController : Controller
+    public class ReestrEmergencyPremisesController : RegistryBaseController
     {
         private readonly ReestrEmergencyPremisesDataService dataService;
         private readonly SecurityService securityService;
-        private readonly RegistryContext registryContext;
 
-        public ReestrEmergencyPremisesController(RegistryContext registryContext, SecurityService securityService, ReestrEmergencyPremisesDataService dataService)
+        public ReestrEmergencyPremisesController(ReestrEmergencyPremisesDataService dataService, SecurityService securityService)
         {
             this.dataService = dataService;
             this.securityService = securityService;
-            this.registryContext = registryContext;
         }
 
         public IActionResult Index(ReestrEmergencyPremisesVM viewModel, bool isBack = false)
@@ -58,7 +56,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var sqlDriver = securityService.PersonalSetting.SqlDriver.Trim();
-                var file = dataService.GetFileReestr(sqlDriver);
+                var file = dataService.GetFileReestr();
                 return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     @"Реестр жилых и (или) не жилых помещений МКД, признанных аварийными на " + DateTime.Now.ToString("dd.MM.yyyy") + ".docx");
             }
@@ -85,13 +83,6 @@ namespace RegistryWeb.Controllers
             totalAreaSum = Math.Round(totalAreaSum, 2);
             livingAreaSum = Math.Round(livingAreaSum, 2);
             return Json(new { date, countMKD, countTenancy, countOwner, countInhabitant, totalAreaSum, livingAreaSum });
-        }
-
-        public IActionResult Error(string msg)
-        {
-            ViewData["TextError"] = new HtmlString(msg);
-            ViewData["Controller"] = "ReestrEmergencyPremises";
-            return View("Error");
         }
     }
 }

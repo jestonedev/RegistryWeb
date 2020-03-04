@@ -11,7 +11,7 @@ using RegistryWeb.ViewModel;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
-    public class AddressController : Controller
+    public class AddressController : RegistryBaseController
     {
         private RegistryContext registryContext;
 

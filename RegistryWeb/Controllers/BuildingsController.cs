@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
@@ -7,6 +8,7 @@ using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -62,14 +64,25 @@ namespace RegistryWeb.Controllers
             return View("BuildingReports", new List<Building>());
         }
 
-        //[HttpPost]
-        //public IActionResult BuildingReports()
-        //{
-        //    if (!securityService.HasPrivilege(Privileges.RegistryRead))
-        //        return View("NotAccess");
-            
-        //    return View("BuildingReports");
-        //}
+        public IActionResult Forma1()
+        {
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+                return View("NotAccess");
+            if (!HttpContext.Session.Keys.Contains("idBuildings"))
+                return Error("Не выбрано ни одного здания.");
+            try
+            {
+                var sqlDriver = securityService.PersonalSetting.SqlDriver.Trim();
+                var ids = HttpContext.Session.Get<List<int>>("idBuildings");
+                var file = dataService.Forma1(ids);
+                return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    @"Форма 1. Общие сведения об аварийном многоквартирном доме г. Братск.docx");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
 
         [HttpPost]
         public void SessionIdBuildings(int idBuilding, bool isCheck)
@@ -128,13 +141,6 @@ namespace RegistryWeb.Controllers
             ViewBag.KladrStreets = dataService.KladrStreets;
             ViewBag.HeatingTypes = dataService.HeatingTypes;
             return View("Building", building);
-        }
-
-        public IActionResult Error(string message = "")
-        {
-            ViewData["TextError"] = message;
-            ViewData["Controller"] = "Buildings";
-            return View("Error");
         }
     }
 }

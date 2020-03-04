@@ -7,7 +7,7 @@ using RegistryWeb.SecurityServices;
 
 namespace RegistryWeb.Controllers
 {
-    public class PersonalSettingController : Controller
+    public class PersonalSettingController : RegistryBaseController
     {
         private RegistryContext registryContext;
         private SecurityService securityService;
