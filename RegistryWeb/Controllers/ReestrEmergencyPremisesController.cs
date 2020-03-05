@@ -77,7 +77,7 @@ namespace RegistryWeb.Controllers
             var countMKD = mkd.Count();
             var countTenancy = tenancyProcessesReestr.Count();
             var countOwner = onwerProcessesReestr.Count();
-            var countInhabitant = reestr.Sum(r => r.Persons.Split(',').Length);
+            var countInhabitant = reestr.Sum(r => r.CountPersons);
             var totalAreaSum = reestr.Sum(r => r.TotalArea);
             var livingAreaSum = reestr.Sum(r => r.LivingArea);
             totalAreaSum = Math.Round(totalAreaSum, 2);

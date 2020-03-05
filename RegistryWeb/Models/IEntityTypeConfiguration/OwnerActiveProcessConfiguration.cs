@@ -28,6 +28,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("owners")
                 .IsUnicode(false);
 
+            builder.Property(e => e.CountOwners)
+                .HasColumnName("count_owners")
+                .HasMaxLength(17)
+                .IsUnicode(false);
+
             builder.HasOne(d => d.OwnerProcessNavigation)
                 .WithOne(p => p.OwnerActiveProcessNavigation)
                 .HasForeignKey<OwnerActiveProcess>(d => d.IdProcess);

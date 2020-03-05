@@ -10,6 +10,7 @@ namespace RegistryWeb.Models
         public int Id { get; set; }
         public IEnumerable<string> Addresses { get; set; }
         public string Persons { get; set; }
+        public int CountPersons { get; set; }
         public ProcessOwnershipTypeEnum Type { get; set; }
         public int NumRooms { get; set; }
         public double TotalArea { get; set; }

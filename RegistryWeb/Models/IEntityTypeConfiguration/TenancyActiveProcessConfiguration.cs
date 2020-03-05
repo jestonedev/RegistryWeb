@@ -28,6 +28,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("tenants")
                 .IsUnicode(false);
 
+            builder.Property(e => e.CountTenants)
+                .HasColumnName("count_tenants")
+                .HasMaxLength(17)
+                .IsUnicode(false);
+
             builder.HasOne(d => d.TenancyProcessNavigation)
                 .WithOne(p => p.TenancyActiveContractNavigation)
                 .HasForeignKey<TenancyActiveProcess>(d => d.IdProcess);

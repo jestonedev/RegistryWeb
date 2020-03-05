@@ -391,6 +391,7 @@ namespace RegistryWeb.DataServices
                     Addresses = procGr.Select(p => p.address),
                     Type = ProcessOwnershipTypeEnum.Municipal,
                     Persons = procGr.Key.Tenants,
+                    CountPersons = procGr.Key.CountTenants,
                     NumRooms = procGr.Sum(p => p.numRooms),
                     TotalArea = procGr.Sum(p => p.totalArea),
                     LivingArea = procGr.Sum(p => p.livingArea)
@@ -425,6 +426,7 @@ namespace RegistryWeb.DataServices
                     Addresses = procGr.Select(sp => sp.address),
                     Type = ProcessOwnershipTypeEnum.Municipal,
                     Persons = procGr.Key.Tenants,
+                    CountPersons = procGr.Key.CountTenants,
                     NumRooms = procGr.Sum(sp => sp.numRooms),
                     TotalArea = procGr.Sum(sp => sp.totalArea),
                     LivingArea = procGr.Sum(sp => sp.livingArea)
@@ -462,6 +464,7 @@ namespace RegistryWeb.DataServices
                     Addresses = procGr.Select(p => p.address),
                     Type = ProcessOwnershipTypeEnum.Private,
                     Persons = procGr.Key.Owners,
+                    CountPersons = procGr.Key.CountOwners,
                     NumRooms = procGr.Sum(p => p.numRooms),
                     TotalArea = procGr.Sum(p => p.totalArea),
                     LivingArea = procGr.Sum(p => p.livingArea)
@@ -496,6 +499,7 @@ namespace RegistryWeb.DataServices
                     Addresses = procGr.Select(sp => sp.address),
                     Type = ProcessOwnershipTypeEnum.Private,
                     Persons = procGr.Key.Owners,
+                    CountPersons = procGr.Key.CountOwners,
                     NumRooms = procGr.Sum(sp => sp.numRooms),
                     TotalArea = procGr.Sum(sp => sp.totalArea),
                     LivingArea = procGr.Sum(sp => sp.livingArea)

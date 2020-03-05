@@ -9,6 +9,7 @@ namespace RegistryWeb.Models.Entities
     {
         public int IdProcess { get; set; }
         public string Owners { get; set; }
+        public int CountOwners { get; set; }
 
         public virtual OwnerProcess OwnerProcessNavigation { get; set; }
     }
