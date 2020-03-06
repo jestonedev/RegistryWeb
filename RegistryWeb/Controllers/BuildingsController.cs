@@ -70,10 +70,12 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             if (!HttpContext.Session.Keys.Contains("idBuildings"))
                 return Error("Не выбрано ни одного здания.");
+            var ids = HttpContext.Session.Get<List<int>>("idBuildings");
+            if (!ids.Any())
+                return Error("Не выбрано ни одного здания.");
             try
             {
                 var sqlDriver = securityService.PersonalSetting.SqlDriver.Trim();
-                var ids = HttpContext.Session.Get<List<int>>("idBuildings");
                 var file = dataService.Forma1(ids);
                 return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     @"Форма 1. Общие сведения об аварийном многоквартирном доме г. Братск.docx");

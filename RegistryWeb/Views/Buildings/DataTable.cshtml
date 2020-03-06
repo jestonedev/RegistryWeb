@@ -4,6 +4,7 @@
 @{ 
     var ids = Context.Session.Get<List<int>>("idBuildings") ?? new List<int>();
     Context.Session.Set("Controller", "Buildings");
+    Context.Session.Set("Action", "Index");
     Context.Session.Set("OrderOptions",Model.OrderOptions);
     Context.Session.Set("FilterOptions", Model.FilterOptions);
     Context.Session.Set("PageOptions", Model.PageOptions);

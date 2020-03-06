@@ -1,5 +1,8 @@
 ﻿@model IEnumerable<RegistryWeb.Models.Entities.Building>
+@using RegistryWeb.Extensions;
 @{
+    Context.Session.Set("Controller", "Buildings");
+    Context.Session.Set("Action", "BuildingReports");
     ViewData["Title"] = "Отчеты";
 }
 <h1>@ViewData["Title"]</h1>
@@ -35,18 +38,18 @@
     <tbody>
         @foreach (var item in Model)
         {
-        <tr>
-            <td>@item.IdBuilding</td>
-            <td>@item.IdStreetNavigation.StreetName, д.@item.House</td>
-            <td>
-                <div class="btn-group" role="group" aria-label="Панель доступа">
-                    <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                       asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
-                    <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                       asp-action="SessionIdBuildingRemove" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
-                </div>
-            </td>
-        </tr>
+            <tr>
+                <td>@item.IdBuilding</td>
+                <td>@item.IdStreetNavigation.StreetName, д.@item.House</td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                           asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
+                        <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                           asp-action="SessionIdBuildingRemove" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
+                    </div>
+                </td>
+            </tr>
         }
     </tbody>
 </table>

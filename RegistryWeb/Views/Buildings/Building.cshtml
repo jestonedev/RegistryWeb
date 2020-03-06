@@ -1,5 +1,8 @@
 ﻿@model RegistryWeb.Models.Entities.Building;
+@using RegistryWeb.Extensions;
 @{
+    var controller = Context.Session.Get<string>("Controller");
+    var action = Context.Session.Get<string>("Action");
     if (ViewBag.Action == "Create")
     {
         ViewData["Title"] = "Создание нового здания";
@@ -10,7 +13,7 @@
     }
 }
 <form asp-controller="Buildings" asp-action="@ViewBag.Action" id="r-buildings-form" data-action="@ViewBag.Action" method="post">
-    <a class="form-control btn btn-primary" asp-controller="Buildings" asp-action="Index" asp-route-isBack="true">Назад</a>
+    <a class="form-control btn btn-primary" asp-controller="@controller" asp-action="@action" asp-route-isBack="true">Назад</a>
     <h2>@ViewData["Title"]</h2>
     <div class="form-group">
         <label asp-for="IdState">Текущее состояние объекта</label>
