@@ -58,7 +58,7 @@ namespace RegistryWeb.Controllers
                 }
                 catch (Exception ex)
                 {
-                    return Content("Ошибка соединения\n"+ex.Message);
+                    return Error("Ошибка соединения<br />"+ex.Message);
                 }
                 return RedirectToAction("Index", "Home");
             }
