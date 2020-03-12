@@ -5,14 +5,6 @@
     $.validator.unobtrusive.parse(form);
     form.validate();
 }
-var arrowAnimation = function (arrow) {
-    if (arrow.html() === '∧') {
-        arrow.html('∨');
-    }
-    else {
-        arrow.html('∧');
-    }
-}
 var ownersToggle = function (e) {
     arrowAnimation($(this));
     $('#ownersTable').toggle();
