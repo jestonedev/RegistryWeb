@@ -55,7 +55,6 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             try
             {
-                var sqlDriver = securityService.PersonalSetting.SqlDriver.Trim();
                 var file = dataService.GetFileReestr();
                 return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     @"Реестр жилых и (или) не жилых помещений МКД, признанных аварийными на " + DateTime.Now.ToString("dd.MM.yyyy") + ".docx");

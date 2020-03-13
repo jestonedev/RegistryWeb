@@ -18,13 +18,13 @@
                 № по реестру
             </a>
         </th>*@
-            <th></th>
-            <th>№ по реестру</th>
-            <th width="350px">Адрес</th>
-            <th>Кадастровый номер</th>
-            <th>Общая площадь</th>
-            <th>Жилая площадь</th>
-            <th>Текущее состояние</th>
+            <th class="align-middle"></th>
+            <th class="align-middle">№ по реестру</th>
+            <th width="350px" class="align-middle">Адрес</th>
+            <th class="align-middle">Кадастровый номер</th>
+            <th class="align-middle">Общая площадь</th>
+            <th class="align-middle">Жилая площадь</th>
+            <th class="align-middle">Текущее состояние</th>
             @*<th class="r-table-header-cell">
             <a href="#" data-order-field="ObjectState" data-order-direction="@OrderDirection.Ascending">
                 Текущее состояние
@@ -44,14 +44,14 @@
             {
                 check = "";
             }
-            <td><input type="checkbox" class="idBuildingCheckbox" data-id="@item.IdBuilding" @Html.Raw(check) /></td>
-            <td>@item.IdBuilding</td>
-            <td>@item.IdStreetNavigation.StreetName, д.@item.House</td>
-            <td>@item.CadastralNum</td>
-            <td>@item.TotalArea</td>
-            <td>@item.LivingArea</td>
-            <td>@item.IdStateNavigation.StateNeutral</td>
-            <td>
+            <td class="align-middle"><input type="checkbox" class="idBuildingCheckbox" data-id="@item.IdBuilding" @Html.Raw(check) /></td>
+            <td class="align-middle">@item.IdBuilding</td>
+            <td class="align-middle">@item.IdStreetNavigation.StreetName, д.@item.House</td>
+            <td class="align-middle">@item.CadastralNum</td>
+            <td class="align-middle">@item.TotalArea</td>
+            <td class="align-middle">@item.LivingArea</td>
+            <td class="align-middle">@item.IdStateNavigation.StateNeutral</td>
+            <td class="align-middle">
                 <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
                    asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
                 @*<a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"

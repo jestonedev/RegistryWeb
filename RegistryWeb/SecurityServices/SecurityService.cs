@@ -11,7 +11,6 @@ namespace RegistryWeb.SecurityServices
     public class SecurityService
     {
         public AclUser User { get; set; }
-        public PersonalSetting PersonalSetting { get; set; }
         public List<AclPrivilege> Privileges { get; set; }
         public uint PrivelegesFlagValue { get; set; }
 
@@ -23,7 +22,6 @@ namespace RegistryWeb.SecurityServices
             this.httpContextAccessor = httpContextAccessor;
             this.registryContext = registryContext;
             User = GetUser();
-            PersonalSetting = GetPersonalSetting();
             Privileges = GetUserPriveleges();
             var pr = Privileges.Select(p => p.PrivilegeMask).ToList();
             if (Privileges.Count() == 0)
@@ -44,13 +42,6 @@ namespace RegistryWeb.SecurityServices
             return registryContext.AclUsers
                 .AsNoTracking()
                 .SingleOrDefault(u => u.UserName.ToLowerInvariant() == userName);
-        }
-
-        private PersonalSetting GetPersonalSetting()
-        {
-            return registryContext.PersonalSettings
-                .AsNoTracking()
-                .SingleOrDefault(ps => ps.IdUserNavigation == User);
         }
 
         private List<AclPrivilege> GetUserPriveleges()

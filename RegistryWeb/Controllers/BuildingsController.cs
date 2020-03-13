@@ -75,7 +75,6 @@ namespace RegistryWeb.Controllers
                 return Error("Не выбрано ни одного здания.");
             try
             {
-                var sqlDriver = securityService.PersonalSetting.SqlDriver.Trim();
                 var file = dataService.Forma1(ids);
                 return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     @"Форма 1. Общие сведения об аварийном многоквартирном доме г. Братск.docx");
