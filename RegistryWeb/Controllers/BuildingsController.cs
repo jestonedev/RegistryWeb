@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.Models.Entities;
+using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
@@ -18,9 +19,12 @@ namespace RegistryWeb.Controllers
     [Authorize]
     public class BuildingsController : ListController<BuildingsDataService>
     {
-        public BuildingsController(BuildingsDataService dataService, SecurityService securityService)
+        ReportService reportService;
+
+        public BuildingsController(BuildingsDataService dataService, SecurityService securityService, ReportService reportService)
             : base(dataService, securityService)
         {
+            this.reportService = reportService;
         }
 
         public IActionResult Index(BuildingsVM viewModel, bool isBack = false)
@@ -75,7 +79,7 @@ namespace RegistryWeb.Controllers
                 return Error("Не выбрано ни одного здания.");
             try
             {
-                var file = dataService.Forma1(ids);
+                var file = reportService.Forma1(ids);
                 return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     @"Форма 1. Общие сведения об аварийном многоквартирном доме г. Братск.docx");
             }

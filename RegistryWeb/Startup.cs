@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using RegistryWeb.Models.Entities;
-using Microsoft.EntityFrameworkCore;
 using RegistryWeb.DataServices;
 using RegistryWeb.Models;
 using System.Globalization;
@@ -13,6 +11,7 @@ using System.Collections.Generic;
 using RegistryWeb.SecurityServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System;
+using RegistryWeb.ReportServices;
 
 namespace RegistryWeb
 {
@@ -57,6 +56,7 @@ namespace RegistryWeb
             services.AddTransient<OwnerProcessesDataService>();
             services.AddTransient<ChangeLogsDataService>();
             services.AddTransient<SecurityService>();
+            services.AddTransient<ReportService>();
             services.AddTransient<ReformaGKHService>();
             services.AddTransient<ReestrEmergencyPremisesDataService>();
             services.AddHttpContextAccessor();
