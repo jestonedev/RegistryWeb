@@ -74,26 +74,39 @@ namespace RegistryWeb.DataServices
             return registryContext.OwnerProcesses.AsNoTracking();
         }
 
-        private Dictionary<int, IEnumerable<string>> GetAddresses(IEnumerable<OwnerProcess> ownerProcesses)
+        private Dictionary<int, List<Address>> GetAddresses(IEnumerable<OwnerProcess> ownerProcesses)
         {
-            var addresses = new Dictionary<int, IEnumerable<string>>();
+            var addresses = new Dictionary<int, List<Address>>();
             var buildingsAssoc = ownerBuildingsAssoc.ToList();
             var premisesAssoc = ownerPremisesAssoc.ToList();
             var subPremisesAssoc = ownerSubPremisesAssoc.ToList();
             foreach (var ownerProcess in ownerProcesses)
             {
-                var curOwnerProcessAddresses = new List<string>();
+                var curOwnerProcessAddresses = new List<Address>();
+                var addr = new Address();
                 foreach (var oba in buildingsAssoc.Where(oba => oba.IdProcess == ownerProcess.IdProcess))
                 {
-                    curOwnerProcessAddresses.Add(oba.BuildingNavigation.GetAddress());
+                    addr = new Address();
+                    addr.AddressType = AddressTypes.Building;
+                    addr.Id = oba.IdBuilding.ToString();
+                    addr.Text = oba.BuildingNavigation.GetAddress();
+                    curOwnerProcessAddresses.Add(addr);
                 }
                 foreach (var opa in premisesAssoc.Where(opa => opa.IdProcess == ownerProcess.IdProcess))
                 {
-                    curOwnerProcessAddresses.Add(opa.PremiseNavigation.GetAddress());
+                    addr = new Address();
+                    addr.AddressType = AddressTypes.Premise;
+                    addr.Id = opa.IdPremise.ToString();
+                    addr.Text = opa.PremiseNavigation.GetAddress();
+                    curOwnerProcessAddresses.Add(addr);
                 }
                 foreach (var ospa in subPremisesAssoc.Where(ospa => ospa.IdProcess == ownerProcess.IdProcess))
                 {
-                    curOwnerProcessAddresses.Add(ospa.SubPremiseNavigation.GetAddress());
+                    addr = new Address();
+                    addr.AddressType = AddressTypes.SubPremise;
+                    addr.Id = ospa.IdSubPremise.ToString();
+                    addr.Text = ospa.SubPremiseNavigation.GetAddress();
+                    curOwnerProcessAddresses.Add(addr);
                 }
                 addresses.Add(ownerProcess.IdProcess, curOwnerProcessAddresses);
             }

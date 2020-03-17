@@ -4,6 +4,7 @@
 @model RegistryWeb.ViewModel.OwnerProcessesVM;
 @{
     Context.Session.Set("Controller", "OwnerProcesses");
+    Context.Session.Set("Action", "Index");
     Context.Session.Set("OrderOptions", Model.OrderOptions);
     Context.Session.Set("FilterOptions", Model.FilterOptions);
     Context.Session.Set("PageOptions", Model.PageOptions);
@@ -37,7 +38,12 @@
             }
             <tr @Html.Raw(annulStyle)>
                 <td class="align-middle">@item.IdProcess</td>
-                <td class="align-middle">@Html.Raw(Model.Addresses[item.IdProcess].Aggregate((x, y) => x + ";<br />" + y))</td>
+                <td class="align-middle">
+                    @foreach (var addr in Model.Addresses[item.IdProcess])
+                    {
+                        @await Component.InvokeAsync("OwnerProcessesAddressComponent", new { address = addr, idProcess = item.IdProcess })
+                    }
+                </td>
                 <td class="align-middle">
                     <div class="btn-group" role="group" aria-label="Панель доступа">
                         <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
@@ -49,6 +55,10 @@
                             <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
                                asp-action="Delete" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
                         }
+                        <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@item.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu" aria-labelledby="reportsBtn_@item.IdProcess">
+                            <a class="dropdown-item" asp-action="Forma2" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess">Форма 2</a>
+                        </div>
                     </div>
                 </td>
             </tr>
