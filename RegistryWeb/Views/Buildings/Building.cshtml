@@ -45,7 +45,7 @@
             <div class="form-row">
                 <div class="form-group col">
                     <label asp-for="IdStreet">Улица</label>
-                    <select class="form-control" asp-for="IdState" title="Улица"
+                    <select class="form-control" asp-for="IdStreet" title="Улица"
                             asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdStreet)}"></select>
                 </div>
                 <div class="form-group col">
