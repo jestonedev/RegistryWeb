@@ -17,19 +17,33 @@ namespace RegistryWeb.ViewComponents
             this.registryContext = registryContext;
         }
 
-        public IViewComponentResult Invoke(int idBuilding, string action)
+        public IViewComponentResult Invoke(int id, AddressTypes type, string action)
         {
             ViewBag.Action = action;
-            var model = GetQueryOwnershipRights(idBuilding);
+            IQueryable<OwnershipRight> model = null;
+            if (type == AddressTypes.Building)
+                model = GetBuildingOwnershipRights(id);
+            if (type == AddressTypes.Premise)
+                model = GetPremiseOwnershipRights(id);
             return View("OwnershipRights", model);
         }
 
-        private IQueryable<OwnershipRight> GetQueryOwnershipRights(int idBuilding)
+        private IQueryable<OwnershipRight> GetBuildingOwnershipRights(int idBuilding)
         {
             return registryContext.OwnershipBuildingsAssoc
                 .Include(oba => oba.OwnershipRightNavigation)
                 .Where(oba => oba.IdBuilding == idBuilding)
                 .Select(oba => oba.OwnershipRightNavigation)
+                .Include(or => or.OwnershipRightTypeNavigation)
+                .OrderBy(or => or.Date);
+        }
+
+        private IQueryable<OwnershipRight> GetPremiseOwnershipRights(int idPremise)
+        {
+            return registryContext.OwnershipPremisesAssoc
+                .Include(opa => opa.OwnershipRightNavigation)
+                .Where(opa => opa.IdPremises == idPremise)
+                .Select(opa => opa.OwnershipRightNavigation)
                 .Include(or => or.OwnershipRightTypeNavigation)
                 .OrderBy(or => or.Date);
         }
