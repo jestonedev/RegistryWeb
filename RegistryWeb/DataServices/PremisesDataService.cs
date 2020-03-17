@@ -11,9 +11,9 @@ using System.Linq.Expressions;
 
 namespace RegistryWeb.DataServices
 {
-    public class PremisesListDataService : ListDataService<PremisesListVM, PremisesListFilter>
+    public class PremisesDataService : ListDataService<PremisesListVM, PremisesListFilter>
     {
-        public PremisesListDataService(RegistryContext rc) : base(rc) { }
+        public PremisesDataService(RegistryContext rc) : base(rc) { }
 
         public override PremisesListVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, PremisesListFilter filterOptions)
         {
@@ -25,7 +25,7 @@ namespace RegistryWeb.DataServices
         }
 
         public PremisesListVM GetViewModel(
-            OrderOptions orderOptions,
+            OrderOptions orderOptions,            
             PageOptions pageOptions,
             PremisesListFilter filterOptions)
         {
@@ -109,6 +109,34 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        private IQueryable<Premise> ObjectStateFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
+            if (filterOptions.IdObjectState.HasValue && filterOptions.IdObjectState.Value != 0)
+            {
+                query = query.Where(b => b.IdStateNavigation.IdState == filterOptions.IdObjectState.Value);
+            }
+            return query;
+        }
+
+
+        private IQueryable<Premise> AddressFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
+            if (filterOptions.IsAddressEmpty())
+                return query;
+            /*if (filterOptions.Address.AddressType == AddressTypes.Street)
+            {
+                return query.Where(q => q.IdStreet.Equals(filterOptions.Address.Id));
+            }*/
+            int id = 0;
+            if (!int.TryParse(filterOptions.Address.Id, out id))
+                return query;
+            if (filterOptions.Address.AddressType == AddressTypes.Building)
+            {
+                return query.Where(q => q.IdBuilding == id);
+            }
+            return query;
+        }
+
         private bool FilterTypeFund(Premise premise, PremisesListFilter filterOptions)
         {
             var fundsHistory = premise.FundsPremisesAssoc.Select(fpa => fpa.IdFundNavigation);
@@ -151,10 +179,47 @@ namespace RegistryWeb.DataServices
             return result.ToList();
         }
 
-        private IQueryable<Premise> GetQueryOrderMask(
-            IQueryable<Premise> query,
-            bool compare,
-            OrderOptions orderOptions,
+
+        public Premise GetPremise(int idPremise)
+        {
+            return registryContext.Premises
+                .Include(b => b.IdBuildingNavigation.IdStreetNavigation)
+                .Include(b => b.IdBuildingNavigation.IdHeatingTypeNavigation)
+                .Include(b => b.IdStateNavigation)
+                .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation)
+                .SingleOrDefault(b => b.IdPremises == idPremise);
+        }
+
+        public IEnumerable<ObjectState> ObjectStates
+        {
+            get => registryContext.ObjectStates.AsNoTracking();
+        }
+
+        public IEnumerable<StructureType> StructureTypes
+        {
+            get => registryContext.StructureTypes.AsNoTracking();
+        }
+
+        public IEnumerable<KladrStreet> KladrStreets
+        {
+            get => registryContext.KladrStreets.AsNoTracking();
+        }
+
+        public IEnumerable<HeatingType> HeatingTypes
+        {
+            get => registryContext.HeatingTypes.AsNoTracking();
+        }
+
+
+
+        public IEnumerable<Premise> GetPremises(List<int> ids)
+        {
+            return registryContext.Premises
+                .Include(b => b.IdBuildingNavigation.IdStreetNavigation)
+                .Where(b => ids.Contains(b.IdBuilding));
+        }
+
+        private IQueryable<Premise> GetQueryOrderMask(IQueryable<Premise> query, bool compare, OrderOptions orderOptions,
             Expression<Func<Premise, int>> expression)
         {
             //query = GetQueryOrderMask(

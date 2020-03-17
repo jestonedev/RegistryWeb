@@ -52,7 +52,7 @@ namespace RegistryWeb
             });
 
             services.AddTransient<BuildingsDataService>();
-            services.AddTransient<PremisesListDataService>();
+            services.AddTransient<PremisesDataService>();
             services.AddTransient<OwnerProcessesDataService>();
             services.AddTransient<ChangeLogsDataService>();
             services.AddTransient<SecurityService>();

@@ -1,4 +1,5 @@
-﻿using RegistryWeb.Models.Entities;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using RegistryWeb.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,6 @@ namespace RegistryWeb.ViewModel
     {
         public Premise Premise { get; set; }
         public IEnumerable<OwnershipRight> OwnershipRights { get; set; }
+
     }
 }

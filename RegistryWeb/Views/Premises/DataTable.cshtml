@@ -34,6 +34,7 @@
                 </a>
             </th>
             <th>Текущий фонд</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -52,14 +53,14 @@
                 <td>@item.IdStateNavigation.StateNeutral</td>
                 <td>@GetTypeFund(item)</td>
                 <td>
-                    @*<a class="btn btn-default oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                        asp-controller="Premise" asp-action="Index" asp-route-idpremises="@item.IdPremises"></a>
-                    <a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
-                        asp-controller="Premise" asp-action="Edit" asp-route-idpremises="@item.IdPremises"></a>
+                    <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                        asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises"></a>
+                    @*<a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
+                        asp-controller="Premises" asp-action="Edit" asp-route-idpremises="@item.IdPremises"></a>
                     <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                        asp-controller="Premise" asp-action="Delete" asp-route-idpremises="@item.IdPremises"></a>
+                        asp-controller="Premises" asp-action="Delete" asp-route-idpremises="@item.IdPremises"></a>
                     <a class="btn btn-default" title="История фондов" aria-label="История фондов"
-                        asp-controller="FundsHistory" asp-action="Index" asp-route-idpremises="@item.IdPremises">ф</a>*@
+                        asp-controller="FundsHistory" asp-action="Index" asp-route-idpremises="@item.IdPremises"></a>*@
                 </td>
             </tr>
         }
