@@ -81,10 +81,10 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<Premise> GetQueryFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
         {
-            if (!string.IsNullOrEmpty(filterOptions.Street))
+            /*if (!string.IsNullOrEmpty(filterOptions.Street))
             {
                 query = query.Where(p => p.IdBuildingNavigation.IdStreetNavigation.StreetLong.ToLowerInvariant().Contains(filterOptions.Street.ToLowerInvariant()));
-            }
+            }*/
             if (filterOptions.IdPremisesType.HasValue)
             {
                 query = query.Where(p => p.IdPremisesTypeNavigation.IdPremisesType == filterOptions.IdPremisesType.Value);

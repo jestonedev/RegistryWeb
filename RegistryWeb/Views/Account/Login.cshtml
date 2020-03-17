@@ -24,11 +24,18 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 </head>
 <body>
+    @if (TempData.ContainsKey("Error"))
+    {
+        <div class="col alert alert-danger">
+            @Html.Raw(TempData["Error"])
+        </div>
+    }
     <div class="wrapper">
         <div class="row">
             <div class="block">
                 <form asp-action="Login" asp-controller="Account" asp-anti-forgery="true">
                     <h2 class="form-signin-heading">Вход на сайт</h2>
+
                     <div class="validation" asp-validation-summary="ModelOnly" />
                     <div class="form-group">
                         <label asp-for="User">Введите пользователя</label>
@@ -49,25 +56,3 @@
     </div>
 </body>
 </html>
-
-
-    <!--
-    <form asp-action="Login" asp-controller="Account" asp-anti-forgery="true">
-        <div class="validation" asp-validation-summary="ModelOnly" />
-        <div>
-            <div class="form-group">
-                <label asp-for="User">Введите пользователя</label>
-                <input type="text" asp-for="User" />
-                <span asp-validation-for="User" />
-            </div>
-            <div class="form-group">
-                <label asp-for="Password">Введите пароль</label>
-                <input asp-for="Password" />
-                <span asp-validation-for="Password" />
-            </div>
-            <div class="form-group">
-                <input type="submit" class="btn" />
-            </div>
-        </div>
-    </form>
-        -->
