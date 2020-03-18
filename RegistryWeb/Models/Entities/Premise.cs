@@ -42,6 +42,7 @@ namespace RegistryWeb.Models.Entities
         public virtual PremisesComment IdPremisesCommentNavigation { get; set; }
         public virtual PremisesKind IdPremisesKindNavigation { get; set; }
         public virtual PremisesType IdPremisesTypeNavigation { get; set; }
+        public virtual PremisesDoorKeys IdPremisesDoorKeysNavigation { get; set; }
         public virtual ObjectState IdStateNavigation { get; set; }
         public virtual IList<FundPremiseAssoc> FundsPremisesAssoc { get; set; }
         public virtual IList<OwnerPremiseAssoc> OwnerPremisesAssoc { get; set; }

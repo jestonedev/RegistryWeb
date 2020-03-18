@@ -32,7 +32,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasName("FK_premises_id_premises_comment");
 
             builder.HasIndex(e => e.IdPremisesDoorKeys)
-                .HasName("FK_premises_id_premises_door_keys");
+                .HasName("FK_premises_premises_id_premises_door_keys");
 
             builder.HasIndex(e => e.IdPremisesKind)
                 .HasName("FK_premises_premises_kinds_id_premises_kind");
@@ -154,6 +154,12 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasForeignKey(d => d.IdPremisesComment)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_premises_id_premises_comment");
+
+            builder.HasOne(d => d.IdPremisesDoorKeysNavigation)
+                .WithMany(p => p.Premises)
+                .HasForeignKey(d => d.IdPremisesDoorKeys)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_premises_id_premises_door_keys");
 
             builder.HasOne(d => d.IdPremisesKindNavigation)
                 .WithMany(p => p.Premises)

@@ -48,6 +48,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<OwnershipRightType> OwnershipRightTypes { get; set; }
         public virtual DbSet<OwnershipRight> OwnershipRights { get; set; }
         public virtual DbSet<PremisesComment> PremisesComments { get; set; }
+        public virtual DbSet<PremisesDoorKeys> PremisesDoorKeys { get; set; }
         public virtual DbSet<PremisesKind> PremisesKinds { get; set; }
         public virtual DbSet<PremisesType> PremisesTypes { get; set; }
         
@@ -133,6 +134,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new ObjectStateConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new HeatingTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremisesCommentConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PremisesDoorKeysConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new OwnershipRightConfiguration(nameDatebase));            
             modelBuilder.ApplyConfiguration(new OwnershipBuildingAssocConfiguration(nameDatebase));

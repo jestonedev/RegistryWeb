@@ -7,7 +7,7 @@ namespace RegistryWeb.ViewOptions.Filter
 {
     public class PremisesListFilter : FilterAddressOptions
     {
-        public string Street { get; set; }
+        //public string Street { get; set; }
         public int? IdPremisesType { get; set; }
         public int? IdObjectState { get; set; }
         public int? IdFundType { get; set; }
