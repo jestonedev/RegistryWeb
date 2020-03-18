@@ -58,14 +58,17 @@ namespace RegistryWeb.Controllers
                 }
                 catch (Exception ex)
                 {
-                    if (ex is MySqlException && ((MySqlException)ex).Number == 0)
+                    if (ex is MySqlException)
                     {
-                        TempData["Error"] = "Логин или пароль введены неверно!";
+                        if (((MySqlException)ex)?.Number != null && ((MySqlException)ex).Number == 1042)
+                            TempData["Error"] = "Хост неизвестен!";
+
+                        if (((MySqlException)ex.InnerException)?.Number != null && ((MySqlException)ex.InnerException).Number == 1045)
+                            TempData["Error"] = "Логин или пароль введены неверно!";
                     }
                     else
-                    {
                         TempData["Error"] = "Ошибка соединения<br />" + ex.Message;
-                    }
+                    
                 }
                 return RedirectToAction("Index", "Home");
             }
