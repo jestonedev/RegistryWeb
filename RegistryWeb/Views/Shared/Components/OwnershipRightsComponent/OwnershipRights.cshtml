@@ -1,4 +1,7 @@
-﻿@model IEnumerable<RegistryWeb.Models.Entities.OwnershipRight>;
+﻿@model IEnumerable<RegistryWeb.ViewModel.OwnershipRightVM>;
+@{
+    var v = Model;
+}
 <div class="card">
     <script src="~/js/ownershipRights.common.js" asp-append-version="true"></script>
     <div class="card-header d-flex justify-content-between">
@@ -10,7 +13,10 @@
     <table class="table table-bordered card-body" id="ownershipRightsTable" style="margin-bottom:0px;">
         <thead>
             <tr>
-                <th class="align-middle">Номер в реестре</th>
+                @if (ViewBag.Type == AddressTypes.Premise)
+                {
+                <th class="align-middle">Принадлежность</th>
+                }
                 <th class="align-middle">Номер</th>
                 <th class="align-middle">Дата</th>
                 <th class="align-middle">Наименование</th>
@@ -23,7 +29,19 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td class="align-middle">@item.IdOwnershipRight</td>
+                    @if (ViewBag.Type == AddressTypes.Premise)
+                    {
+                    <td class="align-middle">
+                        @if (item.AddressType == AddressTypes.Building)
+                        {
+                            @:Здание
+                        }
+                        @if (item.AddressType == AddressTypes.Premise)
+                        {
+                            @:Помещение
+                        }
+                    </td>
+                    }
                     <td class="align-middle">@item.Number</td>
                     <td class="align-middle">@item.Date.ToShortDateString()</td>
                     <td class="align-middle">@item.Description</td>
