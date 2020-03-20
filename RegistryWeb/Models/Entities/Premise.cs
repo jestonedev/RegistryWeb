@@ -10,6 +10,7 @@ namespace RegistryWeb.Models.Entities
             FundsPremisesAssoc = new List<FundPremiseAssoc>();
             OwnerPremisesAssoc = new List<OwnerPremiseAssoc>();
             OwnershipPremisesAssoc = new List<OwnershipPremiseAssoc>();
+            //RestrictionPremisesAssoc = new List<RestrictionpPremiseAssoc>();
             SubPremises = new List<SubPremise>();
             TenancyPremisesAssoc = new List<TenancyPremiseAssoc>();
         }
@@ -47,6 +48,7 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<FundPremiseAssoc> FundsPremisesAssoc { get; set; }
         public virtual IList<OwnerPremiseAssoc> OwnerPremisesAssoc { get; set; }
         public virtual IList<OwnershipPremiseAssoc> OwnershipPremisesAssoc { get; set; }
+        public virtual IList<RestrictionPremiseAssoc> RestrictionPremisesAssoc { get; set; }
         public virtual IList<SubPremise> SubPremises { get; set; }
         public IList<TenancyPremiseAssoc> TenancyPremisesAssoc { get; set; }
 

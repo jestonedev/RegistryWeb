@@ -227,17 +227,19 @@
                 </div>
             </div>
             <br />@*&nbsp;*@
+            @*
             <!--Комнаты-->
             <div class="form-row">
                 <div class="form-group col">
                     @await Component.InvokeAsync("OwnershipRightsComponent", new { id = Model.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
                 </div>
             </div>
-            @*
+                *@
+
             <!--Реквизиты-->
             <div class="form-row">
                 <div class="form-group col">
-                    @await Component.InvokeAsync("OwnershipRightsComponent", new { id = Model.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
+                    @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
                 </div>
             </div>
 
@@ -247,7 +249,7 @@
                     @await Component.InvokeAsync("OwnershipRightsComponent", new { id = Model.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
                 </div>
             </div>
-            *@
+
         </div>
         </div>
 </form>

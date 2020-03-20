@@ -47,6 +47,12 @@ namespace RegistryWeb.Models
         public virtual DbSet<OwnershipPremiseAssoc> OwnershipPremisesAssoc { get; set; }
         public virtual DbSet<OwnershipRightType> OwnershipRightTypes { get; set; }
         public virtual DbSet<OwnershipRight> OwnershipRights { get; set; }
+
+        public virtual DbSet<RestrictionBuildingAssoc> RestrictionBuildingsAssoc { get; set; }
+        public virtual DbSet<RestrictionPremiseAssoc> RestrictionPremisesAssoc { get; set; }
+        public virtual DbSet<RestrictionType> RestrictionTypes { get; set; }
+        public virtual DbSet<Restriction> Restrictions { get; set; }
+
         public virtual DbSet<PremisesComment> PremisesComments { get; set; }
         public virtual DbSet<PremisesDoorKeys> PremisesDoorKeys { get; set; }
         public virtual DbSet<PremisesKind> PremisesKinds { get; set; }
@@ -140,6 +146,11 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new OwnershipBuildingAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnershipPremiseAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnershipRightTypeConfiguration(nameDatebase));
+
+            modelBuilder.ApplyConfiguration(new RestrictionConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new RestrictionBuildingAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new RestrictionPremiseAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new RestrictionTypeConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new FundBuildingAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new FundPremiseAssocConfiguration(nameDatebase));
