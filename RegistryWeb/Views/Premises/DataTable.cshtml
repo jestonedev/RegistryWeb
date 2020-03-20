@@ -1,7 +1,13 @@
 ﻿@model RegistryWeb.ViewModel.PremisesListVM;
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.Models.Entities;
+@using RegistryWeb.Extensions;
 @{
+    Context.Session.Set("Controller", "Premises");
+    Context.Session.Set("Action", "Index");
+    Context.Session.Set("OrderOptions", Model.OrderOptions);
+    Context.Session.Set("FilterOptions", Model.FilterOptions);
+    Context.Session.Set("PageOptions", Model.PageOptions);
     string GetTypeFund(Premise premise)
     {
         var fundsHistory = premise.FundsPremisesAssoc.Select(fpa => fpa.IdFundNavigation);
@@ -54,13 +60,13 @@
                 <td>@GetTypeFund(item)</td>
                 <td>
                     <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                        asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises"></a>
+                       asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises"></a>
                     @*<a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
-                        asp-controller="Premises" asp-action="Edit" asp-route-idpremises="@item.IdPremises"></a>
-                    <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                        asp-controller="Premises" asp-action="Delete" asp-route-idpremises="@item.IdPremises"></a>
-                    <a class="btn btn-default" title="История фондов" aria-label="История фондов"
-                        asp-controller="FundsHistory" asp-action="Index" asp-route-idpremises="@item.IdPremises"></a>*@
+                            asp-controller="Premises" asp-action="Edit" asp-route-idpremises="@item.IdPremises"></a>
+                        <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                            asp-controller="Premises" asp-action="Delete" asp-route-idpremises="@item.IdPremises"></a>
+                        <a class="btn btn-default" title="История фондов" aria-label="История фондов"
+                            asp-controller="FundsHistory" asp-action="Index" asp-route-idpremises="@item.IdPremises"></a>*@
                 </td>
             </tr>
         }

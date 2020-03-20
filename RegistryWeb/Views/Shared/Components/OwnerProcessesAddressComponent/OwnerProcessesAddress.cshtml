@@ -14,7 +14,7 @@
                 }
                 if (addr.AddressType == AddressTypes.Premise)
                 {
-                    <a class="dropdown-item" title="@ViewData["IdProcess"]_@addr.Id">Помещение</a>
+                    <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@addr.Id">Помещение</a>
                 }
                 if (addr.AddressType == AddressTypes.SubPremise)
                 {

@@ -55,24 +55,24 @@
         </div>
         <div class="card-body" id="building">
             <div class="form-row">
-                <div class="form-group col">
+                <div class="form-group col r-form-group-label">
                     <label asp-for="IdBuildingNavigation.IdStreetNavigation.IdStreet">Улица</label>
                     <select class="form-control" asp-for="IdBuildingNavigation.IdStreetNavigation.IdStreet" title="Улица"
                             asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdBuildingNavigation.IdStreet)}"></select>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col r-form-group-label">
                     <label asp-for="IdBuildingNavigation.House">Номер дома</label>
                     <input type="text" class="form-control" asp-for="IdBuildingNavigation.House" title="Номер дома">
                 </div>
-            </div>
-
-            <div class="form-row">
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="PremisesNum">Номер квартиры</label>
+                    <label asp-for="IdPremisesTypeNavigation.PremisesTypeName">@Model.IdPremisesTypeNavigation.PremisesTypeName</label>
                     @*<select class="form-control" asp-for="IdState" title="Улица"
                 asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdBuildingNavigation.IdStreet)}"></select>*@
                     <input type="text" class="form-control" asp-for="PremisesNum" title="Номер квартиры">
                 </div>
+            </div>
+
+            <div class="form-row">
                 <div class="form-group col r-form-group-label">
                     <label asp-for="Floor">Этаж</label>
                     <input type="text" class="form-control" asp-for="Floor" title="Этаж">
@@ -95,13 +95,51 @@
                 <br />
                 <div class="form-group col r-form-group-label">
                     <label asp-for="RegDate">Размер платы от 28.08.2019</label>
-                    <input type="text" class="form-control" asp-for="RegDate" title="Размер платы от 28.08.2019">
+                    <input type="text" class="form-control" value="0.00" title="Размер платы от 28.08.2019">@*asp-for="RegDate"*@
                 </div>
                 <div class="form-group col r-form-group-label">
                     <label asp-for="RegDate">Размер платы до 28.08.2019</label>
-                    <input type="text" class="form-control" asp-for="RegDate" title="Размер платы от 28.08.2019">
+                    <input type="text" class="form-control" value="0.00" title="Размер платы от 28.08.2019">@*asp-for="RegDate"*@
                 </div>
             </div>
+
+
+            <div class="form-row">
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="CadastralNum">Нб</label>
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="Account">Кс</label>
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="CadastralCost">К1</label>
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="BalanceCost">К2</label>
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="BalanceCost">К3</label>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col r-form-group-label">
+                    <input type="text" class="form-control" value="0.00" title="Нб">@*asp-for="CadastralNum" *@
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <input type="text" class="form-control" value="0.00" title="Кс">@* asp-for="Account"*@
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <input type="text" class="form-control" value="0.00" title="К1">@* asp-for="LivingArea"*@
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <input type="text" class="form-control" value="0.00" title="К2">@* asp-for="BalanceCost"*@
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <input type="text" class="form-control" value="0.00" title="К3">@* asp-for="BalanceCost"*@
+                </div>
+            </div>
+
 
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
@@ -129,9 +167,10 @@
                     <input type="text" class="form-control" asp-for="LivingArea" title="Кадастровая стоимость">
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" asp-for="IdState" title="Балансовая стоимость">
+                    <input type="text" class="form-control" asp-for="BalanceCost" title="Балансовая стоимость">
                 </div>
             </div>
+
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
                     <label asp-for="IdState">Текущее состояние</label>
@@ -173,7 +212,7 @@
                 </div>
                 <div class="form-group col r-form-group-label">
                     <label asp-for="LivingArea">Площадь мун. комнат</label>
-                    <input type="text" class="form-control" asp-for="LivingArea" title="Площадь мун. комнат">
+                    <input type="text" class="form-control" value="0" title="Площадь мун. комнат">@*asp-for="LivingArea"*@
                 </div>
                 <div class="form-group col r-form-group-label">
                     <label asp-for="Height">Высота помещения</label>
@@ -187,14 +226,14 @@
                     <textarea class="form-control" rows="3" cols="10"></textarea>
                 </div>
             </div>
-            <br />&nbsp;
+            <br />@*&nbsp;*@
             <!--Комнаты-->
             <div class="form-row">
                 <div class="form-group col">
                     @await Component.InvokeAsync("OwnershipRightsComponent", new { id = Model.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
                 </div>
             </div>
-
+            @*
             <!--Реквизиты-->
             <div class="form-row">
                 <div class="form-group col">
@@ -208,6 +247,7 @@
                     @await Component.InvokeAsync("OwnershipRightsComponent", new { id = Model.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
                 </div>
             </div>
+            *@
         </div>
         </div>
 </form>

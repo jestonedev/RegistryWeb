@@ -189,6 +189,7 @@ namespace RegistryWeb.DataServices
                 .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
                 .Include(b => b.FundsPremisesAssoc).ThenInclude(fpa => fpa.IdFundNavigation).ThenInclude(fh => fh.IdFundTypeNavigation)
                 .Include(b => b.IdPremisesCommentNavigation).ThenInclude(fpa => fpa.Premises)
+                .Include(b => b.IdPremisesTypeNavigation).ThenInclude(fpa => fpa.Premises)
                 .Include(b => b.IdPremisesDoorKeysNavigation)
                 .SingleOrDefault(b => b.IdPremises == idPremise);
         }

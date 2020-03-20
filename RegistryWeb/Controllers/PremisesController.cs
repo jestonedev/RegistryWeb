@@ -1,10 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
+using RegistryWeb.Extensions;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
+using RegistryWeb.ViewOptions;
+using RegistryWeb.ViewOptions.Filter;
 using System.Runtime.CompilerServices;
 using RegistryWeb.Models.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RegistryWeb.Controllers
 {
@@ -16,12 +22,27 @@ namespace RegistryWeb.Controllers
         {
         }
 
-        public IActionResult Index(PremisesListVM viewModel)
+        public IActionResult Index(PremisesListVM viewModel, bool isBack = false)
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
+
+            if (isBack)
+            {
+                viewModel.OrderOptions = HttpContext.Session.Get<OrderOptions>("OrderOptions");
+                viewModel.PageOptions = HttpContext.Session.Get<PageOptions>("PageOptions");
+                viewModel.FilterOptions = HttpContext.Session.Get<PremisesListFilter>("FilterOptions");
+            }
+            else
+            {
+                HttpContext.Session.Remove("OrderOptions");
+                HttpContext.Session.Remove("PageOptions");
+                HttpContext.Session.Remove("FilterOptions");
+            }
+            ViewBag.ObjectStates = dataService.ObjectStates;
+
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
