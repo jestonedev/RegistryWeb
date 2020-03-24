@@ -57,8 +57,8 @@ namespace RegistryWeb.Models
         public virtual DbSet<PremisesDoorKeys> PremisesDoorKeys { get; set; }
         public virtual DbSet<PremisesKind> PremisesKinds { get; set; }
         public virtual DbSet<PremisesType> PremisesTypes { get; set; }
-        
         public virtual DbSet<StructureType> StructureTypes { get; set; }
+        public virtual DbSet<StructureTypeOverlap> StructureTypeOverlaps { get; set; }
 
         //Собственники
         public virtual DbSet<Owner> Owners { get; set; }
@@ -133,7 +133,8 @@ namespace RegistryWeb.Models
 
             modelBuilder.ApplyConfiguration(new DocumentTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new DocumentIssuedByConfiguration(nameDatebase));
-            
+            modelBuilder.ApplyConfiguration(new DocumentResidenceConfiguration(nameDatebase));
+
             modelBuilder.ApplyConfiguration(new BuildingConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremiseConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new SubPremiseConfiguration(nameDatebase));
@@ -141,6 +142,10 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new HeatingTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremisesCommentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremisesDoorKeysConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PremisesTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PremisesKindConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new StructureTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new StructureTypeOverlapConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new OwnershipRightConfiguration(nameDatebase));            
             modelBuilder.ApplyConfiguration(new OwnershipBuildingAssocConfiguration(nameDatebase));
@@ -178,99 +183,6 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new TenancyBuildingAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyPremiseAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancySubPremiseAssocConfiguration(nameDatebase));
-
-            modelBuilder.Entity<DocumentResidence>(entity =>
-            {
-                entity.HasKey(e => e.IdDocumentResidence);
-
-                entity.ToTable("documents_residence", nameDatebase);
-
-                entity.Property(e => e.IdDocumentResidence)
-                    .HasColumnName("id_document_residence")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.Deleted)
-                    .HasColumnName("deleted")
-                    .HasColumnType("tinyint(1)")
-                    .HasDefaultValueSql("0");
-
-                entity.Property(e => e.DocumentResidenceName)
-                    .IsRequired()
-                    .HasColumnName("document_residence")
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                //Фильтры по умолчанию
-                entity.HasQueryFilter(e => e.Deleted == 0);
-            });
-
-            modelBuilder.Entity<PremisesKind>(entity =>
-            {
-                entity.HasKey(e => e.IdPremisesKind);
-
-                entity.ToTable("premises_kinds", nameDatebase);
-
-                entity.Property(e => e.IdPremisesKind)
-                    .HasColumnName("id_premises_kind")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.PremisesKindName)
-                    .HasColumnName("premises_kind")
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<PremisesType>(entity =>
-            {
-                entity.HasKey(e => e.IdPremisesType);
-
-                entity.ToTable("premises_types", nameDatebase);
-
-                entity.Property(e => e.IdPremisesType)
-                    .HasColumnName("id_premises_type")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.PremisesTypeName)
-                    .IsRequired()
-                    .HasColumnName("premises_type")
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.PremisesTypeAsNum)
-                    .HasColumnName("premises_type_as_num")
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.PremisesTypeShort)
-                    .HasColumnName("premises_type_short")
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<StructureType>(entity =>
-            {
-                entity.HasKey(e => e.IdStructureType);
-
-                entity.ToTable("structure_types", nameDatebase);
-
-                entity.Property(e => e.IdStructureType)
-                    .HasColumnName("id_structure_type")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.Deleted)
-                    .HasColumnName("deleted")
-                    .HasColumnType("tinyint(1)")
-                    .HasDefaultValueSql("0");
-
-                entity.Property(e => e.StructureTypeName)
-                    .IsRequired()
-                    .HasColumnName("structure_type")
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                //Фильтры по умолчанию
-                entity.HasQueryFilter(e => e.Deleted == 0);
-            });
         }
     }
 }

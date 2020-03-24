@@ -30,6 +30,9 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.HasIndex(e => e.IdStructureType)
                 .HasName("FK_buildings_types_of_structure_id_type_of_structure");
 
+            builder.HasIndex(e => e.IdStructureTypeOverlap)
+                .HasName("FK_buildings_id_structure_type_overlap");
+
             builder.Property(e => e.IdBuilding)
                 .HasColumnName("id_building")
                 .HasColumnType("int(11)");
@@ -64,7 +67,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnType("tinyint(1)")
                 .HasDefaultValueSql("0");
 
-            builder.Property(e => e.DemolishedFactDate).HasColumnName("demolished_fact_date");
+            builder.Property(e => e.DemolishedFactDate)
+                .HasColumnName("demolished_fact_date");
 
             builder.Property(e => e.Description)
                 .HasColumnName("description")
@@ -84,6 +88,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("floors")
                 .HasColumnType("smallint(6)")
                 .HasDefaultValueSql("5");
+
+            builder.Property(e => e.Entrances)
+                .HasColumnName("entrances")
+                .HasColumnType("smallint(6)");
 
             builder.Property(e => e.HotWaterSupply)
                 .HasColumnName("hot_water_supply")
@@ -120,6 +128,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_structure_type")
                 .HasColumnType("int(11)");
 
+            builder.Property(e => e.IdStructureTypeOverlap)
+                .HasColumnName("id_structure_type_overlap")
+                .HasColumnType("int(11)");
+
             builder.Property(e => e.Improvement)
                 .HasColumnName("improvement")
                 .HasColumnType("tinyint(1)")
@@ -130,11 +142,30 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnType("tinyint(4)")
                 .HasDefaultValueSql("0");
 
+            builder.Property(e => e.MemorialDate)
+                .HasColumnName("memorial_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.MemorialNumber)
+                .HasColumnName("memorial_number")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.MemorialNameOrg)
+                .HasColumnName("memorial_name_org")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.DateOwnerEmergency)
+                .HasColumnName("date_owner_emergency")
+                .HasColumnType("date");
+
             builder.Property(e => e.LandArea)
                 .HasColumnName("land_area")
                 .HasDefaultValueSql("0");
 
-            builder.Property(e => e.LandCadastralDate).HasColumnName("land_cadastral_date");
+            builder.Property(e => e.LandCadastralDate)
+                .HasColumnName("land_cadastral_date");
 
             builder.Property(e => e.LandCadastralNum)
                 .HasColumnName("land_cadastral_num")
@@ -195,7 +226,13 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnType("int(11)")
                 .HasDefaultValueSql("1900");
 
-            builder.Property(e => e.StateDate).HasColumnName("state_date");
+            builder.Property(e => e.Series)
+                .HasColumnName("series")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.StateDate)
+                .HasColumnName("state_date");
 
             builder.Property(e => e.TotalArea)
                 .HasColumnName("total_area")
@@ -224,6 +261,12 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasForeignKey(d => d.IdStructureType)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_buildings_types_of_structure_id_type_of_structure");
+
+            builder.HasOne(d => d.StructureTypeOverlapNavigation)
+                .WithMany(p => p.Buildings)
+                .HasForeignKey(d => d.IdStructureTypeOverlap)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_buildings_id_structure_type_overlap");
 
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);

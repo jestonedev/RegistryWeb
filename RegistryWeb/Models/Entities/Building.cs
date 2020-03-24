@@ -17,9 +17,11 @@ namespace RegistryWeb.Models.Entities
         public int IdBuilding { get; set; }
         public int IdState { get; set; }
         public int IdStructureType { get; set; }
+        public int IdStructureTypeOverlap { get; set; }
         public string IdStreet { get; set; }
         public string House { get; set; }
         public short Floors { get; set; }
+        public short? Entrances { get; set; }
         public int NumPremises { get; set; }
         public int NumRooms { get; set; }
         public int NumApartments { get; set; }
@@ -30,6 +32,7 @@ namespace RegistryWeb.Models.Entities
         public decimal CadastralCost { get; set; }
         public decimal BalanceCost { get; set; }
         public int StartupYear { get; set; }
+        public string Series { get; set; }
         public bool Improvement { get; set; }
         public bool Elevator { get; set; }
         public bool? RubbishChute { get; set; }
@@ -47,6 +50,10 @@ namespace RegistryWeb.Models.Entities
         public DateTime RegDate { get; set; }
         public decimal RentCoefficient { get; set; }
         public bool IsMemorial { get; set; }
+        public DateTime? MemorialDate { get; set; }
+        public string MemorialNumber { get; set; }
+        public string MemorialNameOrg { get; set; }
+        public DateTime? DateOwnerEmergency { get; set; }
         public DateTime? DemolishedFactDate { get; set; }
         public string LandCadastralNum { get; set; }
         public DateTime? LandCadastralDate { get; set; }
@@ -56,6 +63,8 @@ namespace RegistryWeb.Models.Entities
         public virtual HeatingType IdHeatingTypeNavigation { get; set; }
         public virtual ObjectState IdStateNavigation { get; set; }
         public virtual StructureType IdStructureTypeNavigation { get; set; }
+        public virtual StructureTypeOverlap StructureTypeOverlapNavigation { get; set; }
+
         public virtual KladrStreet IdStreetNavigation { get; set; }
         public virtual IList<FundBuildingAssoc> FundsBuildingsAssoc { get; set; }
         public virtual IList<OwnerBuildingAssoc> OwnerBuildingsAssoc { get; set; }

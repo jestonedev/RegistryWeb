@@ -49,7 +49,6 @@ namespace RegistryWeb.DataServices
             return registryContext.Buildings
                 .Include(b => b.IdStreetNavigation)
                 .Include(b => b.IdStateNavigation)
-                .Where(b => b.Deleted == 0)
                 .OrderBy(b => b.IdBuilding);
         }
 
