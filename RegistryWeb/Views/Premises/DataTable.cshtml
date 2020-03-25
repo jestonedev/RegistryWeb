@@ -23,7 +23,7 @@
         <tr>
             <th class="r-table-header-cell">
                 <a href="#" data-order-field="IdPremises" data-order-direction="@OrderDirection.Ascending">
-                    № по реестру
+                    № по рeестру
                 </a>
             </th>
             <th>Адрес</th>
@@ -47,7 +47,13 @@
         @foreach (var item in Model.Premises)
         {
             <tr>
-                <td>@item.IdPremises</td>
+                @{
+                    var idOwnershipTypeP = item.OwnershipPremisesAssoc.FirstOrDefault() != null ? item.OwnershipPremisesAssoc.LastOrDefault().OwnershipRightNavigation.IdOwnershipRightType : 0;
+                    var idOwnershipTypeB = item.IdBuildingNavigation.OwnershipBuildingsAssoc.FirstOrDefault();
+                }
+                <td style="background: @(item.OwnershipPremisesAssoc.FirstOrDefault()!=null && idOwnershipTypeP==1 ? "#FEDCDC" : idOwnershipTypeP == 2 ? "#BBFEE8" : idOwnershipTypeP == 7 ? "#88FF63" : "");">
+                    @item.IdPremises
+                </td>
                 <td>
                     @item.IdBuildingNavigation.IdStreetNavigation.StreetLong,
                     д.@item.IdBuildingNavigation.House,
@@ -59,7 +65,8 @@
                 <td>@item.IdStateNavigation.StateNeutral</td>
                 <td>@GetTypeFund(item)</td>
                 <td>
-                    <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                    <input id="PremiseId" asp-for="@item.IdPremises" hidden />
+                    <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
                        asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises"></a>
                     @*<a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
                             asp-controller="Premises" asp-action="Edit" asp-route-idpremises="@item.IdPremises"></a>
@@ -72,3 +79,67 @@
         }
     </tbody>
 </table>
+
+@*
+@section scripts
+{
+    <script type="text/javascript">
+
+        var ostatockArray;
+        $(document).ready(function ()
+        {
+            var idPremise = $(this).val(); //Model.IdPremises || 0;
+            //var idBuilding = $(this).val()//Model.IdBuilding || 0;
+            console.log(idPremise);
+            idPremise = $("#PremiseId").val();
+
+            $.getJSON('@Url.Action("GetPaymentForPremiseInfo")?' + "id=" + idPremise , function (data)
+            {
+                ostatockArray = data;
+                console.log(ostatockArray);
+                //data.Cost=Rows[this].Cost;
+                var options = "<div class='form-group col r-form-group-label'>";
+                options += "<div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K1+" title='К1'></div> <div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K2+" title='К2'></div><div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K3+" title='К3'></div>";
+                options += "</div>";
+
+                $("div[name$='payment']").each(function (idx, elem)
+                {
+                    var idPerson = $(this).val();
+                    $(this).html(options);
+                    $(this).val(idPerson);
+                    $(this).change();
+                });
+            });
+        });
+
+        $("#premisedetail").on('click', function ()
+        {
+            var idPremise = $(this).val(); //Model.IdPremises || 0;
+            //var idBuilding = $(this).val()//Model.IdBuilding || 0;
+            console.log(idPremise);
+            idPremise = $("#PremiseId").val();
+
+            $.getJSON('@Url.Action("GetPaymentForPremiseInfo")?' + "id=" + idPremise , function (data)
+            {
+                ostatockArray = data;
+                console.log(ostatockArray);
+                //data.Cost=Rows[this].Cost;
+                var options = "<div class='form-group col r-form-group-label'>";
+                options += "<div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K1+" title='К1'></div> <div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K2+" title='К2'></div><div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K3+" title='К3'></div>";
+                options += "</div>";
+
+                $("div[name$='payment']").each(function (idx, elem)
+                {
+                    var idPerson = $(this).val();
+                    $(this).html(options);
+                    $(this).val(idPerson);
+                    $(this).change();
+                });
+            });
+        });
+
+    </script>
+}
+
+
+*@

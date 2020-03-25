@@ -1,0 +1,53 @@
+﻿@model IEnumerable<RegistryWeb.ViewModel.SubPremiseVM>;
+@using RegistryWeb.Extensions;
+@using RegistryWeb.ViewOptions;
+@using RegistryWeb.Models.Entities;
+@{
+    string GetTypeFund(SubPremise subpremise)
+    {
+        var fundsHistory = subpremise.FundsSubPremisesAssoc.Select(fpa => fpa.IdFundNavigation);
+        var fundHistory = fundsHistory
+            .FirstOrDefault(fh => fh.ExcludeRestrictionDate == null && fh.IdFund == fundsHistory.Max(f => f.IdFund));
+        if (fundHistory == null)
+            return "";
+        return fundHistory.IdFundTypeNavigation.FundTypeName;
+    }
+}
+<div class="card">
+    <script src="~/js/subpremises.common.js" asp-append-version="true"></script>
+    <div class="card-header d-flex justify-content-between">
+        <h3>Комнаты</h3>
+        <div class="btn-group" role="group">
+            <a href="#" id="subpremisesToggle" class="form-control btn btn-primary" title="Развернуть список комнат" style="font-weight:bold;">∨</a>
+        </div>
+    </div>
+    <table class="table table-bordered card-body" id="subpremisesTable" style="margin-bottom:0px;">
+        <thead>
+            <tr>
+                <th class="align-middle">Номер</th>
+                <th class="align-middle">Общая площадь</th>
+                <th class="align-middle">Текущее состояние</th>
+                <th class="align-middle">Текущий фонд</th>
+                <th class="align-middle">Лицевой счёт ФКР</th>
+                <th class="align-middle">Кадастровая стоимость</th>
+                <th class="align-middle">Балансовая стоимость</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="align-middle">@item.SubPremisesNum</td>
+                    <td class="align-middle">@item.TotalArea</td>
+                    <td class="align-middle">@item.IdStateNavigation.StateFemale</td>
+                    <td class="align-middle">@GetTypeFund(item)</td>
+                    <td class="align-middle">@item.Account</td>
+                    <td class="align-middle">@item.CadastralCost</td>
+                    <td class="align-middle">@item.BalanceCost</td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

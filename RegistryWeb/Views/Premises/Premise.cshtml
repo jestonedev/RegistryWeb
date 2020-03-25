@@ -27,6 +27,36 @@
 @section scripts
     {
     <script src="~/js/building.common.js" asp-append-version="true"></script>
+    @*
+        <script type="text/javascript">
+            var ostatockArray;
+
+            $(document).ready(function ()
+            {
+                var idPremise = @Model.IdPremises || 0;
+                var idBuilding = @Model.IdBuilding || 0;
+                console.log(idPremise);
+
+                $.getJSON('@Url.Action("GetPaymentForPremiseInfo")?' + "id=" + idPremise /* + "&documentId=" + idTypeDocument*/, function (data)
+                {
+                    ostatockArray = data;
+                    console.log(ostatockArray);
+                    //data.Cost=Rows[this].Cost;
+                    var options = "<div class='form-group col r-form-group-label'>";
+                    options += "<div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K1+" title='К1'></div> <div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K2+" title='К2'></div><div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K3+" title='К3'></div>";
+                    options += "</div>";
+
+                    $("div[name$='payment']").each(function (idx, elem)
+                    {
+                        var idPerson = $(this).val();
+                        $(this).html(options);
+                        $(this).val(idPerson);
+                        $(this).change();
+                    });
+                });
+            });
+
+        </script>*@
 }
 @section styles
     {
@@ -67,7 +97,7 @@
                 <div class="form-group col r-form-group-label">
                     <label asp-for="IdPremisesTypeNavigation.PremisesTypeName">@Model.IdPremisesTypeNavigation.PremisesTypeName</label>
                     @*<select class="form-control" asp-for="IdState" title="Улица"
-                asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdBuildingNavigation.IdStreet)}"></select>*@
+                        asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdBuildingNavigation.IdStreet)}"></select>*@
                     <input type="text" class="form-control" asp-for="PremisesNum" title="Номер квартиры">
                 </div>
             </div>
@@ -124,20 +154,25 @@
 
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" value="0.00" title="Нб">@*asp-for="CadastralNum" *@
+                    <input type="text" class="form-control" value="46.47689" title="Нб">
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" value="0.00" title="Кс">@* asp-for="Account"*@
+                    <input type="text" class="form-control" value="0.18" title="Кс">
                 </div>
-                <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" value="0.00" title="К1">@* asp-for="LivingArea"*@
+                <div name="payment">
+
                 </div>
-                <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" value="0.00" title="К2">@* asp-for="BalanceCost"*@
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" value="0.00" title="К3">@* asp-for="BalanceCost"*@
-                </div>
+                @*
+                    <div class="form-group col r-form-group-label">
+                        <input type="text" class="form-control" value="0.00" title="К1">
+                    </div>
+                    <div class="form-group col r-form-group-label">
+                        <input type="text" class="form-control" value="0.00" title="К2">
+                    </div>
+                    <div class="form-group col r-form-group-label">
+                        <input type="text" class="form-control" value="0.00" title="К3">
+                    </div>
+                *@
             </div>
 
 
@@ -227,14 +262,14 @@
                 </div>
             </div>
             <br />@*&nbsp;*@
-            @*
+
+
             <!--Комнаты-->
             <div class="form-row">
                 <div class="form-group col">
-                    @await Component.InvokeAsync("OwnershipRightsComponent", new { id = Model.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
+                    @await Component.InvokeAsync("SubPremisesComponent", new { id = Model.IdPremises, action = ViewBag.Action })
                 </div>
             </div>
-                *@
 
             <!--Реквизиты-->
             <div class="form-row">
@@ -251,5 +286,6 @@
             </div>
 
         </div>
-        </div>
+    </div>
 </form>
+
