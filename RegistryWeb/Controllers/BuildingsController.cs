@@ -143,6 +143,7 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = action;
             ViewBag.ObjectStates = dataService.ObjectStates;
             ViewBag.StructureTypes = dataService.StructureTypes;
+            ViewBag.StructureTypeOverlaps = dataService.StructureTypeOverlaps;
             ViewBag.KladrStreets = dataService.KladrStreets;
             ViewBag.HeatingTypes = dataService.HeatingTypes;
             return View("Building", building);

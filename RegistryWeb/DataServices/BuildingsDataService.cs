@@ -142,6 +142,11 @@ namespace RegistryWeb.DataServices
             get => registryContext.StructureTypes.AsNoTracking();
         }
 
+        public IEnumerable<StructureTypeOverlap> StructureTypeOverlaps
+        {
+            get => registryContext.StructureTypeOverlaps.AsNoTracking();
+        }
+
         public IEnumerable<KladrStreet> KladrStreets
         {
             get => registryContext.KladrStreets.AsNoTracking();

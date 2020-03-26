@@ -5,4 +5,13 @@
 }
 $(function () {
     $('#buildingToggle').click(buildingToggle);
+
+    var action = $('#r-buildings-form').data("action");
+    if (action == "Details" || action == "Delete") {
+        $('select').prop('disabled', true);
+        $('input').prop('disabled', true);
+        $('textarea').prop('disabled', true);
+        $('input[type="hidden"]').prop('disabled', false);
+        $('input[type="submit"]').prop('disabled', false);
+    }
 });

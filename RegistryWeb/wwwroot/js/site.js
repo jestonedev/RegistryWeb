@@ -6,3 +6,6 @@
         arrow.html('∧');
     }
 }
+$(function () {
+    $("input[type='number']").inputSpinner();  
+});

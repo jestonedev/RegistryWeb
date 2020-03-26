@@ -43,14 +43,32 @@
         </div>
         <div class="card-body" id="building">
             <div class="form-row">
-                <div class="form-group col">
+                <div class="form-group col-6 r-form-group-label">
                     <label asp-for="IdStreet">Улица</label>
+                </div>
+                <div class="form-group col-2 r-form-group-label">
+                    <label asp-for="House">Номер дома</label>
+                </div>
+                <div class="form-group col-2 r-form-group-label">
+                    <label asp-for="TotalArea">Общая площадь</label>
+                </div>
+                <div class="form-group col-2 r-form-group-label">
+                    <label asp-for="LivingArea">Жилая площадь</label>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-6">
                     <select class="form-control" asp-for="IdStreet" title="Улица"
                             asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdStreet)}"></select>
                 </div>
-                <div class="form-group col">
-                    <label asp-for="House">Номер дома</label>
+                <div class="form-group col-2">
                     <input type="text" class="form-control" asp-for="House" title="Номер дома">
+                </div>
+                <div class="form-group col-2">
+                    <input type="text" class="form-control" asp-for="TotalArea" title="Общая площадь">
+                </div>
+                <div class="form-group col-2">
+                    <input type="text" class="form-control" asp-for="LivingArea" title="Жилая площадь">
                 </div>
             </div>
 
@@ -62,10 +80,10 @@
                     <label asp-for="IdStructureType">Тип строения (материал)</label>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="IdHeatingType">Отопление</label>
+                    <label asp-for="IdStructureTypeOverlap">Тип перекрытий</label>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="Floors">Этажность</label>
+                    <label asp-for="IdHeatingType">Отопление</label>
                 </div>
             </div>
             <div class="form-row">
@@ -78,15 +96,22 @@
                             asp-items="@{new SelectList(ViewBag.StructureTypes, "IdStructureType", "StructureTypeName", Model.IdStructureType)}"></select>
                 </div>
                 <div class="form-group col">
-                    <select class="form-control" asp-for="IdHeatingType" title="Отопление"
-                            asp-items="@{new SelectList(ViewBag.HeatingTypes, "IdHeatingType", "HeatingType1", Model.IdHeatingType)}"></select>
+                    <select class="form-control" asp-for="IdStructureTypeOverlap" title="Тип строения (материал)"
+                            asp-items="@{new SelectList(ViewBag.StructureTypeOverlaps, "IdStructureTypeOverlap", "StructureTypeOverlapName", Model.IdStructureTypeOverlap)}"></select>
                 </div>
                 <div class="form-group col">
-                    <input type="number" class="form-control" asp-for="Floors" title="Этажность">
+                    <select class="form-control" asp-for="IdHeatingType" title="Отопление"
+                            asp-items="@{new SelectList(ViewBag.HeatingTypes, "IdHeatingType", "HeatingType1", Model.IdHeatingType)}"></select>
                 </div>
             </div>
 
             <div class="form-row">
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="Floors">Этажность</label>
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="Floors">Количество подъездов</label>
+                </div>
                 <div class="form-group col r-form-group-label">
                     <label asp-for="NumPremises">Число помеещний (всего)</label>
                 </div>
@@ -102,6 +127,12 @@
             </div>
             <div class="form-row">
                 <div class="form-group col">
+                    <input type="number" class="form-control" asp-for="Floors" title="Этажность">
+                </div>
+                <div class="form-group col">
+                    <input type="number" class="form-control" asp-for="Entrances" title="Количество подъездов">
+                </div>
+                <div class="form-group col">
                     <input type="number" class="form-control" asp-for="NumPremises" title="Число помеещний (всего)">
                 </div>
                 <div class="form-group col">
@@ -115,25 +146,10 @@
                 </div>
             </div>
 
-
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="TotalArea">Общая площадь</label>
+                    <label asp-for="Series">Серия, тип постройки</label>
                 </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="LivingArea">Жилая площадь</label>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col">
-                    <input type="text" class="form-control" asp-for="TotalArea" title="Общая площадь">
-                </div>
-                <div class="form-group col">
-                    <input type="text" class="form-control" asp-for="LivingArea" title="Жилая площадь">
-                </div>
-            </div>
-
-            <div class="form-row">
                 <div class="form-group col r-form-group-label">
                     <label asp-for="CadastralNum">Кадастровый номер</label>
                 </div>
@@ -145,6 +161,9 @@
                 </div>
             </div>
             <div class="form-row">
+                <div class="form-group col">
+                    <input type="text" class="form-control" asp-for="Series" title="Серия, тип постройки">
+                </div>
                 <div class="form-group col">
                     <input type="text" class="form-control" asp-for="CadastralNum" title="Кадастровый номер">
                 </div>
@@ -158,13 +177,13 @@
 
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="LandCadastralNum">Кадастровый номер земельного участка, на котором расположено здание</label>
+                    <label asp-for="LandCadastralNum">Кадастровый номер земельнго учатска, на котором расположено здание</label>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="LandCadastralDate">Дата постановки земельного участка на кадастровый учет</label>
+                    <label asp-for="LandCadastralDate">Дата постановки земельнго участка на кадастровый учет</label>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="LandArea">Площадь земельного участка<br />&nbsp;</label>
+                    <label asp-for="LandArea">Площадь земельнго участка</label>
                 </div>
             </div>
             <div class="form-row">
@@ -181,13 +200,13 @@
 
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="StartupYear">Дата ввода в эксплуатацию</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="StateDate">Дата установки состояния</label>
+                    <label asp-for="StartupYear">Год ввода в эксплуатацию</label>
                 </div>
                 <div class="form-group col r-form-group-label">
                     <label asp-for="RegDate">Дата включения в РМИ</label>
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="DemolishedFactDate">Срок принятия собственниками решения о сносе</label>
                 </div>
                 <div class="form-group col r-form-group-label">
                     <label asp-for="DemolishedFactDate">Фактическая дата сноса или реконструкции</label>
@@ -195,18 +214,46 @@
             </div>
             <div class="form-row">
                 <div class="form-group col">
-                    <input type="number" class="form-control" asp-for="StartupYear" title="Дата ввода в эксплуатацию">
-                </div>
-                <div class="form-group col">
-                    <input type="text" class="form-control" asp-for="StateDate" title="Дата установки состояния">
+                    <input type="number" class="form-control" asp-for="StartupYear" title="Год ввода в эксплуатацию">
                 </div>
                 <div class="form-group col">
                     <input type="date" class="form-control" asp-for="RegDate" title="Дата включения в РМИ">
                 </div>
                 <div class="form-group col">
+                    <input type="date" class="form-control" asp-for="DateOwnerEmergency" title="Срок принятия собственниками решения о сносе или реконструкции">
+                </div>
+                <div class="form-group col">
                     <input type="date" class="form-control" asp-for="DemolishedFactDate" title="Фактическая дата сноса или реконструкции">
                 </div>
             </div>
+
+            <fieldset class="form-row r-scheduler-border">
+                <legend class="r-scheduler-border">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" style="margin-top:10px;" asp-for="IsMemorial" title="Памятник культуры">
+                        <label asp-for="IsMemorial" class="form-check-label">Документ о присвоении статуса - памятник культуры</label>
+                    </div>
+                </legend>
+                <div class="col-3">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">№</div>
+                        </div>
+                        <input type="text" class="form-control" asp-for="MemorialNumber" title="Номер документа">
+                    </div>
+                </div>
+                <div class="col-3">
+                    <input type="date" class="form-control" asp-for="MemorialDate" title="Дата документа">
+                </div>
+                <div class="col-6">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Орган</div>
+                        </div>
+                        <input type="text" class="form-control" asp-for="MemorialNumber" title="Наименование органа, выдавшего документ">
+                    </div>
+                </div>
+            </fieldset>
 
             <div class="form-row">
                 <div class="form-group form-check col r-form-group-checkbox">
@@ -245,10 +292,7 @@
                     <input type="checkbox" class="form-check-input" asp-for="RadioNetwork.Value" title="Радиотрансляционная сеть">
                     <label asp-for="RadioNetwork.Value" class="form-check-label">Радиотрансляционная сеть</label>
                 </div>
-                <div class="form-group form-check col r-form-group-checkbox">
-                    <input type="checkbox" class="form-check-input" asp-for="IsMemorial" title="Памятник культуры">
-                    <label asp-for="IsMemorial" class="form-check-label">Памятник культуры</label>
-                </div>
+                <div class="form-group form-check col r-form-group-checkbox"></div>
             </div>
 
             <div class="form-row">
@@ -268,6 +312,11 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <label asp-for="HousingCooperative">Управляющая компания / ТСЖ</label>
+                <input type="text" class="form-control" asp-for="HousingCooperative" title="Управляющая компания / ТСЖ">
+            </div>
+
             <div class="form-row">
                 <div class="form-group col">
                     <label asp-for="Description">Другие сведения</label>
@@ -277,11 +326,6 @@
                     <label asp-for="BtiRooms">Приватиз. квартиры согласно БТИ</label>
                     <textarea rows="5" class="form-control" asp-for="BtiRooms" title="Приватиз. квартиры согласно БТИ"></textarea>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="HousingCooperative">Управляющая компания / ТСЖ</label>
-                <input type="text" class="form-control" asp-for="HousingCooperative" title="Управляющая компания / ТСЖ">
             </div>
 
             @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.IdBuilding, type = AddressTypes.Building, action = ViewBag.Action })
