@@ -164,6 +164,18 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("land_area")
                 .HasDefaultValueSql("0");
 
+            builder.Property(e => e.LivingArea)
+                .HasColumnName("living_area")
+                .HasDefaultValueSql("0");
+
+            builder.Property(e => e.UnlivingArea)
+                .HasColumnName("unliving_area")
+                .HasDefaultValueSql("0");
+
+            builder.Property(e => e.CommonPropertyArea)
+                .HasColumnName("common_property_area")
+                .HasDefaultValueSql("0");
+
             builder.Property(e => e.LandCadastralDate)
                 .HasColumnName("land_cadastral_date");
 
@@ -171,10 +183,6 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("land_cadastral_num")
                 .HasMaxLength(20)
                 .IsUnicode(false);
-
-            builder.Property(e => e.LivingArea)
-                .HasColumnName("living_area")
-                .HasDefaultValueSql("0");
 
             builder.Property(e => e.NumApartments)
                 .HasColumnName("num_apartments")

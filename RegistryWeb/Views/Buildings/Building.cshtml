@@ -43,32 +43,20 @@
         </div>
         <div class="card-body" id="building">
             <div class="form-row">
-                <div class="form-group col-6 r-form-group-label">
+                <div class="form-group col-10 r-form-group-label">
                     <label asp-for="IdStreet">Улица</label>
                 </div>
                 <div class="form-group col-2 r-form-group-label">
                     <label asp-for="House">Номер дома</label>
                 </div>
-                <div class="form-group col-2 r-form-group-label">
-                    <label asp-for="TotalArea">Общая площадь</label>
-                </div>
-                <div class="form-group col-2 r-form-group-label">
-                    <label asp-for="LivingArea">Жилая площадь</label>
-                </div>
             </div>
             <div class="form-row">
-                <div class="form-group col-6">
+                <div class="form-group col-10">
                     <select class="form-control" asp-for="IdStreet" title="Улица"
                             asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdStreet)}"></select>
                 </div>
                 <div class="form-group col-2">
                     <input type="text" class="form-control" asp-for="House" title="Номер дома">
-                </div>
-                <div class="form-group col-2">
-                    <input type="text" class="form-control" asp-for="TotalArea" title="Общая площадь">
-                </div>
-                <div class="form-group col-2">
-                    <input type="text" class="form-control" asp-for="LivingArea" title="Жилая площадь">
                 </div>
             </div>
 
@@ -102,6 +90,35 @@
                 <div class="form-group col">
                     <select class="form-control" asp-for="IdHeatingType" title="Отопление"
                             asp-items="@{new SelectList(ViewBag.HeatingTypes, "IdHeatingType", "HeatingType1", Model.IdHeatingType)}"></select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="TotalArea">Общая площадь</label>
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="LivingArea">Жилая площадь</label>
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="UnlivingArea">Нежилая площадь</label>
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="CommonPropertyArea">Площадь общего имущества</label>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col">
+                    <input type="text" class="form-control" asp-for="TotalArea" title="Общая площадь">
+                </div>
+                <div class="form-group col">
+                    <input type="text" class="form-control" asp-for="LivingArea" title="Жилая площадь">
+                </div>
+                <div class="form-group col">
+                    <input type="text" class="form-control" asp-for="UnlivingArea" title="Нежилая площадь">
+                </div>
+                <div class="form-group col">
+                    <input type="text" class="form-control" asp-for="CommonPropertyArea" title="Площадь общего имущества">
                 </div>
             </div>
 

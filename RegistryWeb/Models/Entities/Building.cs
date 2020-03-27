@@ -28,6 +28,8 @@ namespace RegistryWeb.Models.Entities
         public int NumSharedApartments { get; set; }
         public double TotalArea { get; set; }
         public double LivingArea { get; set; }
+        public double UnlivingArea { get; set; }
+        public double CommonPropertyArea { get; set; }
         public string CadastralNum { get; set; }
         public decimal CadastralCost { get; set; }
         public decimal BalanceCost { get; set; }
