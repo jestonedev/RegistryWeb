@@ -59,6 +59,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<PremisesType> PremisesTypes { get; set; }
         public virtual DbSet<StructureType> StructureTypes { get; set; }
         public virtual DbSet<StructureTypeOverlap> StructureTypeOverlaps { get; set; }
+        public virtual DbSet<GovernmentDecree> GovernmentDecrees { get; set; }
 
         //Собственники
         public virtual DbSet<Owner> Owners { get; set; }
@@ -146,6 +147,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new PremisesKindConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new StructureTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new StructureTypeOverlapConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new GovernmentDecreeConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new OwnershipRightConfiguration(nameDatebase));            
             modelBuilder.ApplyConfiguration(new OwnershipBuildingAssocConfiguration(nameDatebase));

@@ -47,6 +47,7 @@ namespace RegistryWeb.Models.Entities
         public bool? Electricity { get; set; }
         public bool? RadioNetwork { get; set; }
         public int? IdHeatingType { get; set; }
+        public int? IdDecree { get; set; }
         public string BtiRooms { get; set; }
         public string HousingCooperative { get; set; }
         public DateTime RegDate { get; set; }
@@ -66,6 +67,7 @@ namespace RegistryWeb.Models.Entities
         public virtual ObjectState IdStateNavigation { get; set; }
         public virtual StructureType IdStructureTypeNavigation { get; set; }
         public virtual StructureTypeOverlap StructureTypeOverlapNavigation { get; set; }
+        public virtual GovernmentDecree GovernmentDecreeNavigation { get; set; }
 
         public virtual KladrStreet IdStreetNavigation { get; set; }
         public virtual IList<FundBuildingAssoc> FundsBuildingsAssoc { get; set; }

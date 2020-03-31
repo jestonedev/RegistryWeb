@@ -33,6 +33,9 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.HasIndex(e => e.IdStructureTypeOverlap)
                 .HasName("FK_buildings_id_structure_type_overlap");
 
+            builder.HasIndex(e => e.IdDecree)
+                .HasName("FK_buildings_id_decree");
+
             builder.Property(e => e.IdBuilding)
                 .HasColumnName("id_building")
                 .HasColumnType("int(11)");
@@ -111,6 +114,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.Property(e => e.IdHeatingType)
                 .HasColumnName("id_heating_type")
+                .HasColumnType("int(11)");
+
+            builder.Property(e => e.IdDecree)
+                .HasColumnName("id_decree")
                 .HasColumnType("int(11)");
 
             builder.Property(e => e.IdState)
@@ -275,6 +282,12 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasForeignKey(d => d.IdStructureTypeOverlap)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_buildings_id_structure_type_overlap");
+
+            builder.HasOne(d => d.GovernmentDecreeNavigation)
+                .WithMany(p => p.Buildings)
+                .HasForeignKey(d => d.IdDecree)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_buildings_id_decree");
 
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);
