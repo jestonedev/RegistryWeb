@@ -1,24 +1,26 @@
-﻿@model RegistryWeb.ViewModel.PremisesListVM;
+﻿@using RegistryWeb.ViewModel
+@using RegistryWeb.Models.Entities
+@using RegistryWeb.DataServices
+@model PremisesVM<Premise>;
 @{
     ViewData["Title"] = "Реестр помещений";
     var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
         "(" + Model.PageOptions.TotalRows + ")" :
         "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
 }
-
+@section styles
+{
+    <link rel="stylesheet" href="~/css/premise.css" runat="server" />
+}
 <h2>@ViewData["Title"] @text</h2>
-
-@*
-@Html.Partial("Filter", Model)
-@Html.Partial("DataTable", Model)
-*@
 
 <partial name="Filter" model="@Model">
 <partial name="DataTable" model="@Model">
-
 <page-link page-model="Model.PageOptions" page-action="Index"></page-link>
 
-@section Scripts 
+@section Scripts
 {
     <script src="~/js/index.common.js" asp-append-version="true"></script>
+    <script src="~/js/premises.index.js" asp-append-version="true"></script>
+    <script src="~/js/restrictions.common.js" asp-append-version="true"></script>
 }

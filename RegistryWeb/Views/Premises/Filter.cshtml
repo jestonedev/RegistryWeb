@@ -1,42 +1,54 @@
-﻿@model RegistryWeb.ViewModel.PremisesListVM;
+﻿@using RegistryWeb.ViewOptions;
+@using RegistryWeb.Models.Entities;
+@using RegistryWeb.Extensions;
+@model RegistryWeb.ViewModel.PremisesVM<Premise>;
 
-<form asp-action="Index" method="get" class="r-filter-form">
-    <input type="hidden" asp-for="OrderOptions.OrderDirection" />
-    <input type="hidden" asp-for="OrderOptions.OrderField" />
-    <input type="hidden" asp-for="PageOptions.CurrentPage" />
-    <input type="hidden" asp-for="PageOptions.SizePage" />
-    
-    <div class="form-row">
-        <div class="form-group col-11">
-            <input type="text" class="form-control" asp-for="FilterOptions.Address.Text" placeholder="Введите улицу" />
-            @*<input type="text" class="form-control" asp-for="FilterOptions.Street" placeholder="Введите улицу" />*@
-        </div>
-        <div class="form-group col col-md-1">
-            <button class="btn btn-block btn-secondary r-index-search-button" type="submit">Найти</button>
-        </div>
-    </div>
+@section styles{
+    <link rel="stylesheet" href="~/css/premise.css" runat="server" />
+}
+    <form asp-action="Index" method="get" class="filterForm">
+        <input type="hidden" asp-for="OrderOptions.OrderDirection" />
+        <input type="hidden" asp-for="OrderOptions.OrderField" />
+        <input type="hidden" asp-for="PageOptions.CurrentPage" />
+        <input type="hidden" asp-for="PageOptions.SizePage" />
+        <input type="hidden" asp-for="FilterOptions.Address.AddressType" />
+        @*<input type="hidden" asp-for="FilterOptions.Address.Text" />*@
+        <input type="hidden" asp-for="FilterOptions.Address.Id" />
 
-    <div class="form-row">
-        <div class="form-group col">
-            <label class="control-label">Тип помещения: </label>
-            <select class="form-control" asp-for="FilterOptions.IdPremisesType" asp-items="@{
-                new SelectList(Model.PremisesTypes, "IdPremisesType", "PremisesTypeName", Model.FilterOptions.IdPremisesType)}">
-                <option value="">Все типы</option>
-            </select>
+        <div class="form-row" style="height:50px;">
+            <div class="form-group col">
+                <a class="btn btn-success" title="Добавить" aria-label="Добавить помещение" asp-controller="Premises" asp-action="Create" asp-route-action="Create">&#10010;</a>
+            </div>
+            <div class="input-group col-10">
+                <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                <div class="input-group-append h-auto d-inline-block">
+                    <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
+                </div>
+            </div>
+            <div class="form-group col col-md-1">
+                <button class="btn btn-block btn-secondary r-index-search-button" id="r-search-btn" type="submit">Найти</button>
+            </div>
         </div>
-        <div class="form-group col">
-            <label class="control-label">Текущее состояние: </label>
-            <select class="form-control" asp-for="FilterOptions.IdObjectState" asp-items="@{
-                new SelectList(Model.ObjectStates, "IdState", "StateNeutral", Model.FilterOptions.IdObjectState)}">
-                <option value="">Все состояния</option>
-            </select>
+
+        <div class="form-row">
+            <div class="form-group col">
+                <label class="control-label">Тип помещения: </label>
+                <select class="form-control" asp-for="FilterOptions.IdPremisesType" asp-items="@Model.PremisesTypesList">
+                    <option value="">Все типы</option>
+                </select>
+            </div>
+            <div class="form-group col">
+                <label class="control-label">Текущее состояние: </label>
+                <select class="form-control" asp-for="FilterOptions.IdObjectState" asp-items="@Model.ObjectStatesList">
+                    <option value="">Все состояния</option>
+                </select>
+
+            </div>
+            <div class="form-group col">
+                <label class="control-label">Текущий фонд: </label>
+                <select class="form-control" asp-for="FilterOptions.IdFundType" asp-items="@Model.FundTypesList">
+                    <option value="">Все фонды</option>
+                </select>
+            </div>
         </div>
-        <div class="form-group col">
-            <label class="control-label">Текущий фонд: </label>
-            <select class="form-control" asp-for="FilterOptions.IdFundType" asp-items="@{
-                new SelectList(Model.FundTypes, "IdFundType", "FundTypeName", Model.FilterOptions.IdFundType)}">
-                <option value="">Все фонды</option>
-            </select>
-        </div>
-    </div>
-</form>
+    </form>

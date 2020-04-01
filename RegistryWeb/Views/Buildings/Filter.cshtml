@@ -8,12 +8,6 @@
     <input type="hidden" asp-for="FilterOptions.Address.Id" />
 
     <div class="form-row">
-        @*<div class="form-group col-2">
-            <select class="form-control" asp-for="FilterOptions.IdObjectState" asp-items="@{
-                new SelectList(ViewBag.ObjectStates, "IdState", "StateNeutral", Model.FilterOptions.IdObjectState)}">
-                <option value="0">Все состояния</option>
-            </select>
-        </div>*@
         <div class="input-group col-8">
             <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
             <div class="input-group-append h-auto d-inline-block">

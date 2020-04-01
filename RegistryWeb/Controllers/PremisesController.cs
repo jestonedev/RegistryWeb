@@ -11,6 +11,7 @@ using RegistryWeb.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RegistryWeb.Models;
 
 namespace RegistryWeb.Controllers
 {
@@ -22,7 +23,7 @@ namespace RegistryWeb.Controllers
         {
         }
 
-        public IActionResult Index(PremisesListVM viewModel, bool isBack = false)
+        public IActionResult Index(PremisesVM<Premise> viewModel, string action="", bool isBack = false)
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
@@ -49,8 +50,9 @@ namespace RegistryWeb.Controllers
                 viewModel.FilterOptions));
         }
 
-        public IActionResult Details(int? idPremises)
+        public IActionResult Details(int? idPremises, string action="")
         {
+            ViewBag.Action = action;
             if (idPremises == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
@@ -58,17 +60,114 @@ namespace RegistryWeb.Controllers
             var premise = dataService.GetPremise(idPremises.Value);
             if (premise == null)
                 return NotFound();
-            return GetBuildingView(premise);
+            //return dataService.GetPremiseView(premise);
+
+            return View("Premise", dataService.GetPremiseView(premise));
         }
 
-        public IActionResult GetBuildingView(Premise premise, [CallerMemberName]string action = "")
+        public IActionResult Create(string action = "")
         {
             ViewBag.Action = action;
-            ViewBag.ObjectStates = dataService.ObjectStates;
-            ViewBag.StructureTypes = dataService.StructureTypes;
-            ViewBag.KladrStreets = dataService.KladrStreets;
-            ViewBag.HeatingTypes = dataService.HeatingTypes;
-            return View("Premise", premise);
-        }/**/
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
+
+            return View("Premise", dataService.GetPremiseView(dataService.CreatePremise()));
+        }
+
+        [HttpPost]
+        public IActionResult Create(Premise premise)
+        {
+            if (premise == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
+            if (ModelState.IsValid)
+            {
+                dataService.Create(premise);
+                return RedirectToAction("Index");
+            }
+            return View("Premise", dataService.GetPremiseView(premise));
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int? idPremises, string action = "")
+        {
+            ViewBag.Action = action;
+            if (idPremises == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
+
+            var premise = dataService.GetPremise(idPremises.Value);
+            if (premise == null)
+                return NotFound();
+
+            return View("Premise", dataService.GetPremiseView(premise));
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Premise premise)
+        {
+            if (premise == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
+            if (ModelState.IsValid)
+            {
+                dataService.Edit(premise);
+                return RedirectToAction("Index");
+            }
+            return View("Premise", dataService.GetPremiseView(dataService.CreatePremise()));
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int? idPremises, string action = "")
+        {
+            ViewBag.Action = action;
+            if (idPremises == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
+            var premise = dataService.GetPremise(idPremises.Value);
+            if (premise == null)
+                return NotFound();
+
+            return View("Premise", dataService.GetPremiseView(premise));
+        }
+
+        [HttpPost]
+        public IActionResult Delete(Premise premise)
+        {
+            if (premise == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
+            if (ModelState.IsValid)
+            {
+                dataService.Delete(premise.IdPremises);
+                return RedirectToAction("Index");
+            }
+            return View("Premise", dataService.GetPremiseView(premise));
+        }
+
+
+
+        /*public JsonResult GetPaymentForPremiseInfo(int id)
+        {
+            IEnumerable<TenancyPaymentsInfo> payment = dataService.GetPaymentInfo(id);
+            return Json(payment);
+        }*/
+
+        [HttpPost]
+        public IActionResult RestrictionAdd(int id, AddressTypes type, string action)
+        {
+            var restriction = new Restriction();
+            restriction.RestrictionTypeNavigation = new RestrictionType();
+            restriction.RestrictionPremisesAssoc = new List<RestrictionPremiseAssoc>() { new RestrictionPremiseAssoc() };
+            restriction.RestrictionBuildingsAssoc = new List<RestrictionBuildingAssoc>() { new RestrictionBuildingAssoc() };
+            return ViewComponent("RestrictionsComponent", new { id, type, action });
+        }
+
+
     }
 }

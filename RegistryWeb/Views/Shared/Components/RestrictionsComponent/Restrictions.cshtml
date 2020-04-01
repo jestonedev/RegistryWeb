@@ -1,16 +1,27 @@
 ﻿@model IEnumerable<RegistryWeb.ViewModel.RestrictionVM>;
-
-<div class="card">
+@{
+    int i = ViewBag.Id;
+}
+@section script{
     <script src="~/js/restrictions.common.js" asp-append-version="true"></script>
+}
+<div class="card">
     <div class="card-header d-flex justify-content-between">
         <h3>Реквизиты</h3>
         <div class="btn-group" role="group">
+            @*
+            @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+            {
+                <a href="#" class="form-control btn btn-success" id="restrictionAdd" title="Добавить реквизит">&#10010;</a>
+            }
+*@
             <a href="#" id="restrictionsToggle" class="form-control btn btn-primary" title="Развернуть список реквизитов" style="font-weight:bold;">∨</a>
         </div>
     </div>
     <table class="table table-bordered card-body" id="restrictionsTable" style="margin-bottom:0px;">
         <thead>
-            <tr>
+            <tr data-i-restriction="@i">
+
                 <th class="align-middle">Номер</th>
                 <th class="align-middle">Дата документа</th>
                 <th class="align-middle">Наименование</th>
@@ -20,31 +31,48 @@
                 {
                     <th class="align-middle">Принадлежность</th>
                 }
+                @*
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                    <th class="align-middle"></th>
+                }
+*@
             </tr>
         </thead>
-        <tbody>
+        <tbody id="restrictions">
             @foreach (var item in Model)
             {
-            <tr>
-                <td class="align-middle">@item.Number</td>
-                <td class="align-middle">@item.Date.ToShortDateString()</td>
-                <td class="align-middle">@item.Description</td>
-                <td class="align-middle">@(item.DateStateReg == null ? "" : item.DateStateReg.Value.ToShortDateString())</td>
-                <td class="align-middle">@item.RestrictionTypeNavigation.RestrictionTypeName</td>
-                @if (ViewBag.Type == AddressTypes.Premise)
-                {
-                    <td class="align-middle">
-                        @if (item.AddressType == AddressTypes.Building)
-                        {
-                            @:Здание
-                        }
-                        @if (item.AddressType == AddressTypes.Premise)
-                        {
-                            @:Помещение
-                        }
-                    </td>
-                }
-            </tr>
+                <tr class="restrictionBlock">
+                    <input type="hidden" asp-for="@item.IdRestriction" id="Restrictions_@(i)IdRestrictionType" name="Restriction[@i].IdRestrictionType" />
+                    <input type="hidden" asp-for="@item.AddressType" id="Restrictions_@(i)IdAddressType" name="Restriction[@i].IdAddressType" />
+                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.Number" title="@item.Number"></td>
+                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.Date" title="@item.Date" value="@item.Date.ToShortDateString()"></td>
+                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.Description" title="@item.Description"></td>
+                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.DateStateReg" title="@item.DateStateReg" value="@(item.DateStateReg == null ? "" : item.DateStateReg.Value.ToShortDateString())"></td>
+                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.RestrictionTypeNavigation.RestrictionTypeName" title="@item.RestrictionTypeNavigation.RestrictionTypeName"></td>
+                    @if (ViewBag.Type == AddressTypes.Premise)
+                    {
+                        <td class="align-middle">
+                            @if (item.AddressType == AddressTypes.Building)
+                            {
+                                <input type="text" class="form-control inputforcomponent" value="Здание">
+                            }
+                            @if (item.AddressType == AddressTypes.Premise)
+                            {
+                                <input type="text" class="form-control inputforcomponent" value="Помещение">
+                            }
+                        </td>
+                    }
+                    @*
+                    @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                    {
+                        <td class="align-middle">
+                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                               asp-controller="Premises" asp-action="Delete" asp-route-idpremises="@item.IdRestriction"></a>
+                        </td>
+                    }
+*@
+                </tr>
             }
         </tbody>
     </table>

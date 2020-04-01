@@ -20,6 +20,7 @@ namespace RegistryWeb.ViewComponents
 
         public IViewComponentResult Invoke(int id, AddressTypes type, string action)
         {
+            ViewBag.Id = id;
             IEnumerable<RestrictionVM> model = null;
             if (type == AddressTypes.Building)
             {

@@ -1,8 +1,10 @@
-﻿@model RegistryWeb.Models.Entities.Premise;
-@using RegistryWeb.Extensions;
-@using RegistryWeb.ViewOptions;
-@using RegistryWeb.Models.Entities;
+﻿@using RegistryWeb.Extensions
+@using RegistryWeb.ViewOptions
+@using RegistryWeb.Models.Entities
+@using RegistryWeb.ViewModel
+@model PremisesVM<Premise>
 @{
+    ViewBag.addressType = "Premise";
     var controller = Context.Session.Get<string>("Controller");
     var action = Context.Session.Get<string>("Action");
     if (ViewBag.Action == "Create")
@@ -11,7 +13,7 @@
     }
     else
     {
-        ViewData["Title"] = "Помещение №" + Model.IdPremises;
+        ViewData["Title"] = "Помещение №" + Model.Premise.IdPremises;
     }
 
     string GetTypeFund(Premise premise)
@@ -26,7 +28,8 @@
 }
 @section scripts
     {
-    <script src="~/js/building.common.js" asp-append-version="true"></script>
+    <script src="~/js/premises.index.js" asp-append-version="true"></script>
+    <script src="~/js/restrictions.common.js" asp-append-version="true"></script>
     @*
         <script type="text/javascript">
             var ostatockArray;
@@ -57,12 +60,24 @@
             });
 
         </script>*@
+    @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    {
+        <script>
+            $(function () {
+                $('select').prop('disabled', true);
+                $('input').prop('disabled', true);
+                $('textarea').prop('disabled', true);
+                $('input[type="hidden"]').prop('disabled', false);
+                $('input[type="submit"]').prop('disabled', false);
+            })
+        </script>
+    }
 }
 @section styles
     {
-    <link rel="stylesheet" href="~/css/building.css" runat="server" />
+    <link rel="stylesheet" href="~/css/premise.css" runat="server" />
 }
-<form asp-controller="Premise" asp-action="@ViewBag.Action" id="r-buildings-form" data-action="@ViewBag.Action" method="post">
+<form asp-controller="Premise" asp-action="@ViewBag.Action" id="r-premises-form" data-action="@ViewBag.Action" data-addressType="@ViewBag.addressType" method="post">
     <div class="card">
         <div class="card-header d-flex justify-content-between">
             <label class="form-check-label h2">@ViewData["Title"]</label>
@@ -80,210 +95,254 @@
                 {
                     <input type="submit" value="Удалить" class="form-control btn btn-danger" />
                 }
-                <a href="#" id="buildingToggle" class="form-control btn btn-primary" title="Развернуть здание" style="font-weight:bold;">∧</a>
+                <a href="#" id="buildingToggle" class="form-control btn btn-primary" title="Развернуть помещение" style="font-weight:bold;">∧</a>
             </div>
         </div>
-        <div class="card-body" id="building">
+        <div class="card-body" id="premise">
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="IdBuildingNavigation.IdStreetNavigation.IdStreet">Улица</label>
-                    <select class="form-control" asp-for="IdBuildingNavigation.IdStreetNavigation.IdStreet" title="Улица"
-                            asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdBuildingNavigation.IdStreet)}"></select>
+                    <label asp-for="@Model.Premise.IdBuildingNavigation.IdStreetNavigation.IdStreet">Улица</label>
+                    <select class="form-control" asp-for="@Model.Premise.IdBuildingNavigation.IdStreetNavigation.IdStreet" title="Улица"
+                            asp-items="@Model.KladrStreetsList"></select>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="IdBuildingNavigation.House">Номер дома</label>
-                    <input type="text" class="form-control" asp-for="IdBuildingNavigation.House" title="Номер дома">
+                    <label asp-for="@Model.Premise.IdBuildingNavigation.House">Номер дома</label>
+                    <input type="text" class="form-control" asp-for="@Model.Premise.IdBuildingNavigation.House" title="Номер дома">
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="IdPremisesTypeNavigation.PremisesTypeName">@Model.IdPremisesTypeNavigation.PremisesTypeName</label>
-                    @*<select class="form-control" asp-for="IdState" title="Улица"
-                        asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdBuildingNavigation.IdStreet)}"></select>*@
-                    <input type="text" class="form-control" asp-for="PremisesNum" title="Номер квартиры">
+                    <select class="form-control" asp-for="@Model.Premise.IdPremisesTypeNavigation.PremisesTypeName" title="Улица"
+                            asp-items="@Model.PremisesTypeAsNum"></select>
+                    <input type="text" class="form-control" asp-for="@Model.Premise.PremisesNum" title="Номер">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="Floor">Этаж</label>
-                    <input type="text" class="form-control" asp-for="Floor" title="Этаж">
+                    <label asp-for="@Model.Premise.Floor">Этаж</label>
+                    <input type="number" class="form-control" asp-for="@Model.Premise.Floor" title="Этаж">
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="NumRooms">Кол-во комнат</label>
-                    <input type="text" class="form-control" asp-for="NumRooms" title="Кол-во комнат">
+                    <label asp-for="@Model.Premise.NumRooms">Кол-во комнат</label>
+                    <input type="number" class="form-control" asp-for="@Model.Premise.NumRooms" title="Кол-во комнат">
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="NumBeds">Кол-во койко-мест</label>
-                    <input type="text" class="form-control" asp-for="NumBeds" title="Кол-во койко-мест">
+                    <label asp-for="@Model.Premise.NumBeds">Кол-во койко-мест</label>
+                    <input type="number" class="form-control" asp-for="@Model.Premise.NumBeds" title="Кол-во койко-мест">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="RegDate">Дата включения в РМИ</label>
-                    <input type="text" class="form-control" asp-for="RegDate" title="Дата включения в РМИ">
+                    <label asp-for="@Model.Premise.RegDate">Дата включения в РМИ</label>
+                    <input type="date" class="form-control" asp-for="@Model.Premise.RegDate" value="@Model.Premise.RegDate.ToString("yyyy-MM-dd")" title="Дата включения в РМИ">
                 </div>
                 <br />
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="RegDate">Размер платы от 28.08.2019</label>
-                    <input type="text" class="form-control" value="0.00" title="Размер платы от 28.08.2019">@*asp-for="RegDate"*@
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="RegDate">Размер платы до 28.08.2019</label>
-                    <input type="text" class="form-control" value="0.00" title="Размер платы от 28.08.2019">@*asp-for="RegDate"*@
-                </div>
-            </div>
-
-
-            <div class="form-row">
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="CadastralNum">Нб</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="Account">Кс</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="CadastralCost">К1</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="BalanceCost">К2</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="BalanceCost">К3</label>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" value="46.47689" title="Нб">
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" value="0.18" title="Кс">
-                </div>
-                <div name="payment">
-
-                </div>
                 @*
-                    <div class="form-group col r-form-group-label">
-                        <input type="text" class="form-control" value="0.00" title="К1">
-                    </div>
-                    <div class="form-group col r-form-group-label">
-                        <input type="text" class="form-control" value="0.00" title="К2">
-                    </div>
-                    <div class="form-group col r-form-group-label">
-                        <input type="text" class="form-control" value="0.00" title="К3">
-                    </div>
+            <div class="form-group col r-form-group-label">
+                <label asp-for="@Model.Premise.RegDate">Размер платы от 28.08.2019</label>
+                <input type="text" class="form-control" value="0.00" title="Размер платы от 28.08.2019">
+            </div>
+            <div class="form-group col r-form-group-label">
+                <label asp-for="@Model.Premise.RegDate">Размер платы до 28.08.2019</label>
+                <input type="text" class="form-control" value="0.00" title="Размер платы от 28.08.2019">
+            </div>
                 *@
             </div>
 
+            @*
+        <div class="form-row">
+            <div class="form-group col r-form-group-label">
+                <label asp-for="@Model.Premise.CadastralNum">Нб</label>
+            </div>
+            <div class="form-group col r-form-group-label">
+                <label asp-for="@Model.Premise.Account">Кс</label>
+            </div>
+            <div class="form-group col r-form-group-label">
+                <label asp-for="@Model.Premise.CadastralCost">К1</label>
+            </div>
+            <div class="form-group col r-form-group-label">
+                <label asp-for="@Model.Premise.BalanceCost">К2</label>
+            </div>
+            <div class="form-group col r-form-group-label">
+                <label asp-for="@Model.Premise.BalanceCost">К3</label>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col r-form-group-label">
+                <input type="number" data-decimals="5" min="0" max="100" step="0.1" class="form-control" value="46.47689" title="Нб">
+            </div>
+            <div class="form-group col r-form-group-label">
+                <input type="number" data-decimals="2" min="0" max="9" step="0.1" class="form-control" value="0.18" title="Кс">
+            </div>
+            <div name="payment">
+
+            </div>
+
+        <div class="form-group col r-form-group-label">
+            <input type="text" class="form-control" value="0.00" title="К1">
+        </div>
+        <div class="form-group col r-form-group-label">
+            <input type="text" class="form-control" value="0.00" title="К2">
+        </div>
+        <div class="form-group col r-form-group-label">
+            <input type="text" class="form-control" value="0.00" title="К3">
+        </div>
+
+        </div>*@
+
 
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="CadastralNum">Кадастровый номер</label>
+                    <label asp-for="@Model.Premise.CadastralNum">Кадастровый номер</label>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="Account">Лицевой счёт ФКР</label>
+                    <label asp-for="@Model.Premise.Account">Лицевой счёт ФКР</label>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="CadastralCost">Кадастровая стоимость</label>
+                    <label asp-for="@Model.Premise.CadastralCost">Кадастровая стоимость</label>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="BalanceCost">Балансовая стоимость</label>
+                    <label asp-for="@Model.Premise.BalanceCost">Балансовая стоимость</label>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" asp-for="CadastralNum" title="Кадастровый номер">
+                    <input type="text" class="form-control" asp-for="@Model.Premise.CadastralNum" title="Кадастровый номер">
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" asp-for="Account" title="Лицевой счёт ФКР">
+                    <input type="text" class="form-control" asp-for="@Model.Premise.Account" title="Лицевой счёт ФКР">
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" asp-for="LivingArea" title="Кадастровая стоимость">
+                    <input type="text" class="form-control" asp-for="@Model.Premise.CadastralCost" title="Кадастровая стоимость">@*data-decimals="2" min="0" max="100000000" step="0.1"*@
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" asp-for="BalanceCost" title="Балансовая стоимость">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="IdState">Текущее состояние</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="IdPremisesCommentNavigation.PremisesCommentText">Примечание</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="IdPremisesDoorKeysNavigation.LocationOfKeys">Ключи</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="FundsPremisesAssoc">Текущий фонд</label>
+                    <input type="text" class="form-control" asp-for="@Model.Premise.BalanceCost" title="Балансовая стоимость">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" asp-for="BalanceCost" title="Текущее состояние">
+                    <label asp-for="@Model.Premise.IdState">Текущее состояние</label>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" asp-for="IdPremisesCommentNavigation.PremisesCommentText" title="Примечание">
+                    <label asp-for="@Model.Premise.IdPremisesCommentNavigation.PremisesCommentText">Примечание</label>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" asp-for="IdPremisesDoorKeysNavigation.LocationOfKeys" title="Ключи">
+                    <label asp-for="@Model.Premise.IdPremisesDoorKeysNavigation.LocationOfKeys">Ключи</label>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" value="@GetTypeFund(Model)" title="Текущий фонд" readonly><!--*asp-for=""-->
+                    <label asp-for="@Model.Premise.FundsPremisesAssoc">Текущий фонд</label>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="TotalArea">Общая площадь</label>
-                    <input type="text" class="form-control" asp-for="TotalArea" title="Общая площадь">
+                    @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
+                    {
+                        <input type="text" class="form-control" asp-for="@Model.Premise.IdStateNavigation.StateFemale" title="Текущее состояние">
+                    }
+                    else
+                    {
+                        <select class="form-control" asp-for="@Model.Premise.IdState" asp-items="@Model.ObjectStatesList">
+                            <option></option>
+                        </select>
+                    }
+                    @*<input type="text" class="form-control" asp-for="@Model.Premise.BalanceCost" title="Текущее состояние">*@
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="LivingArea">Жилая площадь</label>
-                    <input type="text" class="form-control" asp-for="LivingArea" title="Жилая площадь">
+                    @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
+                    {
+                        <input type="text" class="form-control" asp-for="@Model.Premise.IdPremisesCommentNavigation.PremisesCommentText" title="Примечание">
+                    }
+                    else
+                    {
+                        <select class="form-control" asp-for="@Model.Premise.IdPremisesComment" asp-items="@Model.CommentList">
+                            <option></option>
+                        </select>
+                    }
+                    @*<input type="text" class="form-control" asp-for="@Model.Premise.IdPremisesCommentNavigation.PremisesCommentText" title="Примечание">*@
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="LivingArea">Площадь мун. комнат</label>
-                    <input type="text" class="form-control" value="0" title="Площадь мун. комнат">@*asp-for="LivingArea"*@
+                    @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
+                    {
+                        <input type="text" class="form-control" asp-for="@Model.Premise.IdPremisesDoorKeysNavigation.LocationOfKeys" title="Ключи">
+                    }
+                    else
+                    {
+                        <select class="form-control" asp-for="@Model.Premise.IdPremisesDoorKeys" asp-items="@Model.LocationKeysList">
+                            <option></option>
+                        </select>
+                    }
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="Height">Высота помещения</label>
-                    <input type="text" class="form-control" asp-for="Height" title="Высота помещения">
+                    @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
+                    {@*переписать asp-for*@
+                    <input type="text" class="form-control" value="@GetTypeFund(Model.Premise)" title="Текущий фонд" readonly><!--*asp-for=""-->
+                }
+                else
+                { @*переписать asp-for*@
+                <select class="form-control" asp-items="@Model.FundTypesList">
+                    @*asp-for="@Model.Premise.FundsPremisesAssoc"*@
+                    <option>@GetTypeFund(Model.Premise)</option>
+                </select>
+            }
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="@Model.Premise.TotalArea">Общая площадь</label>
+                    <input type="text" class="form-control" asp-for="@Model.Premise.TotalArea" title="Общая площадь">@*data-decimals="2" min="0" max="1000" step="0.1" *@
+                </div>
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="@Model.Premise.LivingArea">Жилая площадь</label>
+                    <input type="text" class="form-control" asp-for="@Model.Premise.LivingArea" title="Жилая площадь">
+                </div>
+                @*
+            <div class="form-group col r-form-group-label">
+                <label asp-for="@Model.Premise.LivingArea">Площадь мун. комнат</label>
+                <input type="number" data-decimals="2" min="0" max="1000" step="0.1" class="form-control" value="0" title="Площадь мун. комнат">
+            </div>
+                *@
+                <div class="form-group col r-form-group-label">
+                    <label asp-for="@Model.Premise.Height">Высота помещения</label>
+                    <input type="text" class="form-control" asp-for="@Model.Premise.Height" title="Высота помещения">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group col">
-                    <label asp-for="Description">Дополнительные сведения</label>
+                    <label asp-for="@Model.Premise.Description">Дополнительные сведения</label>
                     <textarea class="form-control" rows="3" cols="10"></textarea>
                 </div>
             </div>
             <br />@*&nbsp;*@
 
-
-            <!--Комнаты-->
-            <div class="form-row">
-                <div class="form-group col">
-                    @await Component.InvokeAsync("SubPremisesComponent", new { id = Model.IdPremises, action = ViewBag.Action })
+            @if (ViewBag.Action == "Edit" || ViewBag.Action == "Details")
+            {
+                <!--Комнаты-->
+                <div class="form-row">
+                    <div class="form-group col">
+                        @await Component.InvokeAsync("SubPremisesComponent", new { id = Model.Premise.IdPremises, action = ViewBag.Action })
+                    </div>
                 </div>
-            </div>
 
-            <!--Реквизиты-->
-            <div class="form-row">
-                <div class="form-group col">
-                    @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
+                <!--Реквизиты-->
+                <div class="form-row">
+                    <div class="form-group col">
+                        @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.Premise.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
+                    </div>
                 </div>
-            </div>
 
-            <!--Ограничения-->
-            <div class="form-row">
-                <div class="form-group col">
-                    @await Component.InvokeAsync("OwnershipRightsComponent", new { id = Model.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
+                <!--Ограничения-->
+                <div class="form-row">
+                    <div class="form-group col">
+                        @await Component.InvokeAsync("OwnershipRightsComponent", new { id = Model.Premise.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
+                    </div>
                 </div>
-            </div>
+            }
 
         </div>
     </div>

@@ -1,13 +1,14 @@
-﻿@model RegistryWeb.ViewModel.PremisesListVM;
-@using RegistryWeb.ViewOptions;
+﻿@using RegistryWeb.ViewOptions;
 @using RegistryWeb.Models.Entities;
 @using RegistryWeb.Extensions;
+@model RegistryWeb.ViewModel.PremisesVM<Premise>;
 @{
     Context.Session.Set("Controller", "Premises");
     Context.Session.Set("Action", "Index");
     Context.Session.Set("OrderOptions", Model.OrderOptions);
     Context.Session.Set("FilterOptions", Model.FilterOptions);
     Context.Session.Set("PageOptions", Model.PageOptions);
+
     string GetTypeFund(Premise premise)
     {
         var fundsHistory = premise.FundsPremisesAssoc.Select(fpa => fpa.IdFundNavigation);
@@ -18,26 +19,55 @@
         return fundHistory.IdFundTypeNavigation.FundTypeName;
     }
 }
+
+@section styles{
+    <link rel="stylesheet" href="~/css/premise.css" runat="server" />
+}
+
 <table class="table table-hover">
     <thead>
-        <tr>
-            <th class="r-table-header-cell">
-                <a href="#" data-order-field="IdPremises" data-order-direction="@OrderDirection.Ascending">
+        <tr style="align-content: center;">
+            <th class="r-table-header-cell" style="width:155px;">
                     № по рeестру
-                </a>
+                    @if (Model.OrderOptions.OrderDirection == OrderDirection.Ascending)
+                    {
+                        <a href="#" class="oi oi-sort-descending sort " data-order-field="IdPremises" data-order-direction="1"></a>
+                    }
+                    else
+                    {
+                        <a href="#" class="oi oi-sort-ascending sort" data-order-field="IdPremises" data-order-direction="0"></a>
+                    }
+                @*<a href="#" data-order-field="IdPremises" data-order-direction="@OrderDirection.Ascending"></a>*@
             </th>
-            <th>Адрес</th>
-            <th class="r-table-header-cell">
-                <a href="#" data-order-field="PremisesType" data-order-direction="@OrderDirection.Ascending">
-                    Тип помещения
-                </a>
+            <th>
+                Адрес
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Ascending)
+                {
+                    <a href="#" class="oi oi-sort-descending sort " data-order-field="PremisesType" data-order-direction="1"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort" data-order-field="PremisesType" data-order-direction="0"></a>
+                }
             </th>
-            <th>Кадастровый номер</th>
-            <th>Общая площадь</th>
+            @*<th class="r-table-header-cell">
+                    <a href="#" data-order-field="PremisesType" data-order-direction="@OrderDirection.Ascending">
+                        Тип помещения
+                    </a>
+                </th>
+                <th>Кадастровый номер</th>
+                <th>Общая площадь</th>*@
             <th class="r-table-header-cell">
-                <a href="#" data-order-field="ObjectState" data-order-direction="@OrderDirection.Ascending">
-                    Текущее состояние
-                </a>
+                Текущее состояние
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Ascending)
+                {
+                <a href="#" class="oi oi-sort-descending sort " data-order-field="ObjectState" data-order-direction="1"></a>
+                }
+                else
+                {
+                <a href="#" class="oi oi-sort-ascending sort" data-order-field="ObjectState" data-order-direction="0"></a>
+                }
+                @*<a href="#" data-order-field="ObjectState" data-order-direction="@OrderDirection.Ascending"></a>*@
             </th>
             <th>Текущий фонд</th>
             <th></th>
@@ -58,88 +88,72 @@
                     @item.IdBuildingNavigation.IdStreetNavigation.StreetLong,
                     д.@item.IdBuildingNavigation.House,
                     @item.IdPremisesTypeNavigation.PremisesTypeShort@item.PremisesNum
+
+                    <div id="dopinfo">
+                        Тип помещения: @item.IdPremisesTypeNavigation.PremisesTypeName
+                        Кадастровый номер: @item.CadastralNum
+                        Общая площадь: @item.TotalArea
+                    </div>
+
                 </td>
-                <td>@item.IdPremisesTypeNavigation.PremisesTypeName</td>
-                <td>@item.CadastralNum</td>
-                <td>@item.TotalArea</td>
+
+
                 <td>@item.IdStateNavigation.StateNeutral</td>
                 <td>@GetTypeFund(item)</td>
                 <td>
-                    <input id="PremiseId" asp-for="@item.IdPremises" hidden />
-                    <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
-                       asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises"></a>
-                    @*<a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
-                            asp-controller="Premises" asp-action="Edit" asp-route-idpremises="@item.IdPremises"></a>
-                        <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                            asp-controller="Premises" asp-action="Delete" asp-route-idpremises="@item.IdPremises"></a>
-                        <a class="btn btn-default" title="История фондов" aria-label="История фондов"
-                            asp-controller="FundsHistory" asp-action="Index" asp-route-idpremises="@item.IdPremises"></a>*@
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        <div class="btn-group" role="group" aria-label="Панель доступа">
+                            <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-left" aria-labelledby="toolsBtn_@item.IdPremises">
+                                <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
+                                   asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises" asp-route-action="Details"></a>
+                                <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                                   asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@item.IdPremises" asp-route-action="Edit"></a>
+                                <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                                   asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@item.IdPremises"></a>
+                            </div>
+                        </div>
+                        @*
+                        <div class="btn-group" role="group" aria-label="Панель доступа">
+                            <button class="btn btn-info oi oi-grid-four-up dropdown-toggle" type="button" title="Связанные объекты" aria-label="Связанные объекты" id="objectsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@item.IdPremises">
+                                <a class="btn btn-info oi oi-book" title="История фондов" aria-label="История фондов"
+                                   asp-controller="FundsHistory" asp-action="Index" asp-route-idPremises="@item.IdPremises"></a>
+                                <a class="btn btn-info oi oi-book" title="История найма" aria-label="История найма"
+                                   asp-controller="FundsHistory" asp-action="Index" asp-route-idPremises="@item.IdPremises"></a>
+                                <a class="btn btn-info oi oi-book" title="Лицевые счета" aria-label="Лицевые счета"
+                                   asp-controller="FundsHistory" asp-action="Index" asp-route-idPremises="@item.IdPremises"></a>
+                            </div>
+                        </div>
+                        <div class="btn-group" role="group" aria-label="Панель доступа">
+                            <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdPremises">
+                                <a class="dropdown-item" asp-action="Forma2" asp-controller="OwnerProcesses" asp-route-IdPremises="@item.IdPremises">Форма 1</a>
+                                <a class="dropdown-item" asp-action="Forma2" asp-controller="OwnerProcesses" asp-route-IdPremises="@item.IdPremises">Форма 2</a>
+                                <a class="dropdown-item" asp-action="Forma2" asp-controller="OwnerProcesses" asp-route-IdPremises="@item.IdPremises">Форма 3</a>
+                                <a class="dropdown-item" asp-action="Forma2" asp-controller="OwnerProcesses" asp-route-IdPremises="@item.IdPremises">Форма 4</a>
+                                <a class="dropdown-item" asp-action="Forma2" asp-controller="OwnerProcesses" asp-route-IdPremises="@item.IdPremises">Форма 5</a>
+                            </div>
+                        </div>
+*@
+                    </div>
+
+                    @*
+        <div class="btn-group">
+            <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
+               asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises" asp-route-action="Details"></a>
+            <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+               asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@item.IdPremises" asp-route-action="Edit"></a>
+        </div>
+        <div class="btn-group">
+            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+               asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@item.IdPremises"></a>
+            <a class="btn btn-info oi oi-book" title="История фондов" aria-label="История фондов"
+               asp-controller="FundsHistory" asp-action="Index" asp-route-idPremises="@item.IdPremises"></a>
+        </div>
+                    *@
                 </td>
             </tr>
         }
     </tbody>
 </table>
-
-@*
-@section scripts
-{
-    <script type="text/javascript">
-
-        var ostatockArray;
-        $(document).ready(function ()
-        {
-            var idPremise = $(this).val(); //Model.IdPremises || 0;
-            //var idBuilding = $(this).val()//Model.IdBuilding || 0;
-            console.log(idPremise);
-            idPremise = $("#PremiseId").val();
-
-            $.getJSON('@Url.Action("GetPaymentForPremiseInfo")?' + "id=" + idPremise , function (data)
-            {
-                ostatockArray = data;
-                console.log(ostatockArray);
-                //data.Cost=Rows[this].Cost;
-                var options = "<div class='form-group col r-form-group-label'>";
-                options += "<div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K1+" title='К1'></div> <div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K2+" title='К2'></div><div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K3+" title='К3'></div>";
-                options += "</div>";
-
-                $("div[name$='payment']").each(function (idx, elem)
-                {
-                    var idPerson = $(this).val();
-                    $(this).html(options);
-                    $(this).val(idPerson);
-                    $(this).change();
-                });
-            });
-        });
-
-        $("#premisedetail").on('click', function ()
-        {
-            var idPremise = $(this).val(); //Model.IdPremises || 0;
-            //var idBuilding = $(this).val()//Model.IdBuilding || 0;
-            console.log(idPremise);
-            idPremise = $("#PremiseId").val();
-
-            $.getJSON('@Url.Action("GetPaymentForPremiseInfo")?' + "id=" + idPremise , function (data)
-            {
-                ostatockArray = data;
-                console.log(ostatockArray);
-                //data.Cost=Rows[this].Cost;
-                var options = "<div class='form-group col r-form-group-label'>";
-                options += "<div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K1+" title='К1'></div> <div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K2+" title='К2'></div><div class='form-group col r-form-group-label'><input type='text' class='form-control' value="+ostatockArray.K3+" title='К3'></div>";
-                options += "</div>";
-
-                $("div[name$='payment']").each(function (idx, elem)
-                {
-                    var idPerson = $(this).val();
-                    $(this).html(options);
-                    $(this).val(idPerson);
-                    $(this).change();
-                });
-            });
-        });
-
-    </script>
-}
-
-
-*@
