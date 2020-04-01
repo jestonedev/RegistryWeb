@@ -46,6 +46,9 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("FilterOptions");
             }
             ViewBag.ObjectStates = dataService.ObjectStates;
+            ViewBag.KladrStreets = dataService.KladrStreets;
+            ViewBag.OwnershipRightTypes = dataService.OwnershipRightTypes;
+            ViewBag.GovernmentDecrees = dataService.GovernmentDecrees;
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
@@ -146,6 +149,7 @@ namespace RegistryWeb.Controllers
             ViewBag.StructureTypeOverlaps = dataService.StructureTypeOverlaps;
             ViewBag.KladrStreets = dataService.KladrStreets;
             ViewBag.HeatingTypes = dataService.HeatingTypes;
+            ViewBag.GovernmentDecrees = dataService.GovernmentDecrees;
             return View("Building", building);
         }
     }

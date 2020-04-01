@@ -17,8 +17,9 @@
 			});
 		},
 		select: function (event, ui) {
-			$('input[name="FilterOptions.Address.Id"]').val(ui.item.id);
-			addressFilterClearBtnShow();
+            $('input[name="FilterOptions.Address.Id"]').val(ui.item.id);
+            filterClearModal();
+            $("form.filterForm").submit();
 		},
 		delay: 300,
 		minLength: 3
@@ -34,25 +35,51 @@ var focusOutFilterOptionsAddress = function () {
 		addressClear();
 	}
 }
-var addressFilterClearBtnShow = function () {
-	$('#FilterOptions_Address_Text').prop("disabled", true);
-	$('#addressFilterClearBtn').show();
+var addressFilterClearBtnVisibility = function () {
+    if ($('input[name="FilterOptions.Address.Id"]').val() != "") {
+        $('#FilterOptions_Address_Text').prop("disabled", true);
+        $('#addressFilterClearBtn').show();
+    }
+    else {
+        $('#addressFilterClearBtn').hide();
+    }
 };
 var addressFilterClear = function () {
 	addressClear();
 	$('#FilterOptions_Address_Text').prop("disabled", false);
-	$('#addressFilterClearBtn').hide();
+    $('#addressFilterClearBtn').hide();
+    $("form.filterForm").submit();
 };
-var formSubmit = function () {
-	$('#FilterOptions_Address_Text').prop("disabled", false);
-	$("form.r-filter-form").submit();
+var searchModal = function () {
+    addressClear();
+    $("form.filterForm").submit();
 };
-
+var filterClearModal = function () {
+    $('input[name="FilterOptions.IdBuilding"]').val("");
+    $('#FilterOptions_IdStreet').val("");
+    $('#FilterOptions_IdStreet').selectpicker('render');
+    $('input[name="FilterOptions.House"]').val("");
+    $('input[name="FilterOptions.Floors"]').val("");
+    $('input[name="FilterOptions.Entrances"]').val("");
+    $('#FilterOptions_IdsObjectState').selectpicker("deselectAll");
+    $('#FilterOptions_IdDecree').val("");
+    $('#FilterOptions_IdDecree').selectpicker('render');
+    $('input[name="FilterOptions.DateOwnershipRight"]').val("");
+    $('input[name="FilterOptions.NumberOwnershipRight"]').val("");
+    $('#FilterOptions_IdsOwnershipRightType').selectpicker("deselectAll");
+};
+var filterClear = function () {
+    filterClearModal();
+    $("form.filterForm").submit();
+}
 $(function () {
-	autocompleteFilterOptionsAddress();
+    autocompleteFilterOptionsAddress();
+    addressFilterClearBtnVisibility();
 	$('#FilterOptions_Address_Text').focusout(focusOutFilterOptionsAddress);
 	$('#addressFilterClearBtn').click(addressFilterClear);
-    $('#r-search-btn').click(formSubmit);
+    $('#searchModalBtn').click(searchModal);
+    $('#filterClearModalBtn').click(filterClearModal);
+    $('#filterClearBtn').click(filterClear);
 
     $('.idBuildingCheckbox').click(function (e) {
         var id = +$(this).data('id');
@@ -62,6 +89,13 @@ $(function () {
             data: { idBuilding: id, isCheck: $(this).prop('checked') }
         });
     });
+
+    $("#filterModalShow").on("click", function (e) {
+        e.preventDefault();
+        var modal = $("#filterModal");
+        modal.modal('show');
+    });
+
 	//$("a.sort").click(function () {
 	//	$('input[name="OrderOptions.OrderField"]').val($(this).data("order-field"));
 	//	$('input[name="OrderOptions.OrderDirection"]').val($(this).data("order-direction"));
@@ -69,12 +103,7 @@ $(function () {
 	//});
 	$('.page-link').click(function () {
 		$('input[name="PageOptions.CurrentPage"]').val($(this).data("page"));
-		formSubmit();
+        $('#FilterOptions_Address_Text').prop("disabled", false);
+        $("form.filterForm").submit();
 	});
-	if ($('input[name="FilterOptions.Address.Id"]').val() != "") {
-		addressFilterClearBtnShow();
-	}
-	else {
-		$('#addressFilterClearBtn').hide();
-	}
 });

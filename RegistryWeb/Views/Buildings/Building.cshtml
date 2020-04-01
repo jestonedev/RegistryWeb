@@ -43,20 +43,27 @@
         </div>
         <div class="card-body" id="building">
             <div class="form-row">
-                <div class="form-group col-10 r-form-group-label">
+                <div class="form-group col-8 r-form-group-label">
                     <label asp-for="IdStreet">Улица</label>
                 </div>
                 <div class="form-group col-2 r-form-group-label">
                     <label asp-for="House">Номер дома</label>
                 </div>
+                <div class="form-group col-2 r-form-group-label">
+                    <label asp-for="IdDecree">Постановление</label>
+                </div>
             </div>
             <div class="form-row">
-                <div class="form-group col-10">
+                <div class="form-group col-8">
                     <select class="form-control" asp-for="IdStreet" title="Улица"
                             asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdStreet)}"></select>
                 </div>
                 <div class="form-group col-2">
                     <input type="text" class="form-control" asp-for="House" title="Номер дома">
+                </div>
+                <div class="form-group col-2">
+                    <select class="form-control" asp-for="IdDecree" title="Постановление"
+                            asp-items="@{new SelectList(ViewBag.GovernmentDecrees, "IdDecree", "Number", Model.IdDecree)}"></select>
                 </div>
             </div>
 
