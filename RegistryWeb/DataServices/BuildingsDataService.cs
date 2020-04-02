@@ -248,7 +248,7 @@ namespace RegistryWeb.DataServices
         {
         }
 
-        public void Edit(int idBuilding)
+        public void Edit(Building newBuilding)
         {
         }
     }
