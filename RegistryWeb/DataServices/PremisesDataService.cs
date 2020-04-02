@@ -98,9 +98,9 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<Premise> GetQueryFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
         {
-            if (!string.IsNullOrEmpty(filterOptions.Address.Text))
+            if (!filterOptions.IsAddressEmpty())
             {
-                query = query.Where(p => p.IdBuildingNavigation.IdStreetNavigation.StreetLong.ToUpperInvariant().Contains(filterOptions.Address.Text.ToUpperInvariant()) || p.IdBuildingNavigation.IdStreetNavigation.IdStreet.Equals(filterOptions.Address.Id));
+                query = AddressFilter(query, filterOptions);
             }
             if (filterOptions.IdPremisesType.HasValue)
             {
@@ -126,24 +126,12 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
-        private IQueryable<Premise> ObjectStateFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
-        {
-            if (filterOptions.IdObjectState.HasValue && filterOptions.IdObjectState.Value != 0)
-            {
-                query = query.Where(b => b.IdStateNavigation.IdState == filterOptions.IdObjectState.Value);
-            }
-            return query;
-        }
-
-
         private IQueryable<Premise> AddressFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
         {
-            if (filterOptions.IsAddressEmpty())
-                return query;
-            /*if (filterOptions.Address.AddressType == AddressTypes.Street)
+            if (filterOptions.Address.AddressType == AddressTypes.Street)
             {
-                return query.Where(q => q.IdStreet.Equals(filterOptions.Address.Id));
-            }*/
+                return query.Where(q => q.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id));
+            }
             int id = 0;
             if (!int.TryParse(filterOptions.Address.Id, out id))
                 return query;
@@ -151,15 +139,19 @@ namespace RegistryWeb.DataServices
             {
                 return query.Where(q => q.IdBuilding == id);
             }
+            if (filterOptions.Address.AddressType == AddressTypes.Premise)
+            {
+                return query.Where(q => q.IdPremises == id);
+            }
+            if (filterOptions.Address.AddressType == AddressTypes.SubPremise)
+            {
+                return from q in query
+                        join sp in registryContext.SubPremises
+                            on q.IdPremises equals sp.IdPremises
+                        where sp.IdSubPremises == id
+                        select q;
+            }
             return query;
-        }
-
-        private bool FilterTypeFund(Premise premise, PremisesListFilter filterOptions)
-        {
-            var fundsHistory = premise.FundsPremisesAssoc.Select(fpa => fpa.IdFundNavigation);
-            var fundHistory = fundsHistory
-                .FirstOrDefault(fh => fh.ExcludeRestrictionDate == null && fh.IdFund == fundsHistory.Max(f => f.IdFund));
-            return fundHistory == null ? false : fundHistory.IdFundTypeNavigation.IdFundType == filterOptions.IdFundType.Value;
         }
 
         private IQueryable<Premise> GetQueryOrder(IQueryable<Premise> query, OrderOptions orderOptions)

@@ -15,7 +15,9 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool IsEmpty()
         {
             return IsAddressEmpty() &&
-                (IdObjectState == null || IdObjectState.Value == 0);
+                (IdPremisesType == null || IdPremisesType.Value == 0) &&
+                (IdObjectState == null || IdObjectState.Value == 0) &&
+                (IdFundType == null || IdFundType.Value == 0);
         }
     }
 }
