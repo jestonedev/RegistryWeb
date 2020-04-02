@@ -1,23 +1,25 @@
 ﻿@model RegistryWeb.ViewModel.BuildingsVM;
 @using RegistryWeb.ViewOptions;
+@using RegistryWeb.SecurityServices;
 @using RegistryWeb.Extensions;
-@{ 
+@{
     var ids = Context.Session.Get<List<int>>("idBuildings") ?? new List<int>();
     Context.Session.Set("Controller", "Buildings");
     Context.Session.Set("Action", "Index");
-    Context.Session.Set("OrderOptions",Model.OrderOptions);
+    Context.Session.Set("OrderOptions", Model.OrderOptions);
     Context.Session.Set("FilterOptions", Model.FilterOptions);
     Context.Session.Set("PageOptions", Model.PageOptions);
     var check = "";
+    var securityService = (SecurityService)ViewData["SecurityService"];
 }
 <table class="table table-hover">
     <thead>
         <tr>
             @*<th class="r-table-header-cell">
-            <a href="#" data-order-field="IdBuilding" data-order-direction="@OrderDirection.Ascending">
-                № по реестру
-            </a>
-        </th>*@
+                    <a href="#" data-order-field="IdBuilding" data-order-direction="@OrderDirection.Ascending">
+                        № по реестру
+                    </a>
+                </th>*@
             <th class="align-middle"></th>
             <th class="align-middle">№ по реестру</th>
             <th width="350px" class="align-middle">Адрес</th>
@@ -26,40 +28,44 @@
             <th class="align-middle">Жилая площадь</th>
             <th class="align-middle">Текущее состояние</th>
             @*<th class="r-table-header-cell">
-            <a href="#" data-order-field="ObjectState" data-order-direction="@OrderDirection.Ascending">
-                Текущее состояние
-            </a>
-        </th>*@
+                    <a href="#" data-order-field="ObjectState" data-order-direction="@OrderDirection.Ascending">
+                        Текущее состояние
+                    </a>
+                </th>*@
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.Buildings)
         {
-        <tr>
-            @if (ids.Contains(item.IdBuilding))
-            {
-                check = "checked";
-            }
-            else
-            {
-                check = "";
-            }
-            <td class="align-middle"><input type="checkbox" class="idBuildingCheckbox" data-id="@item.IdBuilding" @Html.Raw(check) /></td>
-            <td class="align-middle">@item.IdBuilding</td>
-            <td class="align-middle">@item.IdStreetNavigation.StreetName, д.@item.House</td>
-            <td class="align-middle">@item.CadastralNum</td>
-            <td class="align-middle">@item.TotalArea</td>
-            <td class="align-middle">@item.LivingArea</td>
-            <td class="align-middle">@item.IdStateNavigation.StateNeutral</td>
-            <td class="align-middle">
-                <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                   asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
-                @*<a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
-               asp-action="Edit" asp-controller="Building" asp-route-idBuilding="@item.IdBuilding"></a>
-            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-               asp-action="Delete" asp-controller="Building" asp-route-idBuilding="@item.IdBuilding"></a>*@
-            </td>
-        </tr>
+            <tr>
+                @if (ids.Contains(item.IdBuilding))
+                {
+                    check = "checked";
+                }
+                else
+                {
+                    check = "";
+                }
+                <td class="align-middle"><input type="checkbox" class="idBuildingCheckbox" data-id="@item.IdBuilding" @Html.Raw(check) /></td>
+                <td class="align-middle">@item.IdBuilding</td>
+                <td class="align-middle">@item.IdStreetNavigation.StreetName, д.@item.House</td>
+                <td class="align-middle">@item.CadastralNum</td>
+                <td class="align-middle">@item.TotalArea</td>
+                <td class="align-middle">@item.LivingArea</td>
+                <td class="align-middle">@item.IdStateNavigation.StateNeutral</td>
+                <td class="align-middle">
+                    <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                       asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
+                    @*@if (securityService.HasPrivilege(Privileges.RegistryWriteAll))
+                    {
+                        <a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
+                           asp-action="Edit" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
+                        <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                           asp-action="Delete" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
+                    }*@
+
+                </td>
+            </tr>
         }
     </tbody>
 </table>

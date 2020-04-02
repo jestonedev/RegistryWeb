@@ -243,5 +243,13 @@ namespace RegistryWeb.DataServices
         {
             get => registryContext.GovernmentDecrees.AsNoTracking();
         }
+
+        public void Delete(int idBuilding)
+        {
+        }
+
+        public void Edit(int idBuilding)
+        {
+        }
     }
 }

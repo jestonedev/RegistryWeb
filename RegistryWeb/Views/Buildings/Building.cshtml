@@ -20,7 +20,7 @@
 {
     <link rel="stylesheet" href="~/css/building.css" runat="server" />
 }
-<form asp-controller="Buildings" asp-action="@ViewBag.Action" id="r-buildings-form" data-action="@ViewBag.Action" method="post">
+<form asp-controller="Buildings" asp-action="@ViewBag.Action" id="buildingsForm" data-action="@ViewBag.Action" method="post">
     <div class="card">
         <div class="card-header d-flex justify-content-between">
             <label class="form-check-label h2">@ViewData["Title"]</label>
@@ -42,6 +42,7 @@
             </div>
         </div>
         <div class="card-body" id="building">
+            <input type="hidden" asp-for="IdBuilding" />
             <div class="form-row">
                 <div class="form-group col-8 r-form-group-label">
                     <label asp-for="IdStreet">Улица</label>

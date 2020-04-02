@@ -49,6 +49,7 @@ namespace RegistryWeb.Controllers
             ViewBag.KladrStreets = dataService.KladrStreets;
             ViewBag.OwnershipRightTypes = dataService.OwnershipRightTypes;
             ViewBag.GovernmentDecrees = dataService.GovernmentDecrees;
+            ViewBag.SecurityService = securityService;
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
@@ -73,7 +74,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Forma1()
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
             if (!HttpContext.Session.Keys.Contains("idBuildings"))
                 return Error("Не выбрано ни одного здания.");
@@ -133,11 +134,63 @@ namespace RegistryWeb.Controllers
         {
             if (idBuilding == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
             var building = dataService.GetBuilding(idBuilding.Value);
             if (building == null)
                 return NotFound();
+            return GetBuildingView(building);
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int? idBuilding)
+        {
+            if (idBuilding == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
+                return View("NotAccess");
+            var building = dataService.GetBuilding(idBuilding.Value);
+            if (building == null)
+                return NotFound();
+            return GetBuildingView(building);
+        }
+
+        [HttpPost]
+        public IActionResult Delete(Building building)
+        {
+            if (building == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
+                return View("NotAccess");
+            dataService.Delete(building.IdBuilding);
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int? idBuilding)
+        {
+            if (idBuilding == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
+                return View("NotAccess");
+            var building = dataService.GetBuilding(idBuilding.Value);
+            if (building == null)
+                return NotFound();
+            return GetBuildingView(building);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Building building)
+        {
+            if (building == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
+                return View("NotAccess");
+            if (ModelState.IsValid)
+            {
+                dataService.Edit(building);
+                return RedirectToAction("Index");
+            }
             return GetBuildingView(building);
         }
 

@@ -6,7 +6,7 @@
 $(function () {
     $('#buildingToggle').click(buildingToggle);
 
-    var action = $('#r-buildings-form').data("action");
+    var action = $('#buildingsForm').data("action");
     if (action == "Details" || action == "Delete") {
         $('select').prop('disabled', true);
         $('input').prop('disabled', true);
