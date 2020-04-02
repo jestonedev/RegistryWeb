@@ -34,6 +34,10 @@ namespace RegistryWeb.DataServices
             viewModel.ObjectStatesList = new SelectList(ObjectStates, "IdState", "StateFemale");
             viewModel.PremisesTypesList = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesTypeName");
             viewModel.FundTypesList = new SelectList(registryContext.FundTypes, "IdFundType", "FundTypeName");
+            viewModel.OwnershipRightTypesList = new SelectList(registryContext.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName");
+            viewModel.RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName");
+            viewModel.LocationKeysList = new SelectList(registryContext.PremisesDoorKeys, "IdPremisesDoorKeys", "LocationOfKeys");
+            viewModel.CommentList = new SelectList(registryContext.PremisesComments, "IdPremisesComment", "PremisesCommentText");
             return viewModel;
         }
 
@@ -98,17 +102,33 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<Premise> GetQueryFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
         {
-            if (!string.IsNullOrEmpty(filterOptions.Address.Text))
+            if (!filterOptions.IsAddressEmpty())
             {
-                query = query.Where(p => p.IdBuildingNavigation.IdStreetNavigation.StreetLong.ToUpperInvariant().Contains(filterOptions.Address.Text.ToUpperInvariant()) || p.IdBuildingNavigation.IdStreetNavigation.IdStreet.Equals(filterOptions.Address.Id));
+                query = AddressFilter(query, filterOptions);
             }
-            if (filterOptions.IdPremisesType.HasValue)
+            if (filterOptions.IdPremise.HasValue)
             {
-                query = query.Where(p => p.IdPremisesTypeNavigation.IdPremisesType == filterOptions.IdPremisesType.Value);
+                query = query.Where(p => p.IdPremises == filterOptions.IdPremise.Value);
             }
-            if (filterOptions.IdObjectState.HasValue)
+            if (!string.IsNullOrEmpty(filterOptions.House))
             {
-                query = query.Where(p => p.IdStateNavigation.IdState == filterOptions.IdObjectState.Value);
+                query = query.Where(b => b.IdBuildingNavigation.House.ToLower() == filterOptions.House.ToLower());
+            }
+            if (!string.IsNullOrEmpty(filterOptions.PremisesNum))
+            {
+                query = query.Where(b => b.PremisesNum == filterOptions.PremisesNum);
+            }
+            if (filterOptions.Floors.HasValue)
+            {
+                query = query.Where(b => b.Floor == filterOptions.Floors.Value);
+            }
+            if (!string.IsNullOrEmpty(filterOptions.IdStreet))
+            {
+                query = query.Where(b => b.IdBuildingNavigation.IdStreet == filterOptions.IdStreet);
+            }
+            if (!string.IsNullOrEmpty(filterOptions.CadastralNum))
+            {
+                query = query.Where(b => b.CadastralNum == filterOptions.CadastralNum);
             }
             if (filterOptions.IdFundType.HasValue)
             {
@@ -123,33 +143,80 @@ namespace RegistryWeb.DataServices
 
                 query = query.Where(p => idPremises.Contains(p.IdPremises));
             }
-            return query;
-        }
-
-        private IQueryable<Premise> ObjectStateFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
-        {
+            /*if (!string.IsNullOrEmpty(filterOptions.RestrictionNum))
+            {
+                query = query.Where(b => b.RestrictionPremisesAssoc == filterOptions.RestrictionNum);
+            }*/
+            if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Count!=0)
+            {
+                var obas = registryContext.OwnershipPremisesAssoc
+                    .Include(oba => oba.OwnershipRightNavigation)
+                    .AsTracking();
+                if (!string.IsNullOrEmpty(filterOptions.NumberOwnershipRight))
+                    obas = obas.Where(oba => oba.OwnershipRightNavigation.Number == filterOptions.NumberOwnershipRight);
+                if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Count != 0)
+                    obas = obas.Where(oba => filterOptions.IdsOwnershipRightType.Contains(oba.OwnershipRightNavigation.IdOwnershipRightType));
+                query = from q in query
+                        join idPremise in obas.Select(oba => oba.IdPremises).Distinct()
+                            on q.IdPremises equals idPremise
+                        select q;
+            }
             if (filterOptions.IdObjectState.HasValue && filterOptions.IdObjectState.Value != 0)
             {
-                query = query.Where(b => b.IdStateNavigation.IdState == filterOptions.IdObjectState.Value);
+                query = query.Where(p => p.IdStateNavigation.IdState == filterOptions.IdObjectState.Value);
+            }
+            if (filterOptions.IdComment.HasValue && filterOptions.IdComment.Value != 0)
+            {
+                query = query.Where(p => p.IdStateNavigation.IdState == filterOptions.IdObjectState.Value);
+            }
+            if (filterOptions.IdLocationDoorKeys.HasValue && filterOptions.IdLocationDoorKeys.Value != 0)
+            {
+                query = query.Where(p => p.IdPremisesDoorKeysNavigation.IdPremisesDoorKeys == filterOptions.IdLocationDoorKeys.Value);
+            }
+            if (filterOptions.StDateOwnershipRight.HasValue && !filterOptions.EndDateOwnershipRight.HasValue)
+            {
+                var stDate = filterOptions.StDateOwnershipRight.Value.Date;
+                query = query.Where(r => r.RegDate != null && r.RegDate >= stDate);
+            }
+            else if (!filterOptions.StDateOwnershipRight.HasValue && filterOptions.EndDateOwnershipRight.HasValue)
+            {
+                var fDate = filterOptions.EndDateOwnershipRight.Value.Date.AddDays(1);
+                query = query.Where(r => r.RegDate != null && r.RegDate < fDate);
+            }
+            else if (filterOptions.EndDateOwnershipRight.HasValue && filterOptions.StDateOwnershipRight.HasValue)
+            {
+                var stDate = filterOptions.StDateOwnershipRight.Value.Date;
+                var fDate = filterOptions.EndDateOwnershipRight.Value.Date.AddDays(1);
+                query = query.Where(r => r.RegDate != null && r.RegDate >= stDate && r.RegDate < fDate);
             }
             return query;
         }
-
 
         private IQueryable<Premise> AddressFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
         {
             if (filterOptions.IsAddressEmpty())
                 return query;
-            /*if (filterOptions.Address.AddressType == AddressTypes.Street)
-            {
-                return query.Where(q => q.IdStreet.Equals(filterOptions.Address.Id));
-            }*/
+
+            if (filterOptions.Address.AddressType == AddressTypes.Street)            
+                return query.Where(q => q.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id));
+            
             int id = 0;
             if (!int.TryParse(filterOptions.Address.Id, out id))
                 return query;
-            if (filterOptions.Address.AddressType == AddressTypes.Building)
-            {
+
+            if (filterOptions.Address.AddressType == AddressTypes.Building)            
                 return query.Where(q => q.IdBuilding == id);
+            
+            if (filterOptions.Address.AddressType == AddressTypes.Premise)            
+                return query.Where(q => q.IdPremises == id);
+            
+            if (filterOptions.Address.AddressType == AddressTypes.SubPremise)
+            {
+                return from q in query
+                       join sp in registryContext.SubPremises
+                       on q.IdPremises equals sp.IdPremises
+                       where sp.IdSubPremises == id
+                       select q;
             }
             return query;
         }
@@ -222,11 +289,6 @@ namespace RegistryWeb.DataServices
         public PremisesVM<Premise> GetPremiseView(Premise premise, [CallerMemberName]string action = "")
         {
             //ViewBag.Action = action;
-
-            /*ViewBag.ObjectStates = dataService.ObjectStates;
-            ViewBag.StructureTypes = dataService.StructureTypes;
-            ViewBag.KladrStreets = dataService.KladrStreets;
-            ViewBag.HeatingTypes = dataService.HeatingTypes;*/
             var premisesVM = new PremisesVM<Premise>()
             {
                 Premise = premise,
@@ -238,7 +300,9 @@ namespace RegistryWeb.DataServices
                 PremisesTypeAsNum = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesTypeAsNum"),
                 FundTypesList = new SelectList(registryContext.FundTypes, "IdFundType", "FundTypeName"),
                 LocationKeysList = new SelectList(registryContext.PremisesDoorKeys, "IdPremisesDoorKeys", "LocationOfKeys"),
-                CommentList = new SelectList(registryContext.PremisesComments, "IdPremisesComment", "PremisesCommentText")
+                CommentList = new SelectList(registryContext.PremisesComments, "IdPremisesComment", "PremisesCommentText"),
+                OwnershipRightTypesList = new SelectList(registryContext.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName"),
+                RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName")
             };
 
             return premisesVM;

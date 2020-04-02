@@ -18,7 +18,9 @@
         },
         select: function (event, ui) {
             $('input[name="FilterOptions.Address.Id"]').val(ui.item.id);
-            addressFilterClearBtnShow();
+            filterClearModal();
+            $("form.filterForm").submit();
+            //addressFilterClearBtnShow();
         },
         delay: 300,
         minLength: 3
@@ -34,7 +36,7 @@ var focusOutFilterOptionsAddress = function () {
         addressClear();
     }
 }
-var addressFilterClearBtnShow = function () {
+var addressFilterClearBtnVisibility = function () {
     if ($('input[name="FilterOptions.Address.Id"]').val() != "") {
         $('#FilterOptions_Address_Text').prop("disabled", true);
         $('#addressFilterClearBtn').show();
@@ -47,45 +49,45 @@ var addressFilterClear = function () {
     addressClear();
     $('#FilterOptions_Address_Text').prop("disabled", false);
     $('#addressFilterClearBtn').hide();
-    //$("form.filterForm").submit();
+    $("form.filterForm").submit();
 };
-/*var searchModal = function () {
+var searchModal = function () {
     addressClear();
+    $("form.filterForm").submit();
+};
+
+/*var formSubmit = function () {
+    $('#FilterOptions_Address_Text').prop("disabled", false);
     $("form.filterForm").submit();
 };*/
 
-var formSubmit = function () {
-    $('#FilterOptions_Address_Text').prop("disabled", false);
-    $("form.filterForm").submit();
-};
-
-/*var filterClearModal = function () {
-    $('input[name="FilterOptions.IdBuilding"]').val("");
+var filterClearModal = function () {
+    $('input[name="FilterOptions.IdPremise"]').val("");
     $('#FilterOptions_IdStreet').val("");
     $('#FilterOptions_IdStreet').selectpicker('render');
     $('input[name="FilterOptions.House"]').val("");
     $('input[name="FilterOptions.Floors"]').val("");
-    $('input[name="FilterOptions.Entrances"]').val("");
+    //$('input[name="FilterOptions.Entrances"]').val("");
     $('#FilterOptions_IdsObjectState').selectpicker("deselectAll");
-    $('#FilterOptions_IdDecree').val("");
+    /*$('#FilterOptions_IdDecree').val("");
     $('#FilterOptions_IdDecree').selectpicker('render');
     $('input[name="FilterOptions.DateOwnershipRight"]').val("");
-    $('input[name="FilterOptions.NumberOwnershipRight"]').val("");
+    $('input[name="FilterOptions.NumberOwnershipRight"]').val("");*/
     $('#FilterOptions_IdsOwnershipRightType').selectpicker("deselectAll");
 };
 var filterClear = function () {
     filterClearModal();
     $("form.filterForm").submit();
-}*/
+}
 $(function () {
     autocompleteFilterOptionsAddress();
-    //addressFilterClearBtnVisibility();
+    addressFilterClearBtnVisibility();
     $('#FilterOptions_Address_Text').focusout(focusOutFilterOptionsAddress);
     $('#addressFilterClearBtn').click(addressFilterClear);
-    /*$('#searchModalBtn').click(searchModal);
+    $('#searchModalBtn').click(searchModal);
     $('#filterClearModalBtn').click(filterClearModal);
-    $('#filterClearBtn').click(filterClear);*/
-    $('#r-search-btn').click(formSubmit);
+    $('#filterClearBtn').click(filterClear);
+    //$('#searchModalBtn').click(formSubmit);
 
     /*$('.idBuildingCheckbox').click(function (e) {
         var id = +$(this).data('id');
@@ -94,13 +96,13 @@ $(function () {
             url: window.location.origin + '/Buildings/SessionIdBuildings',
             data: { idBuilding: id, isCheck: $(this).prop('checked') }
         });
-    });
+    });*/
 
     $("#filterModalShow").on("click", function (e) {
         e.preventDefault();
         var modal = $("#filterModal");
         modal.modal('show');
-    });*/
+    });
 
     $("a.sort").click(function () {
     	$('input[name="OrderOptions.OrderField"]').val($(this).data("order-field"));
@@ -110,13 +112,13 @@ $(function () {
     $('.page-link').click(function () {
         $('input[name="PageOptions.CurrentPage"]').val($(this).data("page"));
         $('#FilterOptions_Address_Text').prop("disabled", false);
-        //$("form.filterForm").submit();
-        formSubmit();
+        $("form.filterForm").submit();
+        //formSubmit();
     });
-    if ($('input[name="FilterOptions.Address.Id"]').val() != "") {
+    /*if ($('input[name="FilterOptions.Address.Id"]').val() != "") {
         addressFilterClearBtnShow();
     }
     else {
         $('#addressFilterClearBtn').hide();
-    } 
+    } */
 });
