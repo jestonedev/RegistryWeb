@@ -17,7 +17,6 @@ namespace RegistryWeb.DataServices
 {
     public class ReestrEmergencyPremisesDataService : ListDataService<ReestrEmergencyPremisesVM, ReestrEmergencyPremisesFilter>
     {
-
         private readonly string sqlDriver;
         private readonly string connString;
         private readonly string activityManagerPath;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RegistryWeb.Models.Entities;
+using RegistryWeb.Models.SqlViews;
 
 namespace RegistryWeb.Models.IEntityTypeConfiguration
 {

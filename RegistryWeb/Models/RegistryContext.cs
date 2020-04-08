@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.Models.Entities;
+using RegistryWeb.Models.SqlViews;
 using RegistryWeb.Models.IEntityTypeConfiguration;
 
 namespace RegistryWeb.Models
@@ -106,6 +107,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
         public virtual DbSet<TenancyActiveProcess> TenancyActiveProcesses { get; set; }
         public virtual DbSet<OwnerActiveProcess> OwnerActiveProcesses { get; set; }
+        public virtual DbSet<BuildingOwnershipRightCurrent> BuildingsOwnershipRightCurrent { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -115,6 +117,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new KladrStreetConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyActiveProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerActiveProcessConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new BuildingOwnershipRightCurrentConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new ChangeLogConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LogOwnerProcessConfiguration(nameDatebase));

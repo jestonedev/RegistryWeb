@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RegistryWeb.Models.Entities;
+using RegistryWeb.Models.SqlViews;
 
 namespace RegistryWeb.Models.IEntityTypeConfiguration
 {
@@ -21,17 +21,27 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.Property(e => e.IdProcess)
                 .HasColumnName("id_process")
-                .HasMaxLength(17)
-                .IsUnicode(false);
+                .HasColumnType("int(11)");
 
             builder.Property(e => e.Owners)
                 .HasColumnName("owners")
                 .IsUnicode(false);
 
+            builder.Property(e => e.IdBuilding)
+                .HasColumnName("id_building")
+                .HasColumnType("int(11)");
+
+            builder.Property(e => e.IdPremise)
+                .HasColumnName("id_premises")
+                .HasColumnType("int(11)");
+
+            builder.Property(e => e.IdSubPremise)
+                .HasColumnName("id_sub_premises")
+                .HasColumnType("int(11)");
+
             builder.Property(e => e.CountOwners)
                 .HasColumnName("count_owners")
-                .HasMaxLength(17)
-                .IsUnicode(false);
+                .HasColumnType("int(11)");
 
             builder.HasOne(d => d.OwnerProcessNavigation)
                 .WithOne(p => p.OwnerActiveProcessNavigation)

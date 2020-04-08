@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using RegistryWeb.Models.Entities;
 
-namespace RegistryWeb.Models.Entities
+namespace RegistryWeb.Models.SqlViews
 {
     public class OwnerActiveProcess
     {
         public int IdProcess { get; set; }
+        public int? IdBuilding { get; set; }
+        public int? IdPremise { get; set; }
+        public int? IdSubPremise { get; set; }
         public string Owners { get; set; }
         public int CountOwners { get; set; }
 

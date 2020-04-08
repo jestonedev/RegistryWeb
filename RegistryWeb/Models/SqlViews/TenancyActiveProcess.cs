@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using RegistryWeb.Models.Entities;
 
-namespace RegistryWeb.Models.Entities
+namespace RegistryWeb.Models.SqlViews
 {
     public class TenancyActiveProcess
     {

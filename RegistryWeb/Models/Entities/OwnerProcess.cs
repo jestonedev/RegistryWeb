@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RegistryWeb.Models.SqlViews;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
