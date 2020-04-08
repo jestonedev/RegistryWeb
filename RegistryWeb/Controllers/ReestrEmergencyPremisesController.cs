@@ -43,7 +43,7 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("PageOptions");
                 HttpContext.Session.Remove("FilterOptions");
             }
-            return View(dataService.GetViewModel(
+            return View("~/Views/OwnerReports/ReestrEmergencyPremises/Index.cshtml", dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
                 viewModel.FilterOptions));

@@ -55,10 +55,6 @@
                             <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
                                asp-action="Delete" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
                         }
-                        <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@item.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled></button>
-                        <div class="dropdown-menu" aria-labelledby="reportsBtn_@item.IdProcess">
-                            <a class="dropdown-item" asp-action="Forma2" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess">Форма 2</a>
-                        </div>
                     </div>
                 </td>
             </tr>

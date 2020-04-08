@@ -61,7 +61,7 @@ namespace RegistryWeb.ReportServices
             }
         }
 
-        public byte[] Forma2(List<int> ids)
+        public byte[] Forma2(int idPremise)
         {
             var logStr = new StringBuilder();
             try
@@ -70,21 +70,16 @@ namespace RegistryWeb.ReportServices
                 var configXml = activityManagerPath + "templates\\registry_web\\owners\\forma2.xml";
                 var destFileName = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", "forma2" + Guid.NewGuid().ToString() + ".docx");
 
-                var fileName = Path.GetTempFileName();
-                using (var sw = new StreamWriter(fileName))
-                    sw.Write(ids.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y));
-
                 p.StartInfo.UseShellExecute = false;
                 p.StartInfo.FileName = activityManagerPath + "ActivityManager.exe";
                 p.StartInfo.Arguments = " config=\"" + configXml + "\" destFileName=\"" + destFileName +
-                    "\" idsTmpFile=\"" + fileName + "\" connectionString=\"Driver={" + sqlDriver + "};" + connString + "\"";
+                    "\" id=\"" + idPremise + "\" connectionString=\"Driver={" + sqlDriver + "};" + connString + "\"";
                 logStr.Append("<dl>\n<dt>Arguments\n<dd>" + p.StartInfo.Arguments + "\n");
                 p.StartInfo.CreateNoWindow = true;
                 p.Start();
                 p.WaitForExit();
                 var file = File.ReadAllBytes(destFileName);
                 File.Delete(destFileName);
-                File.Delete(fileName);
                 return file;
             }
             catch (Exception ex)

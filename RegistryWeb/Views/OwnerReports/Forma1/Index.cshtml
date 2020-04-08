@@ -1,0 +1,26 @@
+﻿@model RegistryWeb.ViewModel.Forma1VM;
+@{
+    ViewData["Title"] = "Отчет по форме 1";
+    var countB = 1;
+}
+
+<h2>@ViewData["Title"]</h2>
+@*<a class="btn btn-block btn-success">Форма 1</a>
+<button class="btn btn-block btn-success">Форма 2</button>*@
+<table class="table table-bordered">
+    <tbody>
+        @foreach (var item in Model.Buildings)
+        {
+            <tr>
+                <td>@(countB++)</td>
+                <td class="align-middle" colspan="2">
+                    <a asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@item.IdBuilding">@item.GetAddress()</a>
+                </td>
+                <td>
+                    <a class="btn btn-success oi oi-document" title="Отчет по форме 1"
+                        asp-action="GetForma1" asp-controller="OwnerReports" asp-route-idBuilding="@item.IdBuilding"></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

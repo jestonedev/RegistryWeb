@@ -8,9 +8,9 @@
 
 <h2>@ViewData["Title"] @text</h2>
 
-@Html.Partial("StatisticDownload", Model)
-@Html.Partial("Filter", Model)
-@Html.Partial("DataTable", Model)
+@Html.Partial("~/Views/OwnerReports/ReestrEmergencyPremises/StatisticDownload.cshtml", Model)
+@Html.Partial("~/Views/OwnerReports/ReestrEmergencyPremises/Filter.cshtml", Model)
+@Html.Partial("~/Views/OwnerReports/ReestrEmergencyPremises/DataTable.cshtml", Model)
 <page-link page-model="Model.PageOptions" page-action="Index"></page-link>
 
 @section Scripts {

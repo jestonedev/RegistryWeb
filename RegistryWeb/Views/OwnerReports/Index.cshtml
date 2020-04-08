@@ -1,0 +1,10 @@
+﻿@{
+    ViewData["Title"] = "Отчеты по собственникам";
+}
+
+<div>
+    <h2>@ViewData["Title"]</h2>
+    <a asp-controller="OwnerReports" asp-action="ReestrEmergencyPremises">Реестр жилых и (или) не жилых помещений МКД, признанных аварийными на @DateTime.Now.ToString("dd.MM.yyyy")</a><br />
+    <a asp-controller="OwnerReports" asp-action="Forma1">Отчет по форме №1</a><br />
+    <a asp-controller="OwnerReports" asp-action="Forma2">Отчет по форме №2</a><br />
+</div>

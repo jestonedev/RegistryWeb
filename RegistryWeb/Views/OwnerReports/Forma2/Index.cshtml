@@ -1,0 +1,43 @@
+﻿@model RegistryWeb.ViewModel.Forma2VM;
+@{
+    ViewData["Title"] = "Отчет по форме 2";
+    var countB = 1;
+    var countP = 1;
+}
+
+<h2>@ViewData["Title"]</h2>
+@*<a class="btn btn-block btn-success">Форма 1</a>
+<button class="btn btn-block btn-success">Форма 2</button>*@
+<table class="table table-bordered">
+    <tbody>
+        @foreach (var groupPremise in Model.GroupPremises)
+        {
+            <tr>
+                <td>@(countB++)</td>
+                <td class="align-middle" colspan="2">
+                    <a asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@groupPremise.Key">@groupPremise.ElementAt(0).IdBuildingNavigation.GetAddress()</a>
+                </td>
+                <td></td>
+            </tr>
+            @foreach (var premise in groupPremise)
+            {
+            <tr>
+                <td></td>
+                <td>@(countP++)</td>
+                <td>
+                    <a asp-controller="Premises" asp-action="Details" asp-route-idPremises="@premise.IdPremises">@premise.GetAddress()</a>
+                </td>
+                <td>
+                    <a class="btn btn-success oi oi-document" title="Отчет по форме 2"
+                       asp-action="GetForma2" asp-controller="OwnerReports" asp-route-idPremise="@premise.IdPremises"></a>
+                    @if (Model.PremisesIdOwnerProcesses.Keys.Contains(premise.IdPremises))
+                    {
+                    <a class="btn btn-success oi oi-aperture" title="Процесс собственности @Model.PremisesIdOwnerProcesses[premise.IdPremises]"
+                       asp-action="Details" asp-controller="OwnerProcesses" asp-route-idProcess="@Model.PremisesIdOwnerProcesses[premise.IdPremises]"></a>
+                    }
+                </td>
+            </tr>
+            }
+        }
+    </tbody>
+</table>
