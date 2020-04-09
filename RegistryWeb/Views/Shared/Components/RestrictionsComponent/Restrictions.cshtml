@@ -9,12 +9,12 @@
     <div class="card-header d-flex justify-content-between">
         <h3>Реквизиты</h3>
         <div class="btn-group" role="group">
-            @*
+            
             @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
             {
-                <a href="#" class="form-control btn btn-success" id="restrictionAdd" title="Добавить реквизит">&#10010;</a>
+                <a href="#" class="form-control btn btn-success disabled" disabled id="restrictionAdd" title="Добавить реквизит">&#10010;</a>
             }
-*@
+
             <a href="#" id="restrictionsToggle" class="form-control btn btn-primary" title="Развернуть список реквизитов" style="font-weight:bold;">∨</a>
         </div>
     </div>
@@ -63,15 +63,15 @@
                             }
                         </td>
                     }
-                    @*
+                    
                     @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                     {
                         <td class="align-middle">
-                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                            <a class="btn btn-danger oi oi-x disabled" disabled title="Удалить" aria-label="Удалить"
                                asp-controller="Premises" asp-action="Delete" asp-route-idpremises="@item.IdRestriction"></a>
                         </td>
                     }
-*@
+
                 </tr>
             }
         </tbody>
