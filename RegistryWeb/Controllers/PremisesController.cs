@@ -169,5 +169,12 @@ namespace RegistryWeb.Controllers
         }
 
 
+        public JsonResult GetHouse(string streetId)
+        {
+            IEnumerable<Building> buildings = dataService.GetHouses(streetId);
+            return Json(buildings);
+        }
+
+
     }
 }

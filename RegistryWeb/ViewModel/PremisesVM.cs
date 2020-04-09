@@ -38,6 +38,9 @@ namespace RegistryWeb.ViewModel
         public SelectList LocationKeysList { get; set; }
         public SelectList CommentList { get; set; }
         public SelectList FundTypesList { get; set; }
+        public SelectList OwnershipRightTypesList { get; set; }
+        public SelectList RestrictionsList { get; set; }
+        public SelectList HousesList { get; set; }
 
         public SelectList PremisesTypeAsNum { get; set; }
         public SelectList PremisesTypesList { get; set; }
