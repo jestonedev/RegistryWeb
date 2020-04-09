@@ -8,12 +8,12 @@
         <h3>Список ограничений</h3>
         <!--<a href="#" class="form-control btn btn-success col-1" title="Добавить ограничение" style="font-weight:bold;">+</a>-->
         <div class="btn-group" role="group">
-            @*
+            
             @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
             {
                 <a href="#" id="ownershipRightAdd" class="form-control btn btn-success" title="Добавить ограничение">&#10010;</a>
             }
-*@
+
             <a href="#" id="ownershipRightsToggle" class="form-control btn btn-primary" title="Развернуть список ограничений" style="font-weight:bold;">∨</a>
         </div>
     </div>
@@ -30,12 +30,12 @@
                 <th class="align-middle">Тип ограничения</th>
                 <th class="align-middle">Планируемая дата переселения</th>
                 <th class="align-middle">Планируемая дата сноса</th>
-                @*
+                
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {
                     <th class="align-middle"></th>
                 }
-*@
+
             </tr>
         </thead>
         <tbody>
@@ -61,7 +61,7 @@
                     <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.OwnershipRightTypeNavigation.OwnershipRightTypeName" title="@item.OwnershipRightTypeNavigation.OwnershipRightTypeName"></td>
                     <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.ResettlePlanDate" title="@item.ResettlePlanDate" value="@(item.ResettlePlanDate == null ? "" : item.ResettlePlanDate.Value.ToShortDateString())"></td>
                     <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.DemolishPlanDate" title="@item.DemolishPlanDate" value="@(item.DemolishPlanDate == null ? "" : item.DemolishPlanDate.Value.ToShortDateString())"></td>
-                    @*
+                    
                     @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                     {
                     <td class="align-middle">
@@ -69,7 +69,7 @@
                            asp-controller="Premises" asp-action="Delete" asp-route-idpremises="@item.IdOwnershipRight"></a>
                     </td>
                     }
-*@
+
                 </tr>
             }
         </tbody>

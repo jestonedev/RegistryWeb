@@ -18,12 +18,12 @@
     <div class="card-header d-flex justify-content-between">
         <h3>Комнаты</h3>
         <div class="btn-group" role="group">
-            @*
+            
             @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
             {
                 <a href="#" id="subpremiseAdd" class="form-control btn btn-success" title="Добавить комнату">&#10010;</a>
             }
-*@
+
             <a href="#" id="subpremisesToggle" class="form-control btn btn-primary" title="Развернуть список комнат" style="font-weight:bold;">∨</a>
         </div>
     </div>
@@ -37,12 +37,12 @@
                 <th class="align-middle">Лицевой счёт ФКР</th>
                 <th class="align-middle">Кадастровая стоимость</th>
                 <th class="align-middle">Балансовая стоимость</th>
-                @*
+                
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {
                     <th class="align-middle"></th>
                 }
-*@
+
             </tr>
         </thead>
         <tbody>
@@ -56,7 +56,7 @@
                     <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.Account" title="@item.Account"></td>
                     <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.CadastralCost" title="@item.CadastralCost"></td>
                     <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.BalanceCost" title="@item.BalanceCost"></td>
-                    @*
+                    
                     @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                     {
                     <td class="align-middle">
@@ -64,7 +64,7 @@
                            asp-controller="SubPremises" asp-action="Delete" asp-route-idsubpremises="@item.IdSubPremises"></a>
                     </td>
                     }
-*@
+
                 </tr>
             }
         </tbody>

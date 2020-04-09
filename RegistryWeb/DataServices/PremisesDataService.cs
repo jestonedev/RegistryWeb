@@ -235,16 +235,24 @@ namespace RegistryWeb.DataServices
             }*/
             if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Count!=0)
             {
-                var obas = registryContext.OwnershipPremisesAssoc
+                var obas = registryContext.OwnershipBuildingsAssoc
                     .Include(oba => oba.OwnershipRightNavigation)
                     .AsTracking();
+                var opas = registryContext.OwnershipPremisesAssoc
+                    .Include(oba => oba.OwnershipRightNavigation)
+                    .Join(registryContext.Premises, opa => opa.IdPremises, p => p.IdPremises, (opa, p) => new { idpremise = opa.IdPremises, idOPA = opa.IdOwnershipRight, owp = opa.OwnershipRightNavigation, idbuilding = p.IdBuilding })
+                    .Join(obas, opa => opa.idbuilding, oba => oba.IdBuilding, (opa, oba) => new { opa.idpremise, opa.idOPA, opa.owp, idbuilding = oba.IdBuilding, odOBA = oba.IdOwnershipRight, owb = oba.OwnershipRightNavigation })
+                    .AsTracking();
+
                 if (!string.IsNullOrEmpty(filterOptions.NumberOwnershipRight))
-                    obas = obas.Where(oba => oba.OwnershipRightNavigation.Number == filterOptions.NumberOwnershipRight);
+                    opas = opas.Where(oba => oba.owp.Number == filterOptions.NumberOwnershipRight || oba.owb.Number == filterOptions.NumberOwnershipRight);
                 if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Count != 0)
-                    obas = obas.Where(oba => filterOptions.IdsOwnershipRightType.Contains(oba.OwnershipRightNavigation.IdOwnershipRightType));
+                    opas = opas.Where(oba => filterOptions.IdsOwnershipRightType.Contains(oba.owp.IdOwnershipRightType) || filterOptions.IdsOwnershipRightType.Contains(oba.owb.IdOwnershipRightType));
                 query = from q in query
-                        join idPremise in obas.Select(oba => oba.IdPremises).Distinct()
+                        join idPremise in opas.Select(oba => oba.idpremise).Distinct()
                             on q.IdPremises equals idPremise
+                        join idBuilding in opas.Select(oba => oba.idbuilding).Distinct()
+                            on q.IdBuilding equals idBuilding
                         select q;
             }
             if (filterOptions.IdObjectState.HasValue && filterOptions.IdObjectState.Value != 0)

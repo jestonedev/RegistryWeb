@@ -133,10 +133,16 @@
                 </div>
                 <div class="form-group col r-form-group-label">
                     <label asp-for="@Model.Premise.IdBuildingNavigation.House">Номер дома</label>
-                    <select asp-for="@Model.Premise.IdBuildingNavigation.House" asp-items="@Model.HousesList" class="form-control value-field">
-                        <option></option>
-                    </select>
-                    
+                    @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
+                    {
+                        <input type="text" class="form-control" asp-for="@Model.Premise.IdBuildingNavigation.House" title="Номер дома">
+                    }
+                    else
+                    {
+                        <select asp-for="@Model.Premise.IdBuildingNavigation.House" asp-items="@Model.HousesList" class="form-control value-field">
+                            <option>@Model.Premise.IdBuildingNavigation.House</option>
+                        </select>
+                    }
                     @*<input type="text" class="form-control" asp-for="@Model.Premise.IdBuildingNavigation.House" title="Номер дома">*@
                 </div>
                 <div class="form-group col r-form-group-label">
