@@ -64,6 +64,87 @@ namespace RegistryWeb.DataServices
 
         public IQueryable<Premise> GetQuery()
         {
+
+            /*var fundsHistory = registryContext.FundsPremisesAssoc.Select(fpa => fpa.IdFundNavigation);            
+            var fundHistory = fundsHistory
+                .FirstOrDefault(fh => fh.ExcludeRestrictionDate == null && fh.IdFund == fundsHistory.Max(f => f.IdFund));
+                
+
+            var t = registryContext.Premises
+            .Include(p => p.IdBuildingNavigation)
+                .ThenInclude(b => b.IdStreetNavigation)
+            .Include(p => p.IdStateNavigation)        //Текущее состояние объекта
+            .Include(p => p.IdPremisesTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
+            .Include(p => p.FundsPremisesAssoc)
+                .ThenInclude(fpa => fpa.IdFundNavigation)
+                    .ThenInclude(fh => fh.IdFundTypeNavigation);
+
+            var prim = from prem in registryContext.Premises
+                       join fpa in registryContext.FundsPremisesAssoc
+                       on prem.IdPremises equals fpa.IdPremises
+                       join fph in registryContext.FundsHistory
+                       on fpa.IdFund equals fph.IdFund
+                       join fpt in registryContext.FundTypes
+                       on fph.IdFundType equals fpt.IdFundType
+                       select new PremiseWithFunType
+                       {
+                           Account=prem.Account,
+                           BalanceCost=prem.BalanceCost,
+                           CadastralCost=prem.CadastralCost,
+                           CadastralNum=prem.CadastralNum,
+                           Deleted=prem.Deleted,
+                           Description=prem.Description,
+                           Floor=prem.Floor,
+                           FundsPremisesAssoc=prem.FundsPremisesAssoc,
+                           FundType = fpa.IdFundNavigation.IdFundTypeNavigation.FundTypeName,
+                           Height=prem.Height,
+                           IdBuilding=prem.IdBuilding,
+                           IdBuildingNavigation=prem.IdBuildingNavigation,
+                           IdPremises=prem.IdPremises,
+                           IdPremisesComment=prem.IdPremisesComment,
+                           IdPremisesCommentNavigation=prem.IdPremisesCommentNavigation,
+                           IdPremisesDoorKeys=prem.IdPremisesDoorKeys,
+                           IdPremisesDoorKeysNavigation=prem.IdPremisesDoorKeysNavigation,
+                           IdPremisesKind=prem.IdPremisesKind,
+                           IdPremisesKindNavigation=prem.IdPremisesKindNavigation,
+                           IdPremisesType=prem.IdPremisesType,
+                           IdPremisesTypeNavigation=prem.IdPremisesTypeNavigation,
+                           IdState=prem.IdState,
+                           IdStateNavigation=prem.IdStateNavigation,
+                           IsMemorial=prem.IsMemorial,
+                           LivingArea=prem.LivingArea,
+                           NumBeds=prem.NumBeds,
+                           NumRooms=prem.NumRooms,
+                           OwnerPremisesAssoc=prem.OwnerPremisesAssoc,
+                           OwnershipPremisesAssoc=prem.OwnershipPremisesAssoc,
+                           PremisesNum=prem.PremisesNum,
+                           RegDate=prem.RegDate,
+                           RestrictionPremisesAssoc=prem.RestrictionPremisesAssoc,
+                           StateDate=prem.StateDate,
+                           SubPremises=prem.SubPremises,
+                           TenancyPremisesAssoc=prem.TenancyPremisesAssoc,
+                           TotalArea=prem.TotalArea
+
+                       };*/
+            //return prim.Where(p=>p.Deleted!=1);
+
+            /*var pr = prim.ToList();
+
+            var fundsHistory = pr[1].FundsPremisesAssoc.Select(fpa => fpa.IdFundNavigation);
+            var fundHistory = fundsHistory
+                .FirstOrDefault(fh => fh.ExcludeRestrictionDate == null && fh.IdFund == fundsHistory.Max(f => f.IdFund));
+
+            pr[1].FundType = fundHistory.IdFundTypeNavigation.FundTypeName;*/
+            /*
+                        return prim
+                            .Include(p => p.IdBuildingNavigation)
+                                .ThenInclude(b => b.IdStreetNavigation)
+                            .Include(p => p.IdStateNavigation)        //Текущее состояние объекта
+                            .Include(p => p.IdPremisesTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
+                            .Include(p => p.FundsPremisesAssoc)
+                                .ThenInclude(fpa => fpa.IdFundNavigation)
+                                    .ThenInclude(fh => fh.IdFundTypeNavigation);
+                                */
             return registryContext.Premises
                 .Include(p => p.IdBuildingNavigation)
                     .ThenInclude(b => b.IdStreetNavigation)
@@ -72,6 +153,7 @@ namespace RegistryWeb.DataServices
                 .Include(p => p.FundsPremisesAssoc)
                     .ThenInclude(fpa => fpa.IdFundNavigation)
                         .ThenInclude(fh => fh.IdFundTypeNavigation);
+                       
         }
 
         //private IQueryable GetFundTypes()
@@ -141,7 +223,11 @@ namespace RegistryWeb.DataServices
                         fpa.IdFundNavigation.IdFundType == filterOptions.IdFundType.Value)
                     .Select(fpa => fpa.IdPremises);
 
-                query = query.Where(p => idPremises.Contains(p.IdPremises));
+                query = from row in query
+                        join idPremise in idPremises
+                        on row.IdPremises equals idPremise
+                        select row;
+
             }
             /*if (!string.IsNullOrEmpty(filterOptions.RestrictionNum))
             {
@@ -310,7 +396,7 @@ namespace RegistryWeb.DataServices
         }
 
         internal void Edit(Premise premise)
-        {            
+        {
             var oldPremise = GetPremise(premise.IdPremises);
 
             foreach (var fpa in oldPremise.FundsPremisesAssoc)
@@ -400,6 +486,19 @@ namespace RegistryWeb.DataServices
 
         public Premise GetPremise(int idPremise)
         {
+            /*var query = GetQuery();
+            return query
+                .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
+                .Include(b => b.IdBuildingNavigation.IdHeatingTypeNavigation)
+                .Include(b => b.IdStateNavigation)                              //Текущее состояние объекта
+                .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
+                .Include(b => b.FundsPremisesAssoc).ThenInclude(fpa => fpa.IdFundNavigation).ThenInclude(fh => fh.IdFundTypeNavigation)
+                .Include(b => b.IdPremisesCommentNavigation).ThenInclude(fpa => fpa.Premises)
+                .Include(b => b.IdPremisesTypeNavigation).ThenInclude(fpa => fpa.Premises)
+                .Include(b => b.IdPremisesDoorKeysNavigation)
+                .SingleOrDefault(b => b.IdPremises == idPremise);
+
+            Where(p=>p.IdPremises== idPremise)*/
             return registryContext.Premises
                 .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
                 .Include(b => b.IdBuildingNavigation.IdHeatingTypeNavigation)
@@ -434,22 +533,19 @@ namespace RegistryWeb.DataServices
 
 
 
-        public IEnumerable<Premise> GetPremises(List<int> ids)
+        /*public IEnumerable<Premise> GetPremises(List<int> ids)
         {
             return registryContext.Premises
-                .Include(b => b.IdBuildingNavigation.IdStreetNavigation)
-                .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
-                .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.OwnershipBuildingsAssoc)
-                .Include(b => b.IdBuildingNavigation.IdHeatingTypeNavigation)
+                .Include(b => b.IdBuildingNavigation)
                 .Include(b => b.IdStateNavigation)                              //Текущее состояние объекта
                 .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
                 .Include(b => b.FundsPremisesAssoc).ThenInclude(fpa => fpa.IdFundNavigation).ThenInclude(fh => fh.IdFundTypeNavigation)
-                .Include(b => b.IdPremisesCommentNavigation).ThenInclude(fpa => fpa.Premises)
-                .Include(b => b.IdPremisesTypeNavigation).ThenInclude(fpa => fpa.Premises)
+                .Include(b => b.IdPremisesCommentNavigation)
+                .Include(b => b.IdPremisesTypeNavigation)
                 .Include(b => b.IdPremisesDoorKeysNavigation)
-                .Include(b => b.OwnershipPremisesAssoc)
+                //.Include(b => b.OwnershipPremisesAssoc)
                 .Where(b => ids.Contains(b.IdBuilding));
-        }
+        }*/
 
         private IQueryable<Premise> GetQueryOrderMask(IQueryable<Premise> query, bool compare, OrderOptions orderOptions,
             Expression<Func<Premise, int>> expression)
@@ -468,6 +564,14 @@ namespace RegistryWeb.DataServices
                     query = query.OrderByDescending(expression);
             }
             return query;
+        }
+
+        public List<Building> GetHouses(string streetId)
+        {
+            var house = from bui in registryContext.Buildings
+                        where bui.IdStreet.Contains(streetId)
+                        select bui;
+            return house.ToList();
         }
     }
 }

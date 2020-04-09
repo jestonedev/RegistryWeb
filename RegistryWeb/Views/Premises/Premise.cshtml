@@ -19,10 +19,10 @@
     string GetTypeFund(Premise premise)
     {
         var fundsHistory = premise.FundsPremisesAssoc.Select(fpa => fpa.IdFundNavigation);
+        if (!fundsHistory.Any())
+            return "";
         var fundHistory = fundsHistory
             .FirstOrDefault(fh => fh.ExcludeRestrictionDate == null && fh.IdFund == fundsHistory.Max(f => f.IdFund));
-        if (fundHistory == null)
-            return "";
         return fundHistory.IdFundTypeNavigation.FundTypeName;
     }
 }
@@ -30,9 +30,35 @@
     {
     <script src="~/js/premises.index.js" asp-append-version="true"></script>
     <script src="~/js/restrictions.common.js" asp-append-version="true"></script>
-    @*
-        <script type="text/javascript">
-            var ostatockArray;
+    
+    <script type="text/javascript">
+        $(document).ready(function ()
+        {
+        $("#selectstreet").on('change', function () {
+        var idStreet = $(this).val() || 0;
+        /*var idDocument = $("#Document_Id").val() || 0;
+        var t = $('input[name$="Cost"]').val();
+        var Cost = $('input[name$="Amount"]').val() || 0;*/
+
+        $.getJSON('@Url.Action("GetHouse")?' + "streetId=" + idStreet, function (data) {
+            ostatockArray = data;
+            var options = "<option></option>";
+            $(ostatockArray).each(function (idx, elem) {
+                options += "<option value=" + elem.house + ">" + elem.house + "</option>";
+            });
+
+            $("select[name$='House']").each(function (idx, elem) {
+                var idPerson = $(this).val();
+                $(this).html(options);
+                $(this).val(idPerson);
+                $(this).change();
+            });
+        });
+            });
+        });
+
+
+        @*var ostatockArray;
 
             $(document).ready(function ()
             {
@@ -57,9 +83,9 @@
                         $(this).change();
                     });
                 });
-            });
+            });*@
 
-        </script>*@
+    </script>
     @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
     {
         <script>
@@ -102,15 +128,19 @@
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
                     <label asp-for="@Model.Premise.IdBuildingNavigation.IdStreetNavigation.IdStreet">Улица</label>
-                    <select class="form-control" asp-for="@Model.Premise.IdBuildingNavigation.IdStreetNavigation.IdStreet" title="Улица"
+                    <select class="form-control" asp-for="@Model.Premise.IdBuildingNavigation.IdStreetNavigation.IdStreet" id="selectstreet" title="Улица"
                             asp-items="@Model.KladrStreetsList"></select>
                 </div>
                 <div class="form-group col r-form-group-label">
                     <label asp-for="@Model.Premise.IdBuildingNavigation.House">Номер дома</label>
-                    <input type="text" class="form-control" asp-for="@Model.Premise.IdBuildingNavigation.House" title="Номер дома">
+                    <select asp-for="@Model.Premise.IdBuildingNavigation.House" asp-items="@Model.HousesList" class="form-control value-field">
+                        <option></option>
+                    </select>
+                    
+                    @*<input type="text" class="form-control" asp-for="@Model.Premise.IdBuildingNavigation.House" title="Номер дома">*@
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <select class="form-control" asp-for="@Model.Premise.IdPremisesTypeNavigation.PremisesTypeName" title="Улица"
+                    <select class="form-control" asp-for="@Model.Premise.IdPremisesType" title="Улица"
                             asp-items="@Model.PremisesTypeAsNum"></select>
                     <input type="text" class="form-control" asp-for="@Model.Premise.PremisesNum" title="Номер">
                 </div>
@@ -279,15 +309,15 @@
                 <div class="form-group col r-form-group-label">
                     @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
                     {@*переписать asp-for*@
-                    <input type="text" class="form-control" value="@GetTypeFund(Model.Premise)" title="Текущий фонд" readonly><!--*asp-for=""-->
-                }
-                else
-                { @*переписать asp-for*@
-                <select class="form-control" asp-items="@Model.FundTypesList">
-                    @*asp-for="@Model.Premise.FundsPremisesAssoc"*@
-                    <option>@GetTypeFund(Model.Premise)</option>
-                </select>
-            }
+                        <input type="text" class="form-control" value="@GetTypeFund(Model.Premise)" title="Текущий фонд" readonly><!--*asp-for=""-->
+                    }
+                    else
+                    { @*переписать asp-for*@
+                        <select class="form-control" asp-items="@Model.FundTypesList">
+                            @*asp-for="@Model.Premise.FundsPremisesAssoc"*@
+                            <option></option>
+                        </select>
+                    }
                 </div>
             </div>
 

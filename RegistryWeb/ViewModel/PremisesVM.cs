@@ -26,6 +26,10 @@ namespace RegistryWeb.ViewModel
         public List<Premise> Premises { get; set; }
         public Premise Premise { get; set; }
 
+        public List<PremiseWithFunType> PremisesWFT { get; set; }
+        public PremiseWithFunType PremiseWFT { get; set; }
+
+        public List<Premise> PremiseWithFundType { get; set; }
         /*public IEnumerable<OwnershipRight> OwnershipRights { get; set; }
         public IEnumerable<PremisesType> PremisesTypes { get; set; }
         public IEnumerable<ObjectState> ObjectStates { get; set; }
@@ -40,6 +44,7 @@ namespace RegistryWeb.ViewModel
         public SelectList FundTypesList { get; set; }
         public SelectList OwnershipRightTypesList { get; set; }
         public SelectList RestrictionsList { get; set; }
+        public SelectList HousesList { get; set; }
 
         public SelectList PremisesTypeAsNum { get; set; }
         public SelectList PremisesTypesList { get; set; }
