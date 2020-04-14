@@ -12,6 +12,7 @@ using RegistryWeb.SecurityServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System;
 using RegistryWeb.ReportServices;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace RegistryWeb
 {
@@ -40,6 +41,7 @@ namespace RegistryWeb
                 });
 
             services.AddDbContext<RegistryContext>();
+            services.Configure<FormOptions>(x => x.ValueCountLimit = int.MaxValue);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 

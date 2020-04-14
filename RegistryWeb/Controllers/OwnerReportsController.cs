@@ -11,6 +11,7 @@ using RegistryWeb.SecurityServices;
 using RegistryWeb.ReportServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.DataServices;
+using RegistryWeb.Extensions;
 
 namespace RegistryWeb.Controllers
 {
@@ -49,7 +50,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetForma1(int? idBuilding)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
             if (idBuilding == null)
                 return Error("id здания не указан.");
@@ -75,14 +76,46 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetForma2(int? idPremise)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
             if (idPremise == null)
-                return Error("id здания не указан.");
-            //var ids = new List<int> { idPremise.Value };
+                return Error("Здание не выбрано.");
             try
             {
-                var file = reportService.Forma2(idPremise.Value);
+                var file = reportService.Forma2(new List<int>() { idPremise.Value });
+                return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    @"Форма 2. Сведения о жилых помещениях и собственниках (нанимателях) жилых помещений аварийного многоквартирного дома.docx");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult MultiForma2(List<int> ids)
+        {
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+                return View("NotAccess");
+            if (!ids.Any())
+                return Error("Не выбрано ни одного здания.");
+            try
+            {
+                var fileNameReport = reportService.Forma2Ajax(ids);
+                return Json(new { fileNameReport });
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetMultiForma2(string fileNameReport)
+        {
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.DownloadFile(fileNameReport);
                 return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     @"Форма 2. Сведения о жилых помещениях и собственниках (нанимателях) жилых помещений аварийного многоквартирного дома.docx");
             }
