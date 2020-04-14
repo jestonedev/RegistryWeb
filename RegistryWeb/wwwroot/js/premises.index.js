@@ -107,7 +107,7 @@ $(function () {
     $("a.sort").click(function () {
         $('input[name="OrderOptions.OrderField"]').val($(this).data("order-field"));
         $('input[name="OrderOptions.OrderDirection"]').val($(this).data("order-direction"));
-        formSubmit();
+        $("form.filterForm").submit();
     });
     $('.page-link').click(function () {
         $('input[name="PageOptions.CurrentPage"]').val($(this).data("page"));
