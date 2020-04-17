@@ -119,5 +119,16 @@ namespace RegistryWeb.ReportServices
             var fileNameReport = GenerateMultiReport(ids, "forma2");
             return DownloadFile(fileNameReport);
         }
+
+        public string Forma3Ajax(List<int> ids)
+        {
+            return GenerateMultiReport(ids, "forma3");
+        }
+
+        public byte[] Forma3(List<int> ids)
+        {
+            var fileNameReport = GenerateMultiReport(ids, "forma3");
+            return DownloadFile(fileNameReport);
+        }
     }
 }
