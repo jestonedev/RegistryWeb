@@ -18,7 +18,7 @@ namespace RegistryWeb.Models.Entities
 
         [Required(ErrorMessage = "Поле «Номер» является обязательным для заполнения")]
         public string ReasonNumber { get; set; }
-        [Required(ErrorMessage = "Поле «Дата» является обязательным для заполнения")]
+        //[Required(ErrorMessage = "Поле «Дата» является обязательным для заполнения")]
         public DateTime? ReasonDate { get; set; }
         public byte Deleted { get; set; }
 
