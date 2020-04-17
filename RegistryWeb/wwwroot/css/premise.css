@@ -4,5 +4,14 @@
 
 #dopinfo {
     color: #888;
-    font-size: 85%;
+    font-size: 75%;
+}
+
+.but{
+    padding-left: 22%;
+}
+
+#filterModalShow{
+    color: white;
+    /*font-weight: bold;*/
 }

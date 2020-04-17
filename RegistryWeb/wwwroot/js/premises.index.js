@@ -79,6 +79,13 @@ var filterClear = function () {
     filterClearModal();
     $("form.filterForm").submit();
 }
+
+var premiseToggle = function (e) {
+    arrowAnimation($(this));
+    $('#premise').toggle();
+    e.preventDefault();
+}
+
 $(function () {
     autocompleteFilterOptionsAddress();
     addressFilterClearBtnVisibility();
@@ -122,7 +129,7 @@ $(function () {
         $('#addressFilterClearBtn').hide();
     } */
 
-    
+    $('#premiseToggle').click(premiseToggle);
 
 
 
