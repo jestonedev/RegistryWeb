@@ -1,0 +1,68 @@
+﻿@using RegistryWeb.ViewModel
+@using RegistryWeb.Models.Entities
+@using RegistryWeb.DataServices
+@using RegistryWeb.Extensions;
+@model FundHistoryVM;
+@{
+    var controller = Context.Session.Get<string>("Controller");
+    var action = Context.Session.Get<string>("Action");
+    if (ViewBag.addressType == "Premise")
+    {
+        ViewData["Title"] = "История фонда помещения №" + ViewBag.idObject;
+    }
+    if (ViewBag.addressType == "Building")
+    {
+        ViewData["Title"] = "История фонда здания №" + ViewBag.idObject;
+    }
+    //var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
+    //    "(" + Model.PageOptions.TotalRows + ")" :
+    //    "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
+}
+@section styles
+{
+    <link rel="stylesheet" href="~/css/fundshistory.css" runat="server" />
+}
+
+<partial name="FundHistory" model="@Model">
+<partial name="FundsHistory" model="@Model">
+
+@section Scripts
+{
+    <script src="~/js/index.common.js" asp-append-version="true"></script>
+    <script src="~/js/fundhistory.index.js" asp-append-version="true"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function ()
+        {
+            $(".selectfund").on('click', function ()
+            {
+                var tr = $(this).closest('tr');
+                var idFund = tr.find('input[name$="IdFund"]').val();
+
+
+                @*$.get('@Url.Action("GetFund")?' + "idFund=" + idFund);*@
+
+                $.getJSON('@Url.Action("GetFund")?' + "idFund=" + idFund, function (data) 
+                {
+                    ostatockArray = data;
+                    //var options = "<option></option>";
+                    $(ostatockArray).each(function (idx, elem) 
+                    {
+                        $("select[name$='IdFundType']").val(elem.idfundtype);
+                        $("input[name$='ProtocolNumber']").val(elem.protocolNumber);
+
+                        //options += "<option value=" + elem.house + ">" + elem.house + "</option>";
+                    });
+
+                    $("select[name$='House']").each(function (idx, elem) 
+                    {
+                        var idPerson = $(this).val();
+                        $(this).html(options);
+                        $(this).val(idPerson);
+                        $(this).change();
+                    });
+                });
+            });
+        });
+    </script>
+}

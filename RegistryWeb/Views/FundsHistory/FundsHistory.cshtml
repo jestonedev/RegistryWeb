@@ -1,0 +1,69 @@
+﻿@using RegistryWeb.ViewModel
+@using RegistryWeb.Models.Entities;
+@model FundHistoryVM;
+
+@section scripts
+    {
+
+    <script type="text/javascript">
+        $(document).ready(function ()
+        {
+        $("#selectfund").on('click', function () {
+        var idFund = $(this).val() || 0;
+
+            $.getJSON('@Url.Action("GetFund")?' + "idFund=" + idFund, function (data) {
+            ostatockArray = data;
+            //var options = "<option></option>";
+            $(ostatockArray).each(function (idx, elem) {
+                $("select[name$='IdFundType']").val(elem.idfundtype);
+
+                //options += "<option value=" + elem.house + ">" + elem.house + "</option>";
+            });
+
+            $("select[name$='House']").each(function (idx, elem) {
+                var idPerson = $(this).val();
+                $(this).html(options);
+                $(this).val(idPerson);
+                $(this).change();
+            });
+        });
+            });
+        });
+    </script>
+}
+@{ 
+    var i=0;
+}
+<div id="fundshistory">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Номер протокола</th>
+                <th>Дата протокола</th>
+                <th>Тип найма</th>
+                
+                <th></th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.FundsHistory)
+            {
+                <tr class="hover" id="@i">
+                    <input type="hidden" asp-for="@item.IdFund" />
+                    <td>@item.ProtocolNumber</td>
+                    <td>@item.ProtocolDate</td>
+                    <td>@item.IdFundTypeNavigation.FundTypeName</td>
+                    
+                    <td>
+                        <a class="btn btn-outline-dark oi oi-pencil" id="edit" title="Изменить" aria-label="Изменить"
+                           asp-controller="FundsHistory" asp-action="Edit" asp-route-idFund="@item.IdFund" asp-route-action="Edit"></a>
+                        <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                           asp-controller="FundsHistory" asp-action="Delete" asp-route-idFund="@item.IdFund"></a>
+                    </td>
+                </tr>
+                //i = i + 1;
+            }
+        </tbody>
+    </table>
+</div>
