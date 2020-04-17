@@ -145,22 +145,19 @@
                         </div>
 
                         <div class="form-row">
-                            <div class="form-group">
-                                        <label asp-for="FilterOptions.StDateOwnershipRight">Дата включения в РМИ</label>
-                                <div class="col-xs-8 col-md-12">
-                                    <div class="input-group date">
-                                        <input type="date" class="form-control" asp-for="FilterOptions.StDateOwnershipRight" title="Дата включения в РМИ">
-                                    </div>
-                                </div>
-                                <div class="col-xs-8 col-md-12">
-                                    <div class="input-group date">
-                                        <input type="date" class="form-control" asp-for="FilterOptions.EndDateOwnershipRight" title="Дата включения в РМИ">
-                                    </div>
-                                </div>
-                            </div>
-                                </div>
+                            <label asp-for="FilterOptions.StDateOwnershipRight">Дата включения в РМИ</label>
+                        </div>
 
+                        <div class="form-row">
+                            <div class="form-group col-6">
+                                <input type="date" class="form-control" asp-for="FilterOptions.StDateOwnershipRight" value="@(Model.FilterOptions.StDateOwnershipRight==null ? DateTime.Now.ToString("yyyy-MM-dd") : Model.FilterOptions.StDateOwnershipRight?.ToString("yyyy-MM-dd"))" title="Дата включения в РМИ">
                             </div>
+                            <div class="form-group col-6">
+                               <input type="date" class="form-control" asp-for="FilterOptions.EndDateOwnershipRight" value="@(Model.FilterOptions.EndDateOwnershipRight==null ? DateTime.Now.ToString("yyyy-MM-dd") : Model.FilterOptions.EndDateOwnershipRight?.ToString("yyyy-MM-dd"))" title="Дата включения в РМИ">
+                            </div>
+                        </div>
+
+                    </div>
                     <div class="modal-footer">
                         <button id="filterClearModalBtn" type="button" class="btn btn-secondary">Очистить</button>
                         <button id="searchModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Найти</button>
