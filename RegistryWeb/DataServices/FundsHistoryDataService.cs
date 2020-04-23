@@ -69,16 +69,23 @@ namespace RegistryWeb.DataServices
             return fundHistoryVM;
         }
 
-        public FundHistoryVM GetFundHistory(int idFund)
+        public List<FundHistory> GetFundHistory(int idFund)
         {
-            var fundHistoryVM = new FundHistoryVM()
+            /*var fundHistoryVM = new FundHistoryVM()
             {
                 FundHistory = rc.FundsHistory
                                 .Include(fh => fh.IdFundTypeNavigation)
                                 .FirstOrDefault(fh => fh.IdFund == idFund),
                 FundTypesList = new SelectList(rc.FundTypes, "IdFundType", "FundTypeName")
             };
-            return fundHistoryVM;
+            return fundHistoryVM;*/
+
+            var fund = from fun in rc.FundsHistory
+                        join ftn in rc.FundTypes 
+                        on fun.IdFundType equals ftn.IdFundType
+                        where fun.IdFund==idFund
+                        select fun;
+            return fund.ToList();
 
             /*return rc.FundsHistory
                 .Include(fh => fh.IdFundTypeNavigation)

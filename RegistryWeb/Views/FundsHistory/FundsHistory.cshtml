@@ -2,35 +2,6 @@
 @using RegistryWeb.Models.Entities;
 @model FundHistoryVM;
 
-@section scripts
-    {
-
-    <script type="text/javascript">
-        $(document).ready(function ()
-        {
-        $("#selectfund").on('click', function () {
-        var idFund = $(this).val() || 0;
-
-            $.getJSON('@Url.Action("GetFund")?' + "idFund=" + idFund, function (data) {
-            ostatockArray = data;
-            //var options = "<option></option>";
-            $(ostatockArray).each(function (idx, elem) {
-                $("select[name$='IdFundType']").val(elem.idfundtype);
-
-                //options += "<option value=" + elem.house + ">" + elem.house + "</option>";
-            });
-
-            $("select[name$='House']").each(function (idx, elem) {
-                var idPerson = $(this).val();
-                $(this).html(options);
-                $(this).val(idPerson);
-                $(this).change();
-            });
-        });
-            });
-        });
-    </script>
-}
 @{ 
     var i=0;
 }
@@ -49,8 +20,9 @@
         <tbody>
             @foreach (var item in Model.FundsHistory)
             {
-                <tr class="hover" id="@i">
+                <tr class="hover" id="@(i)fund">
                     <input type="hidden" asp-for="@item.IdFund" />
+                    @{i = i + 1;}
                     <td>@item.ProtocolNumber</td>
                     <td>@item.ProtocolDate</td>
                     <td>@item.IdFundTypeNavigation.FundTypeName</td>
@@ -62,7 +34,6 @@
                            asp-controller="FundsHistory" asp-action="Delete" asp-route-idFund="@item.IdFund"></a>
                     </td>
                 </tr>
-                //i = i + 1;
             }
         </tbody>
     </table>
