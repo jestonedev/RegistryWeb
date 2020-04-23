@@ -105,6 +105,8 @@
 }
 <form asp-controller="Premise" asp-action="@ViewBag.Action" id="r-premises-form" data-action="@ViewBag.Action" data-addressType="@ViewBag.addressType" method="post">
     <div class="card">
+        <input type="hidden" asp-for="@Model.Premise.IdPremises" />
+        <input type="hidden" asp-for="@Model.Premise.IdPremisesKind" value="1"/>
         <div class="card-header d-flex justify-content-between">
             <label class="form-check-label h2">@ViewData["Title"]</label>
             <div class="btn-group" role="group" aria-label="Панель доступа">
@@ -125,6 +127,12 @@
             </div>
         </div>
         <div class="card-body" id="premise">
+            @if (TempData.ContainsKey("Error"))
+            {
+                <div class="col alert alert-danger">
+                    @Html.Raw(TempData["Error"])
+                </div>
+            }
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
                     <label asp-for="@Model.Premise.IdBuildingNavigation.IdStreetNavigation.IdStreet">Улица</label>
@@ -133,14 +141,14 @@
                 </div>
                 <div class="form-group col r-form-group-label">
                     <label asp-for="@Model.Premise.IdBuildingNavigation.House">Номер дома</label>
-                    @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
+                    @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details" || ViewBag.Action == "Edit")
                     {
                         <input type="text" class="form-control" asp-for="@Model.Premise.IdBuildingNavigation.House" title="Номер дома">
                     }
                     else
                     {
                         <select asp-for="@Model.Premise.IdBuildingNavigation.House" asp-items="@Model.HousesList" class="form-control value-field">
-                            <option>@Model.Premise.IdBuildingNavigation.House</option>
+                            <option></option>
                         </select>
                     }
                     @*<input type="text" class="form-control" asp-for="@Model.Premise.IdBuildingNavigation.House" title="Номер дома">*@
@@ -315,15 +323,15 @@
                 <div class="form-group col r-form-group-label">
                     @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
                     {@*переписать asp-for*@
-                        <input type="text" class="form-control" value="@GetTypeFund(Model.Premise)" title="Текущий фонд" readonly><!--*asp-for=""-->
-                    }
-                    else
-                    { @*переписать asp-for*@
-                        <select class="form-control" asp-items="@Model.FundTypesList">
-                            @*asp-for="@Model.Premise.FundsPremisesAssoc"*@
-                            <option></option>
-                        </select>
-                    }
+                    <input type="text" class="form-control" value="@GetTypeFund(Model.Premise)" title="Текущий фонд" readonly><!--*asp-for=""-->
+                }
+                else
+                { @*переписать asp-for*@
+                <select class="form-control" asp-items="@Model.FundTypesList">
+                    @*asp-for="@Model.Premise.FundsPremisesAssoc"*@
+                    <option></option>
+                </select>
+            }
                 </div>
             </div>
 

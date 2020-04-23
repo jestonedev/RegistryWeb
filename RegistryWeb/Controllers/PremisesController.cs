@@ -18,9 +18,11 @@ namespace RegistryWeb.Controllers
     [Authorize]
     public class PremisesController : ListController<PremisesDataService>
     {
-        public PremisesController(PremisesDataService dataService, SecurityService securityService)
+        private readonly RegistryContext rc;
+        public PremisesController(RegistryContext rc, PremisesDataService dataService, SecurityService securityService)
             : base(dataService, securityService)
         {
+            this.rc = rc;
         }
 
         public IActionResult Index(PremisesVM<Premise> viewModel, string action="", bool isBack = false)
@@ -81,10 +83,24 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
                 return View("NotAccess");
+            
             if (ModelState.IsValid)
             {
-                dataService.Create(premise);
-                return RedirectToAction("Index");
+                var bui = rc.Buildings
+                        .FirstOrDefault(b => b.IdStreet == premise.IdBuildingNavigation.IdStreetNavigation.IdStreet && b.House == premise.IdBuildingNavigation.House);
+                if (bui != null)
+                {
+                    premise.IdBuilding = bui.IdBuilding;
+                    dataService.Create(premise);
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    TempData["Error"] = "На указанном адресе отсутствует здание!";
+                    ViewBag.Action = "Create";
+                    //return RedirectToAction("Create");
+                    return View("Premise", dataService.GetPremiseView(premise));
+                }
             }
             return View("Premise", dataService.GetPremiseView(premise));
         }

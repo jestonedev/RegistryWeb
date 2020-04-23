@@ -359,8 +359,13 @@ namespace RegistryWeb.DataServices
 
         internal void Create(Premise premise)
         {
+            premise.IdBuildingNavigation = null;
+            premise.IdPremisesCommentNavigation = null;
+            premise.IdPremisesDoorKeysNavigation = null;
+            premise.IdPremisesKindNavigation = null;
+            premise.IdPremisesTypeNavigation = null;
             registryContext.Premises.Add(premise);
-            registryContext.SaveChanges();
+            registryContext.SaveChanges();            
         }
 
         internal Premise CreatePremise()
@@ -455,6 +460,7 @@ namespace RegistryWeb.DataServices
                     premise.TenancyPremisesAssoc.Add(tpa);
                 }
             }
+            
             //Добавление и радактирование
             registryContext.Premises.Update(premise);
             registryContext.SaveChanges();
@@ -507,7 +513,7 @@ namespace RegistryWeb.DataServices
                 .SingleOrDefault(b => b.IdPremises == idPremise);
 
             Where(p=>p.IdPremises== idPremise)*/
-            return registryContext.Premises
+            return registryContext.Premises.AsNoTracking()
                 .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
                 .Include(b => b.IdBuildingNavigation.IdHeatingTypeNavigation)
                 .Include(b => b.IdStateNavigation)                              //Текущее состояние объекта
@@ -516,7 +522,7 @@ namespace RegistryWeb.DataServices
                 .Include(b => b.IdPremisesCommentNavigation).ThenInclude(fpa => fpa.Premises)
                 .Include(b => b.IdPremisesTypeNavigation).ThenInclude(fpa => fpa.Premises)
                 .Include(b => b.IdPremisesDoorKeysNavigation)
-                .SingleOrDefault(b => b.IdPremises == idPremise);
+                .FirstOrDefault(b => b.IdPremises == idPremise);
         }
 
         public IEnumerable<ObjectState> ObjectStates
