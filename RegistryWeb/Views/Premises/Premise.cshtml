@@ -107,6 +107,7 @@
     <div class="card">
         <input type="hidden" asp-for="@Model.Premise.IdPremises" />
         <input type="hidden" asp-for="@Model.Premise.IdPremisesKind" value="1"/>
+        <input type="hidden" asp-for="@Model.Premise.IdBuilding"/>
         <div class="card-header d-flex justify-content-between">
             <label class="form-check-label h2">@ViewData["Title"]</label>
             <div class="btn-group" role="group" aria-label="Панель доступа">
@@ -327,7 +328,7 @@
                 }
                 else
                 { @*переписать asp-for*@
-                <select class="form-control" asp-items="@Model.FundTypesList">
+                <select class="form-control" asp-for="@Model.IdFundType" asp-items="@Model.FundTypesList">
                     @*asp-for="@Model.Premise.FundsPremisesAssoc"*@
                     <option></option>
                 </select>

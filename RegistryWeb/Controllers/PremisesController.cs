@@ -77,7 +77,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Premise premise)
+        public IActionResult Create(Premise premise, int IdFundType)
         {
             if (premise == null)
                 return NotFound();
@@ -91,7 +91,7 @@ namespace RegistryWeb.Controllers
                 if (bui != null)
                 {
                     premise.IdBuilding = bui.IdBuilding;
-                    dataService.Create(premise);
+                    dataService.Create(premise, IdFundType);
                     return RedirectToAction("Index");
                 }
                 else

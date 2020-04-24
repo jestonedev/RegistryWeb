@@ -357,7 +357,7 @@ namespace RegistryWeb.DataServices
             return result.ToList();
         }
 
-        internal void Create(Premise premise)
+        internal void Create(Premise premise, int IdFundType)
         {
             premise.IdBuildingNavigation = null;
             premise.IdPremisesCommentNavigation = null;
@@ -365,6 +365,23 @@ namespace RegistryWeb.DataServices
             premise.IdPremisesKindNavigation = null;
             premise.IdPremisesTypeNavigation = null;
             registryContext.Premises.Add(premise);
+
+            /*
+            //добавление записей в FundHistory и FundPremiseAssoc
+            var funfh = new FundHistory
+            {
+                IdFundType = IdFundType
+            };
+            registryContext.FundsHistory.Add(funfh);
+
+            var fpa = new FundPremiseAssoc
+            {
+                IdFund= funfh.IdFund,
+                IdPremises=premise.IdPremises
+            };
+            registryContext.FundsPremisesAssoc.Add(fpa);
+            */
+
             registryContext.SaveChanges();            
         }
 
@@ -460,7 +477,13 @@ namespace RegistryWeb.DataServices
                     premise.TenancyPremisesAssoc.Add(tpa);
                 }
             }
-            
+
+            premise.IdBuildingNavigation = null;
+            premise.IdPremisesCommentNavigation = null;
+            premise.IdPremisesDoorKeysNavigation = null;
+            premise.IdPremisesKindNavigation = null;
+            premise.IdPremisesTypeNavigation = null;
+
             //Добавление и радактирование
             registryContext.Premises.Update(premise);
             registryContext.SaveChanges();

@@ -35,6 +35,8 @@ namespace RegistryWeb.ViewModel
         public IEnumerable<ObjectState> ObjectStates { get; set; }
         public IEnumerable<FundType> FundTypes { get; set; }*/
 
+        public int IdFundType { get; set; }
+
         public SelectList KladrStreetsList { get; set; }
         public SelectList HeatingTypesList { get; set; }
         public SelectList StructureTypesList { get; set; }
