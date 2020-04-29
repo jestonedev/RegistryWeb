@@ -26,7 +26,9 @@ namespace RegistryWeb.DataServices
             {
                 FundsHistory = GetQuery(idObject, typeObject),
                 FundHistory = CreateFundHistory(),
-                FundTypesList = new SelectList(rc.FundTypes, "IdFundType", "FundTypeName")
+                FundTypesList = new SelectList(rc.FundTypes, "IdFundType", "FundTypeName"),
+                IdObject= idObject,
+                TypeObject= typeObject
             };
 
             return fundHistoryVM;
@@ -55,14 +57,12 @@ namespace RegistryWeb.DataServices
 
             funds = funds.Include(f => f.IdFundTypeNavigation);
             return funds;
-
         }
 
         public FundHistoryVM GetViewModel(FundHistory fundsHistory, [CallerMemberName]string action = "")
         {
             var fundHistoryVM = new FundHistoryVM()
             {
-                //FundsHistory = GetFundHistory(),
                 FundTypesList = new SelectList(rc.FundTypes, "IdFundType", "FundTypeName")
             };
 
@@ -71,26 +71,129 @@ namespace RegistryWeb.DataServices
 
         public List<FundHistory> GetFundHistory(int idFund)
         {
-            /*var fundHistoryVM = new FundHistoryVM()
-            {
-                FundHistory = rc.FundsHistory
-                                .Include(fh => fh.IdFundTypeNavigation)
-                                .FirstOrDefault(fh => fh.IdFund == idFund),
-                FundTypesList = new SelectList(rc.FundTypes, "IdFundType", "FundTypeName")
-            };
-            return fundHistoryVM;*/
-
             var fund = from fun in rc.FundsHistory
                         join ftn in rc.FundTypes 
                         on fun.IdFundType equals ftn.IdFundType
                         where fun.IdFund==idFund
                         select fun;
             return fund.ToList();
-
-            /*return rc.FundsHistory
-                .Include(fh => fh.IdFundTypeNavigation)
-                .FirstOrDefault(fh=>fh.IdFund== idFund);*/
         }
+
+        public FundHistory GetFund(int idFund)
+        {
+            var fund = rc.FundsHistory.AsNoTracking()
+                        .Include(fh => fh.IdFundTypeNavigation)
+                        .Include(fh => fh.FundsPremisesAssoc)
+                        .Include(fh => fh.FundsBuildingsAssoc)
+                        .Include(fh => fh.FundsSubPremisesAssoc)
+                        .FirstOrDefault(fh => fh.IdFund == idFund);
+            return fund;
+        }
+
+        public FundHistoryVM GetFundHistoryView(FundHistory fundhis, int IdObject, string typeObject, [CallerMemberName]string action = "")
+        {
+            var fhVM = new FundHistoryVM()
+            {
+                FundHistory = fundhis,
+                FundTypesList = new SelectList(rc.FundTypes, "IdFundType", "FundTypeName"),
+                IdObject = IdObject,
+                TypeObject = typeObject
+            };
+            return fhVM;
+        }
+
+        internal void Create(FundHistory fh, int IdObject, string typeObject)
+        {
+            fh.IdFundType = fh.IdFundTypeNavigation.IdFundType;
+            fh.IdFundTypeNavigation = null;
+            rc.FundsHistory.Add(fh);
+
+            if (typeObject == "Premise")
+            {
+                var foa = new FundPremiseAssoc
+                {
+                    IdFund = fh.IdFund,
+                    IdPremises = IdObject
+                };
+                rc.FundsPremisesAssoc.Add(foa);
+            }
+            else if (typeObject == "Building")
+            {
+                var foa = new FundBuildingAssoc
+                {
+                    IdFund = fh.IdFund,
+                    IdBuilding = IdObject
+                };
+                rc.FundsBuildingsAssoc.Add(foa);
+            }
+            else if (typeObject == "SubPremise")
+            {
+                var foa = new FundSubPremiseAssoc
+                {
+                    IdFund = fh.IdFund,
+                    IdSubPremises = IdObject
+                };
+                rc.FundsSubPremisesAssoc.Add(foa);
+            }
+
+            rc.SaveChanges();
+        }
+
+        internal void Edit(FundHistory fh)
+        {
+            var oldFH = GetFund(fh.IdFund);
+
+            foreach (var fpa in oldFH.FundsPremisesAssoc)
+            {
+                if (fh.FundsPremisesAssoc.Select(owba => owba.IdPremises).Contains(fpa.IdPremises) == false)
+                {
+                    fpa.Deleted = 1;
+                    fh.FundsPremisesAssoc.Add(fpa);
+                }
+            } 
+            foreach (var fpa in oldFH.FundsSubPremisesAssoc)
+            {
+                if (fh.FundsSubPremisesAssoc.Select(owba => owba.IdSubPremises).Contains(fpa.IdSubPremises) == false)
+                {
+                    fpa.Deleted = 1;
+                    fh.FundsSubPremisesAssoc.Add(fpa);
+                }
+            } 
+            foreach (var fpa in oldFH.FundsBuildingsAssoc)
+            {
+                if (fh.FundsBuildingsAssoc.Select(owba => owba.IdBuilding).Contains(fpa.IdBuilding) == false)
+                {
+                    fpa.Deleted = 1;
+                    fh.FundsBuildingsAssoc.Add(fpa);
+                }
+            }
+
+            //Добавление и радактирование
+            rc.FundsHistory.Update(fh);
+            rc.SaveChanges();
+        }
+
+        internal void Delete(int idFund)
+        {
+            var oldFund = GetFund(idFund);
+
+            oldFund.Deleted = 1;
+            foreach (var fpa in oldFund.FundsPremisesAssoc)
+            {
+                fpa.Deleted = 1;
+            }
+            foreach (var fpa in oldFund.FundsBuildingsAssoc)
+            {
+                fpa.Deleted = 1;
+            }
+            foreach (var fpa in oldFund.FundsSubPremisesAssoc)
+            {
+                fpa.Deleted = 1;
+            }
+            rc.FundsHistory.Update(oldFund);
+            rc.SaveChanges();
+        }
+
 
     }
 }

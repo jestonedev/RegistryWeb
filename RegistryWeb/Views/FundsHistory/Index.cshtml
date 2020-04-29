@@ -4,16 +4,26 @@
 @using RegistryWeb.Extensions;
 @model FundHistoryVM;
 @{
+    ViewData["Title"] = "История фонда";
     var controller = Context.Session.Get<string>("Controller");
     var action = Context.Session.Get<string>("Action");
-    if (ViewBag.addressType == "Premise")
+
+    if (ViewBag.Action == "Create")
     {
-        ViewData["Title"] = "История фонда помещения №" + ViewBag.idObject;
+        ViewData["Title"] = "Создание нового помещения";
     }
-    if (ViewBag.addressType == "Building")
+    else
     {
-        ViewData["Title"] = "История фонда здания №" + ViewBag.idObject;
+        if (ViewBag.addressType == "Premise" || Model.TypeObject == "Premise")
+        {
+            ViewData["Title"] = "История фонда помещения №" + Model.IdObject; /*ViewBag.idObject ??*/
+        }
+        if (ViewBag.addressType == "Building" || Model.TypeObject == "Building")
+        {
+            ViewData["Title"] = "История фонда здания №" + Model.IdObject;/*ViewBag.idObject ??*/
+        }
     }
+
     //var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
     //    "(" + Model.PageOptions.TotalRows + ")" :
     //    "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
@@ -34,19 +44,17 @@
     <script type="text/javascript">
         $(document).ready(function ()
         {
-            //$(".selectfund").on('click', function ()
-            $("tr[id$='fund']").on('click', function ()
+            $("td[id$='fund']").on('click', function ()
             {
                 var tr = $(this).closest('tr');
                 var idFund = tr.find('input[name$="IdFund"]').val();
-
+                var action = $('#r-buildings-form').data("action");
 
                 @*$.get('@Url.Action("GetFund")?' + "idFund=" + idFund);*@
 
-                $.getJSON('@Url.Action("GetFund")?' + "idFund=" + idFund, function (data) 
+                $.getJSON('@Url.Action("Details")?' + "idFund=" + idFund + "&action=Details", function (data) 
                 {
                     ostatockArray = data;
-                    //var options = "<option></option>";
                     $(ostatockArray).each(function (idx, elem) 
                     {
                         var now = new Date();
@@ -58,7 +66,7 @@
                         $("select[name$='IdFundType']").val(elem.idFundType);
                         $("input[name$='ProtocolDate']").val(date);
                         $("input[name$='ProtocolNumber']").val(elem.protocolNumber);
-                        $("textarea[name$='Description']").val(elem.description);
+                        $("textarea").val(elem.description);
 
                         date = elem.includeRestrictionDate == null ? today : elem.includeRestrictionDate.substr(0, 10);
                         $("input[name$='IncludeRestrictionNumber']").val(elem.includeRestrictionNumber);

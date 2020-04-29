@@ -5,6 +5,11 @@ var fundbodyToggle = function (e) {
     e.preventDefault();
 }
 $(function () {
+    $('select').prop('disabled', true);
+    $('input').prop('disabled', true);
+    $('textarea').prop('disabled', true);
+    
+
     $('#fundbodyToggle').click(fundbodyToggle);
 
     $('#includecheck').on("click", function (e)
@@ -23,6 +28,18 @@ $(function () {
         } else {
             $('.exclude').attr('disabled', 'disabled');
         }
+    });
+
+    $("#edit").on("click", function (e) {
+        $('select').prop('disabled', false);
+        $('input').prop('disabled', false);
+        $('textarea').prop('disabled', false);
+    });
+
+    $("#delete").on("click", function (e) {
+        $('select').prop('disabled', true);
+        $('input').prop('disabled', true);
+        $('textarea').prop('disabled', true);
     });
 
 
