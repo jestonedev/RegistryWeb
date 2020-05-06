@@ -1,0 +1,165 @@
+﻿@model RegistryWeb.ViewModel.FundHistoryVM;
+@using RegistryWeb.Extensions;
+
+@{
+    var controller = Context.Session.Get<string>("Controller");
+    var action = Context.Session.Get<string>("Action");
+
+    if (ViewBag.Action == "Create")
+    {
+        ViewData["Title"] = "Создание нового фонда";
+    }
+    if (ViewBag.Action == "Edit")
+    {
+        if (ViewBag.addressType == "Premise" || Model.TypeObject == "Premise")
+        {
+            ViewData["Title"] = "Редактирование истории фонда помещения №" + Model.IdObject; /*ViewBag.idObject ??*/
+        }
+        if (ViewBag.addressType == "Building" || Model.TypeObject == "Building")
+        {
+            ViewData["Title"] = "Редактирование истории фонда здания №" + Model.IdObject;/*ViewBag.idObject ??*/
+        }
+    }
+    if (ViewBag.Action == "Delete")
+    {
+        if (ViewBag.addressType == "Premise" || Model.TypeObject == "Premise")
+        {
+            ViewData["Title"] = "Удаление истории фонда помещения №" + Model.IdObject; /*ViewBag.idObject ??*/
+        }
+        if (ViewBag.addressType == "Building" || Model.TypeObject == "Building")
+        {
+            ViewData["Title"] = "Удаление истории фонда здания №" + Model.IdObject;/*ViewBag.idObject ??*/
+        }
+    }
+}
+
+@section Scripts
+{
+    @if (ViewBag.Action == "Delete")
+    {
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('select').prop('readonly', true);
+                $('input').prop('readonly', true);
+                $('textarea').prop('readonly', true);
+                $('#del').prop('readonly', false);
+                $("select").attr("readonly", "readonly");
+            });
+        </script>
+    }
+}
+
+<div id="fundhistory">
+    <form asp-controller="FundHistory" asp-action="@ViewBag.Action" id="r-buildings-form" data-action="@ViewBag.Action" method="post">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <label class="form-check-label h2 col-8">@ViewData["Title"]</label>
+                <a id="fundhistoryAdd" class="form-control btn btn-success col-1" title="Добавить фонд" asp-action="Create" asp-route-action="Create" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise">&#10010;</a>
+                <div class="btn-group" role="group" aria-label="Панель доступа">
+                    <a class="form-control btn btn-primary" asp-controller="@controller" asp-action="@action" asp-route-isBack="true">Назад</a>
+                    @if (ViewBag.Action == "Create")
+                    {
+                        <input type="submit" value="Создать" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" /> @*asp-route-action="Index"*@
+                    }
+                    @if (ViewBag.Action == "Edit")
+                    {
+                        <input type="submit" value="Сохранить" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" />
+                    }
+                    @if (ViewBag.Action == "Delete")
+                    {
+                        <input id="del" type="submit" value="Удалить" class="form-control btn btn-danger" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" />
+                    }
+
+                    <a href="#" id="fundbodyToggle" class="form-control btn btn-primary" title="Развернуть помещение" style="font-weight:bold;">∧</a>
+                </div>
+            </div>
+            <input type="hidden" asp-for="@Model.FundHistory.IdFund" />
+            <input type="hidden" asp-for="@Model.FundHistory.Deleted" />
+            <input type="hidden" asp-for="@Model.IdObject" /> @*value="@ViewBag.idObject"*@
+            <input type="hidden" asp-for="@Model.TypeObject" /> @*value="@ViewBag.addressType"*@
+            <div class="card-body" id="fundbody">
+                <div class="card-group">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col r-form-group-label">
+                                    <label asp-for="@Model.FundHistory.IdFundTypeNavigation.IdFundType">Тип найма</label>
+                                    <select class="form-control" asp-for="@Model.FundHistory.IdFundType" title="Тип найма" asp-items="@Model.FundTypesList">
+                                        @if (Model.FundHistory.IdFundTypeNavigation != null)
+                                        {
+                                            <option>@Model.FundHistory.IdFundTypeNavigation.FundTypeName</option>
+                                        }
+                                        else
+                                        {
+                                            <option></option>
+                                        };
+                                    </select>
+                                </div>
+                                <div class="form-group col r-form-group-label">
+                                    <label asp-for="@Model.FundHistory.ProtocolNumber">№ протокола ЖК</label>
+                                    <input type="text" class="form-control" asp-for="@Model.FundHistory.ProtocolNumber" title="Номер протокола ЖК">
+                                </div>
+                                <div class="form-group col r-form-group-label">
+                                    <label asp-for="@Model.FundHistory.ProtocolDate">Дата протокола ЖК</label>
+                                    <input type="date" class="form-control" asp-for="@Model.FundHistory.ProtocolDate" value="@(Model.FundHistory.ProtocolDate==null ? DateTime.Now.ToString("yyyy-MM-dd") : Model.FundHistory.ProtocolDate?.ToString("yyyy-MM-dd"))" title="Дата протокола ЖК">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col">
+                                    <label asp-for="@Model.FundHistory.Description">Дополнительные сведения</label>
+                                    <textarea asp-for="@Model.FundHistory.Description" class="form-control" rows="3" cols="10"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" id="card2">
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-check col" style="margin-left:20px;">
+                                    <input type="checkbox" class="form-check-input" id="includecheck" title="Реквизиты НПА по включению в фонд">
+                                    <label class="form-check-label">Реквизиты НПА по включению в фонд</label>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col r-form-group-label">
+                                    <label asp-for="@Model.FundHistory.IncludeRestrictionNumber">Номер реквизита</label>
+                                    <input type="text" disabled="disabled" class="form-control include" asp-for="@Model.FundHistory.IncludeRestrictionNumber" title="Номер реквизита">
+                                </div>
+                                <div class="form-group col r-form-group-label">
+                                    <label asp-for="@Model.FundHistory.IncludeRestrictionDate">Дата реквизита</label>
+                                    <input type="date" disabled="disabled" class="form-control include" asp-for="@Model.FundHistory.IncludeRestrictionDate" value="@(Model.FundHistory.IncludeRestrictionDate==null ? DateTime.Now.ToString("yyyy-MM-dd") : Model.FundHistory.IncludeRestrictionDate?.ToString("yyyy-MM-dd"))" title="Дата протокола ЖК">
+                                </div>
+                                <div class="form-group col r-form-group-label">
+                                    <label asp-for="@Model.FundHistory.IncludeRestrictionDescription">Наименование</label>
+                                    <input type="text" disabled="disabled" class="form-control include" asp-for="@Model.FundHistory.IncludeRestrictionDescription" title="Наименование">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-check col" style="margin-left:20px;">
+                                    <input type="checkbox" class="form-check-input" id="excludecheck" title="Реквизиты НПА по исключению из фонда">@*asp-for=""*@
+                                    <label class="form-check-label">Реквизиты НПА по исключению из фонда</label>@*asp-for=""*@
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col r-form-group-label">
+                                    <label asp-for="@Model.FundHistory.ExcludeRestrictionNumber">Номер реквизита</label>
+                                    <input type="text" disabled="disabled" class="form-control exclude" asp-for="@Model.FundHistory.ExcludeRestrictionNumber" title="Номер реквизита">
+                                </div>
+                                <div class="form-group col r-form-group-label">
+                                    <label asp-for="@Model.FundHistory.ExcludeRestrictionDate">Дата реквизита</label>
+                                    <input type="date" disabled="disabled" class="form-control exclude" asp-for="@Model.FundHistory.ExcludeRestrictionDate" value="@(Model.FundHistory.ExcludeRestrictionDate==null ? DateTime.Now.ToString("yyyy-MM-dd") : Model.FundHistory.ExcludeRestrictionDate?.ToString("yyyy-MM-dd"))" title="Дата протокола ЖК">
+                                </div>
+                                <div class="form-group col r-form-group-label">
+                                    <label asp-for="@Model.FundHistory.ExcludeRestrictionDescription">Наименование</label>
+                                    <input type="text" disabled="disabled" class="form-control exclude" asp-for="@Model.FundHistory.ExcludeRestrictionDescription" title="Наименование">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</form>
+</div>
