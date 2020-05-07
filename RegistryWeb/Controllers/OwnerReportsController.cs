@@ -67,11 +67,11 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult Forma2()
+        public IActionResult Forma2And3()
         {
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
-            return View("~/Views/OwnerReports/Forma2/Index.cshtml", dataService.GetForma2VM());
+            return View("~/Views/OwnerReports/Forma2And3/Index.cshtml", dataService.GetForma2VM());
         }
 
         public IActionResult GetForma2(int? idPremise)
@@ -79,7 +79,7 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
             if (idPremise == null)
-                return Error("Здание не выбрано.");
+                return Error("Помещение не выбрано.");
             try
             {
                 var file = reportService.Forma2(new List<int>() { idPremise.Value });
@@ -97,7 +97,7 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
             if (!ids.Any())
-                return Error("Не выбрано ни одного здания.");
+                return Error("Не выбрано ни одного помещения. Либо в здании таковые отсутствуют.");
             try
             {
                 var fileNameReport = reportService.Forma2Ajax(ids);
@@ -118,6 +118,57 @@ namespace RegistryWeb.Controllers
                 var file = reportService.DownloadFile(fileNameReport);
                 return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     @"Форма 2. Сведения о жилых помещениях и собственниках (нанимателях) жилых помещений аварийного многоквартирного дома.docx");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetForma3(int? idPremise)
+        {
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+                return View("NotAccess");
+            if (idPremise == null)
+                return Error("Помещение не выбрано.");
+            try
+            {
+                var file = reportService.Forma3(new List<int>() { idPremise.Value });
+                return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    @"Форма 3. Сведения, необходимые для целей формирования программы переселения граждан  из аварийных многоквартирных домов.docx");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult MultiForma3(List<int> ids)
+        {
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+                return View("NotAccess");
+            if (!ids.Any())
+                return Error("Не выбрано ни одного помещения. Либо в здании таковые отсутствуют.");
+            try
+            {
+                var fileNameReport = reportService.Forma3Ajax(ids);
+                return Json(new { fileNameReport });
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetMultiForma3(string fileNameReport)
+        {
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.DownloadFile(fileNameReport);
+                return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    @"Форма 3. Сведения, необходимые для целей формирования программы переселения граждан  из аварийных многоквартирных домов.docx");
             }
             catch (Exception ex)
             {

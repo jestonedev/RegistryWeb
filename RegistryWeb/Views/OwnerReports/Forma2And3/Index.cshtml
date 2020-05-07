@@ -1,12 +1,12 @@
 ﻿@model RegistryWeb.ViewModel.Forma2VM;
 @{
-    ViewData["Title"] = "Отчет по форме 2";
+    ViewData["Title"] = "Отчет по форме 2 и 3";
     var text = "(Зданий всего: " + Model.GroupPremises.Count() + " | Помещений всего: " + Model.GroupPremises.Sum(gp => gp.Count()) + ")";
 }
 @section scripts
     {
     <script src="~/lib/bootstrap4-toggle/js/bootstrap4-toggle.min.js" asp-append-version="true"></script>
-    <script src="~/js/forma2.js" asp-append-version="true"></script>
+    <script src="~/js/forma1and2and3.js" asp-append-version="true"></script>
 }
 @section styles
     {
@@ -29,8 +29,9 @@
                     (@groupPremise.Count())
                 </td>
                 <td>
-                    <div class="d-flex justify-content-between" style="height: 30px;">
-                        <button class="btn btn-success oi oi-document multiReportPremise" type="button" data-idbuilding="@groupPremise.Key" title="Скачать отчет по форме 2">2</button>
+                    <div class="btn-group" style="height: 30px;">
+                        <button class="btn btn-success oi oi-document multiForma2" type="button" data-idbuilding="@groupPremise.Key" title="Скачать отчет по всем помещениям здания по форме 2">2</button>
+                        <button class="btn btn-success oi oi-document multiForma3" type="button" data-idbuilding="@groupPremise.Key" title="Скачать отчет по всем помещениям здания по форме 3">3</button>
                     </div>
                 </td>
             </tr>
@@ -48,9 +49,11 @@
                         <a asp-controller="Premises" asp-action="Details" asp-route-idPremises="@premise.IdPremises">@premise.GetAddress()</a>
                     </td>
                     <td class="align-middle">
-                        <div class="d-flex justify-content-between" style="height: 30px;">
+                        <div class="btn-group" style="height: 30px;">
                             <a class="btn btn-success oi oi-document" title="Скачать отчет по форме 2"
                                asp-action="GetForma2" asp-controller="OwnerReports" asp-route-idPremise="@premise.IdPremises">2</a>
+                            <a class="btn btn-success oi oi-document" title="Скачать отчет по форме 2"
+                               asp-action="GetForma3" asp-controller="OwnerReports" asp-route-idPremise="@premise.IdPremises">3</a>
                         </div>
                     </td>
                 </tr>
