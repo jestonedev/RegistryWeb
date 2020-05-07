@@ -76,57 +76,57 @@
     <tbody>
         @foreach (var item in Model.Premises)
         {
-            <tr>
-                @{
-                    var idOwnershipTypeP = item.OwnershipPremisesAssoc.FirstOrDefault() != null ? item.OwnershipPremisesAssoc.LastOrDefault().OwnershipRightNavigation.IdOwnershipRightType : 0;
-                    var idOwnershipTypeB = item.IdBuildingNavigation.OwnershipBuildingsAssoc.FirstOrDefault();
-                }
-                <td style="background: @(item.OwnershipPremisesAssoc.FirstOrDefault()!=null && idOwnershipTypeP==1 ? "#FEDCDC" : idOwnershipTypeP == 2 ? "#BBFEE8" : idOwnershipTypeP == 7 ? "#88FF63" : "");">
-                    @item.IdPremises
-                </td>
-                <td>
-                    @item.IdBuildingNavigation.IdStreetNavigation.StreetLong,
-                    д.@item.IdBuildingNavigation.House,
-                    @item.IdPremisesTypeNavigation.PremisesTypeShort@item.PremisesNum
+        <tr>
+            @{
+                var idOwnershipTypeP = item.OwnershipPremisesAssoc.FirstOrDefault() != null ? item.OwnershipPremisesAssoc.LastOrDefault().OwnershipRightNavigation.IdOwnershipRightType : 0;
+                var idOwnershipTypeB = item.IdBuildingNavigation.OwnershipBuildingsAssoc.FirstOrDefault();
+            }
+            <td style="background: @(item.OwnershipPremisesAssoc.FirstOrDefault()!=null && idOwnershipTypeP==1 ? "#FEDCDC" : idOwnershipTypeP == 2 ? "#BBFEE8" : idOwnershipTypeP == 7 ? "#88FF63" : "");">
+                @item.IdPremises
+            </td>
+            <td>
+                @item.IdBuildingNavigation.IdStreetNavigation.StreetLong,
+                д.@item.IdBuildingNavigation.House,
+                @item.IdPremisesTypeNavigation.PremisesTypeShort@item.PremisesNum
 
-                    <div id="dopinfo">
-                        Тип помещения: @item.IdPremisesTypeNavigation.PremisesTypeName
-                        Кадастровый номер: @item.CadastralNum
-                        Общая площадь: @item.TotalArea
+                <div id="dopinfo">
+                    Тип помещения: @item.IdPremisesTypeNavigation.PremisesTypeName;
+                    Кадастровый номер: @item.CadastralNum;<br>
+                    Общая площадь: @item.TotalArea.
+                </div>
+
+            </td>
+
+
+            <td>@item.IdStateNavigation.StateNeutral</td>
+            @*<td>@item.FundType</td>*@
+            <td>@GetTypeFund(item)</td>
+            <td>
+                <div class="btn-group" role="group" aria-label="Панель доступа">
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-left but" aria-labelledby="toolsBtn_@item.IdPremises">
+                            <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
+                               asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises" asp-route-action="Details"></a>
+                            <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                               asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@item.IdPremises" asp-route-action="Edit"></a>
+                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                               asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@item.IdPremises"></a>
+                        </div>
                     </div>
 
-                </td>
-
-
-                <td>@item.IdStateNavigation.StateNeutral</td>
-                <td>@GetTypeFund(item)</td>
-
-                <td>
                     <div class="btn-group" role="group" aria-label="Панель доступа">
-                        <div class="btn-group" role="group" aria-label="Панель доступа">
-                            <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                            <div class="dropdown-menu dropdown-menu-left" aria-labelledby="toolsBtn_@item.IdPremises">
-                                <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
-                                   asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises" asp-route-action="Details"></a>
-                                <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
-                                   asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@item.IdPremises" asp-route-action="Edit"></a>
-                                <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                                   asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@item.IdPremises"></a>
-                            </div>
+                        <button class="btn btn-dark oi oi-grid-two-up dropdown-toggle" type="button" title="Связанные объекты" aria-label="Связанные объекты" id="objectsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right but" aria-labelledby="objectsBtn_@item.IdPremises">
+                            <a class="btn btn-warning oi oi-book" title="История фонда" aria-label="История фонда"
+                               asp-controller="FundsHistory" asp-action="Index" asp-route-idObject="@item.IdPremises" asp-route-typeObject="Premise"></a>
+                            @*<a class="btn btn-info oi oi-briefcase" title="История найма" aria-label="История найма"
+                               asp-controller="FundsHistory" asp-action="Index" asp-route-idPremises="@item.IdPremises"></a>
+                            <a class="btn btn-danger oi oi-project" title="Лицевые счета" aria-label="Лицевые счета"
+                               asp-controller="FundsHistory" asp-action="Index" asp-route-idPremises="@item.IdPremises"></a>*@
                         </div>
-                        @*
-        <div class="btn-group" role="group" aria-label="Панель доступа">
-            <button class="btn btn-info oi oi-grid-four-up dropdown-toggle" type="button" title="Связанные объекты" aria-label="Связанные объекты" id="objectsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@item.IdPremises">
-                <a class="btn btn-info oi oi-book" title="История фондов" aria-label="История фондов"
-                   asp-controller="FundsHistory" asp-action="Index" asp-route-idPremises="@item.IdPremises"></a>
-                <a class="btn btn-info oi oi-book" title="История найма" aria-label="История найма"
-                   asp-controller="FundsHistory" asp-action="Index" asp-route-idPremises="@item.IdPremises"></a>
-                <a class="btn btn-info oi oi-book" title="Лицевые счета" aria-label="Лицевые счета"
-                   asp-controller="FundsHistory" asp-action="Index" asp-route-idPremises="@item.IdPremises"></a>
-            </div>
-        </div>
-        <div class="btn-group" role="group" aria-label="Панель доступа">
+                    </div>
+                    @*<div class="btn-group" role="group" aria-label="Панель доступа">
             <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdPremises">
                 <a class="dropdown-item" asp-action="Forma2" asp-controller="OwnerProcesses" asp-route-IdPremises="@item.IdPremises">Форма 1</a>
@@ -136,26 +136,25 @@
                 <a class="dropdown-item" asp-action="Forma2" asp-controller="OwnerProcesses" asp-route-IdPremises="@item.IdPremises">Форма 5</a>
             </div>
         </div>
-            </div>
-                        *@
-                    </div>                        
-
-                    @*
-        <div class="btn-group">
-            <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
-               asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises" asp-route-action="Details"></a>
-            <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
-               asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@item.IdPremises" asp-route-action="Edit"></a>
-        </div>
-        <div class="btn-group">
-            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-               asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@item.IdPremises"></a>
-            <a class="btn btn-info oi oi-book" title="История фондов" aria-label="История фондов"
-               asp-controller="FundsHistory" asp-action="Index" asp-route-idPremises="@item.IdPremises"></a>
-        </div>
                     *@
-                </td>
-            </tr>
+                </div>
+
+                @*
+            <div class="btn-group">
+                <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
+                   asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises" asp-route-action="Details"></a>
+                <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                   asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@item.IdPremises" asp-route-action="Edit"></a>
+            </div>
+            <div class="btn-group">
+                <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                   asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@item.IdPremises"></a>
+                <a class="btn btn-info oi oi-book" title="История фондов" aria-label="История фондов"
+                   asp-controller="FundsHistory" asp-action="Index" asp-route-idPremises="@item.IdPremises"></a>
+            </div>
+                *@
+            </td>
+        </tr>
         }
     </tbody>
 </table>

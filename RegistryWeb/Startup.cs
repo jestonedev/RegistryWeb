@@ -58,6 +58,7 @@ namespace RegistryWeb
             services.AddTransient<OwnerProcessesDataService>();
             services.AddTransient<ChangeLogsDataService>();
             services.AddTransient<SecurityService>();
+            services.AddTransient<FundsHistoryDataService>();
             services.AddTransient<ReportService>();
             services.AddTransient<ReformaGKHService>();
             services.AddTransient<OwnerReportsDataService>();
