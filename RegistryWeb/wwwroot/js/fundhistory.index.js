@@ -5,9 +5,27 @@ var fundbodyToggle = function (e) {
     e.preventDefault();
 }
 $(function () {
-    $('select').prop('disabled', true);
-    $('input').prop('disabled', true);
-    $('textarea').prop('disabled', true);
+    var action = $('#r-fundshistory-form').data("action");
+
+    if (action == "Index")
+    {
+        $('select').prop('disabled', true);
+        $('input').prop('disabled', true);
+        $('textarea').prop('disabled', true);
+    }    
+    else if (action == "Delete")
+    {
+        $('select').prop('readonly', true);
+        $('input').prop('readonly', true);
+        $('textarea').prop('readonly', true);
+        $('#del').prop('readonly', false);
+        $('select').attr('readonly', 'readonly');
+        /*$('select').prop('disabled', true);
+        $('input').prop('disabled', true);
+        $('textarea').prop('disabled', true);
+        $('input[type="hidden"]').prop('disabled', false);
+        $('input[type="submit"]').prop('disabled', false);*/
+    }
     
 
     $('#fundbodyToggle').click(fundbodyToggle);
@@ -18,16 +36,16 @@ $(function () {
         {
             $('.include').removeAttr('disabled');
         } else {
-            $('.include').attr('disabled', 'disabled');
-        }
+                $('.include').attr('disabled', 'disabled');
+               }
     });
 
     $('#excludecheck').on("click", function (e) {
         if ($('#excludecheck').is(':checked')) {
             $('.exclude').removeAttr('disabled');
         } else {
-            $('.exclude').attr('disabled', 'disabled');
-        }
+                $('.exclude').attr('disabled', 'disabled');
+               }
     });
 
     $("#edit").on("click", function (e) {
