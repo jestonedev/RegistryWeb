@@ -104,6 +104,7 @@ namespace RegistryWeb.Models
 
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
+        public virtual DbSet<RentPremise> RentPremises { get; set; }
         public virtual DbSet<TenancyActiveProcess> TenancyActiveProcesses { get; set; }
         public virtual DbSet<OwnerActiveProcess> OwnerActiveProcesses { get; set; }
 
@@ -113,6 +114,7 @@ namespace RegistryWeb.Models
 
             //SQL-Views
             modelBuilder.ApplyConfiguration(new KladrStreetConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new RentPremiseConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyActiveProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerActiveProcessConfiguration(nameDatebase));
 

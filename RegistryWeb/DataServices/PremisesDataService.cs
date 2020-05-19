@@ -38,6 +38,7 @@ namespace RegistryWeb.DataServices
             viewModel.RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName");
             viewModel.LocationKeysList = new SelectList(registryContext.PremisesDoorKeys, "IdPremisesDoorKeys", "LocationOfKeys");
             viewModel.CommentList = new SelectList(registryContext.PremisesComments, "IdPremisesComment", "PremisesCommentText");
+            //viewModel.RentList = new SelectList(registryContext.RentPremises, "IdPremises", "Payment");
             return viewModel;
         }
 
@@ -149,11 +150,11 @@ namespace RegistryWeb.DataServices
                 .Include(p => p.IdBuildingNavigation)
                     .ThenInclude(b => b.IdStreetNavigation)
                 .Include(p => p.IdStateNavigation)        //Текущее состояние объекта
+                .Include(p => p.IdRentPremiseNavigation)
                 .Include(p => p.IdPremisesTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
                 .Include(p => p.FundsPremisesAssoc)
                     .ThenInclude(fpa => fpa.IdFundNavigation)
-                        .ThenInclude(fh => fh.IdFundTypeNavigation);
-                       
+                        .ThenInclude(fh => fh.IdFundTypeNavigation);           
         }
 
         //private IQueryable GetFundTypes()
@@ -418,7 +419,8 @@ namespace RegistryWeb.DataServices
                 LocationKeysList = new SelectList(registryContext.PremisesDoorKeys, "IdPremisesDoorKeys", "LocationOfKeys"),
                 CommentList = new SelectList(registryContext.PremisesComments, "IdPremisesComment", "PremisesCommentText"),
                 OwnershipRightTypesList = new SelectList(registryContext.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName"),
-                RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName")
+                RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName"),
+                Payment=registryContext.RentPremises.FirstOrDefault(rp=>rp.IdPremises==premise.IdPremises).Payment
             };
 
             return premisesVM;
@@ -542,10 +544,10 @@ namespace RegistryWeb.DataServices
                 .Include(b => b.IdStateNavigation)                              //Текущее состояние объекта
                 .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
                 .Include(b => b.FundsPremisesAssoc).ThenInclude(fpa => fpa.IdFundNavigation).ThenInclude(fh => fh.IdFundTypeNavigation)
-                .Include(b => b.IdPremisesCommentNavigation).ThenInclude(fpa => fpa.Premises)
-                .Include(b => b.IdPremisesTypeNavigation).ThenInclude(fpa => fpa.Premises)
+                .Include(b => b.IdPremisesCommentNavigation)
+                .Include(b => b.IdPremisesTypeNavigation)
                 .Include(b => b.IdPremisesDoorKeysNavigation)
-                .FirstOrDefault(b => b.IdPremises == idPremise);
+                .SingleOrDefault(b => b.IdPremises == idPremise);
         }
 
         public IEnumerable<ObjectState> ObjectStates

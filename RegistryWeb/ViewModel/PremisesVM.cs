@@ -36,8 +36,10 @@ namespace RegistryWeb.ViewModel
         public IEnumerable<FundType> FundTypes { get; set; }*/
 
         public int IdFundType { get; set; }
+        public double Payment { get; set; }
 
         public SelectList KladrStreetsList { get; set; }
+        public SelectList RentList { get; set; }
         public SelectList HeatingTypesList { get; set; }
         public SelectList StructureTypesList { get; set; }
         public SelectList ObjectStatesList { get; set; }

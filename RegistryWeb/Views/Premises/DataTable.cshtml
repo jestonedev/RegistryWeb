@@ -28,16 +28,15 @@
     <thead>
         <tr style="align-content: center;">
             <th class="r-table-header-cell" style="width:155px;">
-                    № по рeестру
-                    @if (Model.OrderOptions.OrderDirection == OrderDirection.Ascending)
-                    {
-                        <a href="#" class="oi oi-sort-descending sort " data-order-field="IdPremises" data-order-direction="1"></a>
-                    }
-                    else
-                    {
-                        <a href="#" class="oi oi-sort-ascending sort" data-order-field="IdPremises" data-order-direction="0"></a>
-                    }
-                @*<a href="#" data-order-field="IdPremises" data-order-direction="@OrderDirection.Ascending"></a>*@
+                № по рeестру
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Ascending)
+                {
+                    <a href="#" class="oi oi-sort-descending sort " data-order-field="IdPremises" data-order-direction="1"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort" data-order-field="IdPremises" data-order-direction="0"></a>
+                }
             </th>
             <th>
                 Адрес
@@ -49,14 +48,7 @@
                 {
                     <a href="#" class="oi oi-sort-ascending sort" data-order-field="PremisesType" data-order-direction="0"></a>
                 }
-            </th>
-            @*<th class="r-table-header-cell">
-                    <a href="#" data-order-field="PremisesType" data-order-direction="@OrderDirection.Ascending">
-                        Тип помещения
-                    </a>
-                </th>
-                <th>Кадастровый номер</th>
-                <th>Общая площадь</th>*@
+            </th>            
             <th class="r-table-header-cell">
                 Текущее состояние
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Ascending)
@@ -67,7 +59,6 @@
                 {
                 <a href="#" class="oi oi-sort-ascending sort" data-order-field="ObjectState" data-order-direction="0"></a>
                 }
-                @*<a href="#" data-order-field="ObjectState" data-order-direction="@OrderDirection.Ascending"></a>*@
             </th>
             <th>Текущий фонд</th>
             <th></th>
@@ -96,7 +87,6 @@
                 </div>
 
             </td>
-
 
             <td>@item.IdStateNavigation.StateNeutral</td>
             @*<td>@item.FundType</td>*@

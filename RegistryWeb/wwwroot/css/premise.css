@@ -15,3 +15,25 @@
     color: white;
     /*font-weight: bold;*/
 }
+
+.error-message span {
+    color: crimson;
+    font-weight: bold;
+}
+
+input.input-validation-error {
+    border: 1px solid #b94a48;
+}
+
+.input-group-addon {
+    cursor:pointer;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    color: #555;
+    text-align: center;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
