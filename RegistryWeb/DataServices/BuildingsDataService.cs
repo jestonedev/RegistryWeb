@@ -244,12 +244,31 @@ namespace RegistryWeb.DataServices
             get => registryContext.GovernmentDecrees.AsNoTracking();
         }
 
-        public void Delete(int idBuilding)
+        internal Building CreateBuilding()
         {
+            var building = new Building();
+            return building;
         }
 
-        public void Edit(Building newBuilding)
+        internal void Create(Building building)
         {
+            registryContext.Buildings.Add(building);
+            registryContext.SaveChanges();
+        }
+
+        internal void Delete(int idBuilding)
+        {
+            var building = registryContext.Buildings
+                .FirstOrDefault(op => op.IdBuilding == idBuilding);
+            building.Deleted = 1;
+            registryContext.SaveChanges();
+        }
+
+        internal void Edit(Building newBuilding)
+        {
+            //Добавление и радактирование
+            registryContext.Buildings.Update(newBuilding);
+            registryContext.SaveChanges();
         }
     }
 }

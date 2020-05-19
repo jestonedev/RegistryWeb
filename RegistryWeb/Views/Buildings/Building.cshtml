@@ -353,10 +353,10 @@
                 </div>
             </div>
 
-            @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.IdBuilding, type = AddressTypes.Building, action = ViewBag.Action })
+            @*@await Component.InvokeAsync("RestrictionsComponent", new { id = Model.IdBuilding, type = AddressTypes.Building, action = ViewBag.Action })*@
 
 
-            @await Component.InvokeAsync("OwnershipRightsComponent", new { id = Model.IdBuilding, type = AddressTypes.Building, action = ViewBag.Action })
+            @await Component.InvokeAsync("OwnershipRightsComponent", new {address = new Address() { Id = Model.IdBuilding.ToString(), AddressType = AddressTypes.Building }, action = ViewBag.Action })
         </div>
     </div>
 </form>

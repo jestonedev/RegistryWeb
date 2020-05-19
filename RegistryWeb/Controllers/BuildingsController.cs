@@ -130,6 +130,28 @@ namespace RegistryWeb.Controllers
             return BuildingReports();
         }
 
+        public IActionResult Create()
+        {
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
+            return GetBuildingView(dataService.CreateBuilding());
+        }
+
+        [HttpPost]
+        public IActionResult Create(Building building)
+        {
+            if (building == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return View("NotAccess");
+            if (ModelState.IsValid)
+            {
+                dataService.Create(building);
+                return RedirectToAction("Index");
+            }
+            return GetBuildingView(building);
+        }
+
         public IActionResult Details(int? idBuilding)
         {
             if (idBuilding == null)

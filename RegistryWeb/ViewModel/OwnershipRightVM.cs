@@ -4,14 +4,14 @@ namespace RegistryWeb.ViewModel
 {
     public class OwnershipRightVM : OwnershipRight
     {
-        public AddressTypes AddressType { get; set; }
+        public Address Address { get; set; }
 
         public OwnershipRightVM() { }
 
-        public OwnershipRightVM(OwnershipRight owr, AddressTypes type)
+        public OwnershipRightVM(OwnershipRight owr, Address address)
         {
             IdOwnershipRight = owr.IdOwnershipRight;
-            IdOwnershipRightType = owr.IdOwnershipRight;
+            IdOwnershipRightType = owr.IdOwnershipRightType;
             Number = owr.Number;
             Date = owr.Date;
             Description = owr.Description;
@@ -21,7 +21,7 @@ namespace RegistryWeb.ViewModel
             OwnershipRightTypeNavigation = owr.OwnershipRightTypeNavigation;
             OwnershipBuildingsAssoc = owr.OwnershipBuildingsAssoc;
             OwnershipPremisesAssoc = owr.OwnershipPremisesAssoc;
-            AddressType = type;
+            Address = address;
         }
     }
 }

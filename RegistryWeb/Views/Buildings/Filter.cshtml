@@ -8,7 +8,10 @@
     <input type="hidden" asp-for="FilterOptions.Address.Id" />
 
     <div class="form-row">
-        <div class="input-group col-8">
+        <div class="form-group col-auto">
+            <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="Buildings" asp-action="Create">&#10010;</a>
+        </div>
+        <div class="input-group col-7">
             <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
             <div class="input-group-append h-auto d-inline-block">
                 <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
