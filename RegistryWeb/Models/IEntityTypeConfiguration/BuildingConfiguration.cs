@@ -246,8 +246,9 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
-            builder.Property(e => e.StateDate)
-                .HasColumnName("state_date");
+            //Не используется
+            //builder.Property(e => e.StateDate)
+            //    .HasColumnName("state_date");
 
             builder.Property(e => e.TotalArea)
                 .HasColumnName("total_area")

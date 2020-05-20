@@ -40,7 +40,8 @@ namespace RegistryWeb.Models.Entities
         public bool? RubbishChute { get; set; }
         public double? Wear { get; set; }
         public string Description { get; set; }
-        public DateTime? StateDate { get; set; }
+        //Не используется
+        //public DateTime? StateDate { get; set; }
         public bool? Plumbing { get; set; }
         public bool? HotWaterSupply { get; set; }
         public bool? Canalization { get; set; }

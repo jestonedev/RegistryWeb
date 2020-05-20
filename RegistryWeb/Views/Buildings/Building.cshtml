@@ -20,28 +20,29 @@
 {
     <link rel="stylesheet" href="~/css/building.css" runat="server" />
 }
-<form asp-controller="Buildings" asp-action="@ViewBag.Action" id="buildingsForm" data-action="@ViewBag.Action" method="post">
-    <div class="card">
-        <div class="card-header d-flex justify-content-between">
-            <label class="form-check-label h2">@ViewData["Title"]</label>
-            <div class="btn-group" role="group" aria-label="Панель доступа">
-                <a class="form-control btn btn-primary" asp-controller="@controller" asp-action="@action" asp-route-isBack="true">Назад</a>
-                @if (ViewBag.Action == "Create")
-                {
-                    <input type="submit" value="Создать" class="form-control btn btn-success" />
-                }
-                @if (ViewBag.Action == "Edit")
-                {
-                    <input type="submit" value="Сохранить" class="form-control btn btn-success" />
-                }
-                @if (ViewBag.Action == "Delete")
-                {
-                    <input type="submit" value="Удалить" class="form-control btn btn-danger" />
-                }
-                <a href="#" id="buildingToggle" class="form-control btn btn-primary" title="Развернуть здание" style="font-weight:bold;">∧</a>
-            </div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <label class="form-check-label h2">@ViewData["Title"]</label>
+        <div class="btn-group" role="group" aria-label="Панель доступа">
+            <a class="form-control btn btn-primary" asp-controller="@controller" asp-action="@action" asp-route-isBack="true">Назад</a>
+            @if (ViewBag.Action == "Create")
+            {
+                <a id="createBtn" class="form-control btn btn-success" style="color: #fff;">Создать</a>
+            }
+            @if (ViewBag.Action == "Edit")
+            {
+                <input type="submit" value="Сохранить" class="form-control btn btn-success" />
+            }
+            @if (ViewBag.Action == "Delete")
+            {
+                <input type="submit" value="Удалить" class="form-control btn btn-danger" />
+            }
+            <a href="#" id="buildingToggle" class="form-control btn btn-primary" title="Развернуть здание" style="font-weight:bold;">∧</a>
         </div>
-        <div class="card-body" id="building">
+    </div>
+    <div class="card-body">
+        <form asp-controller="Buildings" asp-action="@ViewBag.Action" id="building" data-action="@ViewBag.Action" method="post">
             <input type="hidden" asp-for="IdBuilding" />
             <div class="form-row">
                 <div class="form-group col-8 r-form-group-label">
@@ -135,7 +136,7 @@
                     <label asp-for="Floors">Этажность</label>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="Floors">Количество подъездов</label>
+                    <label asp-for="Entrances">Количество подъездов</label>
                 </div>
                 <div class="form-group col r-form-group-label">
                     <label asp-for="NumPremises">Число помеещний (всего)</label>
@@ -231,7 +232,7 @@
                     <label asp-for="RegDate">Дата включения в РМИ</label>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="DemolishedFactDate">Срок принятия собственниками решения о сносе</label>
+                    <label asp-for="DateOwnerEmergency">Срок принятия собственниками решения о сносе</label>
                 </div>
                 <div class="form-group col r-form-group-label">
                     <label asp-for="DemolishedFactDate">Фактическая дата сноса или реконструкции</label>
@@ -275,7 +276,7 @@
                         <div class="input-group-prepend">
                             <div class="input-group-text">Орган</div>
                         </div>
-                        <input type="text" class="form-control" asp-for="MemorialNumber" title="Наименование органа, выдавшего документ">
+                        <input type="text" class="form-control" asp-for="MemorialNameOrg" title="Наименование органа, выдавшего документ">
                     </div>
                 </div>
             </fieldset>
@@ -354,9 +355,7 @@
             </div>
 
             @*@await Component.InvokeAsync("RestrictionsComponent", new { id = Model.IdBuilding, type = AddressTypes.Building, action = ViewBag.Action })*@
-
-
-            @await Component.InvokeAsync("OwnershipRightsComponent", new {address = new Address() { Id = Model.IdBuilding.ToString(), AddressType = AddressTypes.Building }, action = ViewBag.Action })
-        </div>
+        </form>
+        @await Component.InvokeAsync("OwnershipRightsComponent", new { address = new Address() { Id = Model.IdBuilding.ToString(), AddressType = AddressTypes.Building }, action = ViewBag.Action })
     </div>
-</form>
+</div>

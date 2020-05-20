@@ -1,4 +1,13 @@
-﻿let getOwnershipRight = function (tr) {
+﻿let getOwnershipRights = function () {
+    let trs = $('#ownershipRights>tr');
+    let owrs = [];
+    trs.each(function () {
+        let owr = getOwnershipRight($(this));
+        owrs.push(owr);
+    });
+    return owrs;
+}
+let getOwnershipRight = function (tr) {
     let fields = tr.find('.field-ownership-right');
     let ownershipRightVM = {
         idOwnershipRight: tr.data('idownershipright'),
@@ -55,11 +64,6 @@ let showYesNoPanel = function (tr) {
     editDelPanel.hide();
     yesNoPanel.show();
 }
-let ownershipRightsToggle = function (e) {
-    arrowAnimation($(this));
-    $('#ownershipRightsTable').toggle();
-    e.preventDefault();
-}
 let ownershipRightAddClick = function (event) {
     let addressType = $('#ownershipRights').data('addresstype');
     let action = $('#ownershipRights').data('action');
@@ -69,7 +73,11 @@ let ownershipRightAddClick = function (event) {
         url: window.location.origin + '/OwnershipRights/AddOwnershipRight',
         data: { addressType, action },
         success: function (tr) {
-            $('#ownershipRights').append(tr);
+            let trs = $('#ownershipRights');
+            let ownershipRightsToggle = $('#ownershipRightsToggle');
+            if (!isExpandElemntArrow(ownershipRightsToggle)) // развернуть при добавлении, если было свернуто 
+                ownershipRightsToggle.click();
+            trs.append(tr);
             event.preventDefault();
         }
     });
@@ -152,7 +160,7 @@ let ownershipRightsClick = function (event) {
 $(function () {
     $('#ownershipRightsTable').hide();
     $('.yes-no-panel').hide();
-    $('#ownershipRightsToggle').click(ownershipRightsToggle);
+    $('#ownershipRightsToggle').on('click', $('#ownershipRightsTable'), elementToogle);
     $('#ownershipRightAdd').click(ownershipRightAddClick);
     $('#ownershipRights').click(ownershipRightsClick);
 });
