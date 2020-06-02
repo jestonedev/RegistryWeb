@@ -16,29 +16,27 @@
     <thead>
         <tr>
             @*<th class="r-table-header-cell">
-                    <a href="#" data-order-field="IdBuilding" data-order-direction="@OrderDirection.Ascending">
-                        № по реестру
-                    </a>
-                </th>*@
-            <th class="align-middle"></th>
+            <a href="#" data-order-field="IdBuilding" data-order-direction="@OrderDirection.Ascending">
+                № по реестру
+            </a>
+        </th>*@
+            @*<th class="align-middle"></th>*@
             <th class="align-middle">№ по реестру</th>
-            <th width="350px" class="align-middle">Адрес</th>
-            <th class="align-middle">Кадастровый номер</th>
-            <th class="align-middle">Общая площадь</th>
-            <th class="align-middle">Жилая площадь</th>
+            <th class="align-middle">Адрес</th>
             <th class="align-middle">Текущее состояние</th>
+            <th class="align-middle"></th>
             @*<th class="r-table-header-cell">
-                    <a href="#" data-order-field="ObjectState" data-order-direction="@OrderDirection.Ascending">
-                        Текущее состояние
-                    </a>
-                </th>*@
+            <a href="#" data-order-field="ObjectState" data-order-direction="@OrderDirection.Ascending">
+                Текущее состояние
+            </a>
+        </th>*@
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.Buildings)
         {
             <tr>
-                @if (ids.Contains(item.IdBuilding))
+                @*@if (ids.Contains(item.IdBuilding))
                 {
                     check = "checked";
                 }
@@ -46,19 +44,33 @@
                 {
                     check = "";
                 }
-                <td class="align-middle"><input type="checkbox" class="idBuildingCheckbox" data-id="@item.IdBuilding" @Html.Raw(check) /></td>
-                <td class="align-middle">@item.IdBuilding</td>
-                <td class="align-middle">@item.IdStreetNavigation.StreetName, д.@item.House</td>
-                <td class="align-middle">@item.CadastralNum</td>
-                <td class="align-middle">@item.TotalArea</td>
-                <td class="align-middle">@item.LivingArea</td>
-                <td class="align-middle">@item.IdStateNavigation.StateNeutral</td>
-                <td class="align-middle">
+                <td class="align-middle"><input type="checkbox" class="idBuildingCheckbox" data-id="@item.IdBuilding" @Html.Raw(check) /></td>*@
+                <td>@item.IdBuilding</td>
+                <td>
+                    @item.IdStreetNavigation.StreetName, д.@item.House
+                    <div class="dopinfo">
+                        @if (item.CadastralNum != null)
+                        {
+                            @Html.Raw("Кадастровый номер: " + item.CadastralNum + ";")
+                        }
+                        @if (item.CadastralNum != null && (item.TotalArea != 0 || item.LivingArea != 0)) {<br />}
+                        @if (item.TotalArea != 0)
+                        {
+                            @Html.Raw("Общая площадь: " + item.TotalArea + ";")
+                        }
+                        @if (item.LivingArea != 0)
+                        {
+                            @Html.Raw("Жилая площадь: " + item.LivingArea + ";")
+                        }
+                    </div>
+                </td>
+                <td>@item.IdStateNavigation.StateNeutral</td>
+                <td>
                     @if (securityService.HasPrivilege(Privileges.RegistryWriteAll))
                     {
                     <div class="btn-group" role="group" aria-label="Панель доступа">
                         <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                        <div class="dropdown-menu dropdown-menu-left but" aria-labelledby="toolsBtn_@item.IdBuilding">
+                        <div class="dropdown-menu dropdown-menu-right but text-center" aria-labelledby="toolsBtn_@item.IdBuilding">
                             <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
                                asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@item.IdBuilding" asp-route-action="Details"></a>
                             <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"

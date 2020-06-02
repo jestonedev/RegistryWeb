@@ -26,7 +26,7 @@
     <div class="card-header d-flex justify-content-between">
         <label class="form-check-label h2">@ViewData["Title"]</label>
         <div class="btn-group" role="group" aria-label="Панель доступа">
-            <a class="form-control btn btn-primary" asp-controller="@controller" asp-action="@action" asp-route-isBack="true">Назад</a>
+            <a class="form-control btn btn-primary" asp-controller="Buildings" asp-action="Index" asp-route-isBack="true">Назад</a>
             @if (ViewBag.Action == "Create")
             {
                 <a href="#" id="createBtn" class="form-control btn btn-success">Создать</a>
