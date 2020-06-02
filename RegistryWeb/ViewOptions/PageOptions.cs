@@ -12,7 +12,7 @@
         public PageOptions()
         {
             CurrentPage = 1;
-            SizePage = 50;
+            SizePage = 25;
         }
     }
 }
