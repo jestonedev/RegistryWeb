@@ -13,14 +13,15 @@
     }
 }
 @section scripts
-{
+    {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
     <script src="~/js/building.common.js" asp-append-version="true"></script>
 }
 @section styles
-{
+    {
     <link rel="stylesheet" href="~/css/building.css" runat="server" />
 }
-
 <div class="card">
     <div class="card-header d-flex justify-content-between">
         <label class="form-check-label h2">@ViewData["Title"]</label>
@@ -28,15 +29,15 @@
             <a class="form-control btn btn-primary" asp-controller="@controller" asp-action="@action" asp-route-isBack="true">Назад</a>
             @if (ViewBag.Action == "Create")
             {
-                <a id="createBtn" class="form-control btn btn-success" style="color: #fff;">Создать</a>
+                <a href="#" id="createBtn" class="form-control btn btn-success">Создать</a>
             }
             @if (ViewBag.Action == "Edit")
             {
-                <input type="submit" value="Сохранить" class="form-control btn btn-success" />
+                <a href="#" id="editBtn" class="form-control btn btn-success">Сохранить</a>
             }
             @if (ViewBag.Action == "Delete")
             {
-                <input type="submit" value="Удалить" class="form-control btn btn-danger" />
+                <a  href="#" class="form-control btn btn-success" onclick="$('#building').submit();">Удалить</a>
             }
             <a href="#" id="buildingToggle" class="form-control btn btn-primary" title="Развернуть здание" style="font-weight:bold;">∧</a>
         </div>
@@ -59,13 +60,16 @@
                 <div class="form-group col-8">
                     <select class="form-control" asp-for="IdStreet" title="Улица"
                             asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdStreet)}"></select>
+                    <span asp-validation-for="IdStreet" class="text-danger"></span>
                 </div>
                 <div class="form-group col-2">
                     <input type="text" class="form-control" asp-for="House" title="Номер дома">
+                    <span asp-validation-for="House" class="text-danger"></span>
                 </div>
                 <div class="form-group col-2">
                     <select class="form-control" asp-for="IdDecree" title="Постановление"
                             asp-items="@{new SelectList(ViewBag.GovernmentDecrees, "IdDecree", "Number", Model.IdDecree)}"></select>
+                    <span asp-validation-for="IdDecree" class="text-danger"></span>
                 </div>
             </div>
 
@@ -87,18 +91,22 @@
                 <div class="form-group col">
                     <select class="form-control" asp-for="IdState" title="Текущее состояние объекта"
                             asp-items="@{new SelectList(ViewBag.ObjectStates, "IdState", "StateNeutral", Model.IdState)}"></select>
+                    <span asp-validation-for="IdState" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <select class="form-control" asp-for="IdStructureType" title="Тип строения (материал)"
                             asp-items="@{new SelectList(ViewBag.StructureTypes, "IdStructureType", "StructureTypeName", Model.IdStructureType)}"></select>
+                    <span asp-validation-for="IdStructureType" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <select class="form-control" asp-for="IdStructureTypeOverlap" title="Тип строения (материал)"
                             asp-items="@{new SelectList(ViewBag.StructureTypeOverlaps, "IdStructureTypeOverlap", "StructureTypeOverlapName", Model.IdStructureTypeOverlap)}"></select>
+                    <span asp-validation-for="IdStructureTypeOverlap" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <select class="form-control" asp-for="IdHeatingType" title="Отопление"
                             asp-items="@{new SelectList(ViewBag.HeatingTypes, "IdHeatingType", "HeatingType1", Model.IdHeatingType)}"></select>
+                    <span asp-validation-for="IdHeatingType" class="text-danger"></span>
                 </div>
             </div>
 
@@ -119,15 +127,19 @@
             <div class="form-row">
                 <div class="form-group col">
                     <input type="text" class="form-control" asp-for="TotalArea" title="Общая площадь">
+                    <span asp-validation-for="TotalArea" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="text" class="form-control" asp-for="LivingArea" title="Жилая площадь">
+                    <span asp-validation-for="LivingArea" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="text" class="form-control" asp-for="UnlivingArea" title="Нежилая площадь">
+                    <span asp-validation-for="UnlivingArea" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="text" class="form-control" asp-for="CommonPropertyArea" title="Площадь общего имущества">
+                    <span asp-validation-for="CommonPropertyArea" class="text-danger"></span>
                 </div>
             </div>
 
@@ -154,21 +166,27 @@
             <div class="form-row">
                 <div class="form-group col">
                     <input type="number" class="form-control" asp-for="Floors" title="Этажность">
+                    <span asp-validation-for="Floors" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="number" class="form-control" asp-for="Entrances" title="Количество подъездов">
+                    <span asp-validation-for="Entrances" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="number" class="form-control" asp-for="NumPremises" title="Число помеещний (всего)">
+                    <span asp-validation-for="NumPremises" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="number" class="form-control" asp-for="NumRooms" title="Число комнат">
+                    <span asp-validation-for="NumRooms" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="number" class="form-control" asp-for="NumApartments" title="Число квартир">
+                    <span asp-validation-for="NumApartments" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="number" class="form-control" asp-for="NumSharedApartments" title="Число квартир с подселением">
+                    <span asp-validation-for="NumSharedApartments" class="text-danger"></span>
                 </div>
             </div>
 
@@ -189,15 +207,19 @@
             <div class="form-row">
                 <div class="form-group col">
                     <input type="text" class="form-control" asp-for="Series" title="Серия, тип постройки">
+                    <span asp-validation-for="Series" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="text" class="form-control" asp-for="CadastralNum" title="Кадастровый номер">
+                    <span asp-validation-for="CadastralNum" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
-                    <input type="text" class="form-control" asp-for="LivingArea" title="Кадастровая стоимость">
+                    <input type="text" class="form-control" asp-for="CadastralCost" title="Кадастровая стоимость">
+                    <span asp-validation-for="CadastralCost" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="text" class="form-control" asp-for="BalanceCost" title="Балансовая стоимость">
+                    <span asp-validation-for="BalanceCost" class="text-danger"></span>
                 </div>
             </div>
 
@@ -215,12 +237,15 @@
             <div class="form-row">
                 <div class="form-group col">
                     <input type="text" class="form-control" asp-for="LandCadastralNum" title="Кадастровый номер земельного участка, на котором расположено здание">
+                    <span asp-validation-for="LandCadastralNum" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="date" class="form-control" asp-for="LandCadastralDate" title="Дата  постановки на кадастровый учет">
+                    <span asp-validation-for="LandCadastralDate" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="text" class="form-control" asp-for="LandArea" title="Площадь земельного участка">
+                    <span asp-validation-for="LandArea" class="text-danger"></span>
                 </div>
             </div>
 
@@ -241,15 +266,19 @@
             <div class="form-row">
                 <div class="form-group col">
                     <input type="number" class="form-control" asp-for="StartupYear" title="Год ввода в эксплуатацию">
+                    <span asp-validation-for="StartupYear" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="date" class="form-control" asp-for="RegDate" title="Дата включения в РМИ">
+                    <span asp-validation-for="RegDate" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="date" class="form-control" asp-for="DateOwnerEmergency" title="Срок принятия собственниками решения о сносе или реконструкции">
+                    <span asp-validation-for="DateOwnerEmergency" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="date" class="form-control" asp-for="DemolishedFactDate" title="Фактическая дата сноса или реконструкции">
+                    <span asp-validation-for="DemolishedFactDate" class="text-danger"></span>
                 </div>
             </div>
 
@@ -266,10 +295,12 @@
                             <div class="input-group-text">№</div>
                         </div>
                         <input type="text" class="form-control" asp-for="MemorialNumber" title="Номер документа">
+                        <span asp-validation-for="MemorialNumber" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-3">
                     <input type="date" class="form-control" asp-for="MemorialDate" title="Дата документа">
+                    <span asp-validation-for="MemorialDate" class="text-danger"></span>
                 </div>
                 <div class="col-6">
                     <div class="input-group">
@@ -277,6 +308,7 @@
                             <div class="input-group-text">Орган</div>
                         </div>
                         <input type="text" class="form-control" asp-for="MemorialNameOrg" title="Наименование органа, выдавшего документ">
+                        <span asp-validation-for="MemorialNameOrg" class="text-danger"></span>
                     </div>
                 </div>
             </fieldset>
@@ -332,30 +364,34 @@
             <div class="form-row">
                 <div class="form-group col">
                     <input type="text" class="form-control" asp-for="Wear" title="Техническое состояние (Износ), %">
+                    <span asp-validation-for="Wear" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <input type="text" class="form-control" asp-for="RentCoefficient" title="Коэффициент оплаты">
+                    <span asp-validation-for="RentCoefficient" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="form-group">
                 <label asp-for="HousingCooperative">Управляющая компания / ТСЖ</label>
                 <input type="text" class="form-control" asp-for="HousingCooperative" title="Управляющая компания / ТСЖ">
+                <span asp-validation-for="HousingCooperative" class="text-danger"></span>
             </div>
 
             <div class="form-row">
                 <div class="form-group col">
                     <label asp-for="Description">Другие сведения</label>
                     <textarea rows="5" class="form-control" asp-for="Description" title="Другие сведения"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <label asp-for="BtiRooms">Приватиз. квартиры согласно БТИ</label>
                     <textarea rows="5" class="form-control" asp-for="BtiRooms" title="Приватиз. квартиры согласно БТИ"></textarea>
+                    <span asp-validation-for="BtiRooms" class="text-danger"></span>
                 </div>
             </div>
-
-            @*@await Component.InvokeAsync("RestrictionsComponent", new { id = Model.IdBuilding, type = AddressTypes.Building, action = ViewBag.Action })*@
         </form>
+        @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.IdBuilding, type = AddressTypes.Building, action = ViewBag.Action })
         @await Component.InvokeAsync("OwnershipRightsComponent", new { address = new Address() { Id = Model.IdBuilding.ToString(), AddressType = AddressTypes.Building }, action = ViewBag.Action })
     </div>
 </div>

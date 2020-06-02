@@ -105,9 +105,9 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<Building> IdBuildingFilter(IQueryable<Building> query, BuildingsFilter filterOptions)
         {
-            if (filterOptions.IdDecree.HasValue)
+            if (filterOptions.IdBuilding.HasValue)
             {
-                query = query.Where(b => b.IdDecree == filterOptions.IdDecree.Value);
+                query = query.Where(b => b.IdBuilding == filterOptions.IdBuilding.Value);
             }
             return query;
         }

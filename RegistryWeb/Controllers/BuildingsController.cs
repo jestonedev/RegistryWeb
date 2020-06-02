@@ -138,19 +138,18 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(List<OwnershipRight> owrs) //Building building)
+        public IActionResult Create(Building building)
         {
-            //if (building == null)
-            //    return NotFound();
-            //if (!securityService.HasPrivilege(Privileges.OwnerWrite))
-            //    return View("NotAccess");
-            //if (ModelState.IsValid)
-            //{
-            //    dataService.Create(building);
-            //    return RedirectToAction("Index");
-            //}
-            //return GetBuildingView(building);
-            return View("Index");
+            if (building == null)
+                return Json(-1);
+            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+                return Json(-2);
+            if (ModelState.IsValid)
+            {
+                dataService.Create(building);
+                return Json(building.IdBuilding);
+            }
+            return Json(0);
         }
 
         public IActionResult Details(int? idBuilding)

@@ -1,73 +1,92 @@
 ﻿let getBuilding = function () {
     let building = {
-        id_building: $('#building [name="IdBuilding"]').val(),
-        id_street: $('#building [name="IdStreet"]').val(),
-        house: $('#building [name="House"]').val(),
-        id_decree: $('#building [name="IdDecree"]').val(),
-        id_state: $('#building [name="IdState"]').val(),
-        id_structure_type: $('#building [name="IdStructureType"]').val(),
-        id_structure_type_overlap: $('#building [name="IdStructureTypeOverlap"]').val(),
-        id_heating_type: $('#building [name="IdHeatingType"]').val(),
-        total_area: $('#building [name="TotalArea"]').val(),
-        living_area: $('#building [name="LivingArea"]').val(),
-        unliving_area: $('#building [name="UnlivingArea"]').val(),
-        common_property_area: $('#building [name="CommonPropertyArea"]').val(),
-        floors: $('#building [name="Floors"]').val(),
-        entrances: $('#building [name="Entrances"]').val(),
-        num_premises: $('#building [name="NumPremises"]').val(),
-        num_rooms: $('#building [name="NumRooms"]').val(),
-        num_apartments: $('#building [name="NumApartments"]').val(),
-        num_shared_apartments: $('#building [name="NumSharedApartments"]').val(),
-        series: $('#building [name="Series"]').val(),
-        cadastral_num: $('#building [name="CadastralNum"]').val(),
-        cadastral_cost: $('#building [name="CadastralCost"]').val(),
-        balance_cost: $('#building [name="BalanceCost"]').val(),
-        land_cadastral_num: $('#building [name="LandCadastralNum"]').val(),
-        land_cadastral_date: $('#building [name="LandCadastralDate"]').val(),
-        land_area: $('#building [name="LandArea"]').val(),
-        startup_year: $('#building [name="StartupYear"]').val(),
-        reg_date: $('#building [name="RegDate"]').val(),
-        date_owner_emergency: $('#building [name="DateOwnerEmergency"]').val(),
-        demolished_fact_date: $('#building [name="DemolishedFactDate"]').val(),
-        is_memorial: $('#building [name="IsMemorial"]').val(),
-        memorial_number: $('#building [name="MemorialNumber"]').val(),
-        memorial_date: $('#building [name="MemorialDate"]').val(),
-        memorial_name_org: $('#building [name="MemorialNameOrg"]').val(),
-        improvement: $('#building [name="Improvement"]').val(),
-        elevator: $('#building [name="Elevator"]').val(),
-        rubbish_chute: $('#building [name="RubbishChute.Value"]').val(),
-        plumbing: $('#building [name="Plumbing.Value"]').val(),
-        hot_water_supply: $('#building [name="HotWaterSupply.Value"]').val(),
-        canalization: $('#building [name="Canalization.Value"]').val(),
-        electricity: $('#building [name="Electricity.Value"]').val(),
-        radio_network: $('#building [name="RadioNetwork.Value"]').val(),
-        wear: $('#building [name="Wear"]').val(),
-        rent_coefficient: $('#building [name="RentCoefficient"]').val(),
-        housing_cooperative: $('#building [name="HousingCooperative"]').val(),
-        description: $('#building [name="Description"]').val(),
-        BTI_rooms: $('#building [name="BtiRooms"]').val()
+        IdBuilding: $('#building [name="IdBuilding"]').val(),
+        IdStreet: $('#building [name="IdStreet"]').val(),
+        House: $('#building [name="House"]').val(),
+        IdDecree: $('#building [name="IdDecree"]').val(),
+        IdState: $('#building [name="IdState"]').val(),
+        IdStructureType: $('#building [name="IdStructureType"]').val(),
+        IdStructureTypeOverlap: $('#building [name="IdStructureTypeOverlap"]').val(),
+        IdHeatingType: $('#building [name="IdHeatingType"]').val(),
+        TotalArea: $('#building [name="TotalArea"]').val(),
+        LivingArea: $('#building [name="LivingArea"]').val(),
+        UnlivingArea: $('#building [name="UnlivingArea"]').val(),
+        CommonPropertyArea: $('#building [name="CommonPropertyArea"]').val(),
+        Floors: $('#building [name="Floors"]').val(),
+        Entrances: $('#building [name="Entrances"]').val(),
+        NumPremises: $('#building [name="NumPremises"]').val(),
+        NumRooms: $('#building [name="NumRooms"]').val(),
+        NumApartments: $('#building [name="NumApartments"]').val(),
+        NumSharedApartments: $('#building [name="NumSharedApartments"]').val(),
+        Series: $('#building [name="Series"]').val(),
+        CadastralNum: $('#building [name="CadastralNum"]').val(),
+        CadastralCost: $('#building [name="CadastralCost"]').val(),
+        BalanceCost: $('#building [name="BalanceCost"]').val(),
+        LandCadastralNum: $('#building [name="LandCadastralNum"]').val(),
+        LandCadastralDate: $('#building [name="LandCadastralDate"]').val(),
+        LandArea: $('#building [name="LandArea"]').val(),
+        StartupYear: $('#building [name="StartupYear"]').val(),
+        RegDate: $('#building [name="RegDate"]').val(),
+        DateOwnerEmergency: $('#building [name="DateOwnerEmergency"]').val(),
+        DemolishedFactDate: $('#building [name="DemolishedFactDate"]').val(),
+        IsMemorial: $('#building [name="IsMemorial"]').is(':checked'),
+        MemorialNumber: $('#building [name="MemorialNumber"]').val(),
+        MemorialDate: $('#building [name="MemorialDate"]').val(),
+        MemorialNameOrg: $('#building [name="MemorialNameOrg"]').val(),
+        Improvement: $('#building [name="Improvement"]').is(':checked'),
+        Elevator: $('#building [name="Elevator"]').is(':checked'),
+        RubbishChute: $('#building [name="RubbishChute.Value"]').is(':checked'),
+        Plumbing: $('#building [name="Plumbing.Value"]').is(':checked'),
+        HotWaterSupply: $('#building [name="HotWaterSupply.Value"]').is(':checked'),
+        Canalization: $('#building [name="Canalization.Value"]').is(':checked'),
+        Electricity: $('#building [name="Electricity.Value"]').is(':checked'),
+        RadioNetwork: $('#building [name="RadioNetwork.Value"]').is(':checked'),
+        Wear: $('#building [name="Wear"]').val(),
+        RentCoefficient: $('#building [name="RentCoefficient"]').val(),
+        HousingCooperative: $('#building [name="HousingCooperative"]').val(),
+        Description: $('#building [name="Description"]').val(),
+        BtiRooms: $('#building [name="BtiRooms"]').val(),
+
+        OwnershipBuildingsAssoc: CreateOwnershipBuildingsAssoc()
     };
     return building;
 }
-let createBuilding = function () {
-    console.log('asdf');
-    let owrs = getOwnershipRights();
+let createBuildingClick = function () {
     let building = getBuilding();
-    console.log(owrs);
-    console.log(building);
-    $.ajax({
-        async: false,
-        type: 'POST',
-        url: window.location.origin + '/Buildings/Create',
-        data: { owrs },
-        success: function () {
-            alert('good!');
-        }
-    });
+    //Запуск ручной валидации, тк отсутсвует submit
+    var buildingIsValid = $('#building').valid();
+    var ownershipRightsIsValid = $("#ownershipRightsForm").valid();
+    if (buildingIsValid && ownershipRightsIsValid) {
+        $.ajax({
+            async: false,
+            type: 'POST',
+            url: window.location.origin + '/Buildings/Create',
+            data: { building },
+            success: function (idBuilding) {
+                if (idBuilding < 1) {
+                    alert('Ошибка создания!');
+                }
+                window.location.href = window.location.origin + '/Buildings';
+            }
+        });
+    }
+}
+let editBuildingClick = function () {
+    let cadastralCost = $('#building [name="CadastralCost"]');
+    let balanceCost = $('#building [name="BalanceCost"]');
+    let rentCoefficient = $('#building [name="RentCoefficient"]');
+    cadastralCost.val(cadastralCost.val().replace('.', ','));
+    balanceCost.val(balanceCost.val().replace('.', ','));
+    rentCoefficient.val(rentCoefficient.val().replace('.', ','));
+    $('#building').submit();
+}
+let memorialCardClick = function () {
+    var isMemorial = $('#IsMemorial').is(':checked');
+    $('#MemorialNumber').prop('disabled', !isMemorial);
+    $('#MemorialDate').prop('disabled', !isMemorial);
+    $('#MemorialNameOrg').prop('disabled', !isMemorial);
 }
 $(function () {
-    $('#buildingToggle').on('click', $('#building'), elementToogle);
-    $('#createBtn').click(createBuilding);
     var action = $('#building').data("action");
     if (action == "Details" || action == "Delete") {
         $('#building select').prop('disabled', true);
@@ -76,4 +95,9 @@ $(function () {
         $('#building input[type="hidden"]').prop('disabled', false);
         $('#building input[type="submit"]').prop('disabled', false);
     }
+    memorialCardClick();
+    $('#buildingToggle').on('click', $('#building'), elementToogle);
+    $('#createBtn').click(createBuildingClick);
+    $('#editBtn').click(editBuildingClick);
+    $('#IsMemorial').click(memorialCardClick);
 });

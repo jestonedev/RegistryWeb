@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace RegistryWeb.Models.Entities
 {
@@ -15,27 +16,46 @@ namespace RegistryWeb.Models.Entities
         }
 
         public int IdBuilding { get; set; }
+        [Required]
         public int IdState { get; set; }
+        [Required]
         public int IdStructureType { get; set; }
+        [Required]
         public int IdStructureTypeOverlap { get; set; }
+        [Required]
         public string IdStreet { get; set; }
+        [Required]
         public string House { get; set; }
+        [Required]
         public short Floors { get; set; }
         public short? Entrances { get; set; }
+        [Required]
         public int NumPremises { get; set; }
+        [Required]
         public int NumRooms { get; set; }
+        [Required]
         public int NumApartments { get; set; }
+        [Required]
         public int NumSharedApartments { get; set; }
+        [Required]
         public double TotalArea { get; set; }
+        [Required]
         public double LivingArea { get; set; }
+        [Required]
         public double UnlivingArea { get; set; }
+        [Required]
         public double CommonPropertyArea { get; set; }
         public string CadastralNum { get; set; }
+        [Required]
         public decimal CadastralCost { get; set; }
+        [Required]
         public decimal BalanceCost { get; set; }
+        [Required]
         public int StartupYear { get; set; }
         public string Series { get; set; }
+        [Required]
         public bool Improvement { get; set; }
+        [Required]
         public bool Elevator { get; set; }
         public bool? RubbishChute { get; set; }
         public double? Wear { get; set; }
@@ -48,11 +68,15 @@ namespace RegistryWeb.Models.Entities
         public bool? Electricity { get; set; }
         public bool? RadioNetwork { get; set; }
         public int? IdHeatingType { get; set; }
-        public int? IdDecree { get; set; }
+        [Required]
+        public int IdDecree { get; set; }
         public string BtiRooms { get; set; }
         public string HousingCooperative { get; set; }
+        [Required]
         public DateTime RegDate { get; set; }
+        [Required]
         public decimal RentCoefficient { get; set; }
+        [Required]
         public bool IsMemorial { get; set; }
         public DateTime? MemorialDate { get; set; }
         public string MemorialNumber { get; set; }
@@ -61,6 +85,7 @@ namespace RegistryWeb.Models.Entities
         public DateTime? DemolishedFactDate { get; set; }
         public string LandCadastralNum { get; set; }
         public DateTime? LandCadastralDate { get; set; }
+        [Required]
         public double LandArea { get; set; }
         public byte Deleted { get; set; }
 

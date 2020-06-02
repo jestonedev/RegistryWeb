@@ -1,4 +1,11 @@
-﻿//Формат вызова:
+﻿if ($.validator !== undefined) {
+    $.extend($.validator.methods, {
+        number: function (value, element) {
+            return this.optional(element) || /^-?(?:\d+|\d{1,3}(?:[\s\.,]\d{3})+)(?:[\.,]\d+)?$/.test(value);
+        }
+    });
+}
+//Формат вызова:
 //$('1').on('click', 2, elementToogle);
 //  1 - элемент по которому щелкают (стрелочка)
 //  2 - Элемент который надо тоглить

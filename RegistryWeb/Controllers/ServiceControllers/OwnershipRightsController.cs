@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
-using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers.ServiceControllers
 {
@@ -116,7 +113,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 return Json(-1);
             var ownershipRightTypes = registryContext.OwnershipRightTypes.AsNoTracking();
             var tr = new StringBuilder();
-            tr.Append("<tr class=\"ownership-right\" data-idownershipright=\"\">");
+            tr.Append("<tr class=\"ownership-right\" data-idownershipright=\"" + Guid.NewGuid() + "\">");
             if(addressType == AddressTypes.Premise)
             {
                 tr.Append("<td class=\"align-middle\">Помещение</td>");

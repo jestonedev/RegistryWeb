@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace RegistryWeb.Models.Entities
 {
@@ -12,8 +13,11 @@ namespace RegistryWeb.Models.Entities
         }
 
         public int IdOwnershipRight { get; set; }
+        [Required]
         public int IdOwnershipRightType { get; set; }
+        [Required]
         public string Number { get; set; }
+        [Required]
         public DateTime Date { get; set; }
         public string Description { get; set; }
         public DateTime? ResettlePlanDate { get; set; }
