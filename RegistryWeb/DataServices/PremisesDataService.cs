@@ -299,6 +299,9 @@ namespace RegistryWeb.DataServices
             ViewBag.StructureTypes = dataService.StructureTypes;
             ViewBag.KladrStreets = dataService.KladrStreets;
             ViewBag.HeatingTypes = dataService.HeatingTypes;*/
+            var idStreet = premise.IdBuildingNavigation.IdStreet ??
+                registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == premise.IdBuilding).IdStreet;
+
             var premisesVM = new PremisesVM<Premise>()
             {
                 Premise = premise,
@@ -312,7 +315,8 @@ namespace RegistryWeb.DataServices
                 LocationKeysList = new SelectList(registryContext.PremisesDoorKeys, "IdPremisesDoorKeys", "LocationOfKeys"),
                 CommentList = new SelectList(registryContext.PremisesComments, "IdPremisesComment", "PremisesCommentText"),
                 OwnershipRightTypesList = new SelectList(registryContext.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName"),
-                RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName")
+                RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName"),
+                HousesList = new SelectList(GetHouses(idStreet), "IdBuilding", "House", premise.IdBuilding)
             };
 
             return premisesVM;
@@ -479,10 +483,7 @@ namespace RegistryWeb.DataServices
 
         public List<Building> GetHouses(string streetId)
         {
-            var house = from bui in registryContext.Buildings
-                        where bui.IdStreet.Contains(streetId)
-                        select bui;
-            return house.ToList();
+            return registryContext.Buildings.Where(b => b.IdStreet == streetId).ToList();
         }
     }
 }
