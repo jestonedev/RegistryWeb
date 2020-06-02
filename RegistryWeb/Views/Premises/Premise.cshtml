@@ -343,37 +343,24 @@
                     <input type="text" class="form-control" asp-for="@Model.Premise.Height" title="Высота помещения">
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group col">
                     <label asp-for="@Model.Premise.Description">Дополнительные сведения</label>
                     <textarea class="form-control" rows="3" cols="10"></textarea>
                 </div>
             </div>
-            <br />@*&nbsp;*@
+            <br />
 
             @if (ViewBag.Action == "Edit" || ViewBag.Action == "Details")
             {
                 <!--Комнаты-->
-                <div class="form-row">
-                    <div class="form-group col">
-                        @await Component.InvokeAsync("SubPremisesComponent", new { id = Model.Premise.IdPremises, action = ViewBag.Action })
-                    </div>
-                </div>
+                @await Component.InvokeAsync("SubPremisesComponent", new { id = Model.Premise.IdPremises, action = ViewBag.Action })
 
                 <!--Реквизиты-->
-                <div class="form-row">
-                    <div class="form-group col">
-                        @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.Premise.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
-                    </div>
-                </div>
+                @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.Premise.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
 
                 <!--Ограничения-->
-                <div class="form-row">
-                    <div class="form-group col">
-                        @await Component.InvokeAsync("OwnershipRightsComponent", new { id = Model.Premise.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
-                    </div>
-                </div>
+                @await Component.InvokeAsync("OwnershipRightsComponent", new { address = new Address() { Id = Model.Premise.IdPremises.ToString(), AddressType = AddressTypes.Premise }, action = ViewBag.Action })
             }
 
         </div>

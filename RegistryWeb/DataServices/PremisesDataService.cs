@@ -411,15 +411,15 @@ namespace RegistryWeb.DataServices
         public Premise GetPremise(int idPremise)
         {
             return registryContext.Premises
-                .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
-                .Include(b => b.IdBuildingNavigation.IdHeatingTypeNavigation)
-                .Include(b => b.IdStateNavigation)                              //Текущее состояние объекта
-                .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
-                .Include(b => b.FundsPremisesAssoc).ThenInclude(fpa => fpa.IdFundNavigation).ThenInclude(fh => fh.IdFundTypeNavigation)
-                .Include(b => b.IdPremisesCommentNavigation).ThenInclude(fpa => fpa.Premises)
-                .Include(b => b.IdPremisesTypeNavigation).ThenInclude(fpa => fpa.Premises)
-                .Include(b => b.IdPremisesDoorKeysNavigation)
-                .SingleOrDefault(b => b.IdPremises == idPremise);
+                 .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
+                 .Include(b => b.IdBuildingNavigation.IdHeatingTypeNavigation)
+                 .Include(b => b.IdStateNavigation)                              //Текущее состояние объекта
+                 .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
+                 .Include(b => b.FundsPremisesAssoc).ThenInclude(fpa => fpa.IdFundNavigation).ThenInclude(fh => fh.IdFundTypeNavigation)
+                 .Include(b => b.IdPremisesCommentNavigation)
+                 .Include(b => b.IdPremisesTypeNavigation)
+                 .Include(b => b.IdPremisesDoorKeysNavigation)
+                 .SingleOrDefault(b => b.IdPremises == idPremise);
         }
 
         public IEnumerable<ObjectState> ObjectStates
