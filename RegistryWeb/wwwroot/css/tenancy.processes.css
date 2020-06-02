@@ -1,0 +1,16 @@
+﻿    .tp-table > thead > tr > th a.sort {
+        color: #888;
+    }
+
+    .tp-table > thead > tr > th a.sort:hover {
+        color: black;
+    }
+
+    .tp-table > thead > tr > th a.sort.tp-sorted {
+        color: #007bff;
+    }
+
+    .tp-table > thead > tr > th a.sort.tp-sorted:hover {
+        color: #0056b3;
+    }
+
