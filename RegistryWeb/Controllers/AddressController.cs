@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,21 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public JsonResult AutocompleteFilterOptionsAddress(string text, bool isBuldings = false)
         {
-            var addressWords = text.Trim().Split(' ');
+            var match = Regex.Match(text, @"^(.*?)[,]*[ ]*(д\.?)?[ ]*(\d+[а-яА-Я]?([\\\/]\d+[а-яА-Я]?)?)?[ ]*[ ]*([,-]?|кв\.?)?[ ]*(\d+[а-яА-Я]?)?[ ]*$");
+            var addressWordsList = new List<string>();
+            if (!string.IsNullOrEmpty(match.Groups[1].Value))
+            {
+                addressWordsList.Add(match.Groups[1].Value);
+            }
+            if (!string.IsNullOrEmpty(match.Groups[3].Value))
+            {
+                addressWordsList.Add(match.Groups[3].Value);
+            }
+            if (!string.IsNullOrEmpty(match.Groups[6].Value))
+            {
+                addressWordsList.Add(match.Groups[6].Value);
+            }
+            var addressWords = addressWordsList.ToArray();
             var street = addressWords[0].ToLowerInvariant();
             var addressType = AddressTypes.None;
             IEnumerable<Tuple<string, string>> autocompletePairs = null;
