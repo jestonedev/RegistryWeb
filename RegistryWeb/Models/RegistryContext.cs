@@ -78,6 +78,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<TenancyPerson> TenancyPersons { get; set; }
         public virtual DbSet<TenancyProcess> TenancyProcesses { get; set; }
         public virtual DbSet<TenancyReason> TenancyReasons { get; set; }
+        public virtual DbSet<TenancyReasonType> TenancyReasonTypes { get; set; }
         public virtual DbSet<RentTypeCategory> RentTypeCategories { get; set; }
         public virtual DbSet<Kinship> Kinships { get; set; }
         public virtual DbSet<RentType> RentTypes { get; set; }
@@ -183,6 +184,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new KinshipConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyReasonConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancyReasonTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new RentTypeCategoryConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new RentTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyBuildingAssocConfiguration(nameDatebase));

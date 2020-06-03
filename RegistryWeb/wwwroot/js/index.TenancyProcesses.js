@@ -7,7 +7,7 @@
                 dataType: 'json',
                 data: { text: request.term },
                 success: function (data) {
-                    if (data != 0 && data != undefined) {
+                    if (data !== "0" && data !== undefined) {
                         $('input[name="FilterOptions.Address.AddressType"]').val(data.idAddressType);
                         response($.map(data.autocompletePairs, function (pair) {
                             return { label: pair.item2, value: pair.item2, id: pair.item1 };
@@ -59,18 +59,45 @@ var searchModal = function () {
 };
 
 var filterClearModal = function () {
-    $('input[name="FilterOptions.IdPremise"]').val("");
-    $('#FilterOptions_IdStreet').val("");
+    $(".filterForm input[type='text'], .filterForm input[type='date'], .filterForm select").val("");
     $('#FilterOptions_IdStreet').selectpicker('render');
-    $('input[name="FilterOptions.House"]').val("");
-    $('input[name="FilterOptions.Floors"]').val("");
+    $('#FilterOptions_IdsRentType').selectpicker('deselectAll');
     $('#FilterOptions_IdsObjectState').selectpicker("deselectAll");
     $('#FilterOptions_IdsOwnershipRightType').selectpicker("deselectAll");
 };
 var filterClear = function () {
     filterClearModal();
     $("form.filterForm").submit();
-}
+};
+
+var initRegNumState = function () {
+    var inputRegNum = $("#FilterOptions_RegistrationNum");
+    var regNumIsEmpty = $("#FilterOptions_RegistrationNumIsEmpty").val();
+    if (regNumIsEmpty === "True") {
+        inputRegNum.val("");
+        inputRegNum.prop("disabled", "disabled");
+        var wrapperDropDown = inputRegNum.closest(".input-group").find(".rr-registration-num-dropdown");
+        wrapperDropDown.find("button.dropdown-toggle").text("Нет");
+    }
+};
+
+var selectRegNumState = function(e) {
+    var value = $(this).text();
+    var wrapperDropDown = $(this).closest(".rr-registration-num-dropdown");
+    var wrapper = wrapperDropDown.closest(".input-group");
+    var inputRegNum = wrapper.find("#FilterOptions_RegistrationNum");
+    var inputRegNumIsEmpty = wrapper.find("#FilterOptions_RegistrationNumIsEmpty");
+    wrapperDropDown.find("button.dropdown-toggle").text(value);
+    if (value === "Нет") {
+        inputRegNum.val("");
+        inputRegNum.prop("disabled", "disabled");
+        inputRegNumIsEmpty.val("True");
+    } else {
+        inputRegNum.prop("disabled", "");
+        inputRegNumIsEmpty.val("False");
+    }
+};
+
 $(function () {
     autocompleteFilterOptionsAddress();
     addressFilterClearBtnVisibility();
@@ -79,6 +106,9 @@ $(function () {
     $('#searchModalBtn').click(searchModal);
     $('#filterClearModalBtn').click(filterClearModal);
     $('#filterClearBtn').click(filterClear);
+    initRegNumState();
+    $(".rr-registration-num-dropdown a.dropdown-item").click(selectRegNumState);
+
 
     $("#filterModalShow").on("click", function (e) {
         e.preventDefault();
@@ -93,6 +123,7 @@ $(function () {
         $("form.filterForm").submit();
         e.preventDefault();
     });
+
     $('.page-link').click(function (e) {
         $('input[name="PageOptions.CurrentPage"]').val($(this).data("page"));
         $('#FilterOptions_Address_Text').prop("disabled", false);

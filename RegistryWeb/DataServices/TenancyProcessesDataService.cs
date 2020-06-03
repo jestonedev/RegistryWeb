@@ -46,6 +46,11 @@ namespace RegistryWeb.DataServices
         public override TenancyProcessesVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, TenancyProcessesFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
+            viewModel.ReasonTypes = registryContext.TenancyReasonTypes;
+            viewModel.RentTypes = registryContext.RentTypes;
+            viewModel.Streets = registryContext.KladrStreets;
+            viewModel.OwnershipRightTypes = registryContext.OwnershipRightTypes;
+            viewModel.ObjectStates = registryContext.ObjectStates;
             return viewModel;
         }
 
@@ -71,7 +76,7 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<TenancyProcess> GetQuery()
         {
-            return registryContext.TenancyProcesses.Where(t => t.Deleted != 1)
+            return registryContext.TenancyProcesses
                 .Include(tp => tp.IdRentTypeNavigation)
                 .Include(tp => tp.TenancyPersons).AsNoTracking();
         }
@@ -85,7 +90,6 @@ namespace RegistryWeb.DataServices
                                  on tbaRow.IdBuilding equals buildingRow.IdBuilding
                                  join streetRow in registryContext.KladrStreets
                                  on buildingRow.IdStreet equals streetRow.IdStreet
-                                 where tbaRow.Deleted == 0
                                  select new
                                  {
                                      tpRow.IdProcess,
@@ -107,7 +111,6 @@ namespace RegistryWeb.DataServices
                                 on buildingRow.IdStreet equals streetRow.IdStreet
                                 join premiseTypesRow in registryContext.PremisesTypes
                                 on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
-                                where tpaRow.Deleted == 0
                                 select new
                                 {
                                     tpRow.IdProcess,
@@ -132,7 +135,6 @@ namespace RegistryWeb.DataServices
                                    on buildingRow.IdStreet equals streetRow.IdStreet
                                    join premiseTypesRow in registryContext.PremisesTypes
                                    on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
-                                   where tspaRow.Deleted == 0
                                    select new
                                    {
                                        tpRow.IdProcess,

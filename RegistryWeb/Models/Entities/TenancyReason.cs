@@ -16,5 +16,7 @@ namespace RegistryWeb.Models.Entities
         public byte Deleted { get; set; }
 
         public virtual TenancyProcess IdProcessNavigation { get; set; }
+
+        public virtual TenancyReasonType IdReasonTypeNavigation { get; set; }
     }
 }
