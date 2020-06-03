@@ -55,7 +55,7 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = action;
             if (idPremises == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
             var premise = dataService.GetPremise(idPremises.Value);
             if (premise == null)
@@ -68,7 +68,7 @@ namespace RegistryWeb.Controllers
         public IActionResult Create(string action = "")
         {
             ViewBag.Action = action;
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
 
             return View("Premise", dataService.GetPremiseView(dataService.CreatePremise()));
@@ -79,7 +79,7 @@ namespace RegistryWeb.Controllers
         {
             if (premise == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
             if (ModelState.IsValid)
             {
@@ -95,7 +95,7 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = action;
             if (idPremises == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
 
             var premise = dataService.GetPremise(idPremises.Value);
@@ -110,7 +110,7 @@ namespace RegistryWeb.Controllers
         {
             if (premise == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
             if (ModelState.IsValid)
             {
@@ -126,7 +126,7 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = action;
             if (idPremises == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
             var premise = dataService.GetPremise(idPremises.Value);
             if (premise == null)
@@ -140,7 +140,7 @@ namespace RegistryWeb.Controllers
         {
             if (premise == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
             if (ModelState.IsValid)
             {
