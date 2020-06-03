@@ -64,6 +64,7 @@ namespace RegistryWeb.DataServices
             viewModel.PageOptions.TotalRows = tenancyProcesses.Count();
             var query = GetQueryFilter(tenancyProcesses, viewModel.FilterOptions);
             query = GetQueryOrder(query, viewModel.OrderOptions);
+            query = GetQueryIncludes(query);
             var count = query.Count();
             viewModel.PageOptions.Rows = count;
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
@@ -76,9 +77,15 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<TenancyProcess> GetQuery()
         {
-            return registryContext.TenancyProcesses
+            return registryContext.TenancyProcesses;
+        }
+
+        private IQueryable<TenancyProcess> GetQueryIncludes(IQueryable<TenancyProcess> query)
+        {
+            return query
                 .Include(tp => tp.IdRentTypeNavigation)
-                .Include(tp => tp.TenancyPersons).AsNoTracking();
+                .Include(tp => tp.TenancyPersons)
+                .Include(tp => tp.TenancyReasons);
         }
 
         private Dictionary<int, List<Address>> GetAddresses(IEnumerable<TenancyProcess> tenancyProcesses)
@@ -157,6 +164,8 @@ namespace RegistryWeb.DataServices
             if (!filterOptions.IsEmpty())
             {
                 query = AddressFilter(query, filterOptions);
+                query = TenancyFilter(query, filterOptions);
+                query = MunObjectFilter(query, filterOptions);
             }
             return query;
         }
@@ -226,6 +235,160 @@ namespace RegistryWeb.DataServices
                     join idProcess in idProcesses on q.IdProcess equals idProcess
                     select q;
             }
+            return query;
+        }
+
+        private IQueryable<TenancyProcess> TenancyFilter(IQueryable<TenancyProcess> query, TenancyProcessesFilter filterOptions)
+        {
+            if (filterOptions.IdProcess != null && filterOptions.IdProcess != 0)
+            {
+                query = query.Where(p => p.IdProcess == filterOptions.IdProcess.Value);
+            }
+            if (!string.IsNullOrEmpty(filterOptions.RegistrationNum))
+            {
+                query = query.Where(p => p.RegistrationNum.Contains(filterOptions.RegistrationNum));
+            }
+            if (filterOptions.RegistrationNumIsEmpty)
+            {
+                query = query.Where(p => p.RegistrationNum == null);
+            }
+            if (filterOptions.RegistrationDate.HasValue)
+            {
+                query = query.Where(p => p.RegistrationDate == filterOptions.RegistrationDate);
+            }
+            if (filterOptions.IssuedDate.HasValue)
+            {
+                query = query.Where(p => p.IssueDate == filterOptions.IssuedDate);
+            }
+            if (filterOptions.BeginDate.HasValue)
+            {
+                query = query.Where(p => p.BeginDate == filterOptions.BeginDate);
+            }
+            if (filterOptions.EndDate.HasValue)
+            {
+                query = query.Where(p => p.EndDate == filterOptions.EndDate);
+            }
+            if (filterOptions.IdsRentType != null && filterOptions.IdsRentType.Any())
+            {
+                query = query.Where(p => p.IdRentType != null && filterOptions.IdsRentType.Contains(p.IdRentType.Value));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.ReasonDocNum))
+            {
+                query = query.Where(p => p.TenancyReasons.Any(tr => tr.ReasonNumber.Contains(filterOptions.ReasonDocNum)));
+            }
+            if (filterOptions.ReasonDocDate.HasValue)
+            {
+                query = query.Where(p => p.TenancyReasons.Any(tr => tr.ReasonDate == filterOptions.ReasonDocDate));
+            }
+            if (filterOptions.IdsReasonType != null && filterOptions.IdsReasonType.Any())
+            {
+                query = query.Where(p => p.TenancyReasons.Any(tr => filterOptions.IdsReasonType.Contains(tr.IdReasonType)));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.TenantSnp) || !string.IsNullOrEmpty(filterOptions.TenancyParticipantSnp))
+            {
+                var tenantSnp = string.IsNullOrEmpty(filterOptions.TenantSnp) ? null : filterOptions.TenantSnp;
+                var tenancyParticipantSnp = string.IsNullOrEmpty(filterOptions.TenancyParticipantSnp) ? null : filterOptions.TenancyParticipantSnp;
+                query = (from tRow in query
+                         join tpRow in registryContext.TenancyPersons
+                         on tRow.IdProcess equals tpRow.IdProcess
+                         where tpRow.ExcludeDate == null &&
+                             ((tenantSnp != null && tpRow.IdKinship == 1 &&
+                                 string.Concat(tpRow.Surname, " ", tpRow.Name, " ", tpRow.Patronymic).Contains(tenantSnp)) ||
+                             (tenancyParticipantSnp != null &&
+                                 string.Concat(tpRow.Surname, " ", tpRow.Name, " ", tpRow.Patronymic).Contains(tenancyParticipantSnp)))
+                         select tRow).Distinct();
+            }
+            return query;
+        }
+
+        private IQueryable<TenancyProcess> MunObjectFilter(IQueryable<TenancyProcess> query, TenancyProcessesFilter filterOptions)
+        {
+            var buildings = from tbaRow in tenancyBuildingsAssoc
+                            join buildingRow in registryContext.Buildings
+                            on tbaRow.IdBuilding equals buildingRow.IdBuilding
+                            join streetRow in registryContext.KladrStreets
+                            on buildingRow.IdStreet equals streetRow.IdStreet
+                            select new
+                            {
+                                tbaRow.IdProcess,
+                                streetRow.IdStreet,
+                                buildingRow.House
+                            };
+            var premises = from tpaRow in tenancyPremisesAssoc
+                           join premiseRow in registryContext.Premises
+                           on tpaRow.IdPremise equals premiseRow.IdPremises
+                           join buildingRow in registryContext.Buildings
+                           on premiseRow.IdBuilding equals buildingRow.IdBuilding
+                           join streetRow in registryContext.KladrStreets
+                           on buildingRow.IdStreet equals streetRow.IdStreet
+                           join premiseTypesRow in registryContext.PremisesTypes
+                           on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
+                           select new
+                           {
+                               tpaRow.IdProcess,
+                               streetRow.IdStreet,
+                               buildingRow.House,
+                               premiseRow.PremisesNum
+                           };
+            var subPremises = from tspaRow in tenancySubPremisesAssoc
+                              join subPremiseRow in registryContext.SubPremises
+                              on tspaRow.IdSubPremise equals subPremiseRow.IdSubPremises
+                              join premiseRow in registryContext.Premises
+                              on subPremiseRow.IdPremises equals premiseRow.IdPremises
+                              join buildingRow in registryContext.Buildings
+                              on premiseRow.IdBuilding equals buildingRow.IdBuilding
+                              join streetRow in registryContext.KladrStreets
+                              on buildingRow.IdStreet equals streetRow.IdStreet
+                              join premiseTypesRow in registryContext.PremisesTypes
+                              on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
+                              select new
+                              {
+                                  tspaRow.IdProcess,
+                                  streetRow.IdStreet,
+                                  buildingRow.House,
+                                  premiseRow.PremisesNum,
+                                  subPremiseRow.SubPremisesNum
+                              };
+            IEnumerable<int> idsProcess = null;
+
+            if (!string.IsNullOrEmpty(filterOptions.IdStreet))
+            {
+                var ids = buildings.Where(r => r.IdStreet == filterOptions.IdStreet).Select(r => r.IdProcess)
+                    .Union(premises.Where(r => r.IdStreet == filterOptions.IdStreet).Select(r => r.IdProcess))
+                    .Union(subPremises.Where(r => r.IdStreet == filterOptions.IdStreet).Select(r => r.IdProcess));
+                idsProcess = ids;
+            }
+            if (!string.IsNullOrEmpty(filterOptions.House))
+            {
+                var ids = buildings.Where(r => r.House == filterOptions.House).Select(r => r.IdProcess)
+                    .Union(premises.Where(r => r.House == filterOptions.House).Select(r => r.IdProcess))
+                    .Union(subPremises.Where(r => r.House == filterOptions.House).Select(r => r.IdProcess));
+                if (idsProcess == null)
+                {
+                    idsProcess = ids;
+                } else
+                {
+                    idsProcess = idsProcess.Intersect(ids);
+                }
+            }
+            if (!string.IsNullOrEmpty(filterOptions.PremisesNum))
+            {
+                var ids = premises.Where(r => r.PremisesNum == filterOptions.PremisesNum).Select(r => r.IdProcess)
+                    .Union(subPremises.Where(r => r.PremisesNum == filterOptions.PremisesNum).Select(r => r.IdProcess));
+                if (idsProcess == null)
+                {
+                    idsProcess = ids;
+                }
+                else
+                {
+                    idsProcess = idsProcess.Intersect(ids);
+                }
+            }
+            if (idsProcess == null) return query;
+            query = (from row in query
+                   join id in idsProcess
+                   on row.IdProcess equals id
+                   select row).Distinct();
             return query;
         }
 

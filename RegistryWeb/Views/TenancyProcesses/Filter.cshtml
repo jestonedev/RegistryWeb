@@ -17,7 +17,7 @@
         @if (securityService.HasPrivilege(Privileges.TenancyWrite))
         {
             <div class="form-group col-1">
-                <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="TenancyProcesses" asp-action="Create">&#10010;</a>
+                <a class="btn btn-success disabled" title="Добавить" aria-label="Добавить" asp-controller="TenancyProcesses" asp-action="Create">&#10010;</a>
             </div>
         }
         <div class="input-group @(securityService.HasPrivilege(Privileges.TenancyWrite) ? "col-9" : "col-10") ">

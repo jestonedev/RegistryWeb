@@ -59,7 +59,7 @@ var searchModal = function () {
 };
 
 var filterClearModal = function () {
-    $(".filterForm input[type='text'], .filterForm input[type='date'], .filterForm select").val("");
+    $("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal select").val("");
     $('#FilterOptions_IdStreet').selectpicker('render');
     $('#FilterOptions_IdsRentType').selectpicker('deselectAll');
     $('#FilterOptions_IdsObjectState').selectpicker("deselectAll");
