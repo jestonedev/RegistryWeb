@@ -299,6 +299,9 @@ namespace RegistryWeb.DataServices
             ViewBag.StructureTypes = dataService.StructureTypes;
             ViewBag.KladrStreets = dataService.KladrStreets;
             ViewBag.HeatingTypes = dataService.HeatingTypes;*/
+            var idStreet = premise.IdBuildingNavigation.IdStreet ??
+                registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == premise.IdBuilding).IdStreet;
+
             var premisesVM = new PremisesVM<Premise>()
             {
                 Premise = premise,
@@ -312,7 +315,8 @@ namespace RegistryWeb.DataServices
                 LocationKeysList = new SelectList(registryContext.PremisesDoorKeys, "IdPremisesDoorKeys", "LocationOfKeys"),
                 CommentList = new SelectList(registryContext.PremisesComments, "IdPremisesComment", "PremisesCommentText"),
                 OwnershipRightTypesList = new SelectList(registryContext.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName"),
-                RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName")
+                RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName"),
+                HousesList = new SelectList(GetHouses(idStreet), "IdBuilding", "House", premise.IdBuilding)
             };
 
             return premisesVM;
@@ -411,15 +415,15 @@ namespace RegistryWeb.DataServices
         public Premise GetPremise(int idPremise)
         {
             return registryContext.Premises
-                .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
-                .Include(b => b.IdBuildingNavigation.IdHeatingTypeNavigation)
-                .Include(b => b.IdStateNavigation)                              //Текущее состояние объекта
-                .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
-                .Include(b => b.FundsPremisesAssoc).ThenInclude(fpa => fpa.IdFundNavigation).ThenInclude(fh => fh.IdFundTypeNavigation)
-                .Include(b => b.IdPremisesCommentNavigation).ThenInclude(fpa => fpa.Premises)
-                .Include(b => b.IdPremisesTypeNavigation).ThenInclude(fpa => fpa.Premises)
-                .Include(b => b.IdPremisesDoorKeysNavigation)
-                .SingleOrDefault(b => b.IdPremises == idPremise);
+                 .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
+                 .Include(b => b.IdBuildingNavigation.IdHeatingTypeNavigation)
+                 .Include(b => b.IdStateNavigation)                              //Текущее состояние объекта
+                 .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
+                 .Include(b => b.FundsPremisesAssoc).ThenInclude(fpa => fpa.IdFundNavigation).ThenInclude(fh => fh.IdFundTypeNavigation)
+                 .Include(b => b.IdPremisesCommentNavigation)
+                 .Include(b => b.IdPremisesTypeNavigation)
+                 .Include(b => b.IdPremisesDoorKeysNavigation)
+                 .SingleOrDefault(b => b.IdPremises == idPremise);
         }
 
         public IEnumerable<ObjectState> ObjectStates
@@ -479,10 +483,7 @@ namespace RegistryWeb.DataServices
 
         public List<Building> GetHouses(string streetId)
         {
-            var house = from bui in registryContext.Buildings
-                        where bui.IdStreet.Contains(streetId)
-                        select bui;
-            return house.ToList();
+            return registryContext.Buildings.Where(b => b.IdStreet == streetId).ToList();
         }
     }
 }

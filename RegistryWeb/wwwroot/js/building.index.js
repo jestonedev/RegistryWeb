@@ -81,14 +81,14 @@ $(function () {
     $('#filterClearModalBtn').click(filterClearModal);
     $('#filterClearBtn').click(filterClear);
 
-    $('.idBuildingCheckbox').click(function (e) {
-        var id = +$(this).data('id');
-        $.ajax({
-            type: 'POST',
-            url: window.location.origin + '/Buildings/SessionIdBuildings',
-            data: { idBuilding: id, isCheck: $(this).prop('checked') }
-        });
-    });
+    //$('.idBuildingCheckbox').click(function (e) {
+    //    var id = +$(this).data('id');
+    //    $.ajax({
+    //        type: 'POST',
+    //        url: window.location.origin + '/Buildings/SessionIdBuildings',
+    //        data: { idBuilding: id, isCheck: $(this).prop('checked') }
+    //    });
+    //});
 
     $("#filterModalShow").on("click", function (e) {
         e.preventDefault();
