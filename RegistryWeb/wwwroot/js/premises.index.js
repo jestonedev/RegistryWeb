@@ -87,6 +87,8 @@ $(function () {
     $('#searchModalBtn').click(searchModal);
     $('#filterClearModalBtn').click(filterClearModal);
     $('#filterClearBtn').click(filterClear);
+
+    $('#premiseToggle').on('click', $('#r-premises-form'), elementToogle);
     //$('#searchModalBtn').click(formSubmit);
 
     /*$('.idBuildingCheckbox').click(function (e) {

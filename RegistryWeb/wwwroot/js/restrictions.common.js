@@ -6,8 +6,8 @@
 $(function () {
     var action = $('form').data('action');
     var addressType = $('form').data('addressType');
-    var tr = $("#restrictions tr").first();
-    trTemplate = tr[0].outerHTML;
+    //var tr = $("#restrictions tr").first();
+    //trTemplate = tr[0].outerHTML;
 
     $('#restrictionAdd').click(function (e) {
         var id = $('.restrictionBlock').length;
