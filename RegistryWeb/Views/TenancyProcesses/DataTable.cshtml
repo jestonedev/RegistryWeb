@@ -1,0 +1,132 @@
+﻿@using RegistryWeb.Extensions;
+@using RegistryWeb.ViewOptions;
+@using RegistryWeb.SecurityServices;
+@model RegistryWeb.ViewModel.TenancyProcessesVM;
+@{
+    Context.Session.Set("Controller", "TenancyProcesses");
+    Context.Session.Set("Action", "Index");
+    Context.Session.Set("OrderOptions", Model.OrderOptions);
+    Context.Session.Set("FilterOptions", Model.FilterOptions);
+    Context.Session.Set("PageOptions", Model.PageOptions);
+    var securityService = (SecurityService)ViewData["SecurityService"];
+}
+@section styles{
+    <link rel="stylesheet" href="~/css/tenancy.processes.css" runat="server" />
+}
+
+<table class="table table-hover tp-table">
+    <thead>
+        <tr style="align-content: center;">
+            <th class="r-table-header-cell" style="width:155px;">
+                № по рeестр
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "IdProcess")
+                {
+                    <a href="#" class="oi oi-sort-descending sort tp-sorted" data-order-field="IdProcess" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "IdProcess" ? "tp-sorted" : "")" 
+                       data-order-field="IdProcess" data-order-direction="@(Model.OrderOptions.OrderField == "IdProcess" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="r-table-header-cell">
+                Информация о найме
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "RegistrationNum")
+                {
+                    <a href="#" class="oi oi-sort-descending sort tp-sorted" data-order-field="RegistrationNum" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "RegistrationNum" ? "tp-sorted" : "")"
+                       data-order-field="RegistrationNum" data-order-direction="@(Model.OrderOptions.OrderField == "RegistrationNum" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="r-table-header-cell">
+                Адрес
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Address")
+                {
+                    <a href="#" class="oi oi-sort-descending sort tp-sorted" data-order-field="Address" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Address" ? "tp-sorted" : "")"
+                       data-order-field="Address" data-order-direction="@(Model.OrderOptions.OrderField == "Address" ? "1" : "0")"></a>
+                }
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.TenancyProcesses)
+        {
+            <tr>
+                <td>
+                    @item.IdProcess
+                </td>
+                <td>
+                    <div class="rent-type-info">
+                        <b>Найм:</b> @item.IdRentTypeNavigation?.RentTypeName
+                    </div>
+                    <div class="tenant-info">
+                        <b>Наниматель:</b>
+                        @{
+                            var tenant = item.TenancyPersons.FirstOrDefault(tp => tp.ExcludeDate == null && tp.IdKinship == 1 && tp.Deleted == 0);
+                            if (tenant != null)
+                            {
+                                <span>@(tenant.Surname + " " + tenant.Name + (string.IsNullOrEmpty(tenant.Patronymic) ? "" : " " + tenant.Patronymic))</span>
+                            }
+                            else
+                            {
+                                <span><i>Отсутствует</i></span>
+                            }
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(item.RegistrationNum))
+                    {
+                        <div>
+                            <b>Договор найма:</b> № @item.RegistrationNum @(item.RegistrationDate.HasValue ? "от " + @item.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(item.ResidenceWarrantNum))
+                    {
+                        <div>
+                            <b>Ордер (пр. док. осн.):</b> № @item.ResidenceWarrantNum @(item.ResidenceWarrantDate.HasValue ? "от " + @item.ResidenceWarrantDate.Value.ToString("dd.MM.yyyy") : "")
+                        </div>
+                    }
+                </td>
+                <td>
+                    @if (Model.Addresses.ContainsKey(item.IdProcess))
+                    {
+                        @foreach (var addr in Model.Addresses[item.IdProcess])
+                        {
+                            @await Component.InvokeAsync("TenancyProcessesAddressComponent", new { address = addr, idProcess = item.IdProcess })
+                        }
+                    }
+                </td>
+                <td>
+                    @if (securityService.HasPrivilege(Privileges.TenancyWrite))
+                    {
+                        <div class="btn-group" role="group" aria-label="Панель доступа">
+                            <div class="btn-group" role="group" aria-label="Панель доступа">
+                                <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right but text-center" aria-labelledby="toolsBtn_@item.IdProcess">
+                                    <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
+                                       asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdProcess" asp-route-action="Details"></a>
+                                    <a class="btn btn-outline-dark oi oi-pencil disabled" title="Изменить" aria-label="Изменить"
+                                       asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@item.IdProcess" asp-route-action="Edit"></a>
+                                    <a class="btn btn-danger oi oi-x disabled" title="Удалить" aria-label="Удалить"
+                                       asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@item.IdProcess"></a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
+                           asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdProcess" asp-route-action="Details"></a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

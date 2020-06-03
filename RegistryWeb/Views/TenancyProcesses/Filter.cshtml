@@ -1,0 +1,165 @@
+﻿@model RegistryWeb.ViewModel.TenancyProcessesVM;
+@using RegistryWeb.SecurityServices;
+
+@{
+    var securityService = (SecurityService)ViewData["SecurityService"];
+}
+
+<form asp-action="Index" method="get" class="filterForm">
+    <input type="hidden" asp-for="OrderOptions.OrderDirection" />
+    <input type="hidden" asp-for="OrderOptions.OrderField" />
+    <input type="hidden" asp-for="PageOptions.CurrentPage" />
+    <input type="hidden" asp-for="PageOptions.SizePage" />
+    <input type="hidden" asp-for="FilterOptions.Address.AddressType" />
+    <input type="hidden" asp-for="FilterOptions.Address.Id" />
+
+    <div class="form-row">
+        @if (securityService.HasPrivilege(Privileges.TenancyWrite))
+        {
+            <div class="form-group col-1">
+                <a class="btn btn-success disabled" title="Добавить" aria-label="Добавить" asp-controller="TenancyProcesses" asp-action="Create">&#10010;</a>
+            </div>
+        }
+        <div class="input-group @(securityService.HasPrivilege(Privileges.TenancyWrite) ? "col-9" : "col-10") ">
+            <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+            <div class="input-group-append h-auto d-inline-block">
+                <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
+            </div>
+        </div>
+        @if (Model.FilterOptions.IsModalEmpty())
+        {
+            <div class="form-group col-2">
+                <a class="btn btn-block btn-secondary" href="#" id="filterModalShow">Фильтр</a>
+            </div>
+        }
+        else
+        {
+            <div class="form-group btn-group col-2">
+                <a class="btn btn-block btn-secondary" href="#" id="filterModalShow">Фильтр</a>
+                <a class="btn btn-outline-secondary" id="filterClearBtn">&#10006;</a>
+            </div>
+        }
+    </div>
+    <!-- Modal -->
+    <div class="modal fade bd-example-modal-xl" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Фильтр процессов найма</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.IdProcess">Реестровый номер</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.IdProcess" title="Реестровый номер процесса найма">
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.RegistrationNum">Номер договора</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend rr-registration-num-dropdown">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Есть</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">Есть</a>
+                                        <a class="dropdown-item" href="#">Нет</a>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" asp-for="FilterOptions.RegistrationNum" title="Номер договора найма">
+                                <input type="hidden" asp-for="FilterOptions.RegistrationNumIsEmpty"/>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.RegistrationDate">Дата регистрации</label>
+                            <div class="input-group date">
+                                <input type="date" class="form-control" asp-for="FilterOptions.RegistrationDate" title="Дата регистрации договора">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.IssuedDate">Дата выдачи</label>
+                            <div class="input-group date">
+                                <input type="date" class="form-control" asp-for="FilterOptions.IssuedDate" title="Дата выдачи договора">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12 col-lg-6 ">
+                            <label asp-for="FilterOptions.IdsRentType">Тип найма <b>содержит</b></label>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Вид документа-основания" asp-for="FilterOptions.IdsRentType" asp-items="@(new SelectList(Model.RentTypes, "IdRentType", "RentTypeName"))"></select>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.BeginDate">Дата начала действия</label>
+                            <div class="input-group date">
+                                <input type="date" class="form-control" asp-for="FilterOptions.BeginDate" title="Дата начала действия договора">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.EndDate">Дата окончания</label>
+                            <div class="input-group date">
+                                <input type="date" class="form-control" asp-for="FilterOptions.EndDate" title="Дата окончания действия договора">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label class="rr-tenancy-filter-label" asp-for="FilterOptions.ReasonDocNum">Номер документа-основания</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.ReasonDocNum" title="Номер документа-основания найма">
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label class="rr-tenancy-filter-label" asp-for="FilterOptions.ReasonDocDate">Дата документа-оснвоания</label>
+                            <div class="input-group date">
+                                <input type="date" class="form-control" asp-for="FilterOptions.ReasonDocDate" title="Дата документа-оснвоания найма">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 col-lg-6 ">
+                            <label asp-for="FilterOptions.IdsReasonType">Вид документа-основания <b>содержит</b></label>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Вид документа-основания" asp-for="FilterOptions.IdsReasonType" asp-items="@(new SelectList(Model.ReasonTypes, "IdReasonType", "ReasonName"))"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12 col-lg-6">
+                            <label asp-for="FilterOptions.TenantSnp">ФИО нанимателя</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.TenantSnp" title="ФИО нанимателя">
+                        </div>
+                        <div class="form-group col-md-12 col-lg-6">
+                            <label asp-for="FilterOptions.TenancyParticipantSnp">ФИО участника найма</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.TenancyParticipantSnp" title="ФИО участника найма">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12 col-lg-6">
+                            <label asp-for="FilterOptions.IdStreet">Улица</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@(new SelectList(Model.Streets, "IdStreet", "StreetName"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.House">Номер дома</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.House" title="Номер дома">
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.PremisesNum">Номер помещения</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.PremisesNum" title="Номер помещенияв">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12 col-lg-6">
+                            <label asp-for="FilterOptions.IdsOwnershipRightType">Тип ограничения ЖП</label>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип ограничения жилого помещения" asp-for="FilterOptions.IdsOwnershipRightType" asp-items="@(new SelectList(Model.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName"))"></select>
+                        </div>
+                        <div class="form-group col-md-12 col-lg-6">
+                            <label asp-for="FilterOptions.IdsObjectState">Состояние ЖП</label>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Состояние жилого помещения" asp-for="FilterOptions.IdsObjectState" asp-items="@(new SelectList(Model.ObjectStates, "IdState", "StateNeutral"))"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="filterClearModalBtn" type="button" class="btn btn-secondary">Очистить</button>
+                    <button id="searchModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Найти</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+

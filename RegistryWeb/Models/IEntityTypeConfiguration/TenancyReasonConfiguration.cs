@@ -61,6 +61,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasForeignKey(d => d.IdProcess)
                 .HasConstraintName("FK_contract_reasons_tenancy_contracts_id_contract");
 
+            builder.HasOne(d => d.IdReasonTypeNavigation)
+                .WithMany(p => p.TenancyReasons)
+                .HasForeignKey(d => d.IdReasonType)
+                .HasConstraintName("FK_contract_reasons_premises_types_id_premises_type");
+
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);
         }
