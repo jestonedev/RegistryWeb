@@ -15,7 +15,6 @@ namespace RegistryWeb.Models.Entities
         public int IdOwnershipRight { get; set; }
         [Required]
         public int IdOwnershipRightType { get; set; }
-        [Required]
         public string Number { get; set; }
         [Required]
         public DateTime Date { get; set; }

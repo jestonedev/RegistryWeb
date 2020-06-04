@@ -57,15 +57,6 @@ let getErrorSpan = function (dataValmsgFor) {
 let initializeVilidationTr = function (tr) {
     let fields = tr.find('.field-ownership-right');
     let idOwnershipRight = tr.data('idownershipright');
-    //Номер
-    let Number = 'Number_' + idOwnershipRight;
-    $(fields[0]).addClass('valid');
-    $(fields[0]).attr('data-val', 'true');
-    $(fields[0]).attr('data-val-required', 'Поле "Номер" является обязательным');
-    $(fields[0]).attr('id', Number);
-    $(fields[0]).attr('name', Number);
-    $(fields[0]).attr('aria-describedby', Number + '-error');
-    $(fields[0]).after(getErrorSpan(Number));
     //Дата
     let Date = 'Date_' + idOwnershipRight;
     $(fields[1]).addClass('valid');
@@ -105,17 +96,10 @@ let refreshOwnershipRight = function (tr, ownershipRight) {
     //Номер
     $(fields[0]).prop('value', ownershipRight.number);
     $(fields[0]).prop('title', ownershipRight.number);
-    $(fields[0])
-        .removeClass('input-validation-error')
-        .addClass('valid');
-    $(fields[0]).next()
-        .removeClass('field-validation-error')
-        .addClass('field-validation-valid')
-        .text('');
     //Дата
     $(fields[1]).prop('value', ownershipRight.date);
     $(fields[1]).prop('title', ownershipRight.date);
-    $(fields[0])
+    $(fields[1])
         .removeClass('input-validation-error')
         .addClass('valid');
     $(fields[1]).next()
@@ -128,7 +112,7 @@ let refreshOwnershipRight = function (tr, ownershipRight) {
     //Тип ограничения
     $(fields[3]).prop('value', ownershipRight.idOwnershipRightType);
     $(fields[3]).prop('title', ownershipRight.idOwnershipRightType);
-    $(fields[0])
+    $(fields[3])
         .removeClass('input-validation-error')
         .addClass('valid');
     $(fields[3]).next()

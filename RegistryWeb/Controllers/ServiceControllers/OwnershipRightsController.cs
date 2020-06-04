@@ -52,9 +52,9 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 .Include(or => or.OwnershipRightTypeNavigation)
                 .FirstOrDefault(op => op.IdOwnershipRight == idOwnershipRight);
             return Json(new {
-                number = ownershipRight.Number ?? "",
+                number = ownershipRight.Number,
                 date = ownershipRight.Date.ToString("yyyy-MM-dd"),
-                description = ownershipRight.Description ?? "",
+                description = ownershipRight.Description,
                 idOwnershipRightType = ownershipRight.IdOwnershipRightType,
                 resettlePlanDate = ownershipRight.ResettlePlanDate.HasValue ? ownershipRight.ResettlePlanDate.Value.ToString("yyyy-MM-dd") : "",
                 demolishPlanDate = ownershipRight.DemolishPlanDate.HasValue ? ownershipRight.DemolishPlanDate.Value.ToString("yyyy-MM-dd") : "",
