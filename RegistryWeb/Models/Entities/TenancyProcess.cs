@@ -13,6 +13,8 @@ namespace RegistryWeb.Models.Entities
             TenancyPremisesAssoc = new List<TenancyPremiseAssoc>();
             TenancyReasons = new List<TenancyReason>();
             TenancySubPremisesAssoc = new List<TenancySubPremiseAssoc>();
+            TenancyAgreements = new List<TenancyAgreement>();
+            TenancyRentPeriods = new List<TenancyRentPeriod>();
         }
 
         public int IdProcess { get; set; }
@@ -25,7 +27,7 @@ namespace RegistryWeb.Models.Entities
         public DateTime? IssueDate { get; set; }
         public DateTime? BeginDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public byte UntilDismissal { get; set; }
+        public bool UntilDismissal { get; set; }
         public string ResidenceWarrantNum { get; set; }
         public DateTime? ResidenceWarrantDate { get; set; }
         public string ProtocolNum { get; set; }
@@ -38,10 +40,13 @@ namespace RegistryWeb.Models.Entities
         public virtual TenancyActiveProcess TenancyActiveContractNavigation { get; set; }
         public virtual RentTypeCategory IdRentTypeCategoryNavigation { get; set; }
         public virtual RentType IdRentTypeNavigation { get; set; }
+        public virtual Executor IdExecutorNavigation { get; set; }
         public virtual IList<TenancyBuildingAssoc> TenancyBuildingsAssoc { get; set; }
         public virtual IList<TenancyPerson> TenancyPersons { get; set; }
         public virtual IList<TenancyPremiseAssoc> TenancyPremisesAssoc { get; set; }
         public virtual IList<TenancyReason> TenancyReasons { get; set; }
+        public virtual IList<TenancyAgreement> TenancyAgreements { get; set; }
         public virtual IList<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
+        public virtual IList<TenancyRentPeriod> TenancyRentPeriods { get; set; }
     }
 }

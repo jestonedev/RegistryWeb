@@ -14,10 +14,30 @@
         color: #0056b3;
     }
 
-.rr-tenancy-filter-label {
+.rr-tenancy-filter-label, .rr-tenancy-label {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
     margin-bottom: 0.24rem;
+}
+
+.rr-until-dismissal-checkbox {
+    padding-left: 2.2rem;
+}
+
+.rr-tenancy-card {
+    margin-top: 10pt;
+}
+
+.rr-tenancy-card table.card-body {
+    margin-bottom: 0;
+}
+
+.rr-sub-rent-table-untill-dismissal-checkbox input[type="checkbox"] {
+    display: inline-block;
+}
+
+.table td.rr-sub-rent-table-untill-dismissal-checkbox {
+    vertical-align: middle;
 }

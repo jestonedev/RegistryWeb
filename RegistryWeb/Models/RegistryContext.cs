@@ -77,7 +77,9 @@ namespace RegistryWeb.Models
         //Нанимателия        
         public virtual DbSet<TenancyPerson> TenancyPersons { get; set; }
         public virtual DbSet<TenancyProcess> TenancyProcesses { get; set; }
+        public virtual DbSet<TenancyRentPeriod> TenancyRentPeriods { get; set; }
         public virtual DbSet<TenancyReason> TenancyReasons { get; set; }
+        public virtual DbSet<TenancyAgreement> TenancyAgreements { get; set; }
         public virtual DbSet<TenancyReasonType> TenancyReasonTypes { get; set; }
         public virtual DbSet<RentTypeCategory> RentTypeCategories { get; set; }
         public virtual DbSet<Kinship> Kinships { get; set; }
@@ -85,6 +87,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<TenancyBuildingAssoc> TenancyBuildingsAssoc { get; set; }
         public virtual DbSet<TenancyPremiseAssoc> TenancyPremisesAssoc { get; set; }
         public virtual DbSet<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
+        public virtual DbSet<Executor> Executors { get; set; }
 
         //Журнал изменений
         public virtual DbSet<ChangeLog> ChangeLogs { get; set; }
@@ -183,6 +186,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new TenancyPersonConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KinshipConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyProcessConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancyAgreementConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyReasonConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyReasonTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new RentTypeCategoryConfiguration(nameDatebase));
@@ -190,6 +194,8 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new TenancyBuildingAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyPremiseAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancySubPremiseAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ExecutorConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancyRentPeriodConfiguration(nameDatebase));
         }
     }
 }

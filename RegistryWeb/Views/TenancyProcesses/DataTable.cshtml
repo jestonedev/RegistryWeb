@@ -111,11 +111,11 @@
                                 <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                                 <div class="dropdown-menu dropdown-menu-right but text-center" aria-labelledby="toolsBtn_@item.IdProcess">
                                     <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
-                                       asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdProcess" asp-route-action="Details"></a>
+                                       asp-controller="TenancyProcesses" asp-action="Details" asp-route-idProcess="@item.IdProcess" asp-route-action="Details"></a>
                                     <a class="btn btn-outline-dark oi oi-pencil disabled" title="Изменить" aria-label="Изменить"
-                                       asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@item.IdProcess" asp-route-action="Edit"></a>
+                                       asp-controller="TenancyProcesses" asp-action="Edit" asp-route-idProcess="@item.IdProcess" asp-route-action="Edit"></a>
                                     <a class="btn btn-danger oi oi-x disabled" title="Удалить" aria-label="Удалить"
-                                       asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@item.IdProcess"></a>
+                                       asp-controller="TenancyProcesses" asp-action="Delete" asp-route-idProcess="@item.IdProcess"></a>
                                 </div>
                             </div>
                         </div>

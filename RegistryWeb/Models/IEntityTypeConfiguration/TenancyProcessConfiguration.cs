@@ -123,6 +123,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasForeignKey(d => d.IdRentTypeCategory)
                 .HasConstraintName("FK_tenancy_processes_id_rent_type_category");
 
+            builder.HasOne(d => d.IdExecutorNavigation)
+                .WithMany(p => p.TenancyProcesses)
+                .HasForeignKey(d => d.IdExecutor)
+                .HasConstraintName("FK_tenancy_contracts_executors_id_executor");
+
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);
         }

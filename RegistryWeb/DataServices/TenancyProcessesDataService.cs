@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using RegistryWeb.DataHelpers;
 
 namespace RegistryWeb.DataServices
 {
@@ -52,6 +53,32 @@ namespace RegistryWeb.DataServices
             viewModel.OwnershipRightTypes = registryContext.OwnershipRightTypes;
             viewModel.ObjectStates = registryContext.ObjectStates;
             return viewModel;
+        }
+
+        internal TenancyProcessVM GetTenancyProcessViewModel(TenancyProcess process)
+        {
+            return new TenancyProcessVM
+            {
+                TenancyProcess = process,
+                Kinships = registryContext.Kinships.ToList(),
+                RentTypeCategories = registryContext.RentTypeCategories.ToList(),
+                RentTypes = registryContext.RentTypes.ToList(),
+                TenancyReasonTypes = registryContext.TenancyReasonTypes.ToList(),
+                Executors = registryContext.Executors.ToList()
+            };
+        }
+
+        internal TenancyProcess GetTenancyProcess(int idProcess)
+        {
+            return registryContext.TenancyProcesses
+                 .Include(tp => tp.TenancyPersons)
+                 .Include(tp => tp.TenancyReasons)
+                 .Include(tp => tp.TenancyBuildingsAssoc)
+                 .Include(tp => tp.TenancyPremisesAssoc)
+                 .Include(tp => tp.TenancySubPremisesAssoc)
+                 .Include(tp => tp.TenancyRentPeriods)
+                 .Include(tp => tp.TenancyAgreements)
+                 .FirstOrDefault(tp => tp.IdProcess == idProcess);
         }
 
         internal TenancyProcessesVM GetViewModel(
@@ -312,7 +339,8 @@ namespace RegistryWeb.DataServices
                             {
                                 tbaRow.IdProcess,
                                 streetRow.IdStreet,
-                                buildingRow.House
+                                buildingRow.House,
+                                buildingRow.IdState
                             };
             var premises = from tpaRow in tenancyPremisesAssoc
                            join premiseRow in registryContext.Premises
@@ -328,7 +356,8 @@ namespace RegistryWeb.DataServices
                                tpaRow.IdProcess,
                                streetRow.IdStreet,
                                buildingRow.House,
-                               premiseRow.PremisesNum
+                               premiseRow.PremisesNum,
+                               premiseRow.IdState
                            };
             var subPremises = from tspaRow in tenancySubPremisesAssoc
                               join subPremiseRow in registryContext.SubPremises
@@ -347,7 +376,8 @@ namespace RegistryWeb.DataServices
                                   streetRow.IdStreet,
                                   buildingRow.House,
                                   premiseRow.PremisesNum,
-                                  subPremiseRow.SubPremisesNum
+                                  subPremiseRow.SubPremisesNum,
+                                  subPremiseRow.IdState
                               };
             IEnumerable<int> idsProcess = null;
 
@@ -384,11 +414,27 @@ namespace RegistryWeb.DataServices
                     idsProcess = idsProcess.Intersect(ids);
                 }
             }
-            if (idsProcess == null) return query;
-            query = (from row in query
-                   join id in idsProcess
-                   on row.IdProcess equals id
-                   select row).Distinct();
+            if (idsProcess != null)
+            {
+                query = (from row in query
+                         join id in idsProcess
+                         on row.IdProcess equals id
+                         select row).Distinct();
+            }
+            if (filterOptions.IdsObjectState != null && filterOptions.IdsObjectState.Any())
+            {
+                idsProcess = buildings.Where(r => filterOptions.IdsObjectState.Any(s => s == r.IdState)).Select(r => r.IdProcess)
+                    .Union(premises.Where(r => filterOptions.IdsObjectState.Any(s => s == r.IdState)).Select(r => r.IdProcess))
+                    .Union(subPremises.Where(r => filterOptions.IdsObjectState.Any(s => s == r.IdState)).Select(r => r.IdProcess));
+                query = (from row in query
+                         join id in idsProcess
+                         on row.IdProcess equals id
+                         select row).Distinct();
+            }
+            if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Any())
+            {
+                // TODO
+            }
             return query;
         }
 

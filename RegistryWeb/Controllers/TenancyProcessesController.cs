@@ -48,9 +48,18 @@ namespace RegistryWeb.Controllers
         }
 
         // GET: TenancyProcesses/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(int? idProcess, string action = "")
         {
-            return View();
+            ViewBag.Action = action;
+            if (idProcess == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+            var process = dataService.GetTenancyProcess(idProcess.Value);
+            if (process == null)
+                return NotFound();
+
+            return View("TenancyProcess", dataService.GetTenancyProcessViewModel(process));
         }
 
         // GET: TenancyProcesses/Create
