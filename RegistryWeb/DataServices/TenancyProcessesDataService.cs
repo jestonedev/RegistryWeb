@@ -60,11 +60,15 @@ namespace RegistryWeb.DataServices
             return new TenancyProcessVM
             {
                 TenancyProcess = process,
+                RentObjects = GetRentObjects(new List<TenancyProcess> { process }).SelectMany(r => r.Value).ToList(),
                 Kinships = registryContext.Kinships.ToList(),
                 RentTypeCategories = registryContext.RentTypeCategories.ToList(),
                 RentTypes = registryContext.RentTypes.ToList(),
                 TenancyReasonTypes = registryContext.TenancyReasonTypes.ToList(),
-                Executors = registryContext.Executors.ToList()
+                Streets = registryContext.KladrStreets.ToList(),
+                Executors = registryContext.Executors.ToList(),
+                DocumentTypes = registryContext.DocumentTypes.ToList(),
+                DocumentIssuedBy = registryContext.DocumentsIssuedBy.ToList()
             };
         }
 
@@ -115,75 +119,108 @@ namespace RegistryWeb.DataServices
                 .Include(tp => tp.TenancyReasons);
         }
 
-        private Dictionary<int, List<Address>> GetAddresses(IEnumerable<TenancyProcess> tenancyProcesses)
+        private Dictionary<int, List<TenancyRentObject>> GetRentObjects(IEnumerable<TenancyProcess> tenancyProcesses)
         {
             var buildings = from tbaRow in tenancyBuildingsAssoc
-                                 join tpRow in tenancyProcesses
-                                 on tbaRow.IdProcess equals tpRow.IdProcess
-                                 join buildingRow in registryContext.Buildings
-                                 on tbaRow.IdBuilding equals buildingRow.IdBuilding
-                                 join streetRow in registryContext.KladrStreets
-                                 on buildingRow.IdStreet equals streetRow.IdStreet
-                                 select new
-                                 {
-                                     tpRow.IdProcess,
-                                     Addresses = new Address
-                                     {
-                                         AddressType = AddressTypes.Building,
-                                         Id = buildingRow.IdBuilding.ToString(),
-                                         Text = streetRow.StreetName + ", д." + buildingRow.House
-                                     }
-                                 };
-            var premises = from tpaRow in tenancyPremisesAssoc
-                                join tpRow in tenancyProcesses
-                                on tpaRow.IdProcess equals tpRow.IdProcess
-                                join premiseRow in registryContext.Premises
-                                on tpaRow.IdPremise equals premiseRow.IdPremises
-                                join buildingRow in registryContext.Buildings
-                                on premiseRow.IdBuilding equals buildingRow.IdBuilding
-                                join streetRow in registryContext.KladrStreets
-                                on buildingRow.IdStreet equals streetRow.IdStreet
-                                join premiseTypesRow in registryContext.PremisesTypes
-                                on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
-                                select new
+                            join tpRow in tenancyProcesses
+                            on tbaRow.IdProcess equals tpRow.IdProcess
+                            join buildingRow in registryContext.Buildings
+                            on tbaRow.IdBuilding equals buildingRow.IdBuilding
+                            join streetRow in registryContext.KladrStreets
+                            on buildingRow.IdStreet equals streetRow.IdStreet
+                            select new
+                            {
+                                tpRow.IdProcess,
+                                RentObject = new TenancyRentObject
                                 {
-                                    tpRow.IdProcess,
-                                    Addresses = new Address
+                                    Address = new Address
                                     {
-                                        AddressType = AddressTypes.Premise,
-                                        Id = premiseRow.IdPremises.ToString(),
-                                        Text = streetRow.StreetName + ", д." + buildingRow.House + ", " +
-                                        premiseTypesRow.PremisesTypeShort + premiseRow.PremisesNum
-                                    }
-                                };
-            var subPremises = from tspaRow in tenancySubPremisesAssoc
-                                   join tpRow in tenancyProcesses
-                                   on tspaRow.IdProcess equals tpRow.IdProcess
-                                   join subPremiseRow in registryContext.SubPremises
-                                   on tspaRow.IdSubPremise equals subPremiseRow.IdSubPremises
-                                   join premiseRow in registryContext.Premises
-                                   on subPremiseRow.IdPremises equals premiseRow.IdPremises
-                                   join buildingRow in registryContext.Buildings
-                                   on premiseRow.IdBuilding equals buildingRow.IdBuilding
-                                   join streetRow in registryContext.KladrStreets
-                                   on buildingRow.IdStreet equals streetRow.IdStreet
-                                   join premiseTypesRow in registryContext.PremisesTypes
-                                   on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
-                                   select new
+                                        AddressType = AddressTypes.Building,
+                                        Id = buildingRow.IdBuilding.ToString(),
+                                        IdParents = new Dictionary<string, string>(),
+                                        Text = streetRow.StreetName + ", д." + buildingRow.House
+                                    },
+                                    TotalArea = buildingRow.TotalArea,
+                                    LivingArea = buildingRow.LivingArea,
+                                    RentArea = tbaRow.RentTotalArea
+                                }
+                            };
+            var premises = from tpaRow in tenancyPremisesAssoc
+                           join tpRow in tenancyProcesses
+                           on tpaRow.IdProcess equals tpRow.IdProcess
+                           join premiseRow in registryContext.Premises
+                           on tpaRow.IdPremise equals premiseRow.IdPremises
+                           join buildingRow in registryContext.Buildings
+                           on premiseRow.IdBuilding equals buildingRow.IdBuilding
+                           join streetRow in registryContext.KladrStreets
+                           on buildingRow.IdStreet equals streetRow.IdStreet
+                           join premiseTypesRow in registryContext.PremisesTypes
+                           on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
+                           select new
+                           {
+                               tpRow.IdProcess,
+                               RentObject = new TenancyRentObject
+                               {
+                                   Address = new Address
                                    {
-                                       tpRow.IdProcess,
-                                       Addresses = new Address
+                                       AddressType = AddressTypes.Premise,
+                                       Id = premiseRow.IdPremises.ToString(),
+                                       IdParents = new Dictionary<string, string>
                                        {
-                                           AddressType = AddressTypes.SubPremise,
-                                           Id = subPremiseRow.IdSubPremises.ToString(),
-                                           Text = streetRow.StreetName + ", д." + buildingRow.House + ", " +
-                                           premiseTypesRow.PremisesTypeShort + premiseRow.PremisesNum + ", к." + subPremiseRow.SubPremisesNum
-                                       }
-                                   };
+                                           { AddressTypes.Building.ToString(), buildingRow.IdBuilding.ToString() }
+                                       },
+                                       Text = streetRow.StreetName + ", д." + buildingRow.House + ", " +
+                                        premiseTypesRow.PremisesTypeShort + premiseRow.PremisesNum
+                                   },
+                                   TotalArea = premiseRow.TotalArea,
+                                   LivingArea = premiseRow.LivingArea,
+                                   RentArea = tpaRow.RentTotalArea
+                               }
+                           };
+            var subPremises = from tspaRow in tenancySubPremisesAssoc
+                              join tpRow in tenancyProcesses
+                              on tspaRow.IdProcess equals tpRow.IdProcess
+                              join subPremiseRow in registryContext.SubPremises
+                              on tspaRow.IdSubPremise equals subPremiseRow.IdSubPremises
+                              join premiseRow in registryContext.Premises
+                              on subPremiseRow.IdPremises equals premiseRow.IdPremises
+                              join buildingRow in registryContext.Buildings
+                              on premiseRow.IdBuilding equals buildingRow.IdBuilding
+                              join streetRow in registryContext.KladrStreets
+                              on buildingRow.IdStreet equals streetRow.IdStreet
+                              join premiseTypesRow in registryContext.PremisesTypes
+                              on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
+                              select new
+                              {
+                                  tpRow.IdProcess,
+                                  RentObject = new TenancyRentObject
+                                  {
+                                      Address = new Address
+                                      {
+                                          AddressType = AddressTypes.SubPremise,
+                                          Id = subPremiseRow.IdSubPremises.ToString(),
+                                          IdParents = new Dictionary<string, string>
+                                           {
+                                                { AddressTypes.Building.ToString(), buildingRow.IdBuilding.ToString() },
+                                                { AddressTypes.Premise.ToString(), premiseRow.IdPremises.ToString() }
+                                           },
+                                          Text = streetRow.StreetName + ", д." + buildingRow.House + ", " +
+                                            premiseTypesRow.PremisesTypeShort + premiseRow.PremisesNum + ", к." + subPremiseRow.SubPremisesNum
+                                      },
+                                      TotalArea = subPremiseRow.TotalArea,
+                                      LivingArea = subPremiseRow.LivingArea,
+                                      RentArea = tspaRow.RentTotalArea
+                                  }
+                              };
             var result = buildings.Union(premises).Union(subPremises).ToList().GroupBy(r => r.IdProcess)
-                .Select(r => new { IdProcess = r.Key, Addresses = r.Select(v => v.Addresses) })
-                .ToDictionary(v => v.IdProcess, v => v.Addresses.ToList());
+                .Select(r => new { IdProcess = r.Key, RentObject = r.Select(v => v.RentObject) })
+                .ToDictionary(v => v.IdProcess, v => v.RentObject.ToList());
             return result;
+        }
+
+        private Dictionary<int, List<Address>> GetAddresses(IEnumerable<TenancyProcess> tenancyProcesses)
+        {
+            return GetRentObjects(tenancyProcesses).ToDictionary(r => r.Key, r => r.Value.Select(v => v.Address).ToList());
         }
 
         private IQueryable<TenancyProcess> GetQueryFilter(IQueryable<TenancyProcess> query, TenancyProcessesFilter filterOptions)

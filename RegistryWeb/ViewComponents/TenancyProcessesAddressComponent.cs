@@ -27,27 +27,26 @@ namespace RegistryWeb.ViewComponents
             }
             if (address.AddressType == AddressTypes.Premise)
             {
-                var addr = new Address();
-                addr.AddressType = AddressTypes.Building;
-                addr.Id = registryContext.Premises
-                    .SingleOrDefault(p => p.IdPremises == id)
-                    .IdBuilding
-                    .ToString();
+                var addr = new Address
+                {
+                    AddressType = AddressTypes.Building,
+                    Id = address.IdParents[AddressTypes.Building.ToString()]
+                };
                 model.Add(addr);
                 model.Add(address);
             }
             if (address.AddressType == AddressTypes.SubPremise)
             {
-                var premise = registryContext.SubPremises
-                    .Include(sp => sp.IdPremisesNavigation)
-                    .SingleOrDefault(sp => sp.IdSubPremises == id)
-                    .IdPremisesNavigation;
-                var addr_b = new Address();
-                addr_b.AddressType = AddressTypes.Building;
-                addr_b.Id = premise.IdBuilding.ToString();
-                var addr_p = new Address();
-                addr_p.AddressType = AddressTypes.Premise;
-                addr_p.Id = premise.IdPremises.ToString();
+                var addr_b = new Address
+                {
+                    AddressType = AddressTypes.Building,
+                    Id = address.IdParents[AddressTypes.Building.ToString()]
+                };
+                var addr_p = new Address
+                {
+                    AddressType = AddressTypes.Premise,
+                    Id = address.IdParents[AddressTypes.Premise.ToString()]
+                };
                 model.Add(addr_b);
                 model.Add(addr_p);
                 model.Add(address);

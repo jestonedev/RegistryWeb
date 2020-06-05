@@ -9,6 +9,9 @@ namespace RegistryWeb.Models
     {
         public AddressTypes AddressType { get; set; }
         public string Id { get; set; }
+
+        public Dictionary<string, string> IdParents { get; set; }
+
         public string Text { get; set; }
     }
 }

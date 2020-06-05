@@ -110,7 +110,7 @@
                             <div class="btn-group" role="group" aria-label="Панель доступа">
                                 <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                                 <div class="dropdown-menu dropdown-menu-right but text-center" aria-labelledby="toolsBtn_@item.IdProcess">
-                                    <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
+                                    <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
                                        asp-controller="TenancyProcesses" asp-action="Details" asp-route-idProcess="@item.IdProcess" asp-route-action="Details"></a>
                                     <a class="btn btn-outline-dark oi oi-pencil disabled" title="Изменить" aria-label="Изменить"
                                        asp-controller="TenancyProcesses" asp-action="Edit" asp-route-idProcess="@item.IdProcess" asp-route-action="Edit"></a>
@@ -122,7 +122,7 @@
                     }
                     else
                     {
-                        <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
+                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
                            asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdProcess" asp-route-action="Details"></a>
                     }
                 </td>

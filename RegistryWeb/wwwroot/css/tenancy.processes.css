@@ -41,3 +41,8 @@
 .table td.rr-sub-rent-table-untill-dismissal-checkbox {
     vertical-align: middle;
 }
+
+.tenancy-agreement-content {
+    overflow: hidden;
+    resize: none;
+}
