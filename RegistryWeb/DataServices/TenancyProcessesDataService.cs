@@ -101,8 +101,9 @@ namespace RegistryWeb.DataServices
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
             if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
                 viewModel.PageOptions.CurrentPage = 1;
-            viewModel.TenancyProcesses = GetQueryPage(query, viewModel.PageOptions).ToList();
-            viewModel.RentObjects = GetRentObjects(viewModel.TenancyProcesses);
+            query = GetQueryPage(query, viewModel.PageOptions);
+            viewModel.TenancyProcesses = query.ToList();
+            viewModel.RentObjects = GetRentObjects(query);
             return viewModel;
         }
 
@@ -138,7 +139,7 @@ namespace RegistryWeb.DataServices
                                         AddressType = AddressTypes.Building,
                                         Id = buildingRow.IdBuilding.ToString(),
                                         IdParents = new Dictionary<string, string>(),
-                                        Text = streetRow.StreetName + ", д." + buildingRow.House
+                                        Text = string.Concat(streetRow.StreetName, ", д.", buildingRow.House)
                                     },
                                     TotalArea = buildingRow.TotalArea,
                                     LivingArea = buildingRow.LivingArea,
@@ -169,8 +170,8 @@ namespace RegistryWeb.DataServices
                                        {
                                            { AddressTypes.Building.ToString(), buildingRow.IdBuilding.ToString() }
                                        },
-                                       Text = streetRow.StreetName + ", д." + buildingRow.House + ", " +
-                                        premiseTypesRow.PremisesTypeShort + premiseRow.PremisesNum
+                                       Text = string.Concat(streetRow.StreetName, ", д.", buildingRow.House, ", ",
+                                        premiseTypesRow.PremisesTypeShort, premiseRow.PremisesNum)
                                    },
                                    TotalArea = premiseRow.TotalArea,
                                    LivingArea = premiseRow.LivingArea,
@@ -204,8 +205,8 @@ namespace RegistryWeb.DataServices
                                                 { AddressTypes.Building.ToString(), buildingRow.IdBuilding.ToString() },
                                                 { AddressTypes.Premise.ToString(), premiseRow.IdPremises.ToString() }
                                            },
-                                          Text = streetRow.StreetName + ", д." + buildingRow.House + ", " +
-                                            premiseTypesRow.PremisesTypeShort + premiseRow.PremisesNum + ", к." + subPremiseRow.SubPremisesNum
+                                          Text = string.Concat(streetRow.StreetName, ", д.", buildingRow.House, ", ",
+                                            premiseTypesRow.PremisesTypeShort, premiseRow.PremisesNum, ", к." + subPremiseRow.SubPremisesNum)
                                       },
                                       TotalArea = subPremiseRow.TotalArea,
                                       LivingArea = subPremiseRow.LivingArea,
