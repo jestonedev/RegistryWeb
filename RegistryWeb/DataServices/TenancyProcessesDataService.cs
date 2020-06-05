@@ -102,7 +102,7 @@ namespace RegistryWeb.DataServices
             if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
                 viewModel.PageOptions.CurrentPage = 1;
             viewModel.TenancyProcesses = GetQueryPage(query, viewModel.PageOptions).ToList();
-            viewModel.Addresses = GetAddresses(viewModel.TenancyProcesses);
+            viewModel.RentObjects = GetRentObjects(viewModel.TenancyProcesses);
             return viewModel;
         }
 
@@ -212,15 +212,79 @@ namespace RegistryWeb.DataServices
                                       RentArea = tspaRow.RentTotalArea
                                   }
                               };
-            var result = buildings.Union(premises).Union(subPremises).ToList().GroupBy(r => r.IdProcess)
+
+            var objects = buildings.Union(premises).Union(subPremises).ToList();
+
+            var payments = (from paymentsRow in registryContext.TenancyPayments
+                            join tpRow in tenancyProcesses
+                            on paymentsRow.IdProcess equals tpRow.IdProcess
+                            where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
+                                tpRow.TenancyPersons.Any()
+                            select paymentsRow).ToList();
+
+            var paymentsAfter28082019Buildings = (from tbaRow in tenancyBuildingsAssoc
+                                                  join tpRow in tenancyProcesses
+                                                  on tbaRow.IdProcess equals tpRow.IdProcess
+                                                  join paymentRow in registryContext.TenancyPaymentsAfter28082019
+                                                  on tbaRow.IdBuilding equals paymentRow.IdBuilding
+                                                  where paymentRow.IdPremises == null &&
+                                                    (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
+                                                    tpRow.TenancyPersons.Any()
+                                                  select paymentRow).Distinct().ToList();
+            var paymentsAfter28082019Premises = (from tpaRow in tenancyPremisesAssoc
+                                                 join tpRow in tenancyProcesses
+                                                 on tpaRow.IdProcess equals tpRow.IdProcess
+                                                 join paymentRow in registryContext.TenancyPaymentsAfter28082019
+                                                 on tpaRow.IdPremise equals paymentRow.IdPremises
+                                                 where paymentRow.IdSubPremises == null &&
+                                                    (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
+                                                    tpRow.TenancyPersons.Any()
+                                                 select paymentRow).Distinct().ToList();
+            var paymentsAfter28082019SubPremises = (from tspaRow in tenancySubPremisesAssoc
+                                                    join tpRow in tenancyProcesses
+                                                    on tspaRow.IdProcess equals tpRow.IdProcess
+                                                    join paymentRow in registryContext.TenancyPaymentsAfter28082019
+                                                    on tspaRow.IdSubPremise equals paymentRow.IdSubPremises
+                                                    where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
+                                                        tpRow.TenancyPersons.Any()
+                                                    select paymentRow).Distinct().ToList();
+
+            foreach(var obj in objects)
+            {
+                if (obj.RentObject.Address.AddressType == AddressTypes.Building)
+                {
+                    obj.RentObject.Payment = 
+                        payments.Where(r => r.IdBuilding.ToString() == obj.RentObject.Address.Id && r.IdPremises == null).Sum(r => r.Payment);
+                    obj.RentObject.PaymentAfter28082019 =
+                       Math.Round(paymentsAfter28082019Buildings.Where(
+                            r => r.IdBuilding.ToString() == obj.RentObject.Address.Id && r.IdPremises == null
+                            ).Sum(r => (r.K1 + r.K2 + r.K3) / 3 * r.KC * r.Hb * (decimal)r.RentArea), 2);
+                }
+                if (obj.RentObject.Address.AddressType == AddressTypes.Premise)
+                {
+                    obj.RentObject.Payment =
+                        payments.Where(r => r.IdPremises.ToString() == obj.RentObject.Address.Id && r.IdSubPremises == null).Sum(r => r.Payment);
+                    obj.RentObject.PaymentAfter28082019 =
+                        Math.Round(paymentsAfter28082019Premises.Where(
+                            r => r.IdPremises.ToString() == obj.RentObject.Address.Id && r.IdSubPremises == null
+                            ).Sum(r => (r.K1 + r.K2 + r.K3) / 3 * r.KC * r.Hb * (decimal)r.RentArea), 2);
+                }
+                if (obj.RentObject.Address.AddressType == AddressTypes.SubPremise)
+                {
+                    obj.RentObject.Payment =
+                        payments.Where(r => r.IdSubPremises.ToString() == obj.RentObject.Address.Id).Sum(r => r.Payment);
+                    obj.RentObject.PaymentAfter28082019 =
+                        Math.Round(paymentsAfter28082019SubPremises.Where(
+                            r => r.IdSubPremises.ToString() == obj.RentObject.Address.Id
+                            ).Sum(r => (r.K1 + r.K2 + r.K3) / 3 * r.KC * r.Hb * (decimal)r.RentArea), 2);
+                }
+            }
+
+            var result = 
+                objects.GroupBy(r => r.IdProcess)
                 .Select(r => new { IdProcess = r.Key, RentObject = r.Select(v => v.RentObject) })
                 .ToDictionary(v => v.IdProcess, v => v.RentObject.ToList());
             return result;
-        }
-
-        private Dictionary<int, List<Address>> GetAddresses(IEnumerable<TenancyProcess> tenancyProcesses)
-        {
-            return GetRentObjects(tenancyProcesses).ToDictionary(r => r.Key, r => r.Value.Select(v => v.Address).ToList());
         }
 
         private IQueryable<TenancyProcess> GetQueryFilter(IQueryable<TenancyProcess> query, TenancyProcessesFilter filterOptions)

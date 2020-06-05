@@ -93,13 +93,22 @@
                             <b>Ордер (пр. док. осн.):</b> № @item.ResidenceWarrantNum @(item.ResidenceWarrantDate.HasValue ? "от " + @item.ResidenceWarrantDate.Value.ToString("dd.MM.yyyy") : "")
                         </div>
                     }
+                    @if (Model.RentObjects.ContainsKey(item.IdProcess))
+                    {
+                        <div>
+                            <b>Размер платы (до 28.08.19):</b> @(Model.RentObjects[item.IdProcess].Sum(r => r.Payment).ToString("#0.00")) руб.
+                        </div>
+                        <div>
+                            <b>Размер платы (после 28.08.19):</b> @(Model.RentObjects[item.IdProcess].Sum(r => r.PaymentAfter28082019).ToString("#0.00")) руб.
+                        </div>
+                    }
                 </td>
                 <td>
-                    @if (Model.Addresses.ContainsKey(item.IdProcess))
+                    @if (Model.RentObjects.ContainsKey(item.IdProcess))
                     {
-                        @foreach (var addr in Model.Addresses[item.IdProcess])
+                        @foreach (var rentObject in Model.RentObjects[item.IdProcess])
                         {
-                            @await Component.InvokeAsync("TenancyProcessesAddressComponent", new { address = addr, idProcess = item.IdProcess })
+                            @await Component.InvokeAsync("TenancyProcessesAddressComponent", new { address = rentObject.Address, idProcess = item.IdProcess })
                         }
                     }
                 </td>
