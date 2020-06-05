@@ -8,7 +8,7 @@ namespace RegistryWeb.ViewModel
     public class TenancyProcessesVM : ListVM<TenancyProcessesFilter>
     {
         public IEnumerable<TenancyProcess> TenancyProcesses { get; set; }
-        public Dictionary<int, List<Address>> Addresses { get; set; }
+        public Dictionary<int, List<TenancyRentObject>> RentObjects { get; set; }
         public IEnumerable<TenancyReasonType> ReasonTypes { get; set; }
         public IEnumerable<RentType> RentTypes { get; set; }
         public IEnumerable<KladrStreet> Streets { get; set; }

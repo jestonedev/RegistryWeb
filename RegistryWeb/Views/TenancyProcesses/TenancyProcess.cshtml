@@ -55,9 +55,13 @@
                 </div>
             </div>
             <div class="row">
-                <div class="form-group col-md-6">
-                    <label>Стоимость найма жилья</label>
-                    <input class="form-control" type="text" value="0,00" />
+                <div class="form-group col-md-3">
+                    <label class="rr-tenancy-label">Размер платы (до 28.08.19)</label>
+                    <input class="form-control" type="text" value="@Model.RentObjects.Select(ro => ro.Payment).Sum()" />
+                </div>
+                <div class="form-group col-md-3">
+                    <label class="rr-tenancy-label">Размер платы (после 28.08.19)</label>
+                    <input class="form-control" type="text" value="@Model.RentObjects.Select(ro => ro.PaymentAfter28082019).Sum()" />
                 </div>
                 <div class="form-group col-md-6">
                     <label asp-for="TenancyProcess.IdExecutor">Исполнитель/составитель</label>
@@ -304,7 +308,7 @@
                                 {
                                     for (var i = 0; i < Model.TenancyProcess.TenancyPersons.Count; i++)
                                     {
-                                        <tr class="tenancy-person-item">
+                                        <tr class="tenancy-person-item @(Model.TenancyProcess.TenancyPersons[i].ExcludeDate.HasValue ? "table-danger" : "")">
                                             <td>
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IdPerson" />
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].PersonalAccount" />
