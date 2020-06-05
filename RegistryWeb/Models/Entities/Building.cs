@@ -13,6 +13,7 @@ namespace RegistryWeb.Models.Entities
             OwnershipBuildingsAssoc = new List<OwnershipBuildingAssoc>();
             Premises = new List<Premise>();
             TenancyBuildingsAssoc = new List<TenancyBuildingAssoc>();
+            BuildingDemolitionActFiles = new List<BuildingDemolitionActFile>();
         }
 
         public int IdBuilding { get; set; }
@@ -101,6 +102,7 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<OwnershipBuildingAssoc> OwnershipBuildingsAssoc { get; set; }
         public virtual IList<Premise> Premises { get; set; }
         public virtual IList<TenancyBuildingAssoc> TenancyBuildingsAssoc { get; set; }
+        public virtual IList<BuildingDemolitionActFile> BuildingDemolitionActFiles { get; set; }
 
         public string GetAddress()
         {

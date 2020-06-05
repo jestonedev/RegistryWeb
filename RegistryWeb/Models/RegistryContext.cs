@@ -49,6 +49,11 @@ namespace RegistryWeb.Models
         public virtual DbSet<OwnershipRightType> OwnershipRightTypes { get; set; }
         public virtual DbSet<OwnershipRight> OwnershipRights { get; set; }
 
+        //Документы
+        public virtual DbSet<ActTypeDocument> ActTypeDocuments { get; set; }
+        public virtual DbSet<ActFile> ActFiles { get; set; }
+        public virtual DbSet<BuildingDemolitionActFile> BuildingDemolitionActFiles { get; set; }
+
         public virtual DbSet<RestrictionBuildingAssoc> RestrictionBuildingsAssoc { get; set; }
         public virtual DbSet<RestrictionPremiseAssoc> RestrictionPremisesAssoc { get; set; }
         public virtual DbSet<RestrictionType> RestrictionTypes { get; set; }
@@ -136,6 +141,10 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new AclUserConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new AclUserPrivilegeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new AclUserRoleConfiguration(nameDatebase));
+
+            modelBuilder.ApplyConfiguration(new ActTypeDocumentConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ActFileConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new BuildingDemolitionActFileConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new PersonalSettingConfiguration(nameDatebase)); 
 
