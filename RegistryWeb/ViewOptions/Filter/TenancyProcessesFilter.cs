@@ -23,10 +23,12 @@ namespace RegistryWeb.ViewOptions.Filter
         public string PremisesNum { get; set; }
         public List<int> IdsOwnershipRightType { get; set; }
         public List<int> IdsObjectState { get; set; }
+        public int? IdPremises { get; set; }
+        public int? IdBuilding { get; set; }
 
         public bool IsEmpty()
         {
-            return IsAddressEmpty() && IsModalEmpty();
+            return IsAddressEmpty() && IsModalEmpty() && IdPremises == null && IdBuilding == null;
         }
 
         public bool IsModalEmpty()

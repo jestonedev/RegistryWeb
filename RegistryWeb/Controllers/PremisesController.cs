@@ -44,7 +44,7 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("PageOptions");
                 HttpContext.Session.Remove("FilterOptions");
             }
-            ViewBag.ObjectStates = dataService.ObjectStates;
+            ViewBag.SecurityService = securityService;
 
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
@@ -83,7 +83,7 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
-            
+
             if (ModelState.IsValid)
             {
                 var bui = rc.Buildings
