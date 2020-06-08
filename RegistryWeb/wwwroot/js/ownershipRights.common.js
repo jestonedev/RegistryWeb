@@ -33,7 +33,7 @@ let getOwnershipRights = function () {
 let getOwnershipRight = function (tr) {
     let fields = tr.find('.field-ownership-right');
     let ownershipRight = {
-        IdOwnershipRight: tr.data('idownershi pright') == "" ? "0" : tr.data('idownershipright'),
+        IdOwnershipRight: tr.data('idownershipright') == "" ? "0" : tr.data('idownershipright'),
         Number: fields[0].value,
         Date: fields[1].value,
         Description: fields[2].value,

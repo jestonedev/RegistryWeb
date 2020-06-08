@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RegistryWeb.Models;
 using RegistryWeb.ViewModel;
 using RegistryWeb.SecurityServices;
+using System;
 
 namespace RegistryWeb.ViewComponents
 {
@@ -18,7 +19,7 @@ namespace RegistryWeb.ViewComponents
             this.securityService = securityService;
         }
 
-        public IViewComponentResult Invoke(int id, string action)
+        public IViewComponentResult Invoke(int id, DateTime? demolishPlanDate, string action)
         {
             var model = new BuildingDemolitionInfoVM();
             model.BuildingDemolitionActFiles =
@@ -26,10 +27,13 @@ namespace RegistryWeb.ViewComponents
                 .Include(b => b.ActTypeDocument)
                 .Where(b => b.IdBuilding == id)
                 .ToList();
+            model.DemolishPlanDate = demolishPlanDate;
             ViewBag.ActTypeDocuments =
                 registryContext.ActTypeDocuments
                 .Where(atd => atd.ActFileType == ActFileTypes.BuildingDemolitionActFile.ToString())
                 .AsNoTracking();
+            ViewBag.IdBuilding = id;
+            ViewBag.Action = action;
             return View("BuildingDemolitionInfo", model);
         }
     }

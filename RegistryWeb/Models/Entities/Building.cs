@@ -84,6 +84,7 @@ namespace RegistryWeb.Models.Entities
         public string MemorialNameOrg { get; set; }
         public DateTime? DateOwnerEmergency { get; set; }
         public DateTime? DemolishedFactDate { get; set; }
+        public DateTime? DemolishedPlanDate { get; set; }
         public string LandCadastralNum { get; set; }
         public DateTime? LandCadastralDate { get; set; }
         [Required]
