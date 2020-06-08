@@ -1,0 +1,54 @@
+﻿@using RegistryWeb.Extensions
+@using RegistryWeb.ViewOptions
+@using RegistryWeb.Models.Entities
+@using RegistryWeb.ViewModel
+@model PremisesVM<Premise>
+
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function ()
+        {
+            $("input").val().replace(",", ".");
+            /*.on('focusout', function ()
+            {
+                $(this)
+            });*/
+        }
+    </script>
+}
+
+
+<div class="form-row">
+    <div class="form-group col r-form-group-label">
+        <label asp-for="@Model.Premise.IdPaymentNavigation.payment">Размер платы от 28.08.2019</label>@*PaymentInfo.payment*@
+        <input asp-for="@Model.Premise.IdPaymentNavigation.payment" type="text" class="form-control" title="Размер платы от 28.08.2019">
+    </div>
+    <div class="form-group col r-form-group-label">
+            <label asp-for="@Model.Premise.IdPaymentNavigation.rent">Размер платы до 28.08.2019</label>
+            <input asp-for="@Model.Premise.IdPaymentNavigation.rent" type="text" class="form-control" title="Размер платы от 28.08.2019">
+        </div>
+</div>
+
+<div class="form-row">
+    <div class="form-group col r-form-group-label">
+        <label asp-for="@Model.Premise.IdPaymentNavigation.Hb">Нб</label>
+        <input asp-for="@Model.Premise.IdPaymentNavigation.Hb" type="text" class="form-control" title="Нб"> @*data-decimals="5" min="0" max="100" step="0.1"*@
+    </div>
+    <div class="form-group col r-form-group-label">
+        <label asp-for="@Model.Premise.IdPaymentNavigation.Kc">Кс</label>
+        <input asp-for="@Model.Premise.IdPaymentNavigation.Kc" type="text" class="form-control" title="Кс">
+    </div>
+    <div class="form-group col r-form-group-label">
+        <label asp-for="@Model.Premise.IdPaymentNavigation.K1">К1</label>
+        <input asp-for="@Model.Premise.IdPaymentNavigation.K1" type="text" class="form-control" title="К1">
+    </div>
+    <div class="form-group col r-form-group-label">
+        <label asp-for="@Model.Premise.IdPaymentNavigation.K2">К2</label>
+        <input asp-for="@Model.Premise.IdPaymentNavigation.K2" type="text" class="form-control" title="К2">
+    </div>
+    <div class="form-group col r-form-group-label">
+        <label asp-for="@Model.Premise.IdPaymentNavigation.K3">К3</label>
+        <input asp-for="@Model.Premise.IdPaymentNavigation.K3" type="text" class="form-control" title="К3">
+    </div>
+
+</div>

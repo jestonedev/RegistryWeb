@@ -25,6 +25,7 @@ namespace RegistryWeb.ViewModel
         
         public List<Premise> Premises { get; set; }
         public Premise Premise { get; set; }
+        public PremisesPaymentInfo PaymentInfo { get; set; }
 
         public List<PremiseWithFunType> PremisesWFT { get; set; }
         public PremiseWithFunType PremiseWFT { get; set; }

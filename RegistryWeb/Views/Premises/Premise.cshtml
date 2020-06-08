@@ -40,6 +40,12 @@
     <script type="text/javascript">
         $(document).ready(function ()
         {
+            $("input#tarea").on('change', function () {
+                $(this).val().replace(",", ".");
+            });
+            
+            $("input#tarea").val().replace(",", ".");
+
             $("#selectstreet").on('change', function ()
             {
                 var idStreet = $(this).val() || 0;
@@ -157,10 +163,6 @@
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
                     <label asp-for="@Model.Premise.RegDate">Дата включения в РМИ</label>
-
-                    @*<input type="date" class="form-control" asp-for="@Model.Premise.RegDate" value="@Model.Premise.RegDate.ToString("yyyy-MM-dd")" title="Дата включения в РМИ">
-            <span asp-validation-for="@Model.Premise.RegDate" class="error-message"></span>*@
-
                     <div class="input-group date">
                         <input value="@Model.Premise.RegDate.ToString("dd.MM.yyyy")" class="form-control" />
                         <div class="input-group-addon show-date-picker-btn">
@@ -168,91 +170,31 @@
                         </div>
                     </div>
 
-                </div>
-                <br />
-                @*
-        <div class="form-group col r-form-group-label">
-            <label asp-for="@Model.Premise.RegDate">Размер платы от 28.08.2019</label>
-            <input type="text" class="form-control" value="0.00" title="Размер платы от 28.08.2019">
-        </div>*@
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Payment">Размер платы до 28.08.2019</label>
-                    <input type="text" class="form-control" asp-for="@Model.Payment" title="Размер платы от 28.08.2019">
-                </div>
+                    @*<input type="date" class="form-control" asp-for="@Model.Premise.RegDate" value="@Model.Premise.RegDate.ToString("yyyy-MM-dd")" title="Дата включения в РМИ">
+                <span asp-validation-for="@Model.Premise.RegDate" class="error-message"></span>*@
 
+                </div>
             </div>
 
-            @*
-                <div class="form-row">
-                    <div class="form-group col r-form-group-label">
-                        <label asp-for="@Model.Premise.CadastralNum">Нб</label>
-                    </div>
-                    <div class="form-group col r-form-group-label">
-                        <label asp-for="@Model.Premise.Account">Кс</label>
-                    </div>
-                    <div class="form-group col r-form-group-label">
-                        <label asp-for="@Model.Premise.CadastralCost">К1</label>
-                    </div>
-                    <div class="form-group col r-form-group-label">
-                        <label asp-for="@Model.Premise.BalanceCost">К2</label>
-                    </div>
-                    <div class="form-group col r-form-group-label">
-                        <label asp-for="@Model.Premise.BalanceCost">К3</label>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group col r-form-group-label">
-                        <input type="number" data-decimals="5" min="0" max="100" step="0.1" class="form-control" value="46.47689" title="Нб">
-                    </div>
-                    <div class="form-group col r-form-group-label">
-                        <input type="number" data-decimals="2" min="0" max="9" step="0.1" class="form-control" value="0.18" title="Кс">
-                    </div>
-                    <div name="payment">
-
-                    </div>
-
-                <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" value="0.00" title="К1">
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" value="0.00" title="К2">
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <input type="text" class="form-control" value="0.00" title="К3">
-                </div>
-
-                </div>*@
-
+            <partial name="PaymentPartialView" model="@Model">               
 
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
                     <label asp-for="@Model.Premise.CadastralNum">Кадастровый номер</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Premise.Account">Лицевой счёт ФКР</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Premise.CadastralCost">Кадастровая стоимость</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Premise.BalanceCost">Балансовая стоимость</label>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col r-form-group-label">
                     <input type="text" class="form-control" asp-for="@Model.Premise.CadastralNum" title="Кадастровый номер">
                 </div>
                 <div class="form-group col r-form-group-label">
+                    <label asp-for="@Model.Premise.Account">Лицевой счёт ФКР</label>
                     <input type="text" class="form-control" asp-for="@Model.Premise.Account" title="Лицевой счёт ФКР">
                     <span asp-validation-for="@Model.Premise.Account" class="error-message"></span>
                 </div>
                 <div class="form-group col r-form-group-label">
+                    <label asp-for="@Model.Premise.CadastralCost">Кадастровая стоимость</label>
                     <input type="text" class="form-control" id="ccost" asp-for="@Model.Premise.CadastralCost" title="Кадастровая стоимость">@*data-decimals="2" min="0" max="100000000" step="0.1"*@
                     <span asp-validation-for="@Model.Premise.CadastralCost" class="error-message-ccost"></span>
                 </div>
                 <div class="form-group col r-form-group-label">
+                    <label asp-for="@Model.Premise.BalanceCost">Балансовая стоимость</label>
                     <input type="text" class="form-control" id="bcost" asp-for="@Model.Premise.BalanceCost" title="Балансовая стоимость">
                     <span asp-validation-for="@Model.Premise.BalanceCost" class="error-message-bcost"></span>
                 </div>
@@ -261,20 +203,6 @@
             <div class="form-row">
                 <div class="form-group col r-form-group-label">
                     <label asp-for="@Model.Premise.IdState">Текущее состояние</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Premise.IdPremisesCommentNavigation.PremisesCommentText">Примечание</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Premise.IdPremisesDoorKeysNavigation.LocationOfKeys">Ключи</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Premise.FundsPremisesAssoc">Текущий фонд</label>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col r-form-group-label">
                     @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
                     {
                         <input type="text" class="form-control" asp-for="@Model.Premise.IdStateNavigation.StateFemale" title="Текущее состояние">
@@ -288,6 +216,7 @@
                     <span asp-validation-for="@Model.Premise.IdState" class="error-message"></span>
                 </div>
                 <div class="form-group col r-form-group-label">
+                    <label asp-for="@Model.Premise.IdPremisesCommentNavigation.PremisesCommentText">Примечание</label>
                     @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
                     {
                         <input type="text" class="form-control" asp-for="@Model.Premise.IdPremisesCommentNavigation.PremisesCommentText" title="Примечание">
@@ -301,6 +230,7 @@
                     <span asp-validation-for="@Model.Premise.IdPremisesComment" class="error-message"></span>
                 </div>
                 <div class="form-group col r-form-group-label">
+                    <label asp-for="@Model.Premise.IdPremisesDoorKeysNavigation.LocationOfKeys">Ключи</label>
                     @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
                     {
                         <input type="text" class="form-control" asp-for="@Model.Premise.IdPremisesDoorKeysNavigation.LocationOfKeys" title="Ключи">
@@ -314,8 +244,9 @@
                     <span asp-validation-for="@Model.Premise.IdPremisesDoorKeys" class="error-message"></span>
                 </div>
                 <div class="form-group col r-form-group-label">
+                    <label asp-for="@Model.Premise.FundsPremisesAssoc">Текущий фонд</label>
                     @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
-                    { @*переписать asp-for*@
+                    {@*переписать asp-for*@
                         <input type="text" class="form-control" value="@GetTypeFund(Model.Premise)" title="Текущий фонд" readonly><!--*asp-for=""-->
                     }
                     else
@@ -340,10 +271,10 @@
                     <span asp-validation-for="@Model.Premise.LivingArea" class="error-message-larea"></span>
                 </div>
                 @*
-                    <div class="form-group col r-form-group-label">
-                        <label asp-for="@Model.Premise.LivingArea">Площадь мун. комнат</label>
-                        <input type="number" data-decimals="2" min="0" max="1000" step="0.1" class="form-control" value="0" title="Площадь мун. комнат">
-                    </div>
+        <div class="form-group col r-form-group-label">
+            <label asp-for="@Model.Premise.LivingArea">Площадь мун. комнат</label>
+            <input type="number" data-decimals="2" min="0" max="1000" step="0.1" class="form-control" value="0" title="Площадь мун. комнат">
+        </div>
                 *@
                 <div class="form-group col r-form-group-label">
                     <label asp-for="@Model.Premise.Height">Высота помещения</label>
@@ -384,7 +315,7 @@
                 </div>
             }
 
-        </div>
+</div>
     </div>
 </form>
 

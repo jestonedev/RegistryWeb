@@ -181,6 +181,14 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .WithMany(p => p.Premises)
                 .HasForeignKey(d => d.IdPremises);
 
+            builder.HasOne(d => d.IdPaymentNavigation)
+                .WithMany(p => p.Premises)
+                .HasForeignKey(d => d.IdPremises);
+
+            //builder.HasOne(d => d.IdRentPaymentNavigation)
+            //    .WithMany(p => p.Premises)
+            //    .HasForeignKey(d => d.IdPremises);
+
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);
         }

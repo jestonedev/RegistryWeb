@@ -151,6 +151,7 @@ namespace RegistryWeb.DataServices
                     .ThenInclude(b => b.IdStreetNavigation)
                 .Include(p => p.IdStateNavigation)        //Текущее состояние объекта
                 .Include(p => p.IdRentPremiseNavigation)
+                //.Include(p => p.IdRentPaymentNavigation)
                 .Include(p => p.IdPremisesTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
                 .Include(p => p.FundsPremisesAssoc)
                     .ThenInclude(fpa => fpa.IdFundNavigation)
@@ -420,9 +421,20 @@ namespace RegistryWeb.DataServices
                 CommentList = new SelectList(registryContext.PremisesComments, "IdPremisesComment", "PremisesCommentText"),
                 OwnershipRightTypesList = new SelectList(registryContext.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName"),
                 RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName"),
-                Payment=registryContext.RentPremises.FirstOrDefault(rp=>rp.IdPremises==premise.IdPremises).Payment
+                Payment = registryContext.RentPremises.FirstOrDefault(rp => rp.IdPremises == premise.IdPremises).Payment,
+                PaymentInfo = new PremisesPaymentInfo(),
             };
 
+            premisesVM.Premise.IdPaymentNavigation = new PremisesPaymentInfo();
+            premisesVM.Premise.IdPaymentNavigation.payment = premisesVM.Payment;
+            premisesVM.Premise.IdPaymentNavigation.CPc = registryContext.TotalAreaAvgCosts.ToList()[0].Cost;
+            premisesVM.Premise.IdPaymentNavigation.Hb = premisesVM.Premise.IdPaymentNavigation.CPc * 0.001;
+            premisesVM.Premise.IdPaymentNavigation.Kc = 0.18;
+            premisesVM.Premise.IdPaymentNavigation.K1 = ((premise.IdBuildingNavigation.IdStructureType == 1 ? 1.3 : 0.8) + (new int?[] { 4, 9 }.Contains(premise.IdBuildingNavigation.IdStructureType) ? 1 : premise.IdBuildingNavigation.IdStructureType == 3 ? 0.9 : new int?[] { 2, 5, 6, 8 }.Contains(premise.IdBuildingNavigation.IdStructureType) ? 0.8 : 0)) / 2;
+            premisesVM.Premise.IdPaymentNavigation.K2 = premise.IdBuildingNavigation.HotWaterSupply.Value && premise.IdBuildingNavigation.Plumbing.Value && premise.IdBuildingNavigation.Canalization.Value && premise.IdPremisesType == 1 ? 1.3 : premise.IdBuildingNavigation.Plumbing.Value && premise.IdBuildingNavigation.Canalization.Value && premise.IdPremisesType == 1 ? 1 : 0.8;
+            premisesVM.Premise.IdPaymentNavigation.K3 = premise.IdBuildingNavigation.IdStreet.StartsWith("380000050410") || premise.IdBuildingNavigation.IdStreet.StartsWith("380000050230") || premise.IdBuildingNavigation.IdStreet.StartsWith("380000050180") ? 1 : premise.IdBuildingNavigation.IdStreet.StartsWith("380000050130") ? 0.9 : 0.8;
+            premisesVM.Premise.IdPaymentNavigation.rent=(premisesVM.Premise.IdPaymentNavigation.K1 + premisesVM.Premise.IdPaymentNavigation.K2 + premisesVM.Premise.IdPaymentNavigation.K3)/3 * premisesVM.Premise.IdPaymentNavigation.Hb * premisesVM.Premise.IdPaymentNavigation.Kc * registryContext.RentObjectsAreaAndCategories.SingleOrDefault(r=>r.IdPremises==premisesVM.Premise.IdPremises).RentArea;
+            
             return premisesVM;
             //return View("Premise", premisesVM);
         }

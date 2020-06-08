@@ -62,6 +62,8 @@ namespace RegistryWeb.Models.Entities
 
         public virtual Building IdBuildingNavigation { get; set; }
         public virtual RentPremise IdRentPremiseNavigation { get; set; }
+        //public virtual RentObjectsAreaAndCategory IdRentPaymentNavigation { get; set; }
+        public virtual PremisesPaymentInfo IdPaymentNavigation { get; set; }
         public virtual PremisesComment IdPremisesCommentNavigation { get; set; }
         public virtual PremisesKind IdPremisesKindNavigation { get; set; }
         public virtual PremisesType IdPremisesTypeNavigation { get; set; }
