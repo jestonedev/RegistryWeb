@@ -1,4 +1,20 @@
-﻿#premisecreate{
+﻿.p-table > thead > tr > th a.sort {
+    color: #888;
+}
+
+.p-table > thead > tr > th a.sort:hover {
+    color: black;
+}
+
+.p-table > thead > tr > th a.sort.p-sorted {
+    color: #007bff;
+}
+
+.p-table > thead > tr > th a.sort.p-sorted:hover {
+    color: #0056b3;
+}
+
+#premisecreate{
     height: 30px;
 }
 
