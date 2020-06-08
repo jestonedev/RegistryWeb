@@ -25,13 +25,22 @@ namespace RegistryWeb.ViewModel
         
         public List<Premise> Premises { get; set; }
         public Premise Premise { get; set; }
+        public PremisesPaymentInfo PaymentInfo { get; set; }
 
+        public List<PremiseWithFunType> PremisesWFT { get; set; }
+        public PremiseWithFunType PremiseWFT { get; set; }
+
+        public List<Premise> PremiseWithFundType { get; set; }
         /*public IEnumerable<OwnershipRight> OwnershipRights { get; set; }
         public IEnumerable<PremisesType> PremisesTypes { get; set; }
         public IEnumerable<ObjectState> ObjectStates { get; set; }
         public IEnumerable<FundType> FundTypes { get; set; }*/
 
+        public int IdFundType { get; set; }
+        public double Payment { get; set; }
+
         public SelectList KladrStreetsList { get; set; }
+        public SelectList RentList { get; set; }
         public SelectList HeatingTypesList { get; set; }
         public SelectList StructureTypesList { get; set; }
         public SelectList ObjectStatesList { get; set; }

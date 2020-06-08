@@ -8,7 +8,6 @@ namespace RegistryWeb.ViewOptions.Filter
     public class PremisesListFilter : FilterAddressOptions
     {
         //public string Street { get; set; }
-
         public int? IdObjectState { get; set; }
         public int? IdLocationDoorKeys { get; set; }
         public int? IdComment { get; set; }
@@ -25,7 +24,6 @@ namespace RegistryWeb.ViewOptions.Filter
         public string RestrictionNum { get; set; }
         public int? IdRestrictionType { get; set; }
         public int? NumberOwnershipPremiseType { get; set; }
-
         public string NumberOwnershipRight { get; set; }
         public DateTime? StDateOwnershipRight { get; set; }
         public DateTime? EndDateOwnershipRight { get; set; }

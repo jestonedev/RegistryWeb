@@ -25,10 +25,12 @@
                     <th class="align-middle">Тип ограничения</th>
                     <th class="align-middle">Планируемая дата переселения</th>
                     <th class="align-middle">Планируемая дата сноса</th>
+
                     @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                     {
                         <th class="align-middle" width="110"></th>
                     }
+
                 </tr>
             </thead>
             <tbody id="ownershipRights" data-addresstype="@ViewBag.Address.AddressType" data-id="@ViewBag.Address.Id" data-action="@ViewBag.Action">

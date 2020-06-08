@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.Models.SqlViews;
 using RegistryWeb.Models.IEntityTypeConfiguration;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace RegistryWeb.Models
 {
@@ -48,6 +50,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<OwnershipPremiseAssoc> OwnershipPremisesAssoc { get; set; }
         public virtual DbSet<OwnershipRightType> OwnershipRightTypes { get; set; }
         public virtual DbSet<OwnershipRight> OwnershipRights { get; set; }
+        public virtual DbSet<TotalAreaAvgCost> TotalAreaAvgCosts { get; set; }
 
         public virtual DbSet<RestrictionBuildingAssoc> RestrictionBuildingsAssoc { get; set; }
         public virtual DbSet<RestrictionPremiseAssoc> RestrictionPremisesAssoc { get; set; }
@@ -109,9 +112,13 @@ namespace RegistryWeb.Models
 
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
+        public virtual DbSet<RentPremise> RentPremises { get; set; }
         public virtual DbSet<TenancyActiveProcess> TenancyActiveProcesses { get; set; }
         public virtual DbSet<TenancyPayment> TenancyPayments { get; set; }
         public virtual DbSet<TenancyPaymentAfter28082019> TenancyPaymentsAfter28082019 { get; set; }
+
+        public virtual DbQuery<RentObjectsAreaAndCategory> RentObjectsAreaAndCategories { get; set; }
+
         public virtual DbSet<OwnerActiveProcess> OwnerActiveProcesses { get; set; }
         public virtual DbSet<BuildingOwnershipRightCurrent> BuildingsOwnershipRightCurrent { get; set; }
 
@@ -121,11 +128,18 @@ namespace RegistryWeb.Models
 
             //SQL-Views
             modelBuilder.ApplyConfiguration(new KladrStreetConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new RentPremiseConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyActiveProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyPaymentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyPaymentAfter28082019Configuration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerActiveProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new BuildingOwnershipRightCurrentConfiguration(nameDatebase));
+
+            modelBuilder.Query<RentObjectsAreaAndCategory>().ToView("v_rent_objects_area_and_categories");
+
+
+            // modelBuilder.Query<RentObjectsAreaAndCategory>().ToView("v_rent_objects_area_and_categories");
+            //modelBuilder.ApplyConfiguration(new RentObjectsAreaAndCategoryConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new ChangeLogConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LogOwnerProcessConfiguration(nameDatebase));
@@ -159,6 +173,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new StructureTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new StructureTypeOverlapConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new GovernmentDecreeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TotalAreaAvgCostConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new OwnershipRightConfiguration(nameDatebase));            
             modelBuilder.ApplyConfiguration(new OwnershipBuildingAssocConfiguration(nameDatebase));

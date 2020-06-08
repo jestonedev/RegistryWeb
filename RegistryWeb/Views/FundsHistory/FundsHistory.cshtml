@@ -23,12 +23,12 @@
                     @{i = i + 1;}
                     <td id="@(i)fund">@item.ProtocolNumber</td>
                     <td id="@(i)fund">@(item.ProtocolDate != null ? item.ProtocolDate.Value.ToString("dd.MM.yyyy") : "")</td>
-                    <td id="@(i)fund">@item.IdFundTypeNavigation.FundTypeName</td>                    
+                    <td id="@(i)fund">@item.IdFundTypeNavigation.FundTypeName</td>
                     <td>
-                        <a class="btn btn-outline-dark oi oi-pencil" id="edit" title="Изменить" aria-label="Изменить" 
-                            asp-action="Edit" asp-route-idFund="@item.IdFund" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise"></a>
-                        <a class="btn btn-danger oi oi-x" id="delete" title="Удалить" aria-label="Удалить" 
-                            asp-action="Delete" asp-route-idFund="@item.IdFund" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise"></a>
+                        <a class="btn btn-outline-dark oi oi-pencil" id="edit" title="Изменить" aria-label="Изменить"
+                           asp-action="Edit" asp-route-idFund="@item.IdFund" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise"></a>
+                        <a class="btn btn-danger oi oi-x" id="delete" title="Удалить" aria-label="Удалить"
+                           asp-action="Delete" asp-route-idFund="@item.IdFund" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise"></a>
                     </td>
                 </tr>
             }

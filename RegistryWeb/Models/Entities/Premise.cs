@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace RegistryWeb.Models.Entities
 {
@@ -16,23 +17,43 @@ namespace RegistryWeb.Models.Entities
         }
 
         public int IdPremises { get; set; }
+        [Required(ErrorMessage = "Выберете здание")]
         public int IdBuilding { get; set; }
-        public int IdState { get; set; }
+        [Required(ErrorMessage = "Выберете состояние помещения")]
+        public int IdState { get; set; }        
         public int IdPremisesKind { get; set; }
+        [Required(ErrorMessage = "Выберете тип помещения")]
         public int IdPremisesType { get; set; }
+        [Required(ErrorMessage = "Выберете примечание")]
         public int IdPremisesComment { get; set; }
+        [Required(ErrorMessage = "Выберете местонахождение ключей")]
         public int IdPremisesDoorKeys { get; set; }
+        [Required(ErrorMessage = "Укажите номер помещения")]
         public string PremisesNum { get; set; }
+        //[Required(ErrorMessage = "Укажите этаж")]
+        [Range(-1, Double.MaxValue, ErrorMessage = "Количество материала не может быть меньше нуля")]
         public short Floor { get; set; }
+        //[Required(ErrorMessage = "Укажите количество комнат")]
+        [Range(-1, Double.MaxValue, ErrorMessage = "Количество материала не может быть меньше нуля")]
         public short NumRooms { get; set; }
+        //[Required(ErrorMessage = "Укажите количество койко-мест")]
+        [Range(-1, Double.MaxValue, ErrorMessage = "Количество материала не может быть меньше нуля")]
         public short NumBeds { get; set; }
+        [Required(ErrorMessage = "Укажите общую площадь")]
         public double TotalArea { get; set; }
+        [Required(ErrorMessage = "Укажите жилую площадь")]
         public double LivingArea { get; set; }
+        [Required(ErrorMessage = "Укажите высоту помещения")]
         public double Height { get; set; }
         public string CadastralNum { get; set; }
+        [Required(ErrorMessage = "Укажите кадастровую стоимость")]
+        [Range(-1, Double.MaxValue, ErrorMessage = "Количество материала не может быть меньше нуля")]
         public decimal CadastralCost { get; set; }
+        [Required(ErrorMessage = "Укажите балансовую стоимость")]
+        [Range(-1, Double.MaxValue, ErrorMessage = "Количество материала не может быть меньше нуля")]
         public decimal BalanceCost { get; set; }
         public string Description { get; set; }
+        [Required(ErrorMessage = "Укажите дату внесения в реестр")]
         public DateTime RegDate { get; set; }
         public byte IsMemorial { get; set; }
         public string Account { get; set; }
@@ -40,6 +61,9 @@ namespace RegistryWeb.Models.Entities
         public byte Deleted { get; set; }
 
         public virtual Building IdBuildingNavigation { get; set; }
+        public virtual RentPremise IdRentPremiseNavigation { get; set; }
+        //public virtual RentObjectsAreaAndCategory IdRentPaymentNavigation { get; set; }
+        public virtual PremisesPaymentInfo IdPaymentNavigation { get; set; }
         public virtual PremisesComment IdPremisesCommentNavigation { get; set; }
         public virtual PremisesKind IdPremisesKindNavigation { get; set; }
         public virtual PremisesType IdPremisesTypeNavigation { get; set; }

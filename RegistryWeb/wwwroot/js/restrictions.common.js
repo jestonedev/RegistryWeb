@@ -26,23 +26,41 @@ $(function () {
 
     $('#restrictionsTable').hide();
     $('#restrictionsToggle').click(restrictionsToggle);
+
+    var action = $('form').data('action');
+    var addressType = $('form').data('addresstype');
+    var tr = $("#restrictions tr").first();
+    //trTemplate = tr[0].outerHTML;
+
+    $('#restrictionAdd').click(function (e) {
+        var id = $('.restrictionBlock').length;
+        //$('#restrictions').append(trTemplate);
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/Premises/RestrictionAdd',
+            data: { id: id, addressType: "Premise", action: action },
+            success: function (data) {
+                $('#restrictions').append(data);
+                //refreshValidation();
+            }
+        });
+        e.preventDefault();
+    });
+
+
+   /* var action = $('form').data('action');
+    $('#restrictionAdd').click(function (e) {
+        var id = $('.restrictionBlock').length;
+        var addressType = $(this).data('addressType');
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/Premises/RestrictionAdd',
+            data: { type: addressType, id: id, action: action },
+            success: function (data) {
+                $('#restrictions').append(data);
+                refreshValidation();
+            }
+        });
+        e.preventDefault();
+    });*/
 });
-
-/*var refreshValidation = function () {
-    var form = $("#r-restriction-form")
-        .removeData("validator")
-        .removeData("unobtrusiveValidation");
-    $.validator.unobtrusive.parse(form);
-    form.validate();
-}*/
-
-
-/*
-var restrictionDelete = function (owner) {
-    if ($('.restrictionBlock').length == 1)
-        return;
-    var iOwner = +owner.attr('data-i-restriction');//Преобразование iOwner к числу
-    owner.remove();
-    //recalculationIdOwner(iOwner);
-}
-*/

@@ -4,6 +4,8 @@
 @using RegistryWeb.Extensions;
 @model FundHistoryVM;
 @{
+    Context.Session.Set("Controller", "FundsHistory");
+    Context.Session.Set("Action", "Index");
     ViewData["Title"] = "История фонда";
     var controller = Context.Session.Get<string>("Controller");
     var action = Context.Session.Get<string>("Action");
