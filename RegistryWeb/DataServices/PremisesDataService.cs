@@ -25,7 +25,7 @@ namespace RegistryWeb.DataServices
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
             viewModel.KladrStreetsList = new SelectList(KladrStreets, "IdStreet", "StreetName");            
-            viewModel.PremisesTypeAsNum = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesTypeAsNum");
+            viewModel.PremisesTypesList = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesType");
             viewModel.HeatingTypesList = new SelectList(HeatingTypes, "IdHeatingType", "IdHeatingType1");
             viewModel.StructureTypesList = new SelectList(StructureTypes, "IdStructureType", "StructureTypeName");
             viewModel.ObjectStatesList = new SelectList(ObjectStates, "IdState", "StateFemale");
@@ -54,7 +54,8 @@ namespace RegistryWeb.DataServices
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
             if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
                 viewModel.PageOptions.CurrentPage = 1;
-            viewModel.Premises = GetQueryPage(query, viewModel.PageOptions);
+            viewModel.Premises = GetQueryPage(query, viewModel.PageOptions).ToList();
+            viewModel.PaymentsInfo = GetPaymentInfo(viewModel.Premises);
             return viewModel;
         }
 
@@ -64,7 +65,6 @@ namespace RegistryWeb.DataServices
                 .Include(p => p.IdBuildingNavigation)
                     .ThenInclude(b => b.IdStreetNavigation)
                 .Include(p => p.IdStateNavigation)        //Текущее состояние объекта
-                .Include(p => p.IdRentPremiseNavigation)
                 .Include(p => p.IdPremisesTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
                 .Include(p => p.FundsPremisesAssoc)
                     .ThenInclude(fpa => fpa.IdFundNavigation)
@@ -350,37 +350,34 @@ namespace RegistryWeb.DataServices
             return result.ToList();
         }
 
-        internal void Create(Premise premise, int IdFundType)
+        internal void Create(Premise premise, int? IdFundType)
         {
-            premise.IdBuildingNavigation = null;
-            premise.IdPremisesCommentNavigation = null;
-            premise.IdPremisesDoorKeysNavigation = null;
-            premise.IdPremisesKindNavigation = null;
-            premise.IdPremisesTypeNavigation = null;
+            if (IdFundType != null)
+            {
+                var fund = new FundHistory
+                {
+                    IdFundType = IdFundType.Value
+                };
+
+                var fpa = new FundPremiseAssoc
+                {
+                    IdFundNavigation = fund,
+                    IdPremisesNavigation = premise
+                };
+                premise.FundsPremisesAssoc = new List<FundPremiseAssoc>
+                {
+                    fpa
+                };
+            }
             registryContext.Premises.Add(premise);
-
-            /*
-            //добавление записей в FundHistory и FundPremiseAssoc
-            var funfh = new FundHistory
-            {
-                IdFundType = IdFundType
-            };
-            registryContext.FundsHistory.Add(funfh);
-
-            var fpa = new FundPremiseAssoc
-            {
-                IdFund= funfh.IdFund,
-                IdPremises=premise.IdPremises
-            };
-            registryContext.FundsPremisesAssoc.Add(fpa);
-            */
-
             registryContext.SaveChanges();            
         }
 
         internal Premise CreatePremise()
         {
-            var premise = new Premise();
+            var premise = new Premise {
+                RegDate = new DateTime(1999, 10, 29)
+            };
             premise.FundsPremisesAssoc = new List<FundPremiseAssoc>() { new FundPremiseAssoc() };
             premise.OwnerPremisesAssoc = new List<OwnerPremiseAssoc>() { new OwnerPremiseAssoc() };
             premise.TenancyPremisesAssoc = new List<TenancyPremiseAssoc>() { new TenancyPremiseAssoc() };
@@ -397,7 +394,6 @@ namespace RegistryWeb.DataServices
 
         public PremisesVM<Premise> GetPremiseView(Premise premise, [CallerMemberName]string action = "")
         {
-            //ViewBag.Action = action;
             var premisesVM = new PremisesVM<Premise>()
             {
                 Premise = premise,
@@ -406,123 +402,178 @@ namespace RegistryWeb.DataServices
                 StructureTypesList = new SelectList(StructureTypes, "IdStructureType", "StructureTypeName"),
                 ObjectStatesList = new SelectList(ObjectStates, "IdState", "StateFemale"),
                 PremisesTypesList = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesTypeName"),
-                PremisesTypeAsNum = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesTypeAsNum"),
                 FundTypesList = new SelectList(registryContext.FundTypes, "IdFundType", "FundTypeName"),
                 LocationKeysList = new SelectList(registryContext.PremisesDoorKeys, "IdPremisesDoorKeys", "LocationOfKeys"),
                 CommentList = new SelectList(registryContext.PremisesComments, "IdPremisesComment", "PremisesCommentText"),
                 OwnershipRightTypesList = new SelectList(registryContext.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName"),
                 RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName"),
-                Payment = registryContext.RentPremises.FirstOrDefault(rp => rp.IdPremises == premise.IdPremises)?.Payment ?? 0,
-                PaymentInfo = new PremisesPaymentInfo(),
+                IdFundType = (from fhRow in registryContext.FundsHistory
+                             join fpa in registryContext.FundsPremisesAssoc
+                             on fhRow.IdFund equals fpa.IdFund
+                             where fpa.IdPremises == premise.IdPremises && fhRow.ExcludeRestrictionDate == null
+                             orderby fpa.IdFund descending
+                             select fhRow.IdFundType).FirstOrDefault()
             };
 
-            if (action == "Details")
+            if (action == "Details" || action == "Delete")
             {
-                premisesVM.Premise.IdPaymentNavigation = new PremisesPaymentInfo();
-                premisesVM.Premise.IdPaymentNavigation.payment = premisesVM.Payment;
-                premisesVM.Premise.IdPaymentNavigation.CPc = registryContext.TotalAreaAvgCosts.ToList()[0].Cost;
-                premisesVM.Premise.IdPaymentNavigation.Hb = premisesVM.Premise.IdPaymentNavigation.CPc * 0.001;
-                premisesVM.Premise.IdPaymentNavigation.Kc = 0.18;
-                premisesVM.Premise.IdPaymentNavigation.K1 = ((premise.IdBuildingNavigation.IdStructureType == 1 ? 1.3 : 0.8) + (new int?[] { 4, 9 }.Contains(premise.IdBuildingNavigation.IdStructureType) ? 1 : premise.IdBuildingNavigation.IdStructureType == 3 ? 0.9 : new int?[] { 2, 5, 6, 8 }.Contains(premise.IdBuildingNavigation.IdStructureType) ? 0.8 : 0)) / 2;
-                premisesVM.Premise.IdPaymentNavigation.K2 = premise.IdBuildingNavigation.HotWaterSupply.Value && premise.IdBuildingNavigation.Plumbing.Value && premise.IdBuildingNavigation.Canalization.Value && premise.IdPremisesType == 1 ? 1.3 : premise.IdBuildingNavigation.Plumbing.Value && premise.IdBuildingNavigation.Canalization.Value && premise.IdPremisesType == 1 ? 1 : 0.8;
-                premisesVM.Premise.IdPaymentNavigation.K3 = premise.IdBuildingNavigation.IdStreet.StartsWith("380000050410") || premise.IdBuildingNavigation.IdStreet.StartsWith("380000050230") || premise.IdBuildingNavigation.IdStreet.StartsWith("380000050180") ? 1 : premise.IdBuildingNavigation.IdStreet.StartsWith("380000050130") ? 0.9 : 0.8;
-                premisesVM.Premise.IdPaymentNavigation.rent = (premisesVM.Premise.IdPaymentNavigation.K1 + premisesVM.Premise.IdPaymentNavigation.K2 + premisesVM.Premise.IdPaymentNavigation.K3) / 3 * premisesVM.Premise.IdPaymentNavigation.Hb * premisesVM.Premise.IdPaymentNavigation.Kc * registryContext.RentObjectsAreaAndCategories.SingleOrDefault(r => r.IdPremises == premisesVM.Premise.IdPremises).RentArea;
+                premisesVM.PaymentsInfo = GetPaymentInfo(new List<Premise> { premisesVM.Premise });
             }
 
             return premisesVM;
-            //return View("Premise", premisesVM);
+        }
+
+        private List<PaymentsInfo> GetPaymentInfo(List<Premise> premises)
+        {
+            var ids = premises.Select(p => p.IdPremises).ToList();
+            var paymentsInfo = new List<PaymentsInfo>();
+            var paymentsPremises = (from paymentRow in registryContext.TenancyPayments
+                           join tpRow in registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons)
+                           on paymentRow.IdProcess equals tpRow.IdProcess
+                           where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
+                               paymentRow.IdSubPremises == null &&
+                               paymentRow.IdPremises != null && ids.Contains(paymentRow.IdPremises.Value)
+                           select new {
+                               paymentRow.IdPremises,
+                               personCnt = tpRow.TenancyPersons.Count(),
+                               paymentRow.Payment }).ToList();
+
+            var paymentsSubPremises = (from paymentRow in registryContext.TenancyPayments
+                                    join tpRow in registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons)
+                                    on paymentRow.IdProcess equals tpRow.IdProcess
+                                    where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
+                                        paymentRow.IdSubPremises != null &&
+                                        ids.Contains(paymentRow.IdPremises.Value)
+                                    select new
+                                    {
+                                        paymentRow.IdSubPremises,
+                                        personCnt = tpRow.TenancyPersons.Count(),
+                                        paymentRow.Payment
+                                    }).ToList();
+
+            var prePaymentsAfter28082019Premises = (from tpaRow in registryContext.TenancyPremisesAssoc
+                                                    join paymentRow in registryContext.TenancyPaymentsAfter28082019
+                                                    on tpaRow.IdPremise equals paymentRow.IdPremises
+                                                    where paymentRow.IdSubPremises == null &&
+                                                          paymentRow.IdPremises != null && ids.Contains(paymentRow.IdPremises.Value)
+                                                    select new
+                                                    {
+                                                        tpaRow.IdProcess,
+                                                        paymentRow.IdPremises,
+                                                        paymentRow.Hb,
+                                                        paymentRow.K1,
+                                                        paymentRow.K2,
+                                                        paymentRow.K3,
+                                                        paymentRow.KC,
+                                                        paymentRow.RentArea
+                                                    }).Distinct().ToList();
+
+            var paymentsAfter28082019Premises = (from paymentRow in prePaymentsAfter28082019Premises
+                                                 join tpRow in registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons)
+                                                     on paymentRow.IdProcess equals tpRow.IdProcess
+                                                 where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
+                                                   tpRow.TenancyPersons.Any()
+                                                 select paymentRow).Distinct().ToList();
+
+            var prePaymentsAfter28082019SubPremises = (from tspaRow in registryContext.TenancySubPremisesAssoc
+                                                       join paymentRow in registryContext.TenancyPaymentsAfter28082019
+                                                    on tspaRow.IdSubPremise equals paymentRow.IdSubPremises
+                                                       where paymentRow.IdPremises != null && ids.Contains(paymentRow.IdPremises.Value)
+                                                       select new
+                                                       {
+                                                           tspaRow.IdProcess,
+                                                           paymentRow.IdSubPremises,
+                                                           paymentRow.Hb,
+                                                           paymentRow.K1,
+                                                           paymentRow.K2,
+                                                           paymentRow.K3,
+                                                           paymentRow.KC,
+                                                           paymentRow.RentArea
+                                                       }).Distinct().ToList();
+
+            var paymentsAfter28082019SubPremises = (from paymentRow in prePaymentsAfter28082019SubPremises
+                                                    join tpRow in registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons)
+                                                        on paymentRow.IdProcess equals tpRow.IdProcess
+                                                    where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
+                                                      tpRow.TenancyPersons.Any()
+                                                    select paymentRow).Distinct().ToList();
+
+            foreach(var payment in paymentsPremises)
+            {
+                if (payment.IdPremises == null) continue;
+                if (payment.personCnt == 0) continue;
+                paymentsInfo.Add(new PaymentsInfo {
+                    IdObject = payment.IdPremises.Value,
+                    AddresType = AddressTypes.Premise,
+                    Payment = payment.Payment
+                });
+            }
+            foreach (var payment in paymentsSubPremises)
+            {
+                if (payment.IdSubPremises == null) continue;
+                if (payment.personCnt == 0) continue;
+                paymentsInfo.Add(new PaymentsInfo
+                {
+                    IdObject = payment.IdSubPremises.Value,
+                    AddresType = AddressTypes.SubPremise,
+                    Payment = payment.Payment
+                });
+            }
+            foreach (var payment in paymentsAfter28082019Premises)
+            {
+                if (payment.IdPremises == null) continue;
+                var paymentItem = paymentsInfo.FirstOrDefault(p => p.IdObject == payment.IdPremises && p.AddresType == AddressTypes.Premise);
+                if (paymentItem == null)
+                {
+                    paymentItem = new PaymentsInfo {
+                        IdObject = payment.IdPremises.Value,
+                        AddresType = AddressTypes.Premise
+                    };
+                }
+                paymentItem.Nb = payment.Hb;
+                paymentItem.KC = payment.KC;
+                paymentItem.K1 = payment.K1;
+                paymentItem.K2 = payment.K2;
+                paymentItem.K3 = payment.K3;
+                paymentItem.PaymentAfter28082019 = Math.Round((payment.K1 + payment.K2 + payment.K3) / 3 * payment.KC * payment.Hb * (decimal)payment.RentArea, 2);
+            }
+            foreach (var payment in paymentsAfter28082019SubPremises)
+            {
+                if (payment.IdSubPremises == null) continue;
+                var paymentItem = paymentsInfo.FirstOrDefault(p => p.IdObject == payment.IdSubPremises && p.AddresType == AddressTypes.SubPremise);
+                if (paymentItem == null)
+                {
+                    paymentItem = new PaymentsInfo
+                    {
+                        IdObject = payment.IdSubPremises.Value,
+                        AddresType = AddressTypes.SubPremise
+                    };
+                }
+                paymentItem.Nb = payment.Hb;
+                paymentItem.KC = payment.KC;
+                paymentItem.K1 = payment.K1;
+                paymentItem.K2 = payment.K2;
+                paymentItem.K3 = payment.K3;
+                paymentItem.PaymentAfter28082019 = Math.Round((payment.K1 + payment.K2 + payment.K3) / 3 * payment.KC * payment.Hb * (decimal)payment.RentArea, 2);
+            }
+            return paymentsInfo;
         }
 
         internal void Edit(Premise premise)
         {
-            var oldPremise = GetPremise(premise.IdPremises);
-
-            foreach (var fpa in oldPremise.FundsPremisesAssoc)
-            {
-                if (premise.FundsPremisesAssoc.Select(owba => owba.IdPremises).Contains(fpa.IdPremises) == false)
-                {
-                    fpa.Deleted = 1;
-                    premise.FundsPremisesAssoc.Add(fpa);
-                }
-            }
-            foreach (var oba in oldPremise.OwnershipPremisesAssoc)
-            {
-                if (premise.OwnershipPremisesAssoc.Select(owba => owba.IdOwnershipRight).Contains(oba.IdOwnershipRight) == false)
-                {
-                    oba.Deleted = 1;
-                    premise.OwnershipPremisesAssoc.Add(oba);
-                }
-            }
-            foreach (var opa in oldPremise.OwnerPremisesAssoc)
-            {
-                if (premise.OwnerPremisesAssoc.Select(owpa => owpa.IdAssoc).Contains(opa.IdAssoc) == false)
-                {
-                    opa.Deleted = 1;
-                    premise.OwnerPremisesAssoc.Add(opa);
-                }
-            }
-            foreach (var ospa in oldPremise.OwnerPremisesAssoc)
-            {
-                if (premise.OwnerPremisesAssoc.Select(owspa => owspa.IdAssoc).Contains(ospa.IdAssoc) == false)
-                {
-                    ospa.Deleted = 1;
-                    premise.OwnerPremisesAssoc.Add(ospa);
-                }
-            }
-            foreach (var ospa in oldPremise.SubPremises)
-            {
-                if (premise.SubPremises.Select(owspa => owspa.IdPremises).Contains(ospa.IdPremises) == false)
-                {
-                    ospa.Deleted = 1;
-                    premise.SubPremises.Add(ospa);
-                }
-            }
-            foreach (var tpa in oldPremise.TenancyPremisesAssoc)
-            {
-                if (premise.TenancyPremisesAssoc.Select(owspa => owspa.IdPremise).Contains(tpa.IdPremise) == false)
-                {
-                    tpa.Deleted = 1;
-                    premise.TenancyPremisesAssoc.Add(tpa);
-                }
-            }
-
-            premise.IdBuildingNavigation = null;
-            premise.IdPremisesCommentNavigation = null;
-            premise.IdPremisesDoorKeysNavigation = null;
-            premise.IdPremisesKindNavigation = null;
-            premise.IdPremisesTypeNavigation = null;
-
-            //Добавление и радактирование
             registryContext.Premises.Update(premise);
             registryContext.SaveChanges();
         }
 
         internal void Delete(int idPremise)
         {
-            var oldPremise = GetPremise(idPremise);
-
-            oldPremise.Deleted = 1;
-            foreach (var fpa in oldPremise.FundsPremisesAssoc)
+            var premise = registryContext.Premises
+                .FirstOrDefault(op => op.IdPremises == idPremise);
+            if (premise != null)
             {
-                fpa.Deleted = 1;
+                premise.Deleted = 1;
+                registryContext.SaveChanges();
             }
-            foreach (var opa in oldPremise.OwnerPremisesAssoc)
-            {
-                opa.Deleted = 1;
-            }
-            foreach (var ospa in oldPremise.OwnershipPremisesAssoc)
-            {
-                ospa.Deleted = 1;
-            }
-            foreach (var sp in oldPremise.SubPremises)
-            {
-                sp.Deleted = 1;
-            }
-            foreach (var tnpa in oldPremise.TenancyPremisesAssoc)
-            {
-                tnpa.Deleted = 1;
-            }
-            registryContext.SaveChanges();
         }
 
         internal OwnerType GetOwnerType(int idOwnerType)
@@ -531,20 +582,6 @@ namespace RegistryWeb.DataServices
 
         public Premise GetPremise(int idPremise)
         {
-
-            /*var query = GetQuery();
-            return query
-                .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
-                .Include(b => b.IdBuildingNavigation.IdHeatingTypeNavigation)
-                .Include(b => b.IdStateNavigation)                              //Текущее состояние объекта
-                .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
-                .Include(b => b.FundsPremisesAssoc).ThenInclude(fpa => fpa.IdFundNavigation).ThenInclude(fh => fh.IdFundTypeNavigation)
-                .Include(b => b.IdPremisesCommentNavigation).ThenInclude(fpa => fpa.Premises)
-                .Include(b => b.IdPremisesTypeNavigation).ThenInclude(fpa => fpa.Premises)
-                .Include(b => b.IdPremisesDoorKeysNavigation)
-                .SingleOrDefault(b => b.IdPremises == idPremise);
-
-            Where(p=>p.IdPremises== idPremise)*/
             return registryContext.Premises.AsNoTracking()
                 .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
                 .Include(b => b.IdBuildingNavigation.IdHeatingTypeNavigation)
@@ -575,41 +612,6 @@ namespace RegistryWeb.DataServices
         public IEnumerable<HeatingType> HeatingTypes
         {
             get => registryContext.HeatingTypes.AsNoTracking();
-        }
-
-
-
-        /*public IEnumerable<Premise> GetPremises(List<int> ids)
-        {
-            return registryContext.Premises
-                .Include(b => b.IdBuildingNavigation)
-                .Include(b => b.IdStateNavigation)                              //Текущее состояние объекта
-                .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
-                .Include(b => b.FundsPremisesAssoc).ThenInclude(fpa => fpa.IdFundNavigation).ThenInclude(fh => fh.IdFundTypeNavigation)
-                .Include(b => b.IdPremisesCommentNavigation)
-                .Include(b => b.IdPremisesTypeNavigation)
-                .Include(b => b.IdPremisesDoorKeysNavigation)
-                //.Include(b => b.OwnershipPremisesAssoc)
-                .Where(b => ids.Contains(b.IdBuilding));
-        }*/
-
-        private IQueryable<Premise> GetQueryOrderMask(IQueryable<Premise> query, bool compare, OrderOptions orderOptions,
-            Expression<Func<Premise, int>> expression)
-        {
-            //query = GetQueryOrderMask(
-            //    query,
-            //    (string.IsNullOrEmpty(orderOptions.OrderField) || orderOptions.OrderField == "IdPremises"),
-            //    orderOptions,
-            //    p => p.IdPremises
-            //    );
-            if (compare)
-            {
-                if (orderOptions.OrderDirection == OrderDirection.Ascending)
-                    query = query.OrderBy(expression);
-                else
-                    query = query.OrderByDescending(expression);
-            }
-            return query;
         }
 
         public List<Building> GetHouses(string streetId)

@@ -30,14 +30,14 @@ namespace RegistryWeb.Models.Entities
         public int IdPremisesDoorKeys { get; set; }
         [Required(ErrorMessage = "Укажите номер помещения")]
         public string PremisesNum { get; set; }
-        //[Required(ErrorMessage = "Укажите этаж")]
-        [Range(-1, Double.MaxValue, ErrorMessage = "Количество материала не может быть меньше нуля")]
+        [Required(ErrorMessage = "Укажите этаж")]
+        [Range(0, Double.MaxValue, ErrorMessage = "Этаж не может быть меньше нуля")]
         public short Floor { get; set; }
-        //[Required(ErrorMessage = "Укажите количество комнат")]
-        [Range(-1, Double.MaxValue, ErrorMessage = "Количество материала не может быть меньше нуля")]
+        [Required(ErrorMessage = "Укажите количество комнат")]
+        [Range(-1, Double.MaxValue, ErrorMessage = "Количество комнат не может быть меньше нуля")]
         public short NumRooms { get; set; }
-        //[Required(ErrorMessage = "Укажите количество койко-мест")]
-        [Range(-1, Double.MaxValue, ErrorMessage = "Количество материала не может быть меньше нуля")]
+        [Required(ErrorMessage = "Укажите количество койко-мест")]
+        [Range(-1, Double.MaxValue, ErrorMessage = "Количество койко-мест не может быть меньше нуля")]
         public short NumBeds { get; set; }
         [Required(ErrorMessage = "Укажите общую площадь")]
         public double TotalArea { get; set; }
@@ -47,13 +47,13 @@ namespace RegistryWeb.Models.Entities
         public double Height { get; set; }
         public string CadastralNum { get; set; }
         [Required(ErrorMessage = "Укажите кадастровую стоимость")]
-        [Range(-1, Double.MaxValue, ErrorMessage = "Количество материала не может быть меньше нуля")]
+        [Range(0, Double.MaxValue, ErrorMessage = "Кадастровая стоимость должна быть больше нуля")]
         public decimal CadastralCost { get; set; }
         [Required(ErrorMessage = "Укажите балансовую стоимость")]
-        [Range(-1, Double.MaxValue, ErrorMessage = "Количество материала не может быть меньше нуля")]
+        [Range(-1, Double.MaxValue, ErrorMessage = "Балансовая стоимость должна быть больше нуля")]
         public decimal BalanceCost { get; set; }
         public string Description { get; set; }
-        [Required(ErrorMessage = "Укажите дату внесения в реестр")]
+        [Required(ErrorMessage = "Укажите дату включения в РМИ")]
         public DateTime RegDate { get; set; }
         public byte IsMemorial { get; set; }
         public string Account { get; set; }
@@ -61,9 +61,6 @@ namespace RegistryWeb.Models.Entities
         public byte Deleted { get; set; }
 
         public virtual Building IdBuildingNavigation { get; set; }
-        public virtual RentPremise IdRentPremiseNavigation { get; set; }
-        //public virtual RentObjectsAreaAndCategory IdRentPaymentNavigation { get; set; }
-        public virtual PremisesPaymentInfo IdPaymentNavigation { get; set; }
         public virtual PremisesComment IdPremisesCommentNavigation { get; set; }
         public virtual PremisesKind IdPremisesKindNavigation { get; set; }
         public virtual PremisesType IdPremisesTypeNavigation { get; set; }

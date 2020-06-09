@@ -177,13 +177,13 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_premises_states_id_state");
 
-            builder.HasOne(d => d.IdRentPremiseNavigation)
-                .WithMany(p => p.Premises)
-                .HasForeignKey(d => d.IdPremises);
+            //builder.HasOne(d => d.IdRentPremiseNavigation)
+            //    .WithMany(p => p.Premises)
+            //    .HasForeignKey(d => d.IdPremises);
 
-            builder.HasOne(d => d.IdPaymentNavigation)
-                .WithMany(p => p.Premises)
-                .HasForeignKey(d => d.IdPremises);
+            //builder.HasOne(d => d.IdPaymentNavigation)
+            //    .WithMany(p => p.Premises)
+            //    .HasForeignKey(d => d.IdPremises);
 
             //builder.HasOne(d => d.IdRentPaymentNavigation)
             //    .WithMany(p => p.Premises)

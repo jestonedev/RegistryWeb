@@ -14,6 +14,10 @@
     color: #0056b3;
 }
 
+.p-table th {
+    white-space: nowrap;
+}
+
 #premisecreate{
     height: 30px;
 }
@@ -29,16 +33,10 @@
 
 #filterModalShow{
     color: white;
-    /*font-weight: bold;*/
 }
 
-.error-message span {
-    color: crimson;
-    font-weight: bold;
-}
-
-input.input-validation-error {
-    border: 1px solid #b94a48;
+input.input-validation-error, button.input-validation-error {
+    border: 1px solid #dc3545;
 }
 
 .input-group-addon {
@@ -52,4 +50,23 @@ input.input-validation-error {
     background-color: #eee;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+.p-table-low-width-hide-cell {
+    display: none;
+}
+
+@media(min-width: 992px)
+{
+    .p-table-low-width-hide-cell {
+        display: table-cell;
+    }
+}
+
+.rr-premises-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 0.24rem;
 }

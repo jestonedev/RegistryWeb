@@ -52,9 +52,9 @@ namespace RegistryWeb.Controllers
                 viewModel.FilterOptions));
         }
 
-        public IActionResult Details(int? idPremises, string action="")
+        public IActionResult Details(int? idPremises)
         {
-            ViewBag.Action = action;
+            ViewBag.Action = "Details";
             if (idPremises == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
@@ -67,9 +67,9 @@ namespace RegistryWeb.Controllers
             return View("Premise", dataService.GetPremiseView(premise));
         }
 
-        public IActionResult Create(string action = "")
+        public IActionResult Create()
         {
-            ViewBag.Action = action;
+            ViewBag.Action = "Create";
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
 
@@ -77,41 +77,29 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Premise premise, int IdFundType)
+        public IActionResult Create(Premise premise, int? IdFundType)
         {
             if (premise == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal))
                 return View("NotAccess");
 
             if (ModelState.IsValid)
             {
-                var bui = rc.Buildings
-                        .FirstOrDefault(b => b.IdStreet == premise.IdBuildingNavigation.IdStreetNavigation.IdStreet && b.House == premise.IdBuildingNavigation.House);
-                if (bui != null)
-                {
-                    premise.IdBuilding = bui.IdBuilding;
-                    dataService.Create(premise, IdFundType);
-                    return RedirectToAction("Index");
-                }
-                else
-                {
-                    TempData["Error"] = "На указанном адресе отсутствует здание!";
-                    ViewBag.Action = "Create";
-                    //return RedirectToAction("Create");
-                    return View("Premise", dataService.GetPremiseView(premise));
-                }
+                dataService.Create(premise, IdFundType);
+                return RedirectToAction("Details", new { premise.IdPremises });
             }
+            ViewBag.Action = "Create";
             return View("Premise", dataService.GetPremiseView(premise));
         }
 
         [HttpGet]
-        public IActionResult Edit(int? idPremises, string action = "")
+        public IActionResult Edit(int? idPremises)
         {
-            ViewBag.Action = action;
+            ViewBag.Action = "Edit";
             if (idPremises == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal))
                 return View("NotAccess");
 
             var premise = dataService.GetPremise(idPremises.Value);
@@ -126,23 +114,24 @@ namespace RegistryWeb.Controllers
         {
             if (premise == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal))
                 return View("NotAccess");
             if (ModelState.IsValid)
             {
                 dataService.Edit(premise);
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", new { premise.IdPremises });
             }
+            ViewBag.Action = "Edit";
             return View("Premise", dataService.GetPremiseView(dataService.CreatePremise()));
         }
 
         [HttpGet]
-        public IActionResult Delete(int? idPremises, string action = "")
+        public IActionResult Delete(int? idPremises)
         {
-            ViewBag.Action = action;
+            ViewBag.Action = "Delete";
             if (idPremises == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal))
                 return View("NotAccess");
             var premise = dataService.GetPremise(idPremises.Value);
             if (premise == null)
@@ -156,23 +145,11 @@ namespace RegistryWeb.Controllers
         {
             if (premise == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal))
                 return View("NotAccess");
-            if (ModelState.IsValid)
-            {
-                dataService.Delete(premise.IdPremises);
-                return RedirectToAction("Index");
-            }
-            return View("Premise", dataService.GetPremiseView(premise));
+            dataService.Delete(premise.IdPremises);
+            return RedirectToAction("Index");
         }
-
-
-
-        /*public JsonResult GetPaymentForPremiseInfo(int id)
-        {
-            IEnumerable<TenancyPaymentsInfo> payment = dataService.GetPaymentInfo(id);
-            return Json(payment);
-        }*/
 
         [HttpPost]
         public IActionResult RestrictionAdd(int id, AddressTypes type, string action)

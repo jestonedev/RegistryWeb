@@ -2,7 +2,18 @@
     $.extend($.validator.methods, {
         number: function (value, element) {
             return this.optional(element) || /^-?(?:\d+|\d{1,3}(?:[\s\.,]\d{3})+)(?:[\.,]\d+)?$/.test(value);
+        },
+        range: function (value, element, param) {
+            return this.optional(element) || (Number(value.replace(",", ".")) >= param[0] && Number(value.replace(",", ".")) <= param[1]);
         }
+    });
+    $(document).ready(function () {
+        $("[data-val-number]").attr("data-val-number", "Введите числовое значение");
+        var form = $("form")
+            .removeData("validator")
+            .removeData("unobtrusiveValidation");
+        $.validator.unobtrusive.parse(form);
+        form.validate();
     });
 }
 //Формат вызова:

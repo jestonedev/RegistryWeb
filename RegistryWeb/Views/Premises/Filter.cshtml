@@ -24,7 +24,7 @@
         @if (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))
         {
             <div class="form-group col-1">
-                <a class="btn btn-success" title="Добавить" aria-label="Добавить помещение" asp-controller="Premises" asp-action="Create" asp-route-action="Create">&#10010;</a>
+                <a class="btn btn-success" title="Добавить" aria-label="Добавить помещение" asp-controller="Premises" asp-action="Create">&#10010;</a>
             </div>
         }
         <div class="input-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-9" : "col-10") ">
@@ -146,7 +146,7 @@
 
                     <div class="form-row">
                         <div class="form-group col-6">
-                            <input type="date" class="form-control" asp-for="FilterOptions.StDateOwnershipRight" value="@(Model.FilterOptions.StDateOwnershipRight==null ? "" : Model.FilterOptions.StDateOwnershipRight?.ToString("yyyy-MM-dd"))" title="Дата включения в РМИ"> @*DateTime.Now.ToString("yyyy-MM-dd")*@
+                            <input type="date" class="form-control" asp-for="FilterOptions.StDateOwnershipRight" value="@(Model.FilterOptions.StDateOwnershipRight==null ? "" : Model.FilterOptions.StDateOwnershipRight?.ToString("yyyy-MM-dd"))" title="Дата включения в РМИ">
                         </div>
                         <div class="form-group col-6">
                             <input type="date" class="form-control" asp-for="FilterOptions.EndDateOwnershipRight" value="@(Model.FilterOptions.EndDateOwnershipRight==null ? "" : Model.FilterOptions.EndDateOwnershipRight?.ToString("yyyy-MM-dd"))" title="Дата включения в РМИ">
