@@ -1,77 +1,76 @@
 ﻿@model IEnumerable<RegistryWeb.ViewModel.RestrictionVM>;
-@{
-    int i = ViewBag.Id;
-}
-<div class="card">
+<form id="restrictionsForm">
     <script src="~/js/restrictions.common.js" asp-append-version="true"></script>
-    <div class="card-header d-flex justify-content-between">
-        <h3>Реквизиты права собственности</h3>
-        <div class="btn-group" role="group">
-            
-            @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
-            {
-                <a href="#" class="form-control btn btn-success disabled" disabled id="restrictionAdd" title="Добавить реквизит">&#10010;</a>
-            }
-
-            <a href="#" id="restrictionsToggle" class="form-control btn btn-primary" title="Развернуть список реквизитов" style="font-weight:bold;">∨</a>
-        </div>
-    </div>
-    <table class="table table-bordered card-body" id="restrictionsTable" style="margin-bottom:0px;">
-        <thead>
-            <tr data-i-restriction="@i">
-
-                <th class="align-middle">Номер</th>
-                <th class="align-middle">Дата документа</th>
-                <th class="align-middle">Наименование</th>
-                <th class="align-middle">Дата г/р в УЮ</th>
-                <th class="align-middle">Тип права собственности</th>
-                @if (ViewBag.Type == AddressTypes.Premise)
-                {
-                    <th class="align-middle">Принадлежность</th>
-                }
-                
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Список реквизитов права собственности</h3>
+            <div class="btn-group" role="group">
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {
-                    <th class="align-middle"></th>
+                    <a href="#" id="restrictionAdd" class="form-control btn btn-success" title="Добавить реквизит права собственности">&#10010;</a>
                 }
-
-            </tr>
-        </thead>
-        <tbody id="restrictions">
-            @foreach (var item in Model)
-            {
-                <tr class="restrictionBlock">
-                    <input type="hidden" asp-for="@item.IdRestriction" id="Restrictions_@(i)IdRestrictionType" name="Restriction[@i].IdRestrictionType" />
-                    <input type="hidden" asp-for="@item.AddressType" id="Restrictions_@(i)IdAddressType" name="Restriction[@i].IdAddressType" />
-                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.Number" title="@item.Number"></td>
-                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.Date" title="@item.Date" value="@item.Date.ToShortDateString()"></td>
-                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.Description" title="@item.Description"></td>
-                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.DateStateReg" title="@item.DateStateReg" value="@(item.DateStateReg == null ? "" : item.DateStateReg.Value.ToShortDateString())"></td>
-                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.RestrictionTypeNavigation.RestrictionTypeName" title="@item.RestrictionTypeNavigation.RestrictionTypeName"></td>
-                    @if (ViewBag.Type == AddressTypes.Premise)
+                <a href="#" id="restrictionsToggle" class="form-control btn btn-primary" title="Развернуть список реквизитов права собственности" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+        <table class="table table-bordered card-body" id="restrictionsTable" style="margin-bottom:0px;">
+            <thead>
+                <tr>
+                    @if (ViewBag.AddressType == AddressTypes.Premise)
                     {
-                        <td class="align-middle">
-                            @if (item.AddressType == AddressTypes.Building)
-                            {
-                                <input type="text" class="form-control inputforcomponent" value="Здание">
-                            }
-                            @if (item.AddressType == AddressTypes.Premise)
-                            {
-                                <input type="text" class="form-control inputforcomponent" value="Помещение">
-                            }
-                        </td>
+                        <th class="align-middle" title="Принадлежность">Прин-сть</th>
                     }
-                    
+                    <th class="align-middle">Номер</th>
+                    <th class="align-middle">Дата</th>
+                    <th class="align-middle">Наименование</th>
+                    <th class="align-middle">Тип реквизита</th>
+
                     @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                     {
-                        <td class="align-middle">
-                            <a class="btn btn-danger oi oi-x disabled" disabled title="Удалить" aria-label="Удалить"
-                               asp-controller="Premises" asp-action="Delete" asp-route-idpremises="@item.IdRestriction"></a>
-                        </td>
+                        <th class="align-middle" width="110"></th>
                     }
-
                 </tr>
-            }
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody id="restrictions" data-addresstype="@ViewBag.AddressType" data-id="@ViewBag.Id" data-action="@ViewBag.Action">
+                @foreach (var item in Model)
+                {
+                    <tr class="restriction" data-idrestriction="@item.IdRestriction">
+                        @if (ViewBag.AddressType == AddressTypes.Premise)
+                        {
+                            var attachment = item.AddressType == AddressTypes.Building ? "Здание" : item.AddressType == AddressTypes.Premise ? "Помещение" : "";
+                            <td class="align-middle">
+                                @attachment
+                            </td>
+                        }
+                        <td class="align-middle">
+                            <input type="text" disabled class="form-control field-restriction" value="@item.Number" title="@item.Number">
+                        </td>
+                        <td class="align-middle">
+                            <input type="date" disabled class="form-control field-restriction" value="@item.Date.ToString("yyyy-MM-dd")" title="@item.Date.ToString("yyyy-MM-dd")">
+                        </td>
+                        <td class="align-middle"><input type="text" disabled class="form-control field-restriction" value="@item.Description" title="@item.Description"></td>
+                        <td class="align-middle">
+                            <select disabled class="form-control field-restriction" title="@item.RestrictionTypeNavigation.RestrictionTypeName"
+                                    asp-items="@{new SelectList(ViewBag.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName",item.IdRestrictionType)}"></select>
+                        </td>
+                        @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                        {
+                            <td class="align-middle">
+                                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                                    <a class="btn btn-danger oi oi-x" title="Нет" aria-label="Нет"></a>
+                                    <a class="btn btn-success oi oi-check" title="Да" aria-label="Да"></a>
+                                </div>
+                                @if (item.AddressType == ViewBag.AddressType)
+                                {
+                                    <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                                        <a class="btn btn-primary oi oi-pencil" title="Редактировать" aria-label="Редактировать"></a>
+                                        <a class="btn btn-danger oi oi-x delete" title="Удалить" aria-label="Удалить"></a>
+                                    </div>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</form>

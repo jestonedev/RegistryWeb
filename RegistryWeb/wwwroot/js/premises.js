@@ -25,7 +25,8 @@
         $("button[data-id]").removeClass("input-validation-error");
         var isFormValid = $(this).valid();
         var isOwnershipsValid = $("#ownershipRightsForm").valid();
-        if (!isFormValid || !isOwnershipsValid) {
+        var isRestrictionsValid = $("#restrictionsForm").valid();
+        if (!isFormValid || !isOwnershipsValid || !isRestrictionsValid) {
             $(this).find("select").each(function (idx, elem) {
                 var id = $(elem).prop("id");
                 var name = $(elem).prop("name");
@@ -36,16 +37,30 @@
             });
             e.preventDefault();
         } else if ($(this).data("action") === "Create") {
+            var inputTemplate = "<input type='hidden' name='{0}' value='{1}'>";
             var ownerships = CreateOwnershipPremisesAssoc();
             for (var i = 0; i < ownerships.length; i++) {
-                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].IdOwnershipRight' value='" + ownerships[i].IdOwnershipRight + "'>");
-                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].IdPremises' value='" + ownerships[i].IdPremises + "'>");
-                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].OwnershipRightNavigation.Date' value='" + ownerships[i].OwnershipRightNavigation.Date + "'>");
-                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].OwnershipRightNavigation.Number' value='" + ownerships[i].OwnershipRightNavigation.Number + "'>");
-                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].OwnershipRightNavigation.Description' value='" + ownerships[i].OwnershipRightNavigation.Description + "'>");
-                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].OwnershipRightNavigation.IdOwnershipRightType' value='" + ownerships[i].OwnershipRightNavigation.IdOwnershipRightType + "'>");
-                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].OwnershipRightNavigation.DemolishPlanDate' value='" + ownerships[i].OwnershipRightNavigation.DemolishPlanDate + "'>");
-                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].OwnershipRightNavigation.ResettlePlanDate' value='" + ownerships[i].OwnershipRightNavigation.ResettlePlanDate + "'>");
+                var opa = "Premise.OwnershipPremisesAssoc[" + i + "].";
+                var orn = opa + "OwnershipRightNavigation.";
+                $(this).append(inputTemplate.replace('{0}', opa + "IdOwnershipRight").replace('{1}', ownerships[i].IdOwnershipRight));
+                $(this).append(inputTemplate.replace('{0}', opa + "IdPremises").replace('{1}', ownerships[i].IdPremises));
+                $(this).append(inputTemplate.replace('{0}', orn + "Date").replace('{1}', ownerships[i].OwnershipRightNavigation.Date));
+                $(this).append(inputTemplate.replace('{0}', orn + "Number").replace('{1}', ownerships[i].OwnershipRightNavigation.Number));
+                $(this).append(inputTemplate.replace('{0}', orn + "Description").replace('{1}', ownerships[i].OwnershipRightNavigation.Description));
+                $(this).append(inputTemplate.replace('{0}', orn + "IdOwnershipRightType").replace('{1}', ownerships[i].OwnershipRightNavigation.IdOwnershipRightType));
+                $(this).append(inputTemplate.replace('{0}', orn + "DemolishPlanDate").replace('{1}', ownerships[i].OwnershipRightNavigation.DemolishPlanDate));
+                $(this).append(inputTemplate.replace('{0}', orn + "ResettlePlanDate").replace('{1}', ownerships[i].OwnershipRightNavigation.ResettlePlanDate));
+            }
+            var restrictions = CreateRestrictionPremisesAssoc();
+            for (var j = 0; j < restrictions.length; j++) {
+                var rpa = "Premise.RestrictionPremisesAssoc[" + j + "].";
+                var rrn = rpa + "RestrictionNavigation.";
+                $(this).append(inputTemplate.replace('{0}', rpa + "IdRestriction").replace('{1}', restrictions[j].IdRestriction));
+                $(this).append(inputTemplate.replace('{0}', rpa + "IdPremises").replace('{1}', restrictions[j].IdPremises));
+                $(this).append(inputTemplate.replace('{0}', rrn + "Date").replace('{1}', restrictions[j].RestrictionNavigation.Date));
+                $(this).append(inputTemplate.replace('{0}', rrn + "Number").replace('{1}', restrictions[j].RestrictionNavigation.Number));
+                $(this).append(inputTemplate.replace('{0}', rrn + "Description").replace('{1}', restrictions[j].RestrictionNavigation.Description));
+                $(this).append(inputTemplate.replace('{0}', rrn + "IdRestrictionType").replace('{1}', restrictions[j].RestrictionNavigation.IdRestrictionType));
             }
         }
     });

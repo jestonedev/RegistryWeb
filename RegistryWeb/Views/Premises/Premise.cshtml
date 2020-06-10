@@ -271,26 +271,12 @@
                         @await Component.InvokeAsync("SubPremisesComponent", new { id = Model.Premise.IdPremises, action = ViewBag.Action })
                     </div>
                 </div>
-
-                <!--Реквизиты-->
-                <div class="form-row">
-                    <div class="form-group col">
-                        @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.Premise.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
-                    </div>
-                </div>
             }*@
-
-            <!--Ограничения-->
-            @*<div class="form-row">
-                    <div class="form-group col">
-                        @await Component.InvokeAsync("OwnershipRightsComponent", new { id = Model.Premise.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
-                    </div>
-                </div>*@
 
         </div>
     </div>
 </form>
-@* @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.Premise.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action }) *@
+@await Component.InvokeAsync("RestrictionsComponent", new { id = Model.Premise.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
 @await Component.InvokeAsync("OwnershipRightsComponent", new { address = new Address() { Id = Model.Premise.IdPremises.ToString(), AddressType = AddressTypes.Premise }, action = ViewBag.Action })
 
 

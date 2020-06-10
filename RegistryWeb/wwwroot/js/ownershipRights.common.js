@@ -33,7 +33,7 @@ let getOwnershipRights = function () {
 let getOwnershipRight = function (tr) {
     let fields = tr.find('.field-ownership-right');
     let ownershipRight = {
-        IdOwnershipRight: tr.data('idownershi pright') == "" ? "0" : tr.data('idownershipright'),
+        IdOwnershipRight: tr.data('idownershipright') == "" ? "0" : tr.data('idownershipright'),
         Number: fields[0].value,
         Date: fields[1].value,
         Description: fields[2].value,
@@ -131,6 +131,16 @@ let showEditDelPanel = function (tr) {
     let editDelPanel = tr.find('.edit-del-panel');
     let yesNoPanel = tr.find('.yes-no-panel');
     fields.prop('disabled', true);
+    fields.each(function (idx, field) {
+        if (field.tagName === "INPUT" || field.tagName === "TEXTAREA") {
+            $(field).prop("title", $(field).val());
+        } else
+            if (field.tagName === "SELECT") {
+                $(field).prop("title", $(field).find("option[value='" + $(field).val() + "']").text());
+            } else {
+                $(field).prop("title", "");
+            }
+    });
     yesNoPanel.hide();
     editDelPanel.show();
 }

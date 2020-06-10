@@ -30,8 +30,9 @@ namespace RegistryWeb.ViewComponents
             {
                 model = GetPremiseRestrictions(id);
             }
-            ViewBag.Type = type;
+            ViewBag.AddressType = type;
             ViewBag.Action = action;
+            ViewBag.RestrictionTypes = registryContext.RestrictionTypes;
 
             return View("Restrictions", model);
         }

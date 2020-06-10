@@ -11,7 +11,7 @@ namespace RegistryWeb.ViewModel
         public RestrictionVM(Restriction owr, AddressTypes type)
         {
             IdRestriction = owr.IdRestriction;
-            IdRestrictionType = owr.IdRestriction;
+            IdRestrictionType = owr.IdRestrictionType;
             Number = owr.Number;
             Date = owr.Date;
             Description = owr.Description;

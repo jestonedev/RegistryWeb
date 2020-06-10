@@ -11,7 +11,7 @@ namespace RegistryWeb.Models.Entities
             FundsPremisesAssoc = new List<FundPremiseAssoc>();
             OwnerPremisesAssoc = new List<OwnerPremiseAssoc>();
             OwnershipPremisesAssoc = new List<OwnershipPremiseAssoc>();
-            //RestrictionPremisesAssoc = new List<RestrictionpPremiseAssoc>();
+            RestrictionPremisesAssoc = new List<RestrictionPremiseAssoc>();
             SubPremises = new List<SubPremise>();
             TenancyPremisesAssoc = new List<TenancyPremiseAssoc>();
         }
