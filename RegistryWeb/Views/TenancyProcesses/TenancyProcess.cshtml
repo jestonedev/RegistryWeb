@@ -22,7 +22,14 @@
         <div class="card-header d-flex justify-content-between">
             <label class="form-check-label h2">@ViewData["Title"]</label>
             <div class="btn-group" role="group" aria-label="Панель доступа">
-                <a class="form-control btn btn-primary" asp-controller="TenancyProcesses" asp-action="Index" asp-route-isBack="true">Назад</a>
+                @if (@ViewBag.ReturnUrl != null)
+                {
+                    <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+                }
+                else
+                {
+                    <a class="form-control btn btn-primary" asp-controller="TenancyProcesses" asp-action="Index" asp-route-isBack="true">Назад</a>
+                }
                 @if (ViewBag.Action == "Create")
                 {
                     <input type="submit" value="Создать" class="form-control btn btn-success" />

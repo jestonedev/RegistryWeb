@@ -48,9 +48,10 @@ namespace RegistryWeb.Controllers
         }
 
         // GET: TenancyProcesses/Details/5
-        public ActionResult Details(int? idProcess, string action = "")
+        public ActionResult Details(int? idProcess, string returnUrl)
         {
-            ViewBag.Action = action;
+            ViewBag.Action = "Details";
+            ViewBag.ReturnUrl = returnUrl;
             if (idProcess == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.TenancyRead))
