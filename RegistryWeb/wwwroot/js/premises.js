@@ -5,7 +5,7 @@
 
     $("#IdStreet").on('change', function () {
         var idStreet = $(this).val();
-        if (idStreet == "") return;
+        if (idStreet === "") return;
         $.getJSON('/Premises/GetHouse/?' + "streetId=" + idStreet, function (data) {
             var options = "<option></option>";
             $(data).each(function (idx, elem) {
@@ -23,8 +23,9 @@
             $(elem).val($(elem).val().replace(".", ","));
         });
         $("button[data-id]").removeClass("input-validation-error");
-        var isValid = $(this).valid();
-        if (!isValid) {
+        var isFormValid = $(this).valid();
+        var isOwnershipsValid = $("#ownershipRightsForm").valid();
+        if (!isFormValid || !isOwnershipsValid) {
             $(this).find("select").each(function (idx, elem) {
                 var id = $(elem).prop("id");
                 var name = $(elem).prop("name");
@@ -34,6 +35,18 @@
                 }
             });
             e.preventDefault();
+        } else if ($(this).data("action") === "Create") {
+            var ownerships = CreateOwnershipPremisesAssoc();
+            for (var i = 0; i < ownerships.length; i++) {
+                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].IdOwnershipRight' value='" + ownerships[i].IdOwnershipRight + "'>");
+                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].IdPremises' value='" + ownerships[i].IdPremises + "'>");
+                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].OwnershipRightNavigation.Date' value='" + ownerships[i].OwnershipRightNavigation.Date + "'>");
+                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].OwnershipRightNavigation.Number' value='" + ownerships[i].OwnershipRightNavigation.Number + "'>");
+                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].OwnershipRightNavigation.Description' value='" + ownerships[i].OwnershipRightNavigation.Description + "'>");
+                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].OwnershipRightNavigation.IdOwnershipRightType' value='" + ownerships[i].OwnershipRightNavigation.IdOwnershipRightType + "'>");
+                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].OwnershipRightNavigation.DemolishPlanDate' value='" + ownerships[i].OwnershipRightNavigation.DemolishPlanDate + "'>");
+                $(this).append("<input type='hidden' name='Premise.OwnershipPremisesAssoc[" + i + "].OwnershipRightNavigation.ResettlePlanDate' value='" + ownerships[i].OwnershipRightNavigation.ResettlePlanDate + "'>");
+            }
         }
     });
 
@@ -58,4 +71,5 @@
         $('input[type="hidden"]').prop('disabled', false);
         $('input[type="submit"]').prop('disabled', false);
     }
+
 });

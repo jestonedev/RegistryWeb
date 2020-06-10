@@ -93,7 +93,7 @@ namespace RegistryWeb.Controllers
             }
             ViewBag.Action = "Create";
             ViewBag.SecurityService = securityService;
-            return View("Premise", dataService.GetPremiseView(premise));
+            return View("Create", dataService.GetPremiseView(premise));
         }
 
         [HttpGet]
@@ -129,7 +129,7 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = "Edit";
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.SecurityService = securityService;
-            return View("Premise", dataService.GetPremiseView(dataService.CreatePremise()));
+            return View("Edit", dataService.GetPremiseView(dataService.CreatePremise()));
         }
 
         [HttpGet]
@@ -158,16 +158,6 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             dataService.Delete(premise.IdPremises);
             return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        public IActionResult RestrictionAdd(int id, AddressTypes type, string action)
-        {
-            var restriction = new Restriction();
-            restriction.RestrictionTypeNavigation = new RestrictionType();
-            restriction.RestrictionPremisesAssoc = new List<RestrictionPremiseAssoc>() { new RestrictionPremiseAssoc() };
-            restriction.RestrictionBuildingsAssoc = new List<RestrictionBuildingAssoc>() { new RestrictionBuildingAssoc() };
-            return ViewComponent("RestrictionsComponent", new { id, type, action });
         }
 
 
