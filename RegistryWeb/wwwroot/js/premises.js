@@ -4,7 +4,8 @@
     });
 
     $("#IdStreet").on('change', function () {
-        var idStreet = $(this).val() || 0;
+        var idStreet = $(this).val();
+        if (idStreet == "") return;
         $.getJSON('/Premises/GetHouse/?' + "streetId=" + idStreet, function (data) {
             var options = "<option></option>";
             $(data).each(function (idx, elem) {

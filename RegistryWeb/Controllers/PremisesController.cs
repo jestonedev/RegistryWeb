@@ -52,9 +52,11 @@ namespace RegistryWeb.Controllers
                 viewModel.FilterOptions));
         }
 
-        public IActionResult Details(int? idPremises)
+        public IActionResult Details(int? idPremises, string returnUrl)
         {
             ViewBag.Action = "Details";
+            ViewBag.ReturnUrl = returnUrl;
+            ViewBag.SecurityService = securityService;
             if (idPremises == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
@@ -62,7 +64,6 @@ namespace RegistryWeb.Controllers
             var premise = dataService.GetPremise(idPremises.Value);
             if (premise == null)
                 return NotFound();
-            //return dataService.GetPremiseView(premise);
 
             return View("Premise", dataService.GetPremiseView(premise));
         }
@@ -70,6 +71,7 @@ namespace RegistryWeb.Controllers
         public IActionResult Create()
         {
             ViewBag.Action = "Create";
+            ViewBag.SecurityService = securityService;
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
 
@@ -90,13 +92,16 @@ namespace RegistryWeb.Controllers
                 return RedirectToAction("Details", new { premise.IdPremises });
             }
             ViewBag.Action = "Create";
+            ViewBag.SecurityService = securityService;
             return View("Premise", dataService.GetPremiseView(premise));
         }
 
         [HttpGet]
-        public IActionResult Edit(int? idPremises)
+        public IActionResult Edit(int? idPremises, string returnUrl)
         {
             ViewBag.Action = "Edit";
+            ViewBag.ReturnUrl = returnUrl;
+            ViewBag.SecurityService = securityService;
             if (idPremises == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal))
@@ -110,7 +115,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(Premise premise)
+        public IActionResult Edit(Premise premise, string returnUrl)
         {
             if (premise == null)
                 return NotFound();
@@ -122,13 +127,17 @@ namespace RegistryWeb.Controllers
                 return RedirectToAction("Details", new { premise.IdPremises });
             }
             ViewBag.Action = "Edit";
+            ViewBag.ReturnUrl = returnUrl;
+            ViewBag.SecurityService = securityService;
             return View("Premise", dataService.GetPremiseView(dataService.CreatePremise()));
         }
 
         [HttpGet]
-        public IActionResult Delete(int? idPremises)
+        public IActionResult Delete(int? idPremises, string returnUrl)
         {
             ViewBag.Action = "Delete";
+            ViewBag.ReturnUrl = returnUrl;
+            ViewBag.SecurityService = securityService;
             if (idPremises == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal))

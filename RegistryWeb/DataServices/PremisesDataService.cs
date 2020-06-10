@@ -427,31 +427,18 @@ namespace RegistryWeb.DataServices
         {
             var ids = premises.Select(p => p.IdPremises).ToList();
             var paymentsInfo = new List<PaymentsInfo>();
-            var paymentsPremises = (from paymentRow in registryContext.TenancyPayments
-                           join tpRow in registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons)
-                           on paymentRow.IdProcess equals tpRow.IdProcess
-                           where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
-                               paymentRow.IdSubPremises == null &&
-                               paymentRow.IdPremises != null && ids.Contains(paymentRow.IdPremises.Value)
-                           select new {
-                               paymentRow.IdPremises,
-                               personCnt = tpRow.TenancyPersons.Count(),
-                               paymentRow.Payment }).ToList();
+            var payments = (from paymentRow in registryContext.TenancyPayments
+                           where paymentRow.IdPremises != null && ids.Contains(paymentRow.IdPremises.Value)
+                           select paymentRow).ToList();
+            var tenanciesIds = payments.Select(p => p.IdProcess);
 
-            var paymentsSubPremises = (from paymentRow in registryContext.TenancyPayments
-                                    join tpRow in registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons)
-                                    on paymentRow.IdProcess equals tpRow.IdProcess
-                                    where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
-                                        paymentRow.IdSubPremises != null &&
-                                        ids.Contains(paymentRow.IdPremises.Value)
-                                    select new
-                                    {
-                                        paymentRow.IdSubPremises,
-                                        personCnt = tpRow.TenancyPersons.Count(),
-                                        paymentRow.Payment
-                                    }).ToList();
+            var activeTenancies = (from tpRow in registryContext.TenancyProcesses
+                                   join personRow in registryContext.TenancyPersons
+                                   on tpRow.IdProcess equals personRow.IdProcess
+                                    where tenanciesIds.Contains(tpRow.IdProcess) && (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н"))
+                                       select tpRow.IdProcess).Distinct().ToList();
 
-            var prePaymentsAfter28082019Premises = (from tpaRow in registryContext.TenancyPremisesAssoc
+            var prePaymentsAfter28082019Premises = from tpaRow in registryContext.TenancyPremisesAssoc
                                                     join paymentRow in registryContext.TenancyPaymentsAfter28082019
                                                     on tpaRow.IdPremise equals paymentRow.IdPremises
                                                     where paymentRow.IdSubPremises == null &&
@@ -466,7 +453,7 @@ namespace RegistryWeb.DataServices
                                                         paymentRow.K3,
                                                         paymentRow.KC,
                                                         paymentRow.RentArea
-                                                    }).Distinct().ToList();
+                                                    };
 
             var paymentsAfter28082019Premises = (from paymentRow in prePaymentsAfter28082019Premises
                                                  join tpRow in registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons)
@@ -475,7 +462,7 @@ namespace RegistryWeb.DataServices
                                                    tpRow.TenancyPersons.Any()
                                                  select paymentRow).Distinct().ToList();
 
-            var prePaymentsAfter28082019SubPremises = (from tspaRow in registryContext.TenancySubPremisesAssoc
+            var prePaymentsAfter28082019SubPremises = from tspaRow in registryContext.TenancySubPremisesAssoc
                                                        join paymentRow in registryContext.TenancyPaymentsAfter28082019
                                                     on tspaRow.IdSubPremise equals paymentRow.IdSubPremises
                                                        where paymentRow.IdPremises != null && ids.Contains(paymentRow.IdPremises.Value)
@@ -489,7 +476,7 @@ namespace RegistryWeb.DataServices
                                                            paymentRow.K3,
                                                            paymentRow.KC,
                                                            paymentRow.RentArea
-                                                       }).Distinct().ToList();
+                                                       };
 
             var paymentsAfter28082019SubPremises = (from paymentRow in prePaymentsAfter28082019SubPremises
                                                     join tpRow in registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons)
@@ -498,24 +485,15 @@ namespace RegistryWeb.DataServices
                                                       tpRow.TenancyPersons.Any()
                                                     select paymentRow).Distinct().ToList();
 
-            foreach(var payment in paymentsPremises)
+            foreach(var payment in payments)
             {
                 if (payment.IdPremises == null) continue;
-                if (payment.personCnt == 0) continue;
+                var addreType = payment.IdSubPremises == null ? AddressTypes.Premise : AddressTypes.SubPremise;
+                var id = payment.IdSubPremises == null ? payment.IdPremises.Value : payment.IdSubPremises.Value;
+                if (!activeTenancies.Contains(payment.IdProcess)) continue;
                 paymentsInfo.Add(new PaymentsInfo {
-                    IdObject = payment.IdPremises.Value,
-                    AddresType = AddressTypes.Premise,
-                    Payment = payment.Payment
-                });
-            }
-            foreach (var payment in paymentsSubPremises)
-            {
-                if (payment.IdSubPremises == null) continue;
-                if (payment.personCnt == 0) continue;
-                paymentsInfo.Add(new PaymentsInfo
-                {
-                    IdObject = payment.IdSubPremises.Value,
-                    AddresType = AddressTypes.SubPremise,
+                    IdObject = id,
+                    AddresType = addreType,
                     Payment = payment.Payment
                 });
             }
