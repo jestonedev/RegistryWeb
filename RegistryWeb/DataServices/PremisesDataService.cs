@@ -10,15 +10,19 @@ using System;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Runtime.CompilerServices;
+using RegistryWeb.DataHelpers;
+using RegistryWeb.SecurityServices;
 
 namespace RegistryWeb.DataServices
 {
     public class PremisesDataService : ListDataService<PremisesVM<Premise>, PremisesListFilter>
     {
-        private BuildingsDataService BuildingsDataService;
-        public PremisesDataService(RegistryContext rc, BuildingsDataService BuildingsDataService) : base(rc)
+        private BuildingsDataService buildingsDataService;
+        private SecurityService securityService;
+        public PremisesDataService(RegistryContext rc, SecurityService securityService, BuildingsDataService buildingsDataService) : base(rc)
         {
-            this.BuildingsDataService = BuildingsDataService;
+            this.securityService = securityService;
+            this.buildingsDataService = buildingsDataService;
         }
 
         public override PremisesVM<Premise> InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, PremisesListFilter filterOptions)
@@ -68,7 +72,8 @@ namespace RegistryWeb.DataServices
                 .Include(p => p.IdPremisesTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
                 .Include(p => p.FundsPremisesAssoc)
                     .ThenInclude(fpa => fpa.IdFundNavigation)
-                        .ThenInclude(fh => fh.IdFundTypeNavigation);
+                        .ThenInclude(fh => fh.IdFundTypeNavigation)
+                .Include(p => p.SubPremises);
         }
 
         public IQueryable<Premise> GetQuery()
@@ -394,13 +399,20 @@ namespace RegistryWeb.DataServices
 
         public PremisesVM<Premise> GetPremiseView(Premise premise, [CallerMemberName]string action = "")
         {
+            var objectStates = ObjectStates.ToList();
+            if (action == "Create" || action == "Edit")
+            {
+                objectStates = objectStates.Where(r => (
+                securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.MunicipalIds().Contains(r.IdState) ||
+                securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.MunicipalIds().Contains(r.IdState))).ToList();
+            }
             var premisesVM = new PremisesVM<Premise>()
             {
                 Premise = premise,
                 KladrStreetsList = new SelectList(KladrStreets, "IdStreet", "StreetName"),
                 HeatingTypesList = new SelectList(HeatingTypes, "IdHeatingType", "IdHeatingType1"),
                 StructureTypesList = new SelectList(StructureTypes, "IdStructureType", "StructureTypeName"),
-                ObjectStatesList = new SelectList(ObjectStates, "IdState", "StateFemale"),
+                ObjectStatesList = new SelectList(objectStates, "IdState", "StateFemale"),
                 PremisesTypesList = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesTypeName"),
                 FundTypesList = new SelectList(registryContext.FundTypes, "IdFundType", "FundTypeName"),
                 LocationKeysList = new SelectList(registryContext.PremisesDoorKeys, "IdPremisesDoorKeys", "LocationOfKeys"),
@@ -569,6 +581,7 @@ namespace RegistryWeb.DataServices
                 .Include(b => b.IdPremisesCommentNavigation)
                 .Include(b => b.IdPremisesTypeNavigation)
                 .Include(b => b.IdPremisesDoorKeysNavigation)
+                .Include(b => b.SubPremises)
                 .SingleOrDefault(b => b.IdPremises == idPremise);
         }
 
