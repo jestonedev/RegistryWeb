@@ -26,7 +26,8 @@
         var isFormValid = $(this).valid();
         var isOwnershipsValid = $("#ownershipRightsForm").valid();
         var isRestrictionsValid = $("#restrictionsForm").valid();
-        if (!isFormValid || !isOwnershipsValid || !isRestrictionsValid) {
+        var isSubPremisesValid = $("#subpremisesForm").valid();
+        if (!isFormValid || !isOwnershipsValid || !isRestrictionsValid || !isSubPremisesValid) {
             $(this).find("select").each(function (idx, elem) {
                 var id = $(elem).prop("id");
                 var name = $(elem).prop("name");
@@ -61,6 +62,22 @@
                 $(this).append(inputTemplate.replace('{0}', rrn + "Number").replace('{1}', restrictions[j].RestrictionNavigation.Number));
                 $(this).append(inputTemplate.replace('{0}', rrn + "Description").replace('{1}', restrictions[j].RestrictionNavigation.Description));
                 $(this).append(inputTemplate.replace('{0}', rrn + "IdRestrictionType").replace('{1}', restrictions[j].RestrictionNavigation.IdRestrictionType));
+            }
+            var subPremises = getSubPremises();
+            for (var k = 0; k < subPremises.length; k++) {
+                var sp = "Premise.SubPremises[" + k + "].";
+                $(this).append(inputTemplate.replace('{0}', sp + "IdSubPremises").replace('{1}', subPremises[k].IdSubPremises));
+                $(this).append(inputTemplate.replace('{0}', sp + "IdPremises").replace('{1}', subPremises[k].IdPremises));
+                $(this).append(inputTemplate.replace('{0}', sp + "SubPremisesNum").replace('{1}', subPremises[k].SubPremisesNum));
+                $(this).append(inputTemplate.replace('{0}', sp + "TotalArea").replace('{1}', subPremises[k].TotalArea));
+                $(this).append(inputTemplate.replace('{0}', sp + "LivingArea").replace('{1}', subPremises[k].LivingArea));
+                $(this).append(inputTemplate.replace('{0}', sp + "IdState").replace('{1}', subPremises[k].IdState));
+                $(this).append(inputTemplate.replace('{0}', sp + "Description").replace('{1}', subPremises[k].Description));
+                $(this).append(inputTemplate.replace('{0}', sp + "CadastralNum").replace('{1}', subPremises[k].CadastralNum));
+                $(this).append(inputTemplate.replace('{0}', sp + "CadastralCost").replace('{1}', subPremises[k].CadastralCost));
+                $(this).append(inputTemplate.replace('{0}', sp + "BalanceCost").replace('{1}', subPremises[k].BalanceCost));
+                $(this).append(inputTemplate.replace('{0}', sp + "Account").replace('{1}', subPremises[k].Account));
+                $(this).append(inputTemplate.replace('{0}', "SubPremisesFundTypes[" + k + "]").replace('{1}', subPremises[k].IdFundType));
             }
         }
     });

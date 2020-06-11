@@ -427,7 +427,7 @@ namespace RegistryWeb.DataServices
                              select fhRow.IdFundType).FirstOrDefault()
             };
 
-            if (action == "Details" || action == "Delete")
+            if ((action == "Details" || action == "Delete") && securityService.HasPrivilege(Privileges.TenancyRead))
             {
                 premisesVM.PaymentsInfo = GetPaymentInfo(new List<Premise> { premisesVM.Premise });
             }

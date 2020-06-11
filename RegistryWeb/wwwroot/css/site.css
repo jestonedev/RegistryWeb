@@ -72,3 +72,7 @@ legend.r-scheduler-border {
     padding: 0 10px;
     border-bottom: none;
 }
+
+.card {
+    margin-bottom: 10pt;
+}

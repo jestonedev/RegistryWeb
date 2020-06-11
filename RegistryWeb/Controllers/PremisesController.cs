@@ -80,7 +80,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Premise premise, int? IdFundType)
+        public IActionResult Create(Premise premise, int? IdFundType, List<int?> subPremisesFundTypes)
         {
             if (premise == null)
                 return NotFound();
@@ -91,6 +91,30 @@ namespace RegistryWeb.Controllers
 
             if (ModelState.IsValid)
             {
+                if (premise.SubPremises != null)
+                {
+                    for(var i = 0; i < premise.SubPremises.Count; i++)
+                    {
+                        if (subPremisesFundTypes[i] != null)
+                        {
+                            var subPremise = premise.SubPremises[i];
+
+                            var fund = new FundHistory
+                            {
+                                IdFundType = subPremisesFundTypes[i].Value
+                            };
+
+                            var fspa = new FundSubPremiseAssoc
+                            {
+                                IdFundNavigation = fund,
+                                IdSubPremisesNavigation = subPremise
+                            };
+                            
+                            subPremise.FundsSubPremisesAssoc = new List<FundSubPremiseAssoc> { fspa };
+                        }
+                    }
+                }
+
                 dataService.Create(premise, IdFundType);
                 return RedirectToAction("Details", new { premise.IdPremises });
             }

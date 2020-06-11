@@ -199,7 +199,7 @@ let restrictionDeleteClick = function (tr) {
 
 let restrictionNoClick = function (tr) {
     let idRestriction = tr.data('idrestriction');
-    //Отменить изменения внесенные в ограничение
+    //Отменить изменения внесенные в реквизит
     if (Number.isInteger(idRestriction)) {
         $.ajax({
             async: false,
@@ -212,7 +212,7 @@ let restrictionNoClick = function (tr) {
             }
         });
     }
-    //Отменить вставку нового ограничения
+    //Отменить вставку нового реквизита
     else {
         tr.remove();
     }
