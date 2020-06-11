@@ -204,7 +204,7 @@ namespace RegistryWeb.DataServices
                                                 { AddressTypes.Premise.ToString(), premiseRow.IdPremises.ToString() }
                                            },
                                           Text = string.Concat(streetRow.StreetName, ", д.", buildingRow.House, ", ",
-                                            premiseTypesRow.PremisesTypeShort, premiseRow.PremisesNum, ", к." + subPremiseRow.SubPremisesNum)
+                                            premiseTypesRow.PremisesTypeShort, premiseRow.PremisesNum, ", к.", subPremiseRow.SubPremisesNum)
                                       },
                                       TotalArea = subPremiseRow.TotalArea,
                                       LivingArea = subPremiseRow.LivingArea,
@@ -580,7 +580,16 @@ namespace RegistryWeb.DataServices
                          select row).Distinct();
             }
 
-            if(filterOptions.IdPremises != null)
+            if (filterOptions.IdSubPremises != null)
+            {
+                query = (from row in query
+                         join subPremise in tenancySubPremisesAssoc
+                         on row.IdProcess equals subPremise.IdProcess
+                         where subPremise.IdSubPremise == filterOptions.IdSubPremises
+                         select row).Distinct();
+            }
+
+            if (filterOptions.IdPremises != null)
             {
                 query = (from row in query
                  join premise in tenancyPremisesAssoc

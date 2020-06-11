@@ -44,7 +44,7 @@
         <div class="card-header d-flex flex-column flex-md-row">
             <label class="form-check-label h2 col-sm-12 col-md-6 col-xl-7 pl-0">@ViewData["Title"]</label>
             <div class="col-sm-12 col-md-6 col-xl-5 text-md-right pl-0 pr-0 mt-2 mt-md-0">
-                @if (ViewBag.Action != "Create")
+                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
                 {
                     <div class="btn-group" role="group" aria-label="Панель доступа">
                         @if (
