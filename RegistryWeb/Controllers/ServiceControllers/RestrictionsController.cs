@@ -2,10 +2,13 @@
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using RegistryWeb.DataHelpers;
 using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
+using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers.ServiceControllers
 {
@@ -60,7 +63,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         }
 
         [HttpPost]
-        public int YesRestriction(Restriction restriction, Address address)
+        public int SaveRestriction(Restriction restriction, Address address)
         {
             if (restriction == null)
                 return -1;
@@ -107,45 +110,18 @@ namespace RegistryWeb.Controllers.ServiceControllers
         [HttpPost]
         public IActionResult AddRestriction(AddressTypes addressType, string action)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return Json(-1);
-            var restrictionTypes = registryContext.RestrictionTypes.AsNoTracking();
-            var tr = new StringBuilder();
-            tr.Append("<tr class=\"restriction\" data-idrestriction=\"" + Guid.NewGuid() + "\">");
-            if(addressType == AddressTypes.Premise)
-            {
-                tr.Append("<td class=\"align-middle\">Помещение</td>");
-            }
-            tr.Append("<td class=\"align-middle\"><input type=\"text\" class=\"form-control field-restriction\"></td>");
-            tr.Append("<td class=\"align-middle\"><input type=\"date\" class=\"form-control field-restriction\"></td>");
-            tr.Append("<td class=\"align-middle\"><input type=\"text\" class=\"form-control field-restriction\"></td>");
-            //Формирование селекта для restrictionTypes
-            var tdIdRestrictionType = new StringBuilder();
-            tdIdRestrictionType.Append("<td class=\"align-middle\">");
-            tdIdRestrictionType.Append("<select class=\"form-control field-restriction\">");
-            foreach (var rt in restrictionTypes)
-            {
-                tdIdRestrictionType.Append("<option value=\"" + rt.IdRestrictionType + "\">" + rt.RestrictionTypeName + "</option>");
-            }
-            tdIdRestrictionType.Append("</select>");
-            tdIdRestrictionType.Append("</td>");
-            tr.Append(tdIdRestrictionType);
-            //Панели
-            tr.Append("<td class=\"align-middle\">");
-            tr.Append("<div class=\"btn-group yes-no-panel\" role=\"group\" aria-label=\"Панель подтверждения\">");
-            tr.Append("<a class=\"btn btn-danger oi oi-x\" title=\"Нет\" aria-label=\"Нет\"></a>");
-            if (action == "Edit")
-            {
-                tr.Append("<a class=\"btn btn-success oi oi-check\" title=\"Да\" aria-label=\"Да\"></a>");
-                tr.Append("</div>");
-                tr.Append("<div class=\"btn-group edit-del-panel\" role=\"group\" aria-label=\"Панель реадктирования\" style=\"display: none;\">");
-                tr.Append("<a class=\"btn btn-primary oi oi-pencil\" title=\"Редактировать\" aria-label=\"Редактировать\"></a>");
-                tr.Append("<a class=\"btn btn-danger oi oi-x delete\" title=\"Удалить\" aria-label=\"Удалить\"></a>");
-            }
-            tr.Append("</div>");
-            tr.Append("</td>");
-            tr.Append("</tr>");
-            return Content(tr.ToString());
+            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
+                !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
+                return Json(-2);
+
+            var restriction = new Restriction { };
+            var restrictionVM = new RestrictionVM(restriction, addressType);
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.AddressType = addressType;
+            ViewBag.RestrictionTypes = registryContext.RestrictionTypes.ToList();
+
+            return PartialView("~/Views/Shared/Components/RestrictionsComponent/Restriction.cshtml", restrictionVM);
         }
     }
 }

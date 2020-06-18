@@ -76,3 +76,14 @@ legend.r-scheduler-border {
 .card {
     margin-bottom: 10pt;
 }
+
+.rr-restriction-edit-buttons {
+    margin-top: 0;
+}
+
+@media(min-width: 992px)
+{
+    .rr-restriction-edit-buttons {
+        margin-top: 31px;
+    }
+}
