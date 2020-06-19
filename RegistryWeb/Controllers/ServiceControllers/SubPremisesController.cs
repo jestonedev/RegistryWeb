@@ -137,7 +137,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             ViewBag.ObjectStatesList = new SelectList(objectStates, "IdState", "StateFemale");
             ViewBag.FundTypesList = new SelectList(registryContext.FundTypes, "IdFundType", "FundTypeName");
 
-            return PartialView("~/Views/Shared/Components/SubPremisesComponent/SubPremise.cshtml", subPremiseVM);
+            return PartialView("SubPremise", subPremiseVM);
         }
     }
 }

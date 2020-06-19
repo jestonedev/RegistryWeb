@@ -15,7 +15,7 @@
         <ul class="list-group list-group-flush" id="restrictionsList" style="display: none" data-addresstype="@ViewBag.AddressType" data-id="@ViewBag.Id" data-action="@ViewBag.Action">
             @foreach (var item in Model)
             {
-                <partial name="~/Views/Shared/Components/RestrictionsComponent/Restriction.cshtml " model="item" />
+                <partial name="Restriction" model="item" />
             }
         </ul>
     </div>

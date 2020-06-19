@@ -176,7 +176,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             ViewBag.Address = address;
             ViewBag.OwnershipRightTypes = registryContext.OwnershipRightTypes.ToList();
 
-            return PartialView("~/Views/Shared/Components/OwnershipRightsComponent/OwnershipRight.cshtml", owrVM);
+            return PartialView("OwnershipRight", owrVM);
         }
     }
 }

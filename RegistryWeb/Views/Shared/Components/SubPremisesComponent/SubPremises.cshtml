@@ -23,7 +23,7 @@
         <ul class="list-group list-group-flush" id="subPremisesList" data-premise-id="@ViewBag.IdPremises" data-action="@ViewBag.Action" style="display: none">
             @foreach (var item in Model)
             {
-                <partial name="~/Views/Shared/Components/SubPremisesComponent/SubPremise.cshtml " model="item" />
+                <partial name="SubPremise" model="item" />
             }
         </ul>
     </div>
