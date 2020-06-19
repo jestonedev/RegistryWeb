@@ -17,6 +17,9 @@ namespace RegistryWeb.ViewModel
             Description = owr.Description;
             ResettlePlanDate = owr.ResettlePlanDate;
             DemolishPlanDate = owr.DemolishPlanDate;
+            FileOriginName = owr.FileOriginName;
+            FileDisplayName = owr.FileDisplayName;
+            FileMimeType = owr.FileMimeType;
             Deleted = owr.Deleted;
             OwnershipRightTypeNavigation = owr.OwnershipRightTypeNavigation;
             OwnershipBuildingsAssoc = owr.OwnershipBuildingsAssoc;

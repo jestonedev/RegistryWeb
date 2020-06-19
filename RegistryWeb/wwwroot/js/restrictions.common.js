@@ -84,7 +84,7 @@ let initializeVilidationRestriction = function (restrictionElem) {
         .after(getErrorSpanRestrictions(date));
     // Тип документа
     let idRestrictionTypeName = 'IdRestrictionType_' + idRestriction;
-    var restrictionTypeElem = restrictionElem.find("[name^='IdRetrctionType']");
+    var restrictionTypeElem = restrictionElem.find("[name^='IdRestrictionType']");
     restrictionTypeElem.addClass('valid')
         .attr('data-val', 'true')
         .attr('data-val-required', 'Поле "Тип документа" является обязательным')
@@ -110,15 +110,6 @@ let initializeVilidationRestricitons = function () {
     restrictions.each(function () {
         initializeVilidationRestriction($(this));
     });
-};
-
-let showEditDelPanelRetriction = function (restrictionElem) {
-    let fields = restrictionElem.find('input, select, textarea');
-    fields.prop('disabled', true).selectpicker('refresh');
-    let editDelPanel = restrictionElem.find('.edit-del-panel');
-    let yesNoPanel = restrictionElem.find('.yes-no-panel');
-    yesNoPanel.hide();
-    editDelPanel.show();
 };
 
 function deleteRestriction(e) {
@@ -251,7 +242,9 @@ function refreshRestriction(restrictionElem, restriction) {
     restrictionElem.find("[name^='RestrictionNum']").val(restriction.number);
     restrictionElem.find("[name^='RestrictionDate']").val(restriction.date);
     restrictionElem.find("[name^='RestrictionDescription']").val(restriction.description);
-    restrictionElem.find("[name^='IdRetrctionType']").val(restriction.idRestrictionType).selectpicker('refresh');
+    restrictionElem.find("[name^='IdRestrictionType']").val(restriction.idRestrictionType).selectpicker('refresh');
+    restrictionElem.find("[name^='RestrictionFile']").val("");
+    restrictionElem.find("[name^='RestrictionFileRemove']").val(false);
 }
 
 function saveRestriction(e) {
@@ -268,6 +261,8 @@ function saveRestriction(e) {
             success: function (restriction) {
                 if (restriction.idRestriction > 0) {
                     restrictionElem.find("input[name^='IdRestriction']").val(restriction.idRestriction);
+                    restrictionElem.find(".rr-restriction-file-download")
+                        .prop("href", "/Restrictions/DownloadFile/?idRestriction=" + restriction.idRestriction);
                     showRestrictionDownloadFileBtn(restrictionElem, restriction.fileOriginName !== null);
                 }
                 showEditDelPanelRestriction(restrictionElem);

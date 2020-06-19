@@ -77,13 +77,13 @@ legend.r-scheduler-border {
     margin-bottom: 10pt;
 }
 
-.rr-restriction-edit-buttons, .rr-sub-premise-edit-buttons, .rr-sub-premise-nav-buttons {
+.rr-ownership-right-edit-buttons, .rr-restriction-edit-buttons, .rr-sub-premise-edit-buttons, .rr-sub-premise-nav-buttons {
     margin-top: 0;
 }
 
 @media(min-width: 992px)
 {
-    .rr-restriction-edit-buttons {
+    .rr-restriction-edit-buttons, .rr-ownership-right-edit-buttons {
         margin-top: 33px;
     }
 }

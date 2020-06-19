@@ -51,6 +51,9 @@
                 $(this).append(inputTemplate.replace('{0}', orn + "IdOwnershipRightType").replace('{1}', ownerships[i].OwnershipRightNavigation.IdOwnershipRightType));
                 $(this).append(inputTemplate.replace('{0}', orn + "DemolishPlanDate").replace('{1}', ownerships[i].OwnershipRightNavigation.DemolishPlanDate));
                 $(this).append(inputTemplate.replace('{0}', orn + "ResettlePlanDate").replace('{1}', ownerships[i].OwnershipRightNavigation.ResettlePlanDate));
+                var owrFile = $(ownerships[i].OwnershipRightNavigation.OwnershipRightFile).clone();
+                owrFile.attr("name", "OwnershipRightFiles[" + i + "]");
+                $(this).append(owrFile);
             }
             var restrictions = CreateRestrictionPremisesAssoc();
             for (var j = 0; j < restrictions.length; j++) {

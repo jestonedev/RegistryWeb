@@ -21,6 +21,9 @@ namespace RegistryWeb.Models.Entities
         public string Description { get; set; }
         public DateTime? ResettlePlanDate { get; set; }
         public DateTime? DemolishPlanDate { get; set; }
+        public string FileOriginName { get; set; }
+        public string FileDisplayName { get; set; }
+        public string FileMimeType { get; set; }
         public byte Deleted { get; set; }
 
         public virtual OwnershipRightType OwnershipRightTypeNavigation { get; set; }

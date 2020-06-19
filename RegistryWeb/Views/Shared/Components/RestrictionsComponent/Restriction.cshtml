@@ -12,7 +12,7 @@
     {
         if (ViewBag.AddressType == AddressTypes.Building)
         {
-            restrictionTypeClass = "col-md-6 col-lg-10";
+            restrictionTypeClass = "col-md-12 col-lg-10";
         }
     }
     if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
@@ -84,7 +84,7 @@
         <div class="form-group @restrictionTypeClass">
             <label>Тип документа</label>
             <select disabled class="form-control field-restriction selectpicker" title="Тип документа"
-                    asp-items="@{new SelectList(ViewBag.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName",Model.IdRestrictionType)}" name="IdRetrctionType">
+                    asp-items="@{new SelectList(ViewBag.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName",Model.IdRestrictionType)}" name="IdRestrictionType">
                 <option></option>
             </select>   
         </div>

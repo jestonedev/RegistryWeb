@@ -87,7 +87,8 @@ namespace RegistryWeb.Controllers.ServiceControllers
             var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Restrictions\");
             if (restriction == null)
                 return Json(new { Error = -1 });
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
+                !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
                 return Json(new { Error = -2 });
             if (restrictionFile != null && !restrictionFileRemove)
             {
@@ -131,9 +132,12 @@ namespace RegistryWeb.Controllers.ServiceControllers
 
                 return Json(new { restriction.IdRestriction, restriction.FileOriginName });
             }
+            var restrictionDb = registryContext.Restrictions.Where(r => r.IdRestriction == restriction.IdRestriction).AsNoTracking().FirstOrDefault();
+            if (restrictionDb == null)
+                return Json(new { Error = -5 });
             if (restrictionFileRemove)
             {
-                var fileOriginName = registryContext.Restrictions.Where(r => r.IdRestriction == restriction.IdRestriction).Select(r => r.FileOriginName).AsNoTracking().FirstOrDefault();
+                var fileOriginName = restrictionDb.FileOriginName;
                 if (!string.IsNullOrEmpty(fileOriginName))
                 {
                     var filePath = Path.Combine(path, fileOriginName);
@@ -142,6 +146,12 @@ namespace RegistryWeb.Controllers.ServiceControllers
                         System.IO.File.Delete(filePath);
                     }
                 }
+            } else
+            if (restrictionFile == null)
+            {
+                restriction.FileOriginName = restrictionDb.FileOriginName;
+                restriction.FileDisplayName = restrictionDb.FileDisplayName;
+                restriction.FileMimeType = restrictionDb.FileMimeType;
             }
             //Обновить            
             registryContext.Restrictions.Update(restriction);

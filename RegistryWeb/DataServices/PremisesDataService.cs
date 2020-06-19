@@ -396,6 +396,23 @@ namespace RegistryWeb.DataServices
                     fileStream.Close();
                 }
             }
+            // Прикрепляем файлы ограничений
+            var ownershipRightsFilePath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"OwnershipRights\");
+            if (premise.OwnershipPremisesAssoc != null)
+            {
+                for (var i = 0; i < premise.OwnershipPremisesAssoc.Count; i++)
+                {
+                    var file = files.Where(r => r.Name == "OwnershipRightFiles[" + i + "]").FirstOrDefault();
+                    if (file == null) continue;
+                    premise.OwnershipPremisesAssoc[i].OwnershipRightNavigation.FileDisplayName = file.FileName;
+                    var fileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(file.FileName).Extension;
+                    premise.OwnershipPremisesAssoc[i].OwnershipRightNavigation.FileOriginName = fileOriginName;
+                    premise.OwnershipPremisesAssoc[i].OwnershipRightNavigation.FileMimeType = file.ContentType;
+                    var fileStream = new FileStream(Path.Combine(ownershipRightsFilePath, fileOriginName), FileMode.CreateNew);
+                    file.OpenReadStream().CopyTo(fileStream);
+                    fileStream.Close();
+                }
+            }
             registryContext.Premises.Add(premise);
             registryContext.SaveChanges();            
         }

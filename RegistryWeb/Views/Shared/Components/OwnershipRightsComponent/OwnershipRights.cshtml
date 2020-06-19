@@ -3,7 +3,7 @@
     <script src="~/js/ownershipRights.common.js" asp-append-version="true"></script>
     <div class="card">
         <div class="card-header d-flex justify-content-between">
-            <h3>Список ограничений</h3>
+            <h3>Ограничения</h3>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {
@@ -12,72 +12,11 @@
                 <a href="#" id="ownershipRightsToggle" class="form-control btn btn-primary" title="Развернуть список ограничений" style="font-weight:bold;">∨</a>
             </div>
         </div>
-        <table class="table table-bordered card-body" id="ownershipRightsTable" style="margin-bottom:0px; display: none">
-            <thead>
-                <tr>
-                    @if (ViewBag.Address.AddressType == AddressTypes.Premise)
-                    {
-                        <th class="align-middle" title="Принадлежность">Прин-сть</th>
-                    }
-                    <th class="align-middle">Номер</th>
-                    <th class="align-middle">Дата</th>
-                    <th class="align-middle">Наименование</th>
-                    <th class="align-middle">Тип ограничения</th>
-                    <th class="align-middle">Планируемая дата переселения</th>
-                    <th class="align-middle">Планируемая дата сноса</th>
-
-                    @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
-                    {
-                        <th class="align-middle" width="110"></th>
-                    }
-
-                </tr>
-            </thead>
-            <tbody id="ownershipRights" data-addresstype="@ViewBag.Address.AddressType" data-id="@ViewBag.Address.Id" data-action="@ViewBag.Action">
-                @foreach (var item in Model)
-                {
-                    var resettlePlanDate = item.ResettlePlanDate.HasValue ? item.ResettlePlanDate.Value.ToString("yyyy-MM-dd") : "";
-                    var demolishPlanDate = item.DemolishPlanDate.HasValue ? item.DemolishPlanDate.Value.ToString("yyyy-MM-dd") : "";
-                    <tr class="ownership-right" data-idownershipright="@item.IdOwnershipRight">
-                        @if (ViewBag.Address.AddressType == AddressTypes.Premise)
-                        {
-                            var attachment = item.Address.AddressType == AddressTypes.Building ? "Здание" : item.Address.AddressType == AddressTypes.Premise ? "Помещение" : "";
-                            <td class="align-middle">
-                                @attachment
-                            </td>
-                        }
-                        <td class="align-middle">
-                            <input type="text" disabled class="form-control field-ownership-right" value="@item.Number" title="@item.Number">
-                        </td>
-                        <td class="align-middle">
-                            <input type="date" disabled class="form-control field-ownership-right" value="@item.Date.ToString("yyyy-MM-dd")" title="@item.Date.ToString("yyyy-MM-dd")">
-                        </td>
-                        <td class="align-middle"><input type="text" disabled class="form-control field-ownership-right" value="@item.Description" title="@item.Description"></td>
-                        <td class="align-middle">
-                            <select disabled class="form-control field-ownership-right" title="@item.OwnershipRightTypeNavigation.OwnershipRightTypeName"
-                                    asp-items="@{new SelectList(ViewBag.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName",item.IdOwnershipRightType)}"></select>
-                        </td>
-                        <td class="align-middle"><input type="date" disabled class="form-control field-ownership-right" value="@resettlePlanDate" title="@resettlePlanDate"></td>
-                        <td class="align-middle"><input type="date" disabled class="form-control field-ownership-right" value="@demolishPlanDate" title="@demolishPlanDate"></td>
-                        @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
-                        {
-                            <td class="align-middle">
-                                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
-                                    <a class="btn btn-danger oi oi-x" title="Нет" aria-label="Нет"></a>
-                                    <a class="btn btn-success oi oi-check" title="Да" aria-label="Да"></a>
-                                </div>
-                                @if (item.Address.AddressType == ViewBag.Address.AddressType)
-                                {
-                                    <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
-                                        <a class="btn btn-primary oi oi-pencil" title="Редактировать" aria-label="Редактировать"></a>
-                                        <a class="btn btn-danger oi oi-x delete" title="Удалить" aria-label="Удалить"></a>
-                                    </div>
-                                }
-                            </td>
-                        }
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <ul class="list-group list-group-flush" id="ownershipRightsList" style="display: none" data-addresstype="@ViewBag.Address.AddressType" data-id="@ViewBag.Address.Id" data-action="@ViewBag.Action">
+            @foreach (var item in Model)
+            {
+                <partial name="~/Views/Shared/Components/OwnershipRightsComponent/OwnershipRight.cshtml " model="item" />
+            }
+        </ul>
     </div>
 </form>
