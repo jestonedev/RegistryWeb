@@ -174,6 +174,7 @@ let getErrorSpanSubPremises = function (dataValmsgFor) {
 
 function initializeVilidationSubPremise(subPremiseElem) {
     let idSubPremise = subPremiseElem.find("input[name^='IdSubPremise']").val();
+    if (idSubPremise === "0") idSubPremise = uuidv4();
     //Общая площадь
     let totalAreaName = 'TotalArea_' + idSubPremise;
     subPremiseElem.find("[name^='TotalArea']").addClass('valid')

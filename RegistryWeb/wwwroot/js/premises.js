@@ -28,7 +28,7 @@
         var isRestrictionsValid = $("#restrictionsForm").valid();
         var isSubPremisesValid = $("#subpremisesForm").valid();
         if (!isFormValid || !isOwnershipsValid || !isRestrictionsValid || !isSubPremisesValid) {
-            $(this).find("select").each(function (idx, elem) {
+            $("select").each(function (idx, elem) {
                 var id = $(elem).prop("id");
                 var name = $(elem).prop("name");
                 var errorSpan = $("span[data-valmsg-for='" + name + "']");
@@ -62,6 +62,9 @@
                 $(this).append(inputTemplate.replace('{0}', rrn + "Number").replace('{1}', restrictions[j].RestrictionNavigation.Number));
                 $(this).append(inputTemplate.replace('{0}', rrn + "Description").replace('{1}', restrictions[j].RestrictionNavigation.Description));
                 $(this).append(inputTemplate.replace('{0}', rrn + "IdRestrictionType").replace('{1}', restrictions[j].RestrictionNavigation.IdRestrictionType));
+                var restrictionFile = $(restrictions[j].RestrictionNavigation.RestrictionFile).clone();
+                restrictionFile.attr("name", "RestrictionFiles[" + j + "]");
+                $(this).append(restrictionFile);
             }
             var subPremises = getSubPremises();
             for (var k = 0; k < subPremises.length; k++) {
@@ -82,7 +85,7 @@
         }
     });
 
-    $("form#r-premises-form").on("change", "select", function () {
+    $("form").on("change", "select", function () {
         var isValid = $(this).valid();
         var id = $(this).prop("id");
         if (!isValid) {

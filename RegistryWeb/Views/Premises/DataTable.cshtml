@@ -129,7 +129,8 @@
             <td>
                 <div class="btn-group" role="group" aria-label="Панель доступа">
                     @if (
-                        (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(item.IdState) && !item.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState))) || 
+                        (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(item.IdState) && 
+                        (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) || !item.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) || 
                         (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(item.IdState)))
                     {
                         <div class="btn-group" role="group" aria-label="Панель доступа">

@@ -16,6 +16,9 @@ namespace RegistryWeb.ViewModel
             Date = owr.Date;
             Description = owr.Description;
             DateStateReg = owr.DateStateReg;
+            FileOriginName = owr.FileOriginName;
+            FileDisplayName = owr.FileDisplayName;
+            FileMimeType = owr.FileMimeType;
             Deleted = owr.Deleted;
             RestrictionTypeNavigation = owr.RestrictionTypeNavigation;
             RestrictionBuildingsAssoc = owr.RestrictionBuildingsAssoc;

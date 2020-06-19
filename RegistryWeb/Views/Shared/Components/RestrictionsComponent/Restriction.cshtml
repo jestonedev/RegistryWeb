@@ -39,8 +39,39 @@
             <input type="date" class="form-control" disabled value="@(Model.Date.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : Model.Date.ToString("yyyy-MM-dd"))" name="RestrictionDate" title="Дата документа">
         </div>
         <div class="form-group col-md-6 col-lg-8">
-            <label>Наименование</label>
-            <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="RestrictionDescription" title="Наименование">
+            <label>Наименование и образ документа</label>
+            <div class="input-group">
+                <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="RestrictionDescription" title="Наименование">
+                <input type="file" name="RestrictionFile" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
+                <input type="hidden" name="RestrictionFileRemove" value="false" />
+                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+                {
+                    <div class="input-group-append">
+                        <a class="btn btn-success rr-restriction-file-download @(Model.FileOriginName == null ? "disabled" : "")"
+                           href="/Restrictions/DownloadFile/?idRestriction=@Model.IdRestriction" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
+                    </div>
+                }
+                @if (ViewBag.Action == "Edit")
+                {
+                    <div class="input-group-append rr-restriction-file-buttons">
+                        <a class="btn btn-danger rr-restriction-file-remove" style="display: none"
+                           href="#" title="Удалить образ документа" aria-label="Удалить образ документа"><span class="oi oi-trash"></span></a>
+                        <a class="btn btn-success rr-restriction-file-attach" style="display: none"
+                           href="#" title="Прикрепить образ документа" aria-label="Прикрепить образ документа"><span class="oi oi-paperclip"></span></a>
+                        <a class="btn btn-success rr-restriction-file-download @(Model.FileOriginName == null ? "disabled" : "")"
+                           href="/Restrictions/DownloadFile/?idRestriction=@Model.IdRestriction" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
+                    </div>
+                }
+                @if (ViewBag.Action == "Create")
+                {
+                    <div class="input-group-append rr-restriction-file-buttons">
+                        <a class="btn btn-danger rr-restriction-file-remove" style="display: none"
+                           href="#" title="Удалить образ документа" aria-label="Удалить образ документа"><span class="oi oi-x"></span></a>
+                        <a class="btn btn-success rr-restriction-file-attach" style="display: none"
+                           href="#" title="Прикрепить образ документа" aria-label="Прикрепить образ документа"><span class="oi oi-paperclip"></span></a>
+                    </div>
+                }
+            </div>
         </div>
         @if (ViewBag.AddressType == AddressTypes.Premise)
         {
@@ -61,8 +92,8 @@
         {
             <div class="text-lg-right text-center col-lg-2 rr-restriction-edit-buttons">
                 <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
-                    <a class="btn btn-danger restriction-cancel-btn @(ViewBag.AddressType == Model.AddressType ? "" : "disabled")" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
-                    <a class="btn btn-success restriction-save-btn @(ViewBag.AddressType == Model.AddressType ? "" : "disabled")" title="Да" aria-label="Да" href="#"><span class="oi oi-check"></span></a>
+                    <a class="btn btn-danger restriction-cancel-btn @(ViewBag.AddressType == Model.AddressType ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                    <a class="btn btn-success restriction-save-btn @(ViewBag.AddressType == Model.AddressType ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
                 </div>
                 <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
                     <a class="btn btn-primary restriction-edit-btn @(ViewBag.AddressType == Model.AddressType ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>

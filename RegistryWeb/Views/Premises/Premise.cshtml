@@ -34,7 +34,7 @@
     <script src="~/js/premises.js" asp-append-version="true"></script>
 }
 
-<form asp-controller="Premise" asp-action="@ViewBag.Action" id="r-premises-form" data-action="@ViewBag.Action" data-addressType="@(ViewBag.addressType=="Premise" ? "3" : "")" method="post">
+<form asp-controller="Premise" enctype="multipart/form-data" asp-action="@ViewBag.Action" id="r-premises-form" data-action="@ViewBag.Action" data-addressType="@(ViewBag.addressType=="Premise" ? "3" : "")" method="post">
     <div class="card">
         <input type="hidden" asp-for="@Model.Premise.IdPremises" />
         <input type="hidden" asp-for="@Model.Premise.IdPremisesKind" value="1" />
@@ -47,9 +47,7 @@
                 @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
                 {
                     <div class="btn-group" role="group" aria-label="Панель доступа">
-                        @if (
-                           (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(Model.Premise.IdState) && !Model.Premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState))) ||
-                           (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(Model.Premise.IdState)))
+                        @if (ViewBag.CanEdit)
                         {
                             if (ViewBag.Action == "Details")
                             {

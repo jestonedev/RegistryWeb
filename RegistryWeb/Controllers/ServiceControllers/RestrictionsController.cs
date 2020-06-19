@@ -1,9 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using RegistryWeb.DataHelpers;
 using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
@@ -16,11 +19,13 @@ namespace RegistryWeb.Controllers.ServiceControllers
     {
         SecurityService securityService;
         RegistryContext registryContext;
+        private readonly IConfiguration config;
 
-        public RestrictionsController(SecurityService securityService, RegistryContext registryContext)
+        public RestrictionsController(SecurityService securityService, RegistryContext registryContext, IConfiguration config)
         {
             this.securityService = securityService;
             this.registryContext = registryContext;
+            this.config = config;
         }
 
         [HttpPost]
@@ -59,16 +64,40 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 date = restriction.Date.ToString("yyyy-MM-dd"),
                 description = restriction.Description,
                 idRestrictionType = restriction.IdRestrictionType,
+                fileOriginName = restriction.FileOriginName
             });
         }
 
-        [HttpPost]
-        public int SaveRestriction(Restriction restriction, Address address)
+        public IActionResult DownloadFile(int idRestriction)
         {
+            var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Restrictions\");
+            var restriction = registryContext.Restrictions.Where(r => r.IdRestriction == idRestriction).AsNoTracking().FirstOrDefault();
+            if (restriction == null) return Json(new { Error = -1 });
+            var filePath = Path.Combine(path, restriction.FileOriginName);
+            if (!System.IO.File.Exists(filePath))
+            {
+                return Json(new { Error = -2 });
+            }
+            return File(System.IO.File.ReadAllBytes(filePath), restriction.FileMimeType, restriction.FileDisplayName);
+        }
+
+        [HttpPost]
+        public IActionResult SaveRestriction(Restriction restriction, Address address, IFormFile restrictionFile, bool restrictionFileRemove)
+        {
+            var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Restrictions\");
             if (restriction == null)
-                return -1;
+                return Json(new { Error = -1 });
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return -2;
+                return Json(new { Error = -2 });
+            if (restrictionFile != null && !restrictionFileRemove)
+            {
+                restriction.FileDisplayName = restrictionFile.FileName;
+                restriction.FileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(restrictionFile.FileName).Extension;
+                restriction.FileMimeType = restrictionFile.ContentType;
+                var fileStream = new FileStream(Path.Combine(path, restriction.FileOriginName), FileMode.CreateNew);
+                restrictionFile.OpenReadStream().CopyTo(fileStream);
+                fileStream.Close();
+            }
             //Создать
             if (restriction.IdRestriction == 0)
             {
@@ -76,9 +105,9 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 registryContext.SaveChanges();
                 var id = 0;
                 if (address == null)
-                    return -3;
+                    return Json(new { Error = -3 });
                 if (!int.TryParse(address.Id, out id))
-                    return -4;
+                    return Json(new { Error = -4 });
                 if (address.AddressType == AddressTypes.Building)
                 {
                     var rba = new RestrictionBuildingAssoc()
@@ -99,12 +128,25 @@ namespace RegistryWeb.Controllers.ServiceControllers
                     registryContext.RestrictionPremisesAssoc.Add(rpa);
                     registryContext.SaveChanges();
                 }
-                return restriction.IdRestriction;
+
+                return Json(new { restriction.IdRestriction, restriction.FileOriginName });
+            }
+            if (restrictionFileRemove)
+            {
+                var fileOriginName = registryContext.Restrictions.Where(r => r.IdRestriction == restriction.IdRestriction).Select(r => r.FileOriginName).AsNoTracking().FirstOrDefault();
+                if (!string.IsNullOrEmpty(fileOriginName))
+                {
+                    var filePath = Path.Combine(path, fileOriginName);
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
             }
             //Обновить            
             registryContext.Restrictions.Update(restriction);
             registryContext.SaveChanges();
-            return 0;
+            return Json(new { restriction.IdRestriction, restriction.FileOriginName });
         }
 
         [HttpPost]

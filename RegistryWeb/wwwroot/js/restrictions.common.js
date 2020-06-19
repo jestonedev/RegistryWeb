@@ -36,8 +36,24 @@ function getRestriction(restrictionElem) {
         Number: restrictionElem.find("[name^='RestrictionNum']").val(),
         Date: restrictionElem.find("[name^='RestrictionDate']").val(),
         Description: restrictionElem.find("[name^='RestrictionDescription']").val(),
-        IdRestrictionType: restrictionElem.find("[name^='IdRestrictionType']").val()
+        IdRestrictionType: restrictionElem.find("[name^='IdRestrictionType']").val(),
+        RestrictionFile: restrictionElem.find("[name^='RestrictionFile']")[0],
+        RestrictionFileRemove: restrictionElem.find("[name^='RestrictionFileRemove']").val()
     };
+}
+
+function restrictionToFormData(restriction, address) {
+    var formData = new FormData();
+    formData.append("Restriction.IdRestriction", restriction.IdRestriction);
+    formData.append("Restriction.Number", restriction.Number);
+    formData.append("Restriction.Date", restriction.Date);
+    formData.append("Restriction.Description", restriction.Description);
+    formData.append("Restriction.IdRestrictionType", restriction.IdRestrictionType);
+    formData.append("RestrictionFile", restriction.RestrictionFile.files[0]);
+    formData.append("RestrictionFileRemove", restriction.RestrictionFileRemove);
+    formData.append("Address.AddressType", address.addressType);
+    formData.append("Address.Id", address.id);
+    return formData;
 }
 
 let getCurrentAddressRestrictions = function () {
@@ -56,6 +72,7 @@ let getErrorSpanRestrictions = function (dataValmsgFor) {
 let initializeVilidationRestriction = function (restrictionElem) {
 
     let idRestriction = restrictionElem.find("input[name^='IdRestriction']").val();
+    if (idRestriction === "0") idRestriction = uuidv4();
     //Дата документа
     let date = 'RestrictionDate_' + idRestriction;
     restrictionElem.find("[name^='RestrictionDate']").addClass('valid')
@@ -162,6 +179,9 @@ function editRestriction(e) {
     restriction.find("select").selectpicker('refresh');
     editDelPanel.hide();
     yesNoPanel.show();
+    showRestrictionEditFileBtns(restriction,
+        restriction.find(".rr-restriction-file-download").length > 0 &&
+        !restriction.find(".rr-restriction-file-download").hasClass("disabled"));
     e.preventDefault();
 }
 
@@ -178,6 +198,7 @@ function cancelEditRestriction(e) {
                 refreshRestriction(restrictionElem, restriction);
                 showEditDelPanelRestriction(restrictionElem);
                 clearValidationsRestrictions(restrictionElem);
+                showRestrictionDownloadFileBtn(restrictionElem, restriction.fileOriginName !== null);
             }
         });
     }
@@ -188,6 +209,29 @@ function cancelEditRestriction(e) {
     e.preventDefault();
 }
 
+function showRestrictionEditFileBtns(restrictionElem, fileExists) {
+    let restrictionFileBtns = restrictionElem.find(".rr-restriction-file-buttons");
+    restrictionElem.find(".rr-restriction-file-download").hide();
+    if (fileExists) {
+        restrictionFileBtns.append(restrictionElem.find(".rr-restriction-file-remove").show());
+        restrictionElem.find(".rr-restriction-file-attach").hide();
+    } else {
+        restrictionElem.find(".rr-restriction-file-remove").hide();
+        restrictionFileBtns.append(restrictionElem.find(".rr-restriction-file-attach").show());
+    }
+}
+
+function showRestrictionDownloadFileBtn(restrictionElem, fileExists) {
+    let restrictionFileBtns = restrictionElem.find(".rr-restriction-file-buttons");
+    restrictionFileBtns.append(restrictionElem.find(".rr-restriction-file-download").show());
+    if (fileExists) {
+        restrictionElem.find(".rr-restriction-file-download").removeClass("disabled");
+    } else {
+        restrictionElem.find(".rr-restriction-file-download").addClass("disabled");
+    }
+    restrictionElem.find(".rr-restriction-file-remove").hide();
+    restrictionElem.find(".rr-restriction-file-attach").hide();
+}
 
 function clearValidationsRestrictions(restrictionElem) {
     $(restrictionElem).find(".input-validation-error").removeClass("input-validation-error").addClass("valid");
@@ -214,15 +258,17 @@ function saveRestriction(e) {
     let restrictionElem = $(this).closest(".list-group-item");
     restrictionElem.find("button[data-id]").removeClass("input-validation-error");
     if (restrictionElem.find("input, textarea, select").valid()) {
-        let restriction = getRestriction(restrictionElem);
-        let address = getCurrentAddressRestrictions();
+        let restriction = restrictionToFormData(getRestriction(restrictionElem), getCurrentAddressRestrictions());
         $.ajax({
             type: 'POST',
             url: window.location.origin + '/Restrictions/SaveRestriction',
-            data: { restriction, address },
-            success: function (idRestriction) {
-                if (idRestriction > 0) {
-                    restrictionElem.find("input[name^='IdRestriction']").val(idRestriction);
+            data: restriction,
+            processData: false,
+            contentType: false,
+            success: function (restriction) {
+                if (restriction.idRestriction > 0) {
+                    restrictionElem.find("input[name^='IdRestriction']").val(restriction.idRestriction);
+                    showRestrictionDownloadFileBtn(restrictionElem, restriction.fileOriginName !== null);
                 }
                 showEditDelPanelRestriction(restrictionElem);
             }
@@ -240,6 +286,32 @@ function saveRestriction(e) {
     e.preventDefault();
 }
 
+function attachRestrictionFile(e) {
+    var restrictionElem = $(this).closest(".list-group-item");
+    restrictionElem.find("input[name^='RestrictionFile']").click();
+    restrictionElem.find("input[name^='RestrictionFileRemove']").val(false);
+    e.preventDefault();
+}
+
+function changeRestrictionFileAttachment() {
+    var restrictionElem = $(this).closest(".list-group-item");
+    if ($(this).val() !== "") {
+        let restrictionFileBtns = restrictionElem.find(".rr-restriction-file-buttons");
+        restrictionElem.find(".rr-restriction-file-attach").hide();
+        restrictionFileBtns.append(restrictionElem.find(".rr-restriction-file-remove").show());
+    }
+}
+
+function removeRestrictionFile(e) {
+    var restrictionElem = $(this).closest(".list-group-item");
+    restrictionElem.find("input[name^='RestrictionFile']").val("");
+    restrictionElem.find("input[name^='RestrictionFileRemove']").val(true);
+    let restrictionFileBtns = restrictionElem.find(".rr-restriction-file-buttons");
+    restrictionElem.find(".rr-restriction-file-remove").hide();
+    restrictionFileBtns.append(restrictionElem.find(".rr-restriction-file-attach").show());
+    e.preventDefault();
+}
+
 $(function () {
     $('#restrictionsList').hide();
     $('.yes-no-panel').hide();
@@ -250,4 +322,7 @@ $(function () {
     $('#restrictionsList').on('click', '.restriction-cancel-btn', cancelEditRestriction);
     $('#restrictionsList').on('click', '.restriction-save-btn', saveRestriction);
     $('#restrictionsList').on('click', '.restriction-delete-btn', deleteRestriction);
+    $('#restrictionsList').on('click', '.rr-restriction-file-attach', attachRestrictionFile);
+    $('#restrictionsList').on('click', '.rr-restriction-file-remove', removeRestrictionFile);
+    $('#restrictionsList').on('change', "input[name^='RestrictionFile']", changeRestrictionFileAttachment);
 });

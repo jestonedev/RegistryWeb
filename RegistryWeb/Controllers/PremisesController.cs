@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RegistryWeb.Models;
 using RegistryWeb.DataHelpers;
+using Microsoft.AspNetCore.Http;
 
 namespace RegistryWeb.Controllers
 {
@@ -65,7 +66,7 @@ namespace RegistryWeb.Controllers
             var premise = dataService.GetPremise(idPremises.Value);
             if (premise == null)
                 return NotFound();
-
+            ViewBag.CanEdit = CanEditPremise(premise);
             return View("Premise", dataService.GetPremiseView(premise));
         }
 
@@ -85,8 +86,7 @@ namespace RegistryWeb.Controllers
             if (premise == null)
                 return NotFound();
 
-            if (!((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(premise.IdState) && (premise.SubPremises == null || !premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) ||
-                           (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(premise.IdState))))
+            if (!CanEditPremise(premise))
                 return View("NotAccess");
 
             if (ModelState.IsValid)
@@ -115,7 +115,7 @@ namespace RegistryWeb.Controllers
                     }
                 }
 
-                dataService.Create(premise, IdFundType);
+                dataService.Create(premise, HttpContext.Request.Form.Files.Select(f => f).ToList(), IdFundType);
                 return RedirectToAction("Details", new { premise.IdPremises });
             }
             ViewBag.Action = "Create";
@@ -136,8 +136,7 @@ namespace RegistryWeb.Controllers
             if (premise == null)
                 return NotFound();
 
-            if (!((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(premise.IdState) && (premise.SubPremises == null || !premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) ||
-                           (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(premise.IdState))))
+            if (!CanEditPremise(premise))
                 return View("NotAccess");
 
             return View("Premise", dataService.GetPremiseView(premise));
@@ -149,8 +148,7 @@ namespace RegistryWeb.Controllers
             if (premise == null)
                 return NotFound();
 
-            if (!((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(premise.IdState) && (premise.SubPremises == null || !premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) ||
-               (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(premise.IdState))))
+            if (!CanEditPremise(premise))
                 return View("NotAccess");
 
             if (ModelState.IsValid)
@@ -177,8 +175,7 @@ namespace RegistryWeb.Controllers
             if (premise == null)
                 return NotFound();
 
-            if (!((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(premise.IdState) && (premise.SubPremises == null || !premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) ||
-               (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(premise.IdState))))
+            if (!CanEditPremise(premise))
                 return View("NotAccess");
 
             return View("Premise", dataService.GetPremiseView(premise));
@@ -192,12 +189,18 @@ namespace RegistryWeb.Controllers
 
             var premiseDb = dataService.GetPremise(premise.IdPremises);
 
-            if (!((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(premiseDb.IdState) && (premiseDb.SubPremises == null || !premiseDb.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) ||
-               (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(premiseDb.IdState))))
+            if (!CanEditPremise(premiseDb))
                 return View("NotAccess");
 
             dataService.Delete(premise.IdPremises);
             return RedirectToAction("Index");
+        }
+
+        private bool CanEditPremise(Premise premise)
+        {
+            return ((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(premise.IdState) &&
+                (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) || premise.SubPremises == null || !premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) ||
+               (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(premise.IdState)));
         }
 
 
