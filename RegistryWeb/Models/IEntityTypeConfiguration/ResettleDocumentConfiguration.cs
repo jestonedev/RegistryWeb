@@ -7,34 +7,41 @@ using RegistryWeb.Models.Entities;
 
 namespace RegistryWeb.Models.IEntityTypeConfiguration
 {
-    public class RestrictionConfiguration: IEntityTypeConfiguration<Restriction>
+    public class ResettleDocumentConfiguration : IEntityTypeConfiguration<ResettleDocument>
     {
         private string nameDatebase;
 
-        public RestrictionConfiguration(string nameDatebase)
+        public ResettleDocumentConfiguration(string nameDatebase)
         {
             this.nameDatebase = nameDatebase;
         }
 
-        public void Configure(EntityTypeBuilder<Restriction> builder)
+        public void Configure(EntityTypeBuilder<ResettleDocument> builder)
         {
-            builder.HasKey(e => e.IdRestriction);
+            builder.HasKey(e => e.IdDocument);
 
-            builder.ToTable("restrictions", nameDatebase);
+            builder.ToTable("resettle_documents", nameDatebase);
 
-            builder.HasIndex(e => e.IdRestrictionType)
-                .HasName("FK_restrictions_restriction_types_id_restriction_type");
+            builder.HasIndex(e => e.IdDocumentType)
+                .HasName("FK_resettle_documents_id_document_type");
 
-            builder.Property(e => e.IdRestriction)
-                .HasColumnName("id_restriction")
+            builder.HasIndex(e => e.IdResettleInfo)
+                .HasName("FK_resettle_documents_id_resettle_info");
+
+            builder.Property(e => e.IdDocument)
+                .HasColumnName("id_document")
+                .HasColumnType("int(11)");
+
+            builder.Property(e => e.IdDocumentType)
+                .HasColumnName("id_document_type")
+                .HasColumnType("int(11)");
+
+            builder.Property(e => e.IdResettleInfo)
+                .HasColumnName("id_resettle_info")
                 .HasColumnType("int(11)");
 
             builder.Property(e => e.Date)
                 .HasColumnName("date")
-                .HasColumnType("date");
-
-            builder.Property(e => e.DateStateReg)
-                .HasColumnName("date_state_reg")
                 .HasColumnType("date");
 
             builder.Property(e => e.Deleted)
@@ -47,13 +54,9 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
-            builder.Property(e => e.IdRestrictionType)
-                .HasColumnName("id_restriction_type")
-                .HasColumnType("int(11)");
-
             builder.Property(e => e.Number)
                 .HasColumnName("number")
-                .HasMaxLength(10)
+                .HasMaxLength(20)
                 .IsUnicode(false);
 
             builder.Property(e => e.FileOriginName)
@@ -71,11 +74,15 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
+            builder.HasOne(d => d.ResettleDocumentTypeNavigation)
+                .WithMany(p => p.ResettleDocuments)
+                .HasForeignKey(d => d.IdDocumentType)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(d => d.RestrictionTypeNavigation)
-                .WithMany(p => p.Restrictions)
-                .HasForeignKey(d => d.IdRestrictionType)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+            builder.HasOne(d => d.ResettleInfoNavigation)
+                .WithMany(p => p.ResettleDocuments)
+                .HasForeignKey(d => d.IdResettleInfo)
+                .OnDelete(DeleteBehavior.Cascade);
 
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);

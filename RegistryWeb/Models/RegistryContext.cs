@@ -92,6 +92,16 @@ namespace RegistryWeb.Models
         public virtual DbSet<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
         public virtual DbSet<Executor> Executors { get; set; }
 
+        // Переселение
+
+        public virtual DbSet<ResettleInfo> ResettleInfos { get; set; }
+        public virtual DbSet<ResettleKind> ResettleKinds { get; set; }
+        public virtual DbSet<ResettleInfoTo> ResettleInfoTo { get; set; }
+        public virtual DbSet<ResettleInfoSubPremiseFrom> ResettleInfoSubPremisesFrom { get; set; }
+        public virtual DbSet<ResettleDocument> ResettleDocuments { get; set; }
+        public virtual DbSet<ResettleDocumentType> ResettleDocumentTypes { get; set; }
+        public virtual DbSet<ResettlePremiseAssoc> ResettlePremiseAssoc { get; set; }
+
         //Журнал изменений
         public virtual DbSet<ChangeLog> ChangeLogs { get; set; }
         public virtual DbSet<LogObject> LogObjects { get; set; }
@@ -205,6 +215,15 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new TenancySubPremiseAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ExecutorConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyRentPeriodConfiguration(nameDatebase));
+
+            modelBuilder.ApplyConfiguration(new ResettleInfoConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettleKindConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettleInfoToConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettleInfoSubPremiseFromConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettleDocumentTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettleDocumentConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettlePremiseAssocConfiguration(nameDatebase));
+
         }
     }
 }
