@@ -1,0 +1,22 @@
+﻿@model IEnumerable<RegistryWeb.ViewModel.ResettleInfoVM>;
+<form id="resettlesForm">
+    <script src="~/js/resettle.common.js" asp-append-version="true"></script>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Переселение</h3>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                    <a href="#" id="resettleAdd" class="form-control btn btn-success" title="Добавить информацию о переселении">&#10010;</a>
+                }
+                <a href="#" id="resettlesToggle" class="form-control btn btn-primary" title="Развернуть информацию о переселении" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush" id="resettlesList" style="display: none" data-addresstype="@ViewBag.Address.AddressType" data-id="@ViewBag.Address.Id" data-action="@ViewBag.Action">
+            @foreach (var item in Model)
+            {
+                <partial name="ResettleInfo" model="item" />
+            }
+        </ul>
+    </div>
+</form>

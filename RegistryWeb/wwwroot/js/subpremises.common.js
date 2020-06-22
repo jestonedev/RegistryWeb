@@ -54,8 +54,8 @@ function refreshSubPremise(subPremiseElem, subPremise) {
     subPremiseElem.find("[name^='LivingArea']").val(subPremise.livingArea);
     subPremiseElem.find("[name^='Description']").val(subPremise.description);
     subPremiseElem.find("[name^='CadastralNum']").val(subPremise.cadastralNum);
-    subPremiseElem.find("[name^='CadastralCost']").val(subPremise.cadastralCost);
-    subPremiseElem.find("[name^='BalanceCost']").val(subPremise.balanceCost);
+    subPremiseElem.find("[name^='CadastralCost']").val(subPremise.cadastralCost.toFixed(2).replace('.', ','));
+    subPremiseElem.find("[name^='BalanceCost']").val(subPremise.balanceCost.toFixed(2).replace('.', ','));
     subPremiseElem.find("[name^='Account']").val(subPremise.account);
 }
 

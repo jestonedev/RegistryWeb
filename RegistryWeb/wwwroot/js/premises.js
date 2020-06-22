@@ -85,6 +85,21 @@
                 $(this).append(inputTemplate.replace('{0}', sp + "Account").replace('{1}', subPremises[k].Account));
                 $(this).append(inputTemplate.replace('{0}', "SubPremisesFundTypes[" + k + "]").replace('{1}', subPremises[k].IdFundType));
             }
+
+            var resettles = CreateResettlePremisesAssoc();
+            for (var l = 0; l < resettles.length; l++) {
+                var rspa = "Premise.ResettlePremisesAssoc[" + l + "].";
+                var rin = rspa + "ResettleInfoNavigation.";
+                $(this).append(inputTemplate.replace('{0}', rspa + "IdResettleInfo").replace('{1}', resettles[l].IdResettleInfo));
+                $(this).append(inputTemplate.replace('{0}', rspa + "IdPremises").replace('{1}', resettles[l].IdPremises));
+                $(this).append(inputTemplate.replace('{0}', rin + "ResettleDate").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDate));
+                $(this).append(inputTemplate.replace('{0}', rin + "IdResettleKind").replace('{1}', resettles[l].ResettleInfoNavigation.IdResettleKind));
+                $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource1").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource1));
+                $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource2").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource2));
+                $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource3").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource3));
+                $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource4").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource4));
+            }
+
         }
     });
 

@@ -55,13 +55,13 @@
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@Model.Premise.IdPremises">
                                     <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
-                                        asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@Model.Premise.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                       asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@Model.Premise.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                     <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                                        asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@Model.Premise.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                       asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@Model.Premise.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                 </div>
                             </div>
                         }
-                        
+
                         <div class="btn-group" role="group" aria-label="Панель доступа">
                             <button class="btn btn-dark dropdown-toggle" type="button" title="Связанные объекты" aria-label="Связанные объекты" id="objectsBtn_@Model.Premise.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="oi oi-grid-two-up"></span>
@@ -226,7 +226,7 @@
                         <span asp-validation-for="@Model.IdFundType" class="text-danger"></span>
                     }
                     else
-                  if (ViewBag.Action == "Create" || ((ViewBag.Action == "Details" || ViewBag.Action == "Delete") && ObjectStateHelper.IsMunicipal(Model.Premise.IdState)))
+                 if (ViewBag.Action == "Create" || ((ViewBag.Action == "Details" || ViewBag.Action == "Delete") && ObjectStateHelper.IsMunicipal(Model.Premise.IdState)))
                     {
                         <label asp-for="@Model.IdFundType">Текущий фонд</label>
                         <select class="selectpicker form-control" data-live-search="true" asp-for="@Model.IdFundType"
@@ -236,7 +236,7 @@
                         <span asp-validation-for="@Model.IdFundType" class="text-danger"></span>
                     }
                     else
-                  if (ViewBag.Action == "Edit")
+                 if (ViewBag.Action == "Edit")
                     {
                         <label asp-for="@Model.IdFundType">Текущий фонд</label>
                         <select disabled class="selectpicker form-control" data-live-search="true" asp-for="@Model.IdFundType"
@@ -296,5 +296,6 @@
 @await Component.InvokeAsync("SubPremisesComponent", new { idPremise = Model.Premise.IdPremises, action = ViewBag.Action, paymentsInfo = Model.PaymentsInfo ?? new List<PaymentsInfo>() })
 @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.Premise.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
 @await Component.InvokeAsync("OwnershipRightsComponent", new { address = new Address() { Id = Model.Premise.IdPremises.ToString(), AddressType = AddressTypes.Premise }, action = ViewBag.Action })
+@await Component.InvokeAsync("ResettleInfoComponent", new { address = new Address() { Id = Model.Premise.IdPremises.ToString(), AddressType = AddressTypes.Premise }, action = ViewBag.Action })
 
 

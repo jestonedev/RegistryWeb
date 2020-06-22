@@ -1,0 +1,157 @@
+﻿@model RegistryWeb.ViewModel.ResettleInfoVM;
+@using RegistryWeb.Extensions;
+@using RegistryWeb.ViewOptions;
+@using RegistryWeb.Models.Entities;
+@using RegistryWeb.SecurityServices;
+@using RegistryWeb.DataHelpers;
+
+@{
+    var ownershipRightTypeClass = "col-md-6 col-lg-4";
+    if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    {
+        ownershipRightTypeClass = "col-md-6";
+    }
+}
+
+<li class="list-group-item">
+    <input type="hidden" value="@Model.IdResettleInfo" name="IdResettleInfo" />
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label>Дата переселения</label>
+            <input type="date" class="form-control" disabled value="@(Model.ResettleDate == null ? "" : Model.ResettleDate.Value.ToString("yyyy-MM-dd"))" name="ResettleDate" title="Планируемая дата переселения">
+        </div>
+        <div class="form-group col-md-3">
+            <label>Способ переселения</label>
+            <select disabled class="form-control field-resettle selectpicker" title="Способ переселения"
+                    asp-items="@{new SelectList(ViewBag.ResettleKinds, "IdResettleKind", "ResettleKindName",Model.IdResettleKind)}" name="IdResettleKind">
+                <option></option>
+            </select>
+        </div>
+        <div class="form-group @ownershipRightTypeClass">
+            <label>Переселение из</label>
+            @{
+                var subPremisesIds = Model.ResettleInfoSubPremisesFrom.Select(r => r.IdSubPremise);
+                if (!subPremisesIds.Any())
+                {
+                    subPremisesIds = new List<int>() { 0 };
+                }
+            }
+            <select disabled multiple data-actions-box="true" class="form-control field-resettle selectpicker" name="SubPremisesFrom" title="Переселение из"
+                    asp-items="@{new SelectList(ViewBag.SubPremises, "IdSubPremises", "SubPremisesNum")}"
+                    asp-for="@subPremisesIds">
+                <option value="0">Вся квартира</option>
+            </select>
+        </div>
+
+        @if (ViewBag.Action == "Edit")
+        {
+            <div class="text-lg-right col-lg-2 rr-resettle-edit-buttons d-none d-lg-block">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger resettle-cancel-btn @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                    <a class="btn btn-success resettle-save-btn @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                </div>
+                <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                    <a class="btn btn-primary resettle-edit-btn @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                    <a class="btn btn-danger resettle-delete-btn @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                </div>
+            </div>
+        }
+        @if (ViewBag.Action == "Create")
+        {
+            <a class="resettle-edit-btn" style="display: none"></a>
+            <div class="text-lg-right col-lg-2 rr-resettle-edit-buttons d-none d-lg-block">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger resettle-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Источники финансирования</h3>
+        </div>
+        <div class="card-body">
+            <div class="form-row">
+                <div class="form-group col-lg-3 col-md-6">
+                    <label>Федеральный бюджет</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource1" name="FinanceSource1" title="Федеральный бюджет">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon2">руб.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-lg-3 col-md-6">
+                    <label>Областной бюджет</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource2" name="FinanceSource2" title="Областной бюджет">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon2">руб.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-lg-3 col-md-6">
+                    <label>Муниципальный бюджет</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource3" name="FinanceSource3" title="Муниципальный бюджет">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon2">руб.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-lg-3 col-md-6">
+                    <label>Прочие источники</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource4" name="FinanceSource4" title="Прочие источники">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon2">руб.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Документы</h3>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                    <a href="#" id="resettleDocumentAdd" class="form-control btn btn-success" title="Добавить документ по переселению">&#10010;</a>
+                }
+            </div>
+        </div>        
+        <ul class="list-group list-group-flush" id="resettleDocumentsList" style="display: none">
+            @foreach(var document in Model.ResettleDocuments)
+            {
+                <li></li>
+            }
+        </ul>
+    </div>
+
+    @if (ViewBag.Action == "Edit")
+    {
+        <div class="text-center col-12 rr-resettle-edit-buttons-2 d-block d-lg-none">
+            <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                <a class="btn btn-danger resettle-cancel-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                <a class="btn btn-success resettle-save-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+            </div>
+            <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                <a class="btn btn-primary resettle-edit-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                <a class="btn btn-danger resettle-delete-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+            </div>
+        </div>
+    }
+    @if (ViewBag.Action == "Create")
+    {
+        <div class="text-center col-12 rr-resettle-edit-buttons-2 d-block d-lg-none">
+            <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                <a class="btn btn-danger resettle-cancel-btn-2" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
+            </div>
+        </div>
+    }
+
+
+</li>

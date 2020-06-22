@@ -31,7 +31,8 @@ namespace RegistryWeb.Controllers.ServiceControllers
         {
             if (idOwnershipRight == null)
                 return -1;
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
+                !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
                 return -2;
             try
             {

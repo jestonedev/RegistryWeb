@@ -29,6 +29,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_resettle_info")
                 .HasColumnType("int(11)");
 
+            builder.Property(e => e.IdResettleKind)
+                .HasColumnName("id_ressetle_kind")
+                .HasColumnType("int(11)");
+
             builder.Property(e => e.ResettleDate)
                 .HasColumnName("resettle_date")
                 .HasColumnType("date");
@@ -37,15 +41,15 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("finance_source_1")
                 .HasColumnType("decimal(18,2)");
 
-            builder.Property(e => e.FinanceSource1)
+            builder.Property(e => e.FinanceSource2)
                 .HasColumnName("finance_source_2")
                 .HasColumnType("decimal(18,2)");
 
-            builder.Property(e => e.FinanceSource1)
+            builder.Property(e => e.FinanceSource3)
                 .HasColumnName("finance_source_3")
                 .HasColumnType("decimal(18,2)");
 
-            builder.Property(e => e.FinanceSource1)
+            builder.Property(e => e.FinanceSource4)
                 .HasColumnName("finance_source_4")
                 .HasColumnType("decimal(18,2)");
 
