@@ -60,6 +60,21 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("resettle_plan_date")
                 .HasColumnType("date");
 
+            builder.Property(e => e.FileOriginName)
+                .HasColumnName("file_origin_name")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.FileDisplayName)
+                .HasColumnName("file_display_name")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.FileMimeType)
+                .HasColumnName("file_mime_type")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
             builder.HasOne(d => d.OwnershipRightTypeNavigation)
                 .WithMany(p => p.OwnershipRights)
                 .HasForeignKey(d => d.IdOwnershipRightType)

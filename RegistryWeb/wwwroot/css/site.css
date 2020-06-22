@@ -76,3 +76,21 @@ legend.r-scheduler-border {
 .card {
     margin-bottom: 10pt;
 }
+
+.rr-ownership-right-edit-buttons, .rr-restriction-edit-buttons, .rr-sub-premise-edit-buttons, .rr-sub-premise-nav-buttons {
+    margin-top: 0;
+}
+
+@media(min-width: 992px)
+{
+    .rr-restriction-edit-buttons, .rr-ownership-right-edit-buttons {
+        margin-top: 33px;
+    }
+}
+
+@media(min-width: 768px)
+{
+    .rr-sub-premise-edit-buttons, .rr-sub-premise-nav-buttons {
+        margin-top: 33px;
+    }
+}

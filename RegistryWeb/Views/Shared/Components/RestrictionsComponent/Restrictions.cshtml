@@ -3,7 +3,7 @@
     <script src="~/js/restrictions.common.js" asp-append-version="true"></script>
     <div class="card">
         <div class="card-header d-flex justify-content-between">
-            <h3>Список реквизитов права собственности</h3>
+            <h3>Документы права собственности</h3>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {
@@ -12,65 +12,11 @@
                 <a href="#" id="restrictionsToggle" class="form-control btn btn-primary" title="Развернуть список реквизитов права собственности" style="font-weight:bold;">∨</a>
             </div>
         </div>
-        <table class="table table-bordered card-body" id="restrictionsTable" style="margin-bottom:0px; display: none">
-            <thead>
-                <tr>
-                    @if (ViewBag.AddressType == AddressTypes.Premise)
-                    {
-                        <th class="align-middle" title="Принадлежность">Прин-сть</th>
-                    }
-                    <th class="align-middle">Номер</th>
-                    <th class="align-middle">Дата</th>
-                    <th class="align-middle">Наименование</th>
-                    <th class="align-middle">Тип реквизита</th>
-
-                    @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
-                    {
-                        <th class="align-middle" width="110"></th>
-                    }
-                </tr>
-            </thead>
-            <tbody id="restrictions" data-addresstype="@ViewBag.AddressType" data-id="@ViewBag.Id" data-action="@ViewBag.Action">
-                @foreach (var item in Model)
-                {
-                    <tr class="restriction" data-idrestriction="@item.IdRestriction">
-                        @if (ViewBag.AddressType == AddressTypes.Premise)
-                        {
-                            var attachment = item.AddressType == AddressTypes.Building ? "Здание" : item.AddressType == AddressTypes.Premise ? "Помещение" : "";
-                            <td class="align-middle">
-                                @attachment
-                            </td>
-                        }
-                        <td class="align-middle">
-                            <input type="text" disabled class="form-control field-restriction" value="@item.Number" title="@item.Number">
-                        </td>
-                        <td class="align-middle">
-                            <input type="date" disabled class="form-control field-restriction" value="@item.Date.ToString("yyyy-MM-dd")" title="@item.Date.ToString("yyyy-MM-dd")">
-                        </td>
-                        <td class="align-middle"><input type="text" disabled class="form-control field-restriction" value="@item.Description" title="@item.Description"></td>
-                        <td class="align-middle">
-                            <select disabled class="form-control field-restriction" title="@item.RestrictionTypeNavigation.RestrictionTypeName"
-                                    asp-items="@{new SelectList(ViewBag.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName",item.IdRestrictionType)}"></select>
-                        </td>
-                        @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
-                        {
-                            <td class="align-middle">
-                                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
-                                    <a class="btn btn-danger oi oi-x" title="Нет" aria-label="Нет"></a>
-                                    <a class="btn btn-success oi oi-check" title="Да" aria-label="Да"></a>
-                                </div>
-                                @if (item.AddressType == ViewBag.AddressType)
-                                {
-                                    <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
-                                        <a class="btn btn-primary oi oi-pencil" title="Редактировать" aria-label="Редактировать"></a>
-                                        <a class="btn btn-danger oi oi-x delete" title="Удалить" aria-label="Удалить"></a>
-                                    </div>
-                                }
-                            </td>
-                        }
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <ul class="list-group list-group-flush" id="restrictionsList" style="display: none" data-addresstype="@ViewBag.AddressType" data-id="@ViewBag.Id" data-action="@ViewBag.Action">
+            @foreach (var item in Model)
+            {
+                <partial name="Restriction" model="item" />
+            }
+        </ul>
     </div>
 </form>

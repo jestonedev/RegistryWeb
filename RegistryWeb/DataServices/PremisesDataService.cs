@@ -12,17 +12,22 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Runtime.CompilerServices;
 using RegistryWeb.DataHelpers;
 using RegistryWeb.SecurityServices;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace RegistryWeb.DataServices
 {
     public class PremisesDataService : ListDataService<PremisesVM<Premise>, PremisesListFilter>
     {
         private BuildingsDataService buildingsDataService;
+        private readonly IConfiguration config;
         private SecurityService securityService;
-        public PremisesDataService(RegistryContext rc, SecurityService securityService, BuildingsDataService buildingsDataService) : base(rc)
+        public PremisesDataService(RegistryContext rc, SecurityService securityService, BuildingsDataService buildingsDataService, IConfiguration config) : base(rc)
         {
             this.securityService = securityService;
             this.buildingsDataService = buildingsDataService;
+            this.config = config;
         }
 
         public override PremisesVM<Premise> InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, PremisesListFilter filterOptions)
@@ -355,7 +360,7 @@ namespace RegistryWeb.DataServices
             return result.ToList();
         }
 
-        internal void Create(Premise premise, int? IdFundType)
+        internal void Create(Premise premise, List<IFormFile> files, int? IdFundType)
         {
             if (IdFundType != null)
             {
@@ -373,6 +378,40 @@ namespace RegistryWeb.DataServices
                 {
                     fpa
                 };
+            }
+            // Прикрепляем файлы реквизитов
+            var restrictionFilePath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Restrictions\");
+            if (premise.RestrictionPremisesAssoc != null)
+            {
+                for (var i = 0; i < premise.RestrictionPremisesAssoc.Count; i ++)
+                {
+                    var file = files.Where(r => r.Name == "RestrictionFiles[" + i + "]").FirstOrDefault();
+                    if (file == null) continue;
+                    premise.RestrictionPremisesAssoc[i].RestrictionNavigation.FileDisplayName = file.FileName;
+                    var fileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(file.FileName).Extension;
+                    premise.RestrictionPremisesAssoc[i].RestrictionNavigation.FileOriginName = fileOriginName;
+                    premise.RestrictionPremisesAssoc[i].RestrictionNavigation.FileMimeType = file.ContentType;
+                    var fileStream = new FileStream(Path.Combine(restrictionFilePath, fileOriginName), FileMode.CreateNew);
+                    file.OpenReadStream().CopyTo(fileStream);
+                    fileStream.Close();
+                }
+            }
+            // Прикрепляем файлы ограничений
+            var ownershipRightsFilePath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"OwnershipRights\");
+            if (premise.OwnershipPremisesAssoc != null)
+            {
+                for (var i = 0; i < premise.OwnershipPremisesAssoc.Count; i++)
+                {
+                    var file = files.Where(r => r.Name == "OwnershipRightFiles[" + i + "]").FirstOrDefault();
+                    if (file == null) continue;
+                    premise.OwnershipPremisesAssoc[i].OwnershipRightNavigation.FileDisplayName = file.FileName;
+                    var fileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(file.FileName).Extension;
+                    premise.OwnershipPremisesAssoc[i].OwnershipRightNavigation.FileOriginName = fileOriginName;
+                    premise.OwnershipPremisesAssoc[i].OwnershipRightNavigation.FileMimeType = file.ContentType;
+                    var fileStream = new FileStream(Path.Combine(ownershipRightsFilePath, fileOriginName), FileMode.CreateNew);
+                    file.OpenReadStream().CopyTo(fileStream);
+                    fileStream.Close();
+                }
             }
             registryContext.Premises.Add(premise);
             registryContext.SaveChanges();            

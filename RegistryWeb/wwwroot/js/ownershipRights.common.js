@@ -1,7 +1,7 @@
 ﻿let CreateOwnershipPremisesAssoc = function () {
     let ownershipRights = getOwnershipRights();
     let ownershipPremisesAssoc = [];
-    ownershipRights.forEach(function (item, i, arr) {
+    ownershipRights.each(function (idx, item) {
         ownershipPremisesAssoc.push({
             IdPremises: 0,
             IdOwnershipRight: 0,
@@ -13,7 +13,7 @@
 let CreateOwnershipBuildingsAssoc = function () {
     let ownershipRights = getOwnershipRights();
     let ownershipBuildingsAssoc = [];
-    ownershipRights.forEach(function (item, i, arr) {
+    ownershipRights.each(function (idx, item) {
         ownershipBuildingsAssoc.push({
             IdBuilding: 0,
             IdOwnershipRight: 0,
@@ -22,167 +22,112 @@ let CreateOwnershipBuildingsAssoc = function () {
     });
     return ownershipBuildingsAssoc;
 }
-let getOwnershipRights = function () {
-    let trs = $('#ownershipRights>tr');
-    let owrs = [];
-    trs.each(function () {
-        owrs.push(getOwnershipRight($(this)));
+
+function getOwnershipRights() {
+    return $("#ownershipRightsList .list-group-item").map(function (idx, elem) {
+        return getOwnershipRight($(elem));
     });
-    return owrs;
 }
-let getOwnershipRight = function (tr) {
-    let fields = tr.find('.field-ownership-right');
-    let ownershipRight = {
-        IdOwnershipRight: tr.data('idownershipright') == "" ? "0" : tr.data('idownershipright'),
-        Number: fields[0].value,
-        Date: fields[1].value,
-        Description: fields[2].value,
-        IdOwnershipRightType: fields[3].value,
-        ResettlePlanDate: fields[4].value,
-        DemolishPlanDate: fields[5].value
+
+function getOwnershipRight(owElem) {
+    return {
+        IdOwnershipRight: owElem.find("[name^='IdOwnershipRight']").val(),
+        Number: owElem.find("[name^='OwnershipRightNum']").val(),
+        Date: owElem.find("[name^='OwnershipRightDate']").val(),
+        Description: owElem.find("[name^='OwnershipRightDescription']").val(),
+        IdOwnershipRightType: owElem.find("[name^='IdOwnershipRightType']").val(),
+        ResettlePlanDate: owElem.find("[name^='ResettlePlanDate']").val(),
+        DemolishPlanDate: owElem.find("[name^='DemolishPlanDate']").val(),
+        OwnershipRightFile: owElem.find("[name^='OwnershipRightFile']")[0],
+        OwnershipRightFileRemove: owElem.find("[name^='OwnershipRightFileRemove']").val()
     };
-    return ownershipRight;
 }
-let getCurrentAddress = function () {
+
+function ownershipRightToFormData(owr, address) {
+    var formData = new FormData();
+    formData.append("OwnershipRight.IdOwnershipRight", owr.IdOwnershipRight);
+    formData.append("OwnershipRight.Number", owr.Number);
+    formData.append("OwnershipRight.Date", owr.Date);
+    formData.append("OwnershipRight.Description", owr.Description);
+    formData.append("OwnershipRight.IdOwnershipRightType", owr.IdOwnershipRightType);
+    formData.append("OwnershipRight.ResettlePlanDate", owr.ResettlePlanDate);
+    formData.append("OwnershipRight.DemolishPlanDate", owr.DemolishPlanDate);
+    formData.append("OwnershipRightFile", owr.OwnershipRightFile.files[0]);
+    formData.append("OwnershipRightFileRemove", owr.OwnershipRightFileRemove);
+    formData.append("Address.AddressType", address.addressType);
+    formData.append("Address.Id", address.id);
+    return formData;
+}
+
+let getCurrentAddressOwnershipRights = function () {
     let address = {
-        addressType: $('#ownershipRights').data('addresstype'),
-        id: $('#ownershipRights').data('id')
+        addressType: $('#ownershipRightsList').data('addresstype'),
+        id: $('#ownershipRightsList').data('id')
     };
     return address;
-}
-let getErrorSpan = function (dataValmsgFor) {
+};
+
+let getErrorSpanOwnershipRights = function (dataValmsgFor) {
     return "<span class=\"text-danger field-validation-valid\" data-valmsg-for=\"" + dataValmsgFor +
         "\" data-valmsg-replace=\"true\"></span>";
-}
-let initializeVilidationTr = function (tr) {
-    let fields = tr.find('.field-ownership-right');
-    let idOwnershipRight = tr.data('idownershipright');
-    //Дата
-    let Date = 'Date_' + idOwnershipRight;
-    $(fields[1]).addClass('valid');
-    $(fields[1]).attr('data-val', 'true');
-    $(fields[1]).attr('data-val-required', 'Поле "Дата" является обязательным');
-    $(fields[1]).attr('id', Date);
-    $(fields[1]).attr('name', Date);
-    $(fields[1]).attr('aria-describedby', Date + '-error');
-    $(fields[1]).after(getErrorSpan(Date));
-    //Тип ограничения
-    let OwnershipRightType = 'IdOwnershipRightType_' + idOwnershipRight;
-    $(fields[3]).addClass('valid');
-    $(fields[3]).attr('data-val', 'true');
-    $(fields[3]).attr('data-val-required', 'Поле "Тип" является обязательным');
-    $(fields[3]).attr('id', OwnershipRightType);
-    $(fields[3]).attr('name', OwnershipRightType);
-    $(fields[3]).attr('aria-describedby', OwnershipRightType + '-error');
-    $(fields[3]).after(getErrorSpan(OwnershipRightType));
+};
+
+let initializeVilidationOwnershipRight = function (ownershipRightElem) {
+
+    let idOwnershipRight = ownershipRightElem.find("input[name^='IdOwnershipRight']").val();
+    if (idOwnershipRight === "0") idOwnershipRight = uuidv4();
+    //Дата документа
+    let date = 'OwnershipRightDate_' + idOwnershipRight;
+    ownershipRightElem.find("[name^='OwnershipRightDate']").addClass('valid')
+        .attr('data-val', 'true')
+        .attr('data-val-required', 'Поле "Дата документа" является обязательным')
+        .attr('id', date)
+        .attr('name', date)
+        .attr('aria-describedby', date + '-error')
+        .after(getErrorSpanOwnershipRights(date));
+    // Тип документа
+    let idOwnershipRightTypeName = 'IdOwnershipRightType_' + idOwnershipRight;
+    var ownershipRightTypeElem = ownershipRightElem.find("[name^='IdOwnershipRightType']");
+    ownershipRightTypeElem.addClass('valid')
+        .attr('data-val', 'true')
+        .attr('data-val-required', 'Поле "Тип документа" является обязательным')
+        .attr('id', idOwnershipRightTypeName)
+        .attr('name', idOwnershipRightTypeName)
+        .attr('aria-describedby', idOwnershipRightTypeName + '-error').parent()
+        .after(getErrorSpanOwnershipRights(idOwnershipRightTypeName));
+    ownershipRightTypeElem.next().attr("data-id", idOwnershipRightTypeName);
 
     refreshValidationOwnershipRightsForm();
-}
+};
+
 let refreshValidationOwnershipRightsForm = function () {
     var form = $("#ownershipRightsForm")
         .removeData("validator")
         .removeData("unobtrusiveValidation");
     $.validator.unobtrusive.parse(form);
     form.validate();
-}
-let initializeVilidationTrs = function () {
-    let trs = $('#ownershipRights>tr');
-    trs.each(function () {
-        initializeVilidationTr($(this));
+};
+
+let initializeVilidationOwnershipRights = function () {
+    let owrs = $('#ownershipRightsList .list-group-item');
+    owrs.each(function () {
+        initializeVilidationOwnershipRight($(this));
     });
-}
-let refreshOwnershipRight = function (tr, ownershipRight) {
-    let fields = tr.find('.field-ownership-right');
-    //Номер
-    $(fields[0]).prop('value', ownershipRight.number);
-    $(fields[0]).prop('title', ownershipRight.number);
-    //Дата
-    $(fields[1]).prop('value', ownershipRight.date);
-    $(fields[1]).prop('title', ownershipRight.date);
-    $(fields[1])
-        .removeClass('input-validation-error')
-        .addClass('valid');
-    $(fields[1]).next()
-        .removeClass('field-validation-error')
-        .addClass('field-validation-valid')
-        .text('');
-    //Наименование
-    $(fields[2]).prop('value', ownershipRight.description);
-    $(fields[2]).prop('title', ownershipRight.description);
-    //Тип ограничения
-    $(fields[3]).prop('value', ownershipRight.idOwnershipRightType);
-    $(fields[3]).prop('title', ownershipRight.idOwnershipRightType);
-    $(fields[3])
-        .removeClass('input-validation-error')
-        .addClass('valid');
-    $(fields[3]).next()
-        .removeClass('field-validation-error')
-        .addClass('field-validation-valid')
-        .text('');
-    //Планируемая дата переселения
-    $(fields[4]).prop('value', ownershipRight.resettlePlanDate);
-    $(fields[4]).prop('title', ownershipRight.resettlePlanDate);
-    //Планируемая дата сноса
-    $(fields[5]).prop('value', ownershipRight.demolishPlanDate);
-    $(fields[5]).prop('title', ownershipRight.demolishPlanDate);
-}
-let showEditDelPanel = function (tr) {
-    let fields = tr.find('.field-ownership-right');
-    let editDelPanel = tr.find('.edit-del-panel');
-    let yesNoPanel = tr.find('.yes-no-panel');
-    fields.prop('disabled', true);
-    fields.each(function (idx, field) {
-        if (field.tagName === "INPUT" || field.tagName === "TEXTAREA") {
-            $(field).prop("title", $(field).val());
-        } else
-            if (field.tagName === "SELECT") {
-                $(field).prop("title", $(field).find("option[value='" + $(field).val() + "']").text());
-            } else {
-                $(field).prop("title", "");
-            }
-    });
-    yesNoPanel.hide();
-    editDelPanel.show();
-}
-let showYesNoPanel = function (tr) {
-    let fields = tr.find('.field-ownership-right');
-    let yesNoPanel = tr.find('.yes-no-panel');
-    let editDelPanel = tr.find('.edit-del-panel');
-    fields.prop('disabled', false);
-    editDelPanel.hide();
-    yesNoPanel.show();
-}
-let ownershipRightAddClick = function (event) {
-    let addressType = $('#ownershipRights').data('addresstype');
-    let action = $('#ownershipRights').data('action');
-    $.ajax({
-        async: false,
-        type: 'POST',
-        url: window.location.origin + '/OwnershipRights/AddOwnershipRight',
-        data: { addressType, action },
-        success: function (tr) {
-            let trs = $('#ownershipRights');
-            let ownershipRightsToggle = $('#ownershipRightsToggle');
-            if (!isExpandElemntArrow(ownershipRightsToggle)) // развернуть при добавлении, если было свернуто 
-                ownershipRightsToggle.click();
-            trs.append(tr);
-            initializeVilidationTr(trs.find('tr').last());
-            event.preventDefault();
-        }
-    });
-}
-let ownershipRightDeleteClick = function (tr) {
+};
+
+function deleteOwnershipRight(e) {
     let isOk = confirm("Вы уверены что хотите удалить ограничение?");
     if (isOk) {
-        let idOwnershipRight = tr.data('idownershipright');
+        let owrElem = $(this).closest(".list-group-item");
+        let idOwnershipRight = owrElem.find("input[name^='IdOwnershipRight']").val();
         $.ajax({
             async: false,
             type: 'POST',
             url: window.location.origin + '/OwnershipRights/DeleteOwnershipRight',
             data: { idOwnershipRight: idOwnershipRight },
             success: function (ind) {
-                if (ind == 1) {
-                    tr.remove();
+                if (ind === 1) {
+                    owrElem.remove();
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -190,70 +135,193 @@ let ownershipRightDeleteClick = function (tr) {
             }
         });
     }
+    e.preventDefault();
 }
-let ownershipRightNoClick = function (tr) {
-    let idOwnershipRight = tr.data('idownershipright');
-    //Отменить изменения внесенные в ограничение
-    if (Number.isInteger(idOwnershipRight)) {
+
+function addOwnershipRight(e) {
+    let action = $('#ownershipRightsList').data('action');
+    let addressType = $('#ownershipRightsList').data('addresstype');
+
+    $.ajax({
+        type: 'POST',
+        url: window.location.origin + '/OwnershipRights/AddOwnershipRight',
+        data: { addressType, action },
+        success: function (elem) {
+            let list = $('#ownershipRightsList');
+            let ownershipRightsToggle = $('#ownershipRightsToggle');
+            if (!isExpandElemntArrow(ownershipRightsToggle)) // развернуть при добавлении, если было свернуто 
+                ownershipRightsToggle.click();
+            list.append(elem);
+            elem = list.find(".list-group-item").last();
+            elem.find("select").selectpicker("refresh");
+            elem.find(".ownership-right-edit-btn").click();
+            $([document.documentElement, document.body]).animate({
+                scrollTop: $(elem).offset().top
+            }, 1000);
+            initializeVilidationOwnershipRight(elem);
+        }
+    });
+    e.preventDefault();
+}
+
+function editOwnershipRight(e) {
+    let owr = $(this).closest(".list-group-item");
+    let fields = owr.find('input, select, textarea');
+    let yesNoPanel = owr.find('.yes-no-panel');
+    let editDelPanel = owr.find('.edit-del-panel');
+    fields.filter(function (idx, val) { return !$(val).prop("name").startsWith("OwnershipRightAttachment"); }).prop('disabled', false);
+    owr.find("select").selectpicker('refresh');
+    editDelPanel.hide();
+    yesNoPanel.show();
+    showOwnershipRightEditFileBtns(owr,
+        owr.find(".rr-ownership-right-file-download").length > 0 &&
+        !owr.find(".rr-ownership-right-file-download").hasClass("disabled"));
+    e.preventDefault();
+}
+
+function cancelEditOwnershipRight(e) {
+    let owrElem = $(this).closest(".list-group-item");
+    let idOwnershipRight = owrElem.find("input[name^='IdOwnershipRight']").val();
+    //Отменить изменения внесенные в документ
+    if (idOwnershipRight !== "0") {
         $.ajax({
-            async: false,
             type: 'POST',
             url: window.location.origin + '/OwnershipRights/GetOwnershipRight',
             data: { idOwnershipRight: idOwnershipRight },
-            success: function (ownershipRight) {
-                refreshOwnershipRight(tr, ownershipRight);
-                showEditDelPanel(tr);
+            success: function (owr) {
+                refreshOwnershipRight(owrElem, owr);
+                showEditDelPanelOwnershipRight(owrElem);
+                clearValidationsOwnershipRights(owrElem);
+                showOwnershipRightDownloadFileBtn(owrElem, owr.fileOriginName !== null);
             }
         });
     }
-    //Отменить вставку нового ограничения
+    //Отменить вставку нового документа
     else {
-        tr.remove();
+        owrElem.remove();
     }
+    e.preventDefault();
 }
-let ownershipRightYesClick = function (tr) {
-    //Запуск ручной валидации, тк отсутсвует submit
-    if ($('#ownershipRightsForm').valid()) {
-        let owr = getOwnershipRight(tr);
-        let address = getCurrentAddress();
-        $.ajax({
-            async: false,
-            type: 'POST',
-            url: window.location.origin + '/OwnershipRights/YesOwnershipRight',
-            data: { owr, address },
-            success: function (idOwnershipRight) {
-                if (idOwnershipRight > 0) {
-                    tr.data('idownershipright', idOwnershipRight);
-                }
-                showEditDelPanel(tr);
-            }
-        });
-    }
-}
-let ownershipRightsClick = function (event) {
-    let el = $(event.target);
-    let tr = el.parents('tr');
-    if (el.hasClass('oi-x')) {
-        if (el.hasClass('delete')) {
-            ownershipRightDeleteClick(tr);
-        }
-        else {
-            ownershipRightNoClick(tr);
-        }
-    }
-    if (el.hasClass('oi-check')) {
-        ownershipRightYesClick(tr);
-    }
-    if (el.hasClass('oi-pencil')) {
-        showYesNoPanel(tr);
+
+function showOwnershipRightEditFileBtns(owrElem, fileExists) {
+    let owrFileBtns = owrElem.find(".rr-ownership-right-file-buttons");
+    owrElem.find(".rr-ownership-right-file-download").hide();
+    if (fileExists) {
+        owrFileBtns.append(owrElem.find(".rr-ownership-right-file-remove").show());
+        owrElem.find(".rr-ownership-right-file-attach").hide();
+    } else {
+        owrElem.find(".rr-ownership-right-file-remove").hide();
+        owrFileBtns.append(owrElem.find(".rr-ownership-right-file-attach").show());
     }
 }
 
+function showOwnershipRightDownloadFileBtn(owrElem, fileExists) {
+    let owrFileBtns = owrElem.find(".rr-ownership-right-file-buttons");
+    owrFileBtns.append(owrElem.find(".rr-ownership-right-file-download").show());
+    if (fileExists) {
+        owrElem.find(".rr-ownership-right-file-download").removeClass("disabled");
+    } else {
+        owrElem.find(".rr-ownership-right-file-download").addClass("disabled");
+    }
+    owrElem.find(".rr-ownership-right-file-remove").hide();
+    owrElem.find(".rr-ownership-right-file-attach").hide();
+}
+
+function clearValidationsOwnershipRights(owrElem) {
+    $(owrElem).find(".input-validation-error").removeClass("input-validation-error").addClass("valid");
+    $(owrElem).find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid").text("");
+}
+
+function showEditDelPanelOwnershipRight(owrElem) {
+    let fields = owrElem.find('input, select, textarea');
+    fields.prop('disabled', true).selectpicker('refresh');
+    let editDelPanel = owrElem.find('.edit-del-panel');
+    let yesNoPanel = owrElem.find('.yes-no-panel');
+    yesNoPanel.hide();
+    editDelPanel.show();
+}
+
+function refreshOwnershipRight(owrElem, owr) {
+    owrElem.find("[name^='OwnershipRightNum']").val(owr.number);
+    owrElem.find("[name^='OwnershipRightDate']").val(owr.date);
+    owrElem.find("[name^='OwnershipRightDescription']").val(owr.description);
+    owrElem.find("[name^='IdOwnershipRightType']").val(owr.idOwnershipRightType).selectpicker('refresh');
+    owrElem.find("[name^='DemolishPlanDate']").val(owr.demolishPlanDate);
+    owrElem.find("[name^='ResettlePlanDate']").val(owr.resettlePlanDate);
+    owrElem.find("[name^='OwnershipRightFile']").val("");
+    owrElem.find("[name^='OwnershipRightFileRemove']").val(false);
+}
+
+function saveOwnershipRight(e) {
+    let owrElem = $(this).closest(".list-group-item");
+    owrElem.find("button[data-id]").removeClass("input-validation-error");
+    if (owrElem.find("input, textarea, select").valid()) {
+        let owr = ownershipRightToFormData(getOwnershipRight(owrElem), getCurrentAddressOwnershipRights());
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/OwnershipRights/SaveOwnershipRight',
+            data: owr,
+            processData: false,
+            contentType: false,
+            success: function (owr) {
+                if (owr.idOwnershipRight > 0) {
+                    owrElem.find("input[name^='IdOwnershipRight']").val(owr.idOwnershipRight);
+                    owrElem.find(".rr-ownership-right-file-download").prop("href", "/OwnershipRights/DownloadFile/?idOwnershipRight=" + owr.idOwnershipRight);
+                    showOwnershipRightDownloadFileBtn(owrElem, owr.fileOriginName !== null);
+                }
+                showEditDelPanelOwnershipRight(owrElem);
+            }
+        });
+    } else {
+        owrElem.find("select").each(function (idx, elem) {
+            var id = $(elem).prop("id");
+            var name = $(elem).prop("name");
+            var errorSpan = $("span[data-valmsg-for='" + name + "']");
+            if (errorSpan.hasClass("field-validation-error")) {
+                $("button[data-id='" + id + "']").addClass("input-validation-error");
+            }
+        });
+    }
+    e.preventDefault();
+}
+
+function attachOwnershipRightFile(e) {
+    var owrElem = $(this).closest(".list-group-item");
+    owrElem.find("input[name^='OwnershipRightFile']").click();
+    owrElem.find("input[name^='OwnershipRightFileRemove']").val(false);
+    e.preventDefault();
+}
+
+function changeOwnershipRightFileAttachment() {
+    var owrElem = $(this).closest(".list-group-item");
+    if ($(this).val() !== "") {
+        let owrFileBtns = owrElem.find(".rr-ownership-right-file-buttons");
+        owrElem.find(".rr-ownership-right-file-attach").hide();
+        owrFileBtns.append(owrElem.find(".rr-ownership-right-file-remove").show());
+    }
+}
+
+function removeOwnershipRightFile(e) {
+    var owrElem = $(this).closest(".list-group-item");
+    owrElem.find("input[name^='OwnershipRightFile']").val("");
+    owrElem.find("input[name^='OwnershipRightFileRemove']").val(true);
+    let owrFileBtns = owrElem.find(".rr-ownership-right-file-buttons");
+    owrElem.find(".rr-ownership-right-file-remove").hide();
+    owrFileBtns.append(owrElem.find(".rr-ownership-right-file-attach").show());
+    e.preventDefault();
+}
+
 $(function () {
-    $('#ownershipRightsTable').hide();
+    $('#ownershipRightsList').hide();
     $('.yes-no-panel').hide();
-    initializeVilidationTrs();
-    $('#ownershipRightsToggle').on('click', $('#ownershipRightsTable'), elementToogle);
-    $('#ownershipRightAdd').click(ownershipRightAddClick);
-    $('#ownershipRights').click(ownershipRightsClick);
+    initializeVilidationOwnershipRights();
+    $('#ownershipRightAdd').click(addOwnershipRight);
+    $('#ownershipRightsToggle').on('click', $('#ownershipRightsList'), elementToogle);
+    $('#ownershipRightsList').on('click', '.ownership-right-edit-btn', editOwnershipRight);
+    $('#ownershipRightsList').on('click', '.ownership-right-cancel-btn', cancelEditOwnershipRight);
+    $('#ownershipRightsList').on('click', '.ownership-right-save-btn', saveOwnershipRight);
+    $('#ownershipRightsList').on('click', '.ownership-right-delete-btn', deleteOwnershipRight);
+    $('#ownershipRightsList').on('click', '.rr-ownership-right-file-attach', attachOwnershipRightFile);
+    $('#ownershipRightsList').on('click', '.rr-ownership-right-file-remove', removeOwnershipRightFile);
+    $('#ownershipRightsList').on('change', "input[name^='OwnershipRightFile']", changeOwnershipRightFileAttachment);
 });

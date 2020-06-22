@@ -3,7 +3,7 @@
     let fields = subPremise.find('input, select, textarea');
     let yesNoPanel = subPremise.find('.yes-no-panel');
     let editDelPanel = subPremise.find('.edit-del-panel');
-    fields.filter(function (idx, val) { return !($(val).prop("name") === "IdFundType"); }).prop('disabled', false);
+    fields.filter(function (idx, val) { return !$(val).prop("name").startsWith("IdFundType"); }).prop('disabled', false);
     subPremise.find("select").selectpicker('refresh');
     editDelPanel.hide();
     yesNoPanel.show();
@@ -22,8 +22,7 @@ function cancelEditSubPremise(e) {
             success: function (subPremise) {
                 refreshSubPremise(subPremiseElem, subPremise);
                 showEditDelPanelSubPremise(subPremiseElem);
-                updateSubPremiseFieldsTitles(subPremiseElem);
-                clearValidations(subPremiseElem);
+                clearValidationsSubPremises(subPremiseElem);
             }
         });
     }
@@ -34,7 +33,7 @@ function cancelEditSubPremise(e) {
     e.preventDefault();
 }
 
-function clearValidations(subPremiseElem) {
+function clearValidationsSubPremises(subPremiseElem) {
     $(subPremiseElem).find(".input-validation-error").removeClass("input-validation-error").addClass("valid");
     $(subPremiseElem).find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid").text("");
 }
@@ -48,20 +47,6 @@ function showEditDelPanelSubPremise(subPremiseElem) {
     editDelPanel.show();
 }
 
-function updateSubPremiseFieldsTitles(subPremiseElem) {
-    let fields = subPremiseElem.find('input, select, textarea');
-    fields.each(function (idx, field) {
-        if (field.tagName === "INPUT" || field.tagName === "TEXTAREA") {
-            $(field).prop("title", $(field).val());
-        } else
-            if (field.tagName === "SELECT") {
-                $(field).prop("title", $(field).find("option[value='" + $(field).val() + "']").text());
-            } else {
-                $(field).prop("title", "");
-            }
-    });
-}
-
 function refreshSubPremise(subPremiseElem, subPremise) {
     subPremiseElem.find("[name^='SubPremisesNum']").val(subPremise.subPremisesNum);
     subPremiseElem.find("[name^='TotalArea']").val(subPremise.totalArea);
@@ -72,8 +57,6 @@ function refreshSubPremise(subPremiseElem, subPremise) {
     subPremiseElem.find("[name^='CadastralCost']").val(subPremise.cadastralCost);
     subPremiseElem.find("[name^='BalanceCost']").val(subPremise.balanceCost);
     subPremiseElem.find("[name^='Account']").val(subPremise.account);
-
-    //TODO: delete validation attributes
 }
 
 function saveSubPremise(e) {
@@ -191,6 +174,7 @@ let getErrorSpanSubPremises = function (dataValmsgFor) {
 
 function initializeVilidationSubPremise(subPremiseElem) {
     let idSubPremise = subPremiseElem.find("input[name^='IdSubPremise']").val();
+    if (idSubPremise === "0") idSubPremise = uuidv4();
     //Общая площадь
     let totalAreaName = 'TotalArea_' + idSubPremise;
     subPremiseElem.find("[name^='TotalArea']").addClass('valid')

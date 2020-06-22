@@ -125,7 +125,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             var subPremise = new SubPremise { };
             var subPremiseVM = new SubPremiseVM(subPremise, null);
             ViewBag.SecurityService = securityService;
-            ViewBag.action = action;
+            ViewBag.Action = action;
 
             var objectStates = registryContext.ObjectStates.ToList();
             if (action == "Create" || action == "Edit")
@@ -137,7 +137,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             ViewBag.ObjectStatesList = new SelectList(objectStates, "IdState", "StateFemale");
             ViewBag.FundTypesList = new SelectList(registryContext.FundTypes, "IdFundType", "FundTypeName");
 
-            return PartialView("~/Views/Shared/Components/SubPremisesComponent/SubPremise.cshtml", subPremiseVM);
+            return PartialView("SubPremise", subPremiseVM);
         }
     }
 }

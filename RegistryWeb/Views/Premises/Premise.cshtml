@@ -34,7 +34,7 @@
     <script src="~/js/premises.js" asp-append-version="true"></script>
 }
 
-<form asp-controller="Premise" asp-action="@ViewBag.Action" id="r-premises-form" data-action="@ViewBag.Action" data-addressType="@(ViewBag.addressType=="Premise" ? "3" : "")" method="post">
+<form asp-controller="Premise" enctype="multipart/form-data" asp-action="@ViewBag.Action" id="r-premises-form" data-action="@ViewBag.Action" data-addressType="@(ViewBag.addressType=="Premise" ? "3" : "")" method="post">
     <div class="card">
         <input type="hidden" asp-for="@Model.Premise.IdPremises" />
         <input type="hidden" asp-for="@Model.Premise.IdPremisesKind" value="1" />
@@ -47,25 +47,21 @@
                 @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
                 {
                     <div class="btn-group" role="group" aria-label="Панель доступа">
-                        @if (
-                           (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(Model.Premise.IdState) && !Model.Premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState))) ||
-                           (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(Model.Premise.IdState)))
+                        @if (ViewBag.Action == "Details" && ViewBag.CanEdit ?? false)
                         {
-                            if (ViewBag.Action == "Details")
-                            {
-                                <div class="btn-group" role="group" aria-label="Панель доступа">
-                                    <button class="btn btn-primary dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@Model.Premise.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="oi oi-wrench"></span>
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@Model.Premise.IdPremises">
-                                        <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
-                                           asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@Model.Premise.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                        <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                                           asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@Model.Premise.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                    </div>
+                            <div class="btn-group" role="group" aria-label="Панель доступа">
+                                <button class="btn btn-primary dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@Model.Premise.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="oi oi-wrench"></span>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@Model.Premise.IdPremises">
+                                    <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                                        asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@Model.Premise.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                    <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                                        asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@Model.Premise.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                 </div>
-                            }
+                            </div>
                         }
+                        
                         <div class="btn-group" role="group" aria-label="Панель доступа">
                             <button class="btn btn-dark dropdown-toggle" type="button" title="Связанные объекты" aria-label="Связанные объекты" id="objectsBtn_@Model.Premise.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="oi oi-grid-two-up"></span>
