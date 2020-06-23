@@ -60,8 +60,10 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 return Json(-2);
             var resettle = registryContext.ResettleInfos
                 .Include(or => or.ResettleInfoSubPremisesFrom)
+                .Include(or => or.ResettleInfoTo)
                 .Include(or => or.ResettleDocuments)
                 .FirstOrDefault(op => op.IdResettleInfo == idResettleInfo);
+
             return Json(new {
                 resettleDate = resettle.ResettleDate == null ? null : resettle.ResettleDate.Value.ToString("yyyy-MM-dd"),
                 idResettleKind = resettle.IdResettleKind,
@@ -158,7 +160,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 restriction.FileDisplayName = restrictionDb.FileDisplayName;
                 restriction.FileMimeType = restrictionDb.FileMimeType;
             }*/
-            //Обновить         
+            // Обновить переселение из
             var subPremisesFrom = registryContext.ResettleInfoSubPremisesFrom.Where(r => r.IdResettleInfo == resettleInfo.IdResettleInfo);
             foreach(var subPremise in subPremisesFrom)
             {
@@ -176,7 +178,27 @@ namespace RegistryWeb.Controllers.ServiceControllers
                     registryContext.ResettleInfoSubPremisesFrom.Add(subPremise);
                 }
             }
+            // Обновить переселение в
+            var resettlesTo = registryContext.ResettleInfoTo.Where(r => r.IdResettleInfo == resettleInfo.IdResettleInfo);
+            foreach (var resettleTo in resettlesTo)
+            {
+                if (!resettleInfo.ResettleInfoTo.Any(ri => ri.ObjectType == resettleTo.ObjectType && ri.IdObject == resettleTo.IdObject))
+                {
+                    resettleTo.Deleted = 1;
+                }
+            }
+            var resettlesToList = resettlesTo.ToList();
+            foreach (var resettleTo in resettleInfo.ResettleInfoTo)
+            {
+                resettleTo.IdResettleInfo = resettleInfo.IdResettleInfo;
+                if (!resettlesToList.Any(ri => ri.ObjectType == resettleTo.ObjectType && ri.IdObject == resettleTo.IdObject))
+                {
+                    registryContext.ResettleInfoTo.Add(resettleTo);
+                }
+            }
+            // Обновить основную информацию
             resettleInfo.ResettleInfoSubPremisesFrom = null;
+            resettleInfo.ResettleInfoTo = null;
             registryContext.ResettleInfos.Update(resettleInfo);
             registryContext.SaveChanges();
             return Json(new { resettleInfo.IdResettleInfo /*, restriction.FileOriginName  */});
@@ -195,7 +217,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 return Json(new { Error = -4 });
 
             var resettleInfo = new ResettleInfo { };
-            var resettleInfoVM = new ResettleInfoVM(resettleInfo, new Address { AddressType = address.AddressType });
+            var resettleInfoVM = new ResettleInfoVM(resettleInfo, new Address { AddressType = address.AddressType }, registryContext);
             ViewBag.SecurityService = securityService;
             ViewBag.Action = action;
             ViewBag.Address = address;
@@ -205,8 +227,27 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 r.IdSubPremises,
                 SubPremisesNum = string.Concat("Комната ", r.SubPremisesNum)
             });
+            ViewBag.KladrStreets = registryContext.KladrStreets;
 
             return PartialView("ResettleInfo", resettleInfoVM);
+        }
+
+        public JsonResult GetHouses(string idStreet)
+        {
+            IEnumerable<Building> buildings = registryContext.Buildings.Where(r => r.IdStreet == idStreet);
+            return Json(buildings);
+        }
+
+        public JsonResult GetPremises(int? idBuilding)
+        {
+            IEnumerable<Premise> premises = registryContext.Premises.Where(r => r.IdBuilding == idBuilding);
+            return Json(premises);
+        }
+
+        public JsonResult GetSubPremises(int? idPremise)
+        {
+            IEnumerable<SubPremise> subPremises = registryContext.SubPremises.Where(r => r.IdPremises == idPremise);
+            return Json(subPremises);
         }
     }
 }

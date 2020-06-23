@@ -31,8 +31,39 @@ function getResettle(resettleElem) {
         FinanceSource1: resettleElem.find("[name^='FinanceSource1']").val(),
         FinanceSource2: resettleElem.find("[name^='FinanceSource2']").val(),
         FinanceSource3: resettleElem.find("[name^='FinanceSource3']").val(),
-        FinanceSource4: resettleElem.find("[name^='FinanceSource4']").val()
+        FinanceSource4: resettleElem.find("[name^='FinanceSource4']").val(),
+        ResettleInfoTo: GetRessetleInfoTo(resettleElem)
     };
+}
+
+function GetRessetleInfoTo(resettleElem) {
+    var subPremisesSelect = resettleElem.find('select[name="ResettleToSubPremises"]');
+    var premisesSelect = resettleElem.find('select[name="ResettleToIdPremise"]');
+    var buildingsSelect = resettleElem.find('select[name="ResettleToIdBuilding"]');
+    if (subPremisesSelect.val().length !== 0) {
+        return $(subPremisesSelect.val()).map(function (idx, val) {
+            return {
+                ObjectType: 'SubPremise',
+                IdObject: val,
+                IdResettleInfo: 0
+            };
+        });
+    }
+    if (premisesSelect.val() !== "") {
+        return [{
+            ObjectType: 'Premise',
+            IdObject: premisesSelect.val(),
+            IdResettleInfo: 0
+        }];
+    }
+    if (buildingsSelect.val() !== "") {
+        return [{
+            ObjectType: 'Building',
+            IdObject: buildingsSelect.val(),
+            IdResettleInfo: 0
+        }];
+    }
+    return null;
 }
 
 function resettleToFormData(resettle, address) {
@@ -50,6 +81,13 @@ function resettleToFormData(resettle, address) {
     formData.append("ResettleInfo.FinanceSource4", resettle.FinanceSource4);
     formData.append("Address.AddressType", address.addressType);
     formData.append("Address.Id", address.id);
+    if (resettle.ResettleInfoTo !== null) {
+        for (var j = 0; j < resettle.ResettleInfoTo.length; j++) {
+            formData.append("ResettleInfo.ResettleInfoTo[" + j + "].IdObject", resettle.ResettleInfoTo[j].IdObject);
+            formData.append("ResettleInfo.ResettleInfoTo[" + j + "].ObjectType", resettle.ResettleInfoTo[j].ObjectType);
+            formData.append("ResettleInfo.ResettleInfoTo[" + j + "].IdResettleInfo", resettle.ResettleInfoTo[j].IdResettleInfo);
+        }
+    }
     return formData;
 }
 
@@ -258,6 +296,8 @@ function refreshResettle(resettleElem, resettle) {
     resettleElem.find("[name^='FinanceSource2']").val(resettle.financeSource2.toFixed(2).replace('.', ','));
     resettleElem.find("[name^='FinanceSource3']").val(resettle.financeSource3.toFixed(2).replace('.', ','));
     resettleElem.find("[name^='FinanceSource4']").val(resettle.financeSource4.toFixed(2).replace('.', ','));
+    resettleElem.find("[name^='FinanceSource4']").val(resettle.financeSource4.toFixed(2).replace('.', ','));
+    resettleElem.find('select[name="ResettleToIdStreet"]').val(resettleElem.find('input[name="ResettleToIdStreetPrev"]').val()).change().selectpicker('refresh');
 }
 
 function saveResettle(e) {
@@ -281,6 +321,14 @@ function saveResettle(e) {
             success: function (resettle) {
                 if (resettle.idResettleInfo > 0) {
                     resettleElem.find("input[name^='IdResettleInfo']").val(resettle.idResettleInfo);
+                    resettleElem.find('input[name="ResettleToIdStreetPrev"]').val(resettleElem.find('select[name="ResettleToIdStreet"]').val());
+                    resettleElem.find('input[name="ResettleToIdBuildingPrev"]').val(resettleElem.find('select[name="ResettleToIdBuilding"]').val());
+                    resettleElem.find('input[name="ResettleToIdPremisePrev"]').val(resettleElem.find('select[name="ResettleToIdPremise"]').val());
+                    resettleElem.find('input[name="ResettleToSubPremisesPrev"]').remove();
+                    var resettleToSubPremisesIds = resettleElem.find('select[name="ResettleToSubPremises"]').val();
+                    for (var i = 0; i < resettleToSubPremisesIds.length; i++) {
+                        resettleElem.append("<input type='hidden' name='ResettleToSubPremisesPrev' value='" + resettleToSubPremisesIds[i]+"'>");
+                    }
                     //TODO
                     /*resettleElem.find(".rr-resettle-file-download")
                         .prop("href", "/Restrictions/DownloadFile/?idRestriction=" + restriction.idRestriction);*/
@@ -329,6 +377,61 @@ function removeResettleFile(e) {
     e.preventDefault();*/
 }
 
+function getResettleHouses() {
+    var idStreet = $(this).val();
+    var resettleElem = $(this).closest(".list-group-item");
+    var buildingToSelect = resettleElem.find('select[name="ResettleToIdBuilding"]');
+    var buildingPrevId = resettleElem.find('input[name="ResettleToIdBuildingPrev"]').val();
+    buildingToSelect.empty();
+    buildingToSelect.append("<option></option>");
+    buildingToSelect.selectpicker('refresh');
+    $.getJSON('/Resettles/GetHouses', { idStreet: idStreet }, function (buildings) {
+        $(buildings).each(function (idx, building) {
+            var option = '<option value="' + building.idBuilding + '">' + building.house + '</option>';
+            buildingToSelect.append(option);
+        });
+        buildingToSelect.val(buildingPrevId);
+        buildingToSelect.selectpicker('refresh');
+        buildingToSelect.change();
+    });
+}
+
+function getResettlePremises() {
+    var idBuilding = $(this).val();
+    var resettleElem = $(this).closest(".list-group-item");
+    var premiseToSelect = resettleElem.find('select[name="ResettleToIdPremise"]');
+    var premisePrevId = resettleElem.find('input[name="ResettleToIdPremisePrev"]').val();
+    premiseToSelect.empty();
+    premiseToSelect.append("<option></option>");
+    premiseToSelect.selectpicker('refresh');
+    $.getJSON('/Resettles/GetPremises', { idBuilding: idBuilding }, function (premises) {
+        $(premises).each(function (idx, premise) {
+            var option = '<option value="' + premise.idPremises + '">' + premise.premisesNum + '</option>';
+            premiseToSelect.append(option);
+        });
+        premiseToSelect.val(premisePrevId);
+        premiseToSelect.selectpicker('refresh');
+        premiseToSelect.change();
+    });
+}
+
+function getResettleSubPremises() {
+    var idPremise = $(this).val();
+    var resettleElem = $(this).closest(".list-group-item");
+    var subPremiseToSelect = resettleElem.find('select[name="ResettleToSubPremises"]');
+    var subPremisePrevIds = resettleElem.find('input[name="ResettleToSubPremisesPrev"]').map(function (idx, elem) { return $(elem).val() }).toArray();
+    subPremiseToSelect.empty();
+    subPremiseToSelect.selectpicker('refresh');
+    $.getJSON('/Resettles/GetSubPremises', { idPremise: idPremise }, function (subPremises) {
+        $(subPremises).each(function (idx, subPremise) {
+            var option = '<option value="' + subPremise.idSubPremises + '">' + subPremise.subPremisesNum + '</option>';
+            subPremiseToSelect.append(option);
+        });
+        subPremiseToSelect.val(subPremisePrevIds);
+        subPremiseToSelect.selectpicker('refresh');
+    });
+}
+
 $(function () {
     $('#resettlesList').hide();
     $('.yes-no-panel').hide();
@@ -339,6 +442,9 @@ $(function () {
     $('#resettlesList').on('click', '.resettle-cancel-btn, .resettle-cancel-btn-2', cancelEditResettle);
     $('#resettlesList').on('click', '.resettle-save-btn, .resettle-save-btn-2', saveResettle);
     $('#resettlesList').on('click', '.resettle-delete-btn, .resettle-delete-btn-2', deleteResettle);
+    $('#resettlesList').on('change', 'select[name="ResettleToIdStreet"]', getResettleHouses);
+    $('#resettlesList').on('change', 'select[name="ResettleToIdBuilding"]', getResettlePremises);
+    $('#resettlesList').on('change', 'select[name="ResettleToIdPremise"]', getResettleSubPremises);
     /*$('#resettlesList').on('click', '.rr-resettle-file-attach', attachResettleFile);
     $('#resettlesList').on('click', '.rr-resettle-file-remove', removeResettleFile);
     $('#resettlesList').on('change', "input[name^='ResettleFile']", changeResettleFileAttachment);*/

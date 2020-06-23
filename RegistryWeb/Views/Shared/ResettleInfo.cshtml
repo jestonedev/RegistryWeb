@@ -36,7 +36,7 @@
                     subPremisesIds = new List<int>() { 0 };
                 }
             }
-            <select disabled multiple data-actions-box="true" class="form-control field-resettle selectpicker" name="SubPremisesFrom" title="Переселение из"
+            <select disabled multiple class="form-control field-resettle selectpicker" name="SubPremisesFrom" title="Переселение из"
                     asp-items="@{new SelectList(ViewBag.SubPremises, "IdSubPremises", "SubPremisesNum")}"
                     asp-for="@subPremisesIds">
                 <option value="0">Вся квартира</option>
@@ -66,10 +66,52 @@
             </div>
         }
     </div>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h5 class="rr-resettle-card-header-sub-title">Адрес переселения</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label>Улица</label>
+                    <input type="hidden" value="@Model.IdStreet" name="ResettleToIdStreetPrev">
+                    <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Улица"
+                            asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName",Model.IdStreet)}" name="ResettleToIdStreet">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Дом</label>
+                    <input type="hidden" value="@Model.IdBuilding" name="ResettleToIdBuildingPrev">
+                    <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Дом"
+                            asp-items="@{new SelectList(Model.Buildings, "IdBuilding", "House",Model.IdBuilding)}" name="ResettleToIdBuilding">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Помещение</label>
+                    <input type="hidden" value="@Model.IdPremise" name="ResettleToIdPremisePrev">
+                    <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Помещение"
+                            asp-items="@{new SelectList(Model.Premises, "IdPremises", "PremisesNum",Model.IdPremise)}" name="ResettleToIdPremise">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Комнаты</label>
+                    @foreach (var idSubPremise in Model.IdSubPremises)
+                    {
+                        <input type="hidden" value="@idSubPremise" name="ResettleToSubPremisesPrev">
+                    }
+                    <select disabled multiple class="form-control field-resettle selectpicker" title="Комнаты"
+                            asp-items="@{new SelectList(Model.SubPremises, "IdSubPremises", "SubPremisesNum")}" asp-for="@Model.IdSubPremises" name="ResettleToSubPremises"></select>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="card">
         <div class="card-header d-flex justify-content-between">
-            <h3>Источники финансирования</h3>
+            <h5 class="rr-resettle-card-header-sub-title">Источники финансирования</h5>
         </div>
         <div class="card-body">
             <div class="form-row">
@@ -115,16 +157,16 @@
 
     <div class="card">
         <div class="card-header d-flex justify-content-between">
-            <h3>Документы</h3>
+            <h5 class="rr-resettle-card-header-sub-title">Документы</h5>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {
                     <a href="#" id="resettleDocumentAdd" class="form-control btn btn-success" title="Добавить документ по переселению">&#10010;</a>
                 }
             </div>
-        </div>        
+        </div>
         <ul class="list-group list-group-flush" id="resettleDocumentsList" style="display: none">
-            @foreach(var document in Model.ResettleDocuments)
+            @foreach (var document in Model.ResettleDocuments)
             {
                 <li></li>
             }

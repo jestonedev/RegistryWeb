@@ -94,3 +94,7 @@ legend.r-scheduler-border {
         margin-top: 33px;
     }
 }
+
+h5.rr-resettle-card-header-sub-title {
+    margin-bottom: .25rem;
+}

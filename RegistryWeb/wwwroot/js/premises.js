@@ -27,7 +27,8 @@
         var isOwnershipsValid = $("#ownershipRightsForm").valid();
         var isRestrictionsValid = $("#restrictionsForm").valid();
         var isSubPremisesValid = $("#subpremisesForm").valid();
-        if (!isFormValid || !isOwnershipsValid || !isRestrictionsValid || !isSubPremisesValid) {
+        var isResettlesValid = $("#resettlesForm").valid();
+        if (!isFormValid || !isOwnershipsValid || !isRestrictionsValid || !isSubPremisesValid || !isResettlesValid) {
             $("select").each(function (idx, elem) {
                 var id = $(elem).prop("id");
                 var name = $(elem).prop("name");
@@ -98,6 +99,12 @@
                 $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource2").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource2));
                 $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource3").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource3));
                 $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource4").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource4));
+                for (var s = 0; s < resettles[l].ResettleInfoNavigation.ResettleInfoTo.length; s++) {
+                    var rit = rin + "ResettleInfoTo[" + s + "].";
+                    $(this).append(inputTemplate.replace('{0}', rit + "IdResettleInfo").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleInfoTo[s].IdResettleInfo));
+                    $(this).append(inputTemplate.replace('{0}', rit + "IdObject").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleInfoTo[s].IdObject));
+                    $(this).append(inputTemplate.replace('{0}', rit + "ObjectType").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleInfoTo[s].ObjectType));
+                }
             }
 
         }

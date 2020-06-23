@@ -41,6 +41,7 @@ namespace RegistryWeb.ViewComponents
                 r.IdSubPremises,
                 SubPremisesNum = string.Concat("Комната ", r.SubPremisesNum)
             });
+            ViewBag.KladrStreets = registryContext.KladrStreets.ToList();
             return View("ResettleInfoList", model);
         }
 
@@ -59,7 +60,7 @@ namespace RegistryWeb.ViewComponents
                 .Include(ri => ri.ResettleInfoSubPremisesFrom)
                 .Include(ri => ri.ResettleDocuments)
                 .Include(ri => ri.ResettleKindNavigation);
-            var resettleVMs = resettles.ToList().Select(ri => new ResettleInfoVM(ri, address_p));
+            var resettleVMs = resettles.ToList().Select(ri => new ResettleInfoVM(ri, address_p, registryContext));
             return resettleVMs.OrderBy(r => r.ResettleDate);;
         }
     }
