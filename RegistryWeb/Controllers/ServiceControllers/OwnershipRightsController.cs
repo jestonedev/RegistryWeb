@@ -176,6 +176,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             ViewBag.Action = action;
             ViewBag.Address = address;
             ViewBag.OwnershipRightTypes = registryContext.OwnershipRightTypes.ToList();
+            ViewBag.CanEditBaseInfo = true;
 
             return PartialView("OwnershipRight", owrVM);
         }

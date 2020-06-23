@@ -6,6 +6,7 @@
 @using RegistryWeb.DataHelpers;
 
 @{
+    var canEdit = ((bool?)ViewBag.CanEditExtInfo) ?? false;
     var ownershipRightTypeClass = "col-md-6 col-lg-4";
     if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
     {
@@ -47,12 +48,12 @@
         {
             <div class="text-lg-right col-lg-2 rr-resettle-edit-buttons d-none d-lg-block">
                 <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
-                    <a class="btn btn-danger resettle-cancel-btn @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
-                    <a class="btn btn-success resettle-save-btn @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                    <a class="btn btn-danger resettle-cancel-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                    <a class="btn btn-success resettle-save-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
                 </div>
                 <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
-                    <a class="btn btn-primary resettle-edit-btn @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
-                    <a class="btn btn-danger resettle-delete-btn @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                    <a class="btn btn-primary resettle-edit-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                    <a class="btn btn-danger resettle-delete-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
                 </div>
             </div>
         }
@@ -161,7 +162,7 @@
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {
-                    <a href="#" id="resettleDocumentAdd" class="form-control btn btn-success" title="Добавить документ по переселению">&#10010;</a>
+                    <a href="#" id="resettleDocumentAdd" class="form-control btn btn-success @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Добавить документ по переселению">&#10010;</a>
                 }
             </div>
         </div>
@@ -177,12 +178,12 @@
     {
         <div class="text-center col-12 rr-resettle-edit-buttons-2 d-block d-lg-none">
             <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
-                <a class="btn btn-danger resettle-cancel-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
-                <a class="btn btn-success resettle-save-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                <a class="btn btn-danger resettle-cancel-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                <a class="btn btn-success resettle-save-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
             </div>
             <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
-                <a class="btn btn-primary resettle-edit-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
-                <a class="btn btn-danger resettle-delete-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                <a class="btn btn-primary resettle-edit-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                <a class="btn btn-danger resettle-delete-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
             </div>
         </div>
     }

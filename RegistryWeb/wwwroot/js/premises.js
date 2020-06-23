@@ -19,6 +19,10 @@
     });
 
     $("form#r-premises-form").on("submit", function (e) {
+        if ($("form#r-premises-form input[type='submit']").hasClass("disabled")) {
+            e.preventDefault();
+            return;
+        }
         $("input.decimal").each(function (idx, elem) {
             $(elem).val($(elem).val().replace(".", ","));
         });
@@ -124,7 +128,7 @@
     $("select#IdStreet").val($("input[name='IdStreetPrev']").val()).selectpicker('refresh').change();
 
     var action = $('#r-premises-form').data("action");
-    if (action === "Details" || action === "Delete") {
+    if (action === "Details" || action === "Delete" || $("form#r-premises-form input[type='submit']").hasClass("disabled")) {
         $('select').prop('disabled', true);
         $('input').prop('disabled', true);
         $('textarea').prop('disabled', true);

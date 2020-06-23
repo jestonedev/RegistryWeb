@@ -436,10 +436,10 @@ namespace RegistryWeb.DataServices
         }
 
 
-        public PremisesVM<Premise> GetPremiseView(Premise premise, [CallerMemberName]string action = "")
+        public PremisesVM<Premise> GetPremiseView(Premise premise, [CallerMemberName]string action = "", bool canEditBaseInfo = false)
         {
             var objectStates = ObjectStates.ToList();
-            if (action == "Create" || action == "Edit")
+            if ((action == "Create" || action == "Edit") && canEditBaseInfo)
             {
                 objectStates = objectStates.Where(r => (
                 securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.MunicipalIds().Contains(r.IdState) ||

@@ -47,7 +47,7 @@
                 @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
                 {
                     <div class="btn-group" role="group" aria-label="Панель доступа">
-                        @if (ViewBag.Action == "Details" && ViewBag.CanEdit ?? false)
+                        @if (ViewBag.Action == "Details" && ((ViewBag.CanEditBaseInfo ?? false) || (ViewBag.CanEditExtInfo ?? false)))
                         {
                             <div class="btn-group" role="group" aria-label="Панель доступа">
                                 <button class="btn btn-primary dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@Model.Premise.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -56,7 +56,7 @@
                                 <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@Model.Premise.IdPremises">
                                     <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
                                        asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@Model.Premise.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                    <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                                    <a class="btn btn-danger oi oi-x @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" title="Удалить" aria-label="Удалить"
                                        asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@Model.Premise.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                 </div>
                             </div>
@@ -104,7 +104,7 @@
                     }
                     @if (ViewBag.Action == "Edit")
                     {
-                        <input type="submit" value="Сохранить" id="editBtn" class="form-control btn btn-success" />
+                        <input type="submit" value="Сохранить" id="editBtn" class="form-control btn btn-success  @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" />
                     }
                     @if (ViewBag.Action == "Delete")
                     {

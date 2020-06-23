@@ -66,8 +66,9 @@ namespace RegistryWeb.Controllers
             var premise = dataService.GetPremise(idPremises.Value);
             if (premise == null)
                 return NotFound();
-            ViewBag.CanEdit = CanEditPremise(premise);
-            return View("Premise", dataService.GetPremiseView(premise));
+            ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(premise);
+            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: false));
         }
 
         public IActionResult Create()
@@ -76,8 +77,9 @@ namespace RegistryWeb.Controllers
             ViewBag.SecurityService = securityService;
             if (!securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal))
                 return View("NotAccess");
-
-            return View("Premise", dataService.GetPremiseView(dataService.CreatePremise()));
+            ViewBag.CanEditBaseInfo = true;
+            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            return View("Premise", dataService.GetPremiseView(dataService.CreatePremise(), canEditBaseInfo: true));
         }
 
         [HttpPost]
@@ -86,9 +88,12 @@ namespace RegistryWeb.Controllers
             if (premise == null)
                 return NotFound();
 
-            if (!CanEditPremise(premise))
+            if (!CanEditPremiseBaseInfo(premise))
                 return View("NotAccess");
-
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
+            {
+                premise.ResettlePremisesAssoc = null;
+            }
             if (ModelState.IsValid)
             {
                 if (premise.SubPremises != null)
@@ -120,7 +125,9 @@ namespace RegistryWeb.Controllers
             }
             ViewBag.Action = "Create";
             ViewBag.SecurityService = securityService;
-            return View("Create", dataService.GetPremiseView(premise));
+            ViewBag.CanEditBaseInfo = true;
+            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            return View("Create", dataService.GetPremiseView(premise, canEditBaseInfo: true));
         }
 
         [HttpGet]
@@ -136,10 +143,12 @@ namespace RegistryWeb.Controllers
             if (premise == null)
                 return NotFound();
 
-            if (!CanEditPremise(premise))
-                return View("NotAccess");
+            ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(premise);
+            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
 
-            return View("Premise", dataService.GetPremiseView(premise));
+            if (!(bool)ViewBag.CanEditBaseInfo && !(bool)ViewBag.CanEditExtInfo)
+                return View("NotAccess");
+            return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: (bool)ViewBag.CanEditBaseInfo));
         }
 
         [HttpPost]
@@ -148,7 +157,10 @@ namespace RegistryWeb.Controllers
             if (premise == null)
                 return NotFound();
 
-            if (!CanEditPremise(premise))
+            ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(premise);
+            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+
+            if (!(bool)ViewBag.CanEditBaseInfo)
                 return View("NotAccess");
 
             if (ModelState.IsValid)
@@ -159,7 +171,7 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = "Edit";
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.SecurityService = securityService;
-            return View("Edit", dataService.GetPremiseView(dataService.CreatePremise()));
+            return View("Edit", dataService.GetPremiseView(premise, canEditBaseInfo: (bool)ViewBag.CanEditBaseInfo));
         }
 
         [HttpGet]
@@ -175,10 +187,13 @@ namespace RegistryWeb.Controllers
             if (premise == null)
                 return NotFound();
 
-            if (!CanEditPremise(premise))
+            if (!CanEditPremiseBaseInfo(premise))
                 return View("NotAccess");
 
-            return View("Premise", dataService.GetPremiseView(premise));
+            ViewBag.CanEditBaseInfo = false;
+            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+
+            return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: false));
         }
 
         [HttpPost]
@@ -189,14 +204,14 @@ namespace RegistryWeb.Controllers
 
             var premiseDb = dataService.GetPremise(premise.IdPremises);
 
-            if (!CanEditPremise(premiseDb))
+            if (!CanEditPremiseBaseInfo(premiseDb))
                 return View("NotAccess");
 
             dataService.Delete(premise.IdPremises);
             return RedirectToAction("Index");
         }
 
-        private bool CanEditPremise(Premise premise)
+        private bool CanEditPremiseBaseInfo(Premise premise)
         {
             return ((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(premise.IdState) &&
                 (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) || premise.SubPremises == null || !premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) ||

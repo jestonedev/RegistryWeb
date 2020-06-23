@@ -34,8 +34,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         {
             if (idResettleInfo == null)
                 return -1;
-            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
-                            !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
                 return -2;
             try
             {
@@ -101,8 +100,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Resettles\");
             if (resettleInfo == null)
                 return Json(new { Error = -1 });
-            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
-                !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
                 return Json(new { Error = -2 });
             /*if (restrictionFile != null && !restrictionFileRemove)
             {
@@ -207,8 +205,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         [HttpPost]
         public IActionResult AddResettle(Address address, string action)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
-                !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
                 return Json(-2);
             var id = 0;
             if (address == null)
@@ -228,6 +225,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 SubPremisesNum = string.Concat("Комната ", r.SubPremisesNum)
             });
             ViewBag.KladrStreets = registryContext.KladrStreets;
+            ViewBag.CanEditExtInfo = true;
 
             return PartialView("ResettleInfo", resettleInfoVM);
         }

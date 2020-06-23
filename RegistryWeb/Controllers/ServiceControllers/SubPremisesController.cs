@@ -125,6 +125,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             var subPremise = new SubPremise { };
             var subPremiseVM = new SubPremiseVM(subPremise, null);
             ViewBag.SecurityService = securityService;
+            ViewBag.CanEditBaseInfo = true;
             ViewBag.Action = action;
 
             var objectStates = registryContext.ObjectStates.ToList();

@@ -173,6 +173,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             ViewBag.Action = action;
             ViewBag.AddressType = addressType;
             ViewBag.RestrictionTypes = registryContext.RestrictionTypes.ToList();
+            ViewBag.CanEditBaseInfo = true;
 
             return PartialView("Restriction", restrictionVM);
         }
