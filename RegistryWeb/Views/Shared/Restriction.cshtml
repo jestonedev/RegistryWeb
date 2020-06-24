@@ -6,7 +6,7 @@
 @using RegistryWeb.DataHelpers;
 
 @{ 
-    var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? false;
+    var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
     var attachment = Model.AddressType == AddressTypes.Premise ? "Помещение" : "Здание";
     var restrictionTypeClass = "col-md-6 col-lg-6";
     if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")

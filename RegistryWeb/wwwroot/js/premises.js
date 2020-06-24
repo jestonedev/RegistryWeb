@@ -26,7 +26,7 @@
         $("input.decimal").each(function (idx, elem) {
             $(elem).val($(elem).val().replace(".", ","));
         });
-        $("button[data-id]").removeClass("input-validation-error");
+        $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
         var isFormValid = $(this).valid();
         var isOwnershipsValid = $("#ownershipRightsForm").valid();
         var isRestrictionsValid = $("#restrictionsForm").valid();
@@ -41,6 +41,19 @@
                     $("button[data-id='" + id + "']").addClass("input-validation-error");
                 }
             });
+
+            $(".toggle-hide").each(function (idx, elem) {
+                if ($(elem).find(".field-validation-error").length > 0) {
+                    var toggler = $(elem).closest(".card").find("[id$='Toggle']");
+                    if (!isExpandElemntArrow(toggler)) {
+                        toggler.click();
+                    }
+                }
+            });
+            $([document.documentElement, document.body]).animate({
+                scrollTop: $(".input-validation-error").first().offset().top - 35
+            }, 1000);
+
             e.preventDefault();
         } else if ($(this).data("action") === "Create") {
             var inputTemplate = "<input type='hidden' name='{0}' value='{1}'>";
@@ -103,11 +116,27 @@
                 $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource2").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource2));
                 $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource3").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource3));
                 $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource4").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource4));
-                for (var s = 0; s < resettles[l].ResettleInfoNavigation.ResettleInfoTo.length; s++) {
-                    var rit = rin + "ResettleInfoTo[" + s + "].";
-                    $(this).append(inputTemplate.replace('{0}', rit + "IdResettleInfo").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleInfoTo[s].IdResettleInfo));
-                    $(this).append(inputTemplate.replace('{0}', rit + "IdObject").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleInfoTo[s].IdObject));
-                    $(this).append(inputTemplate.replace('{0}', rit + "ObjectType").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleInfoTo[s].ObjectType));
+                if (resettles[l].ResettleInfoNavigation.ResettleInfoTo !== null) {
+                    for (var s = 0; s < resettles[l].ResettleInfoNavigation.ResettleInfoTo.length; s++) {
+                        var rit = rin + "ResettleInfoTo[" + s + "].";
+                        $(this).append(inputTemplate.replace('{0}', rit + "IdResettleInfo").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleInfoTo[s].IdResettleInfo));
+                        $(this).append(inputTemplate.replace('{0}', rit + "IdObject").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleInfoTo[s].IdObject));
+                        $(this).append(inputTemplate.replace('{0}', rit + "ObjectType").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleInfoTo[s].ObjectType));
+                    }
+                }
+                if (resettles[l].ResettleInfoNavigation.ResettleDocuments !== null) {
+                    for (var t = 0; t < resettles[l].ResettleInfoNavigation.ResettleDocuments.length; t++) {
+                        rit = rin + "ResettleDocuments[" + t + "].";
+                        $(this).append(inputTemplate.replace('{0}', rit + "IdResettleInfo").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDocuments[t].IdResettleInfo));
+                        $(this).append(inputTemplate.replace('{0}', rit + "IdDocument").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDocuments[t].IdDocument));
+                        $(this).append(inputTemplate.replace('{0}', rit + "Number").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDocuments[t].Number));
+                        $(this).append(inputTemplate.replace('{0}', rit + "Date").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDocuments[t].Date));
+                        $(this).append(inputTemplate.replace('{0}', rit + "Description").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDocuments[t].Description));
+                        $(this).append(inputTemplate.replace('{0}', rit + "IdDocumentType").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDocuments[t].IdDocumentType));
+                        var resettleDocumentFile = $(resettles[l].ResettleInfoNavigation.ResettleDocuments[t].ResettleDocumentFile).clone();
+                        resettleDocumentFile.attr("name", "Premise.ResettlePremisesAssoc[" + l + "].ResettleDocumentFiles[" + t + "]");
+                        $(this).append(resettleDocumentFile);
+                    }
                 }
             }
 

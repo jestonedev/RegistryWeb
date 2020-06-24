@@ -6,7 +6,7 @@
 @using RegistryWeb.DataHelpers;
 
 @{
-    var canEdit = ((bool?)ViewBag.CanEditExtInfo) ?? false;
+    var canEdit = ((bool?)ViewBag.CanEditExtInfo) ?? true;
     var ownershipRightTypeClass = "col-md-6 col-lg-4";
     if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
     {
@@ -158,18 +158,21 @@
 
     <div class="card">
         <div class="card-header d-flex justify-content-between">
-            <h5 class="rr-resettle-card-header-sub-title">Документы</h5>
+            <h5 class="rr-resettle-card-header-sub-title" style="margin-top: .25em;">Документы</h5>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {
-                    <a href="#" id="resettleDocumentAdd" class="form-control btn btn-success @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Добавить документ по переселению">&#10010;</a>
+                    <a href="#" id="resettleDocumentAdd" class="form-control btn btn-success disabled" title="Добавить документ по переселению">&#10010;</a>
                 }
+                <a href="#" id="resettleDocumentsToggle" class="form-control btn btn-primary" title="Развернуть документы" style="font-weight:bold;">∨</a>
             </div>
         </div>
-        <ul class="list-group list-group-flush" id="resettleDocumentsList" style="display: none">
+        <ul class="list-group list-group-flush toggle-hide" id="resettleDocumentsList">
             @foreach (var document in Model.ResettleDocuments)
             {
-                <li></li>
+                ViewBag.CurrentResettleInfoAddressType = Model.Address.AddressType;
+
+                <partial name="ResettleDocument" model="document"  />
             }
         </ul>
     </div>

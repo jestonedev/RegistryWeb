@@ -7,7 +7,7 @@
 
 @{
     var securityService = (SecurityService)ViewBag.SecurityService;
-    var canEditBasePremiseInfo = ((bool?)ViewBag.CanEditBaseInfo) ?? false;
+    var canEditBasePremiseInfo = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
     var canEdit = canEditBasePremiseInfo && (Model.IdSubPremises == 0 || 
             (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(Model.IdState)) ||
             (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(Model.IdState)));

@@ -12,7 +12,7 @@
 };
 
 function getResettles() {
-    return $("#resettlesList .list-group-item").map(function (idx, elem) {
+    return $("#resettlesList > .list-group-item").map(function (idx, elem) {
         return getResettle($(elem));
     });
 }
@@ -32,7 +32,19 @@ function getResettle(resettleElem) {
         FinanceSource2: resettleElem.find("[name^='FinanceSource2']").val(),
         FinanceSource3: resettleElem.find("[name^='FinanceSource3']").val(),
         FinanceSource4: resettleElem.find("[name^='FinanceSource4']").val(),
-        ResettleInfoTo: GetRessetleInfoTo(resettleElem)
+        ResettleInfoTo: GetRessetleInfoTo(resettleElem),
+        ResettleDocuments: resettleElem.find("#resettleDocumentsList .list-group-item").map(function (idx, elem) {
+            return {
+                IdResettleInfo: 0,
+                IdDocument: $(elem).find("[name^='IdDocument']").val(),
+                Number: $(elem).find("[name^='ResettleDocumentNum']").val(),
+                Date: $(elem).find("[name^='ResettleDocumentDate']").val(),
+                Description: $(elem).find("[name^='ResettleDocumentDescription']").val(),
+                IdDocumentType: $(elem).find("[name^='IdDocumentType']").val(),
+                ResettleDocumentFile: $(elem).find("[name^='ResettleDocumentFile']")[0],
+                ResettleDocumentFileRemove: $(elem).find("[name^='ResettleDocumentFileRemove']").val()
+            };
+        })
     };
 }
 
@@ -86,6 +98,17 @@ function resettleToFormData(resettle, address) {
             formData.append("ResettleInfo.ResettleInfoTo[" + j + "].IdObject", resettle.ResettleInfoTo[j].IdObject);
             formData.append("ResettleInfo.ResettleInfoTo[" + j + "].ObjectType", resettle.ResettleInfoTo[j].ObjectType);
             formData.append("ResettleInfo.ResettleInfoTo[" + j + "].IdResettleInfo", resettle.ResettleInfoTo[j].IdResettleInfo);
+        }
+    }
+    if (resettle.ResettleDocuments !== null) {
+        for (var k = 0; k < resettle.ResettleDocuments.length; k++) {
+            formData.append("ResettleInfo.ResettleDocuments[" + k + "].IdDocument", resettle.ResettleDocuments[k].IdDocument);
+            formData.append("ResettleInfo.ResettleDocuments[" + k + "].Number", resettle.ResettleDocuments[k].Number);
+            formData.append("ResettleInfo.ResettleDocuments[" + k + "].Date", resettle.ResettleDocuments[k].Date);
+            formData.append("ResettleInfo.ResettleDocuments[" + k + "].Description", resettle.ResettleDocuments[k].Description);
+            formData.append("ResettleInfo.ResettleDocuments[" + k + "].IdDocumentType", resettle.ResettleDocuments[k].IdDocumentType);
+            formData.append("ResettleDocumentFiles[" + k + "]", resettle.ResettleDocuments[k].ResettleDocumentFile.files[0]);
+            formData.append("RestrictionFilesRemove[" + k + "]", resettle.ResettleDocuments[k].ResettleDocumentFileRemove);
         }
     }
     return formData;
@@ -145,8 +168,39 @@ let initializeVilidationResettle = function (resettleElem) {
         .attr('aria-describedby', fs4 + '-error').next()
         .after(getErrorSpanResettles(fs4));
 
+    resettleElem.find("#resettleDocumentsList .list-group-item").each(function (idx, elem) {
+        initializeValidationResettleDocument($(elem));
+    });
+
     refreshValidationResettlesForm();
 };
+
+function initializeValidationResettleDocument(documentElem) {
+    let idResettleDocument = $(documentElem).find("input[name^='IdDocument']").val();
+    if (idResettleDocument === "0") idResettleDocument = uuidv4();
+    //Дата документа
+    let date = 'ResettleDocumentDate_' + idResettleDocument;
+    $(documentElem).find("[name^='ResettleDocumentDate']").addClass('valid')
+        .attr('data-val', 'true')
+        .attr('data-val-required', 'Поле "Дата документа" является обязательным')
+        .attr('id', date)
+        .attr('name', date)
+        .attr('aria-describedby', date + '-error')
+        .after(getErrorSpanRestrictions(date));
+    // Тип документа
+    let idDocumentTypeName = 'IdDocumentType' + idResettleDocument;
+    var documentTypeElem = $(documentElem).find("[name^='IdDocumentType']");
+    documentTypeElem.addClass('valid')
+        .attr('data-val', 'true')
+        .attr('data-val-required', 'Поле "Тип документа" является обязательным')
+        .attr('id', idDocumentTypeName)
+        .attr('name', idDocumentTypeName)
+        .attr('aria-describedby', idDocumentTypeName + '-error').parent()
+        .after(getErrorSpanRestrictions(idDocumentTypeName));
+    documentTypeElem.next().attr("data-id", idDocumentTypeName);
+
+    refreshValidationResettlesForm();
+}
 
 let refreshValidationResettlesForm = function () {
     var form = $("#resettlesForm")
@@ -157,7 +211,7 @@ let refreshValidationResettlesForm = function () {
 };
 
 let initializeVilidationResettles = function () {
-    let resettles = $('#resettlesList .list-group-item');
+    let resettles = $('#resettlesList > .list-group-item');
     resettles.each(function () {
         initializeVilidationResettle($(this));
     });
@@ -202,6 +256,9 @@ function addResettle(e) {
                 resettlesToggle.click();
             list.append(elem);
             elem = list.find(".list-group-item").last();
+
+            elem.find("#resettleDocumentsToggle").on('click', elem.find('#resettleDocumentsList'), elementToogleHide);
+
             elem.find("select").selectpicker("refresh");
             elem.find(".resettle-edit-btn").click();
             $([document.documentElement, document.body]).animate({
@@ -213,6 +270,37 @@ function addResettle(e) {
     e.preventDefault();
 }
 
+
+function addResettleDocument(e) {
+    let action = $('#resettlesList').data('action');
+    let addressType = $('#resettlesList').data('addresstype');
+    let documentsList = $(this).closest(".card").find("#resettleDocumentsList");
+    let toggleElem = $(this).closest(".card").find('#resettleDocumentsToggle');
+    $.ajax({
+        type: 'POST',
+        url: window.location.origin + '/Resettles/AddResettleDocument',
+        data: { addressType, action },
+        success: function (elem) {
+            if (!isExpandElemntArrow(toggleElem)) // развернуть при добавлении, если было свернуто 
+                toggleElem.click();
+
+            documentsList.append(elem);
+            elem = documentsList.find(".list-group-item").last();
+            elem.find('input, select, textarea').prop("disabled", false);
+            elem.find(".resettle-document-cancel-btn").removeClass("disabled");
+            elem.find("select").selectpicker("refresh");
+            $([document.documentElement, document.body]).animate({
+                scrollTop: $(elem).offset().top
+            }, 1000);
+            initializeValidationResettleDocument(elem);
+            showResettleDocumentEditFileBtns(elem);
+        }
+    });
+    e.preventDefault();
+}
+
+let resettleDocumentTemplateForCancelation = undefined;
+
 function editResettle(e) {
     let resettle = $(this).closest(".list-group-item");
     let fields = resettle.find('input, select, textarea');
@@ -220,9 +308,17 @@ function editResettle(e) {
     let editDelPanel = resettle.find('.edit-del-panel');
     fields.filter(function (idx, val) { return !$(val).prop("name").startsWith("FinanceSourceTotal"); }).prop('disabled', false);
     resettle.find("select").selectpicker('refresh');
+    resettle.find(".resettle-document-cancel-btn").removeClass("disabled");
+    resettle.find("#resettleDocumentAdd").removeClass("disabled");
     editDelPanel.hide();
     yesNoPanel.show();
-    showResettleEditFileBtns(resettle);  // TODO
+    showResettleEditFileBtns(resettle);
+    let resettleDocumentElems = resettle.find("#resettleDocumentsList > .list-group-item");
+    if (resettleDocumentElems.length > 0) {
+        resettleDocumentTemplateForCancelation = resettleDocumentElems.first().clone();
+    } else {
+        resettleDocumentTemplateForCancelation = undefined;
+    }
     e.preventDefault();
 }
 
@@ -239,7 +335,7 @@ function cancelEditResettle(e) {
                 refreshResettle(resettleElem, resettle);
                 showEditDelPanelResettle(resettleElem);
                 clearValidationsResettles(resettleElem);
-                showResettleDownloadFileBtn(resettleElem, resettle);
+                showResettleDownloadFileBtns(resettleElem, resettle);
             }
         });
     }
@@ -251,27 +347,49 @@ function cancelEditResettle(e) {
 }
 
 function showResettleEditFileBtns(resettleElem) {
-    /*let restrictionFileBtns = restrictionElem.find(".rr-restriction-file-buttons");
-    restrictionElem.find(".rr-restriction-file-download").hide();
-    if (fileExists) {
-        restrictionFileBtns.append(restrictionElem.find(".rr-restriction-file-remove").show());
-        restrictionElem.find(".rr-restriction-file-attach").hide();
-    } else {
-        restrictionElem.find(".rr-restriction-file-remove").hide();
-        restrictionFileBtns.append(restrictionElem.find(".rr-restriction-file-attach").show());
-    }*/
+    let documentElems = resettleElem.find("#resettleDocumentsList > .list-group-item");
+    documentElems.each(function (idx, documentElem) {
+        showResettleDocumentEditFileBtns($(documentElem));
+    });
 }
 
-function showResettleDownloadFileBtn(resettleElem, resettle) {
-    /*let restrictionFileBtns = restrictionElem.find(".rr-restriction-file-buttons");
-    restrictionFileBtns.append(restrictionElem.find(".rr-restriction-file-download").show());
-    if (fileExists) {
-        restrictionElem.find(".rr-restriction-file-download").removeClass("disabled");
+function showResettleDocumentEditFileBtns(resettleDocumentElem) {
+    let resettleDocumentFileBtns = resettleDocumentElem.find(".rr-resettle-document-file-buttons");
+    resettleDocumentElem.find(".rr-resettle-document-file-download").hide();
+    if (resettleDocumentElem.find(".rr-resettle-document-file-download").length > 0 &&
+        !resettleDocumentElem.find(".rr-resettle-document-file-download").hasClass("disabled")) {
+        resettleDocumentFileBtns.append(resettleDocumentElem.find(".rr-resettle-document-file-remove").show());
+        resettleDocumentElem.find(".rr-resettle-document-file-attach").hide();
     } else {
-        restrictionElem.find(".rr-restriction-file-download").addClass("disabled");
+        resettleDocumentElem.find(".rr-resettle-document-file-remove").hide();
+        resettleDocumentFileBtns.append(resettleDocumentElem.find(".rr-resettle-document-file-attach").show());
     }
-    restrictionElem.find(".rr-restriction-file-remove").hide();
-    restrictionElem.find(".rr-restriction-file-attach").hide();*/
+}
+
+function showResettleDownloadFileBtns(resettleElem, resettle) {
+    let documentElems = resettleElem.find("#resettleDocumentsList > .list-group-item");
+    documentElems.each(function (idx, documentElem) {
+        let resettleDocumentFileBtns = $(documentElem).find(".rr-resettle-document-file-buttons");
+        resettleDocumentFileBtns.append($(documentElem).find(".rr-resettle-document-file-download").show());
+        let documentId = parseInt($(documentElem).find("[name^=IdDocument]").val());
+        let hasFile = false;
+        for (let i = 0; i < resettle.documents.length; i++) {
+            let document = resettle.documents[i];
+            if (document.idDocument === documentId && documentId !== 0 && document.fileOriginName !== null) {
+
+                    /*resettleElem.find(".rr-resettle-file-download")
+                        .prop("href", "/Restrictions/DownloadFile/?idRestriction=" + restriction.idRestriction);*/
+
+                $(documentElem).find(".rr-resettle-document-file-download").removeClass("disabled");
+                hasFile = true;
+            }
+        }
+        if (!hasFile) {
+            $(documentElem).find(".rr-resettle-document-file-download").addClass("disabled");
+        }
+        $(documentElem).find(".rr-resettle-document-file-remove").hide();
+        $(documentElem).find(".rr-resettle-document-file-attach").hide();
+    });
 }
 
 function clearValidationsResettles(resettleElem) {
@@ -282,6 +400,8 @@ function clearValidationsResettles(resettleElem) {
 function showEditDelPanelResettle(resettleElem) {
     let fields = resettleElem.find('input, select, textarea');
     fields.prop('disabled', true).selectpicker('refresh');
+    resettleElem.find("#resettleDocumentAdd").addClass("disabled");
+    resettleElem.find(".resettle-document-cancel-btn").addClass("disabled");
     let editDelPanel = resettleElem.find('.edit-del-panel');
     let yesNoPanel = resettleElem.find('.yes-no-panel');
     yesNoPanel.hide();
@@ -298,6 +418,43 @@ function refreshResettle(resettleElem, resettle) {
     resettleElem.find("[name^='FinanceSource4']").val(resettle.financeSource4.toFixed(2).replace('.', ','));
     resettleElem.find("[name^='FinanceSource4']").val(resettle.financeSource4.toFixed(2).replace('.', ','));
     resettleElem.find('select[name="ResettleToIdStreet"]').val(resettleElem.find('input[name="ResettleToIdStreetPrev"]').val()).change().selectpicker('refresh');
+    var documentListElem = resettleElem.find("#resettleDocumentsList");
+    documentListElem.empty();
+    if (resettleDocumentTemplateForCancelation !== undefined) {
+        for (let i = 0; i < resettle.documents.length; i++) {
+            let document = resettle.documents[i];
+            let documentElem = resettleDocumentTemplateForCancelation.clone();
+            documentListElem.append(documentElem);
+            documentElem = documentListElem.find(".list-group-item").last();
+            documentElem.find("[name^='IdDocument']").val(document.idDocument);
+            documentElem.find("[name^='ResettleDocumentNum']").val(document.number);
+            documentElem.find("[name^='ResettleDocumentDate']").val(document.date);
+            documentElem.find("[name^='ResettleDocumentDescription']").val(document.description);
+            var idDocumentTypeElem = documentElem.find('select[name^="IdDocumentType"]');
+            var formGroup = idDocumentTypeElem.closest('.form-group');
+            idDocumentTypeElem.closest('.bootstrap-select').remove();
+            $(idDocumentTypeElem).insertAfter(formGroup.find("label"));
+            idDocumentTypeElem.find("option[class='bs-title-option']").remove();
+            idDocumentTypeElem.selectpicker().val(document.idDocumentType).selectpicker('refresh');
+
+            let idResettleDocument = documentElem.find("input[name^='IdDocument']").val();
+            if (idResettleDocument === "0") idResettleDocument = uuidv4();
+            let date = 'ResettleDocumentDate_' + idResettleDocument;
+            $(documentElem).find("[name^='ResettleDocumentDate']")
+                .attr('id', date)
+                .attr('name', date)
+                .attr('aria-describedby', date + '-error').next().attr("data-valmsg-for", date);
+            let idDocumentTypeName = 'IdDocumentType' + idResettleDocument;
+            var documentTypeElem = $(documentElem).find("[name^='IdDocumentType']");
+            documentTypeElem
+                .attr('id', idDocumentTypeName)
+                .attr('name', idDocumentTypeName)
+                .attr('aria-describedby', idDocumentTypeName + '-error').parent()
+                .next().attr("data-valmsg-for", idDocumentTypeName);
+            documentTypeElem.next().attr("data-id", idDocumentTypeName);
+        }
+        refreshValidationResettlesForm();
+    }
 }
 
 function saveResettle(e) {
@@ -329,10 +486,14 @@ function saveResettle(e) {
                     for (var i = 0; i < resettleToSubPremisesIds.length; i++) {
                         resettleElem.append("<input type='hidden' name='ResettleToSubPremisesPrev' value='" + resettleToSubPremisesIds[i]+"'>");
                     }
-                    //TODO
-                    /*resettleElem.find(".rr-resettle-file-download")
-                        .prop("href", "/Restrictions/DownloadFile/?idRestriction=" + restriction.idRestriction);*/
-                    showResettleDownloadFileBtn(resettleElem, resettle);
+                    var resettleDocumentElems = resettleElem.find("#resettleDocumentsList .list-group-item");
+                    for (var j = 0; j < resettleDocumentElems.length; j++) {
+                        var document = resettle.documents[j];
+                        $(resettleDocumentElems[j]).find("input[name^='IdDocument']").val(document.idDocument);
+                        $(resettleDocumentElems[j]).find(".rr-resettle-document-file-download").attr("href", "/Resettles/DownloadFile/?idDocument=" + document.idDocument);
+                        
+                    }
+                    showResettleDownloadFileBtns(resettleElem, resettle);
                 }
                 showEditDelPanelResettle(resettleElem);
             }
@@ -346,35 +507,42 @@ function saveResettle(e) {
                 $("button[data-id='" + id + "']").addClass("input-validation-error");
             }
         });
+        if (resettleElem.find("#resettleDocumentsList .field-validation-error").length > 0) {
+            if (!isExpandElemntArrow(resettleElem.find("#resettleDocumentsToggle"))) {
+                resettleElem.find("#resettleDocumentsToggle").click();
+            }
+        }
+        $([document.documentElement, document.body]).animate({
+            scrollTop: resettleElem.find(".input-validation-error").first().offset().top
+        }, 1000);
     }
     e.preventDefault();
 }
 
-function attachResettleFile(e) {
-    var resettleElem = $(this).closest(".list-group-item");
-    // TODO
-    /*resettleElem.find("input[name^='RestrictionFile']").click();
-    resettleElem.find("input[name^='RestrictionFileRemove']").val(false);*/
+function attachResettleDocumentFile(e) {
+    var resettleDocumentElem = $(this).closest(".list-group-item");
+    resettleDocumentElem.find("input[name^='ResettleDocumentFile']").click();
+    resettleDocumentElem.find("input[name^='ResettleDocumentFileRemove']").val(false);
     e.preventDefault();
 }
 
-function changeResettleFileAttachment() {
-    var resettleElem = $(this).closest(".list-group-item");
-    /*if ($(this).val() !== "") {
-        let restrictionFileBtns = resettleElem.find(".rr-restriction-file-buttons");
-        resettleElem.find(".rr-restriction-file-attach").hide();
-        restrictionFileBtns.append(resettleElem.find(".rr-restriction-file-remove").show());
-    }*/
+function changeResettleDocumentFileAttachment() {
+    var resettleDocumentElem = $(this).closest(".list-group-item");
+    if ($(this).val() !== "") {
+        let resettleDocumentFileBtns = resettleDocumentElem.find(".rr-resettle-document-file-buttons");
+        resettleDocumentElem.find(".rr-resettle-document-file-attach").hide();
+        resettleDocumentFileBtns.append(resettleDocumentElem.find(".rr-resettle-document-file-remove").show());
+    }
 }
 
-function removeResettleFile(e) {
-    /*var restrictionElem = $(this).closest(".list-group-item");
-    restrictionElem.find("input[name^='RestrictionFile']").val("");
-    restrictionElem.find("input[name^='RestrictionFileRemove']").val(true);
-    let restrictionFileBtns = restrictionElem.find(".rr-restriction-file-buttons");
-    restrictionElem.find(".rr-restriction-file-remove").hide();
-    restrictionFileBtns.append(restrictionElem.find(".rr-restriction-file-attach").show());
-    e.preventDefault();*/
+function removeResettleDocumentFile(e) {
+    var resettleDocumentElem = $(this).closest(".list-group-item");
+    resettleDocumentElem.find("input[name^='ResettleDocumentFile']").val("");
+    resettleDocumentElem.find("input[name^='ResettleDocumentFileRemove']").val(true);
+    let resettleDocumentFileBtns = resettleDocumentElem.find(".rr-resettle-document-file-buttons");
+    resettleDocumentElem.find(".rr-resettle-document-file-remove").hide();
+    resettleDocumentFileBtns.append(resettleDocumentElem.find(".rr-resettle-document-file-attach").show());
+    e.preventDefault();
 }
 
 function getResettleHouses() {
@@ -432,12 +600,27 @@ function getResettleSubPremises() {
     });
 }
 
+function removeResettleDocument(e) {
+    $(this).closest(".list-group-item").remove();
+    e.preventDefault();
+}
+
+function toggleDocuments(e) {
+    $("#resettleDocumentsList").toggle();
+    e.preventDefault();
+}
+
 $(function () {
-    $('#resettlesList').hide();
     $('.yes-no-panel').hide();
     initializeVilidationResettles();
     $('#resettleAdd').click(addResettle);
-    $('#resettlesToggle').on('click', $('#resettlesList'), elementToogle);
+    $('#resettlesToggle').on('click', $('#resettlesList'), elementToogleHide);
+
+    $('#resettlesList .list-group-item').each(function (idx, elem) {
+        $(elem).find('#resettleDocumentsToggle').on('click', $(elem).find('#resettleDocumentsList'), elementToogleHide);
+    });
+
+
     $('#resettlesList').on('click', '.resettle-edit-btn, .resettle-edit-btn-2', editResettle);
     $('#resettlesList').on('click', '.resettle-cancel-btn, .resettle-cancel-btn-2', cancelEditResettle);
     $('#resettlesList').on('click', '.resettle-save-btn, .resettle-save-btn-2', saveResettle);
@@ -445,7 +628,9 @@ $(function () {
     $('#resettlesList').on('change', 'select[name="ResettleToIdStreet"]', getResettleHouses);
     $('#resettlesList').on('change', 'select[name="ResettleToIdBuilding"]', getResettlePremises);
     $('#resettlesList').on('change', 'select[name="ResettleToIdPremise"]', getResettleSubPremises);
-    /*$('#resettlesList').on('click', '.rr-resettle-file-attach', attachResettleFile);
-    $('#resettlesList').on('click', '.rr-resettle-file-remove', removeResettleFile);
-    $('#resettlesList').on('change', "input[name^='ResettleFile']", changeResettleFileAttachment);*/
+    $('#resettlesList').on('click', '#resettleDocumentAdd', addResettleDocument);
+    $('#resettlesList').on('click', '.resettle-document-cancel-btn', removeResettleDocument);
+    $('#resettlesList').on('click', '.rr-resettle-document-file-attach', attachResettleDocumentFile);
+    $('#resettlesList').on('click', '.rr-resettle-document-file-remove', removeResettleDocumentFile);
+    $('#resettlesList').on('change', "input[name^='ResettleDocumentFile']", changeResettleDocumentFileAttachment);
 });

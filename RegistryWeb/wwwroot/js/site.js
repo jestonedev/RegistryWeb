@@ -33,7 +33,26 @@ let elementToogle = function (event) {
     }
     event.data.toggle(!isDisplay);
     event.preventDefault();
-}
+};
+
+// Переделанная версия функции elementToogle. elementToogle оставлена, для обратной совместимости
+let elementToogleHide = function (event) {
+    let elementArrow = $(this);
+    let isDisplay = isExpandElemntArrow(elementArrow);
+    //свернуть
+    if (isDisplay) {
+        elementArrow.html('∨');
+        event.data.addClass("toggle-hide");
+    }
+    //развернуть
+    else {
+        elementArrow.html('∧');
+        event.data.removeClass("toggle-hide");
+    }
+    //event.data.toggle(!isDisplay);
+    event.preventDefault();
+};
+
 let arrowAnimation = function (elemntArrow) {
     //свернуть
     if (elemntArrow.html() === '∧') {

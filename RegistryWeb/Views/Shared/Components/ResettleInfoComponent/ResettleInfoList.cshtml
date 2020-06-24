@@ -12,7 +12,7 @@
                 <a href="#" id="resettlesToggle" class="form-control btn btn-primary" title="Развернуть информацию о переселении" style="font-weight:bold;">∨</a>
             </div>
         </div>
-        <ul class="list-group list-group-flush" id="resettlesList" style="display: none" data-addresstype="@ViewBag.Address.AddressType" data-id="@ViewBag.Address.Id" data-action="@ViewBag.Action">
+        <ul class="list-group list-group-flush toggle-hide" id="resettlesList"data-addresstype="@ViewBag.Address.AddressType" data-id="@ViewBag.Address.Id" data-action="@ViewBag.Action">
             @foreach (var item in Model)
             {
                 <partial name="ResettleInfo" model="item" />

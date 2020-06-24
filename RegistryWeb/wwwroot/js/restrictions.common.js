@@ -277,6 +277,9 @@ function saveRestriction(e) {
                 $("button[data-id='" + id + "']").addClass("input-validation-error");
             }
         });
+        $([document.documentElement, document.body]).animate({
+            scrollTop: restrictionElem.find(".input-validation-error").first().offset().top
+        }, 1000);
     }
     e.preventDefault();
 }
@@ -308,11 +311,10 @@ function removeRestrictionFile(e) {
 }
 
 $(function () {
-    $('#restrictionsList').hide();
     $('.yes-no-panel').hide();
     initializeVilidationRestricitons();
     $('#restrictionAdd').click(addRestriction);
-    $('#restrictionsToggle').on('click', $('#restrictionsList'), elementToogle);
+    $('#restrictionsToggle').on('click', $('#restrictionsList'), elementToogleHide);
     $('#restrictionsList').on('click', '.restriction-edit-btn', editRestriction);
     $('#restrictionsList').on('click', '.restriction-cancel-btn', cancelEditRestriction);
     $('#restrictionsList').on('click', '.restriction-save-btn', saveRestriction);

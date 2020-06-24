@@ -413,6 +413,28 @@ namespace RegistryWeb.DataServices
                     fileStream.Close();
                 }
             }
+            // Прикрепляем файлы документов по переселению
+            var resettleFilePath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Resettles\");
+            if (premise.ResettlePremisesAssoc != null)
+            {
+                for (var i = 0; i < premise.ResettlePremisesAssoc.Count; i++)
+                {
+                    var documents = premise.ResettlePremisesAssoc[i].ResettleInfoNavigation.ResettleDocuments;
+                    if (documents == null) continue;
+                    for (var j = 0; j < premise.ResettlePremisesAssoc[i].ResettleInfoNavigation.ResettleDocuments.Count; j++)
+                    {
+                        var file = files.Where(r => r.Name == "Premise.ResettlePremisesAssoc[" + i + "].ResettleDocumentFiles[" + j + "]").FirstOrDefault();
+                        if (file == null) continue;
+                        premise.ResettlePremisesAssoc[i].ResettleInfoNavigation.ResettleDocuments[j].FileDisplayName = file.FileName;
+                        var fileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(file.FileName).Extension;
+                        premise.ResettlePremisesAssoc[i].ResettleInfoNavigation.ResettleDocuments[j].FileOriginName = fileOriginName;
+                        premise.ResettlePremisesAssoc[i].ResettleInfoNavigation.ResettleDocuments[j].FileMimeType = file.ContentType;
+                        var fileStream = new FileStream(Path.Combine(resettleFilePath, fileOriginName), FileMode.CreateNew);
+                        file.OpenReadStream().CopyTo(fileStream);
+                        fileStream.Close();
+                    }
+                }
+            }
             registryContext.Premises.Add(premise);
             registryContext.SaveChanges();            
         }

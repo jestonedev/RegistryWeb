@@ -78,9 +78,22 @@ legend.r-scheduler-border {
 }
 
 .rr-ownership-right-edit-buttons, .rr-restriction-edit-buttons, .rr-sub-premise-edit-buttons, .rr-sub-premise-nav-buttons, .rr-resettle-edit-buttons,
-.rr-resettle-edit-buttons-2 {
+.rr-resettle-edit-buttons-2, .rr-resettle-document-edit-buttons {
     margin-top: 0;
 }
+
+@media(min-width: 576px) {
+    .rr-resettle-document-edit-buttons {
+        margin-top: 26px;
+    }
+}
+
+@media(min-width: 768px) {
+    .rr-sub-premise-edit-buttons, .rr-sub-premise-nav-buttons, .rr-resettle-edit-buttons, .rr-resettle-document-edit-buttons {
+        margin-top: 32px;
+    }
+}
+
 
 @media(min-width: 992px) {
     .rr-restriction-edit-buttons, .rr-ownership-right-edit-buttons {
@@ -88,13 +101,13 @@ legend.r-scheduler-border {
     }
 }
 
-@media(min-width: 768px)
-{
-    .rr-sub-premise-edit-buttons, .rr-sub-premise-nav-buttons, .rr-resettle-edit-buttons {
-        margin-top: 33px;
-    }
-}
-
 h5.rr-resettle-card-header-sub-title {
     margin-bottom: .25rem;
+}
+
+.toggle-hide {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    visibility: hidden;
 }

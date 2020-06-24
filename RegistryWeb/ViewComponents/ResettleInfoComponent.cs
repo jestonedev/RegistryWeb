@@ -61,7 +61,7 @@ namespace RegistryWeb.ViewComponents
                 .Include(ri => ri.ResettleDocuments)
                 .Include(ri => ri.ResettleKindNavigation);
             var resettleVMs = resettles.ToList().Select(ri => new ResettleInfoVM(ri, address_p, registryContext));
-            return resettleVMs.OrderBy(r => r.ResettleDate);;
+            return resettleVMs.OrderBy(r => r.ResettleDate);
         }
     }
 }

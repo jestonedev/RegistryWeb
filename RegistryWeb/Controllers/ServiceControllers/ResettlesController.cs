@@ -72,8 +72,9 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 financeSource3 = resettle.FinanceSource3,
                 financeSource4 = resettle.FinanceSource4,
                 documents = resettle.ResettleDocuments.Select(r => new {
+                    r.IdDocument,
                     r.Number,
-                    r.Date,
+                    Date = r.Date.ToString("yyyy-MM-dd"),
                     r.Description,
                     r.IdDocumentType,
                     r.FileOriginName,
@@ -95,22 +96,27 @@ namespace RegistryWeb.Controllers.ServiceControllers
         }
 
         [HttpPost]
-        public IActionResult SaveResettle(ResettleInfo resettleInfo, Address address)
+        public IActionResult SaveResettle(ResettleInfo resettleInfo, Address address, List<bool> restrictionFilesRemove)
         {
             var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Resettles\");
             if (resettleInfo == null)
                 return Json(new { Error = -1 });
             if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
                 return Json(new { Error = -2 });
-            /*if (restrictionFile != null && !restrictionFileRemove)
+            if (resettleInfo.ResettleDocuments != null)
             {
-                restriction.FileDisplayName = restrictionFile.FileName;
-                restriction.FileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(restrictionFile.FileName).Extension;
-                restriction.FileMimeType = restrictionFile.ContentType;
-                var fileStream = new FileStream(Path.Combine(path, restriction.FileOriginName), FileMode.CreateNew);
-                restrictionFile.OpenReadStream().CopyTo(fileStream);
-                fileStream.Close();
-            }*/
+                for(var i = 0; i < resettleInfo.ResettleDocuments.Count; i++)
+                {
+                    var file = HttpContext.Request.Form.Files.Where(r => r.Name == "ResettleDocumentFiles[" + i + "]").FirstOrDefault();
+                    if (file == null || restrictionFilesRemove[i] == true) continue;
+                    resettleInfo.ResettleDocuments[i].FileDisplayName = file.FileName;
+                    resettleInfo.ResettleDocuments[i].FileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(file.FileName).Extension;
+                    resettleInfo.ResettleDocuments[i].FileMimeType = file.ContentType;
+                    var fileStream = new FileStream(Path.Combine(path, resettleInfo.ResettleDocuments[i].FileOriginName), FileMode.CreateNew);
+                    file.OpenReadStream().CopyTo(fileStream);
+                    fileStream.Close();
+                }
+            }
             //Создать
             if (resettleInfo.IdResettleInfo == 0)
             {
@@ -135,29 +141,48 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 registryContext.ResettlePremiseAssoc.Add(rpa);
                 registryContext.SaveChanges();
 
-                return Json(new { resettleInfo.IdResettleInfo /*, restriction.FileOriginName */ });
-            }
-            /*var resettleInfoDb = registryContext.ResettleInfos.Where(r => r.IdResettleInfo == resettleInfo.IdResettleInfo).AsNoTracking().FirstOrDefault();
-            if (resettleInfoDb == null)
-                return Json(new { Error = -5 });
-            if (restrictionFileRemove)
-            {
-                var fileOriginName = restrictionDb.FileOriginName;
-                if (!string.IsNullOrEmpty(fileOriginName))
-                {
-                    var filePath = Path.Combine(path, fileOriginName);
-                    if (System.IO.File.Exists(filePath))
+                return Json(new { resettleInfo.IdResettleInfo,
+                    documents = resettleInfo.ResettleDocuments.Select(r => new
                     {
-                        System.IO.File.Delete(filePath);
+                        r.IdDocument,
+                        r.Number,
+                        Date = r.Date.ToString("yyyy-MM-dd"),
+                        r.Description,
+                        r.IdDocumentType,
+                        r.FileOriginName,
+                    })
+                });
+            }
+            if (resettleInfo.ResettleDocuments != null)
+            {
+                for (var i = 0; i < resettleInfo.ResettleDocuments.Count; i++)
+                {
+                    var document = resettleInfo.ResettleDocuments[i];
+                    var documentDb = registryContext.ResettleDocuments.Where(r => r.IdDocument == document.IdDocument).AsNoTracking().FirstOrDefault();
+                    if (document.IdDocument != 0 && documentDb == null) continue;
+                    var file = HttpContext.Request.Form.Files.Where(r => r.Name == "ResettleDocumentFiles[" + i + "]").FirstOrDefault();
+                    if (restrictionFilesRemove[i])
+                    {
+                        var fileOriginName = documentDb.FileOriginName;
+                        if (!string.IsNullOrEmpty(fileOriginName))
+                        {
+                            var filePath = Path.Combine(path, fileOriginName);
+                            if (System.IO.File.Exists(filePath))
+                            {
+                                System.IO.File.Delete(filePath);
+                            }
+                        }
+                    }
+                    else
+                    if (file == null && documentDb != null)
+                    {
+                        document.FileOriginName = documentDb.FileOriginName;
+                        document.FileDisplayName = documentDb.FileDisplayName;
+                        document.FileMimeType = documentDb.FileMimeType;
                     }
                 }
-            } else
-            if (restrictionFile == null)
-            {
-                restriction.FileOriginName = restrictionDb.FileOriginName;
-                restriction.FileDisplayName = restrictionDb.FileDisplayName;
-                restriction.FileMimeType = restrictionDb.FileMimeType;
-            }*/
+            }
+            
             // Обновить переселение из
             var subPremisesFrom = registryContext.ResettleInfoSubPremisesFrom.Where(r => r.IdResettleInfo == resettleInfo.IdResettleInfo);
             foreach(var subPremise in subPremisesFrom)
@@ -194,12 +219,53 @@ namespace RegistryWeb.Controllers.ServiceControllers
                     registryContext.ResettleInfoTo.Add(resettleTo);
                 }
             }
+            // Обновить документы
+            var documents = registryContext.ResettleDocuments.Where(r => r.IdResettleInfo == resettleInfo.IdResettleInfo);
+            foreach (var documentDb in documents)
+            {
+                var document = resettleInfo.ResettleDocuments.Where(ri => ri.IdDocument == documentDb.IdDocument).FirstOrDefault();
+                if (document == null)
+                {
+                    documentDb.Deleted = 1;
+                } else
+                {
+                    documentDb.Number = document.Number;
+                    documentDb.Date = document.Date;
+                    documentDb.Description = document.Description;
+                    documentDb.IdDocumentType = document.IdDocumentType;
+                    documentDb.FileDisplayName = document.FileDisplayName;
+                    documentDb.FileMimeType = document.FileMimeType;
+                    documentDb.FileOriginName = document.FileOriginName;
+                }
+            }
+            var documentsList = documents.ToList();
+            foreach (var document in resettleInfo.ResettleDocuments)
+            {
+                document.IdResettleInfo = resettleInfo.IdResettleInfo;
+                if (!documentsList.Any(ri => ri.IdDocument == document.IdDocument))
+                {
+                    registryContext.ResettleDocuments.Add(document);
+                }
+            }
             // Обновить основную информацию
             resettleInfo.ResettleInfoSubPremisesFrom = null;
             resettleInfo.ResettleInfoTo = null;
+            resettleInfo.ResettleDocuments = null;
             registryContext.ResettleInfos.Update(resettleInfo);
             registryContext.SaveChanges();
-            return Json(new { resettleInfo.IdResettleInfo /*, restriction.FileOriginName  */});
+            return Json(new
+            {
+                resettleInfo.IdResettleInfo,
+                documents = resettleInfo.ResettleDocuments.Where(r => r.Deleted == 0).Select(r => new
+                {
+                    r.IdDocument,
+                    r.Number,
+                    Date = r.Date.ToString("yyyy-MM-dd"),
+                    r.Description,
+                    r.IdDocumentType,
+                    r.FileOriginName,
+                })
+            });
         }
 
         [HttpPost]
@@ -228,6 +294,25 @@ namespace RegistryWeb.Controllers.ServiceControllers
             ViewBag.CanEditExtInfo = true;
 
             return PartialView("ResettleInfo", resettleInfoVM);
+        }
+
+        [HttpPost]
+        public IActionResult AddResettleDocument(Address address, string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
+                return Json(-2);
+            var id = 0;
+            if (address == null)
+                return Json(new { Error = -3 });
+
+            var resettleDocument = new ResettleDocument { };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.Address = address;
+            ViewBag.ResettleDocumentTypes = registryContext.ResettleDocumentTypes;
+            ViewBag.CanEditExtInfo = true;
+
+            return PartialView("ResettleDocument", resettleDocument);
         }
 
         public JsonResult GetHouses(string idStreet)

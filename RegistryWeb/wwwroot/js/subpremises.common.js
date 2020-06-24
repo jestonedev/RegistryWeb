@@ -87,6 +87,9 @@ function saveSubPremise(e) {
                 $("button[data-id='" + id + "']").addClass("input-validation-error");
             }
         });
+        $([document.documentElement, document.body]).animate({
+            scrollTop: subPremiseElem.find(".input-validation-error").first().offset().top
+        }, 1000);
     }
 
     e.preventDefault();
@@ -248,11 +251,10 @@ let refreshValidationSubPremiseesForm = function () {
 
 
 $(function () {
-    $('#subPremisesList').hide();
     $('.yes-no-panel').hide();
     initializeValidationSubPremises();
     $('#subPremiseAdd').click(addSubPremise);
-    $('#subPremisesToggle').on('click', $('#subPremisesList'), elementToogle);
+    $('#subPremisesToggle').on('click', $('#subPremisesList'), elementToogleHide);
     $('#subPremisesList').on('click', '.subpremise-edit-btn', editSubPremise);
     $('#subPremisesList').on('click', '.subpremise-cancel-btn', cancelEditSubPremise);
     $('#subPremisesList').on('click', '.subpremise-save-btn', saveSubPremise);

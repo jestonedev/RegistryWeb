@@ -12,7 +12,7 @@
                 <a href="#" id="restrictionsToggle" class="form-control btn btn-primary" title="Развернуть список реквизитов права собственности" style="font-weight:bold;">∨</a>
             </div>
         </div>
-        <ul class="list-group list-group-flush" id="restrictionsList" style="display: none" data-addresstype="@ViewBag.AddressType" data-id="@ViewBag.Id" data-action="@ViewBag.Action">
+        <ul class="list-group list-group-flush toggle-hide" id="restrictionsList" data-addresstype="@ViewBag.AddressType" data-id="@ViewBag.Id" data-action="@ViewBag.Action">
             @foreach (var item in Model)
             {
                 <partial name="Restriction" model="item" />
