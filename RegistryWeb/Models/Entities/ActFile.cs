@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RegistryWeb.Models.Entities
+﻿namespace RegistryWeb.Models.Entities
 {
     public class ActFile
     {

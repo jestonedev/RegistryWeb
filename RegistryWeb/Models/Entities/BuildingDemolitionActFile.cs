@@ -6,7 +6,7 @@ namespace RegistryWeb.Models.Entities
     {
         public int Id { get; set; }
         public int IdBuilding { get; set; }
-        public int IdActFile  { get; set; }
+        public int? IdActFile  { get; set; }
         public int IdActTypeDocument  { get; set; }
         public string Number  { get; set; }
         public DateTime Date  { get; set; }

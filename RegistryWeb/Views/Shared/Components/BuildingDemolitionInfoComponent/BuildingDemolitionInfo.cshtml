@@ -2,8 +2,9 @@
 @{
     var demolishPlanDate = Model.DemolishPlanDate.HasValue ? Model.DemolishPlanDate.Value.ToString("yyyy-MM-dd") : "";
 }
-<form id="buildingDemolitionInfoForm">
+<form id="buildingDemolitionInfoForm" data-action="@ViewBag.Action" data-idbuilding="@Model.IdBuilding">
     <script src="~/js/buildingDemolitionInfo.common.js" asp-append-version="true"></script>
+    <link rel="stylesheet" href="~/css/buildingDemolitionInfo.css" asp-append-version="true" />
     <div class="card">
         <div class="card-header d-flex justify-content-between">
             <h3>Информация о сносе</h3>
@@ -34,7 +35,7 @@
                         }
                     </tr>
                 </thead>
-                <tbody id="buildingDemolitionActFiles" data-id="@ViewBag.IdBuilding">
+                <tbody id="buildingDemolitionActFiles">
                     @foreach (var item in Model.BuildingDemolitionActFiles)
                     {
                         <tr class="building-demolition-act-file" data-idbuildingdemolitionactfile="@item.Id">
@@ -49,11 +50,31 @@
                                 <select class="form-control field-building-demolition-act-file" title="@item.ActTypeDocument.Name"
                                         asp-items="@{new SelectList(ViewBag.ActTypeDocuments, "Id", "Name", item.IdActTypeDocument)}"></select>
                             </td>
-                            <td></td>
+                            <td>
+                                @{
+                                    var originalName = "";
+                                    var idFile = ""; //значение null для пустого файла
+                                    var id = "actFile_" + Guid.NewGuid().ToString();
+                                    if (item.ActFile != null)
+                                    {
+                                        idFile = item.ActFile.IdFile.ToString();
+                                        id = "actFile_" + idFile;
+                                        originalName = item.ActFile.OriginalName;
+                                    }
+                                }
+                                <div class="act-file-block" data-id="@idFile">
+                                    <input type="file" id="@id" class="act-file-upload" />
+                                    <label for="@id" class="btn btn-success oi oi-paperclip act-file-add"></label>
+                                    <div class="act-file" title="@originalName">
+                                        <a href="#" class="btn-link act-file-link">@originalName</a>
+                                        <span class="badge btn btn-danger">&times;</span>
+                                    </div>
+                                </div>
+                            </td>
                             @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                             {
                                 <td class="align-middle">
-                                    <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"></a>
+                                    <a href="#" class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"></a>
                                 </td>
                             }
                         </tr>

@@ -25,14 +25,16 @@ namespace RegistryWeb.ViewComponents
             model.BuildingDemolitionActFiles =
                 registryContext.BuildingDemolitionActFiles
                 .Include(b => b.ActTypeDocument)
+                .Include(b => b.ActFile)
                 .Where(b => b.IdBuilding == id)
+                .OrderBy(b => b.Id)
                 .ToList();
             model.DemolishPlanDate = demolishPlanDate;
+            model.IdBuilding = id;
             ViewBag.ActTypeDocuments =
                 registryContext.ActTypeDocuments
                 .Where(atd => atd.ActFileType == ActFileTypes.BuildingDemolitionActFile.ToString())
                 .AsNoTracking();
-            ViewBag.IdBuilding = id;
             ViewBag.Action = action;
             return View("BuildingDemolitionInfo", model);
         }

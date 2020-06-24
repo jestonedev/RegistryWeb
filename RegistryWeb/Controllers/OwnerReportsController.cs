@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ReportServices;
-using RegistryWeb.ViewModel;
 using RegistryWeb.DataServices;
-using RegistryWeb.Extensions;
 
 namespace RegistryWeb.Controllers
 {

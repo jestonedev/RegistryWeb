@@ -7,7 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
+using RegistryWeb.ReportServices;
 using RegistryWeb.ViewModel;
+using Microsoft.AspNetCore.Http;
+using System.Net.Http;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace RegistryWeb.Controllers.ServiceControllers
 {
@@ -15,15 +20,17 @@ namespace RegistryWeb.Controllers.ServiceControllers
     {
         SecurityService securityService;
         RegistryContext registryContext;
+        ReportService reportService;
 
-        public BuildingDemolitionInfoController(SecurityService securityService, RegistryContext registryContext)
+        public BuildingDemolitionInfoController(SecurityService securityService, RegistryContext registryContext, ReportService reportService)
         {
             this.securityService = securityService;
             this.registryContext = registryContext;
+            this.reportService = reportService;
         }
 
         [HttpPost]
-        public IActionResult GetBuildingDemolitionInfo(int? idBuilding)
+        public JsonResult GetBuildingDemolitionInfo(int? idBuilding)
         {
             if (idBuilding == null)
                 return Json(-1);
@@ -32,44 +39,50 @@ namespace RegistryWeb.Controllers.ServiceControllers
             var demolishPlanDate = registryContext.Buildings
                 .SingleOrDefault(b => b.IdBuilding == idBuilding)
                 .DemolishedPlanDate;
-            var buildingDemolitionActFiles = registryContext.BuildingDemolitionActFiles
-                .Where(b => b.IdBuilding == idBuilding)
-                .AsNoTracking()
+            var actTypeDocuments = registryContext.ActTypeDocuments
+                .Where(atd => atd.ActFileType == ActFileTypes.BuildingDemolitionActFile.ToString())
+                .Select(atd => new
+                {
+                    id = atd.Id,
+                    name = atd.Name
+                })
                 .ToList();
-            var model = new BuildingDemolitionInfoVM()
+            var buildingDemolitionActFiles = registryContext.BuildingDemolitionActFiles
+                .Include(af => af.ActFile)
+                .Where(b => b.IdBuilding == idBuilding)
+                .OrderBy(b => b.Id)
+                .Select(b => new
+                {
+                    id = b.Id,
+                    idBuilding = b.IdBuilding,
+                    idActFile = b.IdActFile,
+                    idActTypeDocument = b.IdActTypeDocument,
+                    number = b.Number,
+                    date = b.Date.ToString("yyyy-MM-dd"),
+                    name = b.Name,
+                    originalNameActFile = b.ActFile == null ? "" : b.ActFile.OriginalName
+                })
+                .ToList();
+            return Json(new
             {
-                BuildingDemolitionActFiles = buildingDemolitionActFiles,
-                DemolishPlanDate = demolishPlanDate
-            };
-            return Json(model);
+                actTypeDocuments,
+                buildingDemolitionActFiles,
+                demolishPlanDate = demolishPlanDate.HasValue ? demolishPlanDate.Value.ToString("yyyy-MM-dd") : "",
+                idBuilding = idBuilding.Value
+            });
         }
 
-        [HttpPost]
-        public IActionResult SaveBuildingDemolitionInfo(int? idBuilding, BuildingDemolitionInfoVM buildingDemolitionInfoVM)
+        public IActionResult GetActFile(int? idFile)
         {
-            if (buildingDemolitionInfoVM == null || idBuilding == null)
+            if (idFile == null)
                 return Json(-1);
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return Json(-2);
             try
             {
-                registryContext.Buildings.SingleOrDefault(b => b.IdBuilding == idBuilding).DemolishedPlanDate = buildingDemolitionInfoVM.DemolishPlanDate;
-                var oldActFiles = registryContext.BuildingDemolitionActFiles.
-                    Where(af => af.IdBuilding == idBuilding)
-                    .AsNoTracking();
-                var newActFiles = buildingDemolitionInfoVM.BuildingDemolitionActFiles ?? new List<BuildingDemolitionActFile>();
-                foreach (var oldFile in oldActFiles)
-                {
-                    if (newActFiles.Select(af => af.Id).Contains(oldFile.Id) == false)
-                    {
-                        registryContext.Entry(oldFile).Property(p => p.Deleted).IsModified = true;
-                        oldFile.Deleted = 1;
-                        newActFiles.Add(oldFile);
-                    }
-                }
-                registryContext.BuildingDemolitionActFiles.UpdateRange(newActFiles);
-                registryContext.SaveChanges();
-                return Json(1);
+                var actFile = registryContext.ActFiles.SingleOrDefault(f => f.IdFile == idFile);
+                var file = reportService.GetFileContentsAndMIMETypeFromRepository(actFile.FileName, ActFileTypes.BuildingDemolitionActFile);
+                return File(file.Item1, file.Item2, actFile.OriginalName);
             }
             catch
             {
@@ -78,7 +91,109 @@ namespace RegistryWeb.Controllers.ServiceControllers
         }
 
         [HttpPost]
-        public IActionResult AddBuildingDemolitionActFile()
+        public IActionResult SaveBuildingDemolitionInfo(BuildingDemolitionInfoVM viewModel)
+        {
+            if (viewModel == null)
+                return Json(-1);
+            var r = Request;
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+                return Json(-2);
+            var saveFileList = new List<string>();
+            try
+            {
+                registryContext.Buildings.SingleOrDefault(b => b.IdBuilding == viewModel.IdBuilding).DemolishedPlanDate = viewModel.DemolishPlanDate;
+                var oldBDActFiles = registryContext.BuildingDemolitionActFiles
+                    .Include(af => af.ActFile)
+                    .Where(af => af.IdBuilding == viewModel.IdBuilding)
+                    .AsNoTracking();
+                var newBDActFiles = viewModel.BuildingDemolitionActFiles ?? new List<BuildingDemolitionActFile>();
+                var removeFileList = new List<string>();
+                var i = 0; //итератор для массива файлов
+                foreach (var newBDActFile in newBDActFiles)
+                {
+                    //Физический файл не был добавлен
+                    if (newBDActFile.IdActFile == null) { }
+                    //Физический файл добавили
+                    else if (newBDActFile.IdActFile == 0)
+                    {
+                        //Добавляем новый физический файл
+                        var nameNewActFile = reportService.SaveFormFileToRepository(viewModel.Files[i], ActFileTypes.BuildingDemolitionActFile);
+                        saveFileList.Add(nameNewActFile);
+                        //Проверяем был ли другой физический файл прикреплен ранее
+                        foreach (var oldBDActFile in oldBDActFiles)
+                        {
+                            if (oldBDActFile.Id == newBDActFile.Id && oldBDActFile.ActFile != null)
+                            {
+                                //Удаляем старый физическимй файл
+                                var nameOldActFile = oldBDActFile.ActFile.FileName;
+                                removeFileList.Add(nameOldActFile);
+                                //reportService.DeleteFileToRepository(nameOldActFile, ActFileTypes.BuildingDemolitionActFile);
+
+                                //Переписываем запись о старом физфайлу данными о новом физфайле
+                                oldBDActFile.ActFile.OriginalName = Path.GetFileName(viewModel.Files[i].FileName);
+                                oldBDActFile.ActFile.FileName = nameNewActFile;
+
+                                newBDActFile.ActFile = oldBDActFile.ActFile;
+                            }
+                        }
+                        if (newBDActFile.ActFile == null)
+                        {
+                            newBDActFile.ActFile = new ActFile()
+                            {
+                                FileName = nameNewActFile,
+                                OriginalName = Path.GetFileName(viewModel.Files[i].FileName)
+                            };
+                        }
+                        i++;
+                    }
+                    //Физический файл удалили
+                    else if (newBDActFile.IdActFile < 0)
+                    {
+                        //Находим какой файл был ранее прикреплен
+                        newBDActFile.IdActFile = -1 * newBDActFile.IdActFile;
+                        var oldActFile = registryContext.ActFiles.FirstOrDefault(af => af.IdFile == newBDActFile.IdActFile);
+                        //Удаляем старый физический файл
+                        registryContext.ActFiles.Remove(oldActFile);
+                        removeFileList.Add(oldActFile.FileName);
+                        //reportService.DeleteFileToRepository(oldActFile.FileName, ActFileTypes.BuildingDemolitionActFile);
+                    }
+                }
+                foreach (var oldBDActFile in oldBDActFiles)
+                {
+                    //Человек удалил информацию о сносе
+                    if (newBDActFiles.Select(af => af.Id).Contains(oldBDActFile.Id) == false)
+                    {
+                        //Информацию о сносе помечаем на удаление
+                        registryContext.Entry(oldBDActFile).Property(p => p.Deleted).IsModified = true;
+                        oldBDActFile.Deleted = 1;
+                        newBDActFiles.Add(oldBDActFile);
+
+                        //Если к записи был прикреплен физический файл
+                        if (oldBDActFile.ActFile != null)
+                        {
+                            //Удаляем запись про физический файл
+                            registryContext.ActFiles.Remove(oldBDActFile.ActFile);
+
+                            //Удаляем сам физический файл
+                            removeFileList.Add(oldBDActFile.ActFile.FileName);
+                            //reportService.DeleteFileToRepository(oldBDActFile.ActFile.FileName, ActFileTypes.BuildingDemolitionActFile);
+                        }
+                    }
+                }
+                registryContext.BuildingDemolitionActFiles.UpdateRange(newBDActFiles);
+                registryContext.SaveChanges();
+                removeFileList.ForEach(f => reportService.DeleteFileToRepository(f, ActFileTypes.BuildingDemolitionActFile));
+                return Json(1);
+            }
+            catch(Exception ex)
+            {
+                saveFileList.ForEach(f => reportService.DeleteFileToRepository(f, ActFileTypes.BuildingDemolitionActFile));
+                return Json(-3);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult GetBuildingDemolitionActFile()
         {
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return Json(-1);
