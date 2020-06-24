@@ -278,7 +278,7 @@ function saveRestriction(e) {
             }
         });
         $([document.documentElement, document.body]).animate({
-            scrollTop: restrictionElem.find(".input-validation-error").first().offset().top
+            scrollTop: restrictionElem.find(".input-validation-error").first().offset().top - 35
         }, 1000);
     }
     e.preventDefault();

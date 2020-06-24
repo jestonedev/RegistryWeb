@@ -282,7 +282,7 @@ function saveOwnershipRight(e) {
             }
         });
         $([document.documentElement, document.body]).animate({
-            scrollTop: owrElem.find(".input-validation-error").first().offset().top
+            scrollTop: owrElem.find(".input-validation-error").first().offset().top - 35
         }, 1000);
     }
     e.preventDefault();

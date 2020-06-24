@@ -513,7 +513,7 @@ function saveResettle(e) {
             }
         }
         $([document.documentElement, document.body]).animate({
-            scrollTop: resettleElem.find(".input-validation-error").first().offset().top
+            scrollTop: resettleElem.find(".input-validation-error").first().offset().top - 35
         }, 1000);
     }
     e.preventDefault();
