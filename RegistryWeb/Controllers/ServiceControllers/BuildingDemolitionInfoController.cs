@@ -36,9 +36,9 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 return Json(-1);
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return Json(-2);
-            var demolishPlanDate = registryContext.Buildings
-                .SingleOrDefault(b => b.IdBuilding == idBuilding)
-                .DemolishedPlanDate;
+            var demolishedPlanDate = registryContext.Buildings
+                .FirstOrDefault(b => b.IdBuilding == idBuilding)
+                ?.DemolishedPlanDate;
             var actTypeDocuments = registryContext.ActTypeDocuments
                 .Where(atd => atd.ActFileType == ActFileTypes.BuildingDemolitionActFile.ToString())
                 .Select(atd => new
@@ -67,7 +67,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             {
                 actTypeDocuments,
                 buildingDemolitionActFiles,
-                demolishPlanDate = demolishPlanDate.HasValue ? demolishPlanDate.Value.ToString("yyyy-MM-dd") : "",
+                demolishedPlanDate = demolishedPlanDate.HasValue ? demolishedPlanDate.Value.ToString("yyyy-MM-dd") : "",
                 idBuilding = idBuilding.Value
             });
         }
@@ -101,7 +101,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             var saveFileList = new List<string>();
             try
             {
-                registryContext.Buildings.SingleOrDefault(b => b.IdBuilding == viewModel.IdBuilding).DemolishedPlanDate = viewModel.DemolishPlanDate;
+                registryContext.Buildings.SingleOrDefault(b => b.IdBuilding == viewModel.IdBuilding).DemolishedPlanDate = viewModel.DemolishedPlanDate;
                 var oldBDActFiles = registryContext.BuildingDemolitionActFiles
                     .Include(af => af.ActFile)
                     .Where(af => af.IdBuilding == viewModel.IdBuilding)

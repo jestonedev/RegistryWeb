@@ -1,6 +1,6 @@
 ﻿@model RegistryWeb.ViewModel.BuildingDemolitionInfoVM;
 @{
-    var demolishPlanDate = Model.DemolishPlanDate.HasValue ? Model.DemolishPlanDate.Value.ToString("yyyy-MM-dd") : "";
+    var demolishedPlanDate = Model.DemolishedPlanDate.HasValue ? Model.DemolishedPlanDate.Value.ToString("yyyy-MM-dd") : "";
 }
 <form id="buildingDemolitionInfoForm" data-action="@ViewBag.Action" data-idbuilding="@Model.IdBuilding">
     <script src="~/js/buildingDemolitionInfo.common.js" asp-append-version="true"></script>
@@ -14,9 +14,9 @@
         </div>
         <div class="card-body" id="buildingDemolitionInfoBlock">
             <div class="form-group row">
-                <label for="@Model.DemolishPlanDate" class="col-auto col-form-label">Планируемая дата сноса</label>
+                <label for="@Model.DemolishedPlanDate" class="col-auto col-form-label">Планируемая дата сноса</label>
                 <div class="col-auto">
-                    <input type="date" id="demolishPlanDate" class="form-control" value="@demolishPlanDate" title="@demolishPlanDate">
+                    <input type="date" id="demolishPlanDate" class="form-control" value="@demolishedPlanDate" title="@demolishedPlanDate">
                 </div>
             </div>
             <table class="table table-bordered">
@@ -81,7 +81,7 @@
                     }
                 </tbody>
             </table>
-            @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+            @if (ViewBag.Action == "Edit")
             {
                 <div class="form-group row d-flex justify-content-center">
                     <div class="col-auto">

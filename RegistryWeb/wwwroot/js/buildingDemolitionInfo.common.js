@@ -93,7 +93,7 @@
 //}
 let BuildingDemolitionActFile = class {
     constructor(idBuilding) {
-        this.id = "";
+        this.id = 0;
         this.idBuilding = idBuilding;
         this.idActFile = "";
         this.idActTypeDocument = 0;
@@ -200,10 +200,17 @@ let BuildingDemolitionActFile = class {
 }
 
 let BuildingDemolitionInfo = class {
-    constructor(root) {
-        this._root = root;
-        this._action = root.data('action');
-        this.idBuilding = +this._root.data('idbuilding');
+    constructor(form) {
+        this.form = form;
+        this._action = form.data('action');
+        this.idBuilding = +this.form.data('idbuilding');
+    }
+
+    get form() {
+        return this._form
+    }
+    set form(value) {
+        this._form = value;
     }
 
     get idBuilding() {
@@ -213,17 +220,10 @@ let BuildingDemolitionInfo = class {
         this._idBuilding = value;
     }
 
-    get idBuilding() {
-        return this._idBuilding;
-    }
-    set idBuilding(value) {
-        this._idBuilding = value;
-    }
-
-    get demolishPlanDate() {
+    get demolishedPlanDate() {
         return this._demolishPlanDate;
     }
-    set demolishPlanDate(value) {
+    set demolishedPlanDate(value) {
         this._demolishPlanDate = value;
     }
 
@@ -241,14 +241,36 @@ let BuildingDemolitionInfo = class {
         this._actTypeDocuments = value;
     }
 
+    getJson = function () {
+        this.initialize();
+        let buildingDemolitionInfoJson = {
+            IdBuilding: this.idBuilding,
+            DemolishedPlanDate: this.demolishedPlanDate,
+            BuildingDemolitionActFiles: []
+        };
+        for (let i = 0; i < this.buildingDemolitionActFiles.length; i++) {
+            buildingDemolitionInfoJson.BuildingDemolitionActFiles[i] = {
+                Id: this.buildingDemolitionActFiles[i].id,
+                IdBuilding: this.buildingDemolitionActFiles[i].idBuilding,
+                //временное решение
+                IdActFile: null, //this.buildingDemolitionActFiles[i].idActFile,
+                IdActTypeDocument: this.buildingDemolitionActFiles[i].idActTypeDocument,
+                Number: this.buildingDemolitionActFiles[i].number,
+                Date: this.buildingDemolitionActFiles[i].date,
+                Name: this.buildingDemolitionActFiles[i].name
+            };
+        }
+        return buildingDemolitionInfoJson;
+    }
+
     initialize = function () {
-        this._root = $('#buildingDemolitionInfoForm');
-        this._action = this._root.data('action');
-        this.idBuilding = +this._root.data('idbuilding');
-        this.demolishPlanDate = this._root.find('#demolishPlanDate').val();
+        this.form = $('#buildingDemolitionInfoForm');
+        this._action = this.form.data('action');
+        this.idBuilding = +this.form.data('idbuilding');
+        this.demolishedPlanDate = this.form.find('#demolishPlanDate').val();
         this.buildingDemolitionActFiles = [];
 
-        let trs = this._root.find('#buildingDemolitionActFiles>tr');
+        let trs = this.form.find('#buildingDemolitionActFiles>tr');
         for (let i = 0; i < trs.length; i++) {
             this.buildingDemolitionActFiles[i] = new BuildingDemolitionActFile(this.idBuilding);
             this.buildingDemolitionActFiles[i].initialize($(trs[i]));
@@ -257,7 +279,7 @@ let BuildingDemolitionInfo = class {
 
     setAllProperty = function (jsonBuildingDemolitionActFiles) {
         this.idBuilding = jsonBuildingDemolitionActFiles.idBuilding;
-        this.demolishPlanDate = jsonBuildingDemolitionActFiles.demolishPlanDate;
+        this.demolishedPlanDate = jsonBuildingDemolitionActFiles.demolishedPlanDate;
         this.actTypeDocuments = jsonBuildingDemolitionActFiles.actTypeDocuments;
         this.buildingDemolitionActFiles = [];
         for (let i = 0; i < jsonBuildingDemolitionActFiles.buildingDemolitionActFiles.length; i++) {
@@ -284,7 +306,7 @@ let BuildingDemolitionInfo = class {
         this.initialize();
         let buildingDemolitionInfoVM = new FormData();
         buildingDemolitionInfoVM.append('IdBuilding', this.idBuilding);
-        buildingDemolitionInfoVM.append('DemolishPlanDate', this.demolishPlanDate);
+        buildingDemolitionInfoVM.append('demolishedPlanDate', this.demolishedPlanDate);
         for (var i = 0; i < this.buildingDemolitionActFiles.length; i++) {
             if (this.buildingDemolitionActFiles[i].file != "") {
                 buildingDemolitionInfoVM.append('Files', this.buildingDemolitionActFiles[i].file, this.buildingDemolitionActFiles[i].file.name);
@@ -299,7 +321,6 @@ let BuildingDemolitionInfo = class {
         };
         return buildingDemolitionInfoVM;
     }
-
 
     createActTypeDocumentSelect = function (selectedId) {
         let select = `<select class="form-control field-building-demolition-act-file" title="">\n`;
@@ -318,8 +339,8 @@ let BuildingDemolitionInfo = class {
 
     addNewTr = function () {
         let obj = new BuildingDemolitionActFile(this.idBuilding);
-        this._root.find('#buildingDemolitionActFiles').append(this.createTr(obj));        
-        this.drawActFiles(this._root.find('#buildingDemolitionActFiles>tr').last());
+        this.form.find('#buildingDemolitionActFiles').append(this.createTr(obj));        
+        this.drawActFiles(this.form.find('#buildingDemolitionActFiles>tr').last());
     }
 
     createTr = function (buildingDemolitionActFile) {
@@ -335,6 +356,7 @@ let BuildingDemolitionInfo = class {
         let tr = `
         <tr class="building-demolition-act-file" data-idbuildingdemolitionactfile="${buildingDemolitionActFile.id}">
             <td class="align-middle">
+                <input type="hidden" value="${buildingDemolitionActFile.id}" name="Id" />
                 <input type="text" class="form-control field-building-demolition-act-file" value="${buildingDemolitionActFile.number}" title="${buildingDemolitionActFile.number}">
             </td>
             <td class="align-middle">
@@ -364,20 +386,20 @@ let BuildingDemolitionInfo = class {
     }
 
     updateDataInElements = function () {
-        this._root.data('idbuilding', this.idBuilding);
-        this._root.attr('data-idbuilding', this.idBuilding);
+        this.form.data('idbuilding', this.idBuilding);
+        this.form.attr('data-idbuilding', this.idBuilding);
 
-        this._root.find('#demolishPlanDate').val(this.demolishPlanDate);
+        this.form.find('#demolishPlanDate').val(this.demolishedPlanDate);
 
-        this._root.find('#buildingDemolitionActFiles>tr').remove();
+        this.form.find('#buildingDemolitionActFiles>tr').remove();
         if (this.buildingDemolitionActFiles.length == 0) return;
         for (let i = 0; i < this.buildingDemolitionActFiles.length; i++) {
-            this._root.find('#buildingDemolitionActFiles').append(this.createTr(this.buildingDemolitionActFiles[i]));
+            this.form.find('#buildingDemolitionActFiles').append(this.createTr(this.buildingDemolitionActFiles[i]));
         }
         this.drawActFiles();
     }
 
-    drawActFiles = function (trs = this._root.find('#buildingDemolitionActFiles>tr')) {
+    drawActFiles = function (trs = this.form.find('#buildingDemolitionActFiles>tr')) {
         let files = trs.find($('.act-file-block'));
         trs.find($('.act-file-upload')).hide();
         files.each(function () {
@@ -404,30 +426,12 @@ let buildingDemolitionInfoSaveClick = function (event) {
         xhr.send(formData)
         xhr.onreadystatechange = function () {
             if (this.readyState != 4) return;
-            console.log(xhr);
-            console.log(xhr.status);
-            if (xhr.status == 200 && xhr.responseText == 1) {
-                alert('Все гуд');
-            } else {
+            if (xhr.status != 200 || xhr.responseText != 1) {
                 alert("Ошибка сохранения информации о сносе!" +
                     "\nxhrresponseText: " + xhr.responseText +
                     "\nxhr.status: " + xhr.status);
             }
         }
-        
-        //$.ajax({
-        //    async: true,
-        //    type: 'POST',
-        //    url: window.location.origin + '/BuildingDemolitionInfo/SaveBuildingDemolitionInfo',
-        //    processData: false,
-        //    contentType: false,
-        //    data: { buildingDemolitionInfoVM },
-        //    success: function (ind) {
-        //        if (ind != 1) {
-        //            alert("Ошибка сохранения информации о сносе!");
-        //        }
-        //    }
-        //});
     }
 }
 let buildingDemolitionInfoCancelClick = function (event) {
@@ -501,7 +505,6 @@ $(function () {
     _buildingDemolitionInfo = new BuildingDemolitionInfo(rootElem);
     _buildingDemolitionInfo.updateData();
     _buildingDemolitionInfo.drawActFiles();
-    console.log(_buildingDemolitionInfo);
 
     $('#buildingDemolitionInfoBlock').hide();
     //initializeVilidationTrs();

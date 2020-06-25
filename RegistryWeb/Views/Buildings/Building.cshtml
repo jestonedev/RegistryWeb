@@ -396,6 +396,6 @@
         </form>
         @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.IdBuilding, type = AddressTypes.Building, action = ViewBag.Action })
         @await Component.InvokeAsync("OwnershipRightsComponent", new { address = new Address() { Id = Model.IdBuilding.ToString(), AddressType = AddressTypes.Building }, action = ViewBag.Action })
-        @await Component.InvokeAsync("BuildingDemolitionInfoComponent", new { id = Model.IdBuilding, demolishPlanDate = Model.DemolishedPlanDate, action = ViewBag.Action })
+        @await Component.InvokeAsync("BuildingDemolitionInfoComponent", new { id = Model.IdBuilding, demolishedPlanDate = Model.DemolishedPlanDate, action = ViewBag.Action })
     </div>
 </div>

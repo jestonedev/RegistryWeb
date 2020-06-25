@@ -132,7 +132,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Create()
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
                 return View("NotAccess");
             return GetBuildingView(dataService.CreateBuilding());
         }
@@ -142,7 +142,7 @@ namespace RegistryWeb.Controllers
         {
             if (building == null)
                 return Json(-1);
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
                 return Json(-2);
             if (ModelState.IsValid)
             {
