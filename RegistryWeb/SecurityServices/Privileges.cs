@@ -14,6 +14,7 @@ namespace RegistryWeb.SecurityServices
         RegistryReadWriteNotMunicipal = 3,
         RegistryWriteMunicipal = 268435456,
         RegistryReadWriteMunicipal = 268435457,
+        RegistryWriteExtInfo = 536870912,
         RegistryWriteAll = RegistryWriteMunicipal | RegistryWriteNotMunicipal,
         RegistryDirectoriesWrite = 4,
         RegistryDirectoriesReadWrite = 5,

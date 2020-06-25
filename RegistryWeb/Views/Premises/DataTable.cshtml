@@ -128,10 +128,13 @@
             <td class="p-table-low-width-hide-cell">@(ObjectStateHelper.IsMunicipal(item.IdState) ? @GetTypeFund(item) : "")</td>
             <td>
                 <div class="btn-group" role="group" aria-label="Панель доступа">
-                    @if (
-                        (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(item.IdState) && 
-                        (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) || !item.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) || 
-                        (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(item.IdState)))
+                    @{ 
+                        var canEditBaseInfo = (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(item.IdState) &&
+                        (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) || !item.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) ||
+                        (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(item.IdState));
+                        var canEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+                    }
+                    @if (canEditBaseInfo || canEditExtInfo)
                     {
                         <div class="btn-group" role="group" aria-label="Панель доступа">
                             <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
@@ -140,7 +143,7 @@
                                    asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                 <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
                                    asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@item.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                                <a class="btn btn-danger oi oi-x @(canEditBaseInfo ? "" : "disabled")" title="Удалить" aria-label="Удалить"
                                    asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@item.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                             </div>
                         </div>

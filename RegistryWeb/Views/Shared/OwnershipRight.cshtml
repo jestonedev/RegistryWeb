@@ -6,6 +6,7 @@
 @using RegistryWeb.DataHelpers;
 
 @{ 
+    var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
     var attachment = Model.Address.AddressType == AddressTypes.Premise ? "Помещение" : "Здание";
     var ownershipRightTypeClass = "col-md-6 col-lg-6";
     if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
@@ -100,12 +101,12 @@
         {
             <div class="text-lg-right text-center col-lg-2 rr-ownership-right-edit-buttons">
                 <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
-                    <a class="btn btn-danger ownership-right-cancel-btn @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
-                    <a class="btn btn-success ownership-right-save-btn @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                    <a class="btn btn-danger ownership-right-cancel-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                    <a class="btn btn-success ownership-right-save-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
                 </div>
                 <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
-                    <a class="btn btn-primary ownership-right-edit-btn @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
-                    <a class="btn btn-danger ownership-right-delete-btn @(ViewBag.Address.AddressType == Model.Address.AddressType ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                    <a class="btn btn-primary ownership-right-edit-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                    <a class="btn btn-danger ownership-right-delete-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
                 </div>
             </div>
         }

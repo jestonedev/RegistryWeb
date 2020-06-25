@@ -1,0 +1,79 @@
+﻿@model RegistryWeb.Models.Entities.ResettleDocument;
+@using RegistryWeb.Extensions;
+@using RegistryWeb.ViewOptions;
+@using RegistryWeb.Models.Entities;
+@using RegistryWeb.SecurityServices;
+@using RegistryWeb.DataHelpers;
+
+@{ 
+    var canEdit = ((bool?)ViewBag.CanEditExtInfo) ?? false;
+    var resettleDocumentTypeClass = "col-sm-10 col-md-11";
+    if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    {
+        resettleDocumentTypeClass = "col-md-12";
+    }
+}
+
+<li class="list-group-item">
+    <input type="hidden" value="@Model.IdDocument" name="IdDocument" />
+    <div class="form-row">
+        <div class="form-group col-sm-6 col-md-3 col-lg-3">
+            <label>Номер документа</label>
+            <input type="text" maxlength="10" class="form-control" disabled value="@Model.Number" name="ResettleDocumentNum" title="Номер документа">
+        </div>
+        <div class="form-group col-sm-6 col-md-3 col-lg-3">
+            <label>Дата документа</label>
+            <input type="date" class="form-control" disabled value="@(Model.Date.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : Model.Date.ToString("yyyy-MM-dd"))" name="ResettleDocumentDate" title="Дата документа">
+        </div>
+        <div class="form-group col-md-6 col-lg-6">
+            <label>Наименование и образ документа</label>
+            <div class="input-group">
+                <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="ResettleDocumentDescription" title="Наименование">
+                <input type="file" name="ResettleDocumentFile" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
+                <input type="hidden" name="ResettleDocumentFileRemove" value="false" />
+                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+                {
+                    <div class="input-group-append">
+                        <a class="btn btn-success rr-resettle-document-file-download @(Model.FileOriginName == null ? "disabled" : "")"
+                           href="/Resettles/DownloadFile/?idDocument=@Model.IdDocument" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
+                    </div>
+                }
+                @if (ViewBag.Action == "Edit")
+                {
+                    <div class="input-group-append rr-resettle-document-file-buttons">
+                        <a class="btn btn-danger rr-resettle-document-file-remove" style="display: none"
+                           href="#" title="Удалить образ документа" aria-label="Удалить образ документа"><span class="oi oi-trash"></span></a>
+                        <a class="btn btn-success rr-resettle-document-file-attach" style="display: none"
+                           href="#" title="Прикрепить образ документа" aria-label="Прикрепить образ документа"><span class="oi oi-paperclip"></span></a>
+                        <a class="btn btn-success rr-resettle-document-file-download @(Model.FileOriginName == null ? "disabled" : "")"
+                           href="/Resettles/DownloadFile/?idDocument=@Model.IdDocument" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
+                    </div>
+                }
+                @if (ViewBag.Action == "Create")
+                {
+                    <div class="input-group-append rr-resettle-document-file-buttons">
+                        <a class="btn btn-danger rr-resettle-document-file-remove" style="display: none"
+                           href="#" title="Удалить образ документа" aria-label="Удалить образ документа"><span class="oi oi-x"></span></a>
+                        <a class="btn btn-success rr-resettle-document-file-attach" style="display: none"
+                           href="#" title="Прикрепить образ документа" aria-label="Прикрепить образ документа"><span class="oi oi-paperclip"></span></a>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="form-group @resettleDocumentTypeClass">
+            <label>Тип документа</label>
+            <select disabled class="form-control field-resettle selectpicker" title="Тип документа"
+                    asp-items="@{new SelectList(ViewBag.ResettleDocumentTypes, "IdDocumentType", "DocumentTypeName",Model.IdDocumentType)}" name="IdDocumentType">
+                <option></option>
+            </select>   
+        </div>
+        @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+        {
+            <div class="text-sm-right text-center col-sm-2 col-md-1 rr-resettle-document-edit-buttons">
+                <div class="btn-group" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger resettle-document-cancel-btn disabled" title="Удалить документ" aria-label="Удалить документ" href="#"><span class="oi oi-x"></span></a>
+                </div>
+            </div>
+        }
+    </div>
+</li>

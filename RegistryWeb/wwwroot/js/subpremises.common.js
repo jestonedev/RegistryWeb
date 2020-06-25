@@ -54,8 +54,8 @@ function refreshSubPremise(subPremiseElem, subPremise) {
     subPremiseElem.find("[name^='LivingArea']").val(subPremise.livingArea);
     subPremiseElem.find("[name^='Description']").val(subPremise.description);
     subPremiseElem.find("[name^='CadastralNum']").val(subPremise.cadastralNum);
-    subPremiseElem.find("[name^='CadastralCost']").val(subPremise.cadastralCost);
-    subPremiseElem.find("[name^='BalanceCost']").val(subPremise.balanceCost);
+    subPremiseElem.find("[name^='CadastralCost']").val(subPremise.cadastralCost.toFixed(2).replace('.', ','));
+    subPremiseElem.find("[name^='BalanceCost']").val(subPremise.balanceCost.toFixed(2).replace('.', ','));
     subPremiseElem.find("[name^='Account']").val(subPremise.account);
 }
 
@@ -87,6 +87,9 @@ function saveSubPremise(e) {
                 $("button[data-id='" + id + "']").addClass("input-validation-error");
             }
         });
+        $([document.documentElement, document.body]).animate({
+            scrollTop: subPremiseElem.find(".input-validation-error").first().offset().top
+        }, 1000);
     }
 
     e.preventDefault();
@@ -248,11 +251,10 @@ let refreshValidationSubPremiseesForm = function () {
 
 
 $(function () {
-    $('#subPremisesList').hide();
     $('.yes-no-panel').hide();
     initializeValidationSubPremises();
     $('#subPremiseAdd').click(addSubPremise);
-    $('#subPremisesToggle').on('click', $('#subPremisesList'), elementToogle);
+    $('#subPremisesToggle').on('click', $('#subPremisesList'), elementToogleHide);
     $('#subPremisesList').on('click', '.subpremise-edit-btn', editSubPremise);
     $('#subPremisesList').on('click', '.subpremise-cancel-btn', cancelEditSubPremise);
     $('#subPremisesList').on('click', '.subpremise-save-btn', saveSubPremise);

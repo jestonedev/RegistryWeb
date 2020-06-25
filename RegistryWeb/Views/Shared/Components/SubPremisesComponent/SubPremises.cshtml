@@ -15,12 +15,12 @@
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {
-                    <a href="#" id="subPremiseAdd" class="form-control btn btn-success" title="Добавить комнату">&#10010;</a>
+                    <a href="#" id="subPremiseAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить комнату">&#10010;</a>
                 }
                 <a href="#" id="subPremisesToggle" class="form-control btn btn-primary" title="Развернуть список комнат" style="font-weight:bold;">∨</a>
             </div>
         </div>
-        <ul class="list-group list-group-flush" id="subPremisesList" data-premise-id="@ViewBag.IdPremises" data-action="@ViewBag.Action" style="display: none">
+        <ul class="list-group list-group-flush toggle-hide" id="subPremisesList" data-premise-id="@ViewBag.IdPremises" data-action="@ViewBag.Action">
             @foreach (var item in Model)
             {
                 <partial name="SubPremise" model="item" />

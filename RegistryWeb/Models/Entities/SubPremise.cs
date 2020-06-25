@@ -31,6 +31,7 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<FundSubPremiseAssoc> FundsSubPremisesAssoc { get; set; }
         public virtual IList<OwnerSubPremiseAssoc> OwnerSubPremisesAssoc { get; set; }
         public IList<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
+        public virtual IList<ResettleInfoSubPremiseFrom> ResettleInfoSubPremisesFrom { get; set; }
 
         public string GetAddress()
         {

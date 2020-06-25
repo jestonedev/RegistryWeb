@@ -19,15 +19,21 @@
     });
 
     $("form#r-premises-form").on("submit", function (e) {
+        if ($("form#r-premises-form input[type='submit']").hasClass("disabled")) {
+            e.preventDefault();
+            return;
+        }
         $("input.decimal").each(function (idx, elem) {
             $(elem).val($(elem).val().replace(".", ","));
         });
-        $("button[data-id]").removeClass("input-validation-error");
+        $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
         var isFormValid = $(this).valid();
         var isOwnershipsValid = $("#ownershipRightsForm").valid();
         var isRestrictionsValid = $("#restrictionsForm").valid();
         var isSubPremisesValid = $("#subpremisesForm").valid();
-        if (!isFormValid || !isOwnershipsValid || !isRestrictionsValid || !isSubPremisesValid) {
+        var isResettlesValid = $("#resettlesForm").valid();
+        var isLitigationsValid = $("#litigationsForm").valid();
+        if (!isFormValid || !isOwnershipsValid || !isRestrictionsValid || !isSubPremisesValid || !isResettlesValid || !isLitigationsValid) {
             $("select").each(function (idx, elem) {
                 var id = $(elem).prop("id");
                 var name = $(elem).prop("name");
@@ -36,6 +42,19 @@
                     $("button[data-id='" + id + "']").addClass("input-validation-error");
                 }
             });
+
+            $(".toggle-hide").each(function (idx, elem) {
+                if ($(elem).find(".field-validation-error").length > 0) {
+                    var toggler = $(elem).closest(".card").find("[id$='Toggle']");
+                    if (!isExpandElemntArrow(toggler)) {
+                        toggler.click();
+                    }
+                }
+            });
+            $([document.documentElement, document.body]).animate({
+                scrollTop: $(".input-validation-error").first().offset().top - 35
+            }, 1000);
+
             e.preventDefault();
         } else if ($(this).data("action") === "Create") {
             var inputTemplate = "<input type='hidden' name='{0}' value='{1}'>";
@@ -85,6 +104,58 @@
                 $(this).append(inputTemplate.replace('{0}', sp + "Account").replace('{1}', subPremises[k].Account));
                 $(this).append(inputTemplate.replace('{0}', "SubPremisesFundTypes[" + k + "]").replace('{1}', subPremises[k].IdFundType));
             }
+
+            var resettles = CreateResettlePremisesAssoc();
+            for (var l = 0; l < resettles.length; l++) {
+                var rspa = "Premise.ResettlePremisesAssoc[" + l + "].";
+                var rin = rspa + "ResettleInfoNavigation.";
+                $(this).append(inputTemplate.replace('{0}', rspa + "IdResettleInfo").replace('{1}', resettles[l].IdResettleInfo));
+                $(this).append(inputTemplate.replace('{0}', rspa + "IdPremises").replace('{1}', resettles[l].IdPremises));
+                $(this).append(inputTemplate.replace('{0}', rin + "ResettleDate").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDate));
+                $(this).append(inputTemplate.replace('{0}', rin + "IdResettleKind").replace('{1}', resettles[l].ResettleInfoNavigation.IdResettleKind));
+                $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource1").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource1));
+                $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource2").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource2));
+                $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource3").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource3));
+                $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource4").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource4));
+                if (resettles[l].ResettleInfoNavigation.ResettleInfoTo !== null) {
+                    for (var s = 0; s < resettles[l].ResettleInfoNavigation.ResettleInfoTo.length; s++) {
+                        var rit = rin + "ResettleInfoTo[" + s + "].";
+                        $(this).append(inputTemplate.replace('{0}', rit + "IdResettleInfo").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleInfoTo[s].IdResettleInfo));
+                        $(this).append(inputTemplate.replace('{0}', rit + "IdObject").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleInfoTo[s].IdObject));
+                        $(this).append(inputTemplate.replace('{0}', rit + "ObjectType").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleInfoTo[s].ObjectType));
+                    }
+                }
+                if (resettles[l].ResettleInfoNavigation.ResettleDocuments !== null) {
+                    for (var t = 0; t < resettles[l].ResettleInfoNavigation.ResettleDocuments.length; t++) {
+                        rit = rin + "ResettleDocuments[" + t + "].";
+                        $(this).append(inputTemplate.replace('{0}', rit + "IdResettleInfo").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDocuments[t].IdResettleInfo));
+                        $(this).append(inputTemplate.replace('{0}', rit + "IdDocument").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDocuments[t].IdDocument));
+                        $(this).append(inputTemplate.replace('{0}', rit + "Number").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDocuments[t].Number));
+                        $(this).append(inputTemplate.replace('{0}', rit + "Date").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDocuments[t].Date));
+                        $(this).append(inputTemplate.replace('{0}', rit + "Description").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDocuments[t].Description));
+                        $(this).append(inputTemplate.replace('{0}', rit + "IdDocumentType").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDocuments[t].IdDocumentType));
+                        var resettleDocumentFile = $(resettles[l].ResettleInfoNavigation.ResettleDocuments[t].ResettleDocumentFile).clone();
+                        resettleDocumentFile.attr("name", "Premise.ResettlePremisesAssoc[" + l + "].ResettleDocumentFiles[" + t + "]");
+                        $(this).append(resettleDocumentFile);
+                    }
+                }
+            }
+
+            var litigations = CreateLitigationPremisesAssoc();
+            for (var m = 0; m < litigations.length; m++) {
+                var lpa = "Premise.LitigationPremisesAssoc[" + m + "].";
+                var ln = lpa + "LitigationNavigation.";
+                $(this).append(inputTemplate.replace('{0}', lpa + "IdLitigation").replace('{1}', litigations[m].IdLitigation));
+                $(this).append(inputTemplate.replace('{0}', lpa + "IdPremises").replace('{1}', litigations[m].IdPremises));
+                $(this).append(inputTemplate.replace('{0}', ln + "Date").replace('{1}', litigations[m].LitigationNavigation.Date));
+                $(this).append(inputTemplate.replace('{0}', ln + "Number").replace('{1}', litigations[m].LitigationNavigation.Number));
+                $(this).append(inputTemplate.replace('{0}', ln + "Description").replace('{1}', litigations[m].LitigationNavigation.Description));
+                $(this).append(inputTemplate.replace('{0}', ln + "IdLitigationType").replace('{1}', litigations[m].LitigationNavigation.IdLitigationType));
+                var litigationFile = $(litigations[m].LitigationNavigation.LitigationFile).clone();
+                litigationFile.attr("name", "LitigationFiles[" + m + "]");
+                $(this).append(litigationFile);
+            }
+
         }
     });
 
@@ -102,7 +173,7 @@
     $("select#IdStreet").val($("input[name='IdStreetPrev']").val()).selectpicker('refresh').change();
 
     var action = $('#r-premises-form').data("action");
-    if (action === "Details" || action === "Delete") {
+    if (action === "Details" || action === "Delete" || $("form#r-premises-form input[type='submit']").hasClass("disabled")) {
         $('select').prop('disabled', true);
         $('input').prop('disabled', true);
         $('textarea').prop('disabled', true);

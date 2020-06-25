@@ -31,7 +31,8 @@ namespace RegistryWeb.Controllers.ServiceControllers
         {
             if (idOwnershipRight == null)
                 return -1;
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
+                !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
                 return -2;
             try
             {
@@ -175,6 +176,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             ViewBag.Action = action;
             ViewBag.Address = address;
             ViewBag.OwnershipRightTypes = registryContext.OwnershipRightTypes.ToList();
+            ViewBag.CanEditBaseInfo = true;
 
             return PartialView("OwnershipRight", owrVM);
         }

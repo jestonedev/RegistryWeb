@@ -7,34 +7,30 @@ using RegistryWeb.Models.Entities;
 
 namespace RegistryWeb.Models.IEntityTypeConfiguration
 {
-    public class RestrictionConfiguration: IEntityTypeConfiguration<Restriction>
+    public class LitigationConfiguration : IEntityTypeConfiguration<Litigation>
     {
         private string nameDatebase;
 
-        public RestrictionConfiguration(string nameDatebase)
+        public LitigationConfiguration(string nameDatebase)
         {
             this.nameDatebase = nameDatebase;
         }
 
-        public void Configure(EntityTypeBuilder<Restriction> builder)
+        public void Configure(EntityTypeBuilder<Litigation> builder)
         {
-            builder.HasKey(e => e.IdRestriction);
+            builder.HasKey(e => e.IdLitigation);
 
-            builder.ToTable("restrictions", nameDatebase);
+            builder.ToTable("litigation_info", nameDatebase);
 
-            builder.HasIndex(e => e.IdRestrictionType)
-                .HasName("FK_restrictions_restriction_types_id_restriction_type");
+            builder.HasIndex(e => e.IdLitigationType)
+                .HasName("FK_litigation_info_id_litigation_type");
 
-            builder.Property(e => e.IdRestriction)
-                .HasColumnName("id_restriction")
+            builder.Property(e => e.IdLitigation)
+                .HasColumnName("id_litigation")
                 .HasColumnType("int(11)");
 
             builder.Property(e => e.Date)
                 .HasColumnName("date")
-                .HasColumnType("date");
-
-            builder.Property(e => e.DateStateReg)
-                .HasColumnName("date_state_reg")
                 .HasColumnType("date");
 
             builder.Property(e => e.Deleted)
@@ -47,8 +43,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
-            builder.Property(e => e.IdRestrictionType)
-                .HasColumnName("id_restriction_type")
+            builder.Property(e => e.IdLitigationType)
+                .HasColumnName("id_litigation_type")
                 .HasColumnType("int(11)");
 
             builder.Property(e => e.Number)
@@ -71,9 +67,9 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
-            builder.HasOne(d => d.RestrictionTypeNavigation)
-                .WithMany(p => p.Restrictions)
-                .HasForeignKey(d => d.IdRestrictionType)
+            builder.HasOne(d => d.LitigationTypeNavigation)
+                .WithMany(p => p.Litigations)
+                .HasForeignKey(d => d.IdLitigationType)
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
             //Фильтры по умолчанию

@@ -7,9 +7,10 @@
 
 @{
     var securityService = (SecurityService)ViewBag.SecurityService;
-    var canEdit = Model.IdSubPremises == 0 || 
+    var canEditBasePremiseInfo = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
+    var canEdit = canEditBasePremiseInfo && (Model.IdSubPremises == 0 || 
             (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(Model.IdState)) ||
-            (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(Model.IdState));
+            (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(Model.IdState)));
 }
 
 <li class="list-group-item">
@@ -149,16 +150,16 @@
                     </div>
                 </div>
             }
-            @if (ViewBag.Action == "Edit" && canEdit)
+            @if (ViewBag.Action == "Edit")
             {
                 <div class="col-md-2 text-md-right text-center rr-sub-premise-edit-buttons">
                     <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
-                        <a class="btn btn-danger subpremise-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
-                        <a class="btn btn-success subpremise-save-btn" title="Да" aria-label="Да" href="#"><span class="oi oi-check"></span></a>
+                        <a class="btn btn-danger subpremise-cancel-btn @(canEdit ? "" : "disabled")" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
+                        <a class="btn btn-success subpremise-save-btn @(canEdit ? "" : "disabled")" title="Да" aria-label="Да" href="#"><span class="oi oi-check"></span></a>
                     </div>
                     <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
-                        <a class="btn btn-primary subpremise-edit-btn" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
-                        <a class="btn btn-danger subpremise-delete-btn" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                        <a class="btn btn-primary subpremise-edit-btn @(canEdit ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                        <a class="btn btn-danger subpremise-delete-btn @(canEdit ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
                     </div>
                 </div>
             }

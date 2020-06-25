@@ -281,6 +281,9 @@ function saveOwnershipRight(e) {
                 $("button[data-id='" + id + "']").addClass("input-validation-error");
             }
         });
+        $([document.documentElement, document.body]).animate({
+            scrollTop: owrElem.find(".input-validation-error").first().offset().top - 35
+        }, 1000);
     }
     e.preventDefault();
 }
@@ -312,11 +315,10 @@ function removeOwnershipRightFile(e) {
 }
 
 $(function () {
-    $('#ownershipRightsList').hide();
     $('.yes-no-panel').hide();
     initializeVilidationOwnershipRights();
     $('#ownershipRightAdd').click(addOwnershipRight);
-    $('#ownershipRightsToggle').on('click', $('#ownershipRightsList'), elementToogle);
+    $('#ownershipRightsToggle').on('click', $('#ownershipRightsList'), elementToogleHide);
     $('#ownershipRightsList').on('click', '.ownership-right-edit-btn', editOwnershipRight);
     $('#ownershipRightsList').on('click', '.ownership-right-cancel-btn', cancelEditOwnershipRight);
     $('#ownershipRightsList').on('click', '.ownership-right-save-btn', saveOwnershipRight);
