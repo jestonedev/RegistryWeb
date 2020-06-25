@@ -52,11 +52,24 @@
     return building;
 }
 let createBuildingClick = function () {
+    console.log('createBuildingClick');
     let building = getBuilding();
+    let jsonBuildingDemolitionInfo = _buildingDemolitionInfo.getJson();
+    building.BuildingDemolitionActFiles = jsonBuildingDemolitionInfo.BuildingDemolitionActFiles;
+    building.DemolishedPlanDate = jsonBuildingDemolitionInfo.DemolishedPlanDate;
+    console.log(_buildingDemolitionInfo.form);
     //Запуск ручной валидации, тк отсутсвует submit
     var buildingIsValid = $('#building').valid();
     var ownershipRightsIsValid = $("#ownershipRightsForm").valid();
+    var buildingDemolitionInfoValid = _buildingDemolitionInfo.form.valid();
+    console.log(buildingDemolitionInfoValid);
     if (buildingIsValid && ownershipRightsIsValid) {
+        //временное решение
+        if (building.OwnershipBuildingsAssoc != null) {
+            building.OwnershipBuildingsAssoc.forEach(function (value) {
+                value.OwnershipRightNavigation.OwnershipRightFile = null;
+            });
+        }
         $.ajax({
             async: false,
             type: 'POST',

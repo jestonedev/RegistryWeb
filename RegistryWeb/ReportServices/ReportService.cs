@@ -1,10 +1,4 @@
-﻿using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
-using RegistryWeb.ViewModel;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using RegistryWeb.ViewOptions;
-using RegistryWeb.ViewOptions.Filter;
+﻿using System.Linq;
 using System.Collections.Generic;
 using System;
 using System.IO;
@@ -12,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Text;
 using System.Diagnostics;
+using RegistryWeb.Models.Entities;
+using RegistryWeb.Models;
 
 namespace RegistryWeb.ReportServices
 {
@@ -20,12 +16,14 @@ namespace RegistryWeb.ReportServices
         private readonly string sqlDriver;
         private readonly string connString;
         private readonly string activityManagerPath;
+        private readonly string attachmentsPath;
 
         public ReportService(IConfiguration config, IHttpContextAccessor httpContextAccessor)
         {
             sqlDriver = config.GetValue<string>("SqlDriver");
             connString = httpContextAccessor.HttpContext.User.FindFirst("connString").Value;
-            activityManagerPath = config.GetValue<string>("ActivityManagerPath");            
+            activityManagerPath = config.GetValue<string>("ActivityManagerPath");
+            attachmentsPath = config.GetValue<string>("AttachmentsPath");
         }
         
         private string GenerateMultiReport(List<int> ids, string name)
@@ -129,6 +127,82 @@ namespace RegistryWeb.ReportServices
         {
             var fileNameReport = GenerateMultiReport(ids, "forma3");
             return DownloadFile(fileNameReport);
+        }
+
+        private string getExtentionFile(string fileName)
+        {
+            return fileName.Substring(fileName.LastIndexOf('.') + 1, fileName.Length - fileName.LastIndexOf('.') - 1).ToLower();
+        }
+
+        private string getMIMEType(string fileName)
+        {
+            switch (getExtentionFile(fileName))
+            {
+                case "pdf":
+                    return "application/pdf";
+                case "jpeg":
+                case "jpg":
+                    return "application/jpeg";
+                case "png":
+                    return "application/png";
+                case "tiff":
+                    return "application/tiff";
+                case "odt":
+                    return "application/vnd.oasis.opendocument.text";
+                case "doc":
+                    return "application/msword";
+                case "docx":
+                    return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                case "txt":
+                    return "text/plain";
+                default:
+                    return "";
+            }
+        }
+
+        public (byte[], string) GetFileContentsAndMIMETypeFromRepository(string fileName, ActFileTypes actFileType)
+        {
+            try
+            {
+                var path = Path.Combine(attachmentsPath, actFileType.ToString() + 's', fileName);
+                var type = getMIMEType(fileName);
+                var result = File.ReadAllBytes(path);
+                return (result, type);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public string SaveFormFileToRepository(IFormFile file, ActFileTypes actFileType)
+        {
+            try
+            {
+                var fileName = Guid.NewGuid().ToString() + '.' + getExtentionFile(file.FileName);
+                var path = Path.Combine(attachmentsPath, actFileType.ToString() + 's', fileName);
+                var fileStream = new FileStream(path, FileMode.Create);
+                file.CopyTo(fileStream);
+                fileStream.Dispose();
+                return fileName;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public void DeleteFileToRepository(string fileName, ActFileTypes actFileType)
+        {
+            try
+            {
+                var path = Path.Combine(attachmentsPath, actFileType.ToString() + 's', fileName);
+                File.Delete(path);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }
