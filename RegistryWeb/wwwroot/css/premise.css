@@ -1,8 +1,72 @@
-﻿#premisecreate{
+﻿.p-table > thead > tr > th a.sort {
+    color: #888;
+}
+
+.p-table > thead > tr > th a.sort:hover {
+    color: black;
+}
+
+.p-table > thead > tr > th a.sort.p-sorted {
+    color: #007bff;
+}
+
+.p-table > thead > tr > th a.sort.p-sorted:hover {
+    color: #0056b3;
+}
+
+.p-table th {
+    white-space: nowrap;
+}
+
+#premisecreate{
     height: 30px;
 }
 
 #dopinfo {
     color: #888;
-    font-size: 85%;
+    font-size: 75%;
+}
+
+.but{
+    padding-left: 22%;
+}
+
+#filterModalShow{
+    color: white;
+}
+
+input.input-validation-error, button.input-validation-error {
+    border: 1px solid #dc3545;
+}
+
+.input-group-addon {
+    cursor:pointer;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    color: #555;
+    text-align: center;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.p-table-low-width-hide-cell {
+    display: none;
+}
+
+@media(min-width: 992px)
+{
+    .p-table-low-width-hide-cell {
+        display: table-cell;
+    }
+}
+
+.rr-premises-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 0.24rem;
 }

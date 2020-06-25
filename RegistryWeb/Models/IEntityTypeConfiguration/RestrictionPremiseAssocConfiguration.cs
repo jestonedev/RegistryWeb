@@ -45,7 +45,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.HasOne(d => d.PremisesNavigation)
                 .WithMany(p => p.RestrictionPremisesAssoc)
-                .HasForeignKey(d => d.IdRestriction)
+                .HasForeignKey(d => d.IdPremises)
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
             //Фильтры по умолчанию

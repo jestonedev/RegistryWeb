@@ -10,11 +10,11 @@
             {
                 if (addr.AddressType == AddressTypes.Building)
                 {
-                    <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@addr.Id">Здание</a>
+                    <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@addr.Id" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Здание</a>
                 }
                 if (addr.AddressType == AddressTypes.Premise)
                 {
-                    <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@addr.Id">Помещение</a>
+                    <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@addr.Id" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Помещение</a>
                 }
             }
         </div>

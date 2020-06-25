@@ -26,16 +26,19 @@
         minLength: 3
     });
 };
+
 var addressClear = function () {
     $('input[name="FilterOptions.Address.AddressType"]').val("");
     $('input[name="FilterOptions.Address.Id"]').val("");
     $('#FilterOptions_Address_Text').val("");
-}
+};
+
 var focusOutFilterOptionsAddress = function () {
     if ($('input[name="FilterOptions.Address.Id"]').val() == "") {
         addressClear();
     }
-}
+};
+
 var addressFilterClearBtnVisibility = function () {
     if ($('input[name="FilterOptions.Address.Id"]').val() != "") {
         $('#FilterOptions_Address_Text').prop("disabled", true);
@@ -45,41 +48,52 @@ var addressFilterClearBtnVisibility = function () {
         $('#addressFilterClearBtn').hide();
     }
 };
+
 var addressFilterClear = function () {
     addressClear();
     $('#FilterOptions_Address_Text').prop("disabled", false);
     $('#addressFilterClearBtn').hide();
     $("form.filterForm").submit();
 };
+
 var searchModal = function () {
     addressClear();
     $("form.filterForm").submit();
 };
-
-/*var formSubmit = function () {
-    $('#FilterOptions_Address_Text').prop("disabled", false);
-    $("form.filterForm").submit();
-};*/
 
 var filterClearModal = function () {
     $('input[name="FilterOptions.IdPremise"]').val("");
     $('#FilterOptions_IdStreet').val("");
     $('#FilterOptions_IdStreet').selectpicker('render');
     $('input[name="FilterOptions.House"]').val("");
+    $('input[name="FilterOptions.PremisesNum"]').val("");
     $('input[name="FilterOptions.Floors"]').val("");
-    //$('input[name="FilterOptions.Entrances"]').val("");
+    $('input[name="FilterOptions.CadastralNum"]').val("");
+
     $('#FilterOptions_IdsObjectState').selectpicker("deselectAll");
-    /*$('#FilterOptions_IdDecree').val("");
-    $('#FilterOptions_IdDecree').selectpicker('render');
-    $('input[name="FilterOptions.DateOwnershipRight"]').val("");
-    $('input[name="FilterOptions.NumberOwnershipRight"]').val("");*/
+    $('#FilterOptions_IdFundType').selectpicker("deselectAll");
+    $('#FilterOptions_IdsComment').selectpicker("deselectAll");
+    $('#FilterOptions_IdsDoorKeys').selectpicker("deselectAll");
+
     $('#FilterOptions_IdsOwnershipRightType').selectpicker("deselectAll");
+    $('input[name="FilterOptions.NumberOwnershipRight"]').val("");
+    $('input[name="FilterOptions.DateOwnershipRight"]').val("");
+
+    $('#FilterOptions_IdsRestrictionType').selectpicker("deselectAll");
+    $('input[name="FilterOptions.RestrictionNum"]').val("");
+    $('input[name="FilterOptions.RestrictionDate"]').val("");
+
+    $('input[name="FilterOptions.StDateOwnershipRight"]').val("");
+    $('input[name="FilterOptions.EndDateOwnershipRight"]').val("");
 };
+
 var filterClear = function () {
     filterClearModal();
     $("form.filterForm").submit();
-}
-$(function () {
+};
+
+
+$(document).ready(function () {
     autocompleteFilterOptionsAddress();
     addressFilterClearBtnVisibility();
     $('#FilterOptions_Address_Text').focusout(focusOutFilterOptionsAddress);
@@ -87,18 +101,6 @@ $(function () {
     $('#searchModalBtn').click(searchModal);
     $('#filterClearModalBtn').click(filterClearModal);
     $('#filterClearBtn').click(filterClear);
-
-    $('#premiseToggle').on('click', $('#r-premises-form'), elementToogle);
-    //$('#searchModalBtn').click(formSubmit);
-
-    /*$('.idBuildingCheckbox').click(function (e) {
-        var id = +$(this).data('id');
-        $.ajax({
-            type: 'POST',
-            url: window.location.origin + '/Buildings/SessionIdBuildings',
-            data: { idBuilding: id, isCheck: $(this).prop('checked') }
-        });
-    });*/
 
     $("#filterModalShow").on("click", function (e) {
         e.preventDefault();
@@ -115,17 +117,5 @@ $(function () {
         $('input[name="PageOptions.CurrentPage"]').val($(this).data("page"));
         $('#FilterOptions_Address_Text').prop("disabled", false);
         $("form.filterForm").submit();
-        //formSubmit();
     });
-    /*if ($('input[name="FilterOptions.Address.Id"]').val() != "") {
-        addressFilterClearBtnShow();
-    }
-    else {
-        $('#addressFilterClearBtn').hide();
-    } */
-
-
-
-
-
 });

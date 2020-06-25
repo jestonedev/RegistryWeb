@@ -10,25 +10,31 @@ using System;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Runtime.CompilerServices;
+using RegistryWeb.DataHelpers;
+using RegistryWeb.SecurityServices;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace RegistryWeb.DataServices
 {
     public class PremisesDataService : ListDataService<PremisesVM<Premise>, PremisesListFilter>
     {
-        private BuildingsDataService BuildingsDataService;
-        public PremisesDataService(RegistryContext rc, BuildingsDataService BuildingsDataService) : base(rc)
+        private BuildingsDataService buildingsDataService;
+        private readonly IConfiguration config;
+        private SecurityService securityService;
+        public PremisesDataService(RegistryContext rc, SecurityService securityService, BuildingsDataService buildingsDataService, IConfiguration config) : base(rc)
         {
-            this.BuildingsDataService = BuildingsDataService;
+            this.securityService = securityService;
+            this.buildingsDataService = buildingsDataService;
+            this.config = config;
         }
 
         public override PremisesVM<Premise> InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, PremisesListFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
-            /*viewModel.PremisesTypes = registryContext.PremisesTypes;
-            viewModel.ObjectStates = registryContext.ObjectStates;
-            viewModel.FundTypes = registryContext.FundTypes;*/
             viewModel.KladrStreetsList = new SelectList(KladrStreets, "IdStreet", "StreetName");            
-            viewModel.PremisesTypeAsNum = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesTypeAsNum");
+            viewModel.PremisesTypesList = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesType");
             viewModel.HeatingTypesList = new SelectList(HeatingTypes, "IdHeatingType", "IdHeatingType1");
             viewModel.StructureTypesList = new SelectList(StructureTypes, "IdStructureType", "StructureTypeName");
             viewModel.ObjectStatesList = new SelectList(ObjectStates, "IdState", "StateFemale");
@@ -51,54 +57,34 @@ namespace RegistryWeb.DataServices
             viewModel.PageOptions.TotalRows = query.Count();
             query = GetQueryFilter(query, viewModel.FilterOptions);
             query = GetQueryOrder(query, viewModel.OrderOptions);
+            query = GetQueryIncludes(query);
             var count = query.Count();
             viewModel.PageOptions.Rows = count;
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
             if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
                 viewModel.PageOptions.CurrentPage = 1;
-            viewModel.Premises = GetQueryPage(query, viewModel.PageOptions);
+            viewModel.Premises = GetQueryPage(query, viewModel.PageOptions).ToList();
+            viewModel.PaymentsInfo = GetPaymentInfo(viewModel.Premises);
             return viewModel;
         }
 
-
-
-        public IQueryable<Premise> GetQuery()
+        private IQueryable<Premise> GetQueryIncludes(IQueryable<Premise> query)
         {
-            return registryContext.Premises
+            return query
                 .Include(p => p.IdBuildingNavigation)
                     .ThenInclude(b => b.IdStreetNavigation)
                 .Include(p => p.IdStateNavigation)        //Текущее состояние объекта
                 .Include(p => p.IdPremisesTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
                 .Include(p => p.FundsPremisesAssoc)
                     .ThenInclude(fpa => fpa.IdFundNavigation)
-                        .ThenInclude(fh => fh.IdFundTypeNavigation);
+                        .ThenInclude(fh => fh.IdFundTypeNavigation)
+                .Include(p => p.SubPremises);
         }
 
-        //private IQueryable GetFundTypes()
-        //{
-        //    return 
-        //        from pCurFund in
-        //            from fpa in rc.FundsPremisesAssoc
-        //            join fh in rc.FundsHistory on fpa.IdFund equals fh.IdFund
-        //            where fh.ExcludeRestrictionDate == null
-        //            group fpa by fpa.IdPremises into gr
-        //            select new
-        //            {
-        //                IdPremises = gr.Key,
-        //                IdFund = gr.Max(s => s.IdFund)
-        //            }
-        //        join fh in rc.FundsHistory
-        //            on pCurFund.IdFund equals fh.IdFund
-        //        join ft in rc.FundTypes
-        //            on fh.IdFundType equals ft.IdFundType
-        //        select new
-        //        {
-        //            pCurFund.IdPremises,
-        //            fh.IdFund,
-        //            fh.IdFundType,
-        //            ft.FundType
-        //        };
-        //}
+        public IQueryable<Premise> GetQuery()
+        {
+            return GetQueryIncludes(registryContext.Premises);           
+        }
 
         private IQueryable<Premise> GetQueryFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
         {
@@ -110,81 +96,128 @@ namespace RegistryWeb.DataServices
             {
                 query = query.Where(p => p.IdPremises == filterOptions.IdPremise.Value);
             }
+            if (!string.IsNullOrEmpty(filterOptions.IdStreet))
+            {
+                query = query.Where(b => b.IdBuildingNavigation.IdStreet == filterOptions.IdStreet);
+            }
             if (!string.IsNullOrEmpty(filterOptions.House))
             {
                 query = query.Where(b => b.IdBuildingNavigation.House.ToLower() == filterOptions.House.ToLower());
             }
             if (!string.IsNullOrEmpty(filterOptions.PremisesNum))
             {
-                query = query.Where(b => b.PremisesNum == filterOptions.PremisesNum);
+                query = query.Where(b => b.PremisesNum.ToLower() == filterOptions.PremisesNum.ToLower());
             }
             if (filterOptions.Floors.HasValue)
             {
                 query = query.Where(b => b.Floor == filterOptions.Floors.Value);
             }
-            if (!string.IsNullOrEmpty(filterOptions.IdStreet))
-            {
-                query = query.Where(b => b.IdBuildingNavigation.IdStreet == filterOptions.IdStreet);
-            }
             if (!string.IsNullOrEmpty(filterOptions.CadastralNum))
             {
                 query = query.Where(b => b.CadastralNum == filterOptions.CadastralNum);
             }
-            if (filterOptions.IdFundType.HasValue)
+            if (filterOptions.IdFundType != null && filterOptions.IdFundType.Any())
             {
-                var idPremises = registryContext.FundsPremisesAssoc
-                    .Include(fpa => fpa.IdPremisesNavigation)
-                    .Include(fpa => fpa.IdFundNavigation)
-                        .ThenInclude(fh => fh.IdFundTypeNavigation)
-                    .Where(fpa =>
-                        fpa.IdFundNavigation.ExcludeRestrictionDate == null &&
-                        fpa.IdFundNavigation.IdFundType == filterOptions.IdFundType.Value)
-                    .Select(fpa => fpa.IdPremises);
-
+                var maxFunds = from fundRow in registryContext.FundsHistory
+                               join fundPremisesRow in registryContext.FundsPremisesAssoc
+                               on fundRow.IdFund equals fundPremisesRow.IdFund
+                               where fundRow.ExcludeRestrictionDate == null
+                               group fundPremisesRow.IdFund by fundPremisesRow.IdPremises into gs
+                               select new
+                               {
+                                   IdPremises = gs.Key,
+                                   IdFund = gs.Max()
+                               };
+                var idPremises = from fundRow in registryContext.FundsHistory
+                                 join maxFundRow in maxFunds
+                                 on fundRow.IdFund equals maxFundRow.IdFund
+                                 where filterOptions.IdFundType.Contains(fundRow.IdFundType)
+                                 select maxFundRow.IdPremises;
                 query = from row in query
                         join idPremise in idPremises
                         on row.IdPremises equals idPremise
                         select row;
+            }
+            if (filterOptions.IdsObjectState != null && filterOptions.IdsObjectState.Any())
+            {
+                query = query.Where(p => filterOptions.IdsObjectState.Contains(p.IdState));
+            }
+            if (filterOptions.IdsComment != null && filterOptions.IdsComment.Any())
+            {
+                query = query.Where(p => filterOptions.IdsComment.Contains(p.IdPremisesComment));
+            }
+            if (filterOptions.IdsDoorKeys != null && filterOptions.IdsDoorKeys.Any())
+            {
+                query = query.Where(p => filterOptions.IdsDoorKeys.Contains(p.IdPremisesDoorKeys));
+            }
 
-            }
-            /*if (!string.IsNullOrEmpty(filterOptions.RestrictionNum))
+            if ((filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Any()) ||
+                !string.IsNullOrEmpty(filterOptions.NumberOwnershipRight) || filterOptions.DateOwnershipRight != null)
             {
-                query = query.Where(b => b.RestrictionPremisesAssoc == filterOptions.RestrictionNum);
-            }*/
-            if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Count != 0)
-            {
-                var obas = registryContext.OwnershipBuildingsAssoc
-                    .Include(oba => oba.OwnershipRightNavigation)
-                    .AsTracking();                
-                var opas = registryContext.OwnershipPremisesAssoc
-                    .Include(oba => oba.OwnershipRightNavigation)
-                    .Join(registryContext.Premises, opa=>opa.IdPremises, p=>p.IdPremises, (opa,p)=>new { idpremise=opa.IdPremises, idOPA=opa.IdOwnershipRight, owp = opa.OwnershipRightNavigation, idbuilding = p.IdBuilding })
-                    .Join(obas, opa=>opa.idbuilding, oba=> oba.IdBuilding, (opa, oba) =>new { opa.idpremise, opa.idOPA, opa.owp, idbuilding = oba.IdBuilding, odOBA=oba.IdOwnershipRight, owb = oba.OwnershipRightNavigation })
-                    .AsTracking();                
+                // TODO: Упрощенная фильтрация без учета исключения из аварийного
+                query = (from q in query
+                         join obaRow in registryContext.OwnershipBuildingsAssoc
+                         on q.IdBuilding equals obaRow.IdBuilding into b
+                         from bRow in b.DefaultIfEmpty()
+                         join orRow in registryContext.OwnershipRights
+                         on bRow.IdOwnershipRight equals orRow.IdOwnershipRight into bor
+                         from borRow in bor.DefaultIfEmpty()
 
-                if (!string.IsNullOrEmpty(filterOptions.NumberOwnershipRight))
-                    opas = opas.Where(oba => oba.owp.Number == filterOptions.NumberOwnershipRight || oba.owb.Number == filterOptions.NumberOwnershipRight);
-                if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Count != 0)
-                    opas = opas.Where(oba => filterOptions.IdsOwnershipRightType.Contains(oba.owp.IdOwnershipRightType) || filterOptions.IdsOwnershipRightType.Contains(oba.owb.IdOwnershipRightType));
-                query = from q in query
-                        join idPremise in opas.Select(oba => oba.idpremise).Distinct()
-                            on q.IdPremises equals idPremise
-                        join idBuilding in opas.Select(oba => oba.idbuilding).Distinct()
-                            on q.IdBuilding equals idBuilding
-                        select q;
+                         join opaRow in registryContext.OwnershipPremisesAssoc
+                         on q.IdPremises equals opaRow.IdPremises into p
+                         from pRow in p.DefaultIfEmpty()
+                         join orRow in registryContext.OwnershipRights
+                         on pRow.IdOwnershipRight equals orRow.IdOwnershipRight into por
+                         from porRow in por.DefaultIfEmpty()
+
+                         where (borRow != null &&
+                            ((filterOptions.IdsOwnershipRightType == null || !filterOptions.IdsOwnershipRightType.Any() ||
+                            filterOptions.IdsOwnershipRightType.Contains(borRow.IdOwnershipRightType)) &&
+                            (string.IsNullOrEmpty(filterOptions.NumberOwnershipRight) ||
+                             borRow.Number.ToLower() == filterOptions.NumberOwnershipRight.ToLower()) &&
+                             (filterOptions.DateOwnershipRight == null || borRow.Date == filterOptions.DateOwnershipRight))) ||
+                             (porRow != null &&
+                            ((filterOptions.IdsOwnershipRightType == null || !filterOptions.IdsOwnershipRightType.Any() ||
+                            filterOptions.IdsOwnershipRightType.Contains(porRow.IdOwnershipRightType)) &&
+                            (string.IsNullOrEmpty(filterOptions.NumberOwnershipRight) ||
+                             porRow.Number.ToLower() == filterOptions.NumberOwnershipRight.ToLower()) &&
+                             (filterOptions.DateOwnershipRight == null || porRow.Date == filterOptions.DateOwnershipRight)))
+                         select q).Distinct();
             }
-            if (filterOptions.IdObjectState.HasValue && filterOptions.IdObjectState.Value != 0)
+
+            if ((filterOptions.IdsRestrictionType != null && filterOptions.IdsRestrictionType.Any()) ||
+                !string.IsNullOrEmpty(filterOptions.RestrictionNum) || filterOptions.RestrictionDate != null)
             {
-                query = query.Where(p => p.IdStateNavigation.IdState == filterOptions.IdObjectState.Value);
+                query = (from q in query
+                         join rbaRow in registryContext.RestrictionBuildingsAssoc
+                         on q.IdBuilding equals rbaRow.IdBuilding into b
+                         from bRow in b.DefaultIfEmpty()
+                         join rRow in registryContext.Restrictions
+                         on bRow.IdRestriction equals rRow.IdRestriction into bor
+                         from borRow in bor.DefaultIfEmpty()
+
+                         join rpaRow in registryContext.RestrictionPremisesAssoc
+                         on q.IdPremises equals rpaRow.IdPremises into p
+                         from pRow in p.DefaultIfEmpty()
+                         join rRow in registryContext.Restrictions
+                         on pRow.IdRestriction equals rRow.IdRestriction into por
+                         from porRow in por.DefaultIfEmpty()
+
+                         where (borRow != null &&
+                            ((filterOptions.IdsRestrictionType == null || !filterOptions.IdsRestrictionType.Any() ||
+                            filterOptions.IdsRestrictionType.Contains(borRow.IdRestrictionType)) &&
+                            (string.IsNullOrEmpty(filterOptions.RestrictionNum) ||
+                             borRow.Number.ToLower() == filterOptions.RestrictionNum.ToLower()) &&
+                             (filterOptions.RestrictionDate == null || borRow.Date == filterOptions.RestrictionDate))) ||
+                             (porRow != null &&
+                            ((filterOptions.IdsRestrictionType == null || !filterOptions.IdsRestrictionType.Any() ||
+                            filterOptions.IdsRestrictionType.Contains(porRow.IdRestrictionType)) &&
+                            (string.IsNullOrEmpty(filterOptions.RestrictionNum) ||
+                             porRow.Number.ToLower() == filterOptions.RestrictionNum.ToLower()) &&
+                             (filterOptions.RestrictionDate == null || porRow.Date == filterOptions.RestrictionDate)))
+                         select q).Distinct();
             }
-            if (filterOptions.IdComment.HasValue && filterOptions.IdComment.Value != 0)
-            {
-                query = query.Where(p => p.IdStateNavigation.IdState == filterOptions.IdObjectState.Value);
-            }
-            if (filterOptions.IdLocationDoorKeys.HasValue && filterOptions.IdLocationDoorKeys.Value != 0)
-            {
-                query = query.Where(p => p.IdPremisesDoorKeysNavigation.IdPremisesDoorKeys == filterOptions.IdLocationDoorKeys.Value);
-            }
+
             if (filterOptions.StDateOwnershipRight.HasValue && !filterOptions.EndDateOwnershipRight.HasValue)
             {
                 var stDate = filterOptions.StDateOwnershipRight.Value.Date;
@@ -209,10 +242,10 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IsAddressEmpty())
                 return query;
 
-            if (filterOptions.Address.AddressType == AddressTypes.Street)
-            {
+
+            if (filterOptions.Address.AddressType == AddressTypes.Street)            
                 return query.Where(q => q.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id));
-            }
+
             int id = 0;
             if (!int.TryParse(filterOptions.Address.Id, out id))
                 return query;
@@ -226,10 +259,11 @@ namespace RegistryWeb.DataServices
             if (filterOptions.Address.AddressType == AddressTypes.SubPremise)
             {
                 return from q in query
-                        join sp in registryContext.SubPremises
-                            on q.IdPremises equals sp.IdPremises
-                        where sp.IdSubPremises == id
-                        select q;
+
+                       join sp in registryContext.SubPremises
+                       on q.IdPremises equals sp.IdPremises
+                       where sp.IdSubPremises == id
+                       select q;
             }
             return query;
         }
@@ -243,12 +277,31 @@ namespace RegistryWeb.DataServices
                 else
                     return query.OrderByDescending(p => p.IdPremises);
             }
-            if(orderOptions.OrderField == "PremisesType")
+            if(orderOptions.OrderField == "Address")
             {
+                var addresses = query.Select(p => new
+                    {
+                        p.IdPremises,
+                        Address = string.Concat(p.IdBuildingNavigation.IdStreetNavigation.StreetName, ", ",
+                            p.IdBuildingNavigation.House, ", ", p.PremisesNum)
+                    });
+
                 if (orderOptions.OrderDirection == OrderDirection.Ascending)
-                    return query.OrderBy(p => p.IdPremisesTypeNavigation.PremisesTypeName);
+                {
+                    return from row in query
+                            join addr in addresses
+                             on row.IdPremises equals addr.IdPremises
+                            orderby addr.Address
+                            select row;
+                }
                 else
-                    return query.OrderByDescending(p => p.IdPremisesTypeNavigation.PremisesTypeName);
+                {
+                    return from row in query
+                            join addr in addresses
+                             on row.IdPremises equals addr.IdPremises
+                            orderby addr.Address descending
+                            select row;
+                }
             }
             if (orderOptions.OrderField == "ObjectState")
             {
@@ -256,6 +309,45 @@ namespace RegistryWeb.DataServices
                     return query.OrderBy(p => p.IdStateNavigation.StateNeutral);
                 else
                     return query.OrderByDescending(p => p.IdStateNavigation.StateNeutral);
+            }
+            if (orderOptions.OrderField == "CurrentFund")
+            {
+                var maxFunds = from fundRow in registryContext.FundsHistory
+                                   join fundPremisesRow in registryContext.FundsPremisesAssoc
+                                   on fundRow.IdFund equals fundPremisesRow.IdFund
+                                   where fundRow.ExcludeRestrictionDate == null
+                                   group fundPremisesRow.IdFund by fundPremisesRow.IdPremises into gs
+                                   select new
+                                   {
+                                       IdPremises = gs.Key,
+                                       IdFund = gs.Max()
+                                   };
+                var funds = from fundRow in registryContext.FundsHistory
+                            join maxFundRow in maxFunds
+                            on fundRow.IdFund equals maxFundRow.IdFund
+                            join fundTypeRow in registryContext.FundTypes
+                            on fundRow.IdFundType equals fundTypeRow.IdFundType
+                            select new
+                            {
+                                maxFundRow.IdPremises,
+                                fundTypeRow.FundTypeName
+                            };
+                if (orderOptions.OrderDirection == OrderDirection.Ascending)
+                {
+                    return from row in query
+                            join fund in funds
+                             on row.IdPremises equals fund.IdPremises
+                            orderby fund.FundTypeName
+                            select row;
+                }
+                else
+                {
+                    return from row in query
+                            join fund in funds
+                             on row.IdPremises equals fund.IdPremises
+                            orderby fund.FundTypeName descending
+                            select row;
+                }
             }
             return query;
         }
@@ -268,15 +360,90 @@ namespace RegistryWeb.DataServices
             return result.ToList();
         }
 
-        internal void Create(Premise premise)
+        internal void Create(Premise premise, List<IFormFile> files, int? IdFundType)
         {
+            if (IdFundType != null)
+            {
+                var fund = new FundHistory
+                {
+                    IdFundType = IdFundType.Value
+                };
+
+                var fpa = new FundPremiseAssoc
+                {
+                    IdFundNavigation = fund,
+                    IdPremisesNavigation = premise
+                };
+                premise.FundsPremisesAssoc = new List<FundPremiseAssoc>
+                {
+                    fpa
+                };
+            }
+            // Прикрепляем файлы реквизитов
+            var restrictionFilePath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Restrictions\");
+            if (premise.RestrictionPremisesAssoc != null)
+            {
+                for (var i = 0; i < premise.RestrictionPremisesAssoc.Count; i ++)
+                {
+                    var file = files.Where(r => r.Name == "RestrictionFiles[" + i + "]").FirstOrDefault();
+                    if (file == null) continue;
+                    premise.RestrictionPremisesAssoc[i].RestrictionNavigation.FileDisplayName = file.FileName;
+                    var fileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(file.FileName).Extension;
+                    premise.RestrictionPremisesAssoc[i].RestrictionNavigation.FileOriginName = fileOriginName;
+                    premise.RestrictionPremisesAssoc[i].RestrictionNavigation.FileMimeType = file.ContentType;
+                    var fileStream = new FileStream(Path.Combine(restrictionFilePath, fileOriginName), FileMode.CreateNew);
+                    file.OpenReadStream().CopyTo(fileStream);
+                    fileStream.Close();
+                }
+            }
+            // Прикрепляем файлы ограничений
+            var ownershipRightsFilePath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"OwnershipRights\");
+            if (premise.OwnershipPremisesAssoc != null)
+            {
+                for (var i = 0; i < premise.OwnershipPremisesAssoc.Count; i++)
+                {
+                    var file = files.Where(r => r.Name == "OwnershipRightFiles[" + i + "]").FirstOrDefault();
+                    if (file == null) continue;
+                    premise.OwnershipPremisesAssoc[i].OwnershipRightNavigation.FileDisplayName = file.FileName;
+                    var fileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(file.FileName).Extension;
+                    premise.OwnershipPremisesAssoc[i].OwnershipRightNavigation.FileOriginName = fileOriginName;
+                    premise.OwnershipPremisesAssoc[i].OwnershipRightNavigation.FileMimeType = file.ContentType;
+                    var fileStream = new FileStream(Path.Combine(ownershipRightsFilePath, fileOriginName), FileMode.CreateNew);
+                    file.OpenReadStream().CopyTo(fileStream);
+                    fileStream.Close();
+                }
+            }
+            // Прикрепляем файлы документов по переселению
+            var resettleFilePath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Resettles\");
+            if (premise.ResettlePremisesAssoc != null)
+            {
+                for (var i = 0; i < premise.ResettlePremisesAssoc.Count; i++)
+                {
+                    var documents = premise.ResettlePremisesAssoc[i].ResettleInfoNavigation.ResettleDocuments;
+                    if (documents == null) continue;
+                    for (var j = 0; j < premise.ResettlePremisesAssoc[i].ResettleInfoNavigation.ResettleDocuments.Count; j++)
+                    {
+                        var file = files.Where(r => r.Name == "Premise.ResettlePremisesAssoc[" + i + "].ResettleDocumentFiles[" + j + "]").FirstOrDefault();
+                        if (file == null) continue;
+                        premise.ResettlePremisesAssoc[i].ResettleInfoNavigation.ResettleDocuments[j].FileDisplayName = file.FileName;
+                        var fileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(file.FileName).Extension;
+                        premise.ResettlePremisesAssoc[i].ResettleInfoNavigation.ResettleDocuments[j].FileOriginName = fileOriginName;
+                        premise.ResettlePremisesAssoc[i].ResettleInfoNavigation.ResettleDocuments[j].FileMimeType = file.ContentType;
+                        var fileStream = new FileStream(Path.Combine(resettleFilePath, fileOriginName), FileMode.CreateNew);
+                        file.OpenReadStream().CopyTo(fileStream);
+                        fileStream.Close();
+                    }
+                }
+            }
             registryContext.Premises.Add(premise);
-            registryContext.SaveChanges();
+            registryContext.SaveChanges();            
         }
 
         internal Premise CreatePremise()
         {
-            var premise = new Premise();
+            var premise = new Premise {
+                RegDate = new DateTime(1999, 10, 29)
+            };
             premise.FundsPremisesAssoc = new List<FundPremiseAssoc>() { new FundPremiseAssoc() };
             premise.OwnerPremisesAssoc = new List<OwnerPremiseAssoc>() { new OwnerPremiseAssoc() };
             premise.TenancyPremisesAssoc = new List<TenancyPremiseAssoc>() { new TenancyPremiseAssoc() };
@@ -291,121 +458,173 @@ namespace RegistryWeb.DataServices
         }
 
 
-        public PremisesVM<Premise> GetPremiseView(Premise premise, [CallerMemberName]string action = "")
+        public PremisesVM<Premise> GetPremiseView(Premise premise, [CallerMemberName]string action = "", bool canEditBaseInfo = false)
         {
-            //ViewBag.Action = action;
-
-            /*ViewBag.ObjectStates = dataService.ObjectStates;
-            ViewBag.StructureTypes = dataService.StructureTypes;
-            ViewBag.KladrStreets = dataService.KladrStreets;
-            ViewBag.HeatingTypes = dataService.HeatingTypes;*/
-            var idStreet = premise.IdBuildingNavigation.IdStreet ??
-                registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == premise.IdBuilding).IdStreet;
-
+            var objectStates = ObjectStates.ToList();
+            if ((action == "Create" || action == "Edit") && canEditBaseInfo)
+            {
+                objectStates = objectStates.Where(r => (
+                securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.MunicipalIds().Contains(r.IdState) ||
+                securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.MunicipalIds().Contains(r.IdState))).ToList();
+            }
             var premisesVM = new PremisesVM<Premise>()
             {
                 Premise = premise,
                 KladrStreetsList = new SelectList(KladrStreets, "IdStreet", "StreetName"),
                 HeatingTypesList = new SelectList(HeatingTypes, "IdHeatingType", "IdHeatingType1"),
                 StructureTypesList = new SelectList(StructureTypes, "IdStructureType", "StructureTypeName"),
-                ObjectStatesList = new SelectList(ObjectStates, "IdState", "StateFemale"),
+                ObjectStatesList = new SelectList(objectStates, "IdState", "StateFemale"),
                 PremisesTypesList = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesTypeName"),
-                PremisesTypeAsNum = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesTypeAsNum"),
                 FundTypesList = new SelectList(registryContext.FundTypes, "IdFundType", "FundTypeName"),
                 LocationKeysList = new SelectList(registryContext.PremisesDoorKeys, "IdPremisesDoorKeys", "LocationOfKeys"),
                 CommentList = new SelectList(registryContext.PremisesComments, "IdPremisesComment", "PremisesCommentText"),
                 OwnershipRightTypesList = new SelectList(registryContext.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName"),
                 RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName"),
-                HousesList = new SelectList(GetHouses(idStreet), "IdBuilding", "House", premise.IdBuilding)
+                IdFundType = (from fhRow in registryContext.FundsHistory
+                             join fpa in registryContext.FundsPremisesAssoc
+                             on fhRow.IdFund equals fpa.IdFund
+                             where fpa.IdPremises == premise.IdPremises && fhRow.ExcludeRestrictionDate == null
+                             orderby fpa.IdFund descending
+                             select fhRow.IdFundType).FirstOrDefault()
             };
 
+            if ((action == "Details" || action == "Delete") && securityService.HasPrivilege(Privileges.TenancyRead))
+            {
+                premisesVM.PaymentsInfo = GetPaymentInfo(new List<Premise> { premisesVM.Premise });
+            }
+
             return premisesVM;
-            //return View("Premise", premisesVM);
+        }
+
+        private List<PaymentsInfo> GetPaymentInfo(List<Premise> premises)
+        {
+            var ids = premises.Select(p => p.IdPremises).ToList();
+            var paymentsInfo = new List<PaymentsInfo>();
+            var payments = (from paymentRow in registryContext.TenancyPayments
+                           where paymentRow.IdPremises != null && ids.Contains(paymentRow.IdPremises.Value)
+                           select paymentRow).ToList();
+            var tenanciesIds = payments.Select(p => p.IdProcess);
+
+            var activeTenancies = (from tpRow in registryContext.TenancyProcesses
+                                   join personRow in registryContext.TenancyPersons
+                                   on tpRow.IdProcess equals personRow.IdProcess
+                                    where tenanciesIds.Contains(tpRow.IdProcess) && (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н"))
+                                       select tpRow.IdProcess).Distinct().ToList();
+
+            var prePaymentsAfter28082019Premises = from tpaRow in registryContext.TenancyPremisesAssoc
+                                                    join paymentRow in registryContext.TenancyPaymentsAfter28082019
+                                                    on tpaRow.IdPremise equals paymentRow.IdPremises
+                                                    where paymentRow.IdSubPremises == null &&
+                                                          paymentRow.IdPremises != null && ids.Contains(paymentRow.IdPremises.Value)
+                                                    select new
+                                                    {
+                                                        tpaRow.IdProcess,
+                                                        paymentRow.IdPremises,
+                                                        paymentRow.Hb,
+                                                        paymentRow.K1,
+                                                        paymentRow.K2,
+                                                        paymentRow.K3,
+                                                        paymentRow.KC,
+                                                        paymentRow.RentArea
+                                                    };
+
+            var paymentsAfter28082019Premises = (from paymentRow in prePaymentsAfter28082019Premises
+                                                 join tpRow in registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons)
+                                                     on paymentRow.IdProcess equals tpRow.IdProcess
+                                                 where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
+                                                   tpRow.TenancyPersons.Any()
+                                                 select paymentRow).Distinct().ToList();
+
+            var prePaymentsAfter28082019SubPremises = from tspaRow in registryContext.TenancySubPremisesAssoc
+                                                       join paymentRow in registryContext.TenancyPaymentsAfter28082019
+                                                    on tspaRow.IdSubPremise equals paymentRow.IdSubPremises
+                                                       where paymentRow.IdPremises != null && ids.Contains(paymentRow.IdPremises.Value)
+                                                       select new
+                                                       {
+                                                           tspaRow.IdProcess,
+                                                           paymentRow.IdSubPremises,
+                                                           paymentRow.Hb,
+                                                           paymentRow.K1,
+                                                           paymentRow.K2,
+                                                           paymentRow.K3,
+                                                           paymentRow.KC,
+                                                           paymentRow.RentArea
+                                                       };
+
+            var paymentsAfter28082019SubPremises = (from paymentRow in prePaymentsAfter28082019SubPremises
+                                                    join tpRow in registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons)
+                                                        on paymentRow.IdProcess equals tpRow.IdProcess
+                                                    where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
+                                                      tpRow.TenancyPersons.Any()
+                                                    select paymentRow).Distinct().ToList();
+
+            foreach(var payment in payments)
+            {
+                if (payment.IdPremises == null) continue;
+                var addreType = payment.IdSubPremises == null ? AddressTypes.Premise : AddressTypes.SubPremise;
+                var id = payment.IdSubPremises == null ? payment.IdPremises.Value : payment.IdSubPremises.Value;
+                if (!activeTenancies.Contains(payment.IdProcess)) continue;
+                paymentsInfo.Add(new PaymentsInfo {
+                    IdObject = id,
+                    AddresType = addreType,
+                    Payment = payment.Payment
+                });
+            }
+            foreach (var payment in paymentsAfter28082019Premises)
+            {
+                if (payment.IdPremises == null) continue;
+                var paymentItem = paymentsInfo.FirstOrDefault(p => p.IdObject == payment.IdPremises && p.AddresType == AddressTypes.Premise);
+                if (paymentItem == null)
+                {
+                    paymentItem = new PaymentsInfo {
+                        IdObject = payment.IdPremises.Value,
+                        AddresType = AddressTypes.Premise
+                    };
+                }
+                paymentItem.Nb = payment.Hb;
+                paymentItem.KC = payment.KC;
+                paymentItem.K1 = payment.K1;
+                paymentItem.K2 = payment.K2;
+                paymentItem.K3 = payment.K3;
+                paymentItem.PaymentAfter28082019 = Math.Round((payment.K1 + payment.K2 + payment.K3) / 3 * payment.KC * payment.Hb * (decimal)payment.RentArea, 2);
+            }
+            foreach (var payment in paymentsAfter28082019SubPremises)
+            {
+                if (payment.IdSubPremises == null) continue;
+                var paymentItem = paymentsInfo.FirstOrDefault(p => p.IdObject == payment.IdSubPremises && p.AddresType == AddressTypes.SubPremise);
+                if (paymentItem == null)
+                {
+                    paymentItem = new PaymentsInfo
+                    {
+                        IdObject = payment.IdSubPremises.Value,
+                        AddresType = AddressTypes.SubPremise
+                    };
+                }
+                paymentItem.Nb = payment.Hb;
+                paymentItem.KC = payment.KC;
+                paymentItem.K1 = payment.K1;
+                paymentItem.K2 = payment.K2;
+                paymentItem.K3 = payment.K3;
+                paymentItem.PaymentAfter28082019 = Math.Round((payment.K1 + payment.K2 + payment.K3) / 3 * payment.KC * payment.Hb * (decimal)payment.RentArea, 2);
+            }
+            return paymentsInfo;
         }
 
         internal void Edit(Premise premise)
-        {            
-            var oldPremise = GetPremise(premise.IdPremises);
-
-            foreach (var fpa in oldPremise.FundsPremisesAssoc)
-            {
-                if (premise.FundsPremisesAssoc.Select(owba => owba.IdPremises).Contains(fpa.IdPremises) == false)
-                {
-                    fpa.Deleted = 1;
-                    premise.FundsPremisesAssoc.Add(fpa);
-                }
-            }
-            foreach (var oba in oldPremise.OwnershipPremisesAssoc)
-            {
-                if (premise.OwnershipPremisesAssoc.Select(owba => owba.IdOwnershipRight).Contains(oba.IdOwnershipRight) == false)
-                {
-                    oba.Deleted = 1;
-                    premise.OwnershipPremisesAssoc.Add(oba);
-                }
-            }
-            foreach (var opa in oldPremise.OwnerPremisesAssoc)
-            {
-                if (premise.OwnerPremisesAssoc.Select(owpa => owpa.IdAssoc).Contains(opa.IdAssoc) == false)
-                {
-                    opa.Deleted = 1;
-                    premise.OwnerPremisesAssoc.Add(opa);
-                }
-            }
-            foreach (var ospa in oldPremise.OwnerPremisesAssoc)
-            {
-                if (premise.OwnerPremisesAssoc.Select(owspa => owspa.IdAssoc).Contains(ospa.IdAssoc) == false)
-                {
-                    ospa.Deleted = 1;
-                    premise.OwnerPremisesAssoc.Add(ospa);
-                }
-            }
-            foreach (var ospa in oldPremise.SubPremises)
-            {
-                if (premise.SubPremises.Select(owspa => owspa.IdPremises).Contains(ospa.IdPremises) == false)
-                {
-                    ospa.Deleted = 1;
-                    premise.SubPremises.Add(ospa);
-                }
-            }
-            foreach (var tpa in oldPremise.TenancyPremisesAssoc)
-            {
-                if (premise.TenancyPremisesAssoc.Select(owspa => owspa.IdPremise).Contains(tpa.IdPremise) == false)
-                {
-                    tpa.Deleted = 1;
-                    premise.TenancyPremisesAssoc.Add(tpa);
-                }
-            }
-            //Добавление и радактирование
+        {
             registryContext.Premises.Update(premise);
             registryContext.SaveChanges();
         }
 
         internal void Delete(int idPremise)
         {
-            var oldPremise = GetPremise(idPremise);
-
-            oldPremise.Deleted = 1;
-            foreach (var fpa in oldPremise.FundsPremisesAssoc)
+            var premise = registryContext.Premises
+                .FirstOrDefault(op => op.IdPremises == idPremise);
+            if (premise != null)
             {
-                fpa.Deleted = 1;
+                premise.Deleted = 1;
+                registryContext.SaveChanges();
             }
-            foreach (var opa in oldPremise.OwnerPremisesAssoc)
-            {
-                opa.Deleted = 1;
-            }
-            foreach (var ospa in oldPremise.OwnershipPremisesAssoc)
-            {
-                ospa.Deleted = 1;
-            }
-            foreach (var sp in oldPremise.SubPremises)
-            {
-                sp.Deleted = 1;
-            }
-            foreach (var tnpa in oldPremise.TenancyPremisesAssoc)
-            {
-                tnpa.Deleted = 1;
-            }
-            registryContext.SaveChanges();
         }
 
         internal OwnerType GetOwnerType(int idOwnerType)
@@ -414,16 +633,17 @@ namespace RegistryWeb.DataServices
 
         public Premise GetPremise(int idPremise)
         {
-            return registryContext.Premises
-                 .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
-                 .Include(b => b.IdBuildingNavigation.IdHeatingTypeNavigation)
-                 .Include(b => b.IdStateNavigation)                              //Текущее состояние объекта
-                 .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
-                 .Include(b => b.FundsPremisesAssoc).ThenInclude(fpa => fpa.IdFundNavigation).ThenInclude(fh => fh.IdFundTypeNavigation)
-                 .Include(b => b.IdPremisesCommentNavigation)
-                 .Include(b => b.IdPremisesTypeNavigation)
-                 .Include(b => b.IdPremisesDoorKeysNavigation)
-                 .SingleOrDefault(b => b.IdPremises == idPremise);
+            return registryContext.Premises.AsNoTracking()
+                .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
+                .Include(b => b.IdBuildingNavigation.IdHeatingTypeNavigation)
+                .Include(b => b.IdStateNavigation)                              //Текущее состояние объекта
+                .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
+                .Include(b => b.FundsPremisesAssoc).ThenInclude(fpa => fpa.IdFundNavigation).ThenInclude(fh => fh.IdFundTypeNavigation)
+                .Include(b => b.IdPremisesCommentNavigation)
+                .Include(b => b.IdPremisesTypeNavigation)
+                .Include(b => b.IdPremisesDoorKeysNavigation)
+                .Include(b => b.SubPremises)
+                .SingleOrDefault(b => b.IdPremises == idPremise);
         }
 
         public IEnumerable<ObjectState> ObjectStates
@@ -446,44 +666,13 @@ namespace RegistryWeb.DataServices
             get => registryContext.HeatingTypes.AsNoTracking();
         }
 
-
-
-        public IEnumerable<Premise> GetPremises(List<int> ids)
-        {
-            return registryContext.Premises
-                .Include(b => b.IdBuildingNavigation)
-                .Include(b => b.IdStateNavigation)                              //Текущее состояние объекта
-                .Include(b => b.IdBuildingNavigation.IdStructureTypeNavigation) //Тип помещения: квартира, комната, квартира с подселением
-                .Include(b => b.FundsPremisesAssoc).ThenInclude(fpa => fpa.IdFundNavigation).ThenInclude(fh => fh.IdFundTypeNavigation)
-                .Include(b => b.IdPremisesCommentNavigation)
-                .Include(b => b.IdPremisesTypeNavigation)
-                .Include(b => b.IdPremisesDoorKeysNavigation)
-                //.Include(b => b.OwnershipPremisesAssoc)
-                .Where(b => ids.Contains(b.IdBuilding));
-        }
-
-        private IQueryable<Premise> GetQueryOrderMask(IQueryable<Premise> query, bool compare, OrderOptions orderOptions,
-            Expression<Func<Premise, int>> expression)
-        {
-            //query = GetQueryOrderMask(
-            //    query,
-            //    (string.IsNullOrEmpty(orderOptions.OrderField) || orderOptions.OrderField == "IdPremises"),
-            //    orderOptions,
-            //    p => p.IdPremises
-            //    );
-            if (compare)
-            {
-                if (orderOptions.OrderDirection == OrderDirection.Ascending)
-                    query = query.OrderBy(expression);
-                else
-                    query = query.OrderByDescending(expression);
-            }
-            return query;
-        }
-
         public List<Building> GetHouses(string streetId)
         {
-            return registryContext.Buildings.Where(b => b.IdStreet == streetId).ToList();
+
+            var house = from bui in registryContext.Buildings
+                        where bui.IdStreet.Contains(streetId)
+                        select bui;
+            return house.ToList();
         }
     }
 }

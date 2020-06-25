@@ -1,0 +1,203 @@
+﻿@model RegistryWeb.ViewModel.ResettleInfoVM;
+@using RegistryWeb.Extensions;
+@using RegistryWeb.ViewOptions;
+@using RegistryWeb.Models.Entities;
+@using RegistryWeb.SecurityServices;
+@using RegistryWeb.DataHelpers;
+
+@{
+    var canEdit = ((bool?)ViewBag.CanEditExtInfo) ?? true;
+    var ownershipRightTypeClass = "col-md-6 col-lg-4";
+    if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    {
+        ownershipRightTypeClass = "col-md-6";
+    }
+}
+
+<li class="list-group-item">
+    <input type="hidden" value="@Model.IdResettleInfo" name="IdResettleInfo" />
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label>Дата переселения</label>
+            <input type="date" class="form-control" disabled value="@(Model.ResettleDate == null ? "" : Model.ResettleDate.Value.ToString("yyyy-MM-dd"))" name="ResettleDate" title="Планируемая дата переселения">
+        </div>
+        <div class="form-group col-md-3">
+            <label>Способ переселения</label>
+            <select disabled class="form-control field-resettle selectpicker" title="Способ переселения"
+                    asp-items="@{new SelectList(ViewBag.ResettleKinds, "IdResettleKind", "ResettleKindName",Model.IdResettleKind)}" name="IdResettleKind">
+                <option></option>
+            </select>
+        </div>
+        <div class="form-group @ownershipRightTypeClass">
+            <label>Переселение из</label>
+            @{
+                var subPremisesIds = Model.ResettleInfoSubPremisesFrom.Select(r => r.IdSubPremise);
+                if (!subPremisesIds.Any())
+                {
+                    subPremisesIds = new List<int>() { 0 };
+                }
+            }
+            <select disabled multiple class="form-control field-resettle selectpicker" name="SubPremisesFrom" title="Переселение из"
+                    asp-items="@{new SelectList(ViewBag.SubPremises, "IdSubPremises", "SubPremisesNum")}"
+                    asp-for="@subPremisesIds">
+                <option value="0">Вся квартира</option>
+            </select>
+        </div>
+
+        @if (ViewBag.Action == "Edit")
+        {
+            <div class="text-lg-right col-lg-2 rr-resettle-edit-buttons d-none d-lg-block">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger resettle-cancel-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                    <a class="btn btn-success resettle-save-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                </div>
+                <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                    <a class="btn btn-primary resettle-edit-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                    <a class="btn btn-danger resettle-delete-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                </div>
+            </div>
+        }
+        @if (ViewBag.Action == "Create")
+        {
+            <a class="resettle-edit-btn" style="display: none"></a>
+            <div class="text-lg-right col-lg-2 rr-resettle-edit-buttons d-none d-lg-block">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger resettle-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h5 class="rr-resettle-card-header-sub-title">Адрес переселения</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label>Улица</label>
+                    <input type="hidden" value="@Model.IdStreet" name="ResettleToIdStreetPrev">
+                    <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Улица"
+                            asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName",Model.IdStreet)}" name="ResettleToIdStreet">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Дом</label>
+                    <input type="hidden" value="@Model.IdBuilding" name="ResettleToIdBuildingPrev">
+                    <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Дом"
+                            asp-items="@{new SelectList(Model.Buildings, "IdBuilding", "House",Model.IdBuilding)}" name="ResettleToIdBuilding">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Помещение</label>
+                    <input type="hidden" value="@Model.IdPremise" name="ResettleToIdPremisePrev">
+                    <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Помещение"
+                            asp-items="@{new SelectList(Model.Premises, "IdPremises", "PremisesNum",Model.IdPremise)}" name="ResettleToIdPremise">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Комнаты</label>
+                    @foreach (var idSubPremise in Model.IdSubPremises)
+                    {
+                        <input type="hidden" value="@idSubPremise" name="ResettleToSubPremisesPrev">
+                    }
+                    <select disabled multiple class="form-control field-resettle selectpicker" title="Комнаты"
+                            asp-items="@{new SelectList(Model.SubPremises, "IdSubPremises", "SubPremisesNum")}" asp-for="@Model.IdSubPremises" name="ResettleToSubPremises"></select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h5 class="rr-resettle-card-header-sub-title">Источники финансирования</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-row">
+                <div class="form-group col-lg-3 col-md-6">
+                    <label>Федеральный бюджет</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource1" name="FinanceSource1" title="Федеральный бюджет">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon2">руб.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-lg-3 col-md-6">
+                    <label>Областной бюджет</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource2" name="FinanceSource2" title="Областной бюджет">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon2">руб.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-lg-3 col-md-6">
+                    <label>Муниципальный бюджет</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource3" name="FinanceSource3" title="Муниципальный бюджет">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon2">руб.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-lg-3 col-md-6">
+                    <label>Прочие источники</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource4" name="FinanceSource4" title="Прочие источники">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon2">руб.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h5 class="rr-resettle-card-header-sub-title" style="margin-top: .25em;">Документы</h5>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                    <a href="#" id="resettleDocumentAdd" class="form-control btn btn-success disabled" title="Добавить документ по переселению">&#10010;</a>
+                }
+                <a href="#" id="resettleDocumentsToggle" class="form-control btn btn-primary" title="Развернуть документы" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush toggle-hide" id="resettleDocumentsList">
+            @foreach (var document in Model.ResettleDocuments)
+            {
+                ViewBag.CurrentResettleInfoAddressType = Model.Address.AddressType;
+
+                <partial name="ResettleDocument" model="document"  />
+            }
+        </ul>
+    </div>
+
+    @if (ViewBag.Action == "Edit")
+    {
+        <div class="text-center col-12 rr-resettle-edit-buttons-2 d-block d-lg-none">
+            <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                <a class="btn btn-danger resettle-cancel-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                <a class="btn btn-success resettle-save-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+            </div>
+            <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                <a class="btn btn-primary resettle-edit-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                <a class="btn btn-danger resettle-delete-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+            </div>
+        </div>
+    }
+    @if (ViewBag.Action == "Create")
+    {
+        <div class="text-center col-12 rr-resettle-edit-buttons-2 d-block d-lg-none">
+            <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                <a class="btn btn-danger resettle-cancel-btn-2" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
+            </div>
+        </div>
+    }
+
+
+</li>

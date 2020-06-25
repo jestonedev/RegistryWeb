@@ -30,8 +30,9 @@ namespace RegistryWeb.ViewComponents
             {
                 model = GetPremiseRestrictions(id);
             }
-            ViewBag.Type = type;
+            ViewBag.AddressType = type;
             ViewBag.Action = action;
+            ViewBag.RestrictionTypes = registryContext.RestrictionTypes;
 
             return View("Restrictions", model);
         }
@@ -53,10 +54,8 @@ namespace RegistryWeb.ViewComponents
         private IEnumerable<RestrictionVM> GetPremiseRestrictions(int idPremise)
         {
             var idBuilding = registryContext.Premises
-                .Include(p => p.IdBuildingNavigation)
                 .FirstOrDefault(p => p.IdPremises == idPremise)
-                .IdBuildingNavigation
-                .IdBuilding;
+                ?.IdBuilding;
             var owrs_b = registryContext.RestrictionBuildingsAssoc
                 .Include(oba => oba.RestrictionNavigation)
                 .Where(oba => oba.IdBuilding == idBuilding)

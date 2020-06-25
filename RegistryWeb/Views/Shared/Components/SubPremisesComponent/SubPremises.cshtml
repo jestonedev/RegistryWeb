@@ -2,71 +2,29 @@
 @using RegistryWeb.Extensions;
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.Models.Entities;
-@{
-    string GetTypeFund(SubPremise subpremise)
-    {
-        var fundsHistory = subpremise.FundsSubPremisesAssoc.Select(fpa => fpa.IdFundNavigation);
-        var fundHistory = fundsHistory
-            .FirstOrDefault(fh => fh.ExcludeRestrictionDate == null && fh.IdFund == fundsHistory.Max(f => f.IdFund));
-        if (fundHistory == null)
-            return "";
-        return fundHistory.IdFundTypeNavigation.FundTypeName;
-    }
-}
-<div class="card">
-    <script src="~/js/subpremises.common.js" asp-append-version="true"></script>
-    <div class="card-header d-flex justify-content-between">
-        <h3>Комнаты</h3>
-        <div class="btn-group" role="group">
-            
-            @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
-            {
-                <a href="#" id="subpremiseAdd" class="form-control btn btn-success disabled" disabled title="Добавить комнату">&#10010;</a>
-            }
+@using RegistryWeb.SecurityServices;
 
-            <a href="#" id="subpremisesToggle" class="form-control btn btn-primary" title="Развернуть список комнат" style="font-weight:bold;">∨</a>
-        </div>
-    </div>
-    <table class="table table-bordered card-body" id="subpremisesTable" style="margin-bottom:0px;">
-        <thead>
-            <tr>
-                <th class="align-middle">Номер</th>
-                <th class="align-middle">Общая площадь</th>
-                <th class="align-middle">Текущее состояние</th>
-                <th class="align-middle">Текущий фонд</th>
-                <th class="align-middle">Лицевой счёт ФКР</th>
-                <th class="align-middle">Кадастровая стоимость</th>
-                <th class="align-middle">Балансовая стоимость</th>
-                @*
+@{
+    var securityService = (SecurityService)ViewBag.SecurityService;
+}
+<form id="subpremisesForm">
+    <div class="card">
+        <script src="~/js/subPremises.common.js" asp-append-version="true"></script>
+        <div class="card-header d-flex justify-content-between">
+            <h3>Комнаты</h3>
+            <div class="btn-group" role="group">
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {
-                    <th class="align-middle"></th>
+                    <a href="#" id="subPremiseAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить комнату">&#10010;</a>
                 }
-*@
-            </tr>
-        </thead>
-        <tbody>
+                <a href="#" id="subPremisesToggle" class="form-control btn btn-primary" title="Развернуть список комнат" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush toggle-hide" id="subPremisesList" data-premise-id="@ViewBag.IdPremises" data-action="@ViewBag.Action">
             @foreach (var item in Model)
             {
-                <tr>
-                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.SubPremisesNum" title="@item.SubPremisesNum"></td>
-                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.TotalArea" title="@item.TotalArea"></td>
-                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.IdStateNavigation.StateFemale" title="@item.IdStateNavigation.StateFemale"></td>
-                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" value="@GetTypeFund(item)" title="@GetTypeFund(item)"></td>
-                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.Account" title="@item.Account"></td>
-                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.CadastralCost" title="@item.CadastralCost"></td>
-                    <td class="align-middle"><input type="text" class="form-control inputforcomponent" asp-for="@item.BalanceCost" title="@item.BalanceCost"></td>
-                    
-                    @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
-                    {
-                    <td class="align-middle">
-                        <a class="btn btn-danger oi oi-x disabled" disabled title="Удалить" aria-label="Удалить"
-                           asp-controller="SubPremises" asp-action="Delete" asp-route-idsubpremises="@item.IdSubPremises"></a>
-                    </td>
-                    }
-
-                </tr>
+                <partial name="SubPremise" model="item" />
             }
-        </tbody>
-    </table>
-</div>
+        </ul>
+    </div>
+</form>

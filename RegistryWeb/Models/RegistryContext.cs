@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.Models.SqlViews;
 using RegistryWeb.Models.IEntityTypeConfiguration;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace RegistryWeb.Models
 {
@@ -48,6 +50,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<OwnershipPremiseAssoc> OwnershipPremisesAssoc { get; set; }
         public virtual DbSet<OwnershipRightType> OwnershipRightTypes { get; set; }
         public virtual DbSet<OwnershipRight> OwnershipRights { get; set; }
+        public virtual DbSet<TotalAreaAvgCost> TotalAreaAvgCosts { get; set; }
 
         //Документы
         public virtual DbSet<ActTypeDocument> ActTypeDocuments { get; set; }
@@ -94,6 +97,16 @@ namespace RegistryWeb.Models
         public virtual DbSet<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
         public virtual DbSet<Executor> Executors { get; set; }
 
+        // Переселение
+
+        public virtual DbSet<ResettleInfo> ResettleInfos { get; set; }
+        public virtual DbSet<ResettleKind> ResettleKinds { get; set; }
+        public virtual DbSet<ResettleInfoTo> ResettleInfoTo { get; set; }
+        public virtual DbSet<ResettleInfoSubPremiseFrom> ResettleInfoSubPremisesFrom { get; set; }
+        public virtual DbSet<ResettleDocument> ResettleDocuments { get; set; }
+        public virtual DbSet<ResettleDocumentType> ResettleDocumentTypes { get; set; }
+        public virtual DbSet<ResettlePremiseAssoc> ResettlePremiseAssoc { get; set; }
+
         //Журнал изменений
         public virtual DbSet<ChangeLog> ChangeLogs { get; set; }
         public virtual DbSet<LogObject> LogObjects { get; set; }
@@ -117,6 +130,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<TenancyActiveProcess> TenancyActiveProcesses { get; set; }
         public virtual DbSet<TenancyPayment> TenancyPayments { get; set; }
         public virtual DbSet<TenancyPaymentAfter28082019> TenancyPaymentsAfter28082019 { get; set; }
+
         public virtual DbSet<OwnerActiveProcess> OwnerActiveProcesses { get; set; }
         public virtual DbSet<BuildingOwnershipRightCurrent> BuildingsOwnershipRightCurrent { get; set; }
 
@@ -168,6 +182,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new StructureTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new StructureTypeOverlapConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new GovernmentDecreeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TotalAreaAvgCostConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new OwnershipRightConfiguration(nameDatebase));            
             modelBuilder.ApplyConfiguration(new OwnershipBuildingAssocConfiguration(nameDatebase));
@@ -209,6 +224,15 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new TenancySubPremiseAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ExecutorConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyRentPeriodConfiguration(nameDatebase));
+
+            modelBuilder.ApplyConfiguration(new ResettleInfoConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettleKindConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettleInfoToConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettleInfoSubPremiseFromConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettleDocumentTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettleDocumentConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettlePremiseAssocConfiguration(nameDatebase));
+
         }
     }
 }

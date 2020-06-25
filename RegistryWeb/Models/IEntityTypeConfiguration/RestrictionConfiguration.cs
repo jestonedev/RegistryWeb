@@ -20,7 +20,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
         {
             builder.HasKey(e => e.IdRestriction);
 
-            builder.ToTable("restrictions", "registry_test");
+            builder.ToTable("restrictions", nameDatebase);
 
             builder.HasIndex(e => e.IdRestrictionType)
                 .HasName("FK_restrictions_restriction_types_id_restriction_type");
@@ -55,6 +55,22 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("number")
                 .HasMaxLength(10)
                 .IsUnicode(false);
+
+            builder.Property(e => e.FileOriginName)
+                .HasColumnName("file_origin_name")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.FileDisplayName)
+                .HasColumnName("file_display_name")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.FileMimeType)
+                .HasColumnName("file_mime_type")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
 
             builder.HasOne(d => d.RestrictionTypeNavigation)
                 .WithMany(p => p.Restrictions)

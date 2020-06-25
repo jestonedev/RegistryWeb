@@ -1,7 +1,13 @@
 ﻿@using RegistryWeb.ViewOptions;
 @using RegistryWeb.Models.Entities;
 @using RegistryWeb.Extensions;
+@using RegistryWeb.SecurityServices;
+
 @model RegistryWeb.ViewModel.PremisesVM<Premise>;
+
+@{
+    var securityService = (SecurityService)ViewData["SecurityService"];
+}
 
 @section styles{
     <link rel="stylesheet" href="~/css/premise.css" runat="server" />
@@ -14,11 +20,14 @@
     <input type="hidden" asp-for="FilterOptions.Address.AddressType" />
     <input type="hidden" asp-for="FilterOptions.Address.Id" />
 
-    <div class="form-row" style="height:50px;">
-        <div class="form-group col">
-            <a class="btn btn-success" title="Добавить" aria-label="Добавить помещение" asp-controller="Premises" asp-action="Create" asp-route-action="Create">&#10010;</a>
-        </div>
-        <div class="input-group col-9">
+    <div class="form-row">
+        @if (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))
+        {
+            <div class="form-group col-1">
+                <a class="btn btn-success" title="Добавить" aria-label="Добавить помещение" asp-controller="Premises" asp-action="Create">&#10010;</a>
+            </div>
+        }
+        <div class="input-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-9" : "col-10") ">
             <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
             <div class="input-group-append h-auto d-inline-block">
                 <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
@@ -52,111 +61,95 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-row">
-                        <div class="form-group col-2">
+                        <div class="form-group col-lg-4 col-md-4">
                             <label asp-for="FilterOptions.IdPremise">Реестровый номер</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.IdPremise" title="Реестровый номер помещения">
                         </div>
-                        <div class="form-group col-8">
+                        <div class="form-group col-lg-4 col-md-8">
+                            <label asp-for="FilterOptions.IdFundType">Тип жилого фонда</label>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип жилого фонда" asp-for="FilterOptions.IdFundType" asp-items="@Model.FundTypesList"></select>
+                        </div>
+                        <div class="form-group col-lg-4 col-md-12">
+                            <label asp-for="FilterOptions.IdsObjectState">Состояние помещения</label>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Состояние помещения" asp-for="FilterOptions.IdsObjectState" asp-items="@Model.ObjectStatesList"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-lg-6 col-md-12">
                             <label asp-for="FilterOptions.IdStreet">Улица</label>
                             <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@Model.KladrStreetsList">
                                 <option selected></option>
                             </select>
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-lg-3 col-md-6">
                             <label asp-for="FilterOptions.House">Номер дома</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.House" title="Номер дома">
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-lg-3 col-md-6">
                             <label asp-for="FilterOptions.PremisesNum">Номер помещения</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.PremisesNum" title="Номер помещенияв">
                         </div>
-                        <div class="form-group col-2">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-lg-2 col-md-3">
                             <label asp-for="FilterOptions.Floors">Этаж</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.Floors" title="Этаж">
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-lg-4 col-md-9">
                             <label asp-for="FilterOptions.CadastralNum">Кадастровый номер</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.CadastralNum" title="Кадастровый номер">
                         </div>
-                        <div class="form-group col-6">
-                            <label asp-for="FilterOptions.IdFundType">Тип жилого фонда</label>
-                            <select class="selectpicker form-control" title="Тип жилого фонда" asp-for="FilterOptions.IdFundType" asp-items="@Model.FundTypesList">
-                                <option selected></option>
-                            </select>
-                        </div>
-                    </div>
-                    @*
-                        <div class="form-row">
-                            <div class="form-group col-2">
-                                <label asp-for="FilterOptions.CadastralNum">Номер договора найма</label>
-                                <input type="text" class="form-control" asp-for="FilterOptions.CadastralNum" title="Номер договора найма">
-                            </div>
-                            <div class="form-group col-2">
-                                <label asp-for="FilterOptions.CadastralNum">Номер документа-основания найма</label>
-                                <input type="text" class="form-control" asp-for="FilterOptions.CadastralNum" title="Номер документа-основания найма">
-                            </div>
-                            <div class="form-group col-2">
-                                <label asp-for="FilterOptions.CadastralNum">Номер протокола жилищной комиссии</label>
-                                <input type="text" class="form-control" asp-for="FilterOptions.CadastralNum" title="Номер протокола жилищной комиссии">
-                            </div>
-                            <div class="form-group col-2">
-                                <label asp-for="FilterOptions.CadastralNum">ФИО нанимателя</label>
-                                <input type="text" class="form-control" asp-for="FilterOptions.CadastralNum" title="ФИО нанимателя">
-                            </div>
-                        </div>
-                    *@
-                    <div class="form-row">
-                        <div class="form-group col-3">
-                            <label asp-for="FilterOptions.RestrictionNum">Номер реквизита</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.RestrictionNum" title="Номер реквизита">
-                        </div>
-                        <div class="form-group col-6">
-                            <label asp-for="FilterOptions.IdRestrictionType">Тип права собственности</label>
-                            <select class="selectpicker form-control" title="Тип права собственности" asp-for="FilterOptions.IdRestrictionType" asp-items="@Model.RestrictionsList">
-                                <option selected></option>
-                            </select>
-                        </div>
-                        <div class="form-group col-3">
-                            <label asp-for="FilterOptions.NumberOwnershipRight">Номер ограничения</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.NumberOwnershipRight" title="Номер ограницения">
-                        </div>
-                    </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-3">
-                            <label asp-for="FilterOptions.IdsObjectState">Состояние помещения</label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Состояние помещения" asp-for="FilterOptions.IdsObjectState" asp-items="@Model.ObjectStatesList"></select>
-                        </div>
-
-                        <div class="form-group col-3">
-                            <label asp-for="FilterOptions.IdsOwnershipRightType">Тип ограничения <b>содержит</b></label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип ограничения содержит" asp-for="FilterOptions.IdsOwnershipRightType" asp-items="@Model.OwnershipRightTypesList"></select>
-                        </div>
-
-                        <div class="form-group col-3">
+                        <div class="form-group col-lg-3 col-md-6">
                             <label asp-for="FilterOptions.IdsComment">Примечание <b>содержит</b></label>
                             <select multiple class="selectpicker form-control" data-actions-box="true" title="Примечание содержит" asp-for="FilterOptions.IdsComment" asp-items="@Model.CommentList"></select>
                         </div>
 
-                        <div class="form-group col-3">
+                        <div class="form-group col-lg-3 col-md-6">
                             <label asp-for="FilterOptions.IdsDoorKeys">Ключи <b>содержит</b></label>
                             <select multiple class="selectpicker form-control" data-actions-box="true" title="Ключи содержит" asp-for="FilterOptions.IdsDoorKeys" asp-items="@Model.LocationKeysList"></select>
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group col-lg-3 col-md-6">
+                            <label asp-for="FilterOptions.RestrictionNum">Номер реквизита п/с</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.RestrictionNum" title="Номер реквизита">
+                        </div>
+                        <div class="form-group col-lg-3 col-md-6">
+                            <label asp-for="FilterOptions.RestrictionDate">Дата реквизита п/с</label>
+                            <input type="date" class="form-control" asp-for="FilterOptions.RestrictionDate" value="@(Model.FilterOptions.RestrictionDate==null ? "" : Model.FilterOptions.RestrictionDate?.ToString("yyyy-MM-dd"))" title="Дата реквизита права собственности">
+                        </div>
+                        <div class="form-group col-lg-6 col-md-12">
+                            <label asp-for="FilterOptions.IdsRestrictionType">Тип права собственности</label>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип права собственности" asp-for="FilterOptions.IdsRestrictionType" asp-items="@Model.RestrictionsList"></select>
+                        </div>
+                    </div>
 
                     <div class="form-row">
-                        <div class="form-group">
-                            <label asp-for="FilterOptions.StDateOwnershipRight">Дата включения в РМИ</label>
-                            <div class="col-xs-8 col-md-12">
-                                <div class="input-group date">
-                                    <input type="date" class="form-control" asp-for="FilterOptions.StDateOwnershipRight" title="Дата включения в РМИ">
-                                </div>
-                            </div>
-                            <div class="col-xs-8 col-md-12">
-                                <div class="input-group date">
-                                    <input type="date" class="form-control" asp-for="FilterOptions.EndDateOwnershipRight" title="Дата включения в РМИ">
-                                </div>
-                            </div>
+                        <div class="form-group col-lg-3 col-md-6">
+                            <label asp-for="FilterOptions.NumberOwnershipRight">Номер ограничения</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.NumberOwnershipRight" title="Номер ограницения">
+                        </div>
+                        <div class="form-group col-lg-3 col-md-6">
+                            <label asp-for="FilterOptions.DateOwnershipRight">Дата ограничения</label>
+                            <input type="date" class="form-control" asp-for="FilterOptions.DateOwnershipRight" value="@(Model.FilterOptions.DateOwnershipRight==null ? "" : Model.FilterOptions.DateOwnershipRight?.ToString("yyyy-MM-dd"))" title="Дата ограничения">
+                        </div>
+                        <div class="form-group col-lg-6 col-md-12">
+                            <label asp-for="FilterOptions.IdsOwnershipRightType">Тип ограничения <b>содержит</b></label>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип ограничения содержит" asp-for="FilterOptions.IdsOwnershipRightType" asp-items="@Model.OwnershipRightTypesList"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label asp-for="FilterOptions.StDateOwnershipRight">Дата включения в РМИ</label>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <input type="date" class="form-control" asp-for="FilterOptions.StDateOwnershipRight" value="@(Model.FilterOptions.StDateOwnershipRight==null ? "" : Model.FilterOptions.StDateOwnershipRight?.ToString("yyyy-MM-dd"))" title="Дата включения в РМИ">
+                        </div>
+                        <div class="form-group col-6">
+                            <input type="date" class="form-control" asp-for="FilterOptions.EndDateOwnershipRight" value="@(Model.FilterOptions.EndDateOwnershipRight==null ? "" : Model.FilterOptions.EndDateOwnershipRight?.ToString("yyyy-MM-dd"))" title="Дата включения в РМИ">
                         </div>
                     </div>
 
@@ -169,27 +162,4 @@
         </div>
     </div>
 
-    @*
-        <div class="form-row">
-            <div class="form-group col">
-                <label class="control-label">Тип помещения: </label>
-                <select class="form-control" asp-for="FilterOptions.IdPremisesType" asp-items="@Model.PremisesTypesList">
-                    <option value="">Все типы</option>
-                </select>
-            </div>
-            <div class="form-group col">
-                <label class="control-label">Текущее состояние: </label>
-                <select class="form-control" asp-for="FilterOptions.IdObjectState" asp-items="@Model.ObjectStatesList">
-                    <option value="">Все состояния</option>
-                </select>
-
-            </div>
-            <div class="form-group col">
-                <label class="control-label">Текущий фонд: </label>
-                <select class="form-control" asp-for="FilterOptions.IdFundType" asp-items="@Model.FundTypesList">
-                    <option value="">Все фонды</option>
-                </select>
-            </div>
-        </div>
-    *@
 </form>

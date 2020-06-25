@@ -52,7 +52,7 @@ namespace RegistryWeb.ViewComponents
         {
             var idBuilding = registryContext.Premises
                 .FirstOrDefault(p => p.IdPremises == idPremise)
-                .IdBuilding;
+                ?.IdBuilding;
             var owrs_b = registryContext.OwnershipBuildingsAssoc
                 .Include(oba => oba.OwnershipRightNavigation)
                 .Where(oba => oba.IdBuilding == idBuilding)

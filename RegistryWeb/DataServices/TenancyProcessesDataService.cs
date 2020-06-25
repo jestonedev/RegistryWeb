@@ -103,7 +103,7 @@ namespace RegistryWeb.DataServices
                 viewModel.PageOptions.CurrentPage = 1;
             query = GetQueryPage(query, viewModel.PageOptions);
             viewModel.TenancyProcesses = query.ToList();
-            viewModel.RentObjects = GetRentObjects(query);
+            viewModel.RentObjects = GetRentObjects(viewModel.TenancyProcesses);
             return viewModel;
         }
 
@@ -122,16 +122,16 @@ namespace RegistryWeb.DataServices
 
         private Dictionary<int, List<TenancyRentObject>> GetRentObjects(IEnumerable<TenancyProcess> tenancyProcesses)
         {
+            var ids = tenancyProcesses.Select(r => r.IdProcess);
             var buildings = from tbaRow in tenancyBuildingsAssoc
-                            join tpRow in tenancyProcesses
-                            on tbaRow.IdProcess equals tpRow.IdProcess
                             join buildingRow in registryContext.Buildings
                             on tbaRow.IdBuilding equals buildingRow.IdBuilding
                             join streetRow in registryContext.KladrStreets
                             on buildingRow.IdStreet equals streetRow.IdStreet
+                            where ids.Contains(tbaRow.IdProcess)
                             select new
                             {
-                                tpRow.IdProcess,
+                                tbaRow.IdProcess,
                                 RentObject = new TenancyRentObject
                                 {
                                     Address = new Address
@@ -147,8 +147,6 @@ namespace RegistryWeb.DataServices
                                 }
                             };
             var premises = from tpaRow in tenancyPremisesAssoc
-                           join tpRow in tenancyProcesses
-                           on tpaRow.IdProcess equals tpRow.IdProcess
                            join premiseRow in registryContext.Premises
                            on tpaRow.IdPremise equals premiseRow.IdPremises
                            join buildingRow in registryContext.Buildings
@@ -157,9 +155,10 @@ namespace RegistryWeb.DataServices
                            on buildingRow.IdStreet equals streetRow.IdStreet
                            join premiseTypesRow in registryContext.PremisesTypes
                            on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
+                           where ids.Contains(tpaRow.IdProcess)
                            select new
                            {
-                               tpRow.IdProcess,
+                               tpaRow.IdProcess,
                                RentObject = new TenancyRentObject
                                {
                                    Address = new Address
@@ -179,8 +178,6 @@ namespace RegistryWeb.DataServices
                                }
                            };
             var subPremises = from tspaRow in tenancySubPremisesAssoc
-                              join tpRow in tenancyProcesses
-                              on tspaRow.IdProcess equals tpRow.IdProcess
                               join subPremiseRow in registryContext.SubPremises
                               on tspaRow.IdSubPremise equals subPremiseRow.IdSubPremises
                               join premiseRow in registryContext.Premises
@@ -191,9 +188,10 @@ namespace RegistryWeb.DataServices
                               on buildingRow.IdStreet equals streetRow.IdStreet
                               join premiseTypesRow in registryContext.PremisesTypes
                               on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
+                              where ids.Contains(tspaRow.IdProcess)
                               select new
                               {
-                                  tpRow.IdProcess,
+                                  tspaRow.IdProcess,
                                   RentObject = new TenancyRentObject
                                   {
                                       Address = new Address
@@ -206,7 +204,7 @@ namespace RegistryWeb.DataServices
                                                 { AddressTypes.Premise.ToString(), premiseRow.IdPremises.ToString() }
                                            },
                                           Text = string.Concat(streetRow.StreetName, ", д.", buildingRow.House, ", ",
-                                            premiseTypesRow.PremisesTypeShort, premiseRow.PremisesNum, ", к." + subPremiseRow.SubPremisesNum)
+                                            premiseTypesRow.PremisesTypeShort, premiseRow.PremisesNum, ", к.", subPremiseRow.SubPremisesNum)
                                       },
                                       TotalArea = subPremiseRow.TotalArea,
                                       LivingArea = subPremiseRow.LivingArea,
@@ -217,37 +215,85 @@ namespace RegistryWeb.DataServices
             var objects = buildings.Union(premises).Union(subPremises).ToList();
 
             var payments = (from paymentsRow in registryContext.TenancyPayments
-                            join tpRow in tenancyProcesses
-                            on paymentsRow.IdProcess equals tpRow.IdProcess
-                            where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
-                                tpRow.TenancyPersons.Any()
+                            where ids.Contains(paymentsRow.IdProcess)
                             select paymentsRow).ToList();
 
-            var paymentsAfter28082019Buildings = (from tbaRow in tenancyBuildingsAssoc
-                                                  join tpRow in tenancyProcesses
-                                                  on tbaRow.IdProcess equals tpRow.IdProcess
-                                                  join paymentRow in registryContext.TenancyPaymentsAfter28082019
-                                                  on tbaRow.IdBuilding equals paymentRow.IdBuilding
-                                                  where paymentRow.IdPremises == null &&
-                                                    (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
+            payments = (from paymentRow in payments
+                            join tpRow in tenancyProcesses
+                            on paymentRow.IdProcess equals tpRow.IdProcess
+                            where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
+                                tpRow.TenancyPersons.Any()
+                            select paymentRow).ToList();
+
+            var prePaymentsAfter28082019Buildings = (from tbaRow in tenancyBuildingsAssoc
+                                                     join paymentRow in registryContext.TenancyPaymentsAfter28082019
+                                                     on tbaRow.IdBuilding equals paymentRow.IdBuilding
+                                                     where paymentRow.IdPremises == null && ids.Contains(tbaRow.IdProcess)
+                                                     select new
+                                                     {
+                                                         tbaRow.IdProcess,
+                                                         paymentRow.IdBuilding,
+                                                         paymentRow.Hb,
+                                                         paymentRow.K1,
+                                                         paymentRow.K2,
+                                                         paymentRow.K3,
+                                                         paymentRow.KC,
+                                                         paymentRow.RentArea
+                                                     }).Distinct().ToList();
+
+            var paymentsAfter28082019Buildings = (from paymentRow in prePaymentsAfter28082019Buildings
+                                              join tpRow in tenancyProcesses
+                                                  on paymentRow.IdProcess equals tpRow.IdProcess
+                                                  where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
                                                     tpRow.TenancyPersons.Any()
                                                   select paymentRow).Distinct().ToList();
-            var paymentsAfter28082019Premises = (from tpaRow in tenancyPremisesAssoc
+
+            var prePaymentsAfter28082019Premises = (from tpaRow in tenancyPremisesAssoc
+                                                     join paymentRow in registryContext.TenancyPaymentsAfter28082019
+                                                     on tpaRow.IdPremise equals paymentRow.IdPremises
+                                                    where paymentRow.IdSubPremises == null && ids.Contains(tpaRow.IdProcess)
+                                                     select new
+                                                     {
+                                                         tpaRow.IdProcess,
+                                                         paymentRow.IdPremises,
+                                                         paymentRow.Hb,
+                                                         paymentRow.K1,
+                                                         paymentRow.K2,
+                                                         paymentRow.K3,
+                                                         paymentRow.KC,
+                                                         paymentRow.RentArea
+                                                     }).Distinct().ToList();
+
+            var paymentsAfter28082019Premises = (from paymentRow in prePaymentsAfter28082019Premises
                                                  join tpRow in tenancyProcesses
-                                                 on tpaRow.IdProcess equals tpRow.IdProcess
-                                                 join paymentRow in registryContext.TenancyPaymentsAfter28082019
-                                                 on tpaRow.IdPremise equals paymentRow.IdPremises
-                                                 where paymentRow.IdSubPremises == null &&
-                                                    (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
-                                                    tpRow.TenancyPersons.Any()
+                                                     on paymentRow.IdProcess equals tpRow.IdProcess
+                                                 where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
+                                                   tpRow.TenancyPersons.Any()
                                                  select paymentRow).Distinct().ToList();
-            var paymentsAfter28082019SubPremises = (from tspaRow in tenancySubPremisesAssoc
-                                                    join tpRow in tenancyProcesses
-                                                    on tspaRow.IdProcess equals tpRow.IdProcess
-                                                    join paymentRow in registryContext.TenancyPaymentsAfter28082019
+
+            var prePaymentsAfter28082019SubPremises = (from tspaRow in tenancySubPremisesAssoc
+                                                       join paymentRow in registryContext.TenancyPaymentsAfter28082019
                                                     on tspaRow.IdSubPremise equals paymentRow.IdSubPremises
+                                                       where ids.Contains(tspaRow.IdProcess)
+                                                    select new
+                                                    {
+                                                        tspaRow.IdProcess,
+                                                        paymentRow.IdSubPremises,
+                                                        paymentRow.Hb,
+                                                        paymentRow.K1,
+                                                        paymentRow.K2,
+                                                        paymentRow.K3,
+                                                        paymentRow.KC,
+                                                        paymentRow.RentArea
+                                                    }).Distinct().ToList();
+
+
+
+            var paymentsAfter28082019SubPremises = (from paymentRow in prePaymentsAfter28082019SubPremises
+                                                    join tpRow in tenancyProcesses
+                                                        on paymentRow.IdProcess equals tpRow.IdProcess
                                                     where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
-                                                        tpRow.TenancyPersons.Any()
+                                                      tpRow.TenancyPersons.Any()
                                                     select paymentRow).Distinct().ToList();
 
             foreach(var obj in objects)
@@ -258,7 +304,7 @@ namespace RegistryWeb.DataServices
                         payments.Where(r => r.IdBuilding.ToString() == obj.RentObject.Address.Id && r.IdPremises == null).Sum(r => r.Payment);
                     obj.RentObject.PaymentAfter28082019 =
                        Math.Round(paymentsAfter28082019Buildings.Where(
-                            r => r.IdBuilding.ToString() == obj.RentObject.Address.Id && r.IdPremises == null
+                            r => r.IdBuilding.ToString() == obj.RentObject.Address.Id
                             ).Sum(r => (r.K1 + r.K2 + r.K3) / 3 * r.KC * r.Hb * (decimal)r.RentArea), 2);
                 }
                 if (obj.RentObject.Address.AddressType == AddressTypes.Premise)
@@ -267,7 +313,7 @@ namespace RegistryWeb.DataServices
                         payments.Where(r => r.IdPremises.ToString() == obj.RentObject.Address.Id && r.IdSubPremises == null).Sum(r => r.Payment);
                     obj.RentObject.PaymentAfter28082019 =
                         Math.Round(paymentsAfter28082019Premises.Where(
-                            r => r.IdPremises.ToString() == obj.RentObject.Address.Id && r.IdSubPremises == null
+                            r => r.IdPremises.ToString() == obj.RentObject.Address.Id
                             ).Sum(r => (r.K1 + r.K2 + r.K3) / 3 * r.KC * r.Hb * (decimal)r.RentArea), 2);
                 }
                 if (obj.RentObject.Address.AddressType == AddressTypes.SubPremise)
@@ -533,6 +579,34 @@ namespace RegistryWeb.DataServices
                          on row.IdProcess equals id
                          select row).Distinct();
             }
+
+            if (filterOptions.IdSubPremises != null)
+            {
+                query = (from row in query
+                         join subPremise in tenancySubPremisesAssoc
+                         on row.IdProcess equals subPremise.IdProcess
+                         where subPremise.IdSubPremise == filterOptions.IdSubPremises
+                         select row).Distinct();
+            }
+
+            if (filterOptions.IdPremises != null)
+            {
+                query = (from row in query
+                 join premise in tenancyPremisesAssoc
+                 on row.IdProcess equals premise.IdProcess
+                 where premise.IdPremise == filterOptions.IdPremises
+                 select row).Distinct();
+            }
+
+            if (filterOptions.IdBuilding != null)
+            {
+                query = (from row in query
+                 join building in tenancyBuildingsAssoc
+                 on row.IdProcess equals building.IdProcess
+                 where building.IdBuilding == filterOptions.IdBuilding
+                 select row).Distinct();
+            }
+
             if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Any())
             {
                 // TODO

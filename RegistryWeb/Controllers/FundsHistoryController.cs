@@ -79,6 +79,8 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
                 return View("NotAccess");
             ViewBag.Action = "Index";
+            /*ViewBag.idObject = IdObject;
+            ViewBag.addressType = typeObject;*/
             if (ModelState.IsValid)
             {                
                 dataService.Create(fh.FundHistory, IdObject, typeObject);
@@ -149,6 +151,6 @@ namespace RegistryWeb.Controllers
                 //return RedirectToAction("Index");
             }
             return View("FundHistory", dataService.GetFundHistoryView(fh.FundHistory, 0, ""));
-        }
+        }/**/
     }
 }

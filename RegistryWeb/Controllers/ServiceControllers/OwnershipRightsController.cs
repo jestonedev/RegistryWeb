@@ -1,11 +1,15 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
+using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers.ServiceControllers
 {
@@ -13,11 +17,13 @@ namespace RegistryWeb.Controllers.ServiceControllers
     {
         SecurityService securityService;
         RegistryContext registryContext;
+        private readonly IConfiguration config;
 
-        public OwnershipRightsController(SecurityService securityService, RegistryContext registryContext)
+        public OwnershipRightsController(SecurityService securityService, RegistryContext registryContext, IConfiguration config)
         {
             this.securityService = securityService;
             this.registryContext = registryContext;
+            this.config = config;
         }
 
         [HttpPost]
@@ -25,7 +31,8 @@ namespace RegistryWeb.Controllers.ServiceControllers
         {
             if (idOwnershipRight == null)
                 return -1;
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
+                !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
                 return -2;
             try
             {
@@ -58,32 +65,57 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 idOwnershipRightType = ownershipRight.IdOwnershipRightType,
                 resettlePlanDate = ownershipRight.ResettlePlanDate.HasValue ? ownershipRight.ResettlePlanDate.Value.ToString("yyyy-MM-dd") : "",
                 demolishPlanDate = ownershipRight.DemolishPlanDate.HasValue ? ownershipRight.DemolishPlanDate.Value.ToString("yyyy-MM-dd") : "",
+                fileOriginName = ownershipRight.FileOriginName
             });
         }
 
-        [HttpPost]
-        public int YesOwnershipRight(OwnershipRight owr, Address address)
+        public IActionResult DownloadFile(int idOwnershipRight)
         {
-            if (owr == null)
-                return -1;
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return -2;
-            //Создать
-            if (owr.IdOwnershipRight == 0)
+            var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"OwnershipRights\");
+            var ownershipRight = registryContext.OwnershipRights.Where(r => r.IdOwnershipRight == idOwnershipRight).AsNoTracking().FirstOrDefault();
+            if (ownershipRight == null) return Json(new { Error = -1 });
+            var filePath = Path.Combine(path, ownershipRight.FileOriginName);
+            if (!System.IO.File.Exists(filePath))
             {
-                registryContext.OwnershipRights.Add(owr);
+                return Json(new { Error = -2 });
+            }
+            return File(System.IO.File.ReadAllBytes(filePath), ownershipRight.FileMimeType, ownershipRight.FileDisplayName);
+        }
+
+        [HttpPost]
+        public IActionResult SaveOwnershipRight(OwnershipRight ownershipRight, Address address, IFormFile ownershipRightFile, bool ownershipRightFileRemove)
+        {
+            var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"OwnershipRights\");
+            if (ownershipRight == null)
+                return Json(new { Error = -1 });
+            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
+                !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
+                return Json(new { Error = -2 });
+            if (ownershipRightFile != null && !ownershipRightFileRemove)
+            {
+                ownershipRight.FileDisplayName = ownershipRightFile.FileName;
+                ownershipRight.FileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(ownershipRightFile.FileName).Extension;
+                ownershipRight.FileMimeType = ownershipRightFile.ContentType;
+                var fileStream = new FileStream(Path.Combine(path, ownershipRight.FileOriginName), FileMode.CreateNew);
+                ownershipRightFile.OpenReadStream().CopyTo(fileStream);
+                fileStream.Close();
+            }
+            //Создать
+            if (ownershipRight.IdOwnershipRight == 0)
+            {
+                registryContext.OwnershipRights.Add(ownershipRight);
                 registryContext.SaveChanges();
                 var id = 0;
                 if (address == null)
-                    return -3;
+                    return Json(new { Error = -3 });
                 if (!int.TryParse(address.Id, out id))
-                    return -4;
+                    return Json(new { Error = -4 });
                 if (address.AddressType == AddressTypes.Building)
                 {
                     var oba = new OwnershipBuildingAssoc()
                     {
                         IdBuilding = id,
-                        IdOwnershipRight = owr.IdOwnershipRight
+                        IdOwnershipRight = ownershipRight.IdOwnershipRight
                     };
                     registryContext.OwnershipBuildingsAssoc.Add(oba);
                     registryContext.SaveChanges();
@@ -93,63 +125,60 @@ namespace RegistryWeb.Controllers.ServiceControllers
                     var opa = new OwnershipPremiseAssoc()
                     {
                         IdPremises = id,
-                        IdOwnershipRight = owr.IdOwnershipRight
+                        IdOwnershipRight = ownershipRight.IdOwnershipRight
                     };
                     registryContext.OwnershipPremisesAssoc.Add(opa);
                     registryContext.SaveChanges();
                 }
-                return owr.IdOwnershipRight;
+                return Json(new { ownershipRight.IdOwnershipRight, ownershipRight.FileOriginName });
+            }
+
+            var ownershipRightDb = registryContext.OwnershipRights.Where(r => r.IdOwnershipRight == ownershipRight.IdOwnershipRight).AsNoTracking().FirstOrDefault();
+            if (ownershipRightDb == null)
+                return Json(new { Error = -5 });
+            if (ownershipRightFileRemove)
+            {
+                var fileOriginName = ownershipRightDb.FileOriginName;
+                if (!string.IsNullOrEmpty(fileOriginName))
+                {
+                    var filePath = Path.Combine(path, fileOriginName);
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+            }
+            else
+            if (ownershipRightFile == null)
+            {
+                ownershipRight.FileOriginName = ownershipRightDb.FileOriginName;
+                ownershipRight.FileDisplayName = ownershipRightDb.FileDisplayName;
+                ownershipRight.FileMimeType = ownershipRightDb.FileMimeType;
             }
             //Обновить            
-            registryContext.OwnershipRights.Update(owr);
+            registryContext.OwnershipRights.Update(ownershipRight);
             registryContext.SaveChanges();
-            return 0;
+            return Json(new { ownershipRight.IdOwnershipRight, ownershipRight.FileOriginName });
         }
 
         [HttpPost]
         public IActionResult AddOwnershipRight(AddressTypes addressType, string action)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return Json(-1);
-            var ownershipRightTypes = registryContext.OwnershipRightTypes.AsNoTracking();
-            var tr = new StringBuilder();
-            tr.Append("<tr class=\"ownership-right\" data-idownershipright=\"" + Guid.NewGuid() + "\">");
-            if(addressType == AddressTypes.Premise)
-            {
-                tr.Append("<td class=\"align-middle\">Помещение</td>");
-            }
-            tr.Append("<td class=\"align-middle\"><input type=\"text\" class=\"form-control field-ownership-right\"></td>");
-            tr.Append("<td class=\"align-middle\"><input type=\"date\" class=\"form-control field-ownership-right\"></td>");
-            tr.Append("<td class=\"align-middle\"><input type=\"text\" class=\"form-control field-ownership-right\"></td>");
-            //Формирование селекта для ownershipRightTypes
-            var tdIdOwnershipRightType = new StringBuilder();
-            tdIdOwnershipRightType.Append("<td class=\"align-middle\">");
-            tdIdOwnershipRightType.Append("<select class=\"form-control field-ownership-right\">");
-            foreach (var owrt in ownershipRightTypes)
-            {
-                tdIdOwnershipRightType.Append("<option value=\"" + owrt.IdOwnershipRightType + "\">" + owrt.OwnershipRightTypeName + "</option>");
-            }
-            tdIdOwnershipRightType.Append("</select>");
-            tdIdOwnershipRightType.Append("</td>");
-            tr.Append(tdIdOwnershipRightType);
-            tr.Append("<td class=\"align-middle\"><input type=\"date\" class=\"form-control field-ownership-right\"></td>");
-            tr.Append("<td class=\"align-middle\"><input type=\"date\" class=\"form-control field-ownership-right\"></td>");
-            //Панели
-            tr.Append("<td class=\"align-middle\">");
-            tr.Append("<div class=\"btn-group yes-no-panel\" role=\"group\" aria-label=\"Панель подтверждения\">");
-            tr.Append("<a class=\"btn btn-danger oi oi-x\" title=\"Нет\" aria-label=\"Нет\"></a>");
-            if (action == "Edit")
-            {
-                tr.Append("<a class=\"btn btn-success oi oi-check\" title=\"Да\" aria-label=\"Да\"></a>");
-                tr.Append("</div>");
-                tr.Append("<div class=\"btn-group edit-del-panel\" role=\"group\" aria-label=\"Панель реадктирования\" style=\"display: none;\">");
-                tr.Append("<a class=\"btn btn-primary oi oi-pencil\" title=\"Редактировать\" aria-label=\"Редактировать\"></a>");
-                tr.Append("<a class=\"btn btn-danger oi oi-x delete\" title=\"Удалить\" aria-label=\"Удалить\"></a>");
-            }
-            tr.Append("</div>");
-            tr.Append("</td>");
-            tr.Append("</tr>");
-            return Content(tr.ToString());
+
+            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
+                !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
+                return Json(-2);
+
+            var owr = new OwnershipRight { };
+            var address = new Address { AddressType = addressType };
+            var owrVM = new OwnershipRightVM(owr, address);
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.Address = address;
+            ViewBag.OwnershipRightTypes = registryContext.OwnershipRightTypes.ToList();
+            ViewBag.CanEditBaseInfo = true;
+
+            return PartialView("OwnershipRight", owrVM);
         }
     }
 }
