@@ -51,6 +51,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<OwnershipRightType> OwnershipRightTypes { get; set; }
         public virtual DbSet<OwnershipRight> OwnershipRights { get; set; }
         public virtual DbSet<TotalAreaAvgCost> TotalAreaAvgCosts { get; set; }
+        public virtual DbSet<ActTypeDocument> ActTypeDocuments { get; set; }
 
         public virtual DbSet<RestrictionBuildingAssoc> RestrictionBuildingsAssoc { get; set; }
         public virtual DbSet<RestrictionPremiseAssoc> RestrictionPremisesAssoc { get; set; }
@@ -61,6 +62,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<PremisesDoorKeys> PremisesDoorKeys { get; set; }
         public virtual DbSet<PremisesKind> PremisesKinds { get; set; }
         public virtual DbSet<PremisesType> PremisesTypes { get; set; }
+        public virtual DbSet<PremisesJurisdictionActFiles> PremisesJurisdictionActFiles { get; set; }
         public virtual DbSet<StructureType> StructureTypes { get; set; }
         public virtual DbSet<StructureTypeOverlap> StructureTypeOverlaps { get; set; }
         public virtual DbSet<GovernmentDecree> GovernmentDecrees { get; set; }
@@ -157,6 +159,7 @@ namespace RegistryWeb.Models
 
             modelBuilder.ApplyConfiguration(new PersonalSettingConfiguration(nameDatebase)); 
 
+            modelBuilder.ApplyConfiguration(new ActTypeDocumentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new DocumentTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new DocumentIssuedByConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new DocumentResidenceConfiguration(nameDatebase));
@@ -170,6 +173,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new PremisesDoorKeysConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremisesTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremisesKindConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PremisesJurisdictionActFilesConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new StructureTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new StructureTypeOverlapConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new GovernmentDecreeConfiguration(nameDatebase));

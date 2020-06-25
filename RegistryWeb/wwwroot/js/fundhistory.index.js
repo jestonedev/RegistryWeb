@@ -55,14 +55,29 @@ $(function () {
         $('select').prop('disabled', false);
         $('input').prop('disabled', false);
         $('textarea').prop('disabled', false);
+        $(this).closest("tr").css("color", "black");
     });
 
     $("#delete").on("click", function (e) {
         $('select').prop('disabled', true);
         $('input').prop('disabled', true);
         $('textarea').prop('disabled', true);
+
     });
 
+    //$('td[id$="fund"]').on("click", function (e) {        
+    //    $(this).closest("tr").css({ "background-color": "#007bff", "color": "white"});
+    //});
 
+    $('.table tr').click(function () {
+        $('.table tr').removeClass('active1');
+        $(this).addClass('active1');
+    });
+
+    $('.table tr').click(function () {
+        if (($this).hasClass("newsBlock"))
+        $('.table tr').removeClass('active1');
+        $(this).addClass('active1');
+    });
 
 });

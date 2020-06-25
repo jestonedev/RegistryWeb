@@ -6,7 +6,7 @@
     var i=0;
 }
 <div id="fundshistory">
-    <table class="table table-hover">
+    <table class="table">
         <thead>
             <tr>
                 <th>Номер протокола</th>
@@ -18,7 +18,7 @@
         <tbody>
             @foreach (var item in Model.FundsHistory)
             {
-                <tr class="hover"> @*id="@(i)fund"*@
+                <tr class="hover">
                     <input type="hidden" asp-for="@item.IdFund" />
                     @{i = i + 1;}
                     <td id="@(i)fund">@item.ProtocolNumber</td>

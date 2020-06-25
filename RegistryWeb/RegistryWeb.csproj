@@ -18,6 +18,7 @@
 
 
   <ItemGroup>
+    <Folder Include="temp\" />
     <Folder Include="wwwroot\files\" />
   </ItemGroup>
 
