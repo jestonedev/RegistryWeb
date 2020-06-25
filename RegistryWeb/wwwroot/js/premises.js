@@ -32,7 +32,8 @@
         var isRestrictionsValid = $("#restrictionsForm").valid();
         var isSubPremisesValid = $("#subpremisesForm").valid();
         var isResettlesValid = $("#resettlesForm").valid();
-        if (!isFormValid || !isOwnershipsValid || !isRestrictionsValid || !isSubPremisesValid || !isResettlesValid) {
+        var isLitigationsValid = $("#litigationsForm").valid();
+        if (!isFormValid || !isOwnershipsValid || !isRestrictionsValid || !isSubPremisesValid || !isResettlesValid || !isLitigationsValid) {
             $("select").each(function (idx, elem) {
                 var id = $(elem).prop("id");
                 var name = $(elem).prop("name");
@@ -138,6 +139,21 @@
                         $(this).append(resettleDocumentFile);
                     }
                 }
+            }
+
+            var litigations = CreateLitigationPremisesAssoc();
+            for (var m = 0; m < litigations.length; m++) {
+                var lpa = "Premise.LitigationPremisesAssoc[" + m + "].";
+                var ln = lpa + "LitigationNavigation.";
+                $(this).append(inputTemplate.replace('{0}', lpa + "IdLitigation").replace('{1}', litigations[m].IdLitigation));
+                $(this).append(inputTemplate.replace('{0}', lpa + "IdPremises").replace('{1}', litigations[m].IdPremises));
+                $(this).append(inputTemplate.replace('{0}', ln + "Date").replace('{1}', litigations[m].LitigationNavigation.Date));
+                $(this).append(inputTemplate.replace('{0}', ln + "Number").replace('{1}', litigations[m].LitigationNavigation.Number));
+                $(this).append(inputTemplate.replace('{0}', ln + "Description").replace('{1}', litigations[m].LitigationNavigation.Description));
+                $(this).append(inputTemplate.replace('{0}', ln + "IdLitigationType").replace('{1}', litigations[m].LitigationNavigation.IdLitigationType));
+                var litigationFile = $(litigations[m].LitigationNavigation.LitigationFile).clone();
+                litigationFile.attr("name", "LitigationFiles[" + m + "]");
+                $(this).append(litigationFile);
             }
 
         }

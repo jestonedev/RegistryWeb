@@ -18,7 +18,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             
-            builder.ToTable("total_area_avg_cost", "registry_test");
+            builder.ToTable("total_area_avg_cost", nameDatebase);
 
             builder.Property(e => e.Id)
                     .HasColumnName("id")

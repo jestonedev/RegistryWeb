@@ -435,6 +435,23 @@ namespace RegistryWeb.DataServices
                     }
                 }
             }
+            // Прикрепляем файлы судебных разбирательств
+            var litigationFilePath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Litigations\");
+            if (premise.LitigationPremisesAssoc != null)
+            {
+                for (var i = 0; i < premise.LitigationPremisesAssoc.Count; i++)
+                {
+                    var file = files.Where(r => r.Name == "LitigationFiles[" + i + "]").FirstOrDefault();
+                    if (file == null) continue;
+                    premise.LitigationPremisesAssoc[i].LitigationNavigation.FileDisplayName = file.FileName;
+                    var fileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(file.FileName).Extension;
+                    premise.LitigationPremisesAssoc[i].LitigationNavigation.FileOriginName = fileOriginName;
+                    premise.LitigationPremisesAssoc[i].LitigationNavigation.FileMimeType = file.ContentType;
+                    var fileStream = new FileStream(Path.Combine(litigationFilePath, fileOriginName), FileMode.CreateNew);
+                    file.OpenReadStream().CopyTo(fileStream);
+                    fileStream.Close();
+                }
+            }
             registryContext.Premises.Add(premise);
             registryContext.SaveChanges();            
         }

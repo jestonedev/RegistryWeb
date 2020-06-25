@@ -52,17 +52,17 @@ namespace RegistryWeb.Models
         public virtual DbSet<OwnershipRight> OwnershipRights { get; set; }
         public virtual DbSet<TotalAreaAvgCost> TotalAreaAvgCosts { get; set; }
         public virtual DbSet<ActTypeDocument> ActTypeDocuments { get; set; }
-
         public virtual DbSet<RestrictionBuildingAssoc> RestrictionBuildingsAssoc { get; set; }
         public virtual DbSet<RestrictionPremiseAssoc> RestrictionPremisesAssoc { get; set; }
         public virtual DbSet<RestrictionType> RestrictionTypes { get; set; }
         public virtual DbSet<Restriction> Restrictions { get; set; }
-
+        public virtual DbSet<Litigation> Litigations { get; set; }
+        public virtual DbSet<LitigationPremiseAssoc> LitigationPremisesAssoc { get; set; }
+        public virtual DbSet<LitigationType> LitigationTypes { get; set; }
         public virtual DbSet<PremisesComment> PremisesComments { get; set; }
         public virtual DbSet<PremisesDoorKeys> PremisesDoorKeys { get; set; }
         public virtual DbSet<PremisesKind> PremisesKinds { get; set; }
         public virtual DbSet<PremisesType> PremisesTypes { get; set; }
-        public virtual DbSet<PremisesJurisdictionActFiles> PremisesJurisdictionActFiles { get; set; }
         public virtual DbSet<StructureType> StructureTypes { get; set; }
         public virtual DbSet<StructureTypeOverlap> StructureTypeOverlaps { get; set; }
         public virtual DbSet<GovernmentDecree> GovernmentDecrees { get; set; }
@@ -173,7 +173,6 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new PremisesDoorKeysConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremisesTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremisesKindConfiguration(nameDatebase));
-            modelBuilder.ApplyConfiguration(new PremisesJurisdictionActFilesConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new StructureTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new StructureTypeOverlapConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new GovernmentDecreeConfiguration(nameDatebase));
@@ -188,6 +187,10 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new RestrictionBuildingAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new RestrictionPremiseAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new RestrictionTypeConfiguration(nameDatebase));
+
+            modelBuilder.ApplyConfiguration(new LitigationConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new LitigationTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new LitigationPremiseAssocConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new FundBuildingAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new FundPremiseAssocConfiguration(nameDatebase));

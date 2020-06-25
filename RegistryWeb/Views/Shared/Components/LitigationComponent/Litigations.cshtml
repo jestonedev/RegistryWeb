@@ -1,0 +1,22 @@
+﻿@model IEnumerable<RegistryWeb.ViewModel.LitigationVM>;
+<form id="litigationsForm">
+    <script src="~/js/litigations.common.js" asp-append-version="true"></script>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Судебные разбирательства</h3>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                    <a href="#" id="litigationAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditExtInfo ?? true) ? "" : "disabled")" title="Добавить разбирательство">&#10010;</a>
+                }
+                <a href="#" id="litigationsToggle" class="form-control btn btn-primary" title="Развернуть список судебных разбирательств" style="font-weight:bold;">∨</a>
+            </div>
+        </div>        
+        <ul class="list-group list-group-flush toggle-hide" id="litigationsList" data-addresstype="@ViewBag.AddressType" data-id="@ViewBag.Id" data-action="@ViewBag.Action">
+            @foreach (var item in Model)
+            {
+                <partial name="Litigation" model="item" />                
+            }
+        </ul>
+    </div>
+</form>

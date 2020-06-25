@@ -17,7 +17,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
         {
             builder.HasKey(e => e.Id);
 
-            builder.ToTable("act_type_document", "registry_test");
+            builder.ToTable("act_type_document", nameDatebase);
 
             builder.Property(e => e.Id)
                 .HasColumnName("id")
