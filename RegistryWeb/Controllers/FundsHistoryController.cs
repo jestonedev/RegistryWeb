@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
+using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
@@ -14,9 +15,11 @@ namespace RegistryWeb.Controllers
     {
         private readonly FundsHistoryDataService dataService;
         private readonly SecurityService securityService;
+        private readonly RegistryContext rc;
 
-        public FundsHistoryController(FundsHistoryDataService dataService, SecurityService securityService)
+        public FundsHistoryController(RegistryContext rc, FundsHistoryDataService dataService, SecurityService securityService)
         {
+            this.rc = rc;
             this.dataService = dataService;
             this.securityService = securityService;
         }
@@ -49,6 +52,12 @@ namespace RegistryWeb.Controllers
             var viewModel = dataService.GetListViewModel(idObject, typeObject);
             ViewBag.addressType = typeObject;
             ViewBag.idObject = idObject;
+
+            if(typeObject=="SubPremise")
+            {
+                ViewBag.Num = rc.SubPremises.FirstOrDefault(s=>s.IdSubPremises==idObject).SubPremisesNum;
+                ViewBag.Prem = rc.SubPremises.FirstOrDefault(s=>s.IdSubPremises==idObject).IdPremises;
+            }
 
             return View(/*"Index", */viewModel);//dataService.GetViewModel(viewModel));
         }

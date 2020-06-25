@@ -63,15 +63,13 @@ namespace RegistryWeb.ViewComponents
                 Id = idBuilding.ToString()
             };
             var r1 = owrs_b.Select(o => new PremisesJurisdictionActFileVM(o, address_b)).ToList();*/
-            var owrs_pr = registryContext.PremisesJurisdictionActFiles
+            /*var owrs_pr = registryContext.PremisesJurisdictionActFiles
                 .Include(opa => opa.IdActFileTypeDocumentNavigation)
                 .Where(opa => opa.IdPremises == idPremise)
-                //.Select(opa => opa.OwnershipRightNavigation)
-                //.Include(or => or.OwnershipRightTypeNavigation)
                 ;
-            var r2 = owrs_pr.Select(o => new PremisesJurisdictionActFileVM(o, AddressTypes.Premise)).ToList();
+            var r2 = owrs_pr.Select(o => new PremisesJurisdictionActFileVM(o, AddressTypes.Premise)).ToList();*/
             //var r = r1.Union(r2).OrderBy(or => or.Date);
-            return r2;
+            return null;
         }
     }
 }

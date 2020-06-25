@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace RegistryWeb.Models.Entities
 {
@@ -13,6 +14,7 @@ namespace RegistryWeb.Models.Entities
         }
 
         public int IdFund { get; set; }
+        [Required(ErrorMessage = "Выберете тип найма")]
         public int IdFundType { get; set; }
         public string ProtocolNumber { get; set; }
         public DateTime? ProtocolDate { get; set; }

@@ -2,13 +2,13 @@
 using RegistryWeb.Models;
 namespace RegistryWeb.ViewModel
 {
-    public class PremisesJurisdictionActFileVM : PremisesJurisdictionActFiles
+    public class PremisesJurisdictionActFileVM //: PremisesJurisdictionActFiles
     {
         public AddressTypes AddressType { get; set; }
 
         public PremisesJurisdictionActFileVM() { }
 
-        public PremisesJurisdictionActFileVM(PremisesJurisdictionActFiles pjaf, AddressTypes type)
+        /*public PremisesJurisdictionActFileVM(PremisesJurisdictionActFiles pjaf, AddressTypes type)
         {            
             IdJurisdiction = pjaf.IdJurisdiction;
             IdPremises = pjaf.IdPremises;
@@ -23,6 +23,6 @@ namespace RegistryWeb.ViewModel
             IdActFileTypeDocumentNavigation = pjaf.IdActFileTypeDocumentNavigation;
             PremiseNavigation = pjaf.PremiseNavigation;
             AddressType = type;
-        }
+        }*/
     }
 }

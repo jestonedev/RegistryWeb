@@ -24,6 +24,10 @@
         {
             ViewData["Title"] = "История фонда здания №" + Model.IdObject;/*ViewBag.idObject ??*/
         }
+        if (ViewBag.addressType == "SubPremise" || Model.TypeObject == "SubPremise")
+        {
+            ViewData["Title"] = "История фонда комнаты №" + (ViewBag.Num==null ? " _" : ViewBag.Num) + " помещения " + ViewBag.Prem;
+        }
     }
 
     //var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?

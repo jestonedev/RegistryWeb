@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class PremisesJurisdictionActFiles
+    /*public partial class PremisesJurisdictionActFiles
     {
         public int IdJurisdiction { get; set; }
         public int IdPremises { get; set; }
@@ -19,5 +19,5 @@ namespace RegistryWeb.Models.Entities
 
         public virtual Premise PremiseNavigation { get; set; }
         public virtual ActTypeDocument IdActFileTypeDocumentNavigation { get; set; }
-    }
+    }*/
 }

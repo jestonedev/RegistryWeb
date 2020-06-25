@@ -7,7 +7,7 @@ using RegistryWeb.Models.Entities;
 
 namespace RegistryWeb.Models.IEntityTypeConfiguration
 {
-    public class PremisesJurisdictionActFilesConfiguration: IEntityTypeConfiguration<PremisesJurisdictionActFiles>
+    /*public class PremisesJurisdictionActFilesConfiguration: IEntityTypeConfiguration<PremisesJurisdictionActFiles>
     {
         private string nameDatebase;
 
@@ -83,5 +83,5 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
         }
-    }
+    }*/
 }

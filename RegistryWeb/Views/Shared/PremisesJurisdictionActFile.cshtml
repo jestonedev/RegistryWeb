@@ -1,4 +1,4 @@
-﻿@model RegistryWeb.ViewModel.PremisesJurisdictionActFileVM;
+﻿@*@model RegistryWeb.ViewModel.PremisesJurisdictionActFileVM;
 @using RegistryWeb.Extensions;
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.Models.Entities;
@@ -44,7 +44,7 @@
             <label>Номер документа</label>
             <input type="text" maxlength="10" class="form-control" disabled value="@Model.Number" name="JurisdictionNum" title="@Model.Number">
         </div>
-        <div class="form-group @jurisdictionDateClass1">@*col-sm-6 col-md-3 col-lg-2*@
+        <div class="form-group @jurisdictionDateClass1">
             <label>Дата документа</label>
             <input type="date" class="form-control @jurisdictionDateClass2" disabled value="@(Model.Date.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : Model.Date.ToString("yyyy-MM-dd"))" name="JurisdictionDate" title="@(Model.Date.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : Model.Date.ToString("yyyy-MM-dd"))">
         </div>
@@ -121,4 +121,4 @@
             </div>
         }
     </div>
-</li>
+</li>*@

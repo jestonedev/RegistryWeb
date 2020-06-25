@@ -21,7 +21,7 @@
         }
         if (ViewBag.addressType == "SubPremise" || Model.TypeObject == "SubPremise")
         {
-            /*ViewData["Title"] = "Редактирование истории фонда комнаты №" + Model.IdObject + " помещения " +;ViewBag.idObject ??*/
+            ViewData["Title"] = "Редактирование истории фонда комнаты №" + (ViewBag.Num == null ? " _" : ViewBag.Num) + " помещения " + ViewBag.Prem;
         }
     }
     if (ViewBag.Action == "Delete")
@@ -36,13 +36,19 @@
         }
         if (ViewBag.addressType == "SubPremise" || Model.TypeObject == "SubPremise")
         {
-            /*ViewData["Title"] = "Удаление истории фонда комнаты №" + Model.IdObject+" помещения "+;ViewBag.idObject ??*/
+            ViewData["Title"] = "Удаление истории фонда комнаты №" + (ViewBag.Num == null ? " _" : ViewBag.Num) + " помещения " + ViewBag.Prem;
         }
     }
 }
 
+@section validation
+    {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+}
+
 @section Scripts
-{
+    {
     <script src="~/js/fundhistory.index.js" asp-append-version="true"></script>
 }
 
@@ -51,11 +57,11 @@
 
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <label class="form-check-label h2 col-8">@ViewData["Title"]</label>
+                <label class="form-check-label h2 col-10">@ViewData["Title"]</label>
                 <a id="fundhistoryAdd" class="form-control btn btn-success" title="Добавить фонд" asp-action="Create" asp-route-action="Create" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise">&#10010;</a>
                 <div class="btn-group" role="group" aria-label="Панель доступа">
 
-                    <a class="form-control btn btn-primary" asp-controller="@controller" asp-action="@action" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" asp-route-isBack="true">Назад</a>
+                    <a class="form-control btn btn-primary" onclick="history.go(-1);return false;" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" asp-route-isBack="true">Назад</a> @*asp-controller="@controller" asp-action="@action"*@
 
                     @if (ViewBag.Action == "Create")
                     {
@@ -85,7 +91,7 @@
 
                                 <div class="form-group col-md-12 col-xl-4 r-form-group-label">
                                     <label asp-for="@Model.FundHistory.IdFundTypeNavigation.IdFundType">Тип найма</label>
-                                    <select class="form-control" asp-for="@Model.FundHistory.IdFundType" title="Тип найма" asp-items="@Model.FundTypesList">
+                                    <select  data-live-search="true" class="form-control" asp-for="@Model.FundHistory.IdFundType" title="Тип найма" asp-items="@Model.FundTypesList">
                                         @if (Model.FundHistory.IdFundTypeNavigation != null)
                                         {
                                             <option>@Model.FundHistory.IdFundTypeNavigation.FundTypeName</option>
@@ -95,6 +101,7 @@
                                             <option></option>
                                         };
                                     </select>
+                                    <span asp-validation-for="@Model.FundHistory.IdFundType" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-group col-md-12 col-xl-4 r-form-group-label">
@@ -163,5 +170,5 @@
                 </div>
             </div>
         </div>
-</form>
+    </form>
 </div>

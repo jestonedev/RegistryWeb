@@ -28,7 +28,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             this.config = config;
         }
 
-        [HttpPost]
+        /*[HttpPost]
         public int DeleteJurisdiction(int? idJurisdiction)
         {
             if (idJurisdiction == null)
@@ -174,6 +174,6 @@ namespace RegistryWeb.Controllers.ServiceControllers
             ViewBag.ActTypeDocument = registryContext.ActTypeDocuments.Where(a => a.Id > 9 && a.Id < 13).ToList();  //усл изменить
 
             return PartialView("PremisesJurisdictionActFile", jurisdictionVM);
-        }
+        }*/
     }
 }
