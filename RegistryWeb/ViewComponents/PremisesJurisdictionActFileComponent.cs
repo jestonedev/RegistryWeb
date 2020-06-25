@@ -18,23 +18,22 @@ namespace RegistryWeb.ViewComponents
             this.registryContext = registryContext;
         }
 
-        public IViewComponentResult Invoke(Address address, string action)
+        public IViewComponentResult Invoke(int id, AddressTypes type, string action)
         {
+            ViewBag.Id = id;
             IEnumerable<PremisesJurisdictionActFileVM> model = null;
-            var id = 0;
-            int.TryParse(address.Id, out id);
             /*if (address.AddressType == AddressTypes.Building)
             {
                 model = GetBuildingOwnershipRights(id, address);
             }*/
-            if (address.AddressType == AddressTypes.Premise)
+            if (type == AddressTypes.Premise)
             {
-                model = GetPremisesJurisdictionActFiles(id, address);
+                model = GetPremisesJurisdictionActFiles(id);
             }
-            ViewBag.Address = address;
+            ViewBag.AddressType = type;
             ViewBag.Action = action;
             ViewBag.ActTypeDocument = registryContext.ActTypeDocuments.Where(a => a.Id > 9 && a.Id < 13);  //усл изменить
-            return View("PremisesJurisdictionActFile", model);
+            return View("PremisesJurisdictionActFiles", model);
         }
 
         /*private IEnumerable<PremisesJurisdictionActFileVM> GetBuildingOwnershipRights(int idBuilding, Address address_b)
@@ -48,7 +47,7 @@ namespace RegistryWeb.ViewComponents
             return owrs.Select(owr => new PremisesJurisdictionActFileVM(owr, address_b));
         }*/
 
-        private IEnumerable<PremisesJurisdictionActFileVM> GetPremisesJurisdictionActFiles(int idPremise, Address address_p)
+        private IEnumerable<PremisesJurisdictionActFileVM> GetPremisesJurisdictionActFiles(int idPremise)
         {
             /*var idBuilding = registryContext.Premises
                 .FirstOrDefault(p => p.IdPremises == idPremise)
@@ -70,7 +69,7 @@ namespace RegistryWeb.ViewComponents
                 //.Select(opa => opa.OwnershipRightNavigation)
                 //.Include(or => or.OwnershipRightTypeNavigation)
                 ;
-            var r2 = owrs_pr.Select(o => new PremisesJurisdictionActFileVM(o, address_p)).ToList();
+            var r2 = owrs_pr.Select(o => new PremisesJurisdictionActFileVM(o, AddressTypes.Premise)).ToList();
             //var r = r1.Union(r2).OrderBy(or => or.Date);
             return r2;
         }

@@ -1,188 +1,135 @@
-﻿/*let CreateOwnershipPremisesAssoc = function () {
-    let PremisesJurisdictions = getPremisesJurisdictions();
-    let ownershipPremisesAssoc = [];
-    PremisesJurisdictions.forEach(function (item, i, arr) {
-        ownershipPremisesAssoc.push({
+﻿/*let CreateJurisdictionPremisesAssoc = function () {
+    let jurisdictions = getJurisdictions();
+    let jurisdictionPremisesAssoc = [];
+    jurisdictions.each(function (idx, item) {
+        jurisdictionPremisesAssoc.push({
             IdPremises: 0,
-            IdPremisesJurisdiction: 0,
-            PremisesJurisdictionNavigation: item
+            IdJurisdiction: 0,
+            JurisdictionNavigation: item
         });
     });
-    return ownershipPremisesAssoc;
-}
-let CreateOwnershipBuildingsAssoc = function () {
-    let PremisesJurisdictions = getPremisesJurisdictions();
-    let ownershipBuildingsAssoc = [];
-    PremisesJurisdictions.forEach(function (item, i, arr) {
-        ownershipBuildingsAssoc.push({
+    return jurisdictionPremisesAssoc;
+};
+
+let CreateJurisdictionBuildingsAssoc = function () {
+    let jurisdictions = getJurisdictions();
+    let jurisdictionsBuildingsAssoc = [];
+    jurisdictions.each(function (idx, item) {
+        jurisdictionsBuildingsAssoc.push({
             IdBuilding: 0,
-            IdPremisesJurisdiction: 0,
-            PremisesJurisdictionNavigation: item
+            IdJurisdiction: 0,
+            JurisdictionNavigation: item
         });
     });
-    return ownershipBuildingsAssoc;
-}*/
-let getPremisesJurisdictions = function () {
-    let trs = $('#PremisesJurisdictions>tr');
-    let owrs = [];
-    trs.each(function () {
-        owrs.push(getPremisesJurisdiction($(this)));
+    return jurisdictionsBuildingsAssoc;
+};
+*/
+function getJurisdictions() {
+    return $("#jurisdictionsList .list-group-item").map(function (idx, elem) {
+        return getJurisdiction($(elem));
     });
-    return owrs;
 }
-let getPremisesJurisdiction = function (tr) {
-    let fields = tr.find('.field-premises-jurisdiction');
-    let PremisesJurisdiction = {
-        IdPremisesJurisdiction: tr.data('idPremisesJurisdiction') == "" ? "0" : tr.data('idPremisesJurisdiction'),
-        Number: fields[0].value,
-        Date: fields[1].value,
-        Description: fields[2].value,
-        IdPremisesJurisdictionType: fields[3].value,
-        ResettlePlanDate: fields[4].value,
-        DemolishPlanDate: fields[5].value
+
+function getJurisdiction(jurisdictionElem) {
+    return {
+        IdJurisdiction: jurisdictionElem.find("[name^='IdJurisdiction']").val(),
+        IdPremises: jurisdictionElem.find("[name^='IdPremises']").val(),
+        IdActFile: jurisdictionElem.find("[name^='IdActFile']").val(),
+        IdActFileTypeDocument: jurisdictionElem.find("[name^='IdJurisdictionType']").val(),
+        Number: jurisdictionElem.find("[name^='JurisdictionNum']").val(),
+        Date: jurisdictionElem.find("[name^='JurisdictionDate']").val(),
+        Name: jurisdictionElem.find("[name^='JurisdictionName']").val(),
+        JurisdictionFile: jurisdictionElem.find("[name^='JurisdictionFile']")[0],
+        JurisdictionFileRemove: jurisdictionElem.find("[name^='JurisdictionFileRemove']").val(),
+        
     };
-    return PremisesJurisdiction;
 }
+
+function jurisdictionToFormData(jurisdiction, address) {
+    var formData = new FormData();
+    formData.append("Jurisdiction.IdJurisdiction", jurisdiction.IdJurisdiction);
+    formData.append("Jurisdiction.Number", jurisdiction.Number);
+    formData.append("Jurisdiction.Date", jurisdiction.Date);
+    formData.append("Jurisdiction.Name", jurisdiction.Name);
+    formData.append("JurisdictionFile", jurisdiction.JurisdictionFile.files[0]);
+    formData.append("JurisdictionFileRemove", jurisdiction.JurisdictionFileRemove);
+    formData.append("Address.AddressType", address.addressType);
+    formData.append("Address.Id", address.id);
+    formData.append("Jurisdiction.IdPremises", jurisdiction.IdPremises);
+    formData.append("Jurisdiction.IdActFile", jurisdiction.IdActFile);
+    formData.append("Jurisdiction.IdActFileTypeDocument", jurisdiction.IdActFileTypeDocument);
+    return formData;
+}
+
 let getCurrentAddressJurisdictions = function () {
     let address = {
-        addressType: $('#PremisesJurisdictions').data('addresstype'),
-        id: $('#PremisesJurisdictions').data('id')
+        addressType: $('#jurisdictionsList').data('addresstype'),
+        id: $('#jurisdictionsList').data('id')
     };
     return address;
-}
+};
+
 let getErrorSpanJurisdictions = function (dataValmsgFor) {
     return "<span class=\"text-danger field-validation-valid\" data-valmsg-for=\"" + dataValmsgFor +
         "\" data-valmsg-replace=\"true\"></span>";
-}
-let initializeVilidationJurisdictionTr = function (tr) {
-    let fields = tr.find('.field-premises-jurisdiction');
-    let idPremisesJurisdiction = tr.data('idownershipright');
-    //Дата
-    let Date = 'Date_' + idPremisesJurisdiction;
-    $(fields[1]).addClass('valid');
-    $(fields[1]).attr('data-val', 'true');
-    $(fields[1]).attr('data-val-required', 'Поле "Дата" является обязательным');
-    $(fields[1]).attr('id', Date);
-    $(fields[1]).attr('name', Date);
-    $(fields[1]).attr('aria-describedby', Date + '-error');
-    $(fields[1]).after(getErrorSpanJurisdictions(Date));
-    //Тип ограничения
-    let PremisesJurisdictionType = 'IdPremisesJurisdictionType_' + idPremisesJurisdiction;
-    $(fields[3]).addClass('valid');
-    $(fields[3]).attr('data-val', 'true');
-    $(fields[3]).attr('data-val-required', 'Поле "Тип" является обязательным');
-    $(fields[3]).attr('id', PremisesJurisdictionType);
-    $(fields[3]).attr('name', PremisesJurisdictionType);
-    $(fields[3]).attr('aria-describedby', PremisesJurisdictionType + '-error');
-    $(fields[3]).after(getErrorSpanJurisdictions(PremisesJurisdictionType));
+};
 
-    refreshValidationPremisesJurisdictionsForm();
-}
-let refreshValidationPremisesJurisdictionsForm = function () {
-    var form = $("#PremisesJurisdiction")
+let initializeVilidationJurisdiction = function (jurisdictionElem) {
+
+    let idJurisdiction = jurisdictionElem.find("input[name^='IdJurisdiction']").val();
+    if (idJurisdiction === "0") idJurisdiction = uuidv4();
+    //Дата документа
+    let date = 'JurisdictionDate_' + idJurisdiction;
+    jurisdictionElem.find("[name^='JurisdictionDate']").addClass('valid')
+        .attr('data-val', 'true')
+        .attr('data-val-required', 'Поле "Дата документа" является обязательным')
+        .attr('id', date)
+        .attr('name', date)
+        .attr('aria-describedby', date + '-error')
+        .after(getErrorSpanJurisdictions(date));
+    // Тип документа
+    let idJurisdictionTypeName = 'IdJurisdictionType_' + idJurisdiction;
+    var jurisdictionTypeElem = jurisdictionElem.find("[name^='IdJurisdictionType']");
+    jurisdictionTypeElem.addClass('valid')
+        .attr('data-val', 'true')
+        .attr('data-val-required', 'Поле "Тип документа" является обязательным')
+        .attr('id', idJurisdictionTypeName)
+        .attr('name', idJurisdictionTypeName)
+        .attr('aria-describedby', idJurisdictionTypeName + '-error').parent()
+        .after(getErrorSpanJurisdictions(idJurisdictionTypeName));
+    jurisdictionTypeElem.next().attr("data-id", idJurisdictionTypeName);
+
+    refreshValidationJurisdictionsForm();
+};
+
+let refreshValidationJurisdictionsForm = function () {
+    var form = $("#jurisdictionsForm")
         .removeData("validator")
         .removeData("unobtrusiveValidation");
     $.validator.unobtrusive.parse(form);
     form.validate();
-}
-let initializeVilidationJurisdictionTrs = function () {
-    let trs = $('#PremisesJurisdictions>tr');
-    trs.each(function () {
-        initializeVilidationJurisdictionTr($(this));
+};
+
+let initializeVilidationJurisdictions = function () {
+    let jurisdictions = $('#jurisdictionsList .list-group-item');
+    jurisdictions.each(function () {
+        initializeVilidationJurisdiction($(this));
     });
-}
-let refreshPremisesJurisdiction = function (tr, PremisesJurisdiction) {
-    let fields = tr.find('.field-premises-jurisdiction');
-    //Номер
-    $(fields[0]).prop('value', PremisesJurisdiction.number);
-    $(fields[0]).prop('title', PremisesJurisdiction.number);
-    //Дата
-    $(fields[1]).prop('value', PremisesJurisdiction.date);
-    $(fields[1]).prop('title', PremisesJurisdiction.date);
-    $(fields[1])
-        .removeClass('input-validation-error')
-        .addClass('valid');
-    $(fields[1]).next()
-        .removeClass('field-validation-error')
-        .addClass('field-validation-valid')
-        .text('');
-    //Наименование
-    $(fields[2]).prop('value', PremisesJurisdiction.description);
-    $(fields[2]).prop('title', PremisesJurisdiction.description);
-    //Тип ограничения
-    $(fields[3]).prop('value', PremisesJurisdiction.idPremisesJurisdictionType);
-    $(fields[3]).prop('title', PremisesJurisdiction.idPremisesJurisdictionType);
-    $(fields[3])
-        .removeClass('input-validation-error')
-        .addClass('valid');
-    $(fields[3]).next()
-        .removeClass('field-validation-error')
-        .addClass('field-validation-valid')
-        .text('');
-    //Планируемая дата переселения
-    $(fields[4]).prop('value', PremisesJurisdiction.resettlePlanDate);
-    $(fields[4]).prop('title', PremisesJurisdiction.resettlePlanDate);
-    //Планируемая дата сноса
-    $(fields[5]).prop('value', PremisesJurisdiction.demolishPlanDate);
-    $(fields[5]).prop('title', PremisesJurisdiction.demolishPlanDate);
-}
-let showEditDelPanelJurisdiction = function (tr) {
-    let fields = tr.find('.field-premises-jurisdiction');
-    let editDelPanel = tr.find('.edit-del-panel');
-    let yesNoPanel = tr.find('.yes-no-panel');
-    fields.prop('disabled', true);
-    fields.each(function (idx, field) {
-        if (field.tagName === "INPUT" || field.tagName === "TEXTAREA") {
-            $(field).prop("title", $(field).val());
-        } else
-            if (field.tagName === "SELECT") {
-                $(field).prop("title", $(field).find("option[value='" + $(field).val() + "']").text());
-            } else {
-                $(field).prop("title", "");
-            }
-    });
-    yesNoPanel.hide();
-    editDelPanel.show();
-}
-let showYesNoPanelJurisdiction = function (tr) {
-    let fields = tr.find('.field-premises-jurisdiction');
-    let yesNoPanel = tr.find('.yes-no-panel');
-    let editDelPanel = tr.find('.edit-del-panel');
-    fields.prop('disabled', false);
-    editDelPanel.hide();
-    yesNoPanel.show();
-}
-let PremisesJurisdictionAddClick = function (event) {
-    let addressType = $('#PremisesJurisdictions').data('addresstype');
-    let action = $('#PremisesJurisdictions').data('action');
-    $.ajax({
-        async: false,
-        type: 'POST',
-        url: window.location.origin + '/PremisesJurisdictions/AddPremisesJurisdiction',
-        data: { addressType, action },
-        success: function (tr) {
-            let trs = $('#PremisesJurisdictions');
-            let PremisesJurisdictionsToggle = $('#PremisesJurisdictionsToggle');
-            if (!isExpandElemntArrow(PremisesJurisdictionsToggle)) // развернуть при добавлении, если было свернуто 
-                PremisesJurisdictionsToggle.click();
-            trs.append(tr);
-            initializeVilidationJurisdictionTr(trs.find('tr').last());
-            event.preventDefault();
-        }
-    });
-}
-let PremisesJurisdictionDeleteClick = function (tr) {
-    let isOk = confirm("Вы уверены что хотите удалить ограничение?");
+};
+
+function deleteJurisdiction(e) {
+    let isOk = confirm("Вы уверены что хотите удалить документ судебного разбирательства?");
     if (isOk) {
-        let idPremisesJurisdiction = tr.data('idPremisesJurisdiction');
+        let jurisdictionElem = $(this).closest(".list-group-item");
+        let idJurisdiction = jurisdictionElem.find("input[name^='IdJurisdiction']").val();
         $.ajax({
             async: false,
             type: 'POST',
-            url: window.location.origin + '/PremisesJurisdictions/DeletePremisesJurisdiction',
-            data: { idPremisesJurisdiction: idPremisesJurisdiction },
+            url: window.location.origin + '/PremisesJurisdictionActFiles/DeleteJurisdiction',
+            data: { idJurisdiction: idJurisdiction },
             success: function (ind) {
-                if (ind == 1) {
-                    tr.remove();
+                if (ind === 1) {
+                    jurisdictionElem.remove();
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -190,70 +137,192 @@ let PremisesJurisdictionDeleteClick = function (tr) {
             }
         });
     }
+    e.preventDefault();
 }
-let PremisesJurisdictionNoClick = function (tr) {
-    let idPremisesJurisdiction = tr.data('idownershipright');
-    //Отменить изменения внесенные в ограничение
-    if (Number.isInteger(idPremisesJurisdiction)) {
+
+function addJurisdiction(e) {
+    let action = $('#jurisdictionsList').data('action');
+    let addressType = $('#jurisdictionsList').data('addresstype');
+
+    $.ajax({
+        type: 'POST',
+        url: window.location.origin + '/PremisesJurisdictionActFiles/AddJurisdiction',
+        data: { addressType, action },
+        success: function (elem) {
+            let list = $('#jurisdictionsList');
+            let jurisdictionsToggle = $('#jurisdictionsToggle');
+            if (!isExpandElemntArrow(jurisdictionsToggle)) // развернуть при добавлении, если было свернуто 
+                jurisdictionsToggle.click();
+            list.append(elem);
+            elem = list.find(".list-group-item").last();
+            elem.find("select").selectpicker("refresh");
+            elem.find(".jurisdiction-edit-btn").click();
+            $([document.documentElement, document.body]).animate({
+                scrollTop: $(elem).offset().top
+            }, 1000);
+            initializeVilidationJurisdiction(elem);
+        }
+    });
+    e.preventDefault();
+}
+
+function editJurisdiction(e) {
+    let jurisdiction = $(this).closest(".list-group-item");
+    let fields = jurisdiction.find('input, select, textarea');
+    let yesNoPanel = jurisdiction.find('.yes-no-panel');
+    let editDelPanel = jurisdiction.find('.edit-del-panel');
+    fields.filter(function (idx, val) { return !$(val).prop("name").startsWith("JurisdictionAttachment"); }).prop('disabled', false);
+    jurisdiction.find("select").selectpicker('refresh');
+    editDelPanel.hide();
+    yesNoPanel.show();
+    showJurisdictionEditFileBtns(jurisdiction,
+        jurisdiction.find(".rr-jurisdiction-file-download").length > 0 &&
+        !jurisdiction.find(".rr-jurisdiction-file-download").hasClass("disabled"));
+    e.preventDefault();
+}
+
+function cancelEditJurisdiction(e) {
+    let jurisdictionElem = $(this).closest(".list-group-item");
+    let idJurisdiction = jurisdictionElem.find("input[name^='IdJurisdiction']").val();
+    //Отменить изменения внесенные в документ
+    if (idJurisdiction !== "0") {
         $.ajax({
-            async: false,
             type: 'POST',
-            url: window.location.origin + '/PremisesJurisdictions/GetPremisesJurisdiction',
-            data: { idPremisesJurisdiction: idPremisesJurisdiction },
-            success: function (PremisesJurisdiction) {
-                refreshPremisesJurisdiction(tr, PremisesJurisdiction);
-                showEditDelPanelJurisdiction(tr);
+            url: window.location.origin + '/PremisesJurisdictionActFiles/GetJurisdiction',
+            data: { idJurisdiction: idJurisdiction },
+            success: function (jurisdiction) {
+                refreshJurisdiction(jurisdictionElem, jurisdiction);
+                showEditDelPanelJurisdiction(jurisdictionElem);
+                clearValidationsJurisdictions(jurisdictionElem);
+                showJurisdictionDownloadFileBtn(jurisdictionElem, jurisdiction.fileOriginName !== null);
             }
         });
     }
-    //Отменить вставку нового ограничения
+    //Отменить вставку нового документа
     else {
-        tr.remove();
+        jurisdictionElem.remove();
     }
+    e.preventDefault();
 }
-let PremisesJurisdictionYesClick = function (tr) {
-    //Запуск ручной валидации, тк отсутсвует submit
-    if ($('#PremisesJurisdiction').valid()) {
-        let owr = getPremisesJurisdiction(tr);
-        let address = getCurrentAddressJurisdictions();
-        $.ajax({
-            async: false,
-            type: 'POST',
-            url: window.location.origin + '/PremisesJurisdictions/YesPremisesJurisdiction',
-            data: { owr, address },
-            success: function (idPremisesJurisdiction) {
-                if (idPremisesJurisdiction > 0) {
-                    tr.data('idownershipright', idPremisesJurisdiction);
-                }
-                showEditDelPanelJurisdiction(tr);
-            }
-        });
-    }
-}
-let PremisesJurisdictionsClick = function (event) {
-    let el = $(event.target);
-    let tr = el.parents('tr');
-    if (el.hasClass('oi-x')) {
-        if (el.hasClass('delete')) {
-            PremisesJurisdictionDeleteClick(tr);
-        }
-        else {
-            PremisesJurisdictionNoClick(tr);
-        }
-    }
-    if (el.hasClass('oi-check')) {
-        PremisesJurisdictionYesClick(tr);
-    }
-    if (el.hasClass('oi-pencil')) {
-        showYesNoPanelJurisdiction(tr);
+
+function showJurisdictionEditFileBtns(jurisdictionElem, fileExists) {
+    let jurisdictionFileBtns = jurisdictionElem.find(".rr-jurisdiction-file-buttons");
+    jurisdictionElem.find(".rr-jurisdiction-file-download").hide();
+    if (fileExists) {
+        jurisdictionFileBtns.append(jurisdictionElem.find(".rr-jurisdiction-file-remove").show());
+        jurisdictionElem.find(".rr-jurisdiction-file-attach").hide();
+    } else {
+        jurisdictionElem.find(".rr-jurisdiction-file-remove").hide();
+        jurisdictionFileBtns.append(jurisdictionElem.find(".rr-jurisdiction-file-attach").show());
     }
 }
 
+function showJurisdictionDownloadFileBtn(jurisdictionElem, fileExists) {
+    let jurisdictionFileBtns = jurisdictionElem.find(".rr-jurisdiction-file-buttons");
+    jurisdictionFileBtns.append(jurisdictionElem.find(".rr-jurisdiction-file-download").show());
+    if (fileExists) {
+        jurisdictionElem.find(".rr-jurisdiction-file-download").removeClass("disabled");
+    } else {
+        jurisdictionElem.find(".rr-jurisdiction-file-download").addClass("disabled");
+    }
+    jurisdictionElem.find(".rr-jurisdiction-file-remove").hide();
+    jurisdictionElem.find(".rr-jurisdiction-file-attach").hide();
+}
+
+function clearValidationsJurisdictions(jurisdictionElem) {
+    $(jurisdictionElem).find(".input-validation-error").removeClass("input-validation-error").addClass("valid");
+    $(jurisdictionElem).find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid").text("");
+}
+
+function showEditDelPanelJurisdiction(jurisdictionElem) {
+    let fields = jurisdictionElem.find('input, select, textarea');
+    fields.prop('disabled', true).selectpicker('refresh');
+    let editDelPanel = jurisdictionElem.find('.edit-del-panel');
+    let yesNoPanel = jurisdictionElem.find('.yes-no-panel');
+    yesNoPanel.hide();
+    editDelPanel.show();
+}
+
+function refreshJurisdiction(jurisdictionElem, jurisdiction) {
+    jurisdictionElem.find("[name^='JurisdictionNum']").val(jurisdiction.number);
+    jurisdictionElem.find("[name^='JurisdictionDate']").val(jurisdiction.date);
+    jurisdictionElem.find("[name^='JurisdictionName']").val(jurisdiction.name);
+    jurisdictionElem.find("[name^='IdJurisdictionType']").val(jurisdiction.idJurisdictionType).selectpicker('refresh');
+    jurisdictionElem.find("[name^='JurisdictionFile']").val("");
+    jurisdictionElem.find("[name^='JurisdictionFileRemove']").val(false);
+}
+
+function saveJurisdiction(e) {
+    let jurisdictionElem = $(this).closest(".list-group-item");
+    jurisdictionElem.find("button[data-id]").removeClass("input-validation-error");
+    if (jurisdictionElem.find("input, textarea, select").valid()) {
+        let jurisdiction = jurisdictionToFormData(getJurisdiction(jurisdictionElem), getCurrentAddressJurisdictions());
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/PremisesJurisdictionActFiles/SaveJurisdiction',
+            data: jurisdiction,
+            processData: false,
+            contentType: false,
+            success: function (jurisdiction) {
+                if (jurisdiction.idJurisdiction > 0) {
+                    jurisdictionElem.find("input[name^='IdJurisdiction']").val(jurisdiction.idJurisdiction);
+                    jurisdictionElem.find(".rr-jurisdiction-file-download")
+                        .prop("href", "/PremisesJurisdictionActFiles/DownloadFile/?idJurisdiction=" + jurisdiction.idJurisdiction);
+                    showJurisdictionDownloadFileBtn(jurisdictionElem, jurisdiction.fileOriginName !== null);
+                }
+                showEditDelPanelJurisdiction(jurisdictionElem);
+            }
+        });
+    } else {
+        jurisdictionElem.find("select").each(function (idx, elem) {
+            var id = $(elem).prop("id");
+            var name = $(elem).prop("name");
+            var errorSpan = $("span[data-valmsg-for='" + name + "']");
+            if (errorSpan.hasClass("field-validation-error")) {
+                $("button[data-id='" + id + "']").addClass("input-validation-error");
+            }
+        });
+    }
+    e.preventDefault();
+}
+
+function attachJurisdictionFile(e) {
+    var jurisdictionElem = $(this).closest(".list-group-item");
+    jurisdictionElem.find("input[name^='JurisdictionFile']").click();
+    jurisdictionElem.find("input[name^='JurisdictionFileRemove']").val(false);
+    e.preventDefault();
+}
+
+function changeJurisdictionFileAttachment() {
+    var jurisdictionElem = $(this).closest(".list-group-item");
+    if ($(this).val() !== "") {
+        let jurisdictionFileBtns = jurisdictionElem.find(".rr-jurisdiction-file-buttons");
+        jurisdictionElem.find(".rr-jurisdiction-file-attach").hide();
+        jurisdictionFileBtns.append(jurisdictionElem.find(".rr-jurisdiction-file-remove").show());
+    }
+}
+
+function removeJurisdictionFile(e) {
+    var jurisdictionElem = $(this).closest(".list-group-item");
+    jurisdictionElem.find("input[name^='JurisdictionFile']").val("");
+    jurisdictionElem.find("input[name^='JurisdictionFileRemove']").val(true);
+    let jurisdictionFileBtns = jurisdictionElem.find(".rr-jurisdiction-file-buttons");
+    jurisdictionElem.find(".rr-jurisdiction-file-remove").hide();
+    jurisdictionFileBtns.append(jurisdictionElem.find(".rr-jurisdiction-file-attach").show());
+    e.preventDefault();
+}
+
 $(function () {
-    $('#PremisesJurisdictionsTable').hide();
+    $('#jurisdictionsList').hide();
     $('.yes-no-panel').hide();
-    initializeVilidationJurisdictionTrs();
-    $('#PremisesJurisdictionsToggle').on('click', $('#PremisesJurisdictionsTable'), elementToogle);
-    $('#PremisesJurisdictionAdd').click(PremisesJurisdictionAddClick);
-    $('#PremisesJurisdictions').click(PremisesJurisdictionsClick);
+    initializeVilidationJurisdictions();
+    $('#jurisdictionAdd').click(addJurisdiction);
+    $('#jurisdictionsToggle').on('click', $('#jurisdictionsList'), elementToogle);
+    $('#jurisdictionsList').on('click', '.jurisdiction-edit-btn', editJurisdiction);
+    $('#jurisdictionsList').on('click', '.jurisdiction-cancel-btn', cancelEditJurisdiction);
+    $('#jurisdictionsList').on('click', '.jurisdiction-save-btn', saveJurisdiction);
+    $('#jurisdictionsList').on('click', '.jurisdiction-delete-btn', deleteJurisdiction);
+    $('#jurisdictionsList').on('click', '.rr-jurisdiction-file-attach', attachJurisdictionFile);
+    $('#jurisdictionsList').on('click', '.rr-jurisdiction-file-remove', removeJurisdictionFile);
+    $('#jurisdictionsList').on('change', "input[name^='JurisdictionFile']", changeJurisdictionFileAttachment);
 });

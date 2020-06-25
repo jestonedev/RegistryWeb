@@ -61,6 +61,38 @@ input.input-validation-error, button.input-validation-error {
     .p-table-low-width-hide-cell {
         display: table-cell;
     }
+
+    .jurdate {
+        width: 160px;
+    }
+
+    .juri {
+        width: 195px;
+        margin: 0 2px;
+    }
+
+    .jurpanel {
+        width: 85px;
+        margin-left: 3px;
+        margin-top: 32px;
+    }
+}
+
+@media(min-width: 1228px)
+{
+    .jurdate {
+        width: 180px;
+    }
+
+    .juri {
+        width: 260px;
+    }
+
+    .jurpanel {
+        width: 85px;
+        margin-left: 3px;
+        margin-top: 32px;
+    }
 }
 
 .rr-premises-label {
@@ -70,3 +102,4 @@ input.input-validation-error, button.input-validation-error {
     max-width: 100%;
     margin-bottom: 0.24rem;
 }
+

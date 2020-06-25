@@ -296,6 +296,6 @@
 @await Component.InvokeAsync("SubPremisesComponent", new { idPremise = Model.Premise.IdPremises, action = ViewBag.Action, paymentsInfo = Model.PaymentsInfo ?? new List<PaymentsInfo>() })
 @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.Premise.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
 @await Component.InvokeAsync("OwnershipRightsComponent", new { address = new Address() { Id = Model.Premise.IdPremises.ToString(), AddressType = AddressTypes.Premise }, action = ViewBag.Action })
-@await Component.InvokeAsync("PremisesJurisdictionActFileComponent", new { address = new Address() { Id = Model.Premise.IdPremises.ToString(), AddressType = AddressTypes.Premise }, action = ViewBag.Action })
+@await Component.InvokeAsync("PremisesJurisdictionActFileComponent", new { id = Model.Premise.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
 
 

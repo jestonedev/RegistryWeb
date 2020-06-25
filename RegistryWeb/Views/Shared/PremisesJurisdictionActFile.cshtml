@@ -1,0 +1,124 @@
+﻿@model RegistryWeb.ViewModel.PremisesJurisdictionActFileVM;
+@using RegistryWeb.Extensions;
+@using RegistryWeb.ViewOptions;
+@using RegistryWeb.Models.Entities;
+@using RegistryWeb.SecurityServices;
+@using RegistryWeb.DataHelpers;
+
+@{
+    var attachment = Model.AddressType == AddressTypes.Premise ? "Помещение" : "Здание";
+    var jurisdictionTypeClass = "col-md-2 col-lg-2";
+    var jurisdictionDateClass1 = "";
+    var jurisdictionDateClass2 = "jurdate";
+    if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+    {
+        if (ViewBag.AddressType == AddressTypes.Building)
+        {
+            jurisdictionTypeClass = "col-md-12 col-lg-10";
+        }
+        else
+        {
+            jurisdictionTypeClass = "juri";
+        }
+    }
+    if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    {
+        if (ViewBag.AddressType == AddressTypes.Premise)
+        {
+            jurisdictionTypeClass = "col-md-3 col-lg-3";
+            jurisdictionDateClass1 = "col-sm-6 col-md-3 col-lg-3";
+            jurisdictionDateClass2 = "";
+        } else
+        {
+            jurisdictionTypeClass = "col-md-3 col-lg-3";
+        }
+    }
+}
+
+<li class="list-group-item">
+    <input type="hidden" value="@Model.IdJurisdiction" name="IdJurisdiction" />
+    <input type="hidden" value="@Model.IdPremises" name="IdPremises" />
+    <input type="hidden" value="@Model.IdActFile" name="IdActFile" />
+    <div class="form-row">
+        <div class="form-group col-sm-6 col-md-2 col-lg-2">
+            <label>Номер документа</label>
+            <input type="text" maxlength="10" class="form-control" disabled value="@Model.Number" name="JurisdictionNum" title="@Model.Number">
+        </div>
+        <div class="form-group @jurisdictionDateClass1">@*col-sm-6 col-md-3 col-lg-2*@
+            <label>Дата документа</label>
+            <input type="date" class="form-control @jurisdictionDateClass2" disabled value="@(Model.Date.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : Model.Date.ToString("yyyy-MM-dd"))" name="JurisdictionDate" title="@(Model.Date.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : Model.Date.ToString("yyyy-MM-dd"))">
+        </div>
+        <div class="form-group col-md-4 col-lg-4">
+            <label>Наименование и образ документа</label>
+            <div class="input-group">
+                <input type="text" maxlength="255" class="form-control" disabled value="@Model.Name" name="JurisdictionName" title="@Model.Name">
+                <input type="file" name="JurisdictionFile" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
+                <input type="hidden" name="JurisdictionFileRemove" value="false" />
+                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+                {
+                    <div class="input-group-append">
+                        <a class="btn btn-success rr-jurisdiction-file-download @(Model.FileOriginName == null ? "disabled" : "")"
+                           href="/PremisesJurisdictionActFiles/DownloadFile/?idJurisdiction=@Model.IdJurisdiction" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
+                    </div>
+                }
+                @if (ViewBag.Action == "Edit")
+                {
+                    <div class="input-group-append rr-jurisdiction-file-buttons">
+                        <a class="btn btn-danger rr-jurisdiction-file-remove" style="display: none"
+                           href="#" title="Удалить образ документа" aria-label="Удалить образ документа"><span class="oi oi-trash"></span></a>
+                        <a class="btn btn-success rr-jurisdiction-file-attach" style="display: none"
+                           href="#" title="Прикрепить образ документа" aria-label="Прикрепить образ документа"><span class="oi oi-paperclip"></span></a>
+                        <a class="btn btn-success rr-jurisdiction-file-download @(Model.FileOriginName == null ? "disabled" : "")"
+                           href="/PremisesJurisdictionActFiles/DownloadFile/?idJurisdiction=@Model.IdJurisdiction" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
+                    </div>
+                }
+                @if (ViewBag.Action == "Create")
+                {
+                    <div class="input-group-append rr-jurisdiction-file-buttons">
+                        <a class="btn btn-danger rr-jurisdiction-file-remove" style="display: none"
+                           href="#" title="Удалить образ документа" aria-label="Удалить образ документа"><span class="oi oi-x"></span></a>
+                        <a class="btn btn-success rr-jurisdiction-file-attach" style="display: none"
+                           href="#" title="Прикрепить образ документа" aria-label="Прикрепить образ документа"><span class="oi oi-paperclip"></span></a>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="form-group @jurisdictionTypeClass">
+            <label>Тип документа</label>
+            @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
+            {
+                <input type="text" class="form-control" disabled value="@Model.IdActFileTypeDocumentNavigation.Name" name="JurisdictionName" title="@Model.IdActFileTypeDocumentNavigation.Name">
+            }
+            else
+            {
+                <select disabled class="form-control field-premises-jurisdiction" title="@(!string.IsNullOrEmpty(Model.IdActFileTypeDocumentNavigation?.Name) ? Model.IdActFileTypeDocumentNavigation.Name : "")"
+                        asp-items="@{new SelectList(ViewBag.ActTypeDocument, "Id", "Name", Model.IdActFileTypeDocument)}" name="IdJurisdictionType">
+                    <option value="@(!string.IsNullOrEmpty(Model.IdActFileTypeDocumentNavigation?.Name) ? Model.IdActFileTypeDocumentNavigation.Name : "")"></option>
+                </select>
+            }
+
+        </div>
+        @if (ViewBag.Action == "Edit")
+        {
+            <div class="text-lg-right text-center jurpanel rr-jurisdiction-edit-buttons">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger jurisdiction-cancel-btn @(ViewBag.AddressType == Model.AddressType ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                    <a class="btn btn-success jurisdiction-save-btn @(ViewBag.AddressType == Model.AddressType ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                </div>
+                <div class="btn-group edit-del-panel" role="group" aria-label="Панель редактирования">
+                    <a class="btn btn-primary jurisdiction-edit-btn @(ViewBag.AddressType == Model.AddressType ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                    <a class="btn btn-danger jurisdiction-delete-btn @(ViewBag.AddressType == Model.AddressType ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                </div>
+            </div>
+        }
+        @if (ViewBag.Action == "Create")
+        {
+            <a class="jurisdiction-edit-btn" style="display: none"></a>
+            <div class="text-lg-right text-center rr-jurisdiction-edit-buttons">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger jurisdiction-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
+                </div>
+            </div>
+        }
+    </div>
+</li>

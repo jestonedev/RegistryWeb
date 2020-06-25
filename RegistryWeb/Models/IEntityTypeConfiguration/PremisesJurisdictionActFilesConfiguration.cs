@@ -56,6 +56,21 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnType("tinyint(4)")
                 .HasDefaultValueSql("0");
 
+            builder.Property(e => e.FileOriginName)
+                .HasColumnName("file_origin_name")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.FileDisplayName)
+                .HasColumnName("file_display_name")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.FileMimeType)
+                .HasColumnName("file_mime_type")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
             builder.HasOne(d => d.IdActFileTypeDocumentNavigation)
                 .WithMany(p => p.PremisesJurisdictionActFiles)
                 .HasForeignKey(d => d.IdActFileTypeDocument)

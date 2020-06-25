@@ -19,6 +19,10 @@
         {
             ViewData["Title"] = "Редактирование истории фонда здания №" + Model.IdObject;/*ViewBag.idObject ??*/
         }
+        if (ViewBag.addressType == "SubPremise" || Model.TypeObject == "SubPremise")
+        {
+            /*ViewData["Title"] = "Редактирование истории фонда комнаты №" + Model.IdObject + " помещения " +;ViewBag.idObject ??*/
+        }
     }
     if (ViewBag.Action == "Delete")
     {
@@ -29,6 +33,10 @@
         if (ViewBag.addressType == "Building" || Model.TypeObject == "Building")
         {
             ViewData["Title"] = "Удаление истории фонда здания №" + Model.IdObject;/*ViewBag.idObject ??*/
+        }
+        if (ViewBag.addressType == "SubPremise" || Model.TypeObject == "SubPremise")
+        {
+            /*ViewData["Title"] = "Удаление истории фонда комнаты №" + Model.IdObject+" помещения "+;ViewBag.idObject ??*/
         }
     }
 }
@@ -44,7 +52,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <label class="form-check-label h2 col-8">@ViewData["Title"]</label>
-                <a id="fundhistoryAdd" class="form-control btn btn-success col-1" title="Добавить фонд" asp-action="Create" asp-route-action="Create" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise">&#10010;</a>
+                <a id="fundhistoryAdd" class="form-control btn btn-success" title="Добавить фонд" asp-action="Create" asp-route-action="Create" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise">&#10010;</a>
                 <div class="btn-group" role="group" aria-label="Панель доступа">
 
                     <a class="form-control btn btn-primary" asp-controller="@controller" asp-action="@action" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" asp-route-isBack="true">Назад</a>

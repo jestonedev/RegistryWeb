@@ -1,0 +1,22 @@
+﻿@model IEnumerable<RegistryWeb.ViewModel.PremisesJurisdictionActFileVM>;
+<form id="jurisdictionsForm">
+    <script src="~/js/premisesJurisdictionActFile.common.js" asp-append-version="true"></script>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Судебные разбирательства</h3>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                    <a href="#" id="jurisdictionAdd" class="form-control btn btn-success" title="Добавить ограничение">&#10010;</a>
+                }
+                <a href="#" id="jurisdictionsToggle" class="form-control btn btn-primary" title="Развернуть список судебных разбирательств" style="font-weight:bold;">∨</a>
+            </div>
+        </div>        
+        <ul class="list-group list-group-flush" id="jurisdictionsList" style="display: none" data-addresstype="@ViewBag.AddressType" data-id="@ViewBag.Id" data-action="@ViewBag.Action">
+            @foreach (var item in Model)
+            {
+                <partial name="PremisesJurisdictionActFile" model="item" />                
+            }
+        </ul>
+    </div>
+</form>
