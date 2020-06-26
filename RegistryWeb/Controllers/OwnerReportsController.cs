@@ -18,11 +18,11 @@ namespace RegistryWeb.Controllers
     [Authorize]
     public class OwnerReportsController : RegistryBaseController
     {
-        private readonly ReportService reportService;
+        private readonly OwnerReportService reportService;
         private readonly OwnerReportsDataService dataService;
         private readonly SecurityService securityService;
 
-        public OwnerReportsController(ReportService reportService, OwnerReportsDataService dataService, SecurityService securityService)
+        public OwnerReportsController(OwnerReportService reportService, OwnerReportsDataService dataService, SecurityService securityService)
         {
             this.reportService = reportService;
             this.dataService = dataService;

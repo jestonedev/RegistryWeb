@@ -33,7 +33,7 @@ namespace RegistryWeb.DataServices
         public override PremisesVM<Premise> InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, PremisesListFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
-            viewModel.KladrStreetsList = new SelectList(KladrStreets, "IdStreet", "StreetName");            
+            viewModel.KladrStreetsList = new SelectList(KladrStreets, "IdStreet", "StreetName");
             viewModel.PremisesTypesList = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesType");
             viewModel.HeatingTypesList = new SelectList(HeatingTypes, "IdHeatingType", "IdHeatingType1");
             viewModel.StructureTypesList = new SelectList(StructureTypes, "IdStructureType", "StructureTypeName");
@@ -44,6 +44,10 @@ namespace RegistryWeb.DataServices
             viewModel.RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName");
             viewModel.LocationKeysList = new SelectList(registryContext.PremisesDoorKeys, "IdPremisesDoorKeys", "LocationOfKeys");
             viewModel.CommentList = new SelectList(registryContext.PremisesComments, "IdPremisesComment", "PremisesCommentText");
+            viewModel.SignersList = new SelectList(registryContext.SelectableSigners.Where(s => s.IdSignerGroup == 1).ToList().Select(s => new {
+                s.IdRecord,
+                Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
+            }), "IdRecord", "Snp");
             return viewModel;
         }
 
@@ -502,15 +506,19 @@ namespace RegistryWeb.DataServices
                              on fhRow.IdFund equals fpa.IdFund
                              where fpa.IdPremises == premise.IdPremises && fhRow.ExcludeRestrictionDate == null
                              orderby fpa.IdFund descending
-                             select fhRow.IdFundType).FirstOrDefault()
-            };
+                             select fhRow.IdFundType).FirstOrDefault(),
+                SignersList = new SelectList(registryContext.SelectableSigners.Where(s => s.IdSignerGroup == 1).ToList().Select(s => new {
+                    s.IdRecord,
+                    Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
+                }), "IdRecord", "Snp")
+        };
 
-            if ((action == "Details" || action == "Delete") && securityService.HasPrivilege(Privileges.TenancyRead))
-            {
-                premisesVM.PaymentsInfo = GetPaymentInfo(new List<Premise> { premisesVM.Premise });
-            }
+        if ((action == "Details" || action == "Delete") && securityService.HasPrivilege(Privileges.TenancyRead))
+        {
+            premisesVM.PaymentsInfo = GetPaymentInfo(new List<Premise> { premisesVM.Premise });
+        }
 
-            return premisesVM;
+        return premisesVM;
         }
 
         private List<PaymentsInfo> GetPaymentInfo(List<Premise> premises)

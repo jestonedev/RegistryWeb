@@ -66,6 +66,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<StructureType> StructureTypes { get; set; }
         public virtual DbSet<StructureTypeOverlap> StructureTypeOverlaps { get; set; }
         public virtual DbSet<GovernmentDecree> GovernmentDecrees { get; set; }
+        public virtual DbSet<SelectableSigner> SelectableSigners { get; set; }
 
         //Собственники
         public virtual DbSet<Owner> Owners { get; set; }
@@ -127,7 +128,6 @@ namespace RegistryWeb.Models
         public virtual DbSet<TenancyActiveProcess> TenancyActiveProcesses { get; set; }
         public virtual DbSet<TenancyPayment> TenancyPayments { get; set; }
         public virtual DbSet<TenancyPaymentAfter28082019> TenancyPaymentsAfter28082019 { get; set; }
-
         public virtual DbSet<OwnerActiveProcess> OwnerActiveProcesses { get; set; }
         public virtual DbSet<BuildingOwnershipRightCurrent> BuildingsOwnershipRightCurrent { get; set; }
 
@@ -157,7 +157,8 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new AclUserPrivilegeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new AclUserRoleConfiguration(nameDatebase));
 
-            modelBuilder.ApplyConfiguration(new PersonalSettingConfiguration(nameDatebase)); 
+            modelBuilder.ApplyConfiguration(new PersonalSettingConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new SelectableSignersConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new ActTypeDocumentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new DocumentTypeConfiguration(nameDatebase));

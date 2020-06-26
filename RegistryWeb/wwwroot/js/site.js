@@ -81,3 +81,27 @@ function uuidv4() {
         return v.toString(16);
     });
 }
+
+function fixBootstrapSelectHighlight(form) {
+    form.find("select").each(function (idx, elem) {
+        var id = $(elem).prop("id");
+        var name = $(elem).prop("name");
+        var errorSpan = form.find("span[data-valmsg-for='" + name + "']");
+        if (errorSpan.hasClass("field-validation-error")) {
+            form.find("button[data-id='" + id + "']").addClass("input-validation-error");
+        } else {
+            form.find("button[data-id='" + id + "']").removeClass("input-validation-error");
+        }
+    });
+}
+
+function fixBootstrapSelectHighlightOnChange(select) {
+    var isValid = select.valid();
+    var id = select.prop("id");
+    if (!isValid) {
+        select.closest("form").find("button[data-id='" + id + "']").addClass("input-validation-error");
+    } else {
+
+        select.closest("form").find("button[data-id='" + id + "']").removeClass("input-validation-error");
+    }
+}

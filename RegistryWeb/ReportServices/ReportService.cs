@@ -1,17 +1,11 @@
-﻿using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
-using RegistryWeb.ViewModel;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using RegistryWeb.ViewOptions;
-using RegistryWeb.ViewOptions.Filter;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Text;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace RegistryWeb.ReportServices
 {
@@ -27,30 +21,33 @@ namespace RegistryWeb.ReportServices
             connString = httpContextAccessor.HttpContext.User.FindFirst("connString").Value;
             activityManagerPath = config.GetValue<string>("ActivityManagerPath");            
         }
-        
-        private string GenerateMultiReport(List<int> ids, string name)
+
+        protected string GenerateReport(Dictionary<string, object> arguments, string config)
         {
             var logStr = new StringBuilder();
             try
             {
-                var p = new Process();
-                var configXml = activityManagerPath + "templates\\registry_web\\owners\\" + name + ".xml";
-                var fileNameReport = name + Guid.NewGuid().ToString() + ".docx";
+                var configXml = activityManagerPath + "templates\\" + config + ".xml";
+                var configParts = config.Split('\\');
+                var fileNameReport = configParts[configParts.Length - 1] + Guid.NewGuid().ToString() + ".docx";
                 var destFileName = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", fileNameReport);
 
-                var fileName = Path.GetTempFileName();
-                using (var sw = new StreamWriter(fileName))
-                    sw.Write(ids.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y));
+                arguments.Add("config", configXml);
+                arguments.Add("destFileName", destFileName);
+                arguments.Add("force-move-to", destFileName);
+                arguments.Add("connectionString", "Driver={" + sqlDriver + "};" + connString);
 
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.FileName = activityManagerPath + "ActivityManager.exe";
-                p.StartInfo.Arguments = " config=\"" + configXml + "\" destFileName=\"" + destFileName +
-                    "\" idsTmpFile=\"" + fileName + "\" connectionString=\"Driver={" + sqlDriver + "};" + connString + "\"";
-                logStr.Append("<dl>\n<dt>Arguments\n<dd>" + p.StartInfo.Arguments + "\n");
-                p.StartInfo.CreateNoWindow = true;
-                p.Start();
-                p.WaitForExit();
-                File.Delete(fileName);
+                using (var p = new Process())
+                {
+                    p.StartInfo.UseShellExecute = false;
+                    p.StartInfo.FileName = activityManagerPath + "ActivityManager.exe";
+                    p.StartInfo.Arguments = GetArguments(arguments);
+                    logStr.Append("<dl>\n<dt>Arguments\n<dd>" + p.StartInfo.Arguments + "\n");
+                    p.StartInfo.CreateNoWindow = true;
+                    p.Start();
+                    p.WaitForExit();
+                }
+
                 return fileNameReport;
             }
             catch (Exception ex)
@@ -58,6 +55,16 @@ namespace RegistryWeb.ReportServices
                 logStr.Append("<dl>\n<dt>Error\n<dd>" + ex.Message + "\n</dl>");
                 throw new Exception(logStr.ToString());
             }
+        }
+
+        private static string GetArguments(Dictionary<string, object> arguments)
+        {
+            var argumentsString = "";
+            foreach (var argument in arguments)
+                argumentsString += string.Format(CultureInfo.InvariantCulture, "{0}=\"{1}\" ",
+                    argument.Key.Replace("\"", "\\\""),
+                    argument.Value == null ? "" : argument.Value.ToString().Replace("\"", "\\\""));
+            return argumentsString;
         }
 
         public byte[] DownloadFile(string fileName)
@@ -73,62 +80,6 @@ namespace RegistryWeb.ReportServices
             {
                 throw new Exception(ex.Message);
             }
-        }
-
-        private byte[] Report(int id, string name)
-        {
-            var logStr = new StringBuilder();
-            try
-            {
-                var p = new Process();
-                var configXml = activityManagerPath + "templates\\registry_web\\owners\\" + name + ".xml";
-                var destFileName = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", name + Guid.NewGuid().ToString() + ".docx");
-
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.FileName = activityManagerPath + "ActivityManager.exe";
-                p.StartInfo.Arguments = " config=\"" + configXml + "\" destFileName=\"" + destFileName +
-                    "\" id=\"" + id + "\" connectionString=\"Driver={" + sqlDriver + "};" + connString + "\"";
-                logStr.Append("<dl>\n<dt>Arguments\n<dd>" + p.StartInfo.Arguments + "\n");
-                p.StartInfo.CreateNoWindow = true;
-                p.Start();
-                p.WaitForExit();
-                var file = File.ReadAllBytes(destFileName);
-                File.Delete(destFileName);
-                return file;
-            }
-            catch (Exception ex)
-            {
-                logStr.Append("<dl>\n<dt>Error\n<dd>" + ex.Message + "\n</dl>");
-                throw new Exception(logStr.ToString());
-            }
-        }
-
-        public byte[] Forma1(List<int> ids)
-        {
-            var fileNameReport = GenerateMultiReport(ids, "forma1");
-            return DownloadFile(fileNameReport);
-        }
-        
-        public string Forma2Ajax(List<int> ids)
-        {
-            return GenerateMultiReport(ids, "forma2");
-        }
-
-        public byte[] Forma2(List<int> ids)
-        {
-            var fileNameReport = GenerateMultiReport(ids, "forma2");
-            return DownloadFile(fileNameReport);
-        }
-
-        public string Forma3Ajax(List<int> ids)
-        {
-            return GenerateMultiReport(ids, "forma3");
-        }
-
-        public byte[] Forma3(List<int> ids)
-        {
-            var fileNameReport = GenerateMultiReport(ids, "forma3");
-            return DownloadFile(fileNameReport);
         }
     }
 }

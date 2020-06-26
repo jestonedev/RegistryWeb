@@ -19,9 +19,9 @@ namespace RegistryWeb.Controllers
     [Authorize]
     public class BuildingsController : ListController<BuildingsDataService>
     {
-        ReportService reportService;
+        OwnerReportService reportService;
 
-        public BuildingsController(BuildingsDataService dataService, SecurityService securityService, ReportService reportService)
+        public BuildingsController(BuildingsDataService dataService, SecurityService securityService, OwnerReportService reportService)
             : base(dataService, securityService)
         {
             this.reportService = reportService;

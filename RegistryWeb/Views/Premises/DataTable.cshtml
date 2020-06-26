@@ -128,7 +128,7 @@
             <td class="p-table-low-width-hide-cell">@(ObjectStateHelper.IsMunicipal(item.IdState) ? @GetTypeFund(item) : "")</td>
             <td>
                 <div class="btn-group" role="group" aria-label="Панель доступа">
-                    @{ 
+                    @{
                         var canEditBaseInfo = (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(item.IdState) &&
                         (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) || !item.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) ||
                         (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(item.IdState));
@@ -179,6 +179,17 @@
                             }
                         </div>
                     </div>
+
+                    <div class="btn-group" role="group" aria-label="Отчеты">
+                        <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="отчеты" id="reportsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdPremises">
+                            <a class="dropdown-item rr-report-premise-excerpt" href="#" title="Выписка на помещение" aria-label="Выписка на помещение" data-id-premise="@item.IdPremises">Выписка на помещение</a>
+                            <a class="dropdown-item rr-report-mun-sub-premises-excerpt" href="#" title="Выписка на мун. комнаты" aria-label="Выписка на мун. комнаты" data-id-premise="@item.IdPremises">Выписка на мун. комнаты</a>
+                            <a class="dropdown-item rr-report-premise-notice-to-bks" href="#" title="Извещение в БКС" aria-label="Извещение в БКС" data-id-premise="@item.IdPremises">Извещение в БКС</a>
+                            <a class="dropdown-item rr-report-premise-area" href="#" title="Справка о площади помещения" aria-label="Справка о площади помещения" data-id-premise="@item.IdPremises">Справка о площади помещения</a>
+                        </div>
+                    </div>
+
                 </div>
             </td>
         </tr>
