@@ -4,7 +4,7 @@ using RegistryWeb.Models.Entities;
 
 namespace RegistryWeb.Models.IEntityTypeConfiguration
 {
-    public class ActTypeDocumentConfiguration: IEntityTypeConfiguration<ActTypeDocument>
+    public class ActTypeDocumentConfiguration : IEntityTypeConfiguration<ActTypeDocument>
     {
         private string nameDatebase;
 
@@ -15,27 +15,23 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
         public void Configure(EntityTypeBuilder<ActTypeDocument> builder)
         {
-            builder.HasKey(e => e.Id);
-
             builder.ToTable("act_type_document", nameDatebase);
+
+            builder.HasKey(e => e.Id);
 
             builder.Property(e => e.Id)
                 .HasColumnName("id")
                 .HasColumnType("int(11)");
 
             builder.Property(e => e.ActFileType)
-                .IsRequired()
-                .HasColumnName("act_file_type")
                 .HasMaxLength(50)
+                .HasColumnName("act_file_type")
                 .IsUnicode(false);
 
             builder.Property(e => e.Name)
-                .IsRequired()
-                .HasColumnName("name")
                 .HasMaxLength(50)
+                .HasColumnName("name")
                 .IsUnicode(false);
-
-
         }
     }
 }

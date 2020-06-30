@@ -61,8 +61,11 @@ namespace RegistryWeb
             services.AddTransient<SecurityService>();
             services.AddTransient<FundsHistoryDataService>();
             services.AddTransient<ReportService>();
+            services.AddTransient<OwnerReportService>();
+            services.AddTransient<PremiseReportService>();
             services.AddTransient<ReformaGKHService>();
             services.AddTransient<OwnerReportsDataService>();
+            services.AddTransient<PremiseReportsDataService>();
             services.AddTransient<ReestrEmergencyPremisesDataService>();
             services.AddHttpContextAccessor();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

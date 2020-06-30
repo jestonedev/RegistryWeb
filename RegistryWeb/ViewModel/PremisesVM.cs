@@ -41,6 +41,7 @@ namespace RegistryWeb.ViewModel
         public SelectList RestrictionsList { get; set; }
         public SelectList HousesList { get; set; }
         public SelectList PremisesTypesList { get; set; }
+        public SelectList SignersList { get; set; }
         public List<PaymentsInfo> PaymentsInfo { get; set; }
     }
 }

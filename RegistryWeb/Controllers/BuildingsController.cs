@@ -19,9 +19,9 @@ namespace RegistryWeb.Controllers
     [Authorize]
     public class BuildingsController : ListController<BuildingsDataService>
     {
-        ReportService reportService;
+        OwnerReportService reportService;
 
-        public BuildingsController(BuildingsDataService dataService, SecurityService securityService, ReportService reportService)
+        public BuildingsController(BuildingsDataService dataService, SecurityService securityService, OwnerReportService reportService)
             : base(dataService, securityService)
         {
             this.reportService = reportService;
@@ -132,7 +132,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Create()
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
                 return View("NotAccess");
             return GetBuildingView(dataService.CreateBuilding());
         }
@@ -142,7 +142,7 @@ namespace RegistryWeb.Controllers
         {
             if (building == null)
                 return Json(-1);
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
                 return Json(-2);
             if (ModelState.IsValid)
             {

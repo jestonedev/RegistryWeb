@@ -1,0 +1,102 @@
+﻿@using RegistryWeb.ViewModel
+@using RegistryWeb.Models.Entities
+@model PremisesVM<Premise>;
+
+<a id="target" style="display: none"></a>
+
+<form id="excerptForm">
+<div class="modal fade" id="excerptModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Выписка</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="Excerpt.IdObject" />
+                <input type="hidden" name="Excerpt.ExcerptType" />
+                <div class="form-row">
+                    <div class="form-group col-sm-6">
+                        <label for="Excerpt.ExcerptNumber">Номер выписки</label>
+                        <input type="text" class="form-control" name="Excerpt.ExcerptNumber" title="Номер выписки">
+                    </div>
+                    <div class="form-group col-sm-6">
+                        <label for="Excerpt.ExcerptDate">Выписка от</label>
+                        <input type="date" class="form-control" name="Excerpt.ExcerptDate" title="Выписка от" data-val="true" data-val-required="Заполните дату">
+                        <span class="text-danger field-validation-valid" data-valmsg-for="Excerpt.ExcerptDate" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-12">
+                        <label for="Excerpt.Signer">Подписывающий</label>
+                        <select class="selectpicker form-control" title="Состояние помещения" name="Excerpt.Signer"
+                            data-val="true" data-val-required="Подписывающий обязателен для заполнения" id="Excerpt.Signer" asp-items="@Model.SignersList"></select>
+                        <span class="text-danger field-validation-valid" data-valmsg-for="Excerpt.Signer" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+
+
+<form id="noticeToBksForm">
+    <div class="modal fade" id="noticeToBksModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Извещение в БКС</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="NoticeToBks.IdObject" />
+                    <input type="hidden" name="NoticeToBks.NoticeType" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="NoticeToBks.ActionText">Действие</label>
+                            <select class="selectpicker form-control" title="Действие" name="NoticeToBks.ActionText"
+                                    data-val="true" data-val-required="Поле обязательно для заполнения" id="NoticeToBks.ActionText">
+                                <option value="заключен договор">заключен договор</option>
+                                <option value="оформлено соглашение к договору">оформлено соглашение к договору</option>
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="NoticeToBks.ActionText" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="NoticeToBks.PaymentType">Размер платы</label>
+                            <select class="selectpicker form-control" title="Размер платы" name="NoticeToBks.PaymentType"
+                                    data-val="true" data-val-required="Поле обязательно для заполнения" id="NoticeToBks.PaymentType">
+                                <option value="0">По дате регистрации договора</option>
+                                <option value="1">До 28.08.2019</option>
+                                <option value="2">После 28.08.2019</option>
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="NoticeToBks.PaymentType" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="NoticeToBks.Signer">Подписывающий</label>
+                            <select class="selectpicker form-control" title="Состояние помещения" name="NoticeToBks.Signer"
+                                    data-val="true" data-val-required="Подписывающий обязателен для заполнения" id="NoticeToBks.Signer" asp-items="@Model.SignersList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="NoticeToBks.Signer" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

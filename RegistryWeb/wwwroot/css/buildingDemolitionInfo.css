@@ -1,0 +1,14 @@
+﻿#buildingDemolitionInfoForm .act-file {
+    width: 200px;
+}
+#buildingDemolitionInfoForm .badge {
+    cursor: pointer;
+}
+#buildingDemolitionInfoForm .act-file-link {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 85%;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: central;
+}
