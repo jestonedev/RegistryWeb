@@ -26,28 +26,9 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Index(int idObject, string typeObject, string action = "", bool isBack = false)
         {
-            /*if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
-                return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
-
-            if (!isBack)
-            {
-                viewModel.OrderOptions = HttpContext.Session.Get<OrderOptions>("OrderOptions");
-                viewModel.PageOptions = HttpContext.Session.Get<PageOptions>("PageOptions");
-                viewModel.FilterOptions = HttpContext.Session.Get<PremisesListFilter>("FilterOptions");
-            }
-            else
-            {
-                HttpContext.Session.Remove("OrderOptions");
-                HttpContext.Session.Remove("PageOptions");
-                HttpContext.Session.Remove("FilterOptions");
-            }
-
-            return View(dataService.GetViewModel(
-                viewModel.OrderOptions,
-                viewModel.PageOptions,
-                viewModel.FilterOptions));*/
+                        
             ViewBag.Action = action;
             var viewModel = dataService.GetListViewModel(idObject, typeObject);
             ViewBag.addressType = typeObject;
@@ -59,7 +40,7 @@ namespace RegistryWeb.Controllers
                 ViewBag.Prem = rc.SubPremises.FirstOrDefault(s=>s.IdSubPremises==idObject).IdPremises;
             }
 
-            return View(/*"Index", */viewModel);//dataService.GetViewModel(viewModel));
+            return View(viewModel);
         }
 
         public JsonResult Details(int idFund, string action)

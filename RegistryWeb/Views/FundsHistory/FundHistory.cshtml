@@ -4,20 +4,39 @@
 @{
     var controller = Context.Session.Get<string>("Controller");
     var action = Context.Session.Get<string>("Action");
+    var fundheadClass = "col-10";
 
     if (ViewBag.Action == "Create")
     {
         ViewData["Title"] = "Создание нового фонда";
+        fundheadClass = "col-9";
+    }
+
+    if (ViewBag.Action == "Details" || ViewBag.Action == "Index")
+    {
+        if (ViewBag.addressType == "Premise" || Model.TypeObject == "Premise")
+        {
+            ViewData["Title"] = "История фонда помещения №" + Model.IdObject;
+        }
+        if (ViewBag.addressType == "Building" || Model.TypeObject == "Building")
+        {
+            ViewData["Title"] = "История фонда здания №" + Model.IdObject;
+        }
+        if (ViewBag.addressType == "SubPremise" || Model.TypeObject == "SubPremise")
+        {
+            ViewData["Title"] = "История фонда комнаты №" + (ViewBag.Num == null ? " _" : ViewBag.Num) + " помещения " + ViewBag.Prem;
+        }
     }
     if (ViewBag.Action == "Edit")
     {
         if (ViewBag.addressType == "Premise" || Model.TypeObject == "Premise")
         {
-            ViewData["Title"] = "Редактирование истории фонда помещения №" + Model.IdObject; /*ViewBag.idObject ??*/
+            ViewData["Title"] = "Редактирование истории фонда помещения №" + Model.IdObject;
+            fundheadClass = "col-8";
         }
         if (ViewBag.addressType == "Building" || Model.TypeObject == "Building")
         {
-            ViewData["Title"] = "Редактирование истории фонда здания №" + Model.IdObject;/*ViewBag.idObject ??*/
+            ViewData["Title"] = "Редактирование истории фонда здания №" + Model.IdObject;
         }
         if (ViewBag.addressType == "SubPremise" || Model.TypeObject == "SubPremise")
         {
@@ -28,11 +47,12 @@
     {
         if (ViewBag.addressType == "Premise" || Model.TypeObject == "Premise")
         {
-            ViewData["Title"] = "Удаление истории фонда помещения №" + Model.IdObject; /*ViewBag.idObject ??*/
+            ViewData["Title"] = "Удаление истории фонда помещения №" + Model.IdObject;
+            fundheadClass = "col-9";
         }
         if (ViewBag.addressType == "Building" || Model.TypeObject == "Building")
         {
-            ViewData["Title"] = "Удаление истории фонда здания №" + Model.IdObject;/*ViewBag.idObject ??*/
+            ViewData["Title"] = "Удаление истории фонда здания №" + Model.IdObject;
         }
         if (ViewBag.addressType == "SubPremise" || Model.TypeObject == "SubPremise")
         {
@@ -56,42 +76,45 @@
     <form asp-controller="FundHistory" asp-action="@ViewBag.Action" id="r-fundshistory-form" data-action="@ViewBag.Action" method="post">
 
         <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <label class="form-check-label h2 col-10">@ViewData["Title"]</label>
-                <a id="fundhistoryAdd" class="form-control btn btn-success" title="Добавить фонд" asp-action="Create" asp-route-action="Create" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise">&#10010;</a>
-                <div class="btn-group" role="group" aria-label="Панель доступа">
+            <div class="card-header d-flex justify-content-between col-12">
+                <label class="form-check-label h2 @fundheadClass">@ViewData["Title"]</label>
+                @*<div class="col-4">*@
+                    <a id="fundhistoryAdd" style="width: 38px;" class="form-control btn btn-success" title="Добавить фонд" asp-action="Create" asp-route-action="Create" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise">&#10010;</a>
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
 
-                    <a class="form-control btn btn-primary" onclick="history.go(-1);return false;" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" asp-route-isBack="true">Назад</a> @*asp-controller="@controller" asp-action="@action"*@
+                        <a class="form-control btn btn-primary" onclick="history.go(-1);return false;" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" asp-route-isBack="true">Назад</a> @*asp-controller="@controller" asp-action="@action"*@
 
-                    @if (ViewBag.Action == "Create")
-                    {
-                        <input type="submit" value="Создать" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" /> @*asp-route-action="Index"*@
-                    }
-                    @if (ViewBag.Action == "Edit")
-                    {
-                        <input type="submit" value="Сохранить" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" />
-                    }
-                    @if (ViewBag.Action == "Delete")
-                    {
-                        <input id="del" type="submit" value="Удалить" class="form-control btn btn-danger" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" />
-                    }
+                        @if (ViewBag.Action == "Create")
+                        {
+                            <input type="submit" id="createBtn" value="Создать" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" /> @*asp-route-action="Index"*@
+                        }
+                        @if (ViewBag.Action == "Edit")
+                        {
+                            <input type="submit" value="Сохранить" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" />
+                        }
+                        @if (ViewBag.Action == "Delete")
+                        {
+                            <input id="del" type="submit" value="Удалить" class="form-control btn btn-danger" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" />
+                        }
 
-                    <a href="#" id="fundbodyToggle" class="form-control btn btn-primary" title="Развернуть помещение" style="font-weight:bold;">∧</a>
-                </div>
+                        <a href="#" id="fundbodyToggle" class="form-control btn btn-primary" title="Развернуть помещение" style="font-weight:bold;">∧</a>
+                    </div>
+                @*</div>*@
             </div>
             <input type="hidden" asp-for="@Model.FundHistory.IdFund" />
             <input type="hidden" asp-for="@Model.FundHistory.Deleted" />
-            <input type="hidden" asp-for="@Model.IdObject" /> @*value="@ViewBag.idObject"*@
-            <input type="hidden" asp-for="@Model.TypeObject" /> @*value="@ViewBag.addressType"*@
+            <input type="hidden" asp-for="@Model.IdObject" />
+            <input type="hidden" asp-for="@Model.TypeObject" />
             <div class="card-body" id="fundbody">
                 <div class="card-group">
                     <div class="card">
                         <div class="card-body">
+                            <div class="validation" asp-validation-summary="ModelOnly"></div>
                             <div class="form-row">
 
                                 <div class="form-group col-md-12 col-xl-4 r-form-group-label">
                                     <label asp-for="@Model.FundHistory.IdFundTypeNavigation.IdFundType">Тип найма</label>
-                                    <select  data-live-search="true" class="form-control" asp-for="@Model.FundHistory.IdFundType" title="Тип найма" asp-items="@Model.FundTypesList">
+                                    <select id="IdFundType" data-live-search="true" class="form-control" asp-for="@Model.FundHistory.IdFundType" title="Тип найма" asp-items="@Model.FundTypesList">
                                         @if (Model.FundHistory.IdFundTypeNavigation != null)
                                         {
                                             <option>@Model.FundHistory.IdFundTypeNavigation.FundTypeName</option>

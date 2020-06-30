@@ -11,21 +11,24 @@
     cursor: pointer;
 }
 
-#fundhistoryAdd{
-    width: 38px;
-}
 
+
+input.input-validation-error, button.input-validation-error, select .input-validation-error {
+    border: 1px solid #dc3545;
+}
 
 
 .hover1 {
     background-color: #E9ECEF;
     color: black;
-}
+} /*тень для невыделенных строк*/
+
 
 .hover2 {
     background-color: #0063CD;
     color: white;
-}
+} /*тень для выделенных строк*/
+
 
 
 
@@ -36,13 +39,16 @@
     color: white;
 }
 
-.table tr .active1 :after{
+/*.active1 :hover {
+    background-color: #0068D8;
+    color: white;
+}*/
+
+.table tr .active1{/* :after{*/
     background-color: #007bff;
     color: white;
 }
 
-.table tr .active1 :hover {
-    background-color: #0068D8;
-    color: white;
-}
+
+
 

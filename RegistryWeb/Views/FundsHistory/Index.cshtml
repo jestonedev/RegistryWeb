@@ -9,31 +9,8 @@
     ViewData["Title"] = "История фонда";
     var controller = Context.Session.Get<string>("Controller");
     var action = Context.Session.Get<string>("Action");
-
-    if (ViewBag.Action == "Create")
-    {
-        ViewData["Title"] = "Создание нового помещения";
-    }
-    else
-    {
-        if (ViewBag.addressType == "Premise" || Model.TypeObject == "Premise")
-        {
-            ViewData["Title"] = "История фонда помещения №" + Model.IdObject; /*ViewBag.idObject ??*/
-        }
-        if (ViewBag.addressType == "Building" || Model.TypeObject == "Building")
-        {
-            ViewData["Title"] = "История фонда здания №" + Model.IdObject;/*ViewBag.idObject ??*/
-        }
-        if (ViewBag.addressType == "SubPremise" || Model.TypeObject == "SubPremise")
-        {
-            ViewData["Title"] = "История фонда комнаты №" + (ViewBag.Num==null ? " _" : ViewBag.Num) + " помещения " + ViewBag.Prem;
-        }
-    }
-
-    //var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
-    //    "(" + Model.PageOptions.TotalRows + ")" :
-    //    "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
 }
+
 @section styles
 {
     <link rel="stylesheet" href="~/css/fundshistory.css" runat="server" />
@@ -53,10 +30,11 @@
             $("td[id$='fund']").on('click', function ()
             {
                 var tr = $(this).closest('tr');
+
+
+
                 var idFund = tr.find('input[name$="IdFund"]').val();
                 var action = $('#r-buildings-form').data("action");
-
-                @*$.get('@Url.Action("GetFund")?' + "idFund=" + idFund);*@
 
                 $.getJSON('@Url.Action("Details")?' + "idFund=" + idFund + "&action=Details", function (data) 
                 {
@@ -83,16 +61,9 @@
                         $("input[name$='ExcludeRestrictionNumber']").val(elem.excludeRestrictionNumber);
                         $("input[name$='ExcludeRestrictionDate']").val(date);
                         $("input[name$='ExcludeRestrictionDescription']").val(elem.excludeRestrictionDescription);
-                        //options += "<option value=" + elem.house + ">" + elem.house + "</option>";
                     });
 
-                    $("select[name$='House']").each(function (idx, elem) 
-                    {
-                        var idPerson = $(this).val();
-                        $(this).html(options);
-                        $(this).val(idPerson);
-                        $(this).change();
-                    });
+                    
                 });
             });
         });

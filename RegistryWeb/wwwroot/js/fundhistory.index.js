@@ -4,8 +4,16 @@ var fundbodyToggle = function (e) {
     $('#fundbody').toggle();
     e.preventDefault();
 }
-$(function () {
 
+function refreshFormValidation(form) {
+    var form = form.removeData("validator").removeData("unobtrusiveValidation");
+    $.validator.unobtrusive.parse(form);
+    form.validate();
+}
+
+
+$(function ()
+{
     var action = $('#r-fundshistory-form').data("action");
 
     if (action == "Index")
@@ -21,11 +29,6 @@ $(function () {
         $('textarea').prop('readonly', true);
         $('#del').prop('readonly', false);
         $('select').attr('readonly', 'readonly');
-        /*$('select').prop('disabled', true);
-        $('input').prop('disabled', true);
-        $('textarea').prop('disabled', true);
-        $('input[type="hidden"]').prop('disabled', false);
-        $('input[type="submit"]').prop('disabled', false);*/
     }
     
 
@@ -65,22 +68,19 @@ $(function () {
 
     });
 
-    //$('td[id$="fund"]').on("click", function (e) {        
-    //    $(this).closest("tr").css({ "background-color": "#007bff", "color": "white"});
-    //});
+    $("select#IdFundType").on("change", function (e) {
+        $(this).css("border-color", "#CED4DA");
 
-    $("form#r-premises-form").on("submit", function (e) {
-        $("input.decimal").each(function (idx, elem) {
-            $(elem).val($(elem).val().replace(".", ","));
-        });
+    });
+
+    $("form#r-fundshistory-form").on("submit", function (e) {
         $("button[data-id]").removeClass("input-validation-error");
         var isFormValid = $(this).valid();
-        var isOwnershipsValid = $("#ownershipRightsForm").valid();
-        var isRestrictionsValid = $("#restrictionsForm").valid();
-        var isSubPremisesValid = $("#subpremisesForm").valid();
-        if (!isFormValid || !isOwnershipsValid || !isRestrictionsValid || !isSubPremisesValid) {
+        if (!isFormValid) {
             $("select").each(function (idx, elem) {
+
                 var id = $(elem).prop("id");
+                $("#" + id).css("border-color", "#dc3545");
                 var name = $(elem).prop("name");
                 var errorSpan = $("span[data-valmsg-for='" + name + "']");
                 if (errorSpan.hasClass("field-validation-error")) {
@@ -89,8 +89,7 @@ $(function () {
             });
             e.preventDefault();
         }
-
-
+    });
 
     $("form").on("change", "select", function () {
         var isValid = $(this).valid();
@@ -102,13 +101,19 @@ $(function () {
             $("button[data-id='" + id + "']").removeClass("input-validation-error");
         }
     });
-    
+
     
 
     $('.table tr').click(function ()
     {        
-        $('.table tr').removeClass('active1');
+        $('.table tr').removeClass('active1');            
         $(this).addClass('active1');
     });
+
+
+
+
+   
+
 
 });
