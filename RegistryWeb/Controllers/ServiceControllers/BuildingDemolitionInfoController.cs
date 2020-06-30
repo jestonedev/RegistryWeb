@@ -81,8 +81,8 @@ namespace RegistryWeb.Controllers.ServiceControllers
             try
             {
                 var actFile = registryContext.ActFiles.SingleOrDefault(f => f.IdFile == idFile);
-                var file = reportService.GetFileContentsAndMIMETypeFromRepository(actFile.FileName, ActFileTypes.BuildingDemolitionActFile);
-                return File(file.Item1, file.Item2, actFile.OriginalName);
+                var file = reportService.GetFileContentsFromRepository(actFile.FileName, ActFileTypes.BuildingDemolitionActFile);
+                return File(file, actFile.MimeType, actFile.OriginalName);
             }
             catch
             {
@@ -127,11 +127,11 @@ namespace RegistryWeb.Controllers.ServiceControllers
                                 //Удаляем старый физическимй файл
                                 var nameOldActFile = oldBDActFile.ActFile.FileName;
                                 removeFileList.Add(nameOldActFile);
-                                //reportService.DeleteFileToRepository(nameOldActFile, ActFileTypes.BuildingDemolitionActFile);
 
                                 //Переписываем запись о старом физфайлу данными о новом физфайле
                                 oldBDActFile.ActFile.OriginalName = Path.GetFileName(viewModel.Files[i].FileName);
                                 oldBDActFile.ActFile.FileName = nameNewActFile;
+                                oldBDActFile.ActFile.MimeType = viewModel.Files[i].ContentType;
 
                                 newBDActFile.ActFile = oldBDActFile.ActFile;
                             }
@@ -141,8 +141,9 @@ namespace RegistryWeb.Controllers.ServiceControllers
                             newBDActFile.ActFile = new ActFile()
                             {
                                 FileName = nameNewActFile,
-                                OriginalName = Path.GetFileName(viewModel.Files[i].FileName)
-                            };
+                                OriginalName = Path.GetFileName(viewModel.Files[i].FileName),
+                                MimeType = viewModel.Files[i].ContentType
+                        };
                         }
                         i++;
                     }
@@ -155,7 +156,6 @@ namespace RegistryWeb.Controllers.ServiceControllers
                         //Удаляем старый физический файл
                         registryContext.ActFiles.Remove(oldActFile);
                         removeFileList.Add(oldActFile.FileName);
-                        //reportService.DeleteFileToRepository(oldActFile.FileName, ActFileTypes.BuildingDemolitionActFile);
                     }
                 }
                 foreach (var oldBDActFile in oldBDActFiles)
@@ -176,13 +176,14 @@ namespace RegistryWeb.Controllers.ServiceControllers
 
                             //Удаляем сам физический файл
                             removeFileList.Add(oldBDActFile.ActFile.FileName);
-                            //reportService.DeleteFileToRepository(oldBDActFile.ActFile.FileName, ActFileTypes.BuildingDemolitionActFile);
+                            
                         }
                     }
                 }
                 registryContext.BuildingDemolitionActFiles.UpdateRange(newBDActFiles);
                 registryContext.SaveChanges();
-                removeFileList.ForEach(f => reportService.DeleteFileToRepository(f, ActFileTypes.BuildingDemolitionActFile));
+                //Старые файлы не удаляем, на случай ошибочного удаления
+                //removeFileList.ForEach(f => reportService.DeleteFileToRepository(f, ActFileTypes.BuildingDemolitionActFile));
                 return Json(1);
             }
             catch(Exception ex)
