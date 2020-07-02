@@ -52,11 +52,12 @@ namespace RegistryWeb.Controllers
             return Json(fund);
         }
 
-        public IActionResult Create(int IdObject, string typeObject)
+        public IActionResult Create(int IdObject, string typeObject, string returnUrl)
         {
             ViewBag.Action = "Create";
             ViewBag.idObject = IdObject;
             ViewBag.addressType = typeObject;
+            ViewBag.ReturnUrl = returnUrl;
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
                 return View("NotAccess");
 

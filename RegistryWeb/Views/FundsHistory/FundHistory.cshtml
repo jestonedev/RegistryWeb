@@ -76,12 +76,12 @@
     <form asp-controller="FundHistory" asp-action="@ViewBag.Action" id="r-fundshistory-form" data-action="@ViewBag.Action" method="post">
 
         <div class="card">
-            <input type="hidden" value="@ViewBag.ReturnUrl" name="ReturnUrl" />
+            <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
 
             <div class="card-header d-flex justify-content-between col-12">
                 <label class="form-check-label h2 @fundheadClass">@ViewData["Title"]</label>
                 @*<div class="col-4">*@
-                <a id="fundhistoryAdd" style="width: 38px;" class="form-control btn btn-success" title="Добавить фонд" asp-action="Create" asp-route-action="Create" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise">&#10010;</a>
+                <a id="fundhistoryAdd" style="width: 38px;" class="form-control btn btn-success" title="Добавить фонд" asp-action="Create" asp-route-action="Create" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">&#10010;</a>
                 <div class="btn-group" role="group" aria-label="Панель доступа">
 
                     @if (ViewBag.ReturnUrl != null)
