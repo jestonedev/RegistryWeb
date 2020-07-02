@@ -24,12 +24,12 @@ namespace RegistryWeb.Controllers
             this.securityService = securityService;
         }
 
-        public IActionResult Index(int idObject, string typeObject, string returnUrl, string action = "", bool isBack = false)
+        public IActionResult Index(int idObject, string typeObject, string returnUrl, bool isBack = false)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
                         
-            ViewBag.Action = action;
+            ViewBag.Action = "Index";
             ViewBag.ReturnUrl = returnUrl;
             var viewModel = dataService.GetListViewModel(idObject, typeObject);
             ViewBag.addressType = typeObject;
@@ -52,11 +52,12 @@ namespace RegistryWeb.Controllers
             return Json(fund);
         }
 
-        public IActionResult Create(int IdObject, string typeObject)
+        public IActionResult Create(int IdObject, string typeObject, string returnUrl)
         {
             ViewBag.Action = "Create";
             ViewBag.idObject = IdObject;
             ViewBag.addressType = typeObject;
+            ViewBag.ReturnUrl = returnUrl;
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
                 return View("NotAccess");
 
@@ -64,13 +65,14 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(FundHistoryVM fh, int IdObject, string typeObject)
+        public IActionResult Create(FundHistoryVM fh, int IdObject, string typeObject, string returnUrl)
         {
             if (fh.FundHistory == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
                 return View("NotAccess");
             ViewBag.Action = "Create";
+            ViewBag.ReturnUrl = returnUrl;
             if (ModelState.IsValid)
             {                
                 dataService.Create(fh.FundHistory, IdObject, typeObject);
@@ -131,9 +133,10 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(FundHistoryVM fh, int IdObject, string typeObject)
+        public IActionResult Delete(FundHistoryVM fh, int IdObject, string typeObject, string returnUrl)
         {
             ViewBag.Action = "Delete";
+            ViewBag.ReturnUrl = returnUrl;
             if (fh.FundHistory == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
