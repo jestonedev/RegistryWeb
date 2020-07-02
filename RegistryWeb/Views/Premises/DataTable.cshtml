@@ -99,7 +99,7 @@
                     <div class="col-auto">
                         <a class="btn btn-success oi oi-home" title="Здание" aria-label="Здание" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
                     </div>
-                    <div class="col-lg-9 col-md-8">
+                    <div class="col-xl-9 col-lg-12 col-md-8">
                         @item.IdBuildingNavigation?.IdStreetNavigation?.StreetLong,
                         д. @item.IdBuildingNavigation?.House,
                         @item.IdPremisesTypeNavigation?.PremisesTypeShort @item.PremisesNum

@@ -49,10 +49,15 @@ namespace RegistryWeb.DataServices
                                                     join fh in rc.FundsHistory on fpa.IdFund equals fh.IdFund
                                                     where fpa.IdPremises == idObject
                                                     select fh   
-                                                : from fba in rc.FundsBuildingsAssoc
+                                                : typeObject == "Building" ? from fba in rc.FundsBuildingsAssoc
                                                     join fh in rc.FundsHistory on fba.IdFund equals fh.IdFund
                                                     where fba.IdBuilding == idObject
-                                                    select fh;
+                                                    select fh   
+                                                : typeObject == "SubPremise" ? from fba in rc.FundsSubPremisesAssoc
+                                                    join fh in rc.FundsHistory on fba.IdFund equals fh.IdFund
+                                                    where fba.IdSubPremises == idObject
+                                                    select fh : null
+                                                    ;
 
 
             funds = funds.Include(f => f.IdFundTypeNavigation);

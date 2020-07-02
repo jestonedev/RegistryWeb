@@ -24,12 +24,13 @@ namespace RegistryWeb.Controllers
             this.securityService = securityService;
         }
 
-        public IActionResult Index(int idObject, string typeObject, string action = "", bool isBack = false)
+        public IActionResult Index(int idObject, string typeObject, string returnUrl, string action = "", bool isBack = false)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
                         
             ViewBag.Action = action;
+            ViewBag.ReturnUrl = returnUrl;
             var viewModel = dataService.GetListViewModel(idObject, typeObject);
             ViewBag.addressType = typeObject;
             ViewBag.idObject = idObject;
@@ -43,16 +44,17 @@ namespace RegistryWeb.Controllers
             return View(viewModel);
         }
 
-        public JsonResult Details(int idFund, string action)
+        public JsonResult Details(int idFund, string returnUrl)
         {
-            ViewBag.Action = action;
+            ViewBag.Action = "Details";
+            ViewBag.ReturnUrl = returnUrl;
             var fund = dataService.GetFundHistory(idFund);
             return Json(fund);
         }
 
-        public IActionResult Create(int IdObject, string typeObject, string action = "")
+        public IActionResult Create(int IdObject, string typeObject)
         {
-            ViewBag.Action = action;
+            ViewBag.Action = "Create";
             ViewBag.idObject = IdObject;
             ViewBag.addressType = typeObject;
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
@@ -62,28 +64,26 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(FundHistoryVM fh, int IdObject, string typeObject, string action = "")
+        public IActionResult Create(FundHistoryVM fh, int IdObject, string typeObject)
         {
             if (fh.FundHistory == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
                 return View("NotAccess");
-            ViewBag.Action = "Index";
-            /*ViewBag.idObject = IdObject;
-            ViewBag.addressType = typeObject;*/
+            ViewBag.Action = "Create";
             if (ModelState.IsValid)
             {                
                 dataService.Create(fh.FundHistory, IdObject, typeObject);
-                //return RedirectToAction("Index");
                 return View("Index", dataService.GetListViewModel(IdObject, typeObject));
             }
             return View("FundHistory", dataService.GetFundHistoryView(fh.FundHistory, IdObject, typeObject));
         }
 
         [HttpGet]
-        public IActionResult Edit(int? idFund, int IdObject, string typeObject, string action = "")
+        public IActionResult Edit(int? idFund, int IdObject, string typeObject, string returnUrl)
         {
-            ViewBag.Action = action;
+            ViewBag.Action = "Edit";
+            ViewBag.ReturnUrl = returnUrl;
             if (idFund == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
@@ -97,7 +97,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(FundHistoryVM fh, int IdObject, string typeObject, string action = "")
+        public IActionResult Edit(FundHistoryVM fh, int IdObject, string typeObject, string returnUrl)
         {
             if (fh.FundHistory == null)
                 return NotFound();
@@ -109,13 +109,16 @@ namespace RegistryWeb.Controllers
                 return View("Index", dataService.GetListViewModel(IdObject, typeObject));
                 //return RedirectToAction("Index");
             }
+            ViewBag.Action = "Edit";
+            ViewBag.ReturnUrl = returnUrl;
             return View("FundHistory", dataService.GetFundHistoryView(dataService.CreateFundHistory(), IdObject, typeObject));
         }
 
         [HttpGet]
-        public IActionResult Delete(int? idFund, int IdObject, string typeObject, string action = "")
+        public IActionResult Delete(int? idFund, int IdObject, string typeObject, string returnUrl)
         {
-            ViewBag.Action = action;
+            ViewBag.Action = "Delete";
+            ViewBag.ReturnUrl = returnUrl;
             if (idFund == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
@@ -128,8 +131,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(FundHistoryVM fh, int IdObject, string typeObject, string action = "")
+        public IActionResult Delete(FundHistoryVM fh, int IdObject, string typeObject)
         {
+            ViewBag.Action = "Delete";
             if (fh.FundHistory == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
