@@ -92,40 +92,14 @@ namespace RegistryWeb.ReportServices
             return fileName.Substring(fileName.LastIndexOf('.') + 1, fileName.Length - fileName.LastIndexOf('.') - 1).ToLower();
         }
 
-        private string getMIMEType(string fileName)
-        {
-            switch (getExtentionFile(fileName))
-            {
-                case "pdf":
-                    return "application/pdf";
-                case "jpeg":
-                case "jpg":
-                    return "application/jpeg";
-                case "png":
-                    return "application/png";
-                case "tiff":
-                    return "application/tiff";
-                case "odt":
-                    return "application/vnd.oasis.opendocument.text";
-                case "doc":
-                    return "application/msword";
-                case "docx":
-                    return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-                case "txt":
-                    return "text/plain";
-                default:
-                    return "application/octet-stream";
-            }
-        }
 
-        public (byte[], string) GetFileContentsAndMIMETypeFromRepository(string fileName, ActFileTypes actFileType)
+        public byte[] GetFileContentsFromRepository(string fileName, ActFileTypes actFileType)
         {
             try
             {
                 var path = Path.Combine(attachmentsPath, actFileType.ToString() + 's', fileName);
-                var type = getMIMEType(fileName);
-                var result = File.ReadAllBytes(path);
-                return (result, type);
+                var file = File.ReadAllBytes(path);
+                return file;
             }
             catch (Exception ex)
             {

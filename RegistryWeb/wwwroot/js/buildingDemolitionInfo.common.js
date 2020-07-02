@@ -417,6 +417,27 @@ let buildingDemolitionActFileAddClick = function (event) {
     event.preventDefault();
     _buildingDemolitionInfo.addNewTr();
 }
+let editFieldsAndBtnsDisabled = function (isDisabled) {
+    $('#buildingDemolitionInfoForm input').prop('disabled', isDisabled);
+    $('#buildingDemolitionInfoForm select').prop('disabled', isDisabled);
+    if (isDisabled) {
+        $('#buildingDemolitionInfoForm .oi-x').addClass('disabled');
+        $('#buildingDemolitionActFileAdd').addClass('disabled');
+        $('#buildingDemolitionInfoForm .badge').addClass('disabled');
+        $('#buildingDemolitionInfoForm .act-file-add').addClass('disabled');
+    } else {
+        $('#buildingDemolitionInfoForm .oi-x').removeClass('disabled');
+        $('#buildingDemolitionActFileAdd').removeClass('disabled');
+        $('#buildingDemolitionInfoForm .badge').removeClass('disabled');
+        $('#buildingDemolitionInfoForm .act-file-add').removeClass('disabled');
+    }
+}
+let buildingDemolitionInfoEditClick = function (event) {
+    event.preventDefault();
+    $('#buildingDemolitionInfoSave').show();
+    $('#buildingDemolitionInfoEdit').hide();
+    editFieldsAndBtnsDisabled(false);
+}
 let buildingDemolitionInfoSaveClick = function (event) {
     event.preventDefault();
     if ($('#buildingDemolitionInfoForm').valid()) {
@@ -426,6 +447,9 @@ let buildingDemolitionInfoSaveClick = function (event) {
         xhr.send(formData)
         xhr.onreadystatechange = function () {
             if (this.readyState != 4) return;
+            $('#buildingDemolitionInfoSave').hide();
+            $('#buildingDemolitionInfoEdit').show();
+            editFieldsAndBtnsDisabled(true);
             if (xhr.status != 200 || xhr.responseText != 1) {
                 alert("Ошибка сохранения информации о сносе!" +
                     "\nxhrresponseText: " + xhr.responseText +
@@ -438,6 +462,9 @@ let buildingDemolitionInfoCancelClick = function (event) {
     event.preventDefault();
     _buildingDemolitionInfo.updateData();
     _buildingDemolitionInfo.updateDataInElements();
+    $('#buildingDemolitionInfoSave').hide();
+    $('#buildingDemolitionInfoEdit').show();
+    editFieldsAndBtnsDisabled(true);
 }
 let actFileLinkClick = function (elem, event) {
     event.preventDefault();
@@ -459,7 +486,8 @@ let actFileUploadChange = function (elem) {
     actFile.attr('title', fileName);
     actFile.show();
 }
-let closeBadgeClick = function (elem) {
+let closeBadgeClick = function (elem, event) {
+    event.preventDefault();
     let actFileBlock = elem.parents('.act-file-block');
     actFileBlock.find('.act-file-add').show();
     actFileBlock.find('.act-file').hide();
@@ -490,7 +518,7 @@ let buildingDemolitionActFilesClick = function (event) {
         actFileLinkClick(elem, event);
     }
     if (elem.hasClass('badge')) {
-        closeBadgeClick(elem);
+        closeBadgeClick(elem, event);
     }
 }
 let buildingDemolitionActFilesChange = function (event) {
@@ -507,11 +535,14 @@ $(function () {
     _buildingDemolitionInfo.drawActFiles();
 
     $('#buildingDemolitionInfoBlock').hide();
+    $('#buildingDemolitionInfoSave').hide();
+    editFieldsAndBtnsDisabled(true);
     //initializeVilidationTrs();
 
     $('#buildingDemolitionInfoToggle').on('click', $('#buildingDemolitionInfoBlock'), elementToogle);
 
     $('#buildingDemolitionActFileAdd').click(buildingDemolitionActFileAddClick);
+    $('#buildingDemolitionInfoEdit').click(buildingDemolitionInfoEditClick);
     $('#buildingDemolitionInfoSave').click(buildingDemolitionInfoSaveClick);
     $('#buildingDemolitionInfoCancel').click(buildingDemolitionInfoCancelClick);
 

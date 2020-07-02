@@ -32,6 +32,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(4096)
                 .HasColumnName("file_name")
                 .IsUnicode(false);
+
+            builder.Property(e => e.MimeType)
+                .HasMaxLength(255)
+                .HasColumnName("mime_type")
+                .IsUnicode(false);
         }
     }
 }
