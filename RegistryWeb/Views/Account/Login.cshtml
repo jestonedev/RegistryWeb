@@ -20,7 +20,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/jquery-ui/jquery-ui.min.js"></script>
     <script src="~/lib/bootstrap-4.3.1/js/bootstrap.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
 </head>
 <body>
     @if (TempData.ContainsKey("Error"))
@@ -37,7 +36,12 @@
                     <div class="validation" asp-validation-summary="ModelOnly" />
                     <div class="form-group">
                         <label asp-for="User">Введите пользователя</label>
-                        <input type="text" asp-for="User" class="form-control" required="" autofocus="" />
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">PWR\</div>
+                            </div>
+                            <input type="text" asp-for="User" class="form-control" required="" autofocus="" />
+                        </div>
                         <span asp-validation-for="User" />
                     </div>
                     <div class="form-group">
