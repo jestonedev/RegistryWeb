@@ -99,16 +99,23 @@ let memorialCardClick = function () {
     $('#MemorialDate').prop('disabled', !isMemorial);
     $('#MemorialNameOrg').prop('disabled', !isMemorial);
 }
+let buildingDisabled = function (isDisabled) {
+    var isMemorial = $('#IsMemorial').is(':checked');
+    $('#MemorialNumber').prop('disabled', !isMemorial);
+    $('#MemorialDate').prop('disabled', !isMemorial);
+    $('#MemorialNameOrg').prop('disabled', !isMemorial);
+}
 $(function () {
     var action = $('#building').data("action");
-    if (action == "Details" || action == "Delete") {
+    var canEditBaseInfo = JSON.parse($('#building').data("caneditbaseinfo").toLowerCase());
+    memorialCardClick();
+    if (action == "Details" || action == "Delete" || !canEditBaseInfo) {
         $('#building select').prop('disabled', true);
         $('#building input').prop('disabled', true);
         $('#building textarea').prop('disabled', true);
         $('#building input[type="hidden"]').prop('disabled', false);
         $('#building input[type="submit"]').prop('disabled', false);
     }
-    memorialCardClick();
     $('#buildingToggle').on('click', $('#building'), elementToogle);
     $('#createBtn').click(createBuildingClick);
     $('#editBtn').click(editBuildingClick);

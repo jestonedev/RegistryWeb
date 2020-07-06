@@ -1,4 +1,8 @@
 ﻿@model RegistryWeb.ViewModel.BuildingsVM;
+@using RegistryWeb.SecurityServices;
+@{
+    var securityService = (SecurityService)ViewData["SecurityService"];
+}
 <form asp-action="Index" method="get" class="filterForm">
     <input type="hidden" asp-for="OrderOptions.OrderDirection" />
     <input type="hidden" asp-for="OrderOptions.OrderField" />
@@ -9,7 +13,10 @@
 
     <div class="form-row">
         <div class="form-group col-1">
-            <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="Buildings" asp-action="Create">&#10010;</a>
+            @if ((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)))
+            {
+                <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="Buildings" asp-action="Create">&#10010;</a>
+            }
         </div>
         <div class="input-group col-9">
             <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
@@ -31,8 +38,8 @@
             </div>
         }
         @*<div class="form-group col-2">
-            <a class="btn btn-block btn-success" asp-controller="Buildings" asp-action="BuildingReports">Отчеты</a>
-        </div>*@
+                <a class="btn btn-block btn-success" asp-controller="Buildings" asp-action="BuildingReports">Отчеты</a>
+            </div>*@
     </div>
     <!-- Modal -->
     <div class="modal fade bd-example-modal-xl" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
@@ -44,7 +51,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body"> 
+                <div class="modal-body">
                     <div class="form-row">
                         <div class="form-group col-2">
                             <label asp-for="FilterOptions.IdBuilding">Реестровый номер</label>

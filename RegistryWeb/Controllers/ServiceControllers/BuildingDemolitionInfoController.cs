@@ -96,7 +96,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             if (viewModel == null)
                 return Json(-1);
             var r = Request;
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
                 return Json(-2);
             var saveFileList = new List<string>();
             try
@@ -191,40 +191,6 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 saveFileList.ForEach(f => reportService.DeleteFileToRepository(f, ActFileTypes.BuildingDemolitionActFile));
                 return Json(-3);
             }
-        }
-
-        [HttpPost]
-        public IActionResult GetBuildingDemolitionActFile()
-        {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return Json(-1);
-            var actTypeDocuments = registryContext.ActTypeDocuments
-                .Where(atd => atd.ActFileType == ActFileTypes.BuildingDemolitionActFile.ToString())
-                .AsNoTracking();
-            var tr = new StringBuilder();
-            tr.Append("<tr class=\"ownership-right\" data-idownershipright=\"" + Guid.NewGuid() + "\">");
-            tr.Append("<td class=\"align-middle\"><input type=\"text\" class=\"form-control field-ownership-right\"></td>");
-            tr.Append("<td class=\"align-middle\"><input type=\"date\" class=\"form-control field-ownership-right\"></td>");
-            tr.Append("<td class=\"align-middle\"><input type=\"text\" class=\"form-control field-ownership-right\"></td>");
-            //Формирование селекта для ActTypeDocuments
-            var tdIdOwnershipRightType = new StringBuilder();
-            tdIdOwnershipRightType.Append("<td class=\"align-middle\">");
-            tdIdOwnershipRightType.Append("<select class=\"form-control field-ownership-right\">");
-            foreach (var type in actTypeDocuments)
-            {
-                tdIdOwnershipRightType.Append("<option value=\"" + type.Id + "\">" + type.Name + "</option>");
-            }
-            tdIdOwnershipRightType.Append("</select>");
-            tdIdOwnershipRightType.Append("</td>");
-            tr.Append(tdIdOwnershipRightType);
-            tr.Append("<td class=\"align-middle\"><input type=\"date\" class=\"form-control field-ownership-right\"></td>");
-            tr.Append("<td class=\"align-middle\"><input type=\"date\" class=\"form-control field-ownership-right\"></td>");
-            //Панели
-            tr.Append("<td class=\"align-middle\">");
-            tr.Append("<a class=\"btn btn-danger oi oi-x delete\" title=\"Удалить\" aria-label=\"Удалить\"></a>");
-            tr.Append("</td>");
-            tr.Append("</tr>");
-            return Content(tr.ToString());
         }
     }
 }

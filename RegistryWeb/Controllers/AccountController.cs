@@ -35,17 +35,11 @@ namespace RegistryWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                var server = "db01";
-                var port = "3306";
-                if (config.GetValue<bool>("IsNeorProfileSql"))
-                {
-                    server = "localhost";
-                    port = "4040";
-                }
+                var userName = "PWR\\" + model.User.ToUpper();
                 var connectionString =
-                    "server=" + server + ";" +
-                    "port=" + port + ";" +
-                    "user=" + model.User + ";" +
+                    "server=" + config.GetValue<string>("Server") + ";" +
+                    "port=" + config.GetValue<string>("Port") + ";" +
+                    "user=" + userName + ";" +
                     "password=" + model.Password + ";" +
                     "database=" + config.GetValue<string>("Database") + ";";
                     //"convert zero datetime=true;";
@@ -54,7 +48,7 @@ namespace RegistryWeb.Controllers
                     var conn = new MySqlConnection(connectionString);
                     conn.Open();
                     conn.Close();
-                    Authenticate(model.User, connectionString);
+                    Authenticate(userName, connectionString);
                 }
                 catch (Exception ex)
                 {
