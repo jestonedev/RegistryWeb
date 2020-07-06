@@ -1,10 +1,11 @@
 ﻿using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.ViewModel;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
+using RegistryWeb.DataHelpers;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System;
 
@@ -36,7 +37,58 @@ namespace RegistryWeb.DataServices
             viewModel.PageOptions.Rows = count;
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
             viewModel.Buildings = GetQueryPage(query, viewModel.PageOptions).ToList();
+            viewModel.IsMunicipalDictionary = IsMunicipalDictionary(viewModel.Buildings);
             return viewModel;
+        }
+
+        private Dictionary<int, bool> IsMunicipalDictionary(List<Building> buildings)
+        {
+            var idsBuiling = buildings.Select(b => b.IdBuilding).ToList();
+            var result = new Dictionary<int, bool>();
+            var premises = registryContext.Premises
+                .Include(p => p.SubPremises)
+                .Where(p => idsBuiling.Contains(p.IdBuilding))
+                .ToList();
+            foreach (var b in buildings)
+            {
+                result[b.IdBuilding] = ObjectStateHelper.IsMunicipal(b.IdState);
+                var premisesInsideCurrentBuilding = premises.Where(p => p.IdBuilding == b.IdBuilding);
+                foreach (var pr in premisesInsideCurrentBuilding)
+                {
+                    result[b.IdBuilding] = result[b.IdBuilding] || ObjectStateHelper.IsMunicipal(pr.IdState);
+                    var isMunicipalSubPremiseList = pr.SubPremises.Select(sp => ObjectStateHelper.IsMunicipal(sp.IdState));
+                    foreach (var isMunicipalSubPremise in isMunicipalSubPremiseList)
+                    {
+                        result[b.IdBuilding] = result[b.IdBuilding] || isMunicipalSubPremise;
+                    }
+                }
+            }
+            return result;
+        }
+
+        public bool IsMunicipal(int idBuilding)
+        {
+            var builing = registryContext.Buildings.FirstOrDefault();
+            return IsMunicipal(builing);
+        }
+
+        public bool IsMunicipal(Building building)
+        {
+            var premises = registryContext.Premises
+                .Include(p => p.SubPremises)
+                .Where(p => p.IdBuilding == building.IdBuilding)
+                .ToList();
+            var result = ObjectStateHelper.IsMunicipal(building.IdState);
+            foreach (var pr in premises)
+            {
+                result = result || ObjectStateHelper.IsMunicipal(pr.IdState);
+                var isMunicipalSubPremiseList = pr.SubPremises.Select(sp => ObjectStateHelper.IsMunicipal(sp.IdState));
+                foreach (var isMunicipalSubPremise in isMunicipalSubPremiseList)
+                {
+                    result = result || isMunicipalSubPremise;
+                }
+            }
+            return result;
         }
 
         public IQueryable<Building> GetQuery()

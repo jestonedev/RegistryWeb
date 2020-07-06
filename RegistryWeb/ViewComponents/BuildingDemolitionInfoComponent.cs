@@ -36,6 +36,7 @@ namespace RegistryWeb.ViewComponents
                 .Where(atd => atd.ActFileType == ActFileTypes.BuildingDemolitionActFile.ToString())
                 .AsNoTracking();
             ViewBag.Action = action;
+            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
             return View("BuildingDemolitionInfo", model);
         }
     }
