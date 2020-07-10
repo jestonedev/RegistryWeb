@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RegistryWeb.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,5 +16,6 @@ namespace RegistryWeb.Models
         public int IdPremisesType { get; set; }
         public int IdPremise { get; set; }
         public int IdSubPremise { get; set; }
+        public Premise Premise { get; set; }
     }
 }

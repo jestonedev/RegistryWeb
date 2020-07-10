@@ -67,6 +67,23 @@
                     new SelectList(ViewBag.SubPremises, "IdSubPremises", "SubPremisesNum")}"></select>
                 </div>
             </div>
+            @if (ViewBag.Action != "Create" && (Model.IdTypeAddress == 2 || Model.IdTypeAddress == 3)) 
+            {
+            <div class="form-row">
+                <div class="col">
+                    <label class="control-label" asp-for="Premise.NumRooms">Кол-во комнат в помещении</label>
+                    <input typeof="text" class="form-control" asp-for="Premise.NumRooms" disabled/>
+                </div>
+                <div class="col">
+                    <label class="control-label" asp-for="Premise.TotalArea">Общая пл. помещения</label>
+                    <input typeof="text" class="form-control" asp-for="Premise.TotalArea" disabled />
+                </div>
+                <div class="col">
+                    <label class="control-label" asp-for="Premise.LivingArea">Жилая пл. помещения</label>
+                    <input typeof="text" class="form-control" asp-for="Premise.LivingArea" disabled />
+                </div>
+            </div>
+            }
         </div>
     @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
     {

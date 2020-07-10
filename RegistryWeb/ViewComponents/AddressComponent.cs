@@ -91,6 +91,7 @@ namespace RegistryWeb.ViewComponents
                 address.IdBuilding = premise.IdBuilding;
                 address.IdPremisesType = premise.IdPremisesType;
                 address.IdPremise = premise.IdPremises;
+                address.Premise = premise;
             }
             if (addressAssoc is OwnerSubPremiseAssoc)
             {
@@ -108,6 +109,7 @@ namespace RegistryWeb.ViewComponents
                 address.IdPremisesType = subPremise.IdPremisesNavigation.IdPremisesType;
                 address.IdPremise = subPremise.IdPremisesNavigation.IdPremises;
                 address.IdSubPremise = subPremise.IdSubPremises;
+                address.Premise = subPremise.IdPremisesNavigation;
             }
             return address;
         }
