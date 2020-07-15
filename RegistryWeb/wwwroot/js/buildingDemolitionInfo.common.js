@@ -101,6 +101,7 @@ let BuildingDemolitionActFile = class {
         this.date = "";
         this.name = "";
         this.originalNameActFile = "";
+        this.fileInput = "";
         this.file = "";
     }
 
@@ -167,6 +168,13 @@ let BuildingDemolitionActFile = class {
         this._file = value;
     }
 
+    get fileInput() {
+        return this._fileInput;
+    }
+    set fileInput(value) {
+        this._fileInput = value;
+    }
+
     initialize = function (tr) {
         let fields = tr.find('.field-building-demolition-act-file');
         this.id = tr.data('idbuildingdemolitionactfile');
@@ -177,9 +185,9 @@ let BuildingDemolitionActFile = class {
         this.name = fields[2].value;
         this.originalNameActFile = tr.find('.act-file').attr('title');
 
-        let fileInput = tr.find('.act-file-upload')[0];
-        if (fileInput.files[0] != undefined) {
-            this.file = fileInput.files[0];
+        this.fileInput = tr.find('.act-file-upload')[0];
+        if (this.fileInput.files[0] != undefined) {
+            this.file = this.fileInput.files[0];
         }
         else {
             this.file = "";
@@ -195,7 +203,8 @@ let BuildingDemolitionActFile = class {
         this.date = jsonBuildingDemolitionActFiles.date;
         this.name = jsonBuildingDemolitionActFiles.name == null ? "" : jsonBuildingDemolitionActFiles.name;
         this.originalNameActFile = jsonBuildingDemolitionActFiles.originalNameActFile;
-        this.file = ""
+        this.file = "";
+        this.fileInput = "";
     }
 }
 
@@ -203,6 +212,7 @@ let BuildingDemolitionInfo = class {
     constructor(form) {
         this.form = form;
         this._action = form.data('action');
+        this._canEditExtInfo = JSON.parse(form.data("caneditextinfo").toLowerCase());
         this.idBuilding = +this.form.data('idbuilding');
     }
 
@@ -211,6 +221,20 @@ let BuildingDemolitionInfo = class {
     }
     set form(value) {
         this._form = value;
+    }
+
+    get action() {
+        return this._action
+    }
+    set action(value) {
+        this._action = value;
+    }
+
+    get canEditExtInfo() {
+        return this._canEditExtInfo
+    }
+    set canEditExtInfo(value) {
+        this._canEditExtInfo = value;
     }
 
     get idBuilding() {
@@ -252,12 +276,13 @@ let BuildingDemolitionInfo = class {
             buildingDemolitionInfoJson.BuildingDemolitionActFiles[i] = {
                 Id: this.buildingDemolitionActFiles[i].id,
                 IdBuilding: this.buildingDemolitionActFiles[i].idBuilding,
-                //временное решение
-                IdActFile: null, //this.buildingDemolitionActFiles[i].idActFile,
+                IdActFile: this.buildingDemolitionActFiles[i].idActFile,
                 IdActTypeDocument: this.buildingDemolitionActFiles[i].idActTypeDocument,
                 Number: this.buildingDemolitionActFiles[i].number,
                 Date: this.buildingDemolitionActFiles[i].date,
-                Name: this.buildingDemolitionActFiles[i].name
+                Name: this.buildingDemolitionActFiles[i].name,
+                File: this.buildingDemolitionActFiles[i].file,
+                FileInput: this.buildingDemolitionActFiles[i].fileInput
             };
         }
         return buildingDemolitionInfoJson;
@@ -266,6 +291,7 @@ let BuildingDemolitionInfo = class {
     initialize = function () {
         this.form = $('#buildingDemolitionInfoForm');
         this._action = this.form.data('action');
+        this._canEditExtInfo = JSON.parse(this.form.data('caneditextinfo').toLowerCase());
         this.idBuilding = +this.form.data('idbuilding');
         this.demolishedPlanDate = this.form.find('#demolishPlanDate').val();
         this.buildingDemolitionActFiles = [];
@@ -306,7 +332,7 @@ let BuildingDemolitionInfo = class {
         this.initialize();
         let buildingDemolitionInfoVM = new FormData();
         buildingDemolitionInfoVM.append('IdBuilding', this.idBuilding);
-        buildingDemolitionInfoVM.append('demolishedPlanDate', this.demolishedPlanDate);
+        buildingDemolitionInfoVM.append('DemolishedPlanDate', this.demolishedPlanDate);
         for (var i = 0; i < this.buildingDemolitionActFiles.length; i++) {
             if (this.buildingDemolitionActFiles[i].file != "") {
                 buildingDemolitionInfoVM.append('Files', this.buildingDemolitionActFiles[i].file, this.buildingDemolitionActFiles[i].file.name);
@@ -536,7 +562,12 @@ $(function () {
 
     $('#buildingDemolitionInfoBlock').hide();
     $('#buildingDemolitionInfoSave').hide();
-    editFieldsAndBtnsDisabled(true);
+    if (_buildingDemolitionInfo.action != "Create") {
+        editFieldsAndBtnsDisabled(true);
+    }
+    if (_buildingDemolitionInfo.action == "Create" && !_buildingDemolitionInfo.canEditExtInfo) {
+        _buildingDemolitionInfo.form.hide();
+    }
     //initializeVilidationTrs();
 
     $('#buildingDemolitionInfoToggle').on('click', $('#buildingDemolitionInfoBlock'), elementToogle);

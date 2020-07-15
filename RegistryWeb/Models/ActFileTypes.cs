@@ -7,6 +7,8 @@ namespace RegistryWeb.Models
 {
     public enum ActFileTypes
     {
-        BuildingDemolitionActFile = 1
+        BuildingDemolitionActFile = 1,
+        OwnershipRight = 2,
+        Restriction = 3
     }
 }

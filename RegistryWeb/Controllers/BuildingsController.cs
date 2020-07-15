@@ -132,6 +132,7 @@ namespace RegistryWeb.Controllers
         public IActionResult Create()
         {
             ViewBag.CanEditBaseInfo = securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal);
+            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
             if (!ViewBag.CanEditBaseInfo)
                 return View("NotAccess");
             return GetBuildingView(dataService.CreateBuilding());
@@ -141,16 +142,17 @@ namespace RegistryWeb.Controllers
         public IActionResult Create(Building building)
         {
             if (building == null)
-                return Json(-1);
+                return NotFound();
             ViewBag.CanEditBaseInfo = securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal);
+            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
             if (!ViewBag.CanEditBaseInfo)
-                return Json(-2);
+                return View("NotAccess");
             if (ModelState.IsValid)
             {
-                dataService.Create(building);
-                return Json(building.IdBuilding);
+                dataService.Create(building, HttpContext.Request.Form.Files.Select(f => f).ToList());
+                return GetBuildingView(building, "Details");
             }
-            return Json(0);
+            return GetBuildingView(building);
         }
 
         public IActionResult Details(int? idBuilding)
@@ -163,6 +165,7 @@ namespace RegistryWeb.Controllers
             if (building == null)
                 return NotFound();
             ViewBag.CanEditBaseInfo = false;
+            ViewBag.CanEditExtInfo = false;
             return GetBuildingView(building);
         }
 
@@ -176,6 +179,7 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             ViewBag.CanEditBaseInfo = (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !dataService.IsMunicipal(building)) ||
                 (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && dataService.IsMunicipal(building));
+            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
             if (!ViewBag.CanEditBaseInfo)
                 return View("NotAccess");
             return GetBuildingView(building);
@@ -207,8 +211,8 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             ViewBag.CanEditBaseInfo = (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !dataService.IsMunicipal(building)) ||
                 (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && dataService.IsMunicipal(building));
-            var canEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
-            if (!(ViewBag.CanEditBaseInfo || canEditExtInfo))
+            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            if (!(ViewBag.CanEditBaseInfo || ViewBag.CanEditExtInfo))
                 return View("NotAccess");
             return GetBuildingView(building);
         }
@@ -220,6 +224,7 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             ViewBag.CanEditBaseInfo = (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !dataService.IsMunicipal(building)) ||
                 (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && dataService.IsMunicipal(building));
+            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
             if (!ViewBag.CanEditBaseInfo)
                 return View("NotAccess");
             if (ModelState.IsValid)

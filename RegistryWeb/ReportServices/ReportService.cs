@@ -111,7 +111,7 @@ namespace RegistryWeb.ReportServices
         {
             try
             {
-                var fileName = Guid.NewGuid().ToString() + '.' + getExtentionFile(file.FileName);
+                var fileName = Guid.NewGuid().ToString() + new FileInfo(file.FileName).Extension;
                 var path = Path.Combine(attachmentsPath, actFileType.ToString() + 's', fileName);
                 var fileStream = new FileStream(path, FileMode.Create);
                 file.CopyTo(fileStream);

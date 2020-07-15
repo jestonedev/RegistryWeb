@@ -11,6 +11,7 @@ namespace RegistryWeb.Models.Entities
             FundsBuildingsAssoc = new List<FundBuildingAssoc>();
             OwnerBuildingsAssoc = new List<OwnerBuildingAssoc>();
             OwnershipBuildingsAssoc = new List<OwnershipBuildingAssoc>();
+            RestrictionBuildingsAssoc = new List<RestrictionBuildingAssoc>();
             Premises = new List<Premise>();
             TenancyBuildingsAssoc = new List<TenancyBuildingAssoc>();
             BuildingDemolitionActFiles = new List<BuildingDemolitionActFile>();
@@ -101,6 +102,7 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<FundBuildingAssoc> FundsBuildingsAssoc { get; set; }
         public virtual IList<OwnerBuildingAssoc> OwnerBuildingsAssoc { get; set; }
         public virtual IList<OwnershipBuildingAssoc> OwnershipBuildingsAssoc { get; set; }
+        public virtual IList<RestrictionBuildingAssoc> RestrictionBuildingsAssoc { get; set; }
         public virtual IList<Premise> Premises { get; set; }
         public virtual IList<TenancyBuildingAssoc> TenancyBuildingsAssoc { get; set; }
         public virtual IList<BuildingDemolitionActFile> BuildingDemolitionActFiles { get; set; }

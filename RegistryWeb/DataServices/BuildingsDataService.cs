@@ -8,13 +8,17 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System;
+using RegistryWeb.ReportServices;
 
 namespace RegistryWeb.DataServices
 {
     public class BuildingsDataService : ListDataService<BuildingsVM, BuildingsFilter>
     {
-        public BuildingsDataService(RegistryContext registryContext) : base(registryContext)
-        {           
+        ReportService reportService;
+
+        public BuildingsDataService(RegistryContext registryContext, ReportService reportService) : base(registryContext)
+        {
+            this.reportService = reportService;
         }
 
         public override BuildingsVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, BuildingsFilter filterOptions)
@@ -302,8 +306,48 @@ namespace RegistryWeb.DataServices
             return building;
         }
 
-        internal void Create(Building building)
+        internal void Create(Building building, List<Microsoft.AspNetCore.Http.IFormFile> files)
         {
+            // Прикрепляем файлы реквизитов
+            if (building.RestrictionBuildingsAssoc != null)
+            {
+                for (var i = 0; i < building.RestrictionBuildingsAssoc.Count; i++)
+                {
+                    var file = files.Where(r => r.Name == "RestrictionFile[" + i + "]").FirstOrDefault();
+                    if (file == null) continue;
+                    building.RestrictionBuildingsAssoc[i].RestrictionNavigation.FileDisplayName = file.FileName;
+                    var fileOriginName = reportService.SaveFormFileToRepository(file, ActFileTypes.Restriction);
+                    building.RestrictionBuildingsAssoc[i].RestrictionNavigation.FileOriginName = fileOriginName;
+                    building.RestrictionBuildingsAssoc[i].RestrictionNavigation.FileMimeType = file.ContentType;
+                }
+            }
+            // Прикрепляем файлы ограничений
+            if (building.OwnershipBuildingsAssoc != null)
+            {
+                for (var i = 0; i < building.OwnershipBuildingsAssoc.Count; i++)
+                {
+                    var file = files.Where(r => r.Name == "OwnershipRightFile[" + i + "]").FirstOrDefault();
+                    if (file == null) continue;
+                    building.OwnershipBuildingsAssoc[i].OwnershipRightNavigation.FileDisplayName = file.FileName;
+                    var fileOriginName = reportService.SaveFormFileToRepository(file, ActFileTypes.OwnershipRight);
+                    building.OwnershipBuildingsAssoc[i].OwnershipRightNavigation.FileOriginName = fileOriginName;
+                    building.OwnershipBuildingsAssoc[i].OwnershipRightNavigation.FileMimeType = file.ContentType;
+                }
+            }
+            // Прикрепляем файлы о сносе
+            if (building.BuildingDemolitionActFiles != null)
+            {
+                for (var i = 0; i < building.BuildingDemolitionActFiles.Count; i++)
+                {
+                    var file = files.Where(r => r.Name == "BuildingDemolitionActFile[" + i + "]").FirstOrDefault();
+                    if (file == null) continue;
+                    var actFile = new ActFile();
+                    actFile.FileName = reportService.SaveFormFileToRepository(file, ActFileTypes.BuildingDemolitionActFile);
+                    actFile.OriginalName = file.FileName;
+                    actFile.MimeType = file.ContentType;
+                    building.BuildingDemolitionActFiles[i].ActFile = actFile; 
+                }
+            }
             registryContext.Buildings.Add(building);
             registryContext.SaveChanges();
         }

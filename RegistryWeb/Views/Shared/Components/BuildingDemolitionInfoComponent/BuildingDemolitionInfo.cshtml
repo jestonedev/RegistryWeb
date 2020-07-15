@@ -2,7 +2,7 @@
 @{
     var demolishedPlanDate = Model.DemolishedPlanDate.HasValue ? Model.DemolishedPlanDate.Value.ToString("yyyy-MM-dd") : "";
 }
-<form id="buildingDemolitionInfoForm" data-action="@ViewBag.Action" data-idbuilding="@Model.IdBuilding">
+<form id="buildingDemolitionInfoForm" data-action="@ViewBag.Action" data-idbuilding="@Model.IdBuilding" data-caneditextinfo="@ViewBag.CanEditExtInfo">
     <script src="~/js/buildingDemolitionInfo.common.js" asp-append-version="true"></script>
     <link rel="stylesheet" href="~/css/buildingDemolitionInfo.css" asp-append-version="true" />
     <div class="card">
