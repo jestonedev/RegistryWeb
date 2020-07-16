@@ -25,6 +25,8 @@ namespace RegistryWeb.Models.Entities
         [Required]
         public int IdStructureTypeOverlap { get; set; }
         [Required]
+        public int IdFoundationType { get; set; }
+        [Required]
         public string IdStreet { get; set; }
         [Required]
         public string House { get; set; }
@@ -96,8 +98,8 @@ namespace RegistryWeb.Models.Entities
         public virtual ObjectState IdStateNavigation { get; set; }
         public virtual StructureType IdStructureTypeNavigation { get; set; }
         public virtual StructureTypeOverlap StructureTypeOverlapNavigation { get; set; }
+        public virtual FoundationType FoundationTypeNavigation { get; set; }
         public virtual GovernmentDecree GovernmentDecreeNavigation { get; set; }
-
         public virtual KladrStreet IdStreetNavigation { get; set; }
         public virtual IList<FundBuildingAssoc> FundsBuildingsAssoc { get; set; }
         public virtual IList<OwnerBuildingAssoc> OwnerBuildingsAssoc { get; set; }

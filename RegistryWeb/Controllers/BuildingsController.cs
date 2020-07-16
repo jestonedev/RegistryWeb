@@ -244,6 +244,7 @@ namespace RegistryWeb.Controllers
             ViewBag.KladrStreets = dataService.KladrStreets;
             ViewBag.HeatingTypes = dataService.HeatingTypes;
             ViewBag.GovernmentDecrees = dataService.GovernmentDecrees;
+            ViewBag.FoundationTypes = dataService.FoundationTypes;
             return View("Building", building);
         }
     }

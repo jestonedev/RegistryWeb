@@ -33,6 +33,9 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.HasIndex(e => e.IdStructureTypeOverlap)
                 .HasName("FK_buildings_id_structure_type_overlap");
 
+            builder.HasIndex(e => e.IdFoundationType)
+                .HasName("FK_buildings_id_foundation_type");
+
             builder.HasIndex(e => e.IdDecree)
                 .HasName("FK_buildings_id_decree");
 
@@ -120,6 +123,18 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_heating_type")
                 .HasColumnType("int(11)");
 
+            builder.Property(e => e.IdStructureType)
+                .HasColumnName("id_structure_type")
+                .HasColumnType("int(11)");
+
+            builder.Property(e => e.IdStructureTypeOverlap)
+                .HasColumnName("id_structure_type_overlap")
+                .HasColumnType("int(11)");
+
+            builder.Property(e => e.IdFoundationType)
+                .HasColumnName("id_foundation_type")
+                .HasColumnType("int(11)");
+
             builder.Property(e => e.IdDecree)
                 .HasColumnName("id_decree")
                 .HasColumnType("int(11)");
@@ -134,14 +149,6 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_street")
                 .HasMaxLength(17)
                 .IsUnicode(false);
-
-            builder.Property(e => e.IdStructureType)
-                .HasColumnName("id_structure_type")
-                .HasColumnType("int(11)");
-
-            builder.Property(e => e.IdStructureTypeOverlap)
-                .HasColumnName("id_structure_type_overlap")
-                .HasColumnType("int(11)");
 
             builder.Property(e => e.Improvement)
                 .HasColumnName("improvement")
@@ -287,6 +294,12 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasForeignKey(d => d.IdStructureTypeOverlap)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_buildings_id_structure_type_overlap");
+
+            builder.HasOne(d => d.FoundationTypeNavigation)
+                .WithMany(p => p.Buildings)
+                .HasForeignKey(d => d.IdFoundationType)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_buildings_id_foundation_type");
 
             builder.HasOne(d => d.GovernmentDecreeNavigation)
                 .WithMany(p => p.Buildings)

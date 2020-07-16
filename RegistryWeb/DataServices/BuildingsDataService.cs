@@ -255,6 +255,9 @@ namespace RegistryWeb.DataServices
                 .Include(b => b.IdHeatingTypeNavigation)
                 .Include(b => b.IdStateNavigation)
                 .Include(b => b.IdStructureTypeNavigation)
+                .Include(b => b.StructureTypeOverlapNavigation)
+                .Include(b => b.FoundationTypeNavigation)
+                .Include(b => b.GovernmentDecreeNavigation)
                 .SingleOrDefault(b => b.IdBuilding == idBuilding);
         }
 
@@ -298,6 +301,11 @@ namespace RegistryWeb.DataServices
         public IEnumerable<GovernmentDecree> GovernmentDecrees
         {
             get => registryContext.GovernmentDecrees.AsNoTracking();
+        }
+
+        public IEnumerable<FoundationType> FoundationTypes
+        {
+            get => registryContext.FoundationTypes.AsNoTracking();
         }
 
         internal Building CreateBuilding()

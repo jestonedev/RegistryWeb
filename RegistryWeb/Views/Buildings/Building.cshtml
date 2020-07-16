@@ -90,6 +90,9 @@
                     <label asp-for="IdStructureTypeOverlap">Тип перекрытий</label>
                 </div>
                 <div class="form-group col r-form-group-label">
+                    <label asp-for="IdFoundationType">Тип фундамента</label>
+                </div>
+                <div class="form-group col r-form-group-label">
                     <label asp-for="IdHeatingType">Отопление</label>
                 </div>
             </div>
@@ -105,9 +108,14 @@
                     <span asp-validation-for="IdStructureType" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
-                    <select class="form-control" asp-for="IdStructureTypeOverlap" title="Тип строения (материал)"
+                    <select class="form-control" asp-for="IdStructureTypeOverlap" title="Тип перекрытий"
                             asp-items="@{new SelectList(ViewBag.StructureTypeOverlaps, "IdStructureTypeOverlap", "StructureTypeOverlapName", Model.IdStructureTypeOverlap)}"></select>
                     <span asp-validation-for="IdStructureTypeOverlap" class="text-danger"></span>
+                </div>
+                <div class="form-group col">
+                    <select class="form-control" asp-for="IdFoundationType" title="Тип фундамента"
+                            asp-items="@{new SelectList(ViewBag.FoundationTypes, "IdFoundationType", "Name", Model.IdFoundationType)}"></select>
+                    <span asp-validation-for="IdFoundationType" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
                     <select class="form-control" asp-for="IdHeatingType" title="Отопление"
