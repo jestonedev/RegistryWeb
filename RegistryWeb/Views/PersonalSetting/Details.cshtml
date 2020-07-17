@@ -1,19 +1,22 @@
-﻿@model RegistryWeb.Models.Entities.PersonalSetting;
+﻿@model RegistryWeb.ViewModel.PersonalSettingVM;
 @{
     ViewData["Title"] = "Персональные настройки";
 }
-
 <h2>@ViewData["Title"]</h2>
-<form asp-controller="PersonalSetting" asp-action="Save" method="post">
-    <input type="hidden" asp-for="IdUser">
-    <input type="hidden" asp-for="IdUserNavigation.IdUser">
+<div>
     <div class="form-group">
-        <label for="IdUserNavigation.UserName">ФИО</label>
-        <input asp-for="IdUserNavigation.UserDescription" class="form-control">
+        <label for="">ФИО</label>
+        <input asp-for="User.UserDescription" class="form-control">
     </div>
     <div class="form-group">
-        <label for="SqlDriver">Драйвер для отчетов</label>
-        <input asp-for="SqlDriver" class="form-control">
+        <label for="Database">База данных</label>
+        <input asp-for="Database" class="form-control">
     </div>
-    <button type="submit" class="btn btn-success">Сохранить</button>
-</form>
+    <h3>Привилегии:</h3>
+    <ul class="list-group">
+        @foreach (var privilege in Model.Privileges)
+        {
+            <li class="list-group-item">@privilege.PrivilegeDescription</li>
+        }
+    </ul>
+</div>

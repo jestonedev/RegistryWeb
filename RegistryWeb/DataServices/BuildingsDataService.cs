@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System;
 using RegistryWeb.ReportServices;
+using RegistryWeb.SecurityServices;
 
 namespace RegistryWeb.DataServices
 {
@@ -271,6 +272,18 @@ namespace RegistryWeb.DataServices
         public IEnumerable<ObjectState> ObjectStates
         {
             get => registryContext.ObjectStates.AsNoTracking();
+        }
+
+        public IEnumerable<ObjectState> GetObjectStates(SecurityService securityService, string action, bool canEditBaseInfo = false)
+        {
+            var objectStates = ObjectStates.ToList();
+            if ((action == "Create" || action == "Edit") && canEditBaseInfo)
+            {
+                objectStates = objectStates.Where(r => (
+                securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.MunicipalIds().Contains(r.IdState) ||
+                securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.MunicipalIds().Contains(r.IdState))).ToList();
+            }
+            return objectStates;
         }
 
         public IEnumerable<StructureType> StructureTypes

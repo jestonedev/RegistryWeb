@@ -127,8 +127,6 @@ namespace RegistryWeb.Models
         public virtual DbSet<AclUserPrivilege> AclUserPrivileges { get; set; }
         public virtual DbSet<AclUserRole> AclUserRoles { get; set; }
 
-        public virtual DbSet<PersonalSetting> PersonalSettings { get; set; }
-
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
         public virtual DbSet<TenancyActiveProcess> TenancyActiveProcesses { get; set; }
@@ -168,7 +166,6 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new BuildingDemolitionActFileConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new SelectableSignersConfiguration(nameDatebase));
-            modelBuilder.ApplyConfiguration(new PersonalSettingConfiguration(nameDatebase));
             
             modelBuilder.ApplyConfiguration(new DocumentTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new DocumentIssuedByConfiguration(nameDatebase));
