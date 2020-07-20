@@ -226,6 +226,31 @@ namespace RegistryWeb.DataServices
                 else
                     return query.OrderByDescending(b => b.IdBuilding);
             }
+            if (orderOptions.OrderField == "Address")
+            {
+                var addresses = query.Select(b => new
+                {
+                    b.IdBuilding,
+                    Address = string.Concat(b.IdStreetNavigation.StreetName, ", ", b.House)
+                });
+
+                if (orderOptions.OrderDirection == OrderDirection.Ascending)
+                {
+                    return from row in query
+                           join addr in addresses
+                            on row.IdBuilding equals addr.IdBuilding
+                           orderby addr.Address
+                           select row;
+                }
+                else
+                {
+                    return from row in query
+                           join addr in addresses
+                            on row.IdBuilding equals addr.IdBuilding
+                           orderby addr.Address descending
+                           select row;
+                }
+            }
             if (orderOptions.OrderField == "ObjectState")
             {
                 if (orderOptions.OrderDirection == OrderDirection.Ascending)

@@ -2,3 +2,31 @@
     color: #888;
     font-size: 75%;
 }
+
+.rr-building-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 0.24rem;
+}
+
+.b-table > thead > tr > th a.sort {
+    color: #888;
+}
+
+.b-table > thead > tr > th a.sort:hover {
+    color: black;
+}
+
+.b-table > thead > tr > th a.sort.b-sorted {
+    color: #007bff;
+}
+
+.b-table > thead > tr > th a.sort.b-sorted:hover {
+    color: #0056b3;
+}
+
+.b-table th {
+    white-space: nowrap;
+}

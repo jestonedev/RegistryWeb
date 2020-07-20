@@ -96,11 +96,11 @@ $(function () {
         modal.modal('show');
     });
 
-	//$("a.sort").click(function () {
-	//	$('input[name="OrderOptions.OrderField"]').val($(this).data("order-field"));
-	//	$('input[name="OrderOptions.OrderDirection"]').val($(this).data("order-direction"));
-	//	formSubmit();
-	//});
+    $("a.sort").click(function () {
+        $('input[name="OrderOptions.OrderField"]').val($(this).data("order-field"));
+        $('input[name="OrderOptions.OrderDirection"]').val($(this).data("order-direction"));
+        $("form.filterForm").submit();
+    });
 	$('.page-link').click(function () {
 		$('input[name="PageOptions.CurrentPage"]').val($(this).data("page"));
         $('#FilterOptions_Address_Text').prop("disabled", false);

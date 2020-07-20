@@ -13,24 +13,46 @@
     var check = "";
     var securityService = (SecurityService)ViewData["SecurityService"];
 }
-<table class="table table-hover">
+<table class="table table-hover b-table">
     <thead>
         <tr>
-            @*<th class="r-table-header-cell">
-                    <a href="#" data-order-field="IdBuilding" data-order-direction="@OrderDirection.Ascending">
-                        № по реестру
-                    </a>
-                </th>*@
-            @*<th class="align-middle"></th>*@
-            <th class="align-middle">№ по реестру</th>
-            <th class="align-middle">Адрес</th>
-            <th class="align-middle">Текущее состояние</th>
+            <th class="align-middle" style="width:155px;">
+                № по реестру
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "IdBuilding")
+                {
+                    <a href="#" class="oi oi-sort-descending sort b-sorted" data-order-field="IdBuilding" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "IdBuilding" ? "b-sorted" : "")"
+                       data-order-field="IdBuilding" data-order-direction="@(Model.OrderOptions.OrderField == "IdBuilding" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="align-middle">
+                Адрес
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Address")
+                {
+                    <a href="#" class="oi oi-sort-descending sort b-sorted" data-order-field="Address" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Address" ? "b-sorted" : "")"
+                       data-order-field="Address" data-order-direction="@(Model.OrderOptions.OrderField == "Address" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="align-middle">
+                Текущее состояние
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "ObjectState")
+                {
+                    <a href="#" class="oi oi-sort-descending sort b-sorted" data-order-field="ObjectState" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "ObjectState" ? "b-sorted" : "")"
+                       data-order-field="ObjectState" data-order-direction="@(Model.OrderOptions.OrderField == "ObjectState" ? "1" : "0")"></a>
+                }
+            </th>
             <th class="align-middle"></th>
-            @*<th class="r-table-header-cell">
-                    <a href="#" data-order-field="ObjectState" data-order-direction="@OrderDirection.Ascending">
-                        Текущее состояние
-                    </a>
-                </th>*@
         </tr>
     </thead>
     <tbody>
