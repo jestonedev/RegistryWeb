@@ -1,8 +1,11 @@
 ﻿@model RegistryWeb.Models.Entities.Building;
 @using RegistryWeb.Extensions;
+@using RegistryWeb.SecurityServices;
+
 @{
     var controller = Context.Session.Get<string>("Controller");
     var action = Context.Session.Get<string>("Action");
+    var securityService = (SecurityService)ViewBag.SecurityService;
     if (ViewBag.Action == "Create")
     {
         ViewData["Title"] = "Создание нового здания";
@@ -26,26 +29,91 @@
     <link rel="stylesheet" href="~/css/building.css" runat="server" />
 }
 <div class="card">
-    <div class="card-header d-flex justify-content-between">
-        <label class="form-check-label h2">@ViewData["Title"]</label>
-        <div class="btn-group" role="group" aria-label="Панель доступа">
-            <a class="form-control btn btn-primary" asp-controller="Buildings" asp-action="Index" asp-route-isBack="true">Назад</a>
-            @if (ViewBag.CanEditBaseInfo)
+    <div class="card-header d-flex flex-column flex-lg-row">
+        <label class="form-check-label h2 col-sm-12 col-lg-6 col-xl-7 pl-0">@ViewData["Title"]</label>
+
+        <div class="col-sm-12 col-lg-6 col-xl-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
+            @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
             {
+                <a class="btn btn-success" title="Помещения здания" aria-label="Помещения здания" asp-action="Index" asp-controller="Premises" asp-route-FilterOptions.IdBuilding="@Model.IdBuilding">
+                    <span class="oi oi-home"></span>
+                </a>
+                <div class="btn-group" role="group" aria-label="Панель доступа">
+                    @if (ViewBag.Action == "Details" && ((ViewBag.CanEditBaseInfo ?? false) || (ViewBag.CanEditExtInfo ?? false)))
+                    {
+                        <div class="btn-group" role="group" aria-label="Панель доступа">
+                            <button class="btn btn-primary dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@Model.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="oi oi-wrench"></span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@Model.IdBuilding">
+                                <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                                   asp-controller="Buildings" asp-action="Edit" asp-route-idBuilding="@Model.IdBuilding" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                <a class="btn btn-danger oi oi-x @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" title="Удалить" aria-label="Удалить"
+                                   asp-controller="Buildings" asp-action="Delete" asp-route-idBuilding="@Model.IdBuilding" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        <button class="btn btn-dark dropdown-toggle" type="button" title="Связанные объекты" aria-label="Связанные объекты" id="objectsBtn_@Model.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-grid-two-up"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@Model.IdBuilding">
+                            <a class="dropdown-item" title="История фонда" aria-label="История фонда"
+                               asp-controller="FundsHistory" asp-action="Index" asp-route-idObject="@Model.IdBuilding" asp-route-typeObject="Building" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">История фонда</a>
+
+                            @if (securityService.HasPrivilege(Privileges.TenancyRead))
+                            {
+                                <a class="dropdown-item" title="Найм помещения" aria-label="Найм помещения"
+                                   asp-controller="TenancyProcesses" asp-action="Index" asp-route-filterOptions.IdBuilding="@Model.IdBuilding">Процессы найма</a>
+                            }
+                            @if (securityService.HasPrivilege(Privileges.OwnerRead))
+                            {
+                                <a class="dropdown-item" title="Собственники помещения" aria-label="Собственники помещения"
+                                   asp-controller="OwnerProcesses" asp-action="Index" asp-route-filterOptions.IdBuilding="@Model.IdBuilding">Процессы собственности</a>
+                            }
+                            @if (securityService.HasPrivilege(Privileges.ClaimsRead))
+                            {
+                                <a class="dropdown-item" title="Лицевые счета БКС" aria-label="Лицевые счета"
+                                   asp-controller="PaymentAccount" asp-action="Index" asp-route-filterOptions.IdBuilding="@Model.IdBuilding">Лицевые счета БКС</a>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="btn-group" role="group" aria-label="Отчеты">
+                        <button class="btn btn-success dropdown-toggle" type="button" title="Отчеты" aria-label="отчеты" id="reportsBtn_@Model.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-document"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.IdBuilding">
+                            <a class="dropdown-item rr-report-building-excerpt" href="#" title="Выписка на здание" aria-label="Выписка на здание" data-id-building="@Model.IdBuilding">Выписка на здание</a>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="btn-group" role="group" aria-label="Панель доступа">
+                @if (@ViewBag.ReturnUrl != null)
+                {
+                    <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+                }
+                else
+                {
+                    <a class="form-control btn btn-primary" asp-controller="Buildings" asp-action="Index" asp-route-isBack="true">Назад</a>
+                }
                 @if (ViewBag.Action == "Create")
                 {
-                    <a href="#" id="createBtn" class="form-control btn btn-success">Создать</a>
+                    <input type="submit" value="Создать" id="createBtn" class="form-control btn btn-success" />
                 }
                 @if (ViewBag.Action == "Edit")
                 {
-                    <a href="#" id="editBtn" class="form-control btn btn-success">Сохранить</a>
+                    <input type="submit" value="Сохранить" id="editBtn" class="form-control btn btn-success  @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" />
                 }
                 @if (ViewBag.Action == "Delete")
                 {
-                    <a href="#" class="form-control btn btn-success" onclick="$('#building').submit();">Удалить</a>
+                    <input type="submit" value="Удалить" class="form-control btn btn-danger" />
                 }
-            }
-            <a href="#" id="buildingToggle" class="form-control btn btn-primary" title="Развернуть здание" style="font-weight:bold;">∧</a>
+
+                <a href="#" id="buildingToggle" class="form-control btn btn-primary" title="Развернуть здание" style="font-weight:bold;">∧</a>
+            </div>
         </div>
     </div>
     <div class="card-body">
@@ -165,7 +233,7 @@
                     <label asp-for="Entrances">Количество подъездов</label>
                 </div>
                 <div class="form-group col r-form-group-label">
-                    <label asp-for="NumPremises">Число помеещний (всего)</label>
+                    <label asp-for="NumPremises">Число помещений (всего)</label>
                 </div>
                 <div class="form-group col r-form-group-label">
                     <label asp-for="NumRooms">Число комнат</label>

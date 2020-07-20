@@ -93,6 +93,7 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
             {
                 premise.ResettlePremisesAssoc = null;
+                premise.LitigationPremisesAssoc = null;
             }
             if (ModelState.IsValid)
             {

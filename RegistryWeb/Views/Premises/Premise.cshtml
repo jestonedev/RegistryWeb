@@ -42,11 +42,14 @@
         <input type="hidden" value="@Model.Premise.IdBuilding" name="IdBuildingPrev" />
         <input type="hidden" value="@Model.Premise.IdBuildingNavigation?.IdStreet" name="IdStreetPrev" />
         <input type="hidden" value="@ViewBag.ReturnUrl" name="ReturnUrl" />
-        <div class="card-header d-flex flex-column flex-md-row">
-            <label class="form-check-label h2 col-sm-12 col-md-6 col-xl-7 pl-0">@ViewData["Title"]</label>
-            <div class="col-sm-12 col-md-6 col-xl-5 text-md-right pl-0 pr-0 mt-2 mt-md-0">
+        <div class="card-header d-flex flex-column flex-lg-row">
+            <label class="form-check-label h2 col-sm-12 col-lg-6 col-xl-7 pl-0">@ViewData["Title"]</label>
+            <div class="col-sm-12 col-lg-6 col-xl-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
                 @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
                 {
+                    <a class="btn btn-success" title="Здание" aria-label="Здание" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@Model.Premise.IdBuilding" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
+                        <span class="oi oi-home"></span>
+                    </a>
                     <div class="btn-group" role="group" aria-label="Панель доступа">
                         @if (ViewBag.Action == "Details" && ((ViewBag.CanEditBaseInfo ?? false) || (ViewBag.CanEditExtInfo ?? false)))
                         {

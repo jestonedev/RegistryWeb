@@ -8,6 +8,7 @@ namespace RegistryWeb.ViewOptions.Filter
     public class PremisesListFilter : FilterAddressOptions
     {
         public int? IdPremise { get; set; }
+        public int? IdBuilding { get; set; }
         public string IdStreet { get; set; }
         public string House { get; set; }
         public string PremisesNum { get; set; }

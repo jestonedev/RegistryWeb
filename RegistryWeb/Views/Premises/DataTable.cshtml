@@ -97,17 +97,17 @@
             <td>
                 <div class="row">
                     <div class="col-auto">
-                        <a class="btn btn-success oi oi-home" title="Здание" aria-label="Здание" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
+                        <a class="btn btn-success oi oi-home" title="Здание" aria-label="Здание" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                     </div>
                     <div class="col-xl-9 col-lg-12 col-md-8">
                         @item.IdBuildingNavigation?.IdStreetNavigation?.StreetLong,
                         д. @item.IdBuildingNavigation?.House,
                         @item.IdPremisesTypeNavigation?.PremisesTypeShort @item.PremisesNum
 
-                        <div id="dopinfo">
+                        <div class="dopinfo">
                             Тип помещения: @item.IdPremisesTypeNavigation?.PremisesTypeName<br />
                             Кадастровый номер: @item.CadastralNum<br />
-                            Общая площадь: @item.TotalArea
+                            Общая площадь: @item.TotalArea<span> м<sup>2</sup></span>
                             @if (securityService.HasPrivilege(Privileges.TenancyRead))
                             {
                                 var paymentInfo =

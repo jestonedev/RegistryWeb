@@ -71,12 +71,6 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
-        public bool IsMunicipal(int idBuilding)
-        {
-            var builing = registryContext.Buildings.FirstOrDefault();
-            return IsMunicipal(builing);
-        }
-
         public bool IsMunicipal(Building building)
         {
             var premises = registryContext.Premises

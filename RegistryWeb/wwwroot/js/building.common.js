@@ -140,7 +140,8 @@ let getBuildingFormData = function () {
 }
 let getInputTemplate = function (name, value) {
     return '<input type="hidden" name="' + name + '" value="' + value + '">';
-}
+};
+
 let createBuildingClick = function (event) {
     event.preventDefault();
     let buildingIsValid = $('#building').valid();
@@ -198,8 +199,13 @@ let createBuildingClick = function (event) {
         }
         $('#building').submit();
     }
-}
-let editBuildingClick = function () {
+};
+
+let editBuildingClick = function (e) {
+    if ($("#editBtn").hasClass("disabled")) {
+        e.preventDefault();
+        return;
+    }
     let cadastralCost = $('#building [name="CadastralCost"]');
     let balanceCost = $('#building [name="BalanceCost"]');
     let rentCoefficient = $('#building [name="RentCoefficient"]');
@@ -207,13 +213,15 @@ let editBuildingClick = function () {
     balanceCost.val(balanceCost.val().replace('.', ','));
     rentCoefficient.val(rentCoefficient.val().replace('.', ','));
     $('#building').submit();
-}
+};
+
 let memorialCardClick = function () {
     var isMemorial = $('#IsMemorial').is(':checked');
     $('#MemorialNumber').prop('disabled', !isMemorial);
     $('#MemorialDate').prop('disabled', !isMemorial);
     $('#MemorialNameOrg').prop('disabled', !isMemorial);
-}
+};
+
 $(function () {
     var action = $('#building').data("action");
     var canEditBaseInfo = JSON.parse($('#building').data("caneditbaseinfo").toLowerCase());
