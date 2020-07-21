@@ -70,9 +70,26 @@ let isExpandElemntArrow = function (elemntArrow) {
     if (elemntArrow.html() === '∧')
         return true;
     return false;
-}
+};
+
 $(function () {
-    $("input[type='number']").inputSpinner();
+    $("input[type='number']").each(function (idx, elem) {
+        $(elem).inputSpinner();
+        var formGroup = $(elem).closest(".form-group");
+        var input = formGroup.find("[inputmode='decimal']");
+        input.attr("data-val", $(elem).attr("data-val"));
+        input.attr("data-val-required", $(elem).attr("data-val-required"));
+        input.attr("id", $(elem).attr("id") + "_decimal");
+        input.attr("name", $(elem).attr("name") + "_decimal");
+        var span = formGroup.find("[data-valmsg-for='" + $(elem).attr("name") + "']");
+        span.attr("data-valmsg-for", $(elem).attr("name") + "_decimal");
+    });
+    var form = $("form").each(function (idx, elem) {
+        $(elem).removeData("validator")
+            .removeData("unobtrusiveValidation");
+        $.validator.unobtrusive.parse($(elem));
+        $(elem).validate();
+    });
 });
 
 function uuidv4() {

@@ -18,43 +18,45 @@ namespace RegistryWeb.Models.Entities
         }
 
         public int IdBuilding { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Выберите состояние здания")]
         public int IdState { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Выберите тип строения")]
         public int IdStructureType { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Выберите тип перекрытия")]
         public int IdStructureTypeOverlap { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Выберите тип фундамента")]
         public int IdFoundationType { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Выберите улицу")]
         public string IdStreet { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите номер дома")]
         public string House { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите этажность")]
         public short Floors { get; set; }
         public short? Entrances { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите кол-во помещений")]
         public int NumPremises { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите кол-во комнат")]
         public int NumRooms { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите кол-во квартир")]
         public int NumApartments { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите кол-во квартир с подселением")]
         public int NumSharedApartments { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите общую площадь")]
         public double TotalArea { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите жилую площадь")]
         public double LivingArea { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите нежилую площадь")]
         public double UnlivingArea { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите площадь общего имущества")]
         public double CommonPropertyArea { get; set; }
         public string CadastralNum { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите кадастровую стоимость")]
+        [Range(0, Double.MaxValue, ErrorMessage = "Кадастровая стоимость должна быть больше нуля")]
         public decimal CadastralCost { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите балансовую стоимость")]
+        [Range(-1, Double.MaxValue, ErrorMessage = "Балансовая стоимость должна быть больше нуля")]
         public decimal BalanceCost { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите год ввода в эксплуатацию")]
         public int StartupYear { get; set; }
         public string Series { get; set; }
         [Required]
@@ -76,9 +78,9 @@ namespace RegistryWeb.Models.Entities
         public int IdDecree { get; set; }
         public string BtiRooms { get; set; }
         public string HousingCooperative { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите дату включения в РМИ")]
         public DateTime RegDate { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите коэффициент оплаты")]
         public decimal RentCoefficient { get; set; }
         [Required]
         public bool IsMemorial { get; set; }
@@ -90,7 +92,7 @@ namespace RegistryWeb.Models.Entities
         public DateTime? DemolishedPlanDate { get; set; }
         public string LandCadastralNum { get; set; }
         public DateTime? LandCadastralDate { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Укажите площадь земельного участка")]
         public double LandArea { get; set; }
         public byte Deleted { get; set; }
 

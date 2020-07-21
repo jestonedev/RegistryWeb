@@ -156,6 +156,9 @@ let getInputTemplate = function (name, value) {
 
 let createBuildingClick = function (event) {
     event.preventDefault();
+    $("input.decimal").each(function (idx, elem) {
+        $(elem).val($(elem).val().replace(".", ","));
+    });
     let buildingIsValid = $('#building').valid();
     let restrictionsIsValid = $("#restrictionsForm").valid();
     let ownershipRightsIsValid = $("#ownershipRightsForm").valid();
@@ -212,7 +215,7 @@ let createBuildingClick = function (event) {
         let attachmentFiles = CreateBuildingAttachmentFilesAssoc();
         for (let i = 0; i < attachmentFiles.length; i++) {
             let baf = "BuildingAttachmentFilesAssoc[" + i + "].";
-            let oaf = baf +"ObjectAttachmentFileNavigation.";
+            let oaf = baf + "ObjectAttachmentFileNavigation.";
             $('#building').append(getInputTemplate(baf + 'IdBuilding', $('#building [name="IdBuilding"]').val()));
             $('#building').append(getInputTemplate(baf + 'IdAttachment', attachmentFiles[i].ObjectAttachmentFileNavigation.IdAttachment));
             $('#building').append(getInputTemplate(oaf + 'IdAttachment', attachmentFiles[i].ObjectAttachmentFileNavigation.IdAttachment));
@@ -222,21 +225,46 @@ let createBuildingClick = function (event) {
             $('#building').append(file);
         }
         $('#building').submit();
+    } else {
+        onSubmitErrorsPostProcessing();
+        e.preventDefault();
     }
 };
 
 let editBuildingClick = function (e) {
-    if ($("#editBtn").hasClass("disabled")) {
-        e.preventDefault();
-        return;
+    $("input.decimal").each(function (idx, elem) {
+        $(elem).val($(elem).val().replace(".", ","));
+    });
+    let buildingIsValid = $('#building').valid();
+    if (buildingIsValid) {
+        $('#building').submit();
+    } else {
+        onSubmitErrorsPostProcessing();
     }
-    let cadastralCost = $('#building [name="CadastralCost"]');
-    let balanceCost = $('#building [name="BalanceCost"]');
-    let rentCoefficient = $('#building [name="RentCoefficient"]');
-    cadastralCost.val(cadastralCost.val().replace('.', ','));
-    balanceCost.val(balanceCost.val().replace('.', ','));
-    rentCoefficient.val(rentCoefficient.val().replace('.', ','));
-    $('#building').submit();
+    e.preventDefault();
+};
+
+let onSubmitErrorsPostProcessing = function () {
+    $("select").each(function (idx, elem) {
+        var id = $(elem).prop("id");
+        var name = $(elem).prop("name");
+        var errorSpan = $("span[data-valmsg-for='" + name + "']");
+        if (errorSpan.hasClass("field-validation-error")) {
+            $("button[data-id='" + id + "']").addClass("input-validation-error");
+        }
+    });
+
+    $(".toggle-hide").each(function (idx, elem) {
+        if ($(elem).find(".field-validation-error").length > 0) {
+            var toggler = $(elem).closest(".card").find("[id$='Toggle']");
+            if (!isExpandElemntArrow(toggler)) {
+                toggler.click();
+            }
+        }
+    });
+    $([document.documentElement, document.body]).animate({
+        scrollTop: $(".input-validation-error").first().offset().top - 35
+    }, 1000);
 };
 
 let memorialCardClick = function () {

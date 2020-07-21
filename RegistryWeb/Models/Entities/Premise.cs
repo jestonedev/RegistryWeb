@@ -19,16 +19,16 @@ namespace RegistryWeb.Models.Entities
         }
 
         public int IdPremises { get; set; }
-        [Required(ErrorMessage = "Выберете здание")]
+        [Required(ErrorMessage = "Выберите здание")]
         public int IdBuilding { get; set; }
-        [Required(ErrorMessage = "Выберете состояние помещения")]
+        [Required(ErrorMessage = "Выберите состояние помещения")]
         public int IdState { get; set; }        
         public int IdPremisesKind { get; set; }
-        [Required(ErrorMessage = "Выберете тип помещения")]
+        [Required(ErrorMessage = "Выберите тип помещения")]
         public int IdPremisesType { get; set; }
-        [Required(ErrorMessage = "Выберете примечание")]
+        [Required(ErrorMessage = "Выберите примечание")]
         public int IdPremisesComment { get; set; }
-        [Required(ErrorMessage = "Выберете местонахождение ключей")]
+        [Required(ErrorMessage = "Выберите местонахождение ключей")]
         public int IdPremisesDoorKeys { get; set; }
         [Required(ErrorMessage = "Укажите номер помещения")]
         public string PremisesNum { get; set; }
