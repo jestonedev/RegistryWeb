@@ -9,6 +9,7 @@ namespace RegistryWeb.Models
     {
         BuildingDemolitionActFile = 1,
         OwnershipRight = 2,
-        Restriction = 3
+        Restriction = 3,
+        Attachment = 4
     }
 }

@@ -50,7 +50,8 @@
         OwnershipBuildingsAssoc: CreateOwnershipBuildingsAssoc()
     };
     return building;
-}
+};
+
 let getBuildingFormData = function () {
     let buildingFormData = new FormData();
     buildingFormData.append('IdBuilding', $('#building [name="IdBuilding"]').val());
@@ -122,7 +123,7 @@ let getBuildingFormData = function () {
         buildingFormData.append('OwnershipBuildingsAssoc[' + i + '].OwnershipRightNavigation.ResettlePlanDate', obas[i].OwnershipRightNavigation.ResettlePlanDate);
         buildingFormData.append('OwnershipBuildingsAssoc[' + i + '].OwnershipRightNavigation.DemolishPlanDate', obas[i].OwnershipRightNavigation.DemolishPlanDate);
         buildingFormData.append('OwnershipRightFile[' + i + ']', obas[i].OwnershipRightNavigation.OwnershipRightFile.files[0]);
-    }    
+    }
     let buildingDemolitionInfo = _buildingDemolitionInfo.getJson();
     buildingFormData.append('DemolishedPlanDate', buildingDemolitionInfo.DemolishedPlanDate);
     let buildingDemolitionActFiles = buildingDemolitionInfo.BuildingDemolitionActFiles;
@@ -136,8 +137,19 @@ let getBuildingFormData = function () {
         buildingFormData.append('BuildingDemolitionActFiles[' + i + '].Name', buildingDemolitionActFiles[i].Name);
         buildingFormData.append('BuildingDemolitionActFile[' + i + ']', buildingDemolitionActFiles[i].File);
     }
+
+    let attachmentFiles = CreateBuildingAttachmentFilesAssoc();
+    for (let i = 0; i < attachmentFiles.length; i++) {
+        buildingFormData.append('BuildingAttachmentFilesAssoc[' + i + '].IdBuilding', $('#building [name="IdBuilding"]').val());
+        buildingFormData.append('BuildingAttachmentFilesAssoc[' + i + '].IdAttachment', attachmentFiles[i].ObjectAttachmentFileNavigation.IdAttachment);
+        buildingFormData.append('BuildingAttachmentFilesAssoc[' + i + '].ObjectAttachmentFileNavigation.IdRestriction', attachmentFiles[i].ObjectAttachmentFileNavigation.IdAttachment);
+        buildingFormData.append('BuildingAttachmentFilesAssoc[' + i + '].ObjectAttachmentFileNavigation.Description', attachmentFiles[i].ObjectAttachmentFileNavigation.Description);
+        buildingFormData.append('AttachmentFile[' + i + ']', attachmentFiles[i].ObjectAttachmentFileNavigation.AttachmentFile.files[0]);
+    }
+
     return buildingFormData;
-}
+};
+
 let getInputTemplate = function (name, value) {
     return '<input type="hidden" name="' + name + '" value="' + value + '">';
 };
@@ -197,6 +209,18 @@ let createBuildingClick = function (event) {
             file.attr("name", "BuildingDemolitionActFile[" + i + "]");
             $('#building').append(file);
         }
+        let attachmentFiles = CreateBuildingAttachmentFilesAssoc();
+        for (let i = 0; i < attachmentFiles.length; i++) {
+            let baf = "BuildingAttachmentFilesAssoc[" + i + "].";
+            let oaf = baf +"ObjectAttachmentFileNavigation.";
+            $('#building').append(getInputTemplate(baf + 'IdBuilding', $('#building [name="IdBuilding"]').val()));
+            $('#building').append(getInputTemplate(baf + 'IdAttachment', attachmentFiles[i].ObjectAttachmentFileNavigation.IdAttachment));
+            $('#building').append(getInputTemplate(oaf + 'IdAttachment', attachmentFiles[i].ObjectAttachmentFileNavigation.IdAttachment));
+            $('#building').append(getInputTemplate(oaf + 'Description', attachmentFiles[i].ObjectAttachmentFileNavigation.Description));
+            let file = $(attachmentFiles[i].ObjectAttachmentFileNavigation.AttachmentFile).clone();
+            file.attr("name", "AttachmentFile[" + i + "]");
+            $('#building').append(file);
+        }
         $('#building').submit();
     }
 };
@@ -226,7 +250,7 @@ $(function () {
     var action = $('#building').data("action");
     var canEditBaseInfo = JSON.parse($('#building').data("caneditbaseinfo").toLowerCase());
     memorialCardClick();
-    if (action == "Details" || action == "Delete" || !canEditBaseInfo) {
+    if (action === "Details" || action === "Delete" || !canEditBaseInfo) {
         $('#building select').prop('disabled', true);
         $('#building input').prop('disabled', true);
         $('#building textarea').prop('disabled', true);

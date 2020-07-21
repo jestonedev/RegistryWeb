@@ -388,6 +388,19 @@ namespace RegistryWeb.DataServices
                     building.BuildingDemolitionActFiles[i].ActFile = actFile; 
                 }
             }
+            // Прикрепляем прочие файлы
+            if (building.BuildingAttachmentFilesAssoc != null)
+            {
+                for (var i = 0; i < building.BuildingAttachmentFilesAssoc.Count; i++)
+                {
+                    var file = files.Where(r => r.Name == "AttachmentFile[" + i + "]").FirstOrDefault();
+                    if (file == null) continue;
+                    building.BuildingAttachmentFilesAssoc[i].ObjectAttachmentFileNavigation.FileDisplayName = file.FileName;
+                    var fileOriginName = reportService.SaveFormFileToRepository(file, ActFileTypes.Attachment);
+                    building.BuildingAttachmentFilesAssoc[i].ObjectAttachmentFileNavigation.FileOriginName = fileOriginName;
+                    building.BuildingAttachmentFilesAssoc[i].ObjectAttachmentFileNavigation.FileMimeType = file.ContentType;
+                }
+            }
             registryContext.Buildings.Add(building);
             registryContext.SaveChanges();
         }
