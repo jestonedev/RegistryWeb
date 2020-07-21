@@ -15,7 +15,7 @@ namespace RegistryWeb.Models.Entities
 
         public int IdPrivilege { get; set; }
         public string PrivilegeName { get; set; }
-        public uint PrivilegeMask { get; set; }
+        public long PrivilegeMask { get; set; }
         public string PrivilegeDescription { get; set; }
 
         public virtual IList<AclRolePrivilege> AclRolePrivileges { get; set; }

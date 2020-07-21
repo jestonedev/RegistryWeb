@@ -96,7 +96,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             if (viewModel == null)
                 return Json(-1);
             var r = Request;
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo))
                 return Json(-2);
             var saveFileList = new List<string>();
             try

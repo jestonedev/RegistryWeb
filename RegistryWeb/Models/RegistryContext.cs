@@ -46,24 +46,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<FundSubPremiseAssoc> FundsSubPremisesAssoc { get; set; }
         public virtual DbSet<HeatingType> HeatingTypes { get; set; }
         public virtual DbSet<ObjectState> ObjectStates { get; set; }        
-        public virtual DbSet<OwnershipBuildingAssoc> OwnershipBuildingsAssoc { get; set; }
-        public virtual DbSet<OwnershipPremiseAssoc> OwnershipPremisesAssoc { get; set; }
-        public virtual DbSet<OwnershipRightType> OwnershipRightTypes { get; set; }
-        public virtual DbSet<OwnershipRight> OwnershipRights { get; set; }
         public virtual DbSet<TotalAreaAvgCost> TotalAreaAvgCosts { get; set; }
-
-        //Документы
-        public virtual DbSet<ActTypeDocument> ActTypeDocuments { get; set; }
-        public virtual DbSet<ActFile> ActFiles { get; set; }
-        public virtual DbSet<BuildingDemolitionActFile> BuildingDemolitionActFiles { get; set; }
-
-        public virtual DbSet<RestrictionBuildingAssoc> RestrictionBuildingsAssoc { get; set; }
-        public virtual DbSet<RestrictionPremiseAssoc> RestrictionPremisesAssoc { get; set; }
-        public virtual DbSet<RestrictionType> RestrictionTypes { get; set; }
-        public virtual DbSet<Restriction> Restrictions { get; set; }
-        public virtual DbSet<Litigation> Litigations { get; set; }
-        public virtual DbSet<LitigationPremiseAssoc> LitigationPremisesAssoc { get; set; }
-        public virtual DbSet<LitigationType> LitigationTypes { get; set; }
         public virtual DbSet<PremisesComment> PremisesComments { get; set; }
         public virtual DbSet<PremisesDoorKeys> PremisesDoorKeys { get; set; }
         public virtual DbSet<PremisesKind> PremisesKinds { get; set; }
@@ -73,6 +56,24 @@ namespace RegistryWeb.Models
         public virtual DbSet<FoundationType> FoundationTypes { get; set; }
         public virtual DbSet<GovernmentDecree> GovernmentDecrees { get; set; }
         public virtual DbSet<SelectableSigner> SelectableSigners { get; set; }
+
+        //Документы
+        public virtual DbSet<ActTypeDocument> ActTypeDocuments { get; set; }
+        public virtual DbSet<ActFile> ActFiles { get; set; }
+        public virtual DbSet<BuildingDemolitionActFile> BuildingDemolitionActFiles { get; set; }
+        public virtual DbSet<RestrictionBuildingAssoc> RestrictionBuildingsAssoc { get; set; }
+        public virtual DbSet<RestrictionPremiseAssoc> RestrictionPremisesAssoc { get; set; }
+        public virtual DbSet<RestrictionType> RestrictionTypes { get; set; }
+        public virtual DbSet<Restriction> Restrictions { get; set; }
+        public virtual DbSet<Litigation> Litigations { get; set; }
+        public virtual DbSet<LitigationPremiseAssoc> LitigationPremisesAssoc { get; set; }
+        public virtual DbSet<LitigationType> LitigationTypes { get; set; }
+        public virtual DbSet<OwnershipBuildingAssoc> OwnershipBuildingsAssoc { get; set; }
+        public virtual DbSet<OwnershipPremiseAssoc> OwnershipPremisesAssoc { get; set; }
+        public virtual DbSet<OwnershipRightType> OwnershipRightTypes { get; set; }
+        public virtual DbSet<OwnershipRight> OwnershipRights { get; set; }
+        public virtual DbSet<ObjectAttachmentFile> ObjectAttachmentFiles { get; set; }
+        public virtual DbSet<BuildingAttachmentFileAssoc> BuildingAttachmentFilesAssoc { get; set; }
 
         //Собственники
         public virtual DbSet<Owner> Owners { get; set; }
@@ -199,6 +200,9 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new LitigationConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LitigationTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LitigationPremiseAssocConfiguration(nameDatebase));
+
+            modelBuilder.ApplyConfiguration(new ObjectAttachmentFileConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new BuildingAttachmentFileAssocConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new FundBuildingAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new FundPremiseAssocConfiguration(nameDatebase));

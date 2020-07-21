@@ -108,6 +108,7 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<Premise> Premises { get; set; }
         public virtual IList<TenancyBuildingAssoc> TenancyBuildingsAssoc { get; set; }
         public virtual IList<BuildingDemolitionActFile> BuildingDemolitionActFiles { get; set; }
+        public virtual IList<BuildingAttachmentFileAssoc> BuildingAttachmentFilesAssoc { get; set; }
 
         public string GetAddress()
         {

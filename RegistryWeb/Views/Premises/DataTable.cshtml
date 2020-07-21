@@ -132,9 +132,10 @@
                         var canEditBaseInfo = (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(item.IdState) &&
                         (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) || !item.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) ||
                         (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(item.IdState));
-                        var canEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+                        var canEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
+                        var canEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
                     }
-                    @if (canEditBaseInfo || canEditExtInfo)
+                    @if (canEditBaseInfo || canEditResettleInfo || canEditLitigationInfo)
                     {
                         <div class="btn-group" role="group" aria-label="Панель доступа">
                             <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>

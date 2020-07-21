@@ -6,7 +6,7 @@
 @using RegistryWeb.DataHelpers;
 
 @{
-    var canEdit = ((bool?)ViewBag.CanEditExtInfo) ?? true;
+    var canEdit = ((bool?)ViewBag.CanEditResettleInfo) ?? true;
     var ownershipRightTypeClass = "col-md-6 col-lg-4";
     if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
     {

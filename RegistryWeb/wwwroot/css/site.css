@@ -77,7 +77,7 @@ legend.r-scheduler-border {
     margin-bottom: 10pt;
 }
 
-.rr-ownership-right-edit-buttons, .rr-restriction-edit-buttons, .rr-litigation-edit-buttons, .rr-sub-premise-edit-buttons, .rr-sub-premise-nav-buttons, .rr-resettle-edit-buttons,
+.rr-ownership-right-edit-buttons, .rr-restriction-edit-buttons, .rr-attachment-file-edit-buttons, .rr-litigation-edit-buttons, .rr-sub-premise-edit-buttons, .rr-sub-premise-nav-buttons, .rr-resettle-edit-buttons,
 .rr-resettle-edit-buttons-2, .rr-resettle-document-edit-buttons {
     margin-top: 0;
 }
@@ -96,7 +96,7 @@ legend.r-scheduler-border {
 
 
 @media(min-width: 992px) {
-    .rr-restriction-edit-buttons, .rr-ownership-right-edit-buttons {
+    .rr-restriction-edit-buttons, .rr-attachment-file-edit-buttons, .rr-ownership-right-edit-buttons {
         margin-top: 33px;
     }
 }

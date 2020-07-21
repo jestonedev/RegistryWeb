@@ -20,7 +20,8 @@ namespace RegistryWeb.Controllers
     {
         OwnerReportService reportService;
         bool canEditBaseInfo;
-        bool canEditExtInfo;
+        bool canEditDemolishingInfo;
+        bool canAttachAdditionalFiles;
 
         public BuildingsController(BuildingsDataService dataService, SecurityService securityService, OwnerReportService reportService)
             : base(dataService, securityService)
@@ -134,7 +135,8 @@ namespace RegistryWeb.Controllers
         public IActionResult Create()
         {
             canEditBaseInfo = securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal);
-            canEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+            canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
             if (!canEditBaseInfo)
                 return View("NotAccess");
             return GetBuildingView(dataService.CreateBuilding());
@@ -146,12 +148,17 @@ namespace RegistryWeb.Controllers
             if (building == null)
                 return NotFound();
             canEditBaseInfo = securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal);
-            canEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+            canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
             if (!canEditBaseInfo)
                 return View("NotAccess");
-            if (!canEditExtInfo)
+            if (!canEditDemolishingInfo)
             {
                 building.BuildingDemolitionActFiles = null;
+            }
+            if (!canAttachAdditionalFiles)
+            {
+                building.BuildingAttachmentFilesAssoc = null;
             }
             if (ModelState.IsValid)
             {
@@ -172,7 +179,8 @@ namespace RegistryWeb.Controllers
             if (building == null)
                 return NotFound();
             canEditBaseInfo = CanEditBuildingBaseInfo(building);
-            canEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+            canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
             return GetBuildingView(building);
         }
 
@@ -188,7 +196,8 @@ namespace RegistryWeb.Controllers
             if (!CanEditBuildingBaseInfo(building))
                 return View("NotAccess");
             canEditBaseInfo = false;
-            canEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+            canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
             return GetBuildingView(building);
         }
 
@@ -217,8 +226,9 @@ namespace RegistryWeb.Controllers
             if (building == null)
                 return NotFound();
             canEditBaseInfo = CanEditBuildingBaseInfo(building);
-            canEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
-            if (!(canEditBaseInfo || canEditExtInfo))
+            canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+            canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
+            if (!(canEditBaseInfo || canEditDemolishingInfo || canAttachAdditionalFiles))
                 return View("NotAccess");
             return GetBuildingView(building);
         }
@@ -230,7 +240,8 @@ namespace RegistryWeb.Controllers
             if (building == null)
                 return NotFound();
             canEditBaseInfo = CanEditBuildingBaseInfo(building);
-            canEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+            canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
             if (!canEditBaseInfo)
                 return View("NotAccess");
             if (ModelState.IsValid)
@@ -252,7 +263,8 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = action;
             ViewBag.SecurityService = securityService;
             ViewBag.CanEditBaseInfo = canEditBaseInfo;
-            ViewBag.CanEditExtInfo = canEditExtInfo;
+            ViewBag.CanEditDemolishingInfo = canEditDemolishingInfo;
+            ViewBag.CanAttachAdditionalFiles = canAttachAdditionalFiles;
             ViewBag.ObjectStates = dataService.GetObjectStates(securityService, action, canEditBaseInfo);
             ViewBag.StructureTypes = dataService.StructureTypes;
             ViewBag.StructureTypeOverlaps = dataService.StructureTypeOverlaps;

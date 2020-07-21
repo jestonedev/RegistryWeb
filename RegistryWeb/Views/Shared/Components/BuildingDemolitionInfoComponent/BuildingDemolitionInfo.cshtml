@@ -2,7 +2,7 @@
 @{
     var demolishedPlanDate = Model.DemolishedPlanDate.HasValue ? Model.DemolishedPlanDate.Value.ToString("yyyy-MM-dd") : "";
 }
-<form id="buildingDemolitionInfoForm" data-action="@ViewBag.Action" data-idbuilding="@Model.IdBuilding" data-caneditextinfo="@ViewBag.CanEditExtInfo">
+<form id="buildingDemolitionInfoForm" data-action="@ViewBag.Action" data-idbuilding="@Model.IdBuilding" data-caneditextinfo="@ViewBag.CanEditDemolishingInfo">
     <script src="~/js/buildingDemolitionInfo.common.js" asp-append-version="true"></script>
     <link rel="stylesheet" href="~/css/buildingDemolitionInfo.css" asp-append-version="true" />
     <div class="card">
@@ -27,7 +27,7 @@
                         <th class="align-middle">Наименование</th>
                         <th class="align-middle">Тип документа</th>
                         <th class="align-middle">Файл</th>
-                        @if ((ViewBag.Action == "Edit" || ViewBag.Action == "Create") && ViewBag.CanEditExtInfo)
+                        @if ((ViewBag.Action == "Edit" || ViewBag.Action == "Create") && ViewBag.CanEditDemolishingInfo)
                         {
                             <th class="align-middle" width="110">
                                 <a href="#" id="buildingDemolitionActFileAdd" class="form-control btn btn-success w-auto" title="Добавить документ">&#10010;</a>
@@ -71,7 +71,7 @@
                                 </div>
                             </div>
                         </td>
-                        @if ((ViewBag.Action == "Edit" || ViewBag.Action == "Create") && ViewBag.CanEditExtInfo)
+                        @if ((ViewBag.Action == "Edit" || ViewBag.Action == "Create") && ViewBag.CanEditDemolishingInfo)
                         {
                             <td class="align-middle">
                                 <a href="#" class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"></a>
@@ -82,7 +82,7 @@
                 </tbody>
             </table>
 
-            @if (ViewBag.Action == "Edit" && ViewBag.CanEditExtInfo)
+            @if (ViewBag.Action == "Edit" && ViewBag.CanEditDemolishingInfo)
             {
                 <div class="form-group row d-flex justify-content-center">
                     <div class="col-auto">

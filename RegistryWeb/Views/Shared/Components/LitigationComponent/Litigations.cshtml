@@ -7,7 +7,7 @@
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {
-                    <a href="#" id="litigationAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditExtInfo ?? true) ? "" : "disabled")" title="Добавить разбирательство">&#10010;</a>
+                    <a href="#" id="litigationAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditLitigationInfo ?? true) ? "" : "disabled")" title="Добавить разбирательство">&#10010;</a>
                 }
                 <a href="#" id="litigationsToggle" class="form-control btn btn-primary" title="Развернуть список судебных разбирательств" style="font-weight:bold;">∨</a>
             </div>

@@ -30,7 +30,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.Property(e => e.PrivilegeMask)
                 .HasColumnName("privilege_mask")
-                .HasColumnType("int(11)");
+                .HasColumnType("bigint(20)");
 
             builder.Property(e => e.PrivilegeDescription)
                 .HasColumnName("privilege_description")

@@ -34,7 +34,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         {
             if (idResettleInfo == null)
                 return -1;
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo))
                 return -2;
             try
             {
@@ -101,7 +101,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Resettles\");
             if (resettleInfo == null)
                 return Json(new { Error = -1 });
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo))
                 return Json(new { Error = -2 });
             if (resettleInfo.ResettleDocuments != null)
             {
@@ -271,7 +271,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         [HttpPost]
         public IActionResult AddResettle(Address address, string action)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo))
                 return Json(-2);
             var id = 0;
             if (address == null)
@@ -299,7 +299,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         [HttpPost]
         public IActionResult AddResettleDocument(Address address, string action)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo))
                 return Json(-2);
             var id = 0;
             if (address == null)

@@ -99,9 +99,10 @@
                         @{
                             var canEditBaseInfo = (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !Model.IsMunicipalDictionary[item.IdBuilding]) ||
                             (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && Model.IsMunicipalDictionary[item.IdBuilding]);
-                            var canEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+                            var canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+                            var canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
                         }
-                        @if (canEditBaseInfo || canEditExtInfo)
+                        @if (canEditBaseInfo || canEditDemolishingInfo || canAttachAdditionalFiles)
                         {
                             <div class="btn-group" role="group" aria-label="Панель доступа">
                                 <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
