@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.Models.Entities;
@@ -52,6 +53,10 @@ namespace RegistryWeb.Controllers
             ViewBag.OwnershipRightTypes = dataService.OwnershipRightTypes;
             ViewBag.GovernmentDecrees = dataService.GovernmentDecrees;
             ViewBag.SecurityService = securityService;
+            ViewBag.SignersList = new SelectList(dataService.SelectableSigners.Select(s => new {
+                s.IdRecord,
+                Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
+            }), "IdRecord", "Snp");
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
@@ -272,6 +277,10 @@ namespace RegistryWeb.Controllers
             ViewBag.HeatingTypes = dataService.HeatingTypes;
             ViewBag.GovernmentDecrees = dataService.GovernmentDecrees;
             ViewBag.FoundationTypes = dataService.FoundationTypes;
+            ViewBag.SignersList = new SelectList(dataService.SelectableSigners.Select(s => new {
+                s.IdRecord,
+                Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
+            }), "IdRecord", "Snp");
             return View("Building", building);
         }
     }

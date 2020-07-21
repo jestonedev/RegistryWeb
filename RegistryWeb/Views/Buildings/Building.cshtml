@@ -23,6 +23,7 @@
 @section scripts
     {
     <script src="~/js/building.common.js" asp-append-version="true"></script>
+    <script src="~/js/building.reports.js" asp-append-version="true"></script>
 }
 @section styles
     {
@@ -479,3 +480,5 @@
         @await Component.InvokeAsync("AttachmentFilesComponent", new { id = Model.IdBuilding, type = AddressTypes.Building, action = ViewBag.Action })
     </div>
 </div>
+
+<partial name="ReportsModals">
