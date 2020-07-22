@@ -15,6 +15,7 @@ using RegistryWeb.SecurityServices;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using RegistryWeb.Models.SqlViews;
 
 namespace RegistryWeb.DataServices
 {
@@ -48,6 +49,7 @@ namespace RegistryWeb.DataServices
                 s.IdRecord,
                 Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
             }), "IdRecord", "Snp");
+            viewModel.PreparersList= new SelectList(registryContext.Preparers, "IdPreparer", "PreparerName");
             return viewModel;
         }
 
@@ -69,6 +71,8 @@ namespace RegistryWeb.DataServices
                 viewModel.PageOptions.CurrentPage = 1;
             viewModel.Premises = GetQueryPage(query, viewModel.PageOptions).ToList();
             viewModel.PaymentsInfo = GetPaymentInfo(viewModel.Premises);
+            viewModel.PremisesOwnershipRightCurrent = GetPremisesOwnershipRightCurrent(viewModel.Premises);
+            //viewModel.PremisesOwnershipRightCurrent = GetPremisesOwnershipRightCurrent(query);
             return viewModel;
         }
 
@@ -507,10 +511,13 @@ namespace RegistryWeb.DataServices
                              where fpa.IdPremises == premise.IdPremises && fhRow.ExcludeRestrictionDate == null
                              orderby fpa.IdFund descending
                              select fhRow.IdFundType).FirstOrDefault(),
+              
+
                 SignersList = new SelectList(registryContext.SelectableSigners.Where(s => s.IdSignerGroup == 1).ToList().Select(s => new {
                     s.IdRecord,
                     Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
-                }), "IdRecord", "Snp")
+                }), "IdRecord", "Snp"),
+                PreparersList = new SelectList(registryContext.Preparers, "IdPreparer", "PreparerName")
         };
 
         if ((action == "Details" || action == "Delete") && securityService.HasPrivilege(Privileges.TenancyRead))
@@ -635,6 +642,17 @@ namespace RegistryWeb.DataServices
             return paymentsInfo;
         }
 
+        //private Dictionary<int,int> GetPremisesOwnershipRightCurrent(IQueryable<Premise> premises)
+        private List<PremiseOwnershipRightCurrent> GetPremisesOwnershipRightCurrent(List<Premise> premises)
+        {
+            var ids = premises.Select(p => p.IdPremises).ToList();
+            return registryContext.PremisesOwnershipRightCurrent
+                .Where(p => ids.Contains(p.id_premises))     
+                .Select(p=> new PremiseOwnershipRightCurrent { id_premises = p.id_premises, id_ownership_right_type = p.id_ownership_right_type })
+                .ToList();
+                ;
+        }
+
         internal void Edit(Premise premise)
         {
             registryContext.Premises.Update(premise);
@@ -669,6 +687,13 @@ namespace RegistryWeb.DataServices
                 .Include(b => b.IdPremisesDoorKeysNavigation)
                 .Include(b => b.SubPremises)
                 .SingleOrDefault(b => b.IdPremises == idPremise);
+        }
+
+        public List<Premise> GetPremises(List<int> ids)
+        {
+            return registryContext.Premises
+                .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
+                .Where(b => ids.Contains(b.IdPremises)).ToList();
         }
 
         public IEnumerable<ObjectState> ObjectStates

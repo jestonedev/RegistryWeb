@@ -1,10 +1,31 @@
 ﻿@{
+    ViewData["Title"] = "Ошибка";
     if (ViewData["Controller"].ToString() == "Account")
     {
         Layout = null;
         <link href="~/lib/bootstrap-4.3.1/css/bootstrap.min.css" rel="stylesheet" />
     }
 }
-<h1 class="text-danger">Ошибка!</h1>
-<h2 class="text-danger">@ViewData["TextError"]</h2>
-<a class="btn btn-default" asp-controller="@ViewData["Controller"]" asp-action="Index">Назад</a>
+
+
+
+<style>
+    .err{
+        font-weight: bold;
+        font-size: 14pt;
+        margin-bottom: 3%;
+        
+
+    }
+    h1 {
+        margin-top: 3%;
+    }
+
+</style>
+
+<body>
+    <h1 class="text-danger">Ошибка!</h1>
+    <div class="text-danger err">@ViewData["TextError"]</div>
+    <a class="btn btn-primary" asp-controller="@ViewData["Controller"]" asp-action="Index">Назад</a>
+    @*<a class="btn btn-primary" href="@ViewData["ReturnUrl"]">Назад</a>*@
+</body>

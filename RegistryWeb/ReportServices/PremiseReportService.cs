@@ -98,5 +98,55 @@ namespace RegistryWeb.ReportServices
             var fileNameReport = GenerateReport(arguments, "registry\\registry\\area_premises");
             return DownloadFile(fileNameReport);
         }
+
+
+//___________для массовых______________
+        public byte[] ExcerptPremises(string idPremises, string excerptNumber, DateTime excerptDateFrom, int signer)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "ids", idPremises },
+                { "excerpt_type", 4 },
+                { "excerpt_date_from", excerptDateFrom.ToString("dd.MM.yyyy") },
+                { "excerpt_number", excerptNumber },
+                { "executor", securityService.User.UserName },
+                { "signer", signer }
+            };
+            //var fileNameReport = GenerateReport(arguments, "registry\\registry\\excerpt");
+            var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\premises_mx");
+            return DownloadFile(fileNameReport);
+        }
+
+        public byte[] PremisesArea(string idPremises)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "filter", idPremises }
+            };
+            //var fileNameReport = GenerateReport(arguments, "registry\\registry\\area_premises");
+            var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\area_premises");
+            return DownloadFile(fileNameReport);
+        }
+
+        public byte[] MassActPremises(string idPremises, DateTime actDate, bool isNotResides, string commision, int clerk)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "filter", idPremises },
+                { "acttype", 1 },
+                { "executor", securityService.User.UserName },
+                { "date_act", actDate },
+                { "is_not_resides", isNotResides },
+                { "ids_commission", commision },
+                { "id_clerk", clerk }
+            };
+            //var fileNameReport = GenerateReport(arguments, "registry\\registry\\act_residence");
+            var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\act_residence");
+            return DownloadFile(fileNameReport);
+        }
+
+
+
+
     }
 }

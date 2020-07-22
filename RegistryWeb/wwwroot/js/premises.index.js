@@ -118,4 +118,13 @@ $(document).ready(function () {
         $('#FilterOptions_Address_Text').prop("disabled", false);
         $("form.filterForm").submit();
     });
+
+    $('.idPremiseCheckbox').click(function (e) {
+        var id = +$(this).data('id');
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/Premises/SessionIdPremises',
+            data: { idPremise: id, isCheck: $(this).prop('checked') }
+        });
+    });
 });

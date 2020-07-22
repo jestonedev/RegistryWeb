@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.Models;
+using RegistryWeb.Models.SqlViews;
 using RegistryWeb.DataServices;
 
 namespace RegistryWeb.ViewModel
@@ -41,7 +42,11 @@ namespace RegistryWeb.ViewModel
         public SelectList RestrictionsList { get; set; }
         public SelectList HousesList { get; set; }
         public SelectList PremisesTypesList { get; set; }
+        public SelectList CommisionList { get; set; }
         public SelectList SignersList { get; set; }
+        public SelectList PreparersList { get; set; }
         public List<PaymentsInfo> PaymentsInfo { get; set; }
+        public List<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
+        //public IQueryable<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
     }
 }

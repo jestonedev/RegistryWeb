@@ -27,7 +27,7 @@
                 <a class="btn btn-success" title="Добавить" aria-label="Добавить помещение" asp-controller="Premises" asp-action="Create">&#10010;</a>
             </div>
         }
-        <div class="input-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-9" : "col-10") ">
+        <div class="input-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-7" : "col-8") ">
             <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
             <div class="input-group-append h-auto d-inline-block">
                 <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
@@ -47,6 +47,9 @@
                 <a class="btn btn-outline-secondary" id="filterClearBtn">&#10006;</a>
             </div>
         }
+        <div class="form-group col-2">
+            <a class="btn btn-block btn-success" asp-controller="Premises" asp-action="PremiseReports">Отчеты</a>
+        </div>
     </div>
 
     <!-- Modal -->

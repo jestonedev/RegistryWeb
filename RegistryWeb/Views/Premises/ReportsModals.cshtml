@@ -16,6 +16,7 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" name="Excerpt.IdObject" />
+                <input type="hidden" name="Excerpt.IdObjects" />
                 <input type="hidden" name="Excerpt.ExcerptType" />
                 <div class="form-row">
                     <div class="form-group col-sm-6">
@@ -89,6 +90,59 @@
                             <select class="selectpicker form-control" title="Состояние помещения" name="NoticeToBks.Signer"
                                     data-val="true" data-val-required="Подписывающий обязателен для заполнения" id="NoticeToBks.Signer" asp-items="@Model.SignersList"></select>
                             <span class="text-danger field-validation-valid" data-valmsg-for="NoticeToBks.Signer" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<form id="massactForm">
+    <div class="modal fade" id="massactModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Акт проверки факта о проживаении</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="massact.IdObjects" />
+                    <input type="hidden" name="massact.ActType" />
+                    <div class="form-row">
+                        <div class="form-group col-sm-12 col-md-12">
+                            <label for="Excerpt.ActDate">Дата акта</label>
+                            <input type="date" class="form-control" name="massact.ActDate" title="Выписка от" data-val="true" data-val-required="Заполните дату">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="massact.ExcerptDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="checkbox">
+                            <label class="col-xs-12 col-md-12">
+                                <input type="checkbox" name="massact.isNotResides" />
+                                На момент проверки никого не было дома
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-sm-6 col-md-6">
+                            <label for="massact.Commision">Состав комиссии</label>
+                            <select multiple data-actions-box="true" class="selectpicker form-control" title="Состояние помещения" name="massact.Commision"
+                                    data-val="true" data-val-required="Состав комисии обязателен для заполнения" id="massact.Commision" asp-items="@Model.PreparersList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="massact.Commision" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-sm-6 col-md-6">
+                            <label for="massact.Signer">Составил акт</label>
+                            <select class="selectpicker form-control" title="Состояние помещения" name="massact.Clerk"
+                                    data-val="true" data-val-required="Подписывающий обязателен для заполнения" id="massact.Clerk" asp-items="@Model.PreparersList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="massact.Clerk" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                 </div>

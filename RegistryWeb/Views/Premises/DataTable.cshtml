@@ -2,16 +2,20 @@
 @using RegistryWeb.Models.Entities;
 @using RegistryWeb.Extensions;
 @using RegistryWeb.SecurityServices;
+@using RegistryWeb.DataServices;
 @using RegistryWeb.DataHelpers;
 @model RegistryWeb.ViewModel.PremisesVM<Premise>;
 @{
+    var ids = Context.Session.Get<List<int>>("idPremises") ?? new List<int>();
     Context.Session.Set("Controller", "Premises");
     Context.Session.Set("Action", "Index");
     Context.Session.Set("OrderOptions", Model.OrderOptions);
     Context.Session.Set("FilterOptions", Model.FilterOptions);
     Context.Session.Set("PageOptions", Model.PageOptions);
+    var check = "";
 
     var securityService = (SecurityService)ViewData["SecurityService"];
+    var premisesService = (PremisesDataService)ViewData["PremiseService"];
 
     string GetTypeFund(Premise premise)
     {
@@ -22,6 +26,8 @@
             return "";
         return fundHistory.IdFundTypeNavigation.FundTypeName;
     }
+
+
 }
 
 @section styles{
@@ -30,7 +36,8 @@
 
 <table class="table table-hover p-table">
     <thead>
-        <tr style="align-content: center;">
+        <tr>
+            <th class="r-table-header-cell align-middle"></th>
             <th class="r-table-header-cell" style="width:155px;">
                 № по рeестру
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "IdPremises")
@@ -54,7 +61,7 @@
                     <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Address" ? "p-sorted" : "")"
                        data-order-field="Address" data-order-direction="@(Model.OrderOptions.OrderField == "Address" ? "1" : "0")"></a>
                 }
-            </th>            
+            </th>
             <th class="r-table-header-cell p-table-low-width-hide-cell">
                 Текущее состояние
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "ObjectState")
@@ -86,13 +93,32 @@
         @foreach (var item in Model.Premises)
         {
         <tr>
-            @{
-                //var idOwnershipTypeP = item.OwnershipPremisesAssoc.FirstOrDefault() != null ? item.OwnershipPremisesAssoc.LastOrDefault().OwnershipRightNavigation.IdOwnershipRightType : 0;
-                //var idOwnershipTypeB = item.IdBuildingNavigation.OwnershipBuildingsAssoc.FirstOrDefault();
+            @if (ids.Contains(item.IdPremises))
+            {
+                check = "checked";
             }
-            @*<td style="background: @(item.OwnershipPremisesAssoc.FirstOrDefault()!=null && idOwnershipTypeP==1 ? "#FEDCDC" : idOwnershipTypeP == 2 ? "#BBFEE8" : idOwnershipTypeP == 7 ? "#88FF63" : "");">*@
-            <td>
-            @item.IdPremises
+            else
+            {
+                check = "";
+            }
+            <td class="align-middle"><input type="checkbox" class="idPremiseCheckbox" data-id="@item.IdPremises" @Html.Raw(check) /></td>
+            @{
+                var idCurrentOwhershipType = Model.PremisesOwnershipRightCurrent
+                    .FirstOrDefault(p => p.id_premises == item.IdPremises)
+                    ?.id_ownership_right_type;
+                var backgroundColor =
+                    idCurrentOwhershipType == 1 ? "#FEDCDC" :
+                    idCurrentOwhershipType == 2 ? "#BBFEE8" :
+                    idCurrentOwhershipType == 7 ? "#88FF63" :
+                    "white";
+                var title =
+                    idCurrentOwhershipType == 1 ? "Присутствует реквизит \"Снесено\"" :
+                    idCurrentOwhershipType == 2 ? "Присутствует реквизит \"Аварийное\"" :
+                    idCurrentOwhershipType == 7 ? "Присутствует реквизит \"Аварийное после 01.01.2012\"" :
+                    "";
+            }
+            <td style="background-color: @backgroundColor; font-weight: bold;" title="@title">
+                @item.IdPremises
             </td>
             <td>
                 <div class="row">
@@ -112,7 +138,7 @@
                             {
                                 var paymentInfo =
                                         Model.PaymentsInfo.FirstOrDefault(pi => pi.IdObject == item.IdPremises && pi.AddresType == AddressTypes.Premise);
-                                
+
                                 @if (paymentInfo != null)
                                 {
                                     <br /><span>Плана за найма (до 28.08.2019):</span> @paymentInfo.Payment <span>руб.</span>

@@ -35,6 +35,7 @@ namespace RegistryWeb.Models
 
         public virtual DbSet<Building> Buildings { get; set; }
         public virtual DbSet<Premise> Premises { get; set; }
+        public virtual DbSet<Preparers> Preparers { get; set; }
         public virtual DbSet<SubPremise> SubPremises { get; set; }
         public virtual DbSet<DocumentType> DocumentTypes { get; set; }
         public virtual DbSet<DocumentIssuedBy> DocumentsIssuedBy { get; set; }
@@ -136,6 +137,8 @@ namespace RegistryWeb.Models
         public virtual DbSet<OwnerActiveProcess> OwnerActiveProcesses { get; set; }
         public virtual DbSet<BuildingOwnershipRightCurrent> BuildingsOwnershipRightCurrent { get; set; }
 
+        public DbQuery<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.3-servicing-35854");
@@ -147,6 +150,9 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new TenancyPaymentAfter28082019Configuration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerActiveProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new BuildingOwnershipRightCurrentConfiguration(nameDatebase));
+
+            modelBuilder.Query<PremiseOwnershipRightCurrent>().ToView("v_premises_ownership_rights_1_current");
+
 
             modelBuilder.ApplyConfiguration(new ChangeLogConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LogOwnerProcessConfiguration(nameDatebase));
@@ -175,6 +181,7 @@ namespace RegistryWeb.Models
 
             modelBuilder.ApplyConfiguration(new BuildingConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremiseConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PreparersConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new SubPremiseConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ObjectStateConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new HeatingTypeConfiguration(nameDatebase));

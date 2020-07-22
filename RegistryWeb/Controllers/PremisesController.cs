@@ -14,6 +14,7 @@ using System.Linq;
 using RegistryWeb.Models;
 using RegistryWeb.DataHelpers;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace RegistryWeb.Controllers
 {
@@ -47,6 +48,7 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("FilterOptions");
             }
             ViewBag.SecurityService = securityService;
+            ViewBag.PremiseService = dataService;
 
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
@@ -197,7 +199,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(Premise premise)
+        public IActionResult Delete(Premise premise, string returnUrl)
         {
             if (premise == null)
                 return NotFound();
@@ -207,6 +209,7 @@ namespace RegistryWeb.Controllers
             if (!CanEditPremiseBaseInfo(premiseDb))
                 return View("NotAccess");
 
+            ViewBag.ReturnUrl = returnUrl;
             dataService.Delete(premise.IdPremises);
             return RedirectToAction("Index");
         }
@@ -223,6 +226,78 @@ namespace RegistryWeb.Controllers
         {
             IEnumerable<Building> buildings = dataService.GetHouses(streetId);
             return Json(buildings);
+        }
+
+
+        [HttpPost]
+        public void SessionIdPremises(int idPremise, bool isCheck)
+        {
+            List<int> ids;
+            if (HttpContext.Session.Keys.Contains("idPremises"))
+            {
+                ids = HttpContext.Session.Get<List<int>>("idPremises");
+            }
+            else
+            {
+                ids = new List<int>();
+            }
+            if (isCheck)
+            {
+                ids.Add(idPremise);
+            }
+            else if (ids.Any())
+            {
+                ids.Remove(idPremise);
+            }
+            HttpContext.Session.Set("idPremises", ids);
+        }
+
+        public IActionResult SessionIdPremisesClear()
+        {
+            HttpContext.Session.Remove("idPremises");
+            ViewBag.Count = 0;
+            return PremiseReports();
+        }
+
+        public IActionResult SessionIdPremiseRemove(int idBuilding)
+        {
+            var ids = HttpContext.Session.Get<List<int>>("idPremises");
+            ids.Remove(idBuilding);
+            ViewBag.Count = ids.Count();
+            HttpContext.Session.Set("idPremises", ids);
+            return PremiseReports();
+        }
+
+        public IActionResult PremiseReports()
+        {
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+                return View("NotAccess");
+            if (HttpContext.Session.Keys.Contains("idPremises"))
+            {
+                var ids = HttpContext.Session.Get<List<int>>("idPremises");
+                if (ids.Any())
+                {
+                    ViewBag.Count = ids.Count();
+                    
+                    //var premises = dataService.GetPremises(ids);
+                    var viewModel = new PremisesVM<Premise> {
+                        Premises = dataService.GetPremises(ids),
+                        SignersList = new SelectList(rc.SelectableSigners.Where(s => s.IdSignerGroup == 1).ToList().Select(s => new {
+                            s.IdRecord,
+                            Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
+                        }), "IdRecord", "Snp"),
+                        CommisionList = new SelectList(rc.SelectableSigners.Where(s => s.IdSignerGroup == 1).ToList().Select(s => new {
+                            s.IdRecord,
+                            Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
+                        }), "IdRecord", "Snp"),
+                        PreparersList = new SelectList(rc.Preparers, "IdPreparer", "PreparerName")
+                };
+
+                    //return View("PremiseReports", premises);
+                    return View("PremiseReports", viewModel);
+                }
+            }
+            return View("PremiseReports", new List<Premise>());
         }
 
 
