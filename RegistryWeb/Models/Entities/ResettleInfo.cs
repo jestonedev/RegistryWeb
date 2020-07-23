@@ -12,11 +12,13 @@ namespace RegistryWeb.Models.Entities
             ResettleDocuments = new List<ResettleDocument>();
             ResettleInfoSubPremisesFrom = new List<ResettleInfoSubPremiseFrom>();
             ResettleInfoTo = new List<ResettleInfoTo>();
+            ResettleInfoToFact = new List<ResettleInfoToFact>();
         }
 
         public int IdResettleInfo { get; set; }
         public DateTime? ResettleDate { get; set; }
         public int? IdResettleKind { get; set; }
+        public int? IdResettleKindFact { get; set; }
         [Required]
         public decimal FinanceSource1 { get; set; }
         [Required]
@@ -28,9 +30,11 @@ namespace RegistryWeb.Models.Entities
         public byte Deleted { get; set; }
 
         public virtual ResettleKind ResettleKindNavigation { get; set; }
+        public virtual ResettleKind ResettleKindFactNavigation { get; set; }
         public virtual IList<ResettlePremiseAssoc> ResettlePremisesAssoc { get; set; }
         public virtual IList<ResettleDocument> ResettleDocuments { get; set; }
         public virtual IList<ResettleInfoSubPremiseFrom> ResettleInfoSubPremisesFrom  { get; set; }
-        public virtual IList<ResettleInfoTo> ResettleInfoTo { get; set; }
+        public virtual IList<ResettleInfoTo> ResettleInfoTo { get; set; }   // Планируемый адрес переселения
+        public virtual IList<ResettleInfoToFact> ResettleInfoToFact { get; set; }   // Фактический адрес переселения
     }
 }

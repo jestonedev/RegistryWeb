@@ -1,6 +1,7 @@
 ﻿@model RegistryWeb.ViewModel.BuildingDemolitionInfoVM;
 @{
     var demolishedPlanDate = Model.DemolishedPlanDate.HasValue ? Model.DemolishedPlanDate.Value.ToString("yyyy-MM-dd") : "";
+    var demandForDemolishingDeliveryDate = Model.DemandForDemolishingDeliveryDate.HasValue ? Model.DemandForDemolishingDeliveryDate.Value.ToString("yyyy-MM-dd") : "";
 }
 <form id="buildingDemolitionInfoForm" data-action="@ViewBag.Action" data-idbuilding="@Model.IdBuilding" data-caneditextinfo="@ViewBag.CanEditDemolishingInfo">
     <script src="~/js/buildingDemolitionInfo.common.js" asp-append-version="true"></script>
@@ -12,11 +13,15 @@
                 <a href="#" id="buildingDemolitionInfoToggle" class="form-control btn btn-primary" title="Развернуть информацию о сносе" style="font-weight:bold;">∨</a>
             </div>
         </div>
-        <div class="card-body" id="buildingDemolitionInfoBlock">
-            <div class="form-group row">
-                <label for="@Model.DemolishedPlanDate" class="col-auto col-form-label">Планируемая дата сноса</label>
-                <div class="col-auto">
+        <div class="card-body toggle-hide" id="buildingDemolitionInfoBlock">
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="@Model.DemolishedPlanDate">Планируемая дата сноса</label>
                     <input type="date" id="demolishPlanDate" class="form-control" value="@demolishedPlanDate" title="@demolishedPlanDate">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="@Model.DemandForDemolishingDeliveryDate">Дата вручения требования о сносе</label>
+                    <input type="date" id="demandForDemolishingDeliveryDate" class="form-control" value="@demandForDemolishingDeliveryDate" title="@demandForDemolishingDeliveryDate">
                 </div>
             </div>
             <table class="table table-bordered">
@@ -43,7 +48,7 @@
                             <input type="text" class="form-control field-building-demolition-act-file" value="@item.Number" title="@item.Number">
                         </td>
                         <td class="align-middle">
-                            <input type="date" class="form-control field-building-demolition-act-file" value="@item.Date.ToString("yyyy-MM-dd")" title="@item.Date.ToString("yyyy-MM-dd")">
+                            <input type="date" class="form-control field-building-demolition-act-file" value="@(item.Date.HasValue ? item.Date.Value.ToString("yyyy-MM-dd") : "")" title="@(item.Date.HasValue ? item.Date.Value.ToString("yyyy-MM-dd") : "")">
                         </td>
                         <td class="align-middle"><input type="text" class="form-control field-building-demolition-act-file" value="@item.Name" title="@item.Name"></td>
                         <td class="align-middle">
@@ -63,18 +68,28 @@
                                 }
                             }
                             <div class="act-file-block" data-id="@idFile">
-                                <input type="file" id="@id" class="act-file-upload" />
-                                <label for="@id" class="btn btn-success oi oi-paperclip act-file-add"></label>
-                                <div class="act-file" title="@originalName">
-                                    <a href="#" class="btn-link act-file-link">@originalName</a>
-                                    <a href="#" class="badge btn btn-danger">&times;</a>
-                                </div>
+                                @if ((ViewBag.Action == "Edit" || ViewBag.Action == "Create"))
+                                { 
+                                    <input type="file" id="@id" class="act-file-upload" />
+                                    <label for="@id" class="btn btn-success act-file-add">
+                                        <span class="oi oi-paperclip"></span>
+                                    </label>
+                                }
+                                    <div class="act-file" title="@originalName">
+                                        <a href="#" class="btn-link act-file-link">@originalName</a>
+                                        @if ((ViewBag.Action == "Edit" || ViewBag.Action == "Create"))
+                                        {
+                                            <a href="#" class="badge btn btn-danger">&times;</a>
+                                        }
+                                    </div>
                             </div>
                         </td>
                         @if ((ViewBag.Action == "Edit" || ViewBag.Action == "Create") && ViewBag.CanEditDemolishingInfo)
                         {
                             <td class="align-middle">
-                                <a href="#" class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"></a>
+                                <a href="#" class="btn btn-danger act-file-record-remove" title="Удалить" aria-label="Удалить">
+                                    <span class="oi oi-x"></span>
+                                </a>
                             </td>
                         }
                     </tr>
@@ -89,10 +104,10 @@
                         <a href="#" id="buildingDemolitionInfoEdit" class="form-control btn btn-success" title="Редактировать">Редактирвоать</a>
                     </div>
                     <div class="col-auto">
-                        <a href="#" id="buildingDemolitionInfoSave" class="form-control btn btn-success" title="Сохранить">Сохранить</a>
-                    </div>
-                    <div class="col-auto">
-                        <a href="#" id="buildingDemolitionInfoCancel" class="form-control btn btn-primary" title="Отменить">Отменить</a>
+                        <div class="btn-group" role="group">
+                            <a href="#" id="buildingDemolitionInfoSave" class="form-control btn btn-success" title="Сохранить">Сохранить</a>
+                            <a href="#" id="buildingDemolitionInfoCancel" class="form-control btn btn-primary" title="Отменить">Отменить</a>
+                        </div>
                     </div>
                 </div>
             }

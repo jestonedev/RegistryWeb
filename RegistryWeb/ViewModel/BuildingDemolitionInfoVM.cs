@@ -9,6 +9,7 @@ namespace RegistryWeb.ViewModel
     {
         public int IdBuilding { get; set; }
         public DateTime? DemolishedPlanDate { get; set; }
+        public DateTime? DemandForDemolishingDeliveryDate { get; set; }
         public List<BuildingDemolitionActFile> BuildingDemolitionActFiles { get; set; }
         public List<IFormFile> Files { get; set; }
     }

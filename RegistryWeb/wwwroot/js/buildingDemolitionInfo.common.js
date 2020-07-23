@@ -186,7 +186,7 @@ let BuildingDemolitionActFile = class {
         this.originalNameActFile = tr.find('.act-file').attr('title');
 
         this.fileInput = tr.find('.act-file-upload')[0];
-        if (this.fileInput.files[0] != undefined) {
+        if (this.fileInput.files[0] !== undefined) {
             this.file = this.fileInput.files[0];
         }
         else {
@@ -199,14 +199,14 @@ let BuildingDemolitionActFile = class {
         this.idBuilding = jsonBuildingDemolitionActFiles.idBuilding;
         this.idActFile = jsonBuildingDemolitionActFiles.idActFile;
         this.idActTypeDocument = jsonBuildingDemolitionActFiles.idActTypeDocument;
-        this.number = jsonBuildingDemolitionActFiles.number == null ? "" : jsonBuildingDemolitionActFiles.number;
+        this.number = jsonBuildingDemolitionActFiles.number === null ? "" : jsonBuildingDemolitionActFiles.number;
         this.date = jsonBuildingDemolitionActFiles.date;
-        this.name = jsonBuildingDemolitionActFiles.name == null ? "" : jsonBuildingDemolitionActFiles.name;
+        this.name = jsonBuildingDemolitionActFiles.name === null ? "" : jsonBuildingDemolitionActFiles.name;
         this.originalNameActFile = jsonBuildingDemolitionActFiles.originalNameActFile;
         this.file = "";
         this.fileInput = "";
     }
-}
+};
 
 let BuildingDemolitionInfo = class {
     constructor(form) {
@@ -217,21 +217,21 @@ let BuildingDemolitionInfo = class {
     }
 
     get form() {
-        return this._form
+        return this._form;
     }
     set form(value) {
         this._form = value;
     }
 
     get action() {
-        return this._action
+        return this._action;
     }
     set action(value) {
         this._action = value;
     }
 
     get canEditExtInfo() {
-        return this._canEditExtInfo
+        return this._canEditExtInfo;
     }
     set canEditExtInfo(value) {
         this._canEditExtInfo = value;
@@ -249,6 +249,14 @@ let BuildingDemolitionInfo = class {
     }
     set demolishedPlanDate(value) {
         this._demolishPlanDate = value;
+    }
+
+    get demandForDemolishingDeliveryDate() {
+        return this._demandForDemolishingDeliveryDate;
+    }
+    set demandForDemolishingDeliveryDate(value) {
+        this._demandForDemolishingDeliveryDate = value;
+
     }
 
     get buildingDemolitionActFiles() {
@@ -270,6 +278,7 @@ let BuildingDemolitionInfo = class {
         let buildingDemolitionInfoJson = {
             IdBuilding: this.idBuilding,
             DemolishedPlanDate: this.demolishedPlanDate,
+            DemandForDemolishingDeliveryDate: this.demandForDemolishingDeliveryDate,
             BuildingDemolitionActFiles: []
         };
         for (let i = 0; i < this.buildingDemolitionActFiles.length; i++) {
@@ -294,6 +303,7 @@ let BuildingDemolitionInfo = class {
         this._canEditExtInfo = JSON.parse(this.form.data('caneditextinfo').toLowerCase());
         this.idBuilding = +this.form.data('idbuilding');
         this.demolishedPlanDate = this.form.find('#demolishPlanDate').val();
+        this.demandForDemolishingDeliveryDate = this.form.find('#demandForDemolishingDeliveryDate').val();
         this.buildingDemolitionActFiles = [];
 
         let trs = this.form.find('#buildingDemolitionActFiles>tr');
@@ -306,6 +316,7 @@ let BuildingDemolitionInfo = class {
     setAllProperty = function (jsonBuildingDemolitionActFiles) {
         this.idBuilding = jsonBuildingDemolitionActFiles.idBuilding;
         this.demolishedPlanDate = jsonBuildingDemolitionActFiles.demolishedPlanDate;
+        this.demandForDemolishingDeliveryDate = jsonBuildingDemolitionActFiles.demandForDemolishingDeliveryDate;
         this.actTypeDocuments = jsonBuildingDemolitionActFiles.actTypeDocuments;
         this.buildingDemolitionActFiles = [];
         for (let i = 0; i < jsonBuildingDemolitionActFiles.buildingDemolitionActFiles.length; i++) {
@@ -333,6 +344,7 @@ let BuildingDemolitionInfo = class {
         let buildingDemolitionInfoVM = new FormData();
         buildingDemolitionInfoVM.append('IdBuilding', this.idBuilding);
         buildingDemolitionInfoVM.append('DemolishedPlanDate', this.demolishedPlanDate);
+        buildingDemolitionInfoVM.append('DemandForDemolishingDeliveryDate', this.demandForDemolishingDeliveryDate);
         for (var i = 0; i < this.buildingDemolitionActFiles.length; i++) {
             if (this.buildingDemolitionActFiles[i].file != "") {
                 buildingDemolitionInfoVM.append('Files', this.buildingDemolitionActFiles[i].file, this.buildingDemolitionActFiles[i].file.name);
@@ -344,7 +356,7 @@ let BuildingDemolitionInfo = class {
             buildingDemolitionInfoVM.append('BuildingDemolitionActFiles[' + i + '].Number', this.buildingDemolitionActFiles[i].number);
             buildingDemolitionInfoVM.append('BuildingDemolitionActFiles[' + i + '].Date', this.buildingDemolitionActFiles[i].date);
             buildingDemolitionInfoVM.append('BuildingDemolitionActFiles[' + i + '].Name', this.buildingDemolitionActFiles[i].name);
-        };
+        }
         return buildingDemolitionInfoVM;
     }
 
@@ -365,7 +377,7 @@ let BuildingDemolitionInfo = class {
 
     addNewTr = function () {
         let obj = new BuildingDemolitionActFile(this.idBuilding);
-        this.form.find('#buildingDemolitionActFiles').append(this.createTr(obj));        
+        this.form.find('#buildingDemolitionActFiles').append(this.createTr(obj));
         this.drawActFiles(this.form.find('#buildingDemolitionActFiles>tr').last());
     }
 
@@ -373,7 +385,7 @@ let BuildingDemolitionInfo = class {
         let originalName = "";
         let idFile = ""; //значение null для пустого файла
         let id = "actFile_" + uuidv4();
-        if (buildingDemolitionActFile.idActFile != "") {
+        if (buildingDemolitionActFile.idActFile !== "" && buildingDemolitionActFile.idActFile !== null) {
             idFile = buildingDemolitionActFile.idActFile;
             id = "actFile_" + idFile;
             originalName = buildingDemolitionActFile.originalNameActFile;
@@ -391,20 +403,24 @@ let BuildingDemolitionInfo = class {
             <td class="align-middle"><input type="text" class="form-control field-building-demolition-act-file" value="${buildingDemolitionActFile.name}" title="${buildingDemolitionActFile.name}"></td>
             <td class="align-middle">
         `
-        + this.createActTypeDocumentSelect(buildingDemolitionActFile.idActTypeDocument) +
-        `    </td>
+            + this.createActTypeDocumentSelect(buildingDemolitionActFile.idActTypeDocument) +
+            `    </td>
             <td>
                 <div class="act-file-block" data-id="${idFile}">
                     <input type="file" id="${id}" class="act-file-upload"/>
-                    <label for="${id}" class="btn btn-success oi oi-paperclip act-file-add"></label>
-                    <div class="act-file" title="${originalName}" style="cursor: pointer;">
+                    <label for="${id}" class="btn btn-success act-file-add">
+                        <span class="oi oi-paperclip"></span>
+                    </label>
+                    <div class="act-file" title="${originalName}">
                         <a href="#" class="btn-link act-file-link">${originalName}</a>
-                        <span class="badge btn btn-danger ml-1">&times;</span>
+                        <a class="badge btn btn-danger" href="#">&times;</a>
                     </div>
                 </div>
             </td>
             <td class="align-middle">
-                <a href="#" class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"></a>
+                <a href="#" class="btn btn-danger act-file-record-remove" title="Удалить" aria-label="Удалить">
+                    <span class="oi oi-x"></span>
+                </a>
             </td>
         </tr>
         `;
@@ -416,6 +432,7 @@ let BuildingDemolitionInfo = class {
         this.form.attr('data-idbuilding', this.idBuilding);
 
         this.form.find('#demolishPlanDate').val(this.demolishedPlanDate);
+        this.form.find('#demandForDemolishingDeliveryDate').val(this.demandForDemolishingDeliveryDate);
 
         this.form.find('#buildingDemolitionActFiles>tr').remove();
         if (this.buildingDemolitionActFiles.length == 0) return;
@@ -437,61 +454,70 @@ let BuildingDemolitionInfo = class {
             }
         });
     }
-}
+};
 
 let buildingDemolitionActFileAddClick = function (event) {
     event.preventDefault();
     _buildingDemolitionInfo.addNewTr();
-}
+};
 let editFieldsAndBtnsDisabled = function (isDisabled) {
     $('#buildingDemolitionInfoForm input').prop('disabled', isDisabled);
     $('#buildingDemolitionInfoForm select').prop('disabled', isDisabled);
     if (isDisabled) {
-        $('#buildingDemolitionInfoForm .oi-x').addClass('disabled');
+        $('#buildingDemolitionInfoForm .act-file-record-remove').addClass('disabled');
         $('#buildingDemolitionActFileAdd').addClass('disabled');
         $('#buildingDemolitionInfoForm .badge').addClass('disabled');
         $('#buildingDemolitionInfoForm .act-file-add').addClass('disabled');
     } else {
-        $('#buildingDemolitionInfoForm .oi-x').removeClass('disabled');
+        $('#buildingDemolitionInfoForm .act-file-record-remove').removeClass('disabled');
         $('#buildingDemolitionActFileAdd').removeClass('disabled');
         $('#buildingDemolitionInfoForm .badge').removeClass('disabled');
         $('#buildingDemolitionInfoForm .act-file-add').removeClass('disabled');
     }
-}
+};
 let buildingDemolitionInfoEditClick = function (event) {
     event.preventDefault();
     $('#buildingDemolitionInfoSave').show();
+    $('#buildingDemolitionInfoCancel').show();
     $('#buildingDemolitionInfoEdit').hide();
     editFieldsAndBtnsDisabled(false);
-}
+};
 let buildingDemolitionInfoSaveClick = function (event) {
     event.preventDefault();
     if ($('#buildingDemolitionInfoForm').valid()) {
         let formData = _buildingDemolitionInfo.getFormData();
         let xhr = new XMLHttpRequest();
         xhr.open("POST", window.location.origin + '/BuildingDemolitionInfo/SaveBuildingDemolitionInfo');
-        xhr.send(formData)
+        xhr.send(formData);
         xhr.onreadystatechange = function () {
-            if (this.readyState != 4) return;
-            $('#buildingDemolitionInfoSave').hide();
-            $('#buildingDemolitionInfoEdit').show();
-            editFieldsAndBtnsDisabled(true);
-            if (xhr.status != 200 || xhr.responseText != 1) {
+            if (this.readyState !== 4) return;
+            var response = JSON.parse(xhr.responseText);
+            if (xhr.status !== 200 || !(response instanceof Array)) {
                 alert("Ошибка сохранения информации о сносе!" +
                     "\nxhrresponseText: " + xhr.responseText +
                     "\nxhr.status: " + xhr.status);
+                return;
             }
-        }
+            $('#buildingDemolitionInfoSave').hide();
+            $('#buildingDemolitionInfoCancel').hide();
+            $('#buildingDemolitionInfoEdit').show();
+            editFieldsAndBtnsDisabled(true);
+            $(".act-file-block").each(function (idx, elem) {
+                $(this).data("id", response[idx] === null || response[idx] === undefined ? "" : response[idx]);
+                $(this).attr("data-id", response[idx] === null || response[idx] === undefined ? "" : response[idx]);
+            });
+        };
     }
-}
+};
 let buildingDemolitionInfoCancelClick = function (event) {
     event.preventDefault();
     _buildingDemolitionInfo.updateData();
     _buildingDemolitionInfo.updateDataInElements();
     $('#buildingDemolitionInfoSave').hide();
+    $('#buildingDemolitionInfoCancel').hide();
     $('#buildingDemolitionInfoEdit').show();
     editFieldsAndBtnsDisabled(true);
-}
+};
 let actFileLinkClick = function (elem, event) {
     event.preventDefault();
     let actFileBlock = elem.parents('.act-file-block');
@@ -499,7 +525,7 @@ let actFileLinkClick = function (elem, event) {
     if (idFile === '')
         return;
     window.location = window.location.origin + '/BuildingDemolitionInfo/GetActFile?idFile=' + idFile;
-}
+};
 let actFileUploadChange = function (elem) {
     let actFileBlock = elem.parents('.act-file-block');
     let actFile = actFileBlock.find('.act-file');
@@ -511,7 +537,7 @@ let actFileUploadChange = function (elem) {
     actFileBlock.find('.act-file-add').hide();
     actFile.attr('title', fileName);
     actFile.show();
-}
+};
 let closeBadgeClick = function (elem, event) {
     event.preventDefault();
     let actFileBlock = elem.parents('.act-file-block');
@@ -525,18 +551,18 @@ let closeBadgeClick = function (elem, event) {
     }
     actFileBlock.data('id', newIdFile);
     actFileBlock.attr('data-id', newIdFile);
-}
+};
 let renameIdFile = function (actFileBlock, newIdFile) {
     actFileBlock.data('id', newIdFile);
     actFileBlock.attr('data-id', newIdFile);
     actFileBlock.find('.act-file-add').attr('for', 'actFile_' + newIdFile);
     actFileBlock.find('.act-file-upload').attr('id', 'actFile_' + newIdFile);
-}
+};
 
 let buildingDemolitionActFilesClick = function (event) {
     let elem = $(event.target);
     let tr = elem.parents('tr');
-    if (elem.hasClass('oi-x')) {
+    if (elem.hasClass('act-file-record-remove') || elem.hasClass('oi-x')) {
         event.preventDefault();
         tr.remove();
     }
@@ -546,22 +572,22 @@ let buildingDemolitionActFilesClick = function (event) {
     if (elem.hasClass('badge')) {
         closeBadgeClick(elem, event);
     }
-}
+};
 let buildingDemolitionActFilesChange = function (event) {
     let elem = $(event.target);
     if (elem.hasClass('act-file-upload')) {
         actFileUploadChange(elem);
     }
-}
+};
 let _buildingDemolitionInfo;//глобальный объект
 $(function () {
     let rootElem = $('#buildingDemolitionInfoForm');
     _buildingDemolitionInfo = new BuildingDemolitionInfo(rootElem);
     _buildingDemolitionInfo.updateData();
     _buildingDemolitionInfo.drawActFiles();
-
-    $('#buildingDemolitionInfoBlock').hide();
+    
     $('#buildingDemolitionInfoSave').hide();
+    $('#buildingDemolitionInfoCancel').hide();
     if (_buildingDemolitionInfo.action != "Create") {
         editFieldsAndBtnsDisabled(true);
     }
@@ -570,7 +596,7 @@ $(function () {
     }
     //initializeVilidationTrs();
 
-    $('#buildingDemolitionInfoToggle').on('click', $('#buildingDemolitionInfoBlock'), elementToogle);
+    $('#buildingDemolitionInfoToggle').on('click', $('#buildingDemolitionInfoBlock'), elementToogleHide);
 
     $('#buildingDemolitionActFileAdd').click(buildingDemolitionActFileAddClick);
     $('#buildingDemolitionInfoEdit').click(buildingDemolitionInfoEditClick);

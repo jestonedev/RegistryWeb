@@ -59,13 +59,13 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 return Json(-2);
             var resettle = registryContext.ResettleInfos
                 .Include(or => or.ResettleInfoSubPremisesFrom)
-                .Include(or => or.ResettleInfoTo)
                 .Include(or => or.ResettleDocuments)
                 .FirstOrDefault(op => op.IdResettleInfo == idResettleInfo);
 
             return Json(new {
                 resettleDate = resettle.ResettleDate == null ? null : resettle.ResettleDate.Value.ToString("yyyy-MM-dd"),
                 idResettleKind = resettle.IdResettleKind,
+                idResettleKindFact = resettle.IdResettleKindFact,
                 subPremisesFrom = resettle.ResettleInfoSubPremisesFrom.Select(r => r.IdSubPremise),
                 financeSource1 = resettle.FinanceSource1,
                 financeSource2 = resettle.FinanceSource2,
@@ -201,7 +201,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
                     registryContext.ResettleInfoSubPremisesFrom.Add(subPremise);
                 }
             }
-            // Обновить переселение в
+            // Обновить переселение в (плановое)
             var resettlesTo = registryContext.ResettleInfoTo.Where(r => r.IdResettleInfo == resettleInfo.IdResettleInfo);
             foreach (var resettleTo in resettlesTo)
             {
@@ -217,6 +217,24 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 if (!resettlesToList.Any(ri => ri.ObjectType == resettleTo.ObjectType && ri.IdObject == resettleTo.IdObject))
                 {
                     registryContext.ResettleInfoTo.Add(resettleTo);
+                }
+            }
+            // Обновить переселение в (фактическое)
+            var resettlesToFact = registryContext.ResettleInfoToFact.Where(r => r.IdResettleInfo == resettleInfo.IdResettleInfo);
+            foreach (var resettleTo in resettlesToFact)
+            {
+                if (!resettleInfo.ResettleInfoToFact.Any(ri => ri.ObjectType == resettleTo.ObjectType && ri.IdObject == resettleTo.IdObject))
+                {
+                    resettleTo.Deleted = 1;
+                }
+            }
+            var resettlesToFactList = resettlesToFact.ToList();
+            foreach (var resettleTo in resettleInfo.ResettleInfoToFact)
+            {
+                resettleTo.IdResettleInfo = resettleInfo.IdResettleInfo;
+                if (!resettlesToFactList.Any(ri => ri.ObjectType == resettleTo.ObjectType && ri.IdObject == resettleTo.IdObject))
+                {
+                    registryContext.ResettleInfoToFact.Add(resettleTo);
                 }
             }
             // Обновить документы
@@ -250,21 +268,22 @@ namespace RegistryWeb.Controllers.ServiceControllers
             // Обновить основную информацию
             resettleInfo.ResettleInfoSubPremisesFrom = null;
             resettleInfo.ResettleInfoTo = null;
+            resettleInfo.ResettleInfoToFact = null;
             resettleInfo.ResettleDocuments = null;
             registryContext.ResettleInfos.Update(resettleInfo);
             registryContext.SaveChanges();
             return Json(new
             {
                 resettleInfo.IdResettleInfo,
-                documents = resettleInfo.ResettleDocuments.Where(r => r.Deleted == 0).Select(r => new
-                {
-                    r.IdDocument,
-                    r.Number,
-                    Date = r.Date.ToString("yyyy-MM-dd"),
-                    r.Description,
-                    r.IdDocumentType,
-                    r.FileOriginName,
-                })
+                documents = resettleInfo.ResettleDocuments?.Where(r => r.Deleted == 0).Select(r => new
+                            {
+                                r.IdDocument,
+                                r.Number,
+                                Date = r.Date.ToString("yyyy-MM-dd"),
+                                r.Description,
+                                r.IdDocumentType,
+                                r.FileOriginName,
+                            })
             });
         }
 

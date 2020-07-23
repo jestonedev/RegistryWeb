@@ -1,9 +1,18 @@
 ﻿#buildingDemolitionInfoForm .act-file {
     width: 200px;
+    margin-top: 6px;
 }
+
+#buildingDemolitionInfoForm .act-file .btn.btn-danger {
+    float: right;
+    margin-top: 3px;
+    padding-bottom: 4px;
+}
+
 #buildingDemolitionInfoForm .badge {
     cursor: pointer;
 }
+
 #buildingDemolitionInfoForm .act-file-link {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -11,4 +20,18 @@
     white-space: nowrap;
     display: inline-block;
     vertical-align: central;
+}
+
+#buildingDemolitionInfoForm .act-file-add {
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+#buildingDemolitionInfoForm .act-file-add.disabled {
+    cursor: default;
+}
+
+#buildingDemolitionInfoForm .act-file-record-remove {
+    padding-left: 11px;
+    padding-right: 10px;
 }

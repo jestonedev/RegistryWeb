@@ -21,7 +21,8 @@ function getResettle(resettleElem) {
     return {
         IdResettleInfo: resettleElem.find("[name^='IdResettleInfo']").val(),
         ResettleDate: resettleElem.find("[name^='ResettleDate']").val(),
-        IdResettleKind: resettleElem.find("[name^='IdResettleKind']").val(),
+        IdResettleKind: resettleElem.find("[name^='IdResettleKindPlan']").val(),
+        IdResettleKindFact: resettleElem.find("[name^='IdResettleKindFact']").val(),
         ResettleInfoSubPremisesFrom: $(resettleElem.find("[name^='SubPremisesFrom']").val()).map(function (idx, val) {
             return {
                 IdSubPremises: val,
@@ -32,7 +33,8 @@ function getResettle(resettleElem) {
         FinanceSource2: resettleElem.find("[name^='FinanceSource2']").val(),
         FinanceSource3: resettleElem.find("[name^='FinanceSource3']").val(),
         FinanceSource4: resettleElem.find("[name^='FinanceSource4']").val(),
-        ResettleInfoTo: GetRessetleInfoTo(resettleElem),
+        ResettleInfoTo: GetRessetleInfoTo(resettleElem, ""),
+        ResettleInfoToFact: GetRessetleInfoTo(resettleElem, "Fact"),
         ResettleDocuments: resettleElem.find("#resettleDocumentsList .list-group-item").map(function (idx, elem) {
             return {
                 IdResettleInfo: 0,
@@ -48,10 +50,10 @@ function getResettle(resettleElem) {
     };
 }
 
-function GetRessetleInfoTo(resettleElem) {
-    var subPremisesSelect = resettleElem.find('select[name="ResettleToSubPremises"]');
-    var premisesSelect = resettleElem.find('select[name="ResettleToIdPremise"]');
-    var buildingsSelect = resettleElem.find('select[name="ResettleToIdBuilding"]');
+function GetRessetleInfoTo(resettleElem, postfix) {
+    var subPremisesSelect = resettleElem.find('select[name="ResettleToSubPremises' + postfix+'"]');
+    var premisesSelect = resettleElem.find('select[name="ResettleToIdPremise' + postfix +'"]');
+    var buildingsSelect = resettleElem.find('select[name="ResettleToIdBuilding' + postfix +'"]');
     if (subPremisesSelect.val().length !== 0) {
         return $(subPremisesSelect.val()).map(function (idx, val) {
             return {
@@ -83,6 +85,7 @@ function resettleToFormData(resettle, address) {
     formData.append("ResettleInfo.IdResettleInfo", resettle.IdResettleInfo);
     formData.append("ResettleInfo.ResettleDate", resettle.ResettleDate);
     formData.append("ResettleInfo.IdResettleKind", resettle.IdResettleKind);
+    formData.append("ResettleInfo.IdResettleKindFact", resettle.IdResettleKindFact);
     for (var i = 0; i < resettle.ResettleInfoSubPremisesFrom.length; i++) {
         formData.append("ResettleInfo.ResettleInfoSubPremisesFrom["+i+"].IdSubPremise", resettle.ResettleInfoSubPremisesFrom[i].IdSubPremises);
         formData.append("ResettleInfo.ResettleInfoSubPremisesFrom[" + i +"].IdResettleInfo", resettle.ResettleInfoSubPremisesFrom[i].IdResettleInfo);
@@ -94,10 +97,17 @@ function resettleToFormData(resettle, address) {
     formData.append("Address.AddressType", address.addressType);
     formData.append("Address.Id", address.id);
     if (resettle.ResettleInfoTo !== null) {
-        for (var j = 0; j < resettle.ResettleInfoTo.length; j++) {
+        for (let j = 0; j < resettle.ResettleInfoTo.length; j++) {
             formData.append("ResettleInfo.ResettleInfoTo[" + j + "].IdObject", resettle.ResettleInfoTo[j].IdObject);
             formData.append("ResettleInfo.ResettleInfoTo[" + j + "].ObjectType", resettle.ResettleInfoTo[j].ObjectType);
             formData.append("ResettleInfo.ResettleInfoTo[" + j + "].IdResettleInfo", resettle.ResettleInfoTo[j].IdResettleInfo);
+        }
+    }
+    if (resettle.ResettleInfoToFact !== null) {
+        for (let j = 0; j < resettle.ResettleInfoToFact.length; j++) {
+            formData.append("ResettleInfo.ResettleInfoToFact[" + j + "].IdObject", resettle.ResettleInfoToFact[j].IdObject);
+            formData.append("ResettleInfo.ResettleInfoToFact[" + j + "].ObjectType", resettle.ResettleInfoToFact[j].ObjectType);
+            formData.append("ResettleInfo.ResettleInfoToFact[" + j + "].IdResettleInfo", resettle.ResettleInfoToFact[j].IdResettleInfo);
         }
     }
     if (resettle.ResettleDocuments !== null) {
@@ -136,36 +146,40 @@ let initializeVilidationResettle = function (resettleElem) {
     resettleElem.find("[name^='FinanceSource1']").addClass('valid')
         .attr('data-val', 'true')
         .attr('data-val-required', 'Поле "Федеральный бюджет" является обязательным')
+        .attr('data-val-number', 'Введите числовое значение')
         .attr('id', fs1)
         .attr('name', fs1)
-        .attr('aria-describedby', fs1 + '-error').next()
+        .attr('aria-describedby', fs1 + '-error').closest(".input-group")
         .after(getErrorSpanResettles(fs1));
 
     let fs2 = 'FinanceSource2_' + idResettleInfo;
     resettleElem.find("[name^='FinanceSource2']").addClass('valid')
         .attr('data-val', 'true')
         .attr('data-val-required', 'Поле "Областной бюджет" является обязательным')
+        .attr('data-val-number', 'Введите числовое значение')
         .attr('id', fs2)
         .attr('name', fs2)
-        .attr('aria-describedby', fs2 + '-error').next()
+        .attr('aria-describedby', fs2 + '-error').closest(".input-group")
         .after(getErrorSpanResettles(fs2));
 
     let fs3 = 'FinanceSource3_' + idResettleInfo;
     resettleElem.find("[name^='FinanceSource3']").addClass('valid')
         .attr('data-val', 'true')
         .attr('data-val-required', 'Поле "Муниципальный бюджет" является обязательным')
+        .attr('data-val-number', 'Введите числовое значение')
         .attr('id', fs3)
         .attr('name', fs3)
-        .attr('aria-describedby', fs3 + '-error').next()
+        .attr('aria-describedby', fs3 + '-error').closest(".input-group")
         .after(getErrorSpanResettles(fs3));
 
     let fs4 = 'FinanceSource4_' + idResettleInfo;
     resettleElem.find("[name^='FinanceSource4']").addClass('valid')
         .attr('data-val', 'true')
         .attr('data-val-required', 'Поле "Прочие источники" является обязательным')
+        .attr('data-val-number', 'Введите числовое значение')
         .attr('id', fs4)
         .attr('name', fs4)
-        .attr('aria-describedby', fs4 + '-error').next()
+        .attr('aria-describedby', fs4 + '-error').closest(".input-group")
         .after(getErrorSpanResettles(fs4));
 
     resettleElem.find("#resettleDocumentsList .list-group-item").each(function (idx, elem) {
@@ -410,7 +424,8 @@ function showEditDelPanelResettle(resettleElem) {
 
 function refreshResettle(resettleElem, resettle) {
     resettleElem.find("[name^='ResettleDate']").val(resettle.resettleDate);
-    resettleElem.find("[name^='IdResettleKind']").val(resettle.idResettleKind).selectpicker('refresh');
+    resettleElem.find("[name^='IdResettleKindPlan']").val(resettle.idResettleKind).selectpicker('refresh');
+    resettleElem.find("[name^='IdResettleKindFact']").val(resettle.idResettleKindFact).selectpicker('refresh');
     resettleElem.find("[name^='SubPremisesFrom']").val(resettle.subPremisesFrom).selectpicker('refresh');
     resettleElem.find("[name^='FinanceSource1']").val(resettle.financeSource1.toFixed(2).replace('.', ','));
     resettleElem.find("[name^='FinanceSource2']").val(resettle.financeSource2.toFixed(2).replace('.', ','));
@@ -418,6 +433,7 @@ function refreshResettle(resettleElem, resettle) {
     resettleElem.find("[name^='FinanceSource4']").val(resettle.financeSource4.toFixed(2).replace('.', ','));
     resettleElem.find("[name^='FinanceSource4']").val(resettle.financeSource4.toFixed(2).replace('.', ','));
     resettleElem.find('select[name="ResettleToIdStreet"]').val(resettleElem.find('input[name="ResettleToIdStreetPrev"]').val()).change().selectpicker('refresh');
+    resettleElem.find('select[name="ResettleToIdStreetFact"]').val(resettleElem.find('input[name="ResettleToIdStreetFactPrev"]').val()).change().selectpicker('refresh');
     var documentListElem = resettleElem.find("#resettleDocumentsList");
     documentListElem.empty();
     if (resettleDocumentTemplateForCancelation !== undefined) {
@@ -478,14 +494,25 @@ function saveResettle(e) {
             success: function (resettle) {
                 if (resettle.idResettleInfo > 0) {
                     resettleElem.find("input[name^='IdResettleInfo']").val(resettle.idResettleInfo);
+
                     resettleElem.find('input[name="ResettleToIdStreetPrev"]').val(resettleElem.find('select[name="ResettleToIdStreet"]').val());
                     resettleElem.find('input[name="ResettleToIdBuildingPrev"]').val(resettleElem.find('select[name="ResettleToIdBuilding"]').val());
                     resettleElem.find('input[name="ResettleToIdPremisePrev"]').val(resettleElem.find('select[name="ResettleToIdPremise"]').val());
                     resettleElem.find('input[name="ResettleToSubPremisesPrev"]').remove();
                     var resettleToSubPremisesIds = resettleElem.find('select[name="ResettleToSubPremises"]').val();
-                    for (var i = 0; i < resettleToSubPremisesIds.length; i++) {
+                    for (let i = 0; i < resettleToSubPremisesIds.length; i++) {
                         resettleElem.append("<input type='hidden' name='ResettleToSubPremisesPrev' value='" + resettleToSubPremisesIds[i]+"'>");
                     }
+
+                    resettleElem.find('input[name="ResettleToIdStreetFactPrev"]').val(resettleElem.find('select[name="ResettleToIdStreetFact"]').val());
+                    resettleElem.find('input[name="ResettleToIdBuildingFactPrev"]').val(resettleElem.find('select[name="ResettleToIdBuildingFact"]').val());
+                    resettleElem.find('input[name="ResettleToIdPremiseFactPrev"]').val(resettleElem.find('select[name="ResettleToIdPremiseFact"]').val());
+                    resettleElem.find('input[name="ResettleToSubPremisesFactPrev"]').remove();
+                    resettleToSubPremisesIds = resettleElem.find('select[name="ResettleToSubPremisesFact"]').val();
+                    for (let i = 0; i < resettleToSubPremisesIds.length; i++) {
+                        resettleElem.append("<input type='hidden' name='ResettleToSubPremisesFactPrev' value='" + resettleToSubPremisesIds[i] + "'>");
+                    }
+
                     var resettleDocumentElems = resettleElem.find("#resettleDocumentsList .list-group-item");
                     for (var j = 0; j < resettleDocumentElems.length; j++) {
                         var document = resettle.documents[j];
@@ -547,9 +574,10 @@ function removeResettleDocumentFile(e) {
 
 function getResettleHouses() {
     var idStreet = $(this).val();
+    var postfix = $(this).prop("name") === "ResettleToIdStreetFact" ? "Fact" : "";
     var resettleElem = $(this).closest(".list-group-item");
-    var buildingToSelect = resettleElem.find('select[name="ResettleToIdBuilding"]');
-    var buildingPrevId = resettleElem.find('input[name="ResettleToIdBuildingPrev"]').val();
+    var buildingToSelect = resettleElem.find('select[name="ResettleToIdBuilding' + postfix+'"]');
+    var buildingPrevId = resettleElem.find('input[name="ResettleToIdBuilding' + postfix+'Prev"]').val();
     buildingToSelect.empty();
     buildingToSelect.append("<option></option>");
     buildingToSelect.selectpicker('refresh');
@@ -566,9 +594,10 @@ function getResettleHouses() {
 
 function getResettlePremises() {
     var idBuilding = $(this).val();
+    var postfix = $(this).prop("name") === "ResettleToIdBuildingFact" ? "Fact" : "";
     var resettleElem = $(this).closest(".list-group-item");
-    var premiseToSelect = resettleElem.find('select[name="ResettleToIdPremise"]');
-    var premisePrevId = resettleElem.find('input[name="ResettleToIdPremisePrev"]').val();
+    var premiseToSelect = resettleElem.find('select[name="ResettleToIdPremise' + postfix +'"]');
+    var premisePrevId = resettleElem.find('input[name="ResettleToIdPremise' + postfix +'Prev"]').val();
     premiseToSelect.empty();
     premiseToSelect.append("<option></option>");
     premiseToSelect.selectpicker('refresh');
@@ -585,9 +614,10 @@ function getResettlePremises() {
 
 function getResettleSubPremises() {
     var idPremise = $(this).val();
+    var postfix = $(this).prop("name") === "ResettleToIdPremiseFact" ? "Fact" : "";
     var resettleElem = $(this).closest(".list-group-item");
-    var subPremiseToSelect = resettleElem.find('select[name="ResettleToSubPremises"]');
-    var subPremisePrevIds = resettleElem.find('input[name="ResettleToSubPremisesPrev"]').map(function (idx, elem) { return $(elem).val() }).toArray();
+    var subPremiseToSelect = resettleElem.find('select[name="ResettleToSubPremises' + postfix +'"]');
+    var subPremisePrevIds = resettleElem.find('input[name="ResettleToSubPremises' + postfix +'Prev"]').map(function (idx, elem) { return $(elem).val() }).toArray();
     subPremiseToSelect.empty();
     subPremiseToSelect.selectpicker('refresh');
     $.getJSON('/Resettles/GetSubPremises', { idPremise: idPremise }, function (subPremises) {
@@ -625,9 +655,9 @@ $(function () {
     $('#resettlesList').on('click', '.resettle-cancel-btn, .resettle-cancel-btn-2', cancelEditResettle);
     $('#resettlesList').on('click', '.resettle-save-btn, .resettle-save-btn-2', saveResettle);
     $('#resettlesList').on('click', '.resettle-delete-btn, .resettle-delete-btn-2', deleteResettle);
-    $('#resettlesList').on('change', 'select[name="ResettleToIdStreet"]', getResettleHouses);
-    $('#resettlesList').on('change', 'select[name="ResettleToIdBuilding"]', getResettlePremises);
-    $('#resettlesList').on('change', 'select[name="ResettleToIdPremise"]', getResettleSubPremises);
+    $('#resettlesList').on('change', 'select[name="ResettleToIdStreet"], select[name="ResettleToIdStreetFact"]', getResettleHouses);
+    $('#resettlesList').on('change', 'select[name="ResettleToIdBuilding"], select[name="ResettleToIdBuildingFact"]', getResettlePremises);
+    $('#resettlesList').on('change', 'select[name="ResettleToIdPremise"], select[name="ResettleToIdPremiseFact"]', getResettleSubPremises);
     $('#resettlesList').on('click', '#resettleDocumentAdd', addResettleDocument);
     $('#resettlesList').on('click', '.resettle-document-cancel-btn', removeResettleDocument);
     $('#resettlesList').on('click', '.rr-resettle-document-file-attach', attachResettleDocumentFile);

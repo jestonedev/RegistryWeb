@@ -8,6 +8,7 @@ namespace RegistryWeb.Models.Entities
         public ResettleKind()
         {
             ResettleInfos = new List<ResettleInfo>();
+            ResettleInfosFact = new List<ResettleInfo>();
         }
 
         public int IdResettleKind { get; set; }
@@ -15,5 +16,6 @@ namespace RegistryWeb.Models.Entities
         public byte Deleted { get; set; }
 
         public virtual IList<ResettleInfo> ResettleInfos { get; set; }
+        public virtual IList<ResettleInfo> ResettleInfosFact { get; set; }
     }
 }

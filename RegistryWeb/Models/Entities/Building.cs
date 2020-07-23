@@ -74,7 +74,7 @@ namespace RegistryWeb.Models.Entities
         public bool? Electricity { get; set; }
         public bool? RadioNetwork { get; set; }
         public int? IdHeatingType { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Выберите постановление")]
         public int IdDecree { get; set; }
         public string BtiRooms { get; set; }
         public string HousingCooperative { get; set; }
@@ -90,6 +90,7 @@ namespace RegistryWeb.Models.Entities
         public DateTime? DateOwnerEmergency { get; set; }
         public DateTime? DemolishedFactDate { get; set; }
         public DateTime? DemolishedPlanDate { get; set; }
+        public DateTime? DemandForDemolishingDeliveryDate { get; set; }
         public string LandCadastralNum { get; set; }
         public DateTime? LandCadastralDate { get; set; }
         [Required(ErrorMessage = "Укажите площадь земельного участка")]

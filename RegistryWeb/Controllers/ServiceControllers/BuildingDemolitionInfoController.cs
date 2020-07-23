@@ -36,9 +36,10 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 return Json(-1);
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return Json(-2);
-            var demolishedPlanDate = registryContext.Buildings
-                .FirstOrDefault(b => b.IdBuilding == idBuilding)
-                ?.DemolishedPlanDate;
+            var building = registryContext.Buildings
+                .FirstOrDefault(b => b.IdBuilding == idBuilding);
+            var demolishedPlanDate = building?.DemolishedPlanDate;
+            var demandForDemolishingDeliveryDate = building?.DemandForDemolishingDeliveryDate;
             var actTypeDocuments = registryContext.ActTypeDocuments
                 .Where(atd => atd.ActFileType == ActFileTypes.BuildingDemolitionActFile.ToString())
                 .Select(atd => new
@@ -50,7 +51,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             var buildingDemolitionActFiles = registryContext.BuildingDemolitionActFiles
                 .Include(af => af.ActFile)
                 .Where(b => b.IdBuilding == idBuilding)
-                .OrderBy(b => b.Id)
+                .OrderBy(b => b.Id).ToList()
                 .Select(b => new
                 {
                     id = b.Id,
@@ -58,7 +59,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
                     idActFile = b.IdActFile,
                     idActTypeDocument = b.IdActTypeDocument,
                     number = b.Number,
-                    date = b.Date.ToString("yyyy-MM-dd"),
+                    date = b.Date.HasValue ? b.Date.Value.ToString("yyyy-MM-dd") : "",
                     name = b.Name,
                     originalNameActFile = b.ActFile == null ? "" : b.ActFile.OriginalName
                 })
@@ -68,6 +69,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 actTypeDocuments,
                 buildingDemolitionActFiles,
                 demolishedPlanDate = demolishedPlanDate.HasValue ? demolishedPlanDate.Value.ToString("yyyy-MM-dd") : "",
+                demandForDemolishingDeliveryDate = demandForDemolishingDeliveryDate.HasValue ? demandForDemolishingDeliveryDate.Value.ToString("yyyy-MM-dd") : "",
                 idBuilding = idBuilding.Value
             });
         }
@@ -101,7 +103,9 @@ namespace RegistryWeb.Controllers.ServiceControllers
             var saveFileList = new List<string>();
             try
             {
-                registryContext.Buildings.SingleOrDefault(b => b.IdBuilding == viewModel.IdBuilding).DemolishedPlanDate = viewModel.DemolishedPlanDate;
+                var building = registryContext.Buildings.SingleOrDefault(b => b.IdBuilding == viewModel.IdBuilding);
+                building.DemolishedPlanDate = viewModel.DemolishedPlanDate;
+                building.DemandForDemolishingDeliveryDate = viewModel.DemandForDemolishingDeliveryDate;
                 var oldBDActFiles = registryContext.BuildingDemolitionActFiles
                     .Include(af => af.ActFile)
                     .Where(af => af.IdBuilding == viewModel.IdBuilding)
@@ -155,6 +159,8 @@ namespace RegistryWeb.Controllers.ServiceControllers
                         var oldActFile = registryContext.ActFiles.FirstOrDefault(af => af.IdFile == newBDActFile.IdActFile);
                         //Удаляем старый физический файл
                         registryContext.ActFiles.Remove(oldActFile);
+                        //Если файл был удален явно, то удаляем
+                        reportService.DeleteFileToRepository(oldActFile.FileName, ActFileTypes.BuildingDemolitionActFile);
                         removeFileList.Add(oldActFile.FileName);
                     }
                 }
@@ -184,7 +190,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 registryContext.SaveChanges();
                 //Старые файлы не удаляем, на случай ошибочного удаления
                 //removeFileList.ForEach(f => reportService.DeleteFileToRepository(f, ActFileTypes.BuildingDemolitionActFile));
-                return Json(1);
+                return Json(newBDActFiles.Select(f => f.IdActFile));
             }
             catch(Exception ex)
             {

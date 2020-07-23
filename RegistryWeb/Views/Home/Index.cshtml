@@ -1,7 +1,71 @@
 ﻿@{
     ViewData["Title"] = "Главная";
 }
-
-<div>
-    <h2>@ViewData["Title"]</h2>
+<div class="jumbotron">
+    <h1 class="display-4">Жилищный фонд города Братска</h1>
+    <p class="lead">Программный комплекс «Жилищный фонд города Братска» представляет собой автоматизированную информационную систему для учета, ведения и анализа информации о:
+        <ul>
+            <li>муниципальных и немуниципальных зданиях и помещениях</li>
+            <li>собственниках и нанимателях жилых помещений</li>
+            <li>ходе и порядке сноса аварийных зданий</li>
+            <li>ходе переселения граждан из аварийного жилья</li>
+            <li>ходе судебных разбирательств по жилым помещениям</li>
+            <li>лицевых счетах БКС</li>
+            <li>претензионно-исковой работе по задолженности за оплату найма жилых помещений</li>
+        </ul>
+    </p>
+</div>
+<div class="row flex-row flex-wrap">
+    <div class="col-12 col-md-6" style="margin-bottom: 10pt;">
+        <div class="card" style="height: 100%">
+            <div class="card-body" style="position: relative">
+                <h5 class="card-title">Здания</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Перечень муниципальных и немуниципальных зданий</h6>
+                <p class="card-text" style="margin-bottom: 2rem">
+                    Реестр зданий предназначен для ведения информации по муниципальным и немуниципальным зданиям, в том числе исчерпывающего перечня характеристик зданий,
+                    документов о включении зданий в аварийный фонд, о признании здания подлежащим сносу, о включении и/или исключении здания из муниципальной собственности, информации о ходе проведения сноса здания, об истории принадлежности здания определенному жилому фонду и др.
+                </p>
+                <a href="/Buildings" class="card-link" style="position: absolute;bottom: 15pt;">Перейти</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6" style="margin-bottom: 10pt;">
+        <div class="card" style="height: 100%">
+            <div class="card-body" style="position: relative">
+                <h5 class="card-title">Помещения</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Перечень муниципальных и немуниципальных помещений</h6>
+                <p class="card-text" style="margin-bottom: 2rem">
+                    Реестр помещений предназначен для ведения информации по муниципальным и немуниципальным жилым помещениям и комнатам, в том числе исчерпывающего перечня характеристик помещений и комнат,
+                    документов о включении и/или исключении из муниципальной собственности, документов о порядке переселения граждан, информации о ходе судебных разбирательств, об истории принадлежности помещений и комнат определенному жилому фонду, документов о факте приобретения жилого помещения под специализированные нужды и др.
+                </p>
+                <a href="/Premises" class="card-link" style="position: absolute;bottom: 15pt;">Перейти</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 col-md-6" style="margin-bottom: 10pt;">
+        <div class="card" style="height: 100%">
+            <div class="card-body" style="position: relative">
+                <h5 class="card-title">Собственность</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Реестр собственников жилья</h6>
+                <p class="card-text" style="margin-bottom: 2rem">
+                    Реестр собственников жилья предназначен для учета наличия права собственности граждан на жилые помещения с указанием документов-оснований права собственности, персональной информации о гражданах и пр.
+                </p>
+                <a href="/OwnerProcesses" class="card-link" style="position: absolute;bottom: 15pt;">Перейти</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6" style="margin-bottom: 10pt;">
+        <div class="card" style="height: 100%">
+            <div class="card-body" style="position: relative">
+                <h5 class="card-title">Найм жилья</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Реестр найма жилья</h6>
+                <p class="card-text" style="margin-bottom: 2rem">
+                    Реестр найма жилья предназначен для учета перечня нанимателей муниципальных жилых помещений, оснований найма, договоров и дополнительных соглашений, персональной информации о нанимателях и членах их семей, а также для формирования всей необходимой документации для организации работы по предоставлению жилых помещений в найм.
+                </p>
+                <a href="/TenancyProcesses" class="card-link" style="position: absolute;bottom: 15pt;">Перейти</a>
+            </div>
+        </div>
+    </div>
 </div>

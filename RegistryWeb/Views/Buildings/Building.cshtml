@@ -133,8 +133,10 @@
             </div>
             <div class="form-row">
                 <div class="form-group col-8">
-                    <select class="form-control" asp-for="IdStreet" title="Улица"
-                            asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdStreet)}"></select>
+                    <select class="selectpicker form-control" data-live-search="true" asp-for="IdStreet" title="Улица"
+                            asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdStreet)}">
+                        <option></option>
+                    </select>
                     <span asp-validation-for="IdStreet" class="text-danger"></span>
                 </div>
                 <div class="form-group col-2">
@@ -142,7 +144,7 @@
                     <span asp-validation-for="House" class="text-danger"></span>
                 </div>
                 <div class="form-group col-2">
-                    <select class="form-control" asp-for="IdDecree" title="Постановление"
+                    <select class="selectpicker form-control" asp-for="IdDecree" title="Постановление"
                             asp-items="@{new SelectList(ViewBag.GovernmentDecrees, "IdDecree", "Number", Model.IdDecree)}"></select>
                     <span asp-validation-for="IdDecree" class="text-danger"></span>
                 </div>
@@ -167,27 +169,27 @@
             </div>
             <div class="form-row">
                 <div class="form-group col">
-                    <select class="form-control" asp-for="IdState" title="Текущее состояние объекта"
+                    <select class="selectpicker form-control" asp-for="IdState" title="Текущее состояние объекта"
                             asp-items="@{new SelectList(ViewBag.ObjectStates, "IdState", "StateNeutral", Model.IdState)}"></select>
                     <span asp-validation-for="IdState" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
-                    <select class="form-control" asp-for="IdStructureType" title="Тип строения (материал)"
+                    <select class="selectpicker form-control" asp-for="IdStructureType" title="Тип строения (материал)"
                             asp-items="@{new SelectList(ViewBag.StructureTypes, "IdStructureType", "StructureTypeName", Model.IdStructureType)}"></select>
                     <span asp-validation-for="IdStructureType" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
-                    <select class="form-control" asp-for="IdStructureTypeOverlap" title="Тип перекрытий"
+                    <select class="selectpicker form-control" asp-for="IdStructureTypeOverlap" title="Тип перекрытий"
                             asp-items="@{new SelectList(ViewBag.StructureTypeOverlaps, "IdStructureTypeOverlap", "StructureTypeOverlapName", Model.IdStructureTypeOverlap)}"></select>
                     <span asp-validation-for="IdStructureTypeOverlap" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
-                    <select class="form-control" asp-for="IdFoundationType" title="Тип фундамента"
+                    <select class="selectpicker form-control" asp-for="IdFoundationType" title="Тип фундамента"
                             asp-items="@{new SelectList(ViewBag.FoundationTypes, "IdFoundationType", "Name", Model.IdFoundationType)}"></select>
                     <span asp-validation-for="IdFoundationType" class="text-danger"></span>
                 </div>
                 <div class="form-group col">
-                    <select class="form-control" asp-for="IdHeatingType" title="Отопление"
+                    <select class="selectpicker form-control" asp-for="IdHeatingType" title="Отопление"
                             asp-items="@{new SelectList(ViewBag.HeatingTypes, "IdHeatingType", "HeatingType1", Model.IdHeatingType)}"></select>
                     <span asp-validation-for="IdHeatingType" class="text-danger"></span>
                 </div>
@@ -476,7 +478,8 @@
         </form>
         @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.IdBuilding, type = AddressTypes.Building, action = ViewBag.Action })
         @await Component.InvokeAsync("OwnershipRightsComponent", new { address = new Address() { Id = Model.IdBuilding.ToString(), AddressType = AddressTypes.Building }, action = ViewBag.Action })
-        @await Component.InvokeAsync("BuildingDemolitionInfoComponent", new { id = Model.IdBuilding, demolishedPlanDate = Model.DemolishedPlanDate, action = ViewBag.Action })
+        @await Component.InvokeAsync("BuildingDemolitionInfoComponent", new { id = Model.IdBuilding, demolishedPlanDate = Model.DemolishedPlanDate,
+                    demandForDemolishingDeliveryDate = Model.DemandForDemolishingDeliveryDate, action = ViewBag.Action })
         @await Component.InvokeAsync("AttachmentFilesComponent", new { id = Model.IdBuilding, type = AddressTypes.Building, action = ViewBag.Action })
     </div>
 </div>

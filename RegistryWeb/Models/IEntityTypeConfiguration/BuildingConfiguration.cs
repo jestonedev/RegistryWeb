@@ -80,6 +80,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("demolished_plan_date")
                 .HasColumnType("date");
 
+            builder.Property(e => e.DemandForDemolishingDeliveryDate)
+                .HasColumnName("demand_for_demolishing_delivery_date")
+                .HasColumnType("date");
+
             builder.Property(e => e.Description)
                 .HasColumnName("description")
                 .IsUnicode(false);

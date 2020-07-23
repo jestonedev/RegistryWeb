@@ -168,7 +168,7 @@ namespace RegistryWeb.Controllers
             if (ModelState.IsValid)
             {
                 dataService.Create(building, HttpContext.Request.Form.Files.Select(f => f).ToList());
-                return GetBuildingView(building, "Details");
+                return RedirectToAction("Details", new { building.IdBuilding });
             }
             return GetBuildingView(building);
         }
@@ -252,7 +252,7 @@ namespace RegistryWeb.Controllers
             if (ModelState.IsValid)
             {
                 dataService.Edit(building);
-                return GetBuildingView(building, "Details");
+                return RedirectToAction("Details", new { building.IdBuilding });
             }
             return GetBuildingView(building);
         }

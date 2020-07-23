@@ -1,156 +1,4 @@
-﻿let getBuilding = function () {
-    let building = {
-        IdBuilding: $('#building [name="IdBuilding"]').val(),
-        IdStreet: $('#building [name="IdStreet"]').val(),
-        House: $('#building [name="House"]').val(),
-        IdDecree: $('#building [name="IdDecree"]').val(),
-        IdState: $('#building [name="IdState"]').val(),
-        IdStructureType: $('#building [name="IdStructureType"]').val(),
-        IdStructureTypeOverlap: $('#building [name="IdStructureTypeOverlap"]').val(),
-        IdHeatingType: $('#building [name="IdHeatingType"]').val(),
-        TotalArea: $('#building [name="TotalArea"]').val(),
-        LivingArea: $('#building [name="LivingArea"]').val(),
-        UnlivingArea: $('#building [name="UnlivingArea"]').val(),
-        CommonPropertyArea: $('#building [name="CommonPropertyArea"]').val(),
-        Floors: $('#building [name="Floors"]').val(),
-        Entrances: $('#building [name="Entrances"]').val(),
-        NumPremises: $('#building [name="NumPremises"]').val(),
-        NumRooms: $('#building [name="NumRooms"]').val(),
-        NumApartments: $('#building [name="NumApartments"]').val(),
-        NumSharedApartments: $('#building [name="NumSharedApartments"]').val(),
-        Series: $('#building [name="Series"]').val(),
-        CadastralNum: $('#building [name="CadastralNum"]').val(),
-        CadastralCost: $('#building [name="CadastralCost"]').val(),
-        BalanceCost: $('#building [name="BalanceCost"]').val(),
-        LandCadastralNum: $('#building [name="LandCadastralNum"]').val(),
-        LandCadastralDate: $('#building [name="LandCadastralDate"]').val(),
-        LandArea: $('#building [name="LandArea"]').val(),
-        StartupYear: $('#building [name="StartupYear"]').val(),
-        RegDate: $('#building [name="RegDate"]').val(),
-        DateOwnerEmergency: $('#building [name="DateOwnerEmergency"]').val(),
-        DemolishedFactDate: $('#building [name="DemolishedFactDate"]').val(),
-        IsMemorial: $('#building [name="IsMemorial"]').is(':checked'),
-        MemorialNumber: $('#building [name="MemorialNumber"]').val(),
-        MemorialDate: $('#building [name="MemorialDate"]').val(),
-        MemorialNameOrg: $('#building [name="MemorialNameOrg"]').val(),
-        Improvement: $('#building [name="Improvement"]').is(':checked'),
-        Elevator: $('#building [name="Elevator"]').is(':checked'),
-        RubbishChute: $('#building [name="RubbishChute.Value"]').is(':checked'),
-        Plumbing: $('#building [name="Plumbing.Value"]').is(':checked'),
-        HotWaterSupply: $('#building [name="HotWaterSupply.Value"]').is(':checked'),
-        Canalization: $('#building [name="Canalization.Value"]').is(':checked'),
-        Electricity: $('#building [name="Electricity.Value"]').is(':checked'),
-        RadioNetwork: $('#building [name="RadioNetwork.Value"]').is(':checked'),
-        Wear: $('#building [name="Wear"]').val(),
-        RentCoefficient: $('#building [name="RentCoefficient"]').val(),
-        HousingCooperative: $('#building [name="HousingCooperative"]').val(),
-        Description: $('#building [name="Description"]').val(),
-        BtiRooms: $('#building [name="BtiRooms"]').val(),
-
-        OwnershipBuildingsAssoc: CreateOwnershipBuildingsAssoc()
-    };
-    return building;
-};
-
-let getBuildingFormData = function () {
-    let buildingFormData = new FormData();
-    buildingFormData.append('IdBuilding', $('#building [name="IdBuilding"]').val());
-    buildingFormData.append('IdStreet', $('#building [name="IdStreet"]').val());
-    buildingFormData.append('House', $('#building [name="House"]').val());
-    buildingFormData.append('IdDecree', $('#building [name="IdDecree"]').val());
-    buildingFormData.append('IdState', $('#building [name="IdState"]').val());
-    buildingFormData.append('IdStructureType', $('#building [name="IdStructureType"]').val());
-    buildingFormData.append('IdStructureTypeOverlap', $('#building [name="IdStructureTypeOverlap"]').val());
-    buildingFormData.append('IdHeatingType', $('#building [name="IdHeatingType"]').val());
-    buildingFormData.append('TotalArea', $('#building [name="TotalArea"]').val());
-    buildingFormData.append('LivingArea', $('#building [name="LivingArea"]').val());
-    buildingFormData.append('UnlivingArea', $('#building [name="UnlivingArea"]').val());
-    buildingFormData.append('CommonPropertyArea', $('#building [name="CommonPropertyArea"]').val());
-    buildingFormData.append('Floors', $('#building [name="Floors"]').val());
-    buildingFormData.append('Entrances', $('#building [name="Entrances"]').val());
-    buildingFormData.append('NumPremises', $('#building [name="NumPremises"]').val());
-    buildingFormData.append('NumRooms', $('#building [name="NumRooms"]').val());
-    buildingFormData.append('NumApartments', $('#building [name="NumApartments"]').val());
-    buildingFormData.append('NumSharedApartments', $('#building [name="NumSharedApartments"]').val());
-    buildingFormData.append('Series', $('#building [name="Series"]').val());
-    buildingFormData.append('CadastralNum', $('#building [name="CadastralNum"]').val());
-    buildingFormData.append('CadastralCost', $('#building [name="CadastralCost"]').val());
-    buildingFormData.append('BalanceCost', $('#building [name="BalanceCost"]').val());
-    buildingFormData.append('LandCadastralNum', $('#building [name="LandCadastralNum"]').val());
-    buildingFormData.append('LandCadastralDate', $('#building [name="LandCadastralDate"]').val());
-    buildingFormData.append('LandArea', $('#building [name="LandArea"]').val());
-    buildingFormData.append('StartupYear', $('#building [name="StartupYear"]').val());
-    buildingFormData.append('RegDate', $('#building [name="RegDate"]').val());
-    buildingFormData.append('DateOwnerEmergency', $('#building [name="DateOwnerEmergency"]').val());
-    buildingFormData.append('DemolishedFactDate', $('#building [name="DemolishedFactDate"]').val());
-    buildingFormData.append('IsMemorial', $('#building [name="IsMemorial"]').is(':checked'));
-    buildingFormData.append('MemorialNumber', $('#building [name="MemorialNumber"]').val());
-    buildingFormData.append('MemorialDate', $('#building [name="MemorialDate"]').val());
-    buildingFormData.append('MemorialNameOrg', $('#building [name="MemorialNameOrg"]').val());
-    buildingFormData.append('Improvement', $('#building [name="Improvement"]').is(':checked'));
-    buildingFormData.append('Elevator', $('#building [name="Elevator"]').is(':checked'));
-    buildingFormData.append('RubbishChute', $('#building [name="RubbishChute"]').is(':checked'));
-    buildingFormData.append('Plumbing', $('#building [name="Plumbing"]').is(':checked'));
-    buildingFormData.append('HotWaterSupply', $('#building [name="HotWaterSupply"]').is(':checked'));
-    buildingFormData.append('Canalization', $('#building [name="Canalization"]').is(':checked'));
-    buildingFormData.append('Electricity', $('#building [name="Electricity"]').is(':checked'));
-    buildingFormData.append('RadioNetwork', $('#building [name="RadioNetwork"]').is(':checked'));
-    buildingFormData.append('Wear', $('#building [name="Wear"]').val());
-    buildingFormData.append('RentCoefficient', $('#building [name="RentCoefficient"]').val());
-    buildingFormData.append('HousingCooperative', $('#building [name="HousingCooperative"]').val());
-    buildingFormData.append('Description', $('#building [name="Description"]').val());
-    buildingFormData.append('BtiRooms', $('#building [name="BtiRooms"]').val());
-    let restrictions = CreateRestrictionBuildingsAssoc();
-    for (let i = 0; i < restrictions.length; i++) {
-        buildingFormData.append('RestrictionBuildingsAssoc[' + i + '].IdBuilding', $('#building [name="IdBuilding"]').val());
-        buildingFormData.append('RestrictionBuildingsAssoc[' + i + '].IdRestriction', restrictions[i].RestrictionNavigation.IdRestriction);
-        buildingFormData.append('RestrictionBuildingsAssoc[' + i + '].RestrictionNavigation.IdRestriction', restrictions[i].RestrictionNavigation.IdRestriction);
-        buildingFormData.append('RestrictionBuildingsAssoc[' + i + '].RestrictionNavigation.Number', restrictions[i].RestrictionNavigation.Number);
-        buildingFormData.append('RestrictionBuildingsAssoc[' + i + '].RestrictionNavigation.Date', restrictions[i].RestrictionNavigation.Date);
-        buildingFormData.append('RestrictionBuildingsAssoc[' + i + '].RestrictionNavigation.Description', restrictions[i].RestrictionNavigation.Description);
-        buildingFormData.append('RestrictionBuildingsAssoc[' + i + '].RestrictionNavigation.IdRestrictionType', restrictions[i].RestrictionNavigation.IdRestrictionType);
-        buildingFormData.append('RestrictionFile[' + i + ']', restrictions[i].RestrictionNavigation.RestrictionFile.files[0]);
-    }
-    let obas = CreateOwnershipBuildingsAssoc();
-    for (let i = 0; i < obas.length; i++) {
-        buildingFormData.append('OwnershipBuildingsAssoc[' + i + '].IdBuilding', $('#building [name="IdBuilding"]').val());
-        buildingFormData.append('OwnershipBuildingsAssoc[' + i + '].IdOwnershipRight', obas[i].OwnershipRightNavigation.IdOwnershipRight);
-        buildingFormData.append('OwnershipBuildingsAssoc[' + i + '].OwnershipRightNavigation.IdOwnershipRight', obas[i].OwnershipRightNavigation.IdOwnershipRight);
-        buildingFormData.append('OwnershipBuildingsAssoc[' + i + '].OwnershipRightNavigation.Number', obas[i].OwnershipRightNavigation.Number);
-        buildingFormData.append('OwnershipBuildingsAssoc[' + i + '].OwnershipRightNavigation.Date', obas[i].OwnershipRightNavigation.Date);
-        buildingFormData.append('OwnershipBuildingsAssoc[' + i + '].OwnershipRightNavigation.Description', obas[i].OwnershipRightNavigation.Description);
-        buildingFormData.append('OwnershipBuildingsAssoc[' + i + '].OwnershipRightNavigation.IdOwnershipRightType', obas[i].OwnershipRightNavigation.IdOwnershipRightType);
-        buildingFormData.append('OwnershipBuildingsAssoc[' + i + '].OwnershipRightNavigation.ResettlePlanDate', obas[i].OwnershipRightNavigation.ResettlePlanDate);
-        buildingFormData.append('OwnershipBuildingsAssoc[' + i + '].OwnershipRightNavigation.DemolishPlanDate', obas[i].OwnershipRightNavigation.DemolishPlanDate);
-        buildingFormData.append('OwnershipRightFile[' + i + ']', obas[i].OwnershipRightNavigation.OwnershipRightFile.files[0]);
-    }
-    let buildingDemolitionInfo = _buildingDemolitionInfo.getJson();
-    buildingFormData.append('DemolishedPlanDate', buildingDemolitionInfo.DemolishedPlanDate);
-    let buildingDemolitionActFiles = buildingDemolitionInfo.BuildingDemolitionActFiles;
-    for (let i = 0; i < buildingDemolitionActFiles.length; i++) {
-        buildingFormData.append('BuildingDemolitionActFiles[' + i + '].Id', buildingDemolitionActFiles[i].Id);
-        buildingFormData.append('BuildingDemolitionActFiles[' + i + '].IdBuilding', buildingDemolitionActFiles[i].IdBuilding);
-        buildingFormData.append('BuildingDemolitionActFiles[' + i + '].IdActFile', buildingDemolitionActFiles[i].IdActFile);
-        buildingFormData.append('BuildingDemolitionActFiles[' + i + '].IdActTypeDocument', buildingDemolitionActFiles[i].IdActTypeDocument);
-        buildingFormData.append('BuildingDemolitionActFiles[' + i + '].Number', buildingDemolitionActFiles[i].Number);
-        buildingFormData.append('BuildingDemolitionActFiles[' + i + '].Date', buildingDemolitionActFiles[i].Date);
-        buildingFormData.append('BuildingDemolitionActFiles[' + i + '].Name', buildingDemolitionActFiles[i].Name);
-        buildingFormData.append('BuildingDemolitionActFile[' + i + ']', buildingDemolitionActFiles[i].File);
-    }
-
-    let attachmentFiles = CreateBuildingAttachmentFilesAssoc();
-    for (let i = 0; i < attachmentFiles.length; i++) {
-        buildingFormData.append('BuildingAttachmentFilesAssoc[' + i + '].IdBuilding', $('#building [name="IdBuilding"]').val());
-        buildingFormData.append('BuildingAttachmentFilesAssoc[' + i + '].IdAttachment', attachmentFiles[i].ObjectAttachmentFileNavigation.IdAttachment);
-        buildingFormData.append('BuildingAttachmentFilesAssoc[' + i + '].ObjectAttachmentFileNavigation.IdRestriction', attachmentFiles[i].ObjectAttachmentFileNavigation.IdAttachment);
-        buildingFormData.append('BuildingAttachmentFilesAssoc[' + i + '].ObjectAttachmentFileNavigation.Description', attachmentFiles[i].ObjectAttachmentFileNavigation.Description);
-        buildingFormData.append('AttachmentFile[' + i + ']', attachmentFiles[i].ObjectAttachmentFileNavigation.AttachmentFile.files[0]);
-    }
-
-    return buildingFormData;
-};
-
-let getInputTemplate = function (name, value) {
+﻿let getInputTemplate = function (name, value) {
     return '<input type="hidden" name="' + name + '" value="' + value + '">';
 };
 
@@ -159,6 +7,7 @@ let createBuildingClick = function (event) {
     $("input.decimal").each(function (idx, elem) {
         $(elem).val($(elem).val().replace(".", ","));
     });
+    $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
     let buildingIsValid = $('#building').valid();
     let restrictionsIsValid = $("#restrictionsForm").valid();
     let ownershipRightsIsValid = $("#ownershipRightsForm").valid();
@@ -198,16 +47,17 @@ let createBuildingClick = function (event) {
         }
         let buildingDemolitionInfo = _buildingDemolitionInfo.getJson();
         $('#building').append(getInputTemplate('DemolishedPlanDate', buildingDemolitionInfo.DemolishedPlanDate));
+        $('#building').append(getInputTemplate('DemandForDemolishingDeliveryDate', buildingDemolitionInfo.DemandForDemolishingDeliveryDate));
         let buildingDemolitionActFiles = buildingDemolitionInfo.BuildingDemolitionActFiles;
         for (let i = 0; i < buildingDemolitionActFiles.length; i++) {
             let bdaf = "BuildingDemolitionActFiles[" + i + "].";
             $('#building').append(getInputTemplate(bdaf + 'Id', buildingDemolitionActFiles[i].Id));
-            $('#building').append(getInputTemplate(bdaf + 'IdBuilding', buildingDemolitionActFiles[i].Id));
-            $('#building').append(getInputTemplate(bdaf + 'IdActFile', buildingDemolitionActFiles[i].Id));
-            $('#building').append(getInputTemplate(bdaf + 'IdActTypeDocument', buildingDemolitionActFiles[i].Id));
-            $('#building').append(getInputTemplate(bdaf + 'Number', buildingDemolitionActFiles[i].Id));
-            $('#building').append(getInputTemplate(bdaf + 'Date', buildingDemolitionActFiles[i].Id));
-            $('#building').append(getInputTemplate(bdaf + 'Name', buildingDemolitionActFiles[i].Id));
+            $('#building').append(getInputTemplate(bdaf + 'IdBuilding', buildingDemolitionActFiles[i].IdBuilding));
+            $('#building').append(getInputTemplate(bdaf + 'IdActFile', buildingDemolitionActFiles[i].IdActFile));
+            $('#building').append(getInputTemplate(bdaf + 'IdActTypeDocument', buildingDemolitionActFiles[i].IdActTypeDocument));
+            $('#building').append(getInputTemplate(bdaf + 'Number', buildingDemolitionActFiles[i].Number));
+            $('#building').append(getInputTemplate(bdaf + 'Date', buildingDemolitionActFiles[i].Date));
+            $('#building').append(getInputTemplate(bdaf + 'Name', buildingDemolitionActFiles[i].Name));
             let file = $(buildingDemolitionActFiles[i].FileInput).clone();
             file.attr("name", "BuildingDemolitionActFile[" + i + "]");
             $('#building').append(file);
@@ -227,7 +77,6 @@ let createBuildingClick = function (event) {
         $('#building').submit();
     } else {
         onSubmitErrorsPostProcessing();
-        e.preventDefault();
     }
 };
 
@@ -235,6 +84,7 @@ let editBuildingClick = function (e) {
     $("input.decimal").each(function (idx, elem) {
         $(elem).val($(elem).val().replace(".", ","));
     });
+    $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
     let buildingIsValid = $('#building').valid();
     if (buildingIsValid) {
         $('#building').submit();
@@ -285,8 +135,19 @@ $(function () {
         $('#building input[type="hidden"]').prop('disabled', false);
         $('#building input[type="submit"]').prop('disabled', false);
     }
-    $('#buildingToggle').on('click', $('#building'), elementToogle);
+    $('#buildingToggle').on('click', $('#building'), elementToogleHide);
     $('#createBtn').click(createBuildingClick);
     $('#editBtn').click(editBuildingClick);
     $('#IsMemorial').click(memorialCardClick);
+
+    $("form").on("change", "select", function () {
+        var isValid = $(this).valid();
+        var id = $(this).prop("id");
+        if (!isValid) {
+            $("button[data-id='" + id + "']").addClass("input-validation-error");
+        } else {
+
+            $("button[data-id='" + id + "']").removeClass("input-validation-error");
+        }
+    });
 });
