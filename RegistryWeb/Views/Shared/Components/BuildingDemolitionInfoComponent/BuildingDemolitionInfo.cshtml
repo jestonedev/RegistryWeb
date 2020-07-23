@@ -1,6 +1,8 @@
 ﻿@model RegistryWeb.ViewModel.BuildingDemolitionInfoVM;
 @{
     var demolishedPlanDate = Model.DemolishedPlanDate.HasValue ? Model.DemolishedPlanDate.Value.ToString("yyyy-MM-dd") : "";
+    var demolishedFactDate = Model.DemolishedFactDate.HasValue ? Model.DemolishedFactDate.Value.ToString("yyyy-MM-dd") : "";
+    var dateOwnerEmergency = Model.DateOwnerEmergency.HasValue ? Model.DateOwnerEmergency.Value.ToString("yyyy-MM-dd") : "";
     var demandForDemolishingDeliveryDate = Model.DemandForDemolishingDeliveryDate.HasValue ? Model.DemandForDemolishingDeliveryDate.Value.ToString("yyyy-MM-dd") : "";
 }
 <form id="buildingDemolitionInfoForm" data-action="@ViewBag.Action" data-idbuilding="@Model.IdBuilding" data-caneditextinfo="@ViewBag.CanEditDemolishingInfo">
@@ -17,11 +19,19 @@
             <div class="row">
                 <div class="form-group col-md-6">
                     <label for="@Model.DemolishedPlanDate">Планируемая дата сноса</label>
-                    <input type="date" id="demolishPlanDate" class="form-control" value="@demolishedPlanDate" title="@demolishedPlanDate">
+                    <input type="date" id="demolishPlanDate" class="form-control" value="@demolishedPlanDate" title="Планируемая дата сноса">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="@Model.DemolishedFactDate">Фактическая дата сноса</label>
+                    <input type="date" id="demolishFactDate" class="form-control" value="@demolishedFactDate" title="Фактическая дата сноса">
+                </div>
+                <div class="form-group col-md-6">
+                    <label class="rr-building-label" for="@Model.DateOwnerEmergency">Срок принятия собственниками решения о сносе</label>
+                    <input type="date" id="dateOwnerEmergency" class="form-control" value="@dateOwnerEmergency" title="Срок принятия собственниками решения о сносе">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="@Model.DemandForDemolishingDeliveryDate">Дата вручения требования о сносе</label>
-                    <input type="date" id="demandForDemolishingDeliveryDate" class="form-control" value="@demandForDemolishingDeliveryDate" title="@demandForDemolishingDeliveryDate">
+                    <input type="date" id="demandForDemolishingDeliveryDate" class="form-control" value="@demandForDemolishingDeliveryDate" title="Дата вручения требования о сносе">
                 </div>
             </div>
             <table class="table table-bordered">
@@ -99,7 +109,7 @@
 
             @if (ViewBag.Action == "Edit" && ViewBag.CanEditDemolishingInfo)
             {
-                <div class="form-group row d-flex justify-content-center">
+                <div class="form-group row d-flex justify-content-center mb-0">
                     <div class="col-auto">
                         <a href="#" id="buildingDemolitionInfoEdit" class="form-control btn btn-success" title="Редактировать">Редактирвоать</a>
                     </div>

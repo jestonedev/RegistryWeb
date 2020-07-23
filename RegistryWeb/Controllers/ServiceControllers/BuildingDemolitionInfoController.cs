@@ -39,6 +39,8 @@ namespace RegistryWeb.Controllers.ServiceControllers
             var building = registryContext.Buildings
                 .FirstOrDefault(b => b.IdBuilding == idBuilding);
             var demolishedPlanDate = building?.DemolishedPlanDate;
+            var demolishedFactDate = building?.DemolishedFactDate;
+            var dateOwnerEmergency = building?.DateOwnerEmergency;
             var demandForDemolishingDeliveryDate = building?.DemandForDemolishingDeliveryDate;
             var actTypeDocuments = registryContext.ActTypeDocuments
                 .Where(atd => atd.ActFileType == ActFileTypes.BuildingDemolitionActFile.ToString())
@@ -69,6 +71,8 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 actTypeDocuments,
                 buildingDemolitionActFiles,
                 demolishedPlanDate = demolishedPlanDate.HasValue ? demolishedPlanDate.Value.ToString("yyyy-MM-dd") : "",
+                demolishedFactDate = demolishedFactDate.HasValue ? demolishedFactDate.Value.ToString("yyyy-MM-dd") : "",
+                dateOwnerEmergency = dateOwnerEmergency.HasValue ? dateOwnerEmergency.Value.ToString("yyyy-MM-dd") : "",
                 demandForDemolishingDeliveryDate = demandForDemolishingDeliveryDate.HasValue ? demandForDemolishingDeliveryDate.Value.ToString("yyyy-MM-dd") : "",
                 idBuilding = idBuilding.Value
             });
@@ -105,6 +109,8 @@ namespace RegistryWeb.Controllers.ServiceControllers
             {
                 var building = registryContext.Buildings.SingleOrDefault(b => b.IdBuilding == viewModel.IdBuilding);
                 building.DemolishedPlanDate = viewModel.DemolishedPlanDate;
+                building.DemolishedFactDate = viewModel.DemolishedFactDate;
+                building.DateOwnerEmergency = viewModel.DateOwnerEmergency;
                 building.DemandForDemolishingDeliveryDate = viewModel.DemandForDemolishingDeliveryDate;
                 var oldBDActFiles = registryContext.BuildingDemolitionActFiles
                     .Include(af => af.ActFile)

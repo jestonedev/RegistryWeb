@@ -19,7 +19,8 @@ namespace RegistryWeb.ViewComponents
             this.securityService = securityService;
         }
 
-        public IViewComponentResult Invoke(int id, DateTime? demolishedPlanDate, DateTime? demandForDemolishingDeliveryDate, string action)
+        public IViewComponentResult Invoke(int id, DateTime? demolishedPlanDate, DateTime? demolishedFactDate, 
+            DateTime? dateOwnerEmergency, DateTime? demandForDemolishingDeliveryDate, string action)
         {
             var model = new BuildingDemolitionInfoVM();
             model.BuildingDemolitionActFiles =
@@ -30,6 +31,8 @@ namespace RegistryWeb.ViewComponents
                 .OrderBy(b => b.Id)
                 .ToList();
             model.DemolishedPlanDate = demolishedPlanDate;
+            model.DemolishedFactDate = demolishedFactDate;
+            model.DateOwnerEmergency = dateOwnerEmergency;
             model.DemandForDemolishingDeliveryDate = demandForDemolishingDeliveryDate;
             model.IdBuilding = id;
             ViewBag.ActTypeDocuments =

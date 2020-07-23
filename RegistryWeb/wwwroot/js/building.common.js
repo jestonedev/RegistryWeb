@@ -47,6 +47,8 @@ let createBuildingClick = function (event) {
         }
         let buildingDemolitionInfo = _buildingDemolitionInfo.getJson();
         $('#building').append(getInputTemplate('DemolishedPlanDate', buildingDemolitionInfo.DemolishedPlanDate));
+        $('#building').append(getInputTemplate('DemolishedFactDate', buildingDemolitionInfo.DemolishedFactDate));
+        $('#building').append(getInputTemplate('DateOwnerEmergency', buildingDemolitionInfo.DateOwnerEmergency));
         $('#building').append(getInputTemplate('DemandForDemolishingDeliveryDate', buildingDemolitionInfo.DemandForDemolishingDeliveryDate));
         let buildingDemolitionActFiles = buildingDemolitionInfo.BuildingDemolitionActFiles;
         for (let i = 0; i < buildingDemolitionActFiles.length; i++) {
@@ -94,6 +96,11 @@ let editBuildingClick = function (e) {
     e.preventDefault();
 };
 
+let deleteBuildingClick = function (e) {
+    $('#building').submit();
+    e.preventDefault();
+}
+
 let onSubmitErrorsPostProcessing = function () {
     $("select").each(function (idx, elem) {
         var id = $(elem).prop("id");
@@ -138,6 +145,7 @@ $(function () {
     $('#buildingToggle').on('click', $('#building'), elementToogleHide);
     $('#createBtn').click(createBuildingClick);
     $('#editBtn').click(editBuildingClick);
+    $('#deleteBtn').click(deleteBuildingClick);
     $('#IsMemorial').click(memorialCardClick);
 
     $("form").on("change", "select", function () {

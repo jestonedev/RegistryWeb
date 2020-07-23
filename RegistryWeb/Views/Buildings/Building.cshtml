@@ -110,7 +110,7 @@
                 }
                 @if (ViewBag.Action == "Delete")
                 {
-                    <input type="submit" value="Удалить" class="form-control btn btn-danger" />
+                    <input type="submit" value="Удалить" id="deleteBtn" class="form-control btn btn-danger" />
                 }
 
                 <a href="#" id="buildingToggle" class="form-control btn btn-primary" title="Развернуть здание" style="font-weight:bold;">∧</a>
@@ -121,249 +121,157 @@
         <form asp-controller="Buildings" asp-action="@ViewBag.Action" enctype="multipart/form-data" id="building" data-action="@ViewBag.Action" data-caneditbaseinfo="@ViewBag.CanEditBaseInfo" method="post">
             <input type="hidden" asp-for="IdBuilding" />
             <div class="form-row">
-                <div class="form-group col-8 r-form-group-label">
+                <div class="form-group col-md-9 col-lg-8">
                     <label asp-for="IdStreet">Улица</label>
-                </div>
-                <div class="form-group col-2 r-form-group-label">
-                    <label asp-for="House">Номер дома</label>
-                </div>
-                <div class="form-group col-2 r-form-group-label">
-                    <label asp-for="IdDecree">Постановление</label>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-8">
                     <select class="selectpicker form-control" data-live-search="true" asp-for="IdStreet" title="Улица"
                             asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdStreet)}">
                         <option></option>
                     </select>
                     <span asp-validation-for="IdStreet" class="text-danger"></span>
                 </div>
-                <div class="form-group col-2">
+                <div class="form-group col-12 col-md-3 col-lg-2">
+                    <label asp-for="House">Номер дома</label>
                     <input type="text" class="form-control" asp-for="House" title="Номер дома">
                     <span asp-validation-for="House" class="text-danger"></span>
                 </div>
-                <div class="form-group col-2">
+                <div class="form-group col-6 col-lg-2">
+                    <label asp-for="IdDecree">Постановление</label>
                     <select class="selectpicker form-control" asp-for="IdDecree" title="Постановление"
                             asp-items="@{new SelectList(ViewBag.GovernmentDecrees, "IdDecree", "Number", Model.IdDecree)}"></select>
                     <span asp-validation-for="IdDecree" class="text-danger"></span>
                 </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="IdState">Текущее состояние объекта</label>
-                </div>
-                <div class="form-group col r-form-group-label">
+                <div class="form-group col-6 col-lg-4">
                     <label asp-for="IdStructureType">Тип строения (материал)</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="IdStructureTypeOverlap">Тип перекрытий</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="IdFoundationType">Тип фундамента</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="IdHeatingType">Отопление</label>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col">
-                    <select class="selectpicker form-control" asp-for="IdState" title="Текущее состояние объекта"
-                            asp-items="@{new SelectList(ViewBag.ObjectStates, "IdState", "StateNeutral", Model.IdState)}"></select>
-                    <span asp-validation-for="IdState" class="text-danger"></span>
-                </div>
-                <div class="form-group col">
                     <select class="selectpicker form-control" asp-for="IdStructureType" title="Тип строения (материал)"
                             asp-items="@{new SelectList(ViewBag.StructureTypes, "IdStructureType", "StructureTypeName", Model.IdStructureType)}"></select>
                     <span asp-validation-for="IdStructureType" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-4">
+                    <label asp-for="IdStructureTypeOverlap">Тип перекрытий</label>
                     <select class="selectpicker form-control" asp-for="IdStructureTypeOverlap" title="Тип перекрытий"
                             asp-items="@{new SelectList(ViewBag.StructureTypeOverlaps, "IdStructureTypeOverlap", "StructureTypeOverlapName", Model.IdStructureTypeOverlap)}"></select>
                     <span asp-validation-for="IdStructureTypeOverlap" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-4">
+                    <label asp-for="IdFoundationType">Тип фундамента</label>
                     <select class="selectpicker form-control" asp-for="IdFoundationType" title="Тип фундамента"
                             asp-items="@{new SelectList(ViewBag.FoundationTypes, "IdFoundationType", "Name", Model.IdFoundationType)}"></select>
                     <span asp-validation-for="IdFoundationType" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-3">
+                    <label asp-for="StartupYear">Год ввода в эксплуатацию</label>
+                    <input type="number" class="form-control" asp-for="StartupYear" title="Год ввода в эксплуатацию">
+                    <span asp-validation-for="StartupYear" class="text-danger"></span>
+                </div>
+                <div class="form-group col-6 col-lg-3">
+                    <label asp-for="RegDate">Дата включения в РМИ</label>
+                    <input type="date" class="form-control" asp-for="RegDate" value="@(Model.RegDate.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : Model.RegDate.ToString("yyyy-MM-dd"))" title="Дата включения в РМИ">
+                    <span asp-validation-for="RegDate" class="text-danger"></span>
+                </div>
+                <div class="form-group col-6 col-lg-3">
+                    <label asp-for="IdState">Текущее состояние</label>
+                    <select class="selectpicker form-control" asp-for="IdState" title="Текущее состояние"
+                            asp-items="@{new SelectList(ViewBag.ObjectStates, "IdState", "StateNeutral", Model.IdState)}"></select>
+                    <span asp-validation-for="IdState" class="text-danger"></span>
+                </div>
+                <div class="form-group col-6 col-lg-3">
+                    <label asp-for="IdHeatingType">Отопление</label>
                     <select class="selectpicker form-control" asp-for="IdHeatingType" title="Отопление"
                             asp-items="@{new SelectList(ViewBag.HeatingTypes, "IdHeatingType", "HeatingType1", Model.IdHeatingType)}"></select>
                     <span asp-validation-for="IdHeatingType" class="text-danger"></span>
                 </div>
             </div>
-
             <div class="form-row">
-                <div class="form-group col r-form-group-label">
+                <div class="form-group col-6 col-lg-3">
                     <label asp-for="TotalArea">Общая площадь</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="LivingArea">Жилая площадь</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="UnlivingArea">Нежилая площадь</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="CommonPropertyArea">Площадь общего имущества</label>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col">
                     <input type="text" class="form-control decimal" asp-for="TotalArea" title="Общая площадь">
                     <span asp-validation-for="TotalArea" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-3">
+                    <label asp-for="LivingArea">Жилая площадь</label>
                     <input type="text" class="form-control decimal" asp-for="LivingArea" title="Жилая площадь">
                     <span asp-validation-for="LivingArea" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-3">
+                    <label asp-for="UnlivingArea">Нежилая площадь</label>
                     <input type="text" class="form-control decimal" asp-for="UnlivingArea" title="Нежилая площадь">
                     <span asp-validation-for="UnlivingArea" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-3">
+                    <label class="rr-building-label" asp-for="CommonPropertyArea">Площадь общего имущества</label>
                     <input type="text" class="form-control decimal" asp-for="CommonPropertyArea" title="Площадь общего имущества">
                     <span asp-validation-for="CommonPropertyArea" class="text-danger"></span>
                 </div>
             </div>
-
             <div class="form-row">
-                <div class="form-group col r-form-group-label">
+                <div class="form-group col-6 col-lg-4">
                     <label asp-for="Floors">Этажность</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="Entrances">Количество подъездов</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="NumPremises">Число помещений (всего)</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="NumRooms">Число комнат</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="NumApartments">Число квартир</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="NumSharedApartments">Число квартир с подселением</label>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col">
                     <input type="number" class="form-control" asp-for="Floors" title="Этажность">
                     <span asp-validation-for="Floors" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-4">
+                    <label asp-for="Entrances">Количество подъездов</label>
                     <input type="number" class="form-control" asp-for="Entrances" title="Количество подъездов">
                     <span asp-validation-for="Entrances" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-4">
+                    <label asp-for="NumPremises">Число помещений (всего)</label>
                     <input type="number" class="form-control" asp-for="NumPremises" title="Число помеещний (всего)">
                     <span asp-validation-for="NumPremises" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-4">
+                    <label asp-for="NumRooms">Число комнат</label>
                     <input type="number" class="form-control" asp-for="NumRooms" title="Число комнат">
                     <span asp-validation-for="NumRooms" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-4">
+                    <label asp-for="NumApartments">Число квартир</label>
                     <input type="number" class="form-control" asp-for="NumApartments" title="Число квартир">
                     <span asp-validation-for="NumApartments" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-4">
+                    <label class="rr-building-label" asp-for="NumSharedApartments">Число квартир с подселением</label>
                     <input type="number" class="form-control" asp-for="NumSharedApartments" title="Число квартир с подселением">
                     <span asp-validation-for="NumSharedApartments" class="text-danger"></span>
                 </div>
             </div>
-
             <div class="form-row">
-                <div class="form-group col r-form-group-label">
+                <div class="form-group col-6 col-lg-3">
                     <label asp-for="Series">Серия, тип постройки</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="CadastralNum">Кадастровый номер</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="CadastralCost">Кадастровая стоимость</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="BalanceCost">Балансовая стоимость</label>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col">
                     <input type="text" class="form-control" asp-for="Series" title="Серия, тип постройки">
                     <span asp-validation-for="Series" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-3">
+                    <label asp-for="CadastralNum">Кадастровый номер</label>
                     <input type="text" class="form-control" asp-for="CadastralNum" title="Кадастровый номер">
                     <span asp-validation-for="CadastralNum" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-3">
+                    <label asp-for="CadastralCost">Кадастровая стоимость</label>
                     <input type="text" class="form-control decimal" asp-for="CadastralCost" title="Кадастровая стоимость">
                     <span asp-validation-for="CadastralCost" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-3">
+                    <label asp-for="BalanceCost">Балансовая стоимость</label>
                     <input type="text" class="form-control decimal" asp-for="BalanceCost" title="Балансовая стоимость">
                     <span asp-validation-for="BalanceCost" class="text-danger"></span>
                 </div>
             </div>
-
             <div class="form-row">
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="LandCadastralNum">Кадастровый номер земельнго учатска, на котором расположено здание</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="LandCadastralDate">Дата постановки земельнго участка на кадастровый учет</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="LandArea">Площадь земельнго участка</label>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col">
+                <div class="form-group col-12 col-lg-4">
+                    <label class="rr-building-label" asp-for="LandCadastralNum">Кадастровый номер земельного участка</label>
                     <input type="text" class="form-control" asp-for="LandCadastralNum" title="Кадастровый номер земельного участка, на котором расположено здание">
                     <span asp-validation-for="LandCadastralNum" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
-                    <input type="date" class="form-control" asp-for="LandCadastralDate" title="Дата  постановки на кадастровый учет">
+                <div class="form-group col-6 col-lg-4">
+                    <label class="rr-building-label" asp-for="LandCadastralDate">Дата постановки ЗУ на кадастровый учет</label>
+                    <input type="date" class="form-control" asp-for="LandCadastralDate" title="Дата постановки земельного учатска на кадастровый учет">
                     <span asp-validation-for="LandCadastralDate" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-6 col-lg-4">
+                    <label class="rr-building-label" asp-for="LandArea">Площадь земельнго участка</label>
                     <input type="text" class="form-control" asp-for="LandArea" title="Площадь земельного участка">
                     <span asp-validation-for="LandArea" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="StartupYear">Год ввода в эксплуатацию</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="RegDate">Дата включения в РМИ</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="DateOwnerEmergency">Срок принятия собственниками решения о сносе</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="DemolishedFactDate">Фактическая дата сноса или реконструкции</label>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col">
-                    <input type="number" class="form-control" asp-for="StartupYear" title="Год ввода в эксплуатацию">
-                    <span asp-validation-for="StartupYear" class="text-danger"></span>
-                </div>
-                <div class="form-group col">
-                    <input type="date" class="form-control" asp-for="RegDate" title="Дата включения в РМИ">
-                    <span asp-validation-for="RegDate" class="text-danger"></span>
-                </div>
-                <div class="form-group col">
-                    <input type="date" class="form-control" asp-for="DateOwnerEmergency" title="Срок принятия собственниками решения о сносе или реконструкции">
-                    <span asp-validation-for="DateOwnerEmergency" class="text-danger"></span>
-                </div>
-                <div class="form-group col">
-                    <input type="date" class="form-control" asp-for="DemolishedFactDate" title="Фактическая дата сноса или реконструкции">
-                    <span asp-validation-for="DemolishedFactDate" class="text-danger"></span>
                 </div>
             </div>
 
@@ -371,10 +279,10 @@
                 <legend class="r-scheduler-border">
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" style="margin-top:10px;" asp-for="IsMemorial" title="Памятник культуры">
-                        <label asp-for="IsMemorial" class="form-check-label">Документ о присвоении статуса - памятник культуры</label>
+                        <label asp-for="IsMemorial" class="form-check-label rr-building-label">Документ о присвоении статуса - памятник культуры</label>
                     </div>
                 </legend>
-                <div class="col-3">
+                <div class="col-6 col-lg-3 mb-3 mb-lg-0">
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <div class="input-group-text">№</div>
@@ -383,11 +291,11 @@
                         <span asp-validation-for="MemorialNumber" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="col-3">
+                <div class="col-6 col-lg-3 mb-3 mb-lg-0">
                     <input type="date" class="form-control" asp-for="MemorialDate" title="Дата документа">
                     <span asp-validation-for="MemorialDate" class="text-danger"></span>
                 </div>
-                <div class="col-6">
+                <div class="col-12 col-lg-6">
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <div class="input-group-text">Орган</div>
@@ -398,60 +306,48 @@
                 </div>
             </fieldset>
 
-            <div class="form-row">
-                <div class="form-group form-check col r-form-group-checkbox">
+            <div class="form-row ml-3 mb-2">
+                <div class="form-group form-check col-6 col-lg-4">
                     <input type="checkbox" class="form-check-input" asp-for="Improvement" title="Благоустроенность">
                     <label asp-for="Improvement" class="form-check-label">Благоустроенность</label>
                 </div>
-                <div class="form-group form-check col r-form-group-checkbox">
+                <div class="form-group form-check col-6 col-lg-4">
                     <input type="checkbox" class="form-check-input" asp-for="Elevator" title="Наличие в доме лифта">
                     <label asp-for="Elevator" class="form-check-label">Наличие в доме лифта</label>
                 </div>
-                <div class="form-group form-check col r-form-group-checkbox">
+                <div class="form-group form-check col-6 col-lg-4">
                     <input type="checkbox" class="form-check-input" asp-for="RubbishChute.Value" title="Наличие в доме мусоропровода">
                     <label asp-for="RubbishChute.Value" class="form-check-label">Наличие в доме мусоропровода</label>
                 </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group form-check col r-form-group-checkbox">
+                <div class="form-group form-check col-6 col-lg-4">
                     <input type="checkbox" class="form-check-input" asp-for="Plumbing.Value" title="Водопровод">
                     <label asp-for="Plumbing.Value" class="form-check-label">Водопровод</label>
                 </div>
-                <div class="form-group form-check col r-form-group-checkbox">
+                <div class="form-group form-check col-6 col-lg-4">
                     <input type="checkbox" class="form-check-input" asp-for="HotWaterSupply.Value" title="Горячее водоснабжение">
                     <label asp-for="HotWaterSupply.Value" class="form-check-label">Горячее водоснабжение</label>
                 </div>
-                <div class="form-group form-check col r-form-group-checkbox">
+                <div class="form-group form-check col-6 col-lg-4">
                     <input type="checkbox" class="form-check-input" asp-for="Canalization.Value" title="Канализация">
                     <label asp-for="Canalization.Value" class="form-check-label">Канализация</label>
                 </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group form-check col r-form-group-checkbox">
+                <div class="form-group form-check col-6 col-lg-4">
                     <input type="checkbox" class="form-check-input" asp-for="Electricity.Value" title="Электроосвещение">
                     <label asp-for="Electricity.Value" class="form-check-label">Электроосвещение</label>
                 </div>
-                <div class="form-group form-check col r-form-group-checkbox">
+                <div class="form-group form-check col-6 col-lg-4">
                     <input type="checkbox" class="form-check-input" asp-for="RadioNetwork.Value" title="Радиотрансляционная сеть">
                     <label asp-for="RadioNetwork.Value" class="form-check-label">Радиотрансляционная сеть</label>
                 </div>
-                <div class="form-group form-check col r-form-group-checkbox"></div>
             </div>
-
             <div class="form-row">
-                <div class="form-group col r-form-group-label">
+                <div class="form-group col-12 col-md-6">
                     <label asp-for="Wear">Техническое состояние (Износ), %</label>
-                </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="RentCoefficient">Коэффициент оплаты</label>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col">
                     <input type="text" class="form-control" asp-for="Wear" title="Техническое состояние (Износ), %">
                     <span asp-validation-for="Wear" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-12 col-md-6">
+                    <label asp-for="RentCoefficient">Коэффициент оплаты</label>
                     <input type="text" class="form-control decimal" asp-for="RentCoefficient" title="Коэффициент оплаты">
                     <span asp-validation-for="RentCoefficient" class="text-danger"></span>
                 </div>
@@ -464,12 +360,12 @@
             </div>
 
             <div class="form-row">
-                <div class="form-group col">
+                <div class="form-group col-12 col-md-6">
                     <label asp-for="Description">Другие сведения</label>
                     <textarea rows="5" class="form-control" asp-for="Description" title="Другие сведения"></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
-                <div class="form-group col">
+                <div class="form-group col-12 col-md-6">
                     <label asp-for="BtiRooms">Приватиз. квартиры согласно БТИ</label>
                     <textarea rows="5" class="form-control" asp-for="BtiRooms" title="Приватиз. квартиры согласно БТИ"></textarea>
                     <span asp-validation-for="BtiRooms" class="text-danger"></span>
@@ -478,8 +374,10 @@
         </form>
         @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.IdBuilding, type = AddressTypes.Building, action = ViewBag.Action })
         @await Component.InvokeAsync("OwnershipRightsComponent", new { address = new Address() { Id = Model.IdBuilding.ToString(), AddressType = AddressTypes.Building }, action = ViewBag.Action })
-        @await Component.InvokeAsync("BuildingDemolitionInfoComponent", new { id = Model.IdBuilding, demolishedPlanDate = Model.DemolishedPlanDate,
-                    demandForDemolishingDeliveryDate = Model.DemandForDemolishingDeliveryDate, action = ViewBag.Action })
+        @await Component.InvokeAsync("BuildingDemolitionInfoComponent", new { id = Model.IdBuilding,
+            demolishedPlanDate = Model.DemolishedPlanDate, demolishedFactDate = Model.DemolishedFactDate,
+            demandForDemolishingDeliveryDate = Model.DemandForDemolishingDeliveryDate,
+            dateOwnerEmergency = Model.DateOwnerEmergency, action = ViewBag.Action })
         @await Component.InvokeAsync("AttachmentFilesComponent", new { id = Model.IdBuilding, type = AddressTypes.Building, action = ViewBag.Action })
     </div>
 </div>

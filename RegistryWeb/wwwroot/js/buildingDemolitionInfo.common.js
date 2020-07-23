@@ -251,6 +251,20 @@ let BuildingDemolitionInfo = class {
         this._demolishPlanDate = value;
     }
 
+    get demolishedFactDate() {
+        return this._demolishFactDate;
+    }
+    set demolishedFactDate(value) {
+        this._demolishFactDate = value;
+    }
+
+    get dateOwnerEmergency() {
+        return this._dateOwnerEmergency;
+    }
+    set dateOwnerEmergency(value) {
+        this._dateOwnerEmergency= value;
+    }
+
     get demandForDemolishingDeliveryDate() {
         return this._demandForDemolishingDeliveryDate;
     }
@@ -278,6 +292,8 @@ let BuildingDemolitionInfo = class {
         let buildingDemolitionInfoJson = {
             IdBuilding: this.idBuilding,
             DemolishedPlanDate: this.demolishedPlanDate,
+            DemolishedFactDate: this.demolishedFactDate,
+            DateOwnerEmergency: this.dateOwnerEmergency,
             DemandForDemolishingDeliveryDate: this.demandForDemolishingDeliveryDate,
             BuildingDemolitionActFiles: []
         };
@@ -303,6 +319,8 @@ let BuildingDemolitionInfo = class {
         this._canEditExtInfo = JSON.parse(this.form.data('caneditextinfo').toLowerCase());
         this.idBuilding = +this.form.data('idbuilding');
         this.demolishedPlanDate = this.form.find('#demolishPlanDate').val();
+        this.demolishedFactDate = this.form.find('#demolishFactDate').val();
+        this.dateOwnerEmergency = this.form.find('#dateOwnerEmergency').val();
         this.demandForDemolishingDeliveryDate = this.form.find('#demandForDemolishingDeliveryDate').val();
         this.buildingDemolitionActFiles = [];
 
@@ -316,6 +334,8 @@ let BuildingDemolitionInfo = class {
     setAllProperty = function (jsonBuildingDemolitionActFiles) {
         this.idBuilding = jsonBuildingDemolitionActFiles.idBuilding;
         this.demolishedPlanDate = jsonBuildingDemolitionActFiles.demolishedPlanDate;
+        this.demolishedFactDate = jsonBuildingDemolitionActFiles.demolishedFactDate;
+        this.dateOwnerEmergency = jsonBuildingDemolitionActFiles.dateOwnerEmergency;
         this.demandForDemolishingDeliveryDate = jsonBuildingDemolitionActFiles.demandForDemolishingDeliveryDate;
         this.actTypeDocuments = jsonBuildingDemolitionActFiles.actTypeDocuments;
         this.buildingDemolitionActFiles = [];
@@ -344,6 +364,8 @@ let BuildingDemolitionInfo = class {
         let buildingDemolitionInfoVM = new FormData();
         buildingDemolitionInfoVM.append('IdBuilding', this.idBuilding);
         buildingDemolitionInfoVM.append('DemolishedPlanDate', this.demolishedPlanDate);
+        buildingDemolitionInfoVM.append('DemolishedFactDate', this.demolishedFactDate);
+        buildingDemolitionInfoVM.append('DateOwnerEmergency', this.dateOwnerEmergency);
         buildingDemolitionInfoVM.append('DemandForDemolishingDeliveryDate', this.demandForDemolishingDeliveryDate);
         for (var i = 0; i < this.buildingDemolitionActFiles.length; i++) {
             if (this.buildingDemolitionActFiles[i].file != "") {
@@ -432,6 +454,8 @@ let BuildingDemolitionInfo = class {
         this.form.attr('data-idbuilding', this.idBuilding);
 
         this.form.find('#demolishPlanDate').val(this.demolishedPlanDate);
+        this.form.find('#demolishFactDate').val(this.demolishedFactDate);
+        this.form.find('#dateOwnerEmergency').val(this.dateOwnerEmergency);
         this.form.find('#demandForDemolishingDeliveryDate').val(this.demandForDemolishingDeliveryDate);
 
         this.form.find('#buildingDemolitionActFiles>tr').remove();
@@ -505,6 +529,13 @@ let buildingDemolitionInfoSaveClick = function (event) {
             $(".act-file-block").each(function (idx, elem) {
                 $(this).data("id", response[idx] === null || response[idx] === undefined ? "" : response[idx]);
                 $(this).attr("data-id", response[idx] === null || response[idx] === undefined ? "" : response[idx]);
+            });
+            $("#buildingDemolitionActFiles input[title], #buildingDemolitionActFiles select[title]").each(function (idx, elem) {
+                if (elem.tagName === "SELECT") {
+                    $(elem).attr("title", $(elem).find("option[value='" + $(elem).val()+"']").text());
+                } else {
+                    $(elem).attr("title", $(elem).val());
+                }
             });
         };
     }
