@@ -83,8 +83,8 @@
             <div class="row">
                 <div class="form-group col-md-6">
                     <label asp-for="TenancyProcess.IdRentType">Тип найма жилья</label>
-                    <select class="selectpicker form-control" asp-for="TenancyProcess.IdRentType" asp-items="@(new SelectList(Model.RentTypes, "IdRentType", "RentTypeName"))" 
-                        title="Тип найма жилья" data-val="true" data-val-required="Выберите тип найма жилья">
+                    <select class="selectpicker form-control" asp-for="TenancyProcess.IdRentType" asp-items="@(new SelectList(Model.RentTypes, "IdRentType", "RentTypeName"))"
+                            title="Тип найма жилья" data-val="true" data-val-required="Выберите тип найма жилья">
                         <option></option>
                     </select>
                     <span asp-validation-for="TenancyProcess.IdRentType" class="text-danger"></span>
@@ -92,7 +92,7 @@
                 <div class="form-group col-md-6">
                     <label asp-for="TenancyProcess.IdExecutor">Исполнитель/составитель</label>
                     <select class="selectpicker form-control" asp-for="TenancyProcess.IdExecutor" title="Исполнитель/составитель"
-                        data-val="true" data-val-required="Выберите исполнителя/составителя">
+                            data-val="true" data-val-required="Выберите исполнителя/составителя">
                         <option></option>
                         @foreach (var executor in Model.Executors)
                         {
@@ -124,7 +124,7 @@
                 <div class="form-group @(ViewBag.Action == "Details" || ViewBag.Action == "Delete" ? "col-md-6" : "col-md-12" )">
                     <label asp-for="TenancyProcess.IdRentTypeCategory">Категория права</label>
                     <select class="selectpicker form-control" asp-for="TenancyProcess.IdRentTypeCategory" title="Категория права"
-                        data-val="true" data-val-required="Выберите категорию права">
+                            data-val="true" data-val-required="Выберите категорию права">
                         <option></option>
                         @foreach (var rentTypeCategory in Model.RentTypeCategories)
                         {
@@ -250,6 +250,20 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 rr-tenancy-card">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <h3 for="TenancyProcess.Description">Дополнительные сведения</h3>
+                            <div class="btn-group" role="group">
+                                <a href="#" data-for="TenancyProcessDescription" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть дополнительные сведения" style="font-weight:bold;">∧</a>
+                            </div>
+                        </div>
+                        <textarea id="TenancyProcessDescription" class="form-control" asp-for="TenancyProcess.Description" title="Дополнительные сведения"></textarea>
                     </div>
                 </div>
             </div>
