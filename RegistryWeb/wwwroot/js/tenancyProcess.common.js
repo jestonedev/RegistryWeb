@@ -1,7 +1,7 @@
 ﻿
 $(function () {
     $('.tenancy-process-toggler').each(function (idx, e) {
-        $(e).on('click', $('#' + $(e).data("for")), elementToogle);
+        $(e).on('click', $('#' + $(e).data("for")), elementToogleHide);
     });
 
     $('body').on('click', '.tenancy-agreement-open', function (e) {
@@ -78,5 +78,156 @@ $(function () {
 
         modal.modal('show');
         e.preventDefault();
+    });
+
+    var idRentTypeCategories = $("#TenancyProcess_IdRentTypeCategory option[value]").clone(true);
+
+    $("#TenancyProcess_IdRentType").on("change", function (e) {
+        var idRentType = $(this).val();
+        $("#TenancyProcess_IdRentTypeCategory option[value]").remove();
+        $(idRentTypeCategories).each(function (idx, option) {
+            if ($(option).data("id-rent-type")+"" === idRentType) {
+                $("#TenancyProcess_IdRentTypeCategory").append(option);
+            }
+        });
+        $("#TenancyProcess_IdRentTypeCategory").selectpicker("refresh");
+        e.preventDefault();
+    });
+
+    var lastEndDateBeforeDismissal = undefined;
+
+    $("#TenancyProcess_UntilDismissal").on("change", function (e) {
+        var endDateElem = $("#TenancyProcess_EndDate");
+        if ($(this).is(":checked")) {
+            lastEndDateBeforeDismissal = endDateElem.val();
+            endDateElem.val("");
+            endDateElem.prop("disabled", "disabled");
+        } else {
+            endDateElem.prop("disabled", "");
+            if (lastEndDateBeforeDismissal !== undefined) {
+                endDateElem.val(lastEndDateBeforeDismissal);
+            }
+        }
+        e.preventDefault();
+    });
+
+    $("#TenancyProcess_IdRentType").change();
+
+    function tenancyClearValidationError(elem) {
+        var spanError = $("span[data-valmsg-for='" + elem.attr("name") + "']");
+        spanError.empty().removeClass("field-validation-error").addClass("field-validation-valid");
+        elem.removeClass("input-validation-error");
+    }
+
+    function removeErrorFromValidator(validator, elem) {
+        validator.errorList = $(validator.errorList)
+            .filter(function (idx, error) {
+                return $(error.element).prop("name") !== elem.attr("name");
+            });
+
+        delete validator.errorMap[elem.attr("name")];
+    }
+
+    function tenancyCustomValidations(validator) {
+        var isValid = true;
+
+        var regDate = $("#TenancyProcess_RegistrationDate");
+        var regNum = $("#TenancyProcess_RegistrationNum");
+
+
+        regNum.val($.trim(regNum.val()));
+        if (regDate.val() !== "" && regNum.val() === "") {
+            let error = {};
+            error[regNum.attr("name")] = "Введите номер договора найма";
+            validator.showErrors(error);
+            isValid = false;
+        } else {
+            tenancyClearValidationError(regNum);
+            removeErrorFromValidator(validator, regNum);
+        }
+        if (regDate.val() === "" && $.trim(regNum.val()) !== "") {
+            let error = {};
+            error[regDate.attr("name")] = "Введите дату регистрации договора";
+            validator.showErrors(error);
+            isValid = false;
+        } else {
+            tenancyClearValidationError(regDate);
+            removeErrorFromValidator(validator, regDate);
+        }
+        
+        var subTenancyNum = $("#TenancyProcess_SubTenancyNum");
+        var subTenancyDate = $("#TenancyProcess_SubTenancyDate");
+
+
+        subTenancyNum.val($.trim(subTenancyNum.val()));
+        if (subTenancyDate.val() !== "" && subTenancyNum.val() === "") {
+            let error = {};
+            error[subTenancyNum.attr("name")] = "Введите номер реквизита разрешения";
+            validator.showErrors(error);
+            isValid = false;
+        } else {
+            tenancyClearValidationError(subTenancyNum);
+            removeErrorFromValidator(validator, subTenancyNum);
+        }
+        if (subTenancyDate.val() === "" && $.trim(subTenancyNum.val()) !== "") {
+            let error = {};
+            error[subTenancyDate.attr("name")] = "Введите дату выдачи разрешения";
+            validator.showErrors(error);
+            isValid = false;
+        } else {
+            tenancyClearValidationError(subTenancyDate);
+            removeErrorFromValidator(validator, subTenancyDate);
+        }
+        return isValid;
+    }
+
+    $("#TenancyProcess_RegistrationDate, #TenancyProcess_RegistrationNum, #TenancyProcess_SubTenancyDate, #TenancyProcess_SubTenancyNum").on("change", function () {
+        var validator = $("#TenancyProcessForm").validate();
+        tenancyCustomValidations(validator);
+    });
+
+    $("#TenancyProcessForm").on("submit", function (e) {
+        $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
+        var validator = $(this).validate();
+        var isFormValid = $(this).valid();
+        if (!tenancyCustomValidations(validator)) {
+            isFormValid = false;
+        }
+
+        if (!isFormValid) {
+            $("select").each(function (idx, elem) {
+                var id = $(elem).prop("id");
+                var name = $(elem).prop("name");
+                var errorSpan = $("span[data-valmsg-for='" + name + "']");
+                if (errorSpan.hasClass("field-validation-error")) {
+                    $("button[data-id='" + id + "']").addClass("input-validation-error");
+                }
+            });
+
+            $(".toggle-hide").each(function (idx, elem) {
+                if ($(elem).find(".field-validation-error").length > 0) {
+                    var toggler = $(elem).closest(".card").find(".card-header .tenancy-process-toggler").first();
+                    if (!isExpandElemntArrow(toggler)) {
+                        toggler.click();
+                    }
+                }
+            });
+            $([document.documentElement, document.body]).animate({
+                scrollTop: $(".input-validation-error").first().offset().top - 35
+            }, 1000);
+
+            e.preventDefault();
+        }
+    });
+
+    $("form").on("change", "select", function () {
+        var isValid = $(this).valid();
+        var id = $(this).prop("id");
+        if (!isValid) {
+            $("button[data-id='" + id + "']").addClass("input-validation-error");
+        } else {
+
+            $("button[data-id='" + id + "']").removeClass("input-validation-error");
+        }
     });
 });

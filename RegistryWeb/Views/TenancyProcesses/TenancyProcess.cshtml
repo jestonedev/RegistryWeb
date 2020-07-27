@@ -4,7 +4,7 @@
 
     if (ViewBag.Action == "Create")
     {
-        ViewData["Title"] = "Создание нового процесса собственности";
+        ViewData["Title"] = "Создание нового найма жилья";
     }
     else
     {
@@ -17,64 +17,121 @@
     <link rel="stylesheet" href="~/css/tenancy.processes.css" runat="server" />
 }
 
-<form asp-controller="TenancyProcesses" asp-action="@ViewBag.Action" id="r-ownerprocess-form" data-action="@ViewBag.Action" method="post">
+<form asp-controller="TenancyProcesses" asp-action="@ViewBag.Action" id="TenancyProcessForm" data-action="@ViewBag.Action" method="post">
     <div class="card">
-        <div class="card-header d-flex justify-content-between">
-            <label class="form-check-label h2">@ViewData["Title"]</label>
-            <div class="btn-group" role="group" aria-label="Панель доступа">
-                @if (@ViewBag.ReturnUrl != null)
+        <div class="card-header d-flex flex-column flex-lg-row">
+            <label class="form-check-label h2 col-sm-12 col-lg-6 col-xl-7 pl-0">@ViewData["Title"]</label>
+
+            <div class="col-sm-12 col-lg-6 col-xl-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
+                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
                 {
-                    <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        @if (ViewBag.Action == "Details" && (ViewBag.CanEditBaseInfo ?? false))
+                        {
+                            <div class="btn-group" role="group" aria-label="Панель доступа">
+                                <button class="btn btn-primary dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@Model.TenancyProcess.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="oi oi-wrench"></span>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@Model.TenancyProcess.IdProcess">
+                                    <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                                       asp-controller="TenancyProcesses" asp-action="Edit" asp-route-idProcess="@Model.TenancyProcess.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                    <a class="btn btn-danger oi oi-x @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" title="Удалить" aria-label="Удалить"
+                                       asp-controller="TenancyProcesses" asp-action="Delete" asp-route-idProcess="@Model.TenancyProcess.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="btn-group" role="group" aria-label="Отчеты">
+                            <button class="btn btn-success dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@Model.TenancyProcess.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="oi oi-document"></span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.TenancyProcess.IdProcess">
+                                <a class="dropdown-item rr-report-tenancy-process" href="#" title="Договор найма" aria-label="Договор найма" data-id-process="@Model.TenancyProcess.IdProcess">Договор найма</a>
+                            </div>
+                        </div>
+                    </div>
                 }
-                else
-                {
-                    <a class="form-control btn btn-primary" asp-controller="TenancyProcesses" asp-action="Index" asp-route-isBack="true">Назад</a>
-                }
-                @if (ViewBag.Action == "Create")
-                {
-                    <input type="submit" value="Создать" class="form-control btn btn-success" />
-                }
-                @if (ViewBag.Action == "Edit")
-                {
-                    <input type="submit" value="Сохранить" class="form-control btn btn-success" />
-                }
-                @if (ViewBag.Action == "Delete")
-                {
-                    <input type="submit" value="Удалить" class="form-control btn btn-danger" />
-                }
-                <a href="#" data-for="TenancyProcess" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть процесс найма" style="font-weight:bold;">∧</a>
+                <div class="btn-group" role="group" aria-label="Панель доступа">
+                    @if (@ViewBag.ReturnUrl != null)
+                    {
+                        <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+                    }
+                    else
+                    {
+                        <a class="form-control btn btn-primary" asp-controller="TenancyProcess" asp-action="Index" asp-route-isBack="true">Назад</a>
+                    }
+                    @if (ViewBag.Action == "Create")
+                    {
+                        <input type="submit" value="Создать" id="createBtn" class="form-control btn btn-success" />
+                    }
+                    @if (ViewBag.Action == "Edit")
+                    {
+                        <input type="submit" value="Сохранить" id="editBtn" class="form-control btn btn-success" />
+                    }
+                    @if (ViewBag.Action == "Delete")
+                    {
+                        <input type="submit" value="Удалить" class="form-control btn btn-danger" />
+                    }
+
+                    <a href="#" data-for="TenancyProcess" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть найм жилья" style="font-weight:bold;">∧</a>
+                </div>
             </div>
         </div>
         <div class="card-body" id="TenancyProcess">
             <input type="hidden" asp-for="TenancyProcess.IdProcess" />
+            <input type="hidden" value="@ViewBag.ReturnUrl" name="ReturnUrl" />
             <div class="row">
                 <div class="form-group col-md-6">
                     <label asp-for="TenancyProcess.IdRentType">Тип найма жилья</label>
-                    <select class="form-control" asp-for="TenancyProcess.IdRentType" asp-items="@(new SelectList(Model.RentTypes, "IdRentType", "RentTypeName"))">
+                    <select class="selectpicker form-control" asp-for="TenancyProcess.IdRentType" asp-items="@(new SelectList(Model.RentTypes, "IdRentType", "RentTypeName"))" 
+                        title="Тип найма жилья" data-val="true" data-val-required="Выберите тип найма жилья">
                         <option></option>
                     </select>
-                </div>
-                <div class="form-group col-md-6">
-                    <label asp-for="TenancyProcess.IdRentTypeCategory">Категория права</label>
-                    <select class="form-control" asp-for="TenancyProcess.IdRentTypeCategory" asp-items="@(new SelectList(Model.RentTypeCategories, "IdRentTypeCategory", "RentTypeCategoryName"))">
-                        <option></option>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-3">
-                    <label class="rr-tenancy-label">Размер платы (до 28.08.19)</label>
-                    <input class="form-control" type="text" value="@Model.RentObjects.Select(ro => ro.Payment).Sum()" />
-                </div>
-                <div class="form-group col-md-3">
-                    <label class="rr-tenancy-label">Размер платы (после 28.08.19)</label>
-                    <input class="form-control" type="text" value="@Model.RentObjects.Select(ro => ro.PaymentAfter28082019).Sum()" />
+                    <span asp-validation-for="TenancyProcess.IdRentType" class="text-danger"></span>
                 </div>
                 <div class="form-group col-md-6">
                     <label asp-for="TenancyProcess.IdExecutor">Исполнитель/составитель</label>
-                    <select class="form-control" asp-for="TenancyProcess.IdExecutor" asp-items="@(new SelectList(Model.Executors, "IdExecutor", "ExecutorName"))">
+                    <select class="selectpicker form-control" asp-for="TenancyProcess.IdExecutor" title="Исполнитель/составитель"
+                        data-val="true" data-val-required="Выберите исполнителя/составителя">
                         <option></option>
+                        @foreach (var executor in Model.Executors)
+                        {
+                            if (Model.CurrentExecutor != null && executor.IdExecutor == Model.CurrentExecutor.IdExecutor)
+                            {
+                                <option value="@executor.IdExecutor" selected>@executor.ExecutorName</option>
+                            }
+                            else
+                            {
+                                <option value="@executor.IdExecutor">@executor.ExecutorName</option>
+                            }
+                        }
                     </select>
+                    <span asp-validation-for="TenancyProcess.IdExecutor" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+                {
+                    <div class="form-group col-md-3">
+                        <label class="rr-tenancy-label">Размер платы (до 28.08.19)</label>
+                        <input class="form-control" type="text" value="@Model.RentObjects.Select(ro => ro.Payment).Sum()" />
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label class="rr-tenancy-label">Размер платы (после 28.08.19)</label>
+                        <input class="form-control" type="text" value="@Model.RentObjects.Select(ro => ro.PaymentAfter28082019).Sum()" />
+                    </div>
+                }
+                <div class="form-group @(ViewBag.Action == "Details" || ViewBag.Action == "Delete" ? "col-md-6" : "col-md-12" )">
+                    <label asp-for="TenancyProcess.IdRentTypeCategory">Категория права</label>
+                    <select class="selectpicker form-control" asp-for="TenancyProcess.IdRentTypeCategory" title="Категория права"
+                        data-val="true" data-val-required="Выберите категорию права">
+                        <option></option>
+                        @foreach (var rentTypeCategory in Model.RentTypeCategories)
+                        {
+                            <option value="@rentTypeCategory.IdRentTypeCategory" data-id-rent-type="@rentTypeCategory.IdRentType">@rentTypeCategory.RentTypeCategoryName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="TenancyProcess.IdRentTypeCategory" class="text-danger"></span>
                 </div>
             </div>
             <div class="row">
@@ -106,11 +163,13 @@
                             <div class="form-group">
                                 <label asp-for="TenancyProcess.SubTenancyNum">Номер реквизита разрешения</label>
                                 <input type="text" class="form-control" asp-for="TenancyProcess.SubTenancyNum" title="Номер реквизита разрешения">
+                                <span asp-validation-for="TenancyProcess.SubTenancyNum" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="TenancyProcess.SubTenancyDate">Дата выдачи разрешения</label>
                                 <input type="date" class="form-control" asp-for="TenancyProcess.SubTenancyDate"
                                        value="@(Model.TenancyProcess.SubTenancyDate.HasValue ? Model.TenancyProcess.SubTenancyDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата выдачи разрешения">
+                                <span asp-validation-for="TenancyProcess.SubTenancyDate" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -176,11 +235,13 @@
                                 <div class="form-group col-md-4">
                                     <label asp-for="TenancyProcess.RegistrationNum">Номер договора найма</label>
                                     <input type="text" class="form-control" asp-for="TenancyProcess.RegistrationNum" title="Номер договора найма">
+                                    <span asp-validation-for="TenancyProcess.RegistrationNum" class="text-danger"></span>
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label class="rr-tenancy-label" asp-for="TenancyProcess.RegistrationDate">Дата регистрации договора</label>
                                     <input type="date" class="form-control" asp-for="TenancyProcess.RegistrationDate"
                                            value="@(Model.TenancyProcess.RegistrationDate.HasValue ? Model.TenancyProcess.RegistrationDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата регистрации договора">
+                                    <span asp-validation-for="TenancyProcess.RegistrationDate" class="text-danger"></span>
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label asp-for="TenancyProcess.IssueDate">Дата выдачи договора</label>
@@ -192,262 +253,265 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card rr-tenancy-card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3>Прочие основания найма</h3>
-                            <div>
-                                <a href="#" data-for="TenancyProcessReasons" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель прочих оснований найма жилья" style="font-weight:bold;">∧</a>
+            @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card rr-tenancy-card">
+                            <div class="card-header d-flex justify-content-between">
+                                <h3>Прочие основания найма</h3>
+                                <div>
+                                    <a href="#" data-for="TenancyProcessReasons" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель прочих оснований найма жилья" style="font-weight:bold;">∧</a>
+                                </div>
                             </div>
-                        </div>
-                        <table id="TenancyProcessReasons" class="table table-bordered card-body">
-                            <thead>
-                                <tr>
-                                    <th>Наименование</th>
-                                    <th>№</th>
-                                    <th>Дата</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.TenancyProcess.TenancyReasons != null && Model.TenancyProcess.TenancyReasons.Any())
-                                {
-                                    for (var i = 0; i < Model.TenancyProcess.TenancyReasons.Count; i++)
+                            <table id="TenancyProcessReasons" class="table table-bordered card-body">
+                                <thead>
+                                    <tr>
+                                        <th>Наименование</th>
+                                        <th>№</th>
+                                        <th>Дата</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.TenancyProcess.TenancyReasons != null && Model.TenancyProcess.TenancyReasons.Any())
+                                    {
+                                        for (var i = 0; i < Model.TenancyProcess.TenancyReasons.Count; i++)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <select class="form-control" asp-for="TenancyProcess.TenancyReasons[i].IdReasonType" asp-items="@(new SelectList(Model.TenancyReasonTypes, "IdReasonType", "ReasonName"))">
+                                                        <option></option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" asp-for="TenancyProcess.TenancyReasons[i].ReasonNumber" title="Номер основания найма">
+                                                </td>
+                                                <td>
+                                                    <input type="date" class="form-control" asp-for="TenancyProcess.TenancyReasons[i].ReasonDate"
+                                                           value="@(Model.TenancyProcess.TenancyReasons[i].ReasonDate.HasValue ? Model.TenancyProcess.TenancyReasons[i].ReasonDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата основания найма">
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
                                     {
                                         <tr>
-                                            <td>
-                                                <select class="form-control" asp-for="TenancyProcess.TenancyReasons[i].IdReasonType" asp-items="@(new SelectList(Model.TenancyReasonTypes, "IdReasonType", "ReasonName"))">
-                                                    <option></option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control" asp-for="TenancyProcess.TenancyReasons[i].ReasonNumber" title="Номер основания найма">
-                                            </td>
-                                            <td>
-                                                <input type="date" class="form-control" asp-for="TenancyProcess.TenancyReasons[i].ReasonDate"
-                                                       value="@(Model.TenancyProcess.TenancyReasons[i].ReasonDate.HasValue ? Model.TenancyProcess.TenancyReasons[i].ReasonDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата основания найма">
-                                            </td>
+                                            <td class="text-center" colspan="3"><i>Прочие основания найма отсутствуют</i></td>
                                         </tr>
                                     }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td class="text-center" colspan="3"><i>Прочие основания найма отсутствуют</i></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card rr-tenancy-card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3>Дополнительные соглашения</h3>
-                            <div>
-                                <a href="#" data-for="TenancyProcessAgreements" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель дополнительных соглашений" style="font-weight:bold;">∧</a>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card rr-tenancy-card">
+                            <div class="card-header d-flex justify-content-between">
+                                <h3>Дополнительные соглашения</h3>
+                                <div>
+                                    <a href="#" data-for="TenancyProcessAgreements" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель дополнительных соглашений" style="font-weight:bold;">∧</a>
+                                </div>
                             </div>
-                        </div>
-                        <table id="TenancyProcessAgreements" class="table table-bordered card-body">
-                            <thead>
-                                <tr>
-                                    <th>Дата</th>
-                                    <th>Содержание</th>
-                                    <th style="width: 67px"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.TenancyProcess.TenancyAgreements != null && Model.TenancyProcess.TenancyAgreements.Any())
-                                {
-                                    for (var i = 0; i < Model.TenancyProcess.TenancyAgreements.Count; i++)
+                            <table id="TenancyProcessAgreements" class="table table-bordered card-body">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Содержание</th>
+                                        <th style="width: 67px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.TenancyProcess.TenancyAgreements != null && Model.TenancyProcess.TenancyAgreements.Any())
                                     {
-                                        <tr class="tenancy-agreement-item">
-                                            <td>
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyAgreements[i].IdAgreement" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyAgreements[i].IdExecutor" />
-                                                <input type="date" class="form-control" asp-for="TenancyProcess.TenancyAgreements[i].AgreementDate"
-                                                       value="@(Model.TenancyProcess.TenancyAgreements[i].AgreementDate.HasValue ? Model.TenancyProcess.TenancyAgreements[i].AgreementDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата соглашения">
-                                            </td>
-                                            <td>
-                                                <textarea rows="1" class="form-control tenancy-agreement-content" asp-for="TenancyProcess.TenancyAgreements[i].AgreementContent" title="@Model.TenancyProcess.TenancyAgreements[i].AgreementContent"></textarea>
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-primary oi oi-eye tenancy-agreement-open" href="#" title="Открыть дополнительное соглашение" aria-label="Открыть дополнительное соглашение"></a>
-                                            </td>
-                                        </tr>
+                                        for (var i = 0; i < Model.TenancyProcess.TenancyAgreements.Count; i++)
+                                        {
+                                            <tr class="tenancy-agreement-item">
+                                                <td>
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyAgreements[i].IdAgreement" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyAgreements[i].IdExecutor" />
+                                                    <input type="date" class="form-control" asp-for="TenancyProcess.TenancyAgreements[i].AgreementDate"
+                                                           value="@(Model.TenancyProcess.TenancyAgreements[i].AgreementDate.HasValue ? Model.TenancyProcess.TenancyAgreements[i].AgreementDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата соглашения">
+                                                </td>
+                                                <td>
+                                                    <textarea rows="1" class="form-control tenancy-agreement-content" asp-for="TenancyProcess.TenancyAgreements[i].AgreementContent" title="@Model.TenancyProcess.TenancyAgreements[i].AgreementContent"></textarea>
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-primary oi oi-eye tenancy-agreement-open" href="#" title="Открыть дополнительное соглашение" aria-label="Открыть дополнительное соглашение"></a>
+                                                </td>
+                                            </tr>
+                                        }
                                     }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td class="text-center" colspan="3"><i>Дополнительные соглашения отсутствуют</i></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card rr-tenancy-card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3>Участники найма</h3>
-                            <div>
-                                <a href="#" data-for="TenancyProcessPersons" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель участников найма" style="font-weight:bold;">∧</a>
-                            </div>
-                        </div>
-                        <table id="TenancyProcessPersons" class="table table-bordered card-body">
-                            <thead>
-                                <tr>
-                                    <th>Фамилия</th>
-                                    <th>Имя</th>
-                                    <th>Отчество</th>
-                                    <th>Дата рождения</th>
-                                    <th>Родственные отношения</th>
-                                    <th style="width: 67px"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.TenancyProcess.TenancyPersons != null && Model.TenancyProcess.TenancyPersons.Any())
-                                {
-                                    for (var i = 0; i < Model.TenancyProcess.TenancyPersons.Count; i++)
-                                    {
-                                        <tr class="tenancy-person-item @(Model.TenancyProcess.TenancyPersons[i].ExcludeDate.HasValue ? "table-danger" : "")">
-                                            <td>
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IdPerson" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].PersonalAccount" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IncludeDate"
-                                                       value="@(Model.TenancyProcess.TenancyPersons[i].IncludeDate.HasValue ? Model.TenancyProcess.TenancyPersons[i].IncludeDate.Value.ToString("yyyy-MM-dd") : "")" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ExcludeDate"
-                                                       value="@(Model.TenancyProcess.TenancyPersons[i].ExcludeDate.HasValue ? Model.TenancyProcess.TenancyPersons[i].ExcludeDate.Value.ToString("yyyy-MM-dd") : "")" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IdDocumentType" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].DocumentSeria" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].DocumentNum" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IdDocumentIssuedBy" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].DateOfDocumentIssue"
-                                                       value="@(Model.TenancyProcess.TenancyPersons[i].DateOfDocumentIssue.HasValue ? Model.TenancyProcess.TenancyPersons[i].DateOfDocumentIssue.Value.ToString("yyyy-MM-dd") : "")" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].Snils" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationIdStreet" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationHouse" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationFlat" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationRoom" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ResidenceIdStreet" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ResidenceHouse" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ResidenceFlat" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ResidenceRoom" />
-
-                                                <input type="text" class="form-control" asp-for="TenancyProcess.TenancyPersons[i].Surname" title="Фамилия">
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control" asp-for="TenancyProcess.TenancyPersons[i].Name" title="Имя">
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control" asp-for="TenancyProcess.TenancyPersons[i].Patronymic" title="Отчество">
-                                            </td>
-                                            <td>
-                                                <input type="date" class="form-control" asp-for="TenancyProcess.TenancyPersons[i].DateOfBirth"
-                                                       value="@(Model.TenancyProcess.TenancyPersons[i].DateOfBirth.HasValue ? Model.TenancyProcess.TenancyPersons[i].DateOfBirth.Value.ToString("yyyy-MM-dd") : "")" title="Дата рождения">
-                                            </td>
-                                            <td>
-                                                <select class="form-control" asp-for="TenancyProcess.TenancyPersons[i].IdKinship" asp-items="@(new SelectList(Model.Kinships, "IdKinship", "KinshipName"))">
-                                                    <option></option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-primary oi oi-eye tenancy-person-open" href="#" title="Открыть дополнительную информацию об участнике найма" aria-label="Открыть дополнительную информацию об участнике найма"></a>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td class="text-center" colspan="5"><i>Наниматели отсутствуют</i></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card rr-tenancy-card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3>Нанимаемое жилье</h3>
-                            <div>
-                                <a href="#" data-for="TenancyProcessAddresses" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель нанимаемого жилья" style="font-weight:bold;">∧</a>
-                            </div>
-                        </div>
-                        <table id="TenancyProcessAddresses" class="table table-bordered card-body">
-                            <thead>
-                                <tr>
-                                    <th>Адрес</th>
-                                    <th>Общая площадь</th>
-                                    <th>Жилая площадь</th>
-                                    <th>Площадь койко-места</th>
-                                    <th style="width: 67px"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.RentObjects != null && Model.RentObjects.Any())
-                                {
-                                    for (var i = 0; i < Model.RentObjects.Count; i++)
+                                    else
                                     {
                                         <tr>
-                                            <td style="width: 50%">
-                                                <input type="hidden" asp-for="RentObjects[i].Address.Id">
-                                                <input type="hidden" asp-for="RentObjects[i].Address.AddressType">
-                                                <input type="text" class="form-control" asp-for="RentObjects[i].Address.Text" title="@Model.RentObjects[i].Address.Text">
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control" asp-for="RentObjects[i].TotalArea" title="Общая площадь">
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control" asp-for="RentObjects[i].LivingArea" title="Жилая площадь">
-                                            </td>
-                                            <td>
-
-                                                <input type="text" class="form-control" asp-for="RentObjects[i].RentArea" title="Арендуемая площадь койко-места">
-                                            </td>
-                                            <td>
-                                                @if (Model.RentObjects[i].Address.AddressType == AddressTypes.Building)
-                                                {
-                                                    <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
-                                                       asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@Model.RentObjects[i].Address.Id" asp-route-action="Details"
-                                                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                                }
-                                                else
-                                              if (Model.RentObjects[i].Address.AddressType == AddressTypes.Premise)
-                                                {
-                                                    <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
-                                                       asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.RentObjects[i].Address.Id" asp-route-action="Details"
-                                                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                                }
-                                                else
-                                                {
-                                                    <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
-                                                       asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.RentObjects[i].Address.IdParents[AddressTypes.Premise.ToString()]" asp-route-action="Details" 
-                                                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                                }
-                                            </td>
+                                            <td class="text-center" colspan="3"><i>Дополнительные соглашения отсутствуют</i></td>
                                         </tr>
                                     }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td class="text-center" colspan="5"><i>Нанимаемое жилье отсутствует</i></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card rr-tenancy-card">
+                            <div class="card-header d-flex justify-content-between">
+                                <h3>Участники найма</h3>
+                                <div>
+                                    <a href="#" data-for="TenancyProcessPersons" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель участников найма" style="font-weight:bold;">∧</a>
+                                </div>
+                            </div>
+                            <table id="TenancyProcessPersons" class="table table-bordered card-body">
+                                <thead>
+                                    <tr>
+                                        <th>Фамилия</th>
+                                        <th>Имя</th>
+                                        <th>Отчество</th>
+                                        <th>Дата рождения</th>
+                                        <th>Родственные отношения</th>
+                                        <th style="width: 67px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.TenancyProcess.TenancyPersons != null && Model.TenancyProcess.TenancyPersons.Any())
+                                    {
+                                        for (var i = 0; i < Model.TenancyProcess.TenancyPersons.Count; i++)
+                                        {
+                                            <tr class="tenancy-person-item @(Model.TenancyProcess.TenancyPersons[i].ExcludeDate.HasValue ? "table-danger" : "")">
+                                                <td>
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IdPerson" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].PersonalAccount" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IncludeDate"
+                                                           value="@(Model.TenancyProcess.TenancyPersons[i].IncludeDate.HasValue ? Model.TenancyProcess.TenancyPersons[i].IncludeDate.Value.ToString("yyyy-MM-dd") : "")" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ExcludeDate"
+                                                           value="@(Model.TenancyProcess.TenancyPersons[i].ExcludeDate.HasValue ? Model.TenancyProcess.TenancyPersons[i].ExcludeDate.Value.ToString("yyyy-MM-dd") : "")" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IdDocumentType" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].DocumentSeria" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].DocumentNum" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IdDocumentIssuedBy" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].DateOfDocumentIssue"
+                                                           value="@(Model.TenancyProcess.TenancyPersons[i].DateOfDocumentIssue.HasValue ? Model.TenancyProcess.TenancyPersons[i].DateOfDocumentIssue.Value.ToString("yyyy-MM-dd") : "")" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].Snils" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationIdStreet" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationHouse" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationFlat" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationRoom" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ResidenceIdStreet" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ResidenceHouse" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ResidenceFlat" />
+                                                    <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ResidenceRoom" />
+
+                                                    <input type="text" class="form-control" asp-for="TenancyProcess.TenancyPersons[i].Surname" title="Фамилия">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" asp-for="TenancyProcess.TenancyPersons[i].Name" title="Имя">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" asp-for="TenancyProcess.TenancyPersons[i].Patronymic" title="Отчество">
+                                                </td>
+                                                <td>
+                                                    <input type="date" class="form-control" asp-for="TenancyProcess.TenancyPersons[i].DateOfBirth"
+                                                           value="@(Model.TenancyProcess.TenancyPersons[i].DateOfBirth.HasValue ? Model.TenancyProcess.TenancyPersons[i].DateOfBirth.Value.ToString("yyyy-MM-dd") : "")" title="Дата рождения">
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" asp-for="TenancyProcess.TenancyPersons[i].IdKinship" asp-items="@(new SelectList(Model.Kinships, "IdKinship", "KinshipName"))">
+                                                        <option></option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-primary oi oi-eye tenancy-person-open" href="#" title="Открыть дополнительную информацию об участнике найма" aria-label="Открыть дополнительную информацию об участнике найма"></a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td class="text-center" colspan="5"><i>Наниматели отсутствуют</i></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card rr-tenancy-card">
+                            <div class="card-header d-flex justify-content-between">
+                                <h3>Нанимаемое жилье</h3>
+                                <div>
+                                    <a href="#" data-for="TenancyProcessAddresses" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель нанимаемого жилья" style="font-weight:bold;">∧</a>
+                                </div>
+                            </div>
+                            <table id="TenancyProcessAddresses" class="table table-bordered card-body">
+                                <thead>
+                                    <tr>
+                                        <th>Адрес</th>
+                                        <th>Общая площадь</th>
+                                        <th>Жилая площадь</th>
+                                        <th>Площадь койко-места</th>
+                                        <th style="width: 67px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.RentObjects != null && Model.RentObjects.Any())
+                                    {
+                                        for (var i = 0; i < Model.RentObjects.Count; i++)
+                                        {
+                                            <tr>
+                                                <td style="width: 50%">
+                                                    <input type="hidden" asp-for="RentObjects[i].Address.Id">
+                                                    <input type="hidden" asp-for="RentObjects[i].Address.AddressType">
+                                                    <input type="text" class="form-control" asp-for="RentObjects[i].Address.Text" title="@Model.RentObjects[i].Address.Text">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" asp-for="RentObjects[i].TotalArea" title="Общая площадь">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" asp-for="RentObjects[i].LivingArea" title="Жилая площадь">
+                                                </td>
+                                                <td>
+
+                                                    <input type="text" class="form-control" asp-for="RentObjects[i].RentArea" title="Арендуемая площадь койко-места">
+                                                </td>
+                                                <td>
+                                                    @if (Model.RentObjects[i].Address.AddressType == AddressTypes.Building)
+                                                    {
+                                                        <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
+                                                           asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@Model.RentObjects[i].Address.Id" asp-route-action="Details"
+                                                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                                    }
+                                                    else
+if (Model.RentObjects[i].Address.AddressType == AddressTypes.Premise)
+                                                    {
+                                                        <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
+                                                           asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.RentObjects[i].Address.Id" asp-route-action="Details"
+                                                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
+                                                           asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.RentObjects[i].Address.IdParents[AddressTypes.Premise.ToString()]" asp-route-action="Details"
+                                                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td class="text-center" colspan="5"><i>Нанимаемое жилье отсутствует</i></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </form>
@@ -456,7 +520,7 @@
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Дополнительно соглашение</h5>
+                <h5 class="modal-title" id="modalLabel">Дополнительное соглашение</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

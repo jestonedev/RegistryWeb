@@ -134,7 +134,7 @@ namespace RegistryWeb.Controllers
             ViewBag.CanEditBaseInfo = true;
             ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
             ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
-            return View("Create", dataService.GetPremiseView(premise, canEditBaseInfo: true));
+            return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: true));
         }
 
         [HttpGet]
@@ -180,7 +180,7 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = "Edit";
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.SecurityService = securityService;
-            return View("Edit", dataService.GetPremiseView(premise, canEditBaseInfo: (bool)ViewBag.CanEditBaseInfo));
+            return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: (bool)ViewBag.CanEditBaseInfo));
         }
 
         [HttpGet]

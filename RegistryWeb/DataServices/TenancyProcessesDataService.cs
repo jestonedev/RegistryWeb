@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using RegistryWeb.DataHelpers;
+using System.Runtime.CompilerServices;
 
 namespace RegistryWeb.DataServices
 {
@@ -16,8 +17,9 @@ namespace RegistryWeb.DataServices
         private readonly IQueryable<TenancyBuildingAssoc> tenancyBuildingsAssoc;
         private readonly IQueryable<TenancyPremiseAssoc> tenancyPremisesAssoc;
         private readonly IQueryable<TenancySubPremiseAssoc> tenancySubPremisesAssoc;
+        private readonly SecurityServices.SecurityService securityService;
 
-        public TenancyProcessesDataService(RegistryContext registryContext) : base(registryContext)
+        public TenancyProcessesDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService) : base(registryContext)
         {
             tenancyBuildingsAssoc = registryContext.TenancyBuildingsAssoc
                     .Include(oba => oba.BuildingNavigation)
@@ -42,6 +44,7 @@ namespace RegistryWeb.DataServices
                         .ThenInclude(p => p.IdPremisesTypeNavigation)
                 .Include(oba => oba.ProcessNavigation)
                 .AsNoTracking();
+            this.securityService = securityService;
         }
 
         public override TenancyProcessesVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, TenancyProcessesFilter filterOptions)
@@ -55,21 +58,31 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
-        internal TenancyProcessVM GetTenancyProcessViewModel(TenancyProcess process)
+        internal TenancyProcessVM CreateTenancyProcessEmptyViewModel([CallerMemberName]string action = "")
         {
+            var userName = securityService.User.UserName.ToLowerInvariant();
             return new TenancyProcessVM
             {
-                TenancyProcess = process,
-                RentObjects = GetRentObjects(new List<TenancyProcess> { process }).SelectMany(r => r.Value).ToList(),
+                TenancyProcess = new TenancyProcess(),
                 Kinships = registryContext.Kinships.ToList(),
                 RentTypeCategories = registryContext.RentTypeCategories.ToList(),
                 RentTypes = registryContext.RentTypes.ToList(),
                 TenancyReasonTypes = registryContext.TenancyReasonTypes.ToList(),
                 Streets = registryContext.KladrStreets.ToList(),
-                Executors = registryContext.Executors.ToList(),
+                Executors = (action == "Details" || action == "Delete") ? registryContext.Executors.ToList() : registryContext.Executors.Where(e => !e.IsInactive).ToList(),
+                CurrentExecutor = registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null && 
+                        e.ExecutorLogin.ToLowerInvariant() == userName),
                 DocumentTypes = registryContext.DocumentTypes.ToList(),
                 DocumentIssuedBy = registryContext.DocumentsIssuedBy.ToList()
             };
+        }
+
+        internal TenancyProcessVM GetTenancyProcessViewModel(TenancyProcess process)
+        {
+            var tenancyProcessVM = CreateTenancyProcessEmptyViewModel();
+            tenancyProcessVM.TenancyProcess = process;
+            tenancyProcessVM.RentObjects = GetRentObjects(new List<TenancyProcess> { process }).SelectMany(r => r.Value).ToList();
+            return tenancyProcessVM;
         }
 
         internal TenancyProcess GetTenancyProcess(int idProcess)
@@ -332,6 +345,29 @@ namespace RegistryWeb.DataServices
                 .Select(r => new { IdProcess = r.Key, RentObject = r.Select(v => v.RentObject) })
                 .ToDictionary(v => v.IdProcess, v => v.RentObject.ToList());
             return result;
+        }
+
+        internal void Create(TenancyProcess tenancyProcess)
+        {
+            registryContext.TenancyProcesses.Add(tenancyProcess);
+            registryContext.SaveChanges();
+        }
+
+        internal void Edit(TenancyProcess tenancyProcess)
+        {
+            registryContext.TenancyProcesses.Update(tenancyProcess);
+            registryContext.SaveChanges();
+        }
+
+        internal void Delete(int idProcess)
+        {
+            var tenancyProcesses = registryContext.TenancyProcesses
+                    .FirstOrDefault(op => op.IdProcess == idProcess);
+            if (tenancyProcesses != null)
+            {
+                tenancyProcesses.Deleted = 1;
+                registryContext.SaveChanges();
+            }
         }
 
         private IQueryable<TenancyProcess> GetQueryFilter(IQueryable<TenancyProcess> query, TenancyProcessesFilter filterOptions)
