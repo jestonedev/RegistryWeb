@@ -11,6 +11,7 @@ using RegistryWeb.ViewModel;
 using RegistryWeb.Extensions;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
+using RegistryWeb.Models.Entities;
 
 namespace RegistryWeb.Controllers
 {
@@ -124,6 +125,7 @@ namespace RegistryWeb.Controllers
 
             if (ModelState.IsValid)
             {
+                tenancyProcessVM.TenancyProcess.TenancyRentPeriods = null;
                 dataService.Edit(tenancyProcessVM.TenancyProcess);
                 return RedirectToAction("Details", new { tenancyProcessVM.TenancyProcess.IdProcess });
             }
@@ -164,6 +166,20 @@ namespace RegistryWeb.Controllers
 
             dataService.Delete(tenancyProcessVM.TenancyProcess.IdProcess);
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult AddRentPeriod(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+
+            var rentPeriod = new TenancyRentPeriod { };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+
+            return PartialView("RentPeriod", rentPeriod);
         }
     }
 }

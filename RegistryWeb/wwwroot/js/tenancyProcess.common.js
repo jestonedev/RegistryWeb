@@ -217,6 +217,8 @@ $(function () {
             }, 1000);
 
             e.preventDefault();
+        } else {
+            rentPeriodsCorrectNaming();
         }
     });
 
@@ -230,4 +232,78 @@ $(function () {
             $("button[data-id='" + id + "']").removeClass("input-validation-error");
         }
     });
+
+    $("#createBtn, #editBtn, #deleteBtn").on("click", function () {
+        $("#TenancyProcessForm").submit();
+    });
+
+    function checkRentPeriod(rentPeriod) {
+        if (rentPeriod.BeginDate === "" && rentPeriod.EndDate === "" && rentPeriod.UntilDismissal === false) {
+            alert("Не задан период найма для переноса");
+            return false;
+        }
+        var equalPeriod = $("#TenancyProcessRentPeriods .list-group-item").filter(function (idx, elem) {
+            return !$(elem).hasClass("rr-list-group-item-empty") &&
+                $(elem).find("input[id^='BeginDate']").val() === rentPeriod.BeginDate &&
+                $(elem).find("input[id^='EndDate']").val() === rentPeriod.EndDate &&
+                $(elem).find("input[id^='UntilDismissal']").is(":checked") === rentPeriod.UntilDismissal;
+        });
+        if (equalPeriod.length > 0) {
+            alert("Указанный период уже присутствует в списке предыдущих периодов найма");
+            return false;
+        }
+        return true;
+    }
+
+    $("#RentPeriodToHistroy").on("click", function (e) {
+        e.preventDefault();
+        var rentPeriod = {
+            IdProcess: $("#TenancyProcess_IdProcess").val(),
+            BeginDate: $("#TenancyProcess_BeginDate").val(),
+            EndDate: $("#TenancyProcess_EndDate").val(),
+            UntilDismissal: $("#TenancyProcess_UntilDismissal").is(":checked")
+        };
+        if (!checkRentPeriod(rentPeriod)) return false;
+
+        var formData = rentPeriodToFormData(rentPeriod);
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/TenancyRentPeriods/SaveRentPeriod',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (rentPeriodSuccess) {
+                let action = $('#TenancyProcessRentPeriods').data('action');
+
+                $.ajax({
+                    type: 'POST',
+                    url: window.location.origin + '/TenancyProcesses/AddRentPeriod',
+                    data: { action },
+                    success: function (elem) {
+                        let list = $('#TenancyProcessRentPeriods');
+                        list.find(".rr-list-group-item-empty").hide();
+                        let rentPeriodToggle = $('.rr-rent-periods-card .tenancy-process-toggler');
+                        if (!isExpandElemntArrow(rentPeriodToggle)) // развернуть при добавлении, если было свернуто 
+                            rentPeriodToggle.click();
+                        list.append(elem);
+                        elem = list.find(".list-group-item").last();
+                        $(elem).find("input[id^='BeginDate']").val(rentPeriod.BeginDate);
+                        $(elem).find("input[id^='EndDate']").val(rentPeriod.EndDate);
+                        $(elem).find("input[id^='UntilDismissal']").prop("checked", rentPeriod.UntilDismissal);
+                        $("#TenancyProcess_BeginDate").val("");
+                        $("#TenancyProcess_EndDate").val("").prop("disabled", "");
+                        $("#TenancyProcess_UntilDismissal").prop("checked", false);
+                        if (rentPeriodSuccess.idRentPeriod > 0) {
+                            $(elem).find("input[name^='IdRentPeriod']").val(rentPeriodSuccess.idRentPeriod);
+                        }
+
+                        $([document.documentElement, document.body]).animate({
+                            scrollTop: $(elem).offset().top
+                        }, 1000);
+                    }
+                });
+            }
+        });
+    });
 });
+;
