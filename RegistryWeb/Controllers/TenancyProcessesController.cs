@@ -181,5 +181,20 @@ namespace RegistryWeb.Controllers
 
             return PartialView("RentPeriod", rentPeriod);
         }
+
+        [HttpPost]
+        public IActionResult AddTenancyReason(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+
+            var reason = new TenancyReason { };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+            ViewBag.TenancyReasonTypes = dataService.TenancyReasonTypes;
+
+            return PartialView("TenancyReason", reason);
+        }
     }
 }

@@ -349,6 +349,18 @@ namespace RegistryWeb.DataServices
 
         internal void Create(TenancyProcess tenancyProcess)
         {
+            if (tenancyProcess.TenancyReasons != null)
+            {
+                foreach(var reason in tenancyProcess.TenancyReasons)
+                {
+                    var tenancyReasonType = registryContext.TenancyReasonTypes.FirstOrDefault(tr => tr.IdReasonType == reason.IdReasonType);
+                    if (tenancyReasonType == null)
+                        throw new Exception("Некорректный тип основания найма");
+                    reason.ReasonPrepared = tenancyReasonType.ReasonTemplate
+                        .Replace("@reason_date@", reason.ReasonDate.HasValue ? reason.ReasonDate.Value.ToString("dd.MM.yyyy") : "")
+                        .Replace("@reason_number@", reason.ReasonNumber);
+                }
+            }
             registryContext.TenancyProcesses.Add(tenancyProcess);
             registryContext.SaveChanges();
         }
@@ -713,6 +725,11 @@ namespace RegistryWeb.DataServices
             return query
                 .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
                 .Take(pageOptions.SizePage);
+        }
+
+        public IEnumerable<TenancyReasonType> TenancyReasonTypes
+        {
+            get => registryContext.TenancyReasonTypes.AsNoTracking();
         }
     }
 }

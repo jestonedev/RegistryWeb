@@ -12,10 +12,10 @@
             {
                 <a href="#" id="rentPeriodAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить период найма">&#10010;</a>
             }
-            <a href="#" data-for="TenancyProcessRentPeriods" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель предыдущих периодов найма" style="font-weight:bold;">∧</a>
+                <a href="#" data-for="TenancyProcessRentPeriods" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель предыдущих периодов найма" style="font-weight:bold;">∨</a>
         </div>
     </div>
-    <ul class="list-group list-group-flush" id="TenancyProcessRentPeriods" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
+    <ul class="list-group list-group-flush toggle-hide" id="TenancyProcessRentPeriods" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
         <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
             <i>Предыдущие периоды найма отсутстувуют</i>
         </li>

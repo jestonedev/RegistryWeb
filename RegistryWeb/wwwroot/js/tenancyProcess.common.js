@@ -187,14 +187,19 @@ $(function () {
     });
 
     $("#TenancyProcessForm").on("submit", function (e) {
+        var action = $("#TenancyProcessForm").data("action");
         $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
         var validator = $(this).validate();
         var isFormValid = $(this).valid();
         if (!tenancyCustomValidations(validator)) {
             isFormValid = false;
         }
+        var isReasonsValid = true;
+        if (action === "Create") {
+            isReasonsValid = $("#TenancyProcessReasonsForm").valid();
+        }
 
-        if (!isFormValid) {
+        if (!isFormValid || !isReasonsValid) {
             $("select").each(function (idx, elem) {
                 var id = $(elem).prop("id");
                 var name = $(elem).prop("name");
@@ -219,6 +224,18 @@ $(function () {
             e.preventDefault();
         } else {
             rentPeriodsCorrectNaming();
+            if (action !== "Create") return true;
+            var inputTemplate = "<input type='hidden' name='{0}' value='{1}'>";
+            // Переносим основания найма в форму
+            let tenancyReasons = getTenancyReasons();
+            for (let i = 0; i < tenancyReasons.length; i++) {
+                let tr = "TenancyProcess.TenancyReasons[" + i + "].";
+                $(this).append(inputTemplate.replace('{0}', tr + "IdReason").replace('{1}', tenancyReasons[i].IdReason));
+                $(this).append(inputTemplate.replace('{0}', tr + "IdProcess").replace('{1}', tenancyReasons[i].IdProcess));
+                $(this).append(inputTemplate.replace('{0}', tr + "IdReasonType").replace('{1}', tenancyReasons[i].IdReasonType));
+                $(this).append(inputTemplate.replace('{0}', tr + "ReasonDate").replace('{1}', tenancyReasons[i].ReasonDate));
+                $(this).append(inputTemplate.replace('{0}', tr + "ReasonNumber").replace('{1}', tenancyReasons[i].ReasonNumber));
+            }
         }
     });
 

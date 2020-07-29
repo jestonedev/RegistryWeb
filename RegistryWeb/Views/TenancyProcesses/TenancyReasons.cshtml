@@ -1,0 +1,31 @@
+﻿@using RegistryWeb.Models.Entities
+@model IList<TenancyReason>
+
+<link rel="stylesheet" href="~/css/tenancy.reasons.css" />
+<script src="~/js/tenancyProcess.reasons.js"></script>
+<form id="TenancyProcessReasonsForm">
+    <div class="card rr-tenancy-card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Прочие основания найма</h3>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                    <a href="#" id="tenancyReasonAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить основание найма">&#10010;</a>
+                }
+                    <a href="#" data-for="TenancyProcessReasons" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель прочих оснований найма жилья" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush toggle-hide" id="TenancyProcessReasons" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
+            <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
+                <i>Прочие основания найма отсутствуют</i>
+            </li>
+            @if (Model != null && Model.Any())
+            {
+                for (var i = 0; i < Model.Count; i++)
+                {
+                    <partial name="TenancyReason" model="Model[i]" />
+                }
+            }
+        </ul>
+    </div>
+</form>

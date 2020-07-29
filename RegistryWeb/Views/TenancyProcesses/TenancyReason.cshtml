@@ -1,0 +1,59 @@
+﻿@using RegistryWeb.Models.Entities
+@model TenancyReason
+
+@{ 
+    var widthClass = "col-md-6";
+    if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+    {
+        widthClass = "col-md-4";
+    }
+    var id = Guid.NewGuid();
+}
+
+<li class="list-group-item">
+    <input type="hidden" value="@Model.IdReason" name="IdReason_@id" />
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label>Номер основания</label>
+            <input type="text" class="form-control" maxlength="50" disabled asp-for="ReasonNumber" id="ReasonNumber_@id" name="ReasonNumber_@id" title="Номер основания найма">
+        </div>
+        <div class="form-group col-md-3">
+            <label>Дата основания</label>
+            <input type="date" class="form-control" disabled asp-for="ReasonDate"
+                   value="@(Model.ReasonDate.HasValue ? Model.ReasonDate.Value.ToString("yyyy-MM-dd") : "")" 
+                   data-val="true" data-val-required="Укажите дату основания" id="ReasonDate_@id" name="ReasonDate_@id" title="Дата основания найма">
+            <span class="text-danger field-validation-valid" data-valmsg-for="ReasonDate_@id" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group @widthClass">
+            <label>Тип основания</label>
+            <select class="selectpicker form-control" data-live-search="true" disabled asp-for="IdReasonType" asp-items="@(new SelectList(ViewBag.TenancyReasonTypes, "IdReasonType", "ReasonName"))"
+                    id="IdReasonType_@id" name="IdReasonType_@id" title="Тип основания">
+                <option></option>
+            </select>
+            <span class="text-danger field-validation-valid" data-valmsg-for="IdReasonType_@id" data-valmsg-replace="true"></span>
+        </div>
+
+        @if (ViewBag.Action == "Edit")
+        {
+            <div class="text-md-right text-center col-md-2 rr-tenancy-reason-edit-buttons">
+                <div class="btn-group yes-no-panel" role="group" style="display: none" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger tenancy-reason-cancel-btn" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                    <a class="btn btn-success tenancy-reason-save-btn" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                </div>
+                <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                    <a class="btn btn-primary tenancy-reason-edit-btn" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                    <a class="btn btn-danger tenancy-reason-delete-btn" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                </div>
+            </div>
+        }
+        @if (ViewBag.Action == "Create")
+        {
+            <a class="tenancy-reason-edit-btn" style="display: none"></a>
+            <div class="text-md-right text-center col-md-2 rr-tenancy-reason-edit-buttons">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger tenancy-reason-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
+                </div>
+            </div>
+        }
+    </div>
+</li>

@@ -11,6 +11,7 @@
         ViewData["Title"] = "Найм жилья №" + Model.TenancyProcess.IdProcess;
     }
     ViewData["Id"] = Model.TenancyProcess.IdProcess;
+    ViewData["TenancyReasonTypes"] = Model.TenancyReasonTypes;
 }
 
 @section styles {
@@ -176,10 +177,10 @@
                         <div class="card-header d-flex justify-content-between">
                             <h3>Сдача в поднаем</h3>
                             <div>
-                                <a href="#" data-for="TenancyProcessSubTenancy" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель разрешения на сдачу в поднаем" style="font-weight:bold;">∧</a>
+                                <a href="#" data-for="TenancyProcessSubTenancy" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель разрешения на сдачу в поднаем" style="font-weight:bold;">∨</a>
                             </div>
                         </div>
-                        <div id="TenancyProcessSubTenancy" class="card-body">
+                        <div id="TenancyProcessSubTenancy" class="card-body toggle-hide">
                             <div class="form-group">
                                 <label asp-for="TenancyProcess.SubTenancyNum">Номер реквизита разрешения</label>
                                 <input type="text" class="form-control" asp-for="TenancyProcess.SubTenancyNum" title="Номер реквизита разрешения">
@@ -188,17 +189,17 @@
                             <div class="form-group">
                                 <label asp-for="TenancyProcess.SubTenancyDate">Дата выдачи разрешения</label>
                                 <input type="date" class="form-control" asp-for="TenancyProcess.SubTenancyDate"
-                                        value="@(Model.TenancyProcess.SubTenancyDate.HasValue ? Model.TenancyProcess.SubTenancyDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата выдачи разрешения">
+                                       value="@(Model.TenancyProcess.SubTenancyDate.HasValue ? Model.TenancyProcess.SubTenancyDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата выдачи разрешения">
                                 <span asp-validation-for="TenancyProcess.SubTenancyDate" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                
+
 
                 <div class="col-md-6 rr-tenancy-card">
-                    <partial name="RentPeriods" model="Model.TenancyProcess.TenancyRentPeriods"/>
+                    <partial name="RentPeriods" model="Model.TenancyProcess.TenancyRentPeriods" />
                 </div>
 
 
@@ -209,10 +210,10 @@
                         <div class="card-header d-flex justify-content-between">
                             <h3>Договор найма</h3>
                             <div>
-                                <a href="#" data-for="TenancyProcessContract" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель договора найма" style="font-weight:bold;">∧</a>
+                                <a href="#" data-for="TenancyProcessContract" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель договора найма" style="font-weight:bold;">∨</a>
                             </div>
                         </div>
-                        <div id="TenancyProcessContract" class="card-body">
+                        <div id="TenancyProcessContract" class="card-body toggle-hide">
                             <div class="row">
                                 <div class="form-group col-md-4">
                                     <label asp-for="TenancyProcess.RegistrationNum">Номер договора найма</label>
@@ -222,13 +223,13 @@
                                 <div class="form-group col-md-4">
                                     <label class="rr-tenancy-label" asp-for="TenancyProcess.RegistrationDate">Дата регистрации договора</label>
                                     <input type="date" class="form-control" asp-for="TenancyProcess.RegistrationDate"
-                                            value="@(Model.TenancyProcess.RegistrationDate.HasValue ? Model.TenancyProcess.RegistrationDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата регистрации договора">
+                                           value="@(Model.TenancyProcess.RegistrationDate.HasValue ? Model.TenancyProcess.RegistrationDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата регистрации договора">
                                     <span asp-validation-for="TenancyProcess.RegistrationDate" class="text-danger"></span>
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label asp-for="TenancyProcess.IssueDate">Дата выдачи договора</label>
                                     <input type="date" class="form-control" asp-for="TenancyProcess.IssueDate"
-                                            value="@(Model.TenancyProcess.IssueDate.HasValue ? Model.TenancyProcess.IssueDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата выдачи договора">
+                                           value="@(Model.TenancyProcess.IssueDate.HasValue ? Model.TenancyProcess.IssueDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата выдачи договора">
                                 </div>
                             </div>
                         </div>
@@ -242,75 +243,34 @@
                         <div class="card-header d-flex justify-content-between">
                             <h3 for="TenancyProcess.Description">Дополнительные сведения</h3>
                             <div class="btn-group" role="group">
-                                <a href="#" data-for="TenancyProcessDescription" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть дополнительные сведения" style="font-weight:bold;">∧</a>
+                                <a href="#" data-for="TenancyProcessDescription" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть дополнительные сведения" style="font-weight:bold;">∨</a>
                             </div>
                         </div>
-                        <textarea id="TenancyProcessDescription" class="form-control" asp-for="TenancyProcess.Description" title="Дополнительные сведения"></textarea>
+                        <textarea id="TenancyProcessDescription" class="form-control toggle-hide" asp-for="TenancyProcess.Description" title="Дополнительные сведения"></textarea>
                     </div>
                 </div>
             </div>
         </form>
+
+
+        <div class="row">
+            <div class="col-12">
+                <partial name="TenancyReasons" model="Model.TenancyProcess.TenancyReasons" />
+            </div>
+        </div>
+
         @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
         {
             <div class="row">
                 <div class="col-12">
                     <div class="card rr-tenancy-card">
                         <div class="card-header d-flex justify-content-between">
-                            <h3>Прочие основания найма</h3>
-                            <div>
-                                <a href="#" data-for="TenancyProcessReasons" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель прочих оснований найма жилья" style="font-weight:bold;">∧</a>
-                            </div>
-                        </div>
-                        <table id="TenancyProcessReasons" class="table table-bordered card-body">
-                            <thead>
-                                <tr>
-                                    <th>Наименование</th>
-                                    <th>№</th>
-                                    <th>Дата</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.TenancyProcess.TenancyReasons != null && Model.TenancyProcess.TenancyReasons.Any())
-                                {
-                                    for (var i = 0; i < Model.TenancyProcess.TenancyReasons.Count; i++)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <select class="form-control" asp-for="TenancyProcess.TenancyReasons[i].IdReasonType" asp-items="@(new SelectList(Model.TenancyReasonTypes, "IdReasonType", "ReasonName"))">
-                                                    <option></option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control" asp-for="TenancyProcess.TenancyReasons[i].ReasonNumber" title="Номер основания найма">
-                                            </td>
-                                            <td>
-                                                <input type="date" class="form-control" asp-for="TenancyProcess.TenancyReasons[i].ReasonDate"
-                                                        value="@(Model.TenancyProcess.TenancyReasons[i].ReasonDate.HasValue ? Model.TenancyProcess.TenancyReasons[i].ReasonDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата основания найма">
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td class="text-center" colspan="3"><i>Прочие основания найма отсутствуют</i></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card rr-tenancy-card">
-                        <div class="card-header d-flex justify-content-between">
                             <h3>Дополнительные соглашения</h3>
                             <div>
-                                <a href="#" data-for="TenancyProcessAgreements" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель дополнительных соглашений" style="font-weight:bold;">∧</a>
+                                <a href="#" data-for="TenancyProcessAgreements" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель дополнительных соглашений" style="font-weight:bold;">∨</a>
                             </div>
                         </div>
-                        <table id="TenancyProcessAgreements" class="table table-bordered card-body">
+                        <table id="TenancyProcessAgreements" class="table table-bordered card-body toggle-hide">
                             <thead>
                                 <tr>
                                     <th>Дата</th>
@@ -328,7 +288,7 @@
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyAgreements[i].IdAgreement" />
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyAgreements[i].IdExecutor" />
                                                 <input type="date" class="form-control" asp-for="TenancyProcess.TenancyAgreements[i].AgreementDate"
-                                                        value="@(Model.TenancyProcess.TenancyAgreements[i].AgreementDate.HasValue ? Model.TenancyProcess.TenancyAgreements[i].AgreementDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата соглашения">
+                                                       value="@(Model.TenancyProcess.TenancyAgreements[i].AgreementDate.HasValue ? Model.TenancyProcess.TenancyAgreements[i].AgreementDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата соглашения">
                                             </td>
                                             <td>
                                                 <textarea rows="1" class="form-control tenancy-agreement-content" asp-for="TenancyProcess.TenancyAgreements[i].AgreementContent" title="@Model.TenancyProcess.TenancyAgreements[i].AgreementContent"></textarea>
@@ -356,10 +316,10 @@
                         <div class="card-header d-flex justify-content-between">
                             <h3>Участники найма</h3>
                             <div>
-                                <a href="#" data-for="TenancyProcessPersons" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель участников найма" style="font-weight:bold;">∧</a>
+                                <a href="#" data-for="TenancyProcessPersons" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель участников найма" style="font-weight:bold;">∨</a>
                             </div>
                         </div>
-                        <table id="TenancyProcessPersons" class="table table-bordered card-body">
+                        <table id="TenancyProcessPersons" class="table table-bordered card-body toggle-hide">
                             <thead>
                                 <tr>
                                     <th>Фамилия</th>
@@ -380,15 +340,15 @@
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IdPerson" />
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].PersonalAccount" />
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IncludeDate"
-                                                        value="@(Model.TenancyProcess.TenancyPersons[i].IncludeDate.HasValue ? Model.TenancyProcess.TenancyPersons[i].IncludeDate.Value.ToString("yyyy-MM-dd") : "")" />
+                                                       value="@(Model.TenancyProcess.TenancyPersons[i].IncludeDate.HasValue ? Model.TenancyProcess.TenancyPersons[i].IncludeDate.Value.ToString("yyyy-MM-dd") : "")" />
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ExcludeDate"
-                                                        value="@(Model.TenancyProcess.TenancyPersons[i].ExcludeDate.HasValue ? Model.TenancyProcess.TenancyPersons[i].ExcludeDate.Value.ToString("yyyy-MM-dd") : "")" />
+                                                       value="@(Model.TenancyProcess.TenancyPersons[i].ExcludeDate.HasValue ? Model.TenancyProcess.TenancyPersons[i].ExcludeDate.Value.ToString("yyyy-MM-dd") : "")" />
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IdDocumentType" />
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].DocumentSeria" />
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].DocumentNum" />
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IdDocumentIssuedBy" />
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].DateOfDocumentIssue"
-                                                        value="@(Model.TenancyProcess.TenancyPersons[i].DateOfDocumentIssue.HasValue ? Model.TenancyProcess.TenancyPersons[i].DateOfDocumentIssue.Value.ToString("yyyy-MM-dd") : "")" />
+                                                       value="@(Model.TenancyProcess.TenancyPersons[i].DateOfDocumentIssue.HasValue ? Model.TenancyProcess.TenancyPersons[i].DateOfDocumentIssue.Value.ToString("yyyy-MM-dd") : "")" />
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].Snils" />
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationIdStreet" />
                                                 <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationHouse" />
@@ -409,7 +369,7 @@
                                             </td>
                                             <td>
                                                 <input type="date" class="form-control" asp-for="TenancyProcess.TenancyPersons[i].DateOfBirth"
-                                                        value="@(Model.TenancyProcess.TenancyPersons[i].DateOfBirth.HasValue ? Model.TenancyProcess.TenancyPersons[i].DateOfBirth.Value.ToString("yyyy-MM-dd") : "")" title="Дата рождения">
+                                                       value="@(Model.TenancyProcess.TenancyPersons[i].DateOfBirth.HasValue ? Model.TenancyProcess.TenancyPersons[i].DateOfBirth.Value.ToString("yyyy-MM-dd") : "")" title="Дата рождения">
                                             </td>
                                             <td>
                                                 <select class="form-control" asp-for="TenancyProcess.TenancyPersons[i].IdKinship" asp-items="@(new SelectList(Model.Kinships, "IdKinship", "KinshipName"))">
@@ -439,10 +399,10 @@
                         <div class="card-header d-flex justify-content-between">
                             <h3>Нанимаемое жилье</h3>
                             <div>
-                                <a href="#" data-for="TenancyProcessAddresses" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель нанимаемого жилья" style="font-weight:bold;">∧</a>
+                                <a href="#" data-for="TenancyProcessAddresses" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель нанимаемого жилья" style="font-weight:bold;">∨</a>
                             </div>
                         </div>
-                        <table id="TenancyProcessAddresses" class="table table-bordered card-body">
+                        <table id="TenancyProcessAddresses" class="table table-bordered card-body toggle-hide">
                             <thead>
                                 <tr>
                                     <th>Адрес</th>
@@ -477,21 +437,21 @@
                                                 @if (Model.RentObjects[i].Address.AddressType == AddressTypes.Building)
                                                 {
                                                     <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
-                                                        asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@Model.RentObjects[i].Address.Id" asp-route-action="Details"
-                                                        asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                                       asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@Model.RentObjects[i].Address.Id" asp-route-action="Details"
+                                                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                                 }
                                                 else
-                                                if (Model.RentObjects[i].Address.AddressType == AddressTypes.Premise)
+                                               if (Model.RentObjects[i].Address.AddressType == AddressTypes.Premise)
                                                 {
                                                     <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
-                                                        asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.RentObjects[i].Address.Id" asp-route-action="Details"
-                                                        asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                                       asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.RentObjects[i].Address.Id" asp-route-action="Details"
+                                                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                                 }
                                                 else
                                                 {
                                                     <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
-                                                        asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.RentObjects[i].Address.IdParents[AddressTypes.Premise.ToString()]" asp-route-action="Details"
-                                                        asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                                       asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.RentObjects[i].Address.IdParents[AddressTypes.Premise.ToString()]" asp-route-action="Details"
+                                                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                                 }
                                             </td>
                                         </tr>
