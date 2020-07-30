@@ -1,4 +1,19 @@
-﻿$(function () {
+﻿function getTenancyPersons() {
+    var items = $("#TenancyProcessPersons .list-group-item").filter(function (idx, elem) {
+        return !$(elem).hasClass("rr-list-group-item-empty");
+    });
+    return items.map(function (idx, elem) {
+        var data = {};
+        var fields = $(elem).find("input, select, textarea");
+        fields.each(function (idx, elem) {
+            var name = $(elem).attr("name").split("_")[0];
+            data[name] = $(elem).val();
+        });
+        return data;
+    });
+}
+
+$(function () {
 
     function tenancyPersonFillModal(tenancyPersonElem, action) {
         var modal = $("#personModal");
@@ -78,12 +93,39 @@
         addingTenancyPersonElem = undefined;
     });
 
-    $("#personModal").on("click", "#savePersonModalBtn", function (e) {
+    function updateInsertTenancyPersonElem() {
         var modal = $("#personModal");
+        let tenancyPersonElem = $('#TenancyProcessPersons .list-group-item[data-processing]');
+        if (tenancyPersonElem.length > 0) {
+            tenancyPersonFillElem(tenancyPersonElem);
+            modal.modal('hide');
+        } else {
+            let list = $('#TenancyProcessPersons');
+            list.find(".rr-list-group-item-empty").hide();
+            let tenancyPersonToggle = $('#TenancyProcessPersonsForm .tenancy-process-toggler');
+            if (!isExpandElemntArrow(tenancyPersonToggle)) // развернуть при добавлении, если было свернуто 
+                tenancyPersonToggle.click();
+            list.append(addingTenancyPersonElem);
+            let tenancyPersonElem = $('#TenancyProcessPersons .list-group-item').last();
+            tenancyPersonElem.find("select").selectpicker("render");
+            tenancyPersonFillElem(tenancyPersonElem);
+            modal.modal('hide');
+            $([document.documentElement, document.body]).animate({
+                scrollTop: $(tenancyPersonElem).offset().top
+            }, 1000);
+        }
+    }
+
+    $("#personModal").on("click", "#savePersonModalBtn", function (e) {
+        let action = $('#TenancyProcessPersons').data('action');
         var form = $("#TenancyProcessPersonsModalForm");
         var isValid = form.valid();
         if (isValid) {
             tenancyPersonCorrectSnp(form);
+            if (action == "Create") {
+                updateInsertTenancyPersonElem();
+                return;
+            }
             let tenancyPerson = tenancyPersonToFormData(getTenancyPerson(form));
             $.ajax({
                 type: 'POST',
@@ -94,25 +136,7 @@
                 success: function (tenancyPersonReturn) {
                     if (tenancyPersonReturn.idPerson > 0) {
                         form.find("[name='Person.IdPerson']").val(tenancyPersonReturn.idPerson);
-                        let tenancyPersonElem = $('#TenancyProcessPersons .list-group-item[data-processing]');
-                        if (tenancyPersonElem.length > 0) {
-                            tenancyPersonFillElem(tenancyPersonElem);
-                            modal.modal('hide');
-                        } else {
-                            let list = $('#TenancyProcessPersons');
-                            list.find(".rr-list-group-item-empty").hide();
-                            let tenancyPersonToggle = $('#TenancyProcessPersonsForm .tenancy-process-toggler');
-                            if (!isExpandElemntArrow(tenancyPersonToggle)) // развернуть при добавлении, если было свернуто 
-                                tenancyPersonToggle.click();
-                            list.append(addingTenancyPersonElem);
-                            let tenancyPersonElem = $('#TenancyProcessPersons .list-group-item').last();
-                            tenancyPersonElem.find("select").selectpicker("render");
-                            tenancyPersonFillElem(tenancyPersonElem);
-                            modal.modal('hide');
-                            $([document.documentElement, document.body]).animate({
-                                scrollTop: $(tenancyPersonElem).offset().top
-                            }, 1000);
-                        }
+                        updateInsertTenancyPersonElem();
                     } else {
                         alert('Произошла ошибка при сохранении');
                     }
@@ -139,23 +163,30 @@
         if (isOk) {
             let tenancyPersonElem = $(this).closest(".list-group-item");
             let idPerson = tenancyPersonElem.find("input[name^='IdPerson']").val();
-            $.ajax({
-                async: false,
-                type: 'POST',
-                url: window.location.origin + '/TenancyPersons/DeletePerson',
-                data: { idPerson: idPerson },
-                success: function (ind) {
-                    if (ind === 1) {
-                        tenancyPersonElem.remove();
-                        if ($("#TenancyProcessPersons .list-group-item").length === 1) {
-                            $("#TenancyProcessPersons .rr-list-group-item-empty").show();
+            if (idPerson === "0") {
+                tenancyPersonElem.remove();
+                if ($("#TenancyProcessPersons .list-group-item").length === 1) {
+                    $("#TenancyProcessPersons .rr-list-group-item-empty").show();
+                }
+            } else {
+                $.ajax({
+                    async: false,
+                    type: 'POST',
+                    url: window.location.origin + '/TenancyPersons/DeletePerson',
+                    data: { idPerson: idPerson },
+                    success: function (ind) {
+                        if (ind === 1) {
+                            tenancyPersonElem.remove();
+                            if ($("#TenancyProcessPersons .list-group-item").length === 1) {
+                                $("#TenancyProcessPersons .rr-list-group-item-empty").show();
+                            }
+                        }
+                        else {
+                            alert("Ошибка удаления!");
                         }
                     }
-                    else {
-                        alert("Ошибка удаления!");
-                    }
-                }
-            });
+                });
+            }
         }
         e.preventDefault();
     }

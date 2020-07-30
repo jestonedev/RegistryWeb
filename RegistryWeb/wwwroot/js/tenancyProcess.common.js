@@ -176,6 +176,14 @@ $(function () {
                 $(this).append(inputTemplate.replace('{0}', tr + "ReasonDate").replace('{1}', tenancyReasons[i].ReasonDate));
                 $(this).append(inputTemplate.replace('{0}', tr + "ReasonNumber").replace('{1}', tenancyReasons[i].ReasonNumber));
             }
+
+            let tenancyPersons = getTenancyPersons();
+            for (let i = 0; i < tenancyPersons.length; i++) {
+                let tp = "TenancyProcess.TenancyPersons[" + i + "].";
+                for (var field in tenancyPersons[i]) {
+                    $(this).append(inputTemplate.replace('{0}', tp + field).replace('{1}', tenancyPersons[i][field]));
+                }
+            }
         }
     });
 
