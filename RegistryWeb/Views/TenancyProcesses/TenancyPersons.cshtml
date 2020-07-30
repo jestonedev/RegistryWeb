@@ -1,0 +1,180 @@
+﻿@using RegistryWeb.Models.Entities
+@model IList<TenancyPerson>
+
+<link rel="stylesheet" href="~/css/tenancy.persons.css" />
+<script src="~/js/tenancyProcess.persons.js"></script>
+<form id="TenancyProcessPersonsForm">
+    <div class="card rr-tenancy-card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Участники найма</h3>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                    <a href="#" id="tenancyPersonAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить участника найма">&#10010;</a>
+                }
+                <a href="#" data-for="TenancyProcessPersons" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель участников найма жилья" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush toggle-hide" id="TenancyProcessPersons" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
+            <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
+                <i>Участники найма отсутствуют</i>
+            </li>
+            @if (Model != null && Model.Any())
+            {
+                for (var i = 0; i < Model.Count; i++)
+                {
+                    <partial name="TenancyPerson" model="Model[i]" />
+                }
+            }
+        </ul>
+    </div>
+</form>
+
+<form id="TenancyProcessPersonsModalForm">
+    <div class="modal fade bd-example-modal-xl" id="personModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Участник найма</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="Person_IdPerson" name="Person.IdPerson"/>
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_Surname">Фамилия</label>
+                            <input type="text" id="Person_Surname" name="Person.Surname" class="form-control" title="Фамилия участника найма"
+                                   data-val="true" data-val-required="Укажите фамилию" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Person.Surname" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_Name">Имя</label>
+                            <input type="text" id="Person_Name" name="Person.Name" class="form-control" title="Имя участника найма"
+                                   data-val="true" data-val-required="Укажите имя" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Person.Name" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_Patronymic">Отчество</label>
+                            <input type="text" id="Person_Patronymic" name="Person.Patronymic" class="form-control" title="Отчетство участника найма" />
+                        </div>
+
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_DateOfBirth">Дата рождения</label>
+                            <div class="input-group date">
+                                <input type="date" id="Person_DateOfBirth" name="Person.DateOfBirth" class="form-control" title="Дата рождения участника найма">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_IdKinship">Родственное отношение</label>
+                            <select class="selectpicker form-control" data-live-search="true" id="Person_IdKinship" name="Person.IdKinship" title="Родственное отношение" asp-items="@(new SelectList(ViewBag.Kinships, "IdKinship", "KinshipName"))"
+                                    data-val="true" data-val-required="Выберите родственное отношение"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Person.IdKinship" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_PersonalAccount">Номер телефона</label>
+                            <input type="text" id="Person_PersonalAccount" name="Person.PersonalAccount" class="form-control" title="Телефон участника найма" />
+                        </div>
+                        <div class="form-group col-md-6 offset-lg-2 col-lg-4">
+                            <label for="Person_IncludeDate">Дата включения</label>
+                            <div class="input-group date">
+                                <input type="date" id="Person_IncludeDate" name="Person.IncludeDate" class="form-control" title="Дата включения участника в найм">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_ExcludeDate">Дата исключения</label>
+                            <div class="input-group date">
+                                <input type="date" id="Person_ExcludeDate" name="Person.ExcludeDate" class="form-control" title="Дата исключения участника из найм">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <h5>Документы, удостоверяющие личность</h5>
+                            <hr />
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_IdDocumentType">Вид документа</label>
+                            <select class="selectpicker form-control" id="Person_IdDocumentType" name="Person.IdDocumentType" title="Вид документа, удостоверяющего личность" asp-items="@(new SelectList(ViewBag.DocumentTypes, "IdDocumentType", "DocumentTypeName"))"
+                                    data-val="true" data-val-required="Выберите вид документа"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Person.IdDocumentType" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_DocumentSeria">Серия</label>
+                            <input type="text" id="Person_DocumentSeria" name="Person.DocumentSeria" class="form-control" title="Серия документа, удостоверяющего личность" />
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_DocumentNum">Номер</label>
+                            <input type="text" id="Person_DocumentNum" name="Person.DocumentNum" class="form-control" title="Номер документа, удостоверяющего личность" />
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_IdDocumentIssuedBy">Кем выдан</label>
+                            <select class="selectpicker form-control" data-live-search="true" id="Person_IdDocumentIssuedBy" name="Person.IdDocumentIssuedBy" title="Кем выдан документ, удостоверяющий личность" asp-items="@(new SelectList(ViewBag.DocumentIssuedBy, "IdDocumentIssuedBy", "DocumentIssuedByName"))"></select>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_DateOfDocumentIssue">Дата выдачи</label>
+                            <div class="input-group date">
+                                <input type="date" id="Person_DateOfDocumentIssue" name="Person.DateOfDocumentIssue" class="form-control" title="Дата выдачи документа, удостоверяющего личность">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_Snils">СНИЛС</label>
+                            <input type="text" id="Person_Snils" name="Person.Snils" class="form-control" title="СНИЛС участника найма" />
+                        </div>
+                        <div class="col-md-12">
+                            <h5>Адрес регистрации</h5>
+                            <hr />
+                        </div>
+                        <div class="form-group col-md-6 col-lg-6">
+                            <label for="Person_RegistrationIdStreet">Улица</label>
+                            <select class="selectpicker form-control" data-live-search="true" id="Person_RegistrationIdStreet" name="Person.RegistrationIdStreet" title="Улица регистрации" asp-items="@(new SelectList(ViewBag.Streets, "IdStreet", "StreetName"))"></select>
+                        </div>
+                        <div class="form-group col-sm-4 col-md-6 col-lg-2">
+                            <label for="Person_RegistrationHouse">Дом</label>
+                            <input type="text" id="Person_RegistrationHouse" name="Person.RegistrationHouse" class="form-control" title="Дом регистрации" />
+                        </div>
+                        <div class="form-group col-sm-4 col-md-6 col-lg-2">
+                            <label for="Person_RegistrationFlat">Квартира</label>
+                            <input type="text" id="Person_RegistrationFlat" name="Person.RegistrationFlat" class="form-control" title="Квартира регистрации" />
+                        </div>
+                        <div class="form-group col-sm-4 col-md-6 col-lg-2">
+                            <label for="Person_RegistrationRoom">Комната</label>
+                            <input type="text" id="Person_RegistrationRoom" name="Person.RegistrationRoom" class="form-control" title="Комната регистрации" />
+                        </div>
+                        <div class="col-md-12">
+                            <h5>Адрес проживания</h5>
+                            <hr />
+                        </div>
+                        <div class="form-group col-md-6 col-lg-6">
+                            <label for="Person_ResidenceIdStreet">Улица</label>
+                            <select class="selectpicker form-control" data-live-search="true" id="Person_ResidenceIdStreet" name="Person.ResidenceIdStreet" title="Улица проживания" asp-items="@(new SelectList(ViewBag.Streets, "IdStreet", "StreetName"))"></select>
+                        </div>
+                        <div class="form-group col-sm-4 col-md-6 col-lg-2">
+                            <label for="Person_ResidenceHouse">Дом</label>
+                            <input type="text" id="Person_ResidenceHouse" name="Person.ResidenceHouse" class="form-control" title="Дом проживания" />
+                        </div>
+                        <div class="form-group col-sm-4 col-md-6 col-lg-2">
+                            <label for="Person_ResidenceFlat">Квартира</label>
+                            <input type="text" id="Person_ResidenceFlat" name="Person.ResidenceFlat" class="form-control" title="Квартира проживания" />
+                        </div>
+                        <div class="form-group col-sm-4 col-md-6 col-lg-2">
+                            <label for="Person_ResidenceRoom">Комната</label>
+                            <input type="text" id="Person_ResidenceRoom" name="Person.ResidenceRoom" class="form-control" title="Комната проживания" />
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                    {
+                        <button id="savePersonModalBtn" type="button" class="btn btn-secondary">Сохранить</button>
+                        <button id="cancelPersonModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                    }
+                    @if (ViewBag.Action == "Details")
+                    {
+                        <button id="closePersonModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

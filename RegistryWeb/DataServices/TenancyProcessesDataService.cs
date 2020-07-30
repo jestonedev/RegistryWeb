@@ -731,5 +731,10 @@ namespace RegistryWeb.DataServices
         {
             get => registryContext.TenancyReasonTypes.AsNoTracking();
         }
+
+        public IEnumerable<Kinship> Kinships
+        {
+            get => registryContext.Kinships.AsNoTracking();
+        }
     }
 }

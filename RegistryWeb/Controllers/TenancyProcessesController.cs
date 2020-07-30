@@ -196,5 +196,20 @@ namespace RegistryWeb.Controllers
 
             return PartialView("TenancyReason", reason);
         }
+
+        [HttpPost]
+        public IActionResult AddTenancyPerson(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+
+            var person = new TenancyPerson { };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+            ViewBag.Kinships = dataService.Kinships;
+
+            return PartialView("TenancyPerson", person);
+        }
     }
 }

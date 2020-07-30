@@ -49,7 +49,7 @@ function cancelEditTenancyReason(e) {
             success: function (tenancyReason) {
                 refreshTenancyReason(tenancyReasonElem, tenancyReason);
                 showEditDelPanelTenancyReason(tenancyReasonElem);
-                clearValidationsTenancyRason(tenancyReasonElem);
+                clearValidationsTenancyReason(tenancyReasonElem);
             }
         });
     }
@@ -63,7 +63,7 @@ function cancelEditTenancyReason(e) {
     e.preventDefault();
 }
 
-function clearValidationsTenancyRason(tenancyReasonElem) {
+function clearValidationsTenancyReason(tenancyReasonElem) {
     $(tenancyReasonElem).find(".input-validation-error").removeClass("input-validation-error").addClass("valid");
     $(tenancyReasonElem).find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid").text("");
 }

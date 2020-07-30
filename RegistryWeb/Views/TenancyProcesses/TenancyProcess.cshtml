@@ -12,6 +12,12 @@
     }
     ViewData["Id"] = Model.TenancyProcess.IdProcess;
     ViewData["TenancyReasonTypes"] = Model.TenancyReasonTypes;
+
+    @*TenancyPersons*@
+    ViewData["Kinships"] = Model.Kinships;
+    ViewData["DocumentTypes"] = Model.DocumentTypes;
+    ViewData["DocumentIssuedBy"] = Model.DocumentIssuedBy;
+    ViewData["Streets"] = Model.Streets;
 }
 
 @section styles {
@@ -310,89 +316,16 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card rr-tenancy-card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3>Участники найма</h3>
-                            <div>
-                                <a href="#" data-for="TenancyProcessPersons" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель участников найма" style="font-weight:bold;">∨</a>
-                            </div>
-                        </div>
-                        <table id="TenancyProcessPersons" class="table table-bordered card-body toggle-hide">
-                            <thead>
-                                <tr>
-                                    <th>Фамилия</th>
-                                    <th>Имя</th>
-                                    <th>Отчество</th>
-                                    <th>Дата рождения</th>
-                                    <th>Родственные отношения</th>
-                                    <th style="width: 67px"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.TenancyProcess.TenancyPersons != null && Model.TenancyProcess.TenancyPersons.Any())
-                                {
-                                    for (var i = 0; i < Model.TenancyProcess.TenancyPersons.Count; i++)
-                                    {
-                                        <tr class="tenancy-person-item @(Model.TenancyProcess.TenancyPersons[i].ExcludeDate.HasValue ? "table-danger" : "")">
-                                            <td>
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IdPerson" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].PersonalAccount" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IncludeDate"
-                                                       value="@(Model.TenancyProcess.TenancyPersons[i].IncludeDate.HasValue ? Model.TenancyProcess.TenancyPersons[i].IncludeDate.Value.ToString("yyyy-MM-dd") : "")" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ExcludeDate"
-                                                       value="@(Model.TenancyProcess.TenancyPersons[i].ExcludeDate.HasValue ? Model.TenancyProcess.TenancyPersons[i].ExcludeDate.Value.ToString("yyyy-MM-dd") : "")" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IdDocumentType" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].DocumentSeria" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].DocumentNum" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].IdDocumentIssuedBy" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].DateOfDocumentIssue"
-                                                       value="@(Model.TenancyProcess.TenancyPersons[i].DateOfDocumentIssue.HasValue ? Model.TenancyProcess.TenancyPersons[i].DateOfDocumentIssue.Value.ToString("yyyy-MM-dd") : "")" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].Snils" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationIdStreet" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationHouse" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationFlat" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].RegistrationRoom" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ResidenceIdStreet" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ResidenceHouse" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ResidenceFlat" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyPersons[i].ResidenceRoom" />
+        }
 
-                                                <input type="text" class="form-control" asp-for="TenancyProcess.TenancyPersons[i].Surname" title="Фамилия">
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control" asp-for="TenancyProcess.TenancyPersons[i].Name" title="Имя">
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control" asp-for="TenancyProcess.TenancyPersons[i].Patronymic" title="Отчество">
-                                            </td>
-                                            <td>
-                                                <input type="date" class="form-control" asp-for="TenancyProcess.TenancyPersons[i].DateOfBirth"
-                                                       value="@(Model.TenancyProcess.TenancyPersons[i].DateOfBirth.HasValue ? Model.TenancyProcess.TenancyPersons[i].DateOfBirth.Value.ToString("yyyy-MM-dd") : "")" title="Дата рождения">
-                                            </td>
-                                            <td>
-                                                <select class="form-control" asp-for="TenancyProcess.TenancyPersons[i].IdKinship" asp-items="@(new SelectList(Model.Kinships, "IdKinship", "KinshipName"))">
-                                                    <option></option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-primary oi oi-eye tenancy-person-open" href="#" title="Открыть дополнительную информацию об участнике найма" aria-label="Открыть дополнительную информацию об участнике найма"></a>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td class="text-center" colspan="5"><i>Наниматели отсутствуют</i></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <div class="row">
+            <div class="col-12">
+                <partial name="TenancyPersons" model="Model.TenancyProcess.TenancyPersons" />
             </div>
+        </div>
+
+        @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+        {
             <div class="row">
                 <div class="col-12">
                     <div class="card rr-tenancy-card">
@@ -441,7 +374,7 @@
                                                        asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                                 }
                                                 else
-                                               if (Model.RentObjects[i].Address.AddressType == AddressTypes.Premise)
+                                             if (Model.RentObjects[i].Address.AddressType == AddressTypes.Premise)
                                                 {
                                                     <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
                                                        asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.RentObjects[i].Address.Id" asp-route-action="Details"
@@ -515,145 +448,6 @@
         </div>
     </div>
 </div>
-
-<div class="modal fade bd-example-modal-xl" id="personModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Участник найма</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-row">
-                    <div class="form-group col-md-6 col-lg-4">
-                        <label for="Person_Surname">Фамилия</label>
-                        <input type="text" id="Person_Surname" name="Person.Surname" class="form-control" title="Фамилия участника найма" />
-                    </div>
-                    <div class="form-group col-md-6 col-lg-4">
-                        <label for="Person_Name">Имя</label>
-                        <input type="text" id="Person_Name" name="Person.Name" class="form-control" title="Имя участника найма" />
-                    </div>
-                    <div class="form-group col-md-6 col-lg-4">
-                        <label for="Person_Patronymic">Отчество</label>
-                        <input type="text" id="Person_Patronymic" name="Person.Patronymic" class="form-control" title="Отчетство участника найма" />
-                    </div>
-
-                    <div class="form-group col-md-6 col-lg-4">
-                        <label for="Person_DateOfBirth">Дата рождения</label>
-                        <div class="input-group date">
-                            <input type="date" id="Person_DateOfBirth" name="Person.DateOfBirth" class="form-control" title="Дата рождения участника найма">
-                        </div>
-                    </div>
-                    <div class="form-group col-md-6 col-lg-4">
-                        <label for="Person_IdKinship">Родственное отношение</label>
-                        <select class="selectpicker form-control" data-actions-box="true" id="Person_IdKinship" name="Person.IdKinship" title="Родственное отношение" asp-items="@(new SelectList(Model.Kinships, "IdKinship", "KinshipName"))"></select>
-                    </div>
-                    <div class="form-group col-md-6 col-lg-4">
-                        <label for="Person_Phone">Номер телефона</label>
-                        <input type="text" id="Person_Phone" name="Person.Phone" class="form-control" title="Телефон участника найма" />
-                    </div>
-                    <div class="form-group col-md-6 offset-lg-2 col-lg-4">
-                        <label for="Person_IncludeDate">Дата включения</label>
-                        <div class="input-group date">
-                            <input type="date" id="Person_IncludeDate" name="Person.IncludeDate" class="form-control" title="Дата включения участника в найм">
-                        </div>
-                    </div>
-                    <div class="form-group col-md-6 col-lg-4">
-                        <label for="Person_ExcludeDate">Дата исключения</label>
-                        <div class="input-group date">
-                            <input type="date" id="Person_ExcludeDate" name="Person.ExcludeDate" class="form-control" title="Дата исключения участника из найм">
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <h5>Документы, удостоверяющие личность</h5>
-                        <hr />
-                    </div>
-                    <div class="form-group col-md-6 col-lg-4">
-                        <label for="Person_IdDocType">Вид документа</label>
-                        <select class="selectpicker form-control" data-actions-box="true" id="Person_IdDocType" name="Person.IdDocType" title="Вид документа, удостоверяющего личность" asp-items="@(new SelectList(Model.DocumentTypes, "IdDocumentType", "DocumentTypeName"))"></select>
-                    </div>
-                    <div class="form-group col-md-6 col-lg-4">
-                        <label for="Person_DocSeria">Серия</label>
-                        <input type="text" id="Person_DocSeria" name="Person.DocSeria" class="form-control" title="Серия документа, удостоверяющего личность" />
-                    </div>
-                    <div class="form-group col-md-6 col-lg-4">
-                        <label for="Person_DocNumber">Номер</label>
-                        <input type="text" id="Person_DocNumber" name="Person.DocNumber" class="form-control" title="Номер документа, удостоверяющего личность" />
-                    </div>
-                    <div class="form-group col-md-6 col-lg-4">
-                        <label for="Person_IdDocIssuer">Кем выдан</label>
-                        <select class="selectpicker form-control" data-actions-box="true" id="Person_IdDocIssuer" name="Person.IdDocIssuer" title="Кем выдан документ, удостоверяющий личность" asp-items="@(new SelectList(Model.DocumentIssuedBy, "IdDocumentIssuedBy", "DocumentIssuedByName"))"></select>
-                    </div>
-                    <div class="form-group col-md-6 col-lg-4">
-                        <label for="Person_IssueDate">Дата выдачи</label>
-                        <div class="input-group date">
-                            <input type="date" id="Person_IssueDate" name="Person.IssueDate" class="form-control" title="Дата выдачи документа, удостоверяющего личность">
-                        </div>
-                    </div>
-                    <div class="form-group col-md-6 col-lg-4">
-                        <label for="Person_Snils">СНИЛС</label>
-                        <input type="text" id="Person_Snils" name="Person.Snils" class="form-control" title="СНИЛС участника найма" />
-                    </div>
-                    <div class="col-md-12">
-                        <h5>Адрес регистрации</h5>
-                        <hr />
-                    </div>
-                    <div class="form-group col-md-6 col-lg-6">
-                        <label for="Person_IdRegStreet">Улица</label>
-                        <select class="selectpicker form-control" data-actions-box="true" id="Person_IdRegStreet" name="Person.IdRegStreet" title="Улица регистрации" asp-items="@(new SelectList(Model.Streets, "IdStreet", "StreetName"))"></select>
-                    </div>
-                    <div class="form-group col-sm-4 col-md-6 col-lg-2">
-                        <label for="Person_RegHouse">Дом</label>
-                        <input type="text" id="Person_RegHouse" name="Person.RegHouse" class="form-control" title="Дом регистрации" />
-                    </div>
-                    <div class="form-group col-sm-4 col-md-6 col-lg-2">
-                        <label for="Person_RegPremise">Квартира</label>
-                        <input type="text" id="Person_RegPremise" name="Person.RegPremise" class="form-control" title="Квартира регистрации" />
-                    </div>
-                    <div class="form-group col-sm-4 col-md-6 col-lg-2">
-                        <label for="Person_RegSubPremise">Комната</label>
-                        <input type="text" id="Person_RegSubPremise" name="Person.RegSubPremise" class="form-control" title="Комната регистрации" />
-                    </div>
-                    <div class="col-md-12">
-                        <h5>Адрес проживания</h5>
-                        <hr />
-                    </div>
-                    <div class="form-group col-md-6 col-lg-6">
-                        <label for="Person_IdLivingStreet">Улица</label>
-                        <select class="selectpicker form-control" data-actions-box="true" id="Person_IdLivingStreet" name="Person.IdLivingStreet" title="Улица проживания" asp-items="@(new SelectList(Model.Streets, "IdStreet", "StreetName"))"></select>
-                    </div>
-                    <div class="form-group col-sm-4 col-md-6 col-lg-2">
-                        <label for="Person_LivingHouse">Дом</label>
-                        <input type="text" id="Person_LivingHouse" name="Person.LivingHouse" class="form-control" title="Дом проживания" />
-                    </div>
-                    <div class="form-group col-sm-4 col-md-6 col-lg-2">
-                        <label for="Person_LivingPremise">Квартира</label>
-                        <input type="text" id="Person_LivingPremise" name="Person.LivingPremise" class="form-control" title="Квартира проживания" />
-                    </div>
-                    <div class="form-group col-sm-4 col-md-6 col-lg-2">
-                        <label for="Person_LivingSubPremise">Комната</label>
-                        <input type="text" id="Person_LivingSubPremise" name="Person.LivingSubPremise" class="form-control" title="Комната проживания" />
-                    </div>
-
-                </div>
-            </div>
-            <div class="modal-footer">
-                @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-                {
-                    <button id="insertPersonModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Добавить</button>
-                    <button id="cancelPersonModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
-                }
-                @if (ViewBag.Action == "Details")
-                {
-                    <button id="closePersonModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                }
-            </div>
-        </div>
-    </div>
-</div>
-
 
 @section Scripts {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>

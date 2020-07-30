@@ -1,0 +1,83 @@
+﻿@using RegistryWeb.Models.Entities
+@model TenancyPerson
+
+@{
+    var id = Guid.NewGuid();
+}
+
+<li class="list-group-item">
+    <input type="hidden" asp-for="IdPerson" id="IdPerson_@id" name="IdPerson_@id" />
+    <input type="hidden" asp-for="PersonalAccount" id="PersonalAccount_@id" name="PersonalAccount_@id"/>
+    <input type="hidden" asp-for="IncludeDate" id="IncludeDate_@id" name="IncludeDate_@id"
+           value="@(Model.IncludeDate.HasValue ? Model.IncludeDate.Value.ToString("yyyy-MM-dd") : "")" />
+    <input type="hidden" asp-for="ExcludeDate" id="ExcludeDate_@id" name="ExcludeDate_@id"
+           value="@(Model.ExcludeDate.HasValue ? Model.ExcludeDate.Value.ToString("yyyy-MM-dd") : "")" />
+    <input type="hidden" asp-for="IdDocumentType" id="IdDocumentType_@id" name="IdDocumentType_@id"/>
+    <input type="hidden" asp-for="DocumentSeria" id="DocumentSeria_@id" name="DocumentSeria_@id" />
+    <input type="hidden" asp-for="DocumentNum" id="DocumentNum_@id" name="DocumentNum_@id" />
+    <input type="hidden" asp-for="IdDocumentIssuedBy" id="IdDocumentIssuedBy_@id" name="IdDocumentIssuedBy_@id" />
+    <input type="hidden" asp-for="DateOfDocumentIssue" id="DateOfDocumentIssue_@id" name="DateOfDocumentIssue_@id"
+           value="@(Model.DateOfDocumentIssue.HasValue ? Model.DateOfDocumentIssue.Value.ToString("yyyy-MM-dd") : "")" />
+    <input type="hidden" asp-for="Snils" id="Snils_@id" name="Snils_@id" />
+    <input type="hidden" asp-for="RegistrationIdStreet" id="RegistrationIdStreet_@id" name="RegistrationIdStreet_@id" />
+    <input type="hidden" asp-for="RegistrationHouse" id="RegistrationHouse_@id" name="RegistrationHouse_@id" />
+    <input type="hidden" asp-for="RegistrationFlat" id="RegistrationFlat_@id" name="RegistrationFlat_@id" />
+    <input type="hidden" asp-for="RegistrationRoom" id="RegistrationRoom_@id" name="RegistrationRoom_@id" />
+    <input type="hidden" asp-for="ResidenceIdStreet" id="ResidenceIdStreet_@id" name="ResidenceIdStreet_@id" />
+    <input type="hidden" asp-for="ResidenceHouse" id="ResidenceHouse_@id" name="ResidenceHouse_@id" />
+    <input type="hidden" asp-for="ResidenceFlat" id="ResidenceFlat_@id" name="ResidenceFlat_@id" />
+    <input type="hidden" asp-for="ResidenceRoom" id="ResidenceRoom_@id" name="ResidenceRoom_@id" />
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label>Фамилия</label>
+            <input type="text" class="form-control @(Model.ExcludeDate != null ? "text-danger" : "")" disabled asp-for="Surname" id="Surname_@id" name="Surname_@id" title="Фамилия">
+        </div>
+        <div class="form-group col-md-4">
+            <label>Имя</label>
+            <input type="text" class="form-control @(Model.ExcludeDate != null ? "text-danger" : "")" disabled asp-for="Name" id="Name_@id" name="Name_@id" title="Имя">
+        </div>
+        <div class="form-group col-md-4">
+            <label>Отчество</label>
+            <input type="text" class="form-control @(Model.ExcludeDate != null ? "text-danger" : "")" disabled asp-for="Patronymic" id="Patronymic_@id" name="Patronymic_@id" title="Отчество">
+        </div>
+        <div class="form-group col-md-4">
+            <label>Дата рождения</label>
+            <input type="date" class="form-control" disabled asp-for="DateOfBirth"
+                   value="@(Model.DateOfBirth.HasValue ? Model.DateOfBirth.Value.ToString("yyyy-MM-dd") : "")"
+                   name="DateOfBirth_@id" title="Дата рождения">
+        </div>
+        <div class="form-group col-9 col-md-6">
+            <label>Родственное отношение</label>
+            <select class="selectpicker form-control" disabled asp-for="IdKinship" asp-items="@(new SelectList(ViewBag.Kinships, "IdKinship", "KinshipName"))" id="IdKinship_@id" name="IdKinship_@id" title="Родственные отношения">
+                <option></option>
+            </select>
+        </div>
+
+        @if (ViewBag.Action == "Edit")
+        {
+            <div class="text-right col-3 col-md-2 rr-tenancy-person-edit-buttons">
+                <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                    <a class="btn btn-primary tenancy-person-edit-btn" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                    <a class="btn btn-danger tenancy-person-delete-btn" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                </div>
+            </div>
+        }
+        @if (ViewBag.Action == "Create")
+        {
+            <a class="tenancy-person-edit-btn" style="display: none"></a>
+            <div class="text-right col-3 col-md-2 rr-tenancy-person-edit-buttons">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger tenancy-person-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
+                </div>
+            </div>
+        }
+        @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+        {
+            <div class="text-right col-3 col-md-2 rr-tenancy-person-view-buttons">
+                <a class="btn btn-primary tenancy-person-open-btn" href="#" title="Открыть дополнительную информацию об участнике найма" aria-label="Открыть дополнительную информацию об участнике найма">
+                    <span class="oi oi-eye"></span>
+                </a>
+            </div>
+        }
+    </div>
+</li>
