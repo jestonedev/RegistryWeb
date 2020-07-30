@@ -19,6 +19,7 @@ $(function () {
         var modal = $("#personModal");
         var fields = tenancyPersonElem.find("input, select, textarea");
         var modalFields = modal.find("input, select, textarea");
+        modalFields.prop("disabled", "");
         fields.each(function (idx, elem) {
             var name = $(elem).attr("name").split("_")[0];
             modal.find("[name='Person." + name + "']").val($(elem).val());
@@ -157,10 +158,45 @@ $(function () {
         return code > 0;
     }
 
+    function tenancyPersonsCustomValidations(form, validator) {
+        var isValid = true;
+
+        var idKinshipElem = form.find("#Person_IdKinship");
+        var excludeDateElem = form.find("#Person_ExcludeDate");
+        if (idKinshipElem.val() === "1" && excludeDateElem.val() === "") {
+            var tenantAlreadyExists = false;
+            var persons = $('#TenancyProcessPersons .list-group-item');
+            persons.each(function (idx, elem) {
+                if ($(elem).attr("data-processing") === "edit") return;
+                var personIdKinship = $(elem).find("[id^='IdKinship']").val();
+                var personExcludeDate = $(elem).find("[id^='ExcludeDate']").val();
+                if (personIdKinship === "1" && personExcludeDate === "") {
+                    tenantAlreadyExists = true;
+                }
+            });
+            if (tenantAlreadyExists) {
+                error = {};
+                error[idKinshipElem.attr("name")] = "Для добавления нового нанимателя необходимо исключить или удалить предыдущего";
+                validator.showErrors(error);
+                isValid = false;
+            } else {
+                clearValidationError(idKinshipElem);
+                removeErrorFromValidator(validator, idKinshipElem);
+            }
+        }
+
+        return isValid;
+    }
+
     $("#personModal").on("click", "#savePersonModalBtn", function (e) {
         let action = $('#TenancyProcessPersons').data('action');
         var form = $("#TenancyProcessPersonsModalForm");
+        var validator = form.validate();
         var isValid = form.valid();
+        if (!tenancyPersonsCustomValidations(form, validator)) {
+            isValid = false;
+        }
+
         if (isValid) {
             if (isCustomDocumentIssuedBy) {
                 if (!addCustomDocumentIssuedBy())

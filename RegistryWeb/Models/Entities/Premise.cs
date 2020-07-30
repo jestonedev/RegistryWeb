@@ -32,26 +32,26 @@ namespace RegistryWeb.Models.Entities
         public int IdPremisesDoorKeys { get; set; }
         [Required(ErrorMessage = "Укажите номер помещения")]
         public string PremisesNum { get; set; }
-        [Required(ErrorMessage = "Укажите этаж")]
+        [Required(ErrorMessage = "Укажите этаж", AllowEmptyStrings = false)]
         [Range(0, Double.MaxValue, ErrorMessage = "Этаж не может быть меньше нуля")]
         public short Floor { get; set; }
-        [Required(ErrorMessage = "Укажите количество комнат")]
+        [Required(ErrorMessage = "Укажите количество комнат", AllowEmptyStrings = false)]
         [Range(-1, Double.MaxValue, ErrorMessage = "Количество комнат не может быть меньше нуля")]
         public short NumRooms { get; set; }
-        [Required(ErrorMessage = "Укажите количество койко-мест")]
+        [Required(ErrorMessage = "Укажите количество койко-мест", AllowEmptyStrings = false)]
         [Range(-1, Double.MaxValue, ErrorMessage = "Количество койко-мест не может быть меньше нуля")]
         public short NumBeds { get; set; }
-        [Required(ErrorMessage = "Укажите общую площадь")]
+        [Required(ErrorMessage = "Укажите общую площадь", AllowEmptyStrings = false)]
         public double TotalArea { get; set; }
-        [Required(ErrorMessage = "Укажите жилую площадь")]
+        [Required(ErrorMessage = "Укажите жилую площадь", AllowEmptyStrings = false)]
         public double LivingArea { get; set; }
-        [Required(ErrorMessage = "Укажите высоту помещения")]
+        [Required(ErrorMessage = "Укажите высоту помещения", AllowEmptyStrings = false)]
         public double Height { get; set; }
         public string CadastralNum { get; set; }
-        [Required(ErrorMessage = "Укажите кадастровую стоимость")]
+        [Required(ErrorMessage = "Укажите кадастровую стоимость", AllowEmptyStrings = false)]
         [Range(0, Double.MaxValue, ErrorMessage = "Кадастровая стоимость должна быть больше нуля")]
         public decimal CadastralCost { get; set; }
-        [Required(ErrorMessage = "Укажите балансовую стоимость")]
+        [Required(ErrorMessage = "Укажите балансовую стоимость", AllowEmptyStrings = false)]
         [Range(-1, Double.MaxValue, ErrorMessage = "Балансовая стоимость должна быть больше нуля")]
         public decimal BalanceCost { get; set; }
         public string Description { get; set; }

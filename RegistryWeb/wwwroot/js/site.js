@@ -5,6 +5,9 @@
         },
         range: function (value, element, param) {
             return this.optional(element) || (Number(value.replace(",", ".")) >= param[0] && Number(value.replace(",", ".")) <= param[1]);
+        },
+        required: function (b, c, d) {
+            return $.trim(b).length > 0;
         }
     });
     $(document).ready(function () {
@@ -16,6 +19,7 @@
         form.validate();
     });
 }
+
 //Формат вызова:
 //$('1').on('click', 2, elementToogle);
 //  1 - элемент по которому щелкают (стрелочка)
@@ -121,4 +125,19 @@ function fixBootstrapSelectHighlightOnChange(select) {
 
         select.closest("form").find("button[data-id='" + id + "']").removeClass("input-validation-error");
     }
+}
+
+function clearValidationError(elem) {
+    var spanError = $("span[data-valmsg-for='" + elem.attr("name") + "']");
+    spanError.empty().removeClass("field-validation-error").addClass("field-validation-valid");
+    elem.removeClass("input-validation-error");
+}
+
+function removeErrorFromValidator(validator, elem) {
+    validator.errorList = $(validator.errorList)
+        .filter(function (idx, error) {
+            return $(error.element).prop("name") !== elem.attr("name");
+        });
+
+    delete validator.errorMap[elem.attr("name")];
 }

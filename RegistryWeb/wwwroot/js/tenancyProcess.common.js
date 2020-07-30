@@ -53,21 +53,6 @@ $(function () {
 
     $("#TenancyProcess_IdRentType").change();
 
-    function tenancyClearValidationError(elem) {
-        var spanError = $("span[data-valmsg-for='" + elem.attr("name") + "']");
-        spanError.empty().removeClass("field-validation-error").addClass("field-validation-valid");
-        elem.removeClass("input-validation-error");
-    }
-
-    function removeErrorFromValidator(validator, elem) {
-        validator.errorList = $(validator.errorList)
-            .filter(function (idx, error) {
-                return $(error.element).prop("name") !== elem.attr("name");
-            });
-
-        delete validator.errorMap[elem.attr("name")];
-    }
-
     function tenancyCustomValidations(validator) {
         var isValid = true;
 
@@ -82,7 +67,7 @@ $(function () {
             validator.showErrors(error);
             isValid = false;
         } else {
-            tenancyClearValidationError(regNum);
+            clearValidationError(regNum);
             removeErrorFromValidator(validator, regNum);
         }
         if (regDate.val() === "" && $.trim(regNum.val()) !== "") {
@@ -91,7 +76,7 @@ $(function () {
             validator.showErrors(error);
             isValid = false;
         } else {
-            tenancyClearValidationError(regDate);
+            clearValidationError(regDate);
             removeErrorFromValidator(validator, regDate);
         }
         
@@ -106,7 +91,7 @@ $(function () {
             validator.showErrors(error);
             isValid = false;
         } else {
-            tenancyClearValidationError(subTenancyNum);
+            clearValidationError(subTenancyNum);
             removeErrorFromValidator(validator, subTenancyNum);
         }
         if (subTenancyDate.val() === "" && $.trim(subTenancyNum.val()) !== "") {
@@ -115,7 +100,7 @@ $(function () {
             validator.showErrors(error);
             isValid = false;
         } else {
-            tenancyClearValidationError(subTenancyDate);
+            clearValidationError(subTenancyDate);
             removeErrorFromValidator(validator, subTenancyDate);
         }
         return isValid;

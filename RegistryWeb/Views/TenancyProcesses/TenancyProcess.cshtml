@@ -20,6 +20,12 @@
     ViewData["Streets"] = Model.Streets;
 }
 
+@section validation
+    {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+}
+
 @section styles {
     <link href="~/lib/bootstrap4-toggle/css/bootstrap4-toggle.min.css" rel="stylesheet">
     <link rel="stylesheet" href="~/css/tenancy.processes.css" runat="server" />
@@ -42,9 +48,9 @@
                             </button>
                             <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@Model.TenancyProcess.IdProcess">
                                 <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
-                                    asp-controller="TenancyProcesses" asp-action="Edit" asp-route-idProcess="@Model.TenancyProcess.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                   asp-controller="TenancyProcesses" asp-action="Edit" asp-route-idProcess="@Model.TenancyProcess.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                 <a class="btn btn-danger oi oi-x @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" title="Удалить" aria-label="Удалить"
-                                    asp-controller="TenancyProcesses" asp-action="Delete" asp-route-idProcess="@Model.TenancyProcess.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                   asp-controller="TenancyProcesses" asp-action="Delete" asp-route-idProcess="@Model.TenancyProcess.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                             </div>
                         </div>
                     }
@@ -374,7 +380,7 @@
                                                        asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                                 }
                                                 else
-                                             if (Model.RentObjects[i].Address.AddressType == AddressTypes.Premise)
+                                            if (Model.RentObjects[i].Address.AddressType == AddressTypes.Premise)
                                                 {
                                                     <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
                                                        asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.RentObjects[i].Address.Id" asp-route-action="Details"
@@ -450,8 +456,6 @@
 </div>
 
 @section Scripts {
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/js/address.common.js" asp-append-version="true"></script>
     <script src="~/js/tenancyProcess.common.js" asp-append-version="true"></script>
     <script src="~/lib/bootstrap4-toggle/js/bootstrap4-toggle.min.js"></script>
