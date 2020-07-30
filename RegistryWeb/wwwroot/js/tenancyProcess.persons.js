@@ -91,6 +91,8 @@ $(function () {
         var tenancyPersonElem = $('#TenancyProcessPersons .list-group-item[data-processing]');
         tenancyPersonElem.removeAttr("data-processing");
         addingTenancyPersonElem = undefined;
+
+        $("#cancelDocumentIssudeByBtn").click();
     });
 
     function updateInsertTenancyPersonElem() {
@@ -116,13 +118,56 @@ $(function () {
         }
     }
 
+    function addCustomDocumentIssuedBy() {
+        let personDocumentIssuedByElem = $("#Person_IdDocumentIssuedBy");
+        let customDocumentIssuedBy = $("#CustomDocumentIssuedBy").val();
+        if (!$("#CustomDocumentIssuedBy").valid()) return false;
+        let code = 0;
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/TenancyPersons/AddDocumentIssuedBy',
+            data: { documentIssuedByName: customDocumentIssuedBy },
+            async: false,
+            success: function (id) {
+                code = id;
+                if (id > 0) {
+                    personDocumentIssuedByElem.append("<option value='" + id + "'>" + customDocumentIssuedBy + "</option>");
+                    $("#cancelDocumentIssudeByBtn").click();
+                    personDocumentIssuedByElem.val(id).selectpicker("refresh");
+                } else
+                    if (id === -3) {
+                        $("#cancelDocumentIssudeByBtn").click();
+                        var duplicateOption = personDocumentIssuedByElem.find("option").filter(function (idx, elem) {
+                            return $(elem).text() === customDocumentIssuedBy;
+                        });
+                        var optionId = 0;
+                        if (duplicateOption.length > 0) {
+                            optionId = duplicateOption.prop("value");
+                        } else {
+                            alert('Произошла ошибка при сохранении органа, выдающего документы, удостоверяющие личность');
+                        }
+                        personDocumentIssuedByElem.val(optionId).selectpicker("refresh");
+                        code = optionId;
+                    } else {
+                        alert('Произошла ошибка при сохранении органа, выдающего документы, удостоверяющие личность');
+                        return false;
+                    }
+            }
+        });
+        return code > 0;
+    }
+
     $("#personModal").on("click", "#savePersonModalBtn", function (e) {
         let action = $('#TenancyProcessPersons').data('action');
         var form = $("#TenancyProcessPersonsModalForm");
         var isValid = form.valid();
         if (isValid) {
+            if (isCustomDocumentIssuedBy) {
+                if (!addCustomDocumentIssuedBy())
+                    return;
+            }
             tenancyPersonCorrectSnp(form);
-            if (action == "Create") {
+            if (action === "Create") {
                 updateInsertTenancyPersonElem();
                 return;
             }
@@ -221,6 +266,29 @@ $(function () {
         tenancyPersonFillModal(tenancyPersonElem, action);
         var modal = $("#personModal");
         modal.modal('show');
+        e.preventDefault();
+    });
+
+    var isCustomDocumentIssuedBy = false;
+
+    $("#addDocumentIssudeByBtn").on('click', function (e) {
+        $("#addDocumentIssudeByBtn").hide();
+        $("#cancelDocumentIssudeByBtn").show();
+        $("#CustomDocumentIssuedBy").show();
+        $("#Person_IdDocumentIssuedBy").closest(".bootstrap-select").hide();
+        isCustomDocumentIssuedBy = true;
+        e.preventDefault();
+    });
+
+    $("#cancelDocumentIssudeByBtn").on('click', function (e) {
+        $("#addDocumentIssudeByBtn").show();
+        $("#cancelDocumentIssudeByBtn").hide();
+        $("#CustomDocumentIssuedBy").val("").hide();
+        $("#Person_IdDocumentIssuedBy").closest(".bootstrap-select").show();
+        isCustomDocumentIssuedBy = false;
+        var customDocumentIssuedBy = $("#CustomDocumentIssuedBy").closest(".form-group");
+        customDocumentIssuedBy.find(".input-validation-error").removeClass("input-validation-error").addClass("valid");
+        customDocumentIssuedBy.find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid").text("");
         e.preventDefault();
     });
 

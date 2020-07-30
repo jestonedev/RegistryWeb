@@ -108,7 +108,21 @@
                         </div>
                         <div class="form-group col-md-6 col-lg-4">
                             <label for="Person_IdDocumentIssuedBy">Кем выдан</label>
-                            <select class="selectpicker form-control" data-live-search="true" id="Person_IdDocumentIssuedBy" name="Person.IdDocumentIssuedBy" title="Кем выдан документ, удостоверяющий личность" asp-items="@(new SelectList(ViewBag.DocumentIssuedBy, "IdDocumentIssuedBy", "DocumentIssuedByName"))"></select>
+                            @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                            {
+                                <button id="addDocumentIssudeByBtn" class="btn pt-0 pb-0 pl-1 pr-1 text-success" title="Добавить новый орган, выдающий документы, удостоверяющие личность">
+                                    <span class="oi oi-plus"></span>
+                                </button>
+                                <button id="cancelDocumentIssudeByBtn" style="display: none" class="btn pt-0 pb-0 pl-1 pr-1 text-danger" title="Отменить добавление">
+                                    <span class="oi oi-ban"></span>
+                                </button>
+                                <input type="text" style="display: none" class="form-control" id="CustomDocumentIssuedBy" name="CustomDocumentIssuedBy" 
+                                       placeholder="Наименование органа" title="Наименование органа" data-val="true" data-val-required="Укажите наименование органа">
+                                <span class="text-danger field-validation-valid" data-valmsg-for="CustomDocumentIssuedBy" data-valmsg-replace="true"></span>
+                            }
+                            <select class="selectpicker form-control" data-live-search="true" id="Person_IdDocumentIssuedBy" name="Person.IdDocumentIssuedBy" title="Кем выдан документ, удостоверяющий личность" asp-items="@(new SelectList(ViewBag.DocumentIssuedBy, "IdDocumentIssuedBy", "DocumentIssuedByName"))">
+                                <option></option>
+                            </select>
                         </div>
                         <div class="form-group col-md-6 col-lg-4">
                             <label for="Person_DateOfDocumentIssue">Дата выдачи</label>
@@ -126,7 +140,9 @@
                         </div>
                         <div class="form-group col-md-6 col-lg-6">
                             <label for="Person_RegistrationIdStreet">Улица</label>
-                            <select class="selectpicker form-control" data-live-search="true" id="Person_RegistrationIdStreet" name="Person.RegistrationIdStreet" title="Улица регистрации" asp-items="@(new SelectList(ViewBag.Streets, "IdStreet", "StreetName"))"></select>
+                            <select class="selectpicker form-control" data-live-search="true" id="Person_RegistrationIdStreet" name="Person.RegistrationIdStreet" title="Улица регистрации" asp-items="@(new SelectList(ViewBag.Streets, "IdStreet", "StreetName"))">
+                                <option></option>
+                            </select>
                         </div>
                         <div class="form-group col-sm-4 col-md-6 col-lg-2">
                             <label for="Person_RegistrationHouse">Дом</label>
@@ -146,7 +162,9 @@
                         </div>
                         <div class="form-group col-md-6 col-lg-6">
                             <label for="Person_ResidenceIdStreet">Улица</label>
-                            <select class="selectpicker form-control" data-live-search="true" id="Person_ResidenceIdStreet" name="Person.ResidenceIdStreet" title="Улица проживания" asp-items="@(new SelectList(ViewBag.Streets, "IdStreet", "StreetName"))"></select>
+                            <select class="selectpicker form-control" data-live-search="true" id="Person_ResidenceIdStreet" name="Person.ResidenceIdStreet" title="Улица проживания" asp-items="@(new SelectList(ViewBag.Streets, "IdStreet", "StreetName"))">
+                                <option></option>
+                            </select>
                         </div>
                         <div class="form-group col-sm-4 col-md-6 col-lg-2">
                             <label for="Person_ResidenceHouse">Дом</label>

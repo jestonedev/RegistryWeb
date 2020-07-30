@@ -70,5 +70,22 @@ namespace RegistryWeb.Controllers.ServiceControllers
             registryContext.SaveChanges();
             return Json(new { person.IdPerson });
         }
+
+        public IActionResult AddDocumentIssuedBy(string documentIssuedByName)
+        {
+            if (string.IsNullOrEmpty(documentIssuedByName))
+                return Json(-1);
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+            var duplicates = registryContext.DocumentsIssuedBy.FirstOrDefault(r => r.DocumentIssuedByName == documentIssuedByName);
+            if (duplicates != null)
+            {
+                return Json(-3);
+            }
+            var documentIssuedBy = new DocumentIssuedBy { DocumentIssuedByName = documentIssuedByName };
+            registryContext.DocumentsIssuedBy.Add(documentIssuedBy);
+            registryContext.SaveChanges();
+            return Json(documentIssuedBy.IdDocumentIssuedBy);
+        }
     }
 }
