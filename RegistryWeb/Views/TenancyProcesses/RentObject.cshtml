@@ -36,7 +36,7 @@
     <input type="hidden" value="@Model.Address.AddressType" name="AddressTypePrev_@id" />
     <input type="hidden" value="@Model.RentArea" name="RentAreaPrev_@id" />
     <div class="form-row">
-        <div class="form-group col-12 @(edit ? "col-md-10" : "col-lg-4")">
+        <div class="form-group col-12 col-lg-4">
             <label>Улица</label>
             <select class="selectpicker form-control" data-live-search="true" disabled
                     id="IdStreet_@id" name="IdStreet_@id" title="Улица" data-val="true" data-val-required="Выберите улицу">
@@ -55,35 +55,33 @@
             </select>
             <span class="text-danger field-validation-valid" data-valmsg-for="IdStreet_@id" data-valmsg-replace="true"></span>
         </div>
-        @if (!edit)
-        {
-            <div class="form-group col-4 col-md-3 col-lg-2">
-                <label>Дом</label>
-                <select class="selectpicker form-control" data-live-search="true" disabled
-                        id="IdBuilding_@id" name="IdBuilding_@id" title="Дом" data-val="true" data-val-required="Выберите дом">
-                    <option></option>
-                </select>
-                <span class="text-danger field-validation-valid" data-valmsg-for="IdBuilding_@id" data-valmsg-replace="true"></span>
-            </div>
-            <div class="form-group col-4 col-md-3 col-lg-2">
-                <label>Помещение</label>
-                <select class="selectpicker form-control" data-live-search="true" disabled
-                        id="IdPremises_@id" name="IdPremises_@id" title="Помещение">
-                    <option></option>
-                </select>
-            </div>
-            <div class="form-group col-4 col-md-3 col-lg-2">
-                <label>Комната</label>
-                <select class="selectpicker form-control" data-live-search="true" disabled
-                        id="IdSubPremises_@id" name="IdSubPremises_@id" title="Комната">
-                    <option></option>
-                </select>
-            </div>
-        }
+        <div class="form-group col-4 col-lg-2">
+            <label>Дом</label>
+            <select class="selectpicker form-control" data-live-search="true" disabled
+                    id="IdBuilding_@id" name="IdBuilding_@id" title="Дом" data-val="true" data-val-required="Выберите дом">
+                <option></option>
+            </select>
+            <span class="text-danger field-validation-valid" data-valmsg-for="IdBuilding_@id" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group col-4 col-lg-2">
+            <label>Помещение</label>
+            <select class="selectpicker form-control" data-live-search="true" disabled
+                    id="IdPremises_@id" name="IdPremises_@id" title="Помещение">
+                <option></option>
+            </select>
+        </div>
+        <div class="form-group col-4 col-lg-2">
+            <label>Комната</label>
+            <select class="selectpicker form-control" data-live-search="true" disabled
+                    id="IdSubPremises_@id" name="IdSubPremises_@id" title="Комната">
+                <option></option>
+            </select>
+        </div>
+        
 
         @if (ViewBag.Action == "Edit")
         {
-            <div class="text-md-right text-center col-md-2 rr-tenancy-rent-objects-edit-buttons d-none d-md-block">
+            <div class="text-md-right text-center col-md-2 rr-tenancy-rent-objects-edit-buttons d-none d-lg-block">
                 <div class="btn-group yes-no-panel" role="group" style="display: none" aria-label="Панель подтверждения">
                     <a class="btn btn-danger tenancy-rent-object-cancel-btn" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
                     <a class="btn btn-success tenancy-rent-object-save-btn" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
@@ -97,7 +95,7 @@
         @if (ViewBag.Action == "Create")
         {
             <a class="tenancy-rent-object-edit-btn" style="display: none"></a>
-            <div class="text-md-right text-center col-md-2 rr-tenancy-rent-objects-edit-buttons d-none d-md-block">
+            <div class="text-md-right text-center col-md-2 rr-tenancy-rent-objects-edit-buttons d-none d-lg-block">
                 <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
                     <a class="btn btn-danger tenancy-rent-object-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
                 </div>
@@ -105,7 +103,7 @@
         }
         @if (!edit)
         {
-            <div class="text-md-right text-center col-md-3 col-lg-2 rr-tenancy-rent-objects-view-buttons d-none d-md-block">
+            <div class="text-md-right text-center col-md-3 col-lg-2 rr-tenancy-rent-objects-view-buttons d-none d-lg-block">
                 @if (Model.Address.AddressType == AddressTypes.Building)
                 {
                     <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
@@ -128,53 +126,25 @@
         }
     </div>
     <div class="form-row">
-        @if (!edit)
-        {
-            <div class="form-group col-4">
-                <label class="rr-tenancy-rent-object-label">Общая площадь</label>
-                <input type="text" class="form-control" asp-for="TotalArea" title="Общая площадь">
-            </div>
-            <div class="form-group col-4">
-                <label class="rr-tenancy-rent-object-label">Жилая площадь</label>
-                <input type="text" class="form-control" asp-for="LivingArea" title="Жилая площадь">
-            </div>
-        }
-        @if (edit)
-        {
-            <div class="form-group col-6 col-md-3">
-                <label>Дом</label>
-                <select class="selectpicker form-control" data-live-search="true" disabled
-                        id="IdBuilding_@id" name="IdBuilding_@id" title="Дом" data-val="true" data-val-required="Выберите дом">
-                    <option></option>
-                </select>
-                <span class="text-danger field-validation-valid" data-valmsg-for="IdBuilding_@id" data-valmsg-replace="true"></span>
-            </div>
-            <div class="form-group col-6 col-md-3">
-                <label>Помещение</label>
-                <select class="selectpicker form-control" data-live-search="true" disabled
-                        id="IdPremises_@id" name="IdPremises_@id" title="Помещение">
-                    <option></option>
-                </select>
-            </div>
-            <div class="form-group col-6 col-md-3">
-                <label>Комната</label>
-                <select class="selectpicker form-control" data-live-search="true" disabled
-                        id="IdSubPremises_@id" name="IdSubPremises_@id" title="Комната">
-                    <option></option>
-                </select>
-            </div>
-        }
-            <div class="form-group @(edit ? "col-6 col-md-3" : "col-4")">
-                <label class="rr-tenancy-rent-object-label">Площадь койко-места</label>
-                <input type="text" disabled class="form-control" asp-for="RentArea" data-val="true" data-val-number="Введите числовое значение"
-                       id="RentArea_@id" name="RentArea_@id" title="Площадь койко-места">
-                <span class="text-danger field-validation-valid" data-valmsg-for="RentArea_@id" data-valmsg-replace="true"></span>
-            </div>
+        <div class="form-group col-4">
+            <label class="rr-tenancy-rent-object-label">Общая площадь</label>
+            <input type="text" disabled class="form-control" asp-for="TotalArea" id="TotalArea_@id" name="TotalArea_@id" title="Общая площадь">
+        </div>
+        <div class="form-group col-4">
+            <label class="rr-tenancy-rent-object-label">Жилая площадь</label>
+            <input type="text" disabled class="form-control" asp-for="LivingArea" id="LivingArea_@id" name="LivingArea_@id" title="Жилая площадь">
+        </div>
+        <div class="form-group col-4">
+            <label class="rr-tenancy-rent-object-label">Площадь койко-места</label>
+            <input type="text" disabled class="form-control" asp-for="RentArea" data-val="true" data-val-number="Введите числовое значение"
+                    id="RentArea_@id" name="RentArea_@id" title="Площадь койко-места">
+            <span class="text-danger field-validation-valid" data-valmsg-for="RentArea_@id" data-valmsg-replace="true"></span>
+        </div>
     </div>
-    <div class="form-row d-block d-md-none">
+    <div class="form-row d-block d-lg-none">
         @if (ViewBag.Action == "Edit")
         {
-            <div class="text-md-right text-center col-md-3 col-lg-2 rr-tenancy-rent-objects-edit-buttons">
+            <div class="text-lg-right text-center col-12 col-lg-2 rr-tenancy-rent-objects-edit-buttons">
                 <div class="btn-group yes-no-panel" role="group" style="display: none" aria-label="Панель подтверждения">
                     <a class="btn btn-danger tenancy-rent-object-cancel-btn" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
                     <a class="btn btn-success tenancy-rent-object-save-btn" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
@@ -188,7 +158,7 @@
         @if (ViewBag.Action == "Create")
         {
             <a class="tenancy-rent-objects-edit-btn" style="display: none"></a>
-            <div class="text-md-right text-center col-md-3 col-lg-2 rr-tenancy-rent-objects-edit-buttons">
+            <div class="text-lg-right text-center col-12 col-lg-2 rr-tenancy-rent-objects-edit-buttons">
                 <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
                     <a class="btn btn-danger tenancy-rent-object-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
                 </div>
@@ -196,7 +166,7 @@
         }
         @if (!edit)
         {
-            <div class="text-md-right text-center col-md-3 col-lg-2 rr-tenancy-rent-objects-view-buttons">
+            <div class="text-lg-right text-center col-12 col-lg-2 rr-tenancy-rent-objects-view-buttons">
                 @if (Model.Address.AddressType == AddressTypes.Building)
                 {
                     <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"

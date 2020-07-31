@@ -1,4 +1,25 @@
-﻿function getTenancyRentHouses() {
+﻿function updateRentObjectAreas(rentObjectElem) {
+    buildingElem = rentObjectElem.find('select[name^="IdBuilding"]');
+    premisesElem = rentObjectElem.find('select[name^="IdPremises"]');
+    subPremisesElem = rentObjectElem.find('select[name^="IdSubPremises"]');
+    var currentOption = null;
+    if (subPremisesElem.val() !== null && subPremisesElem.val() !== "") {
+        currentOption = rentObjectElem.find('select[name^="IdSubPremises"] option[value="' + subPremisesElem.val() + '"]');
+    } else if (premisesElem.val() !== null && premisesElem.val() !== "") {
+        currentOption = rentObjectElem.find('select[name^="IdPremises"] option[value="' + premisesElem.val() + '"]');
+    } else if (buildingElem.val() !== null && buildingElem.val() !== "") {
+        currentOption = rentObjectElem.find('select[name^="IdBuilding"] option[value="' + buildingElem.val() + '"]');
+    }
+    if (currentOption === null) {
+        rentObjectElem.find('input[name^="TotalArea"]').val(0);
+        rentObjectElem.find('input[name^="LivingArea"]').val(0);
+    } else {
+        rentObjectElem.find('input[name^="TotalArea"]').val(currentOption.data("total-area").toString().replace(".", ","));
+        rentObjectElem.find('input[name^="LivingArea"]').val(currentOption.data("living-area").toString().replace(".", ","));
+    }
+}
+
+function getTenancyRentHouses() {
     var idStreet = $(this).val();
     var rentObjectElem = $(this).closest(".list-group-item");
     var buildingToSelect = rentObjectElem.find('select[name^="IdBuilding"]');
@@ -8,12 +29,13 @@
     buildingToSelect.selectpicker('refresh');
     $.getJSON('/TenancyRentObjects/GetHouses', { idStreet: idStreet }, function (buildings) {
         $(buildings).each(function (idx, building) {
-            var option = '<option value="' + building.idBuilding + '">' + building.house + '</option>';
+            var option = '<option data-total-area="' + building.totalArea + '" data-living-area="' + building.livingArea +'" value="' + building.idBuilding + '">' + building.house + '</option>';
             buildingToSelect.append(option);
         });
         buildingToSelect.val(buildingPrevId);
         buildingToSelect.selectpicker('refresh');
         buildingToSelect.change();
+        updateRentObjectAreas(rentObjectElem);
     });
 }
 
@@ -27,12 +49,13 @@ function getTenancyRentPremises() {
     premiseToSelect.selectpicker('refresh');
     $.getJSON('/TenancyRentObjects/GetPremises', { idBuilding: idBuilding }, function (premises) {
         $(premises).each(function (idx, premise) {
-            var option = '<option value="' + premise.idPremises + '">' + premise.premisesNum + '</option>';
+            var option = '<option data-total-area="' + premise.totalArea + '" data-living-area="' + premise.livingArea +'" value="' + premise.idPremises + '">' + premise.premisesNum + '</option>';
             premiseToSelect.append(option);
         });
         premiseToSelect.val(premisePrevId);
         premiseToSelect.selectpicker('refresh');
         premiseToSelect.change();
+        updateRentObjectAreas(rentObjectElem);
     });
 }
 
@@ -46,12 +69,18 @@ function getTenancyRentSubPremises() {
     subPremiseToSelect.selectpicker('refresh');
     $.getJSON('/TenancyRentObjects/GetSubPremises', { idPremise: idPremise }, function (subPremises) {
         $(subPremises).each(function (idx, subPremise) {
-            var option = '<option value="' + subPremise.idSubPremises + '">' + subPremise.subPremisesNum + '</option>';
+            var option = '<option data-total-area="' + subPremise.totalArea + '" data-living-area="' + subPremise.livingArea +'" value="' + subPremise.idSubPremises + '">' + subPremise.subPremisesNum + '</option>';
             subPremiseToSelect.append(option);
         });
         subPremiseToSelect.val(subPremisePrevId);
         subPremiseToSelect.selectpicker('refresh');
+        updateRentObjectAreas(rentObjectElem);
     });
+}
+
+function updateSubPremisesArea() {
+    var rentObjectElem = $(this).closest(".list-group-item");
+    updateRentObjectAreas(rentObjectElem);
 }
 
 function addTenancyRentObject(e) {
@@ -128,7 +157,7 @@ function editTenancyRentObject(e) {
     let fields = tenancyRentObject.find('input, select, textarea');
     let yesNoPanel = tenancyRentObject.find('.yes-no-panel');
     let editDelPanel = tenancyRentObject.find('.edit-del-panel');
-    fields.prop('disabled', false);
+    fields.filter(function (idx, elem) { return !/^(TotalArea|LivingArea)_/.test($(elem).prop("name")); }).prop('disabled', false);
     tenancyRentObject.find("select").selectpicker('refresh');
     editDelPanel.hide();
     yesNoPanel.show();
@@ -144,7 +173,7 @@ function cancelEditTenancyRentObject(e) {
         idStreetElem.val(tenancyRentObjectElem.find("input[name^='IdStreetPrev']").val());
         idStreetElem.selectpicker('refresh');
         idStreetElem.change();
-        $("input[name^='RentArea_']").val($("input[name^='RentAreaPrev_']").val());
+        tenancyRentObjectElem.find("input[name^='RentArea_']").val(tenancyRentObjectElem.find("input[name^='RentAreaPrev_']").val());
 
         showEditDelPanelTenancyRentObject(tenancyRentObjectElem);
         clearValidationsTenancyRentObject(tenancyRentObjectElem);
@@ -238,11 +267,29 @@ function tenancyRentObjectToFormData(rentObject) {
     return formData;
 }
 
+function tenancyRentObjectCustomValidations(tenancyRentObjectElem, validator) {
+    var isValid = true;
+    var totalAreaElem = tenancyRentObjectElem.find("input[name^='TotalArea']");
+    var rentAreaElem = tenancyRentObjectElem.find("input[name^='RentArea_']");
+    if (parseFloat(rentAreaElem.val().replace(",", ".")) > parseFloat(totalAreaElem.val().replace(",", "."))) {
+        error = {};
+        error[rentAreaElem.attr("name")] = "Площадь койко-места не может превышать общую площадь";
+        validator.showErrors(error);
+        isValid = false;
+    }
+
+    return isValid;
+}
+
 function saveTenancyRentObject(e) {
     let tenancyRentObjectElem = $(this).closest(".list-group-item");
     var rentAreaElem = tenancyRentObjectElem.find("input[id^='RentArea_']");
     rentAreaElem.val(rentAreaElem.val().replace('.', ','));
-    if (tenancyRentObjectElem.find("input, textarea, select").valid()) {
+    let isValid = tenancyRentObjectElem.find("input, textarea, select").valid();
+    if (!tenancyRentObjectCustomValidations(tenancyRentObjectElem, $("#TenancyProcessRentObjectsForm").validate())) {
+        isValid = false;
+    }
+    if (isValid) {
         let rentObject = getTenancyRentObject(tenancyRentObjectElem);
         let tenancyRentObject = tenancyRentObjectToFormData(rentObject);
         $.ajax({
@@ -290,5 +337,6 @@ $(function () {
     $('#TenancyProcessRentObjects').on('change', 'select[name^="IdStreet"]', getTenancyRentHouses);
     $('#TenancyProcessRentObjects').on('change', 'select[name^="IdBuilding"]', getTenancyRentPremises);
     $('#TenancyProcessRentObjects').on('change', 'select[name^="IdPremises"]', getTenancyRentSubPremises);
+    $('#TenancyProcessRentObjects').on('change', 'select[name^="IdSubPremises"]', updateSubPremisesArea);
     $('#TenancyProcessRentObjects select[name^="IdStreet"]').change();
 });

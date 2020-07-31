@@ -2,12 +2,6 @@
     margin-top: 0;
 }
 
-@media(min-width: 768px) {
-    .rr-tenancy-rent-objects-edit-buttons, .rr-tenancy-rent-objects-view-buttons {
-        margin-top: 33px;
-    }
-}
-
 @media(min-width: 992px) {
     .rr-tenancy-rent-objects-edit-buttons, .rr-tenancy-rent-objects-view-buttons {
         margin-top: 32px;

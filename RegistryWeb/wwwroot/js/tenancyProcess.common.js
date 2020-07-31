@@ -130,6 +130,12 @@ $(function () {
                 $(elem).val($(elem).val().replace('.', ','));
             });
             isRentObjectsValid = $("#TenancyProcessRentObjectsForm").valid();
+            $("#TenancyProcessRentObjects .list-group-item").each(function (idx, elem) {
+                if ($(elem).hasClass("rr-list-group-item-empty")) return;
+                if (!tenancyRentObjectCustomValidations($(elem), $("#TenancyProcessRentObjectsForm").validate())) {
+                    isRentObjectsValid = false;
+                }
+            });
         }
 
         if (!isFormValid || !isReasonsValid || !isRentObjectsValid) {
