@@ -68,7 +68,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         }
 
         [HttpPost]
-        public IActionResult SaveRentObject(int? idProcess, int? idObject, AddressTypes addressType, int? idObjectPrev, AddressTypes addressTypePrev)
+        public IActionResult SaveRentObject(int? idProcess, int? idObject, double? rentArea, AddressTypes addressType, int? idObjectPrev, AddressTypes addressTypePrev)
         {
             if (idProcess == null || idObject == null)
                 return Json(new { Error = -1 });
@@ -76,6 +76,27 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 return Json(new { Error = -2 });
             if (idObject == idObjectPrev && addressType == addressTypePrev)
             {
+                switch (addressType)
+                {
+                    case AddressTypes.Building:
+                        var tenancyAssocBuilding = registryContext.TenancyBuildingsAssoc.FirstOrDefault(
+                            r => r.IdBuilding == idObjectPrev && r.IdProcess == idProcess);
+                        tenancyAssocBuilding.RentTotalArea = rentArea;
+                        break;
+                    case AddressTypes.Premise:
+                        var tenancyAssocPremises = registryContext.TenancyPremisesAssoc.FirstOrDefault(
+                            r => r.IdPremise == idObjectPrev && r.IdProcess == idProcess);
+                        tenancyAssocPremises.RentTotalArea = rentArea;
+                        break;
+                    case AddressTypes.SubPremise:
+                        var tenancyAssocSubPremises = registryContext.TenancySubPremisesAssoc.FirstOrDefault(
+                            r => r.IdSubPremise == idObjectPrev && r.IdProcess == idProcess);
+                        tenancyAssocSubPremises.RentTotalArea = rentArea;
+                        break;
+                    default:
+                        throw new Exception("Некорректный тип объекта найма");
+                }
+                registryContext.SaveChanges();
                 return Json(new { Error = 0 });
             }
 
@@ -110,21 +131,24 @@ namespace RegistryWeb.Controllers.ServiceControllers
                     var tenancyAssocBuilding = registryContext.TenancyBuildingsAssoc.Add(new TenancyBuildingAssoc
                     {
                         IdProcess = idProcess.Value,
-                        IdBuilding = idObject.Value
+                        IdBuilding = idObject.Value,
+                        RentTotalArea = rentArea
                     });
                     break;
                 case AddressTypes.Premise:
                     var tenancyAssocPremises = registryContext.TenancyPremisesAssoc.Add(new TenancyPremiseAssoc
                     {
                         IdProcess = idProcess.Value,
-                        IdPremise = idObject.Value
+                        IdPremise = idObject.Value,
+                        RentTotalArea = rentArea
                     });
                     break;
                 case AddressTypes.SubPremise:
                     var tenancyAssocSubPremises = registryContext.TenancySubPremisesAssoc.Add(new TenancySubPremiseAssoc
                     {
                         IdProcess = idProcess.Value,
-                        IdSubPremise = idObject.Value
+                        IdSubPremise = idObject.Value,
+                        RentTotalArea = rentArea
                     });
                     break;
                 default:

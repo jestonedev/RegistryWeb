@@ -126,6 +126,9 @@ $(function () {
 
         var isRentObjectsValid = true;
         if (action === "Create") {
+            $("#TenancyProcessRentObjectsForm").find("input[id^='RentArea_']").each(function (idx, elem) {
+                $(elem).val($(elem).val().replace('.', ','));
+            });
             isRentObjectsValid = $("#TenancyProcessRentObjectsForm").valid();
         }
 
@@ -180,6 +183,7 @@ $(function () {
                 let ro = "RentObjects[" + i + "].";
                 $(this).append(inputTemplate.replace('{0}', ro + "Address.AddressType").replace('{1}', tenancyRentObjects[i].AddressType));
                 $(this).append(inputTemplate.replace('{0}', ro + "Address.Id").replace('{1}', tenancyRentObjects[i].IdObject));
+                $(this).append(inputTemplate.replace('{0}', ro + "RentArea").replace('{1}', tenancyRentObjects[i].RentArea));
             }
         }
     });

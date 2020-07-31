@@ -374,19 +374,22 @@ namespace RegistryWeb.DataServices
                         case AddressTypes.Building:
                             tenancyProcess.TenancyBuildingsAssoc.Add(new TenancyBuildingAssoc
                             {
-                                IdBuilding = int.Parse(rentObject.Address.Id)
+                                IdBuilding = int.Parse(rentObject.Address.Id),
+                                RentTotalArea = rentObject.RentArea
                             });
                             break;
                         case AddressTypes.Premise:
                             tenancyProcess.TenancyPremisesAssoc.Add(new TenancyPremiseAssoc
                             {
-                                IdPremise = int.Parse(rentObject.Address.Id)
+                                IdPremise = int.Parse(rentObject.Address.Id),
+                                RentTotalArea = rentObject.RentArea
                             });
                             break;
                         case AddressTypes.SubPremise:
                             tenancyProcess.TenancySubPremisesAssoc.Add(new TenancySubPremiseAssoc
                             {
-                                IdSubPremise = int.Parse(rentObject.Address.Id)
+                                IdSubPremise = int.Parse(rentObject.Address.Id),
+                                RentTotalArea = rentObject.RentArea
                             });
                             break;
                     }

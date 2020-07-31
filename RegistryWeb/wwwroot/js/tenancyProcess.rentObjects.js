@@ -144,6 +144,7 @@ function cancelEditTenancyRentObject(e) {
         idStreetElem.val(tenancyRentObjectElem.find("input[name^='IdStreetPrev']").val());
         idStreetElem.selectpicker('refresh');
         idStreetElem.change();
+        $("input[name^='RentArea_']").val($("input[name^='RentAreaPrev_']").val());
 
         showEditDelPanelTenancyRentObject(tenancyRentObjectElem);
         clearValidationsTenancyRentObject(tenancyRentObjectElem);
@@ -224,7 +225,8 @@ function getTenancyRentObject(tenancyRentObjectElem) {
         IdObject: idObject,
         AddressType: addressType,
         IdObjectPrev: idObjectPrev,
-        AddressTypePrev: addressTypePrev
+        AddressTypePrev: addressTypePrev,
+        RentArea: tenancyRentObjectElem.find("input[id^='RentArea_']").val()
     };
 }
 
@@ -238,6 +240,8 @@ function tenancyRentObjectToFormData(rentObject) {
 
 function saveTenancyRentObject(e) {
     let tenancyRentObjectElem = $(this).closest(".list-group-item");
+    var rentAreaElem = tenancyRentObjectElem.find("input[id^='RentArea_']");
+    rentAreaElem.val(rentAreaElem.val().replace('.', ','));
     if (tenancyRentObjectElem.find("input, textarea, select").valid()) {
         let rentObject = getTenancyRentObject(tenancyRentObjectElem);
         let tenancyRentObject = tenancyRentObjectToFormData(rentObject);
@@ -254,6 +258,7 @@ function saveTenancyRentObject(e) {
                     tenancyRentObjectElem.find("input[name^='IdBuildingPrev']").val(tenancyRentObjectElem.find("select[id^='IdBuilding']").val());
                     tenancyRentObjectElem.find("input[name^='IdPremisesPrev']").val(tenancyRentObjectElem.find("select[id^='IdPremises']").val());
                     tenancyRentObjectElem.find("input[name^='IdSubPremisesPrev']").val(tenancyRentObjectElem.find("select[id^='IdSubPremises']").val());
+                    tenancyRentObjectElem.find("input[name^='RentAreaPrev']").val(rentAreaElem.val());
                     showEditDelPanelTenancyRentObject(tenancyRentObjectElem);
                 } else {
                     alert("Во время сохранения произошла ошибка");
