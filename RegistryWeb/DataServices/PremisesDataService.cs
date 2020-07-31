@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Runtime.CompilerServices;
 using RegistryWeb.DataHelpers;
 using RegistryWeb.SecurityServices;
+using RegistryWeb.Extensions;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.Extensions.Configuration;
@@ -56,7 +57,7 @@ namespace RegistryWeb.DataServices
         public PremisesVM<Premise> GetViewModel(
             OrderOptions orderOptions,            
             PageOptions pageOptions,
-            PremisesListFilter filterOptions)
+            PremisesListFilter filterOptions, out List<int> filteredPremisesIds)
         {
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
             var query = GetQuery();
@@ -64,9 +65,16 @@ namespace RegistryWeb.DataServices
             query = GetQueryFilter(query, viewModel.FilterOptions);
             query = GetQueryOrder(query, viewModel.OrderOptions);
             query = GetQueryIncludes(query);
+
             var count = query.Count();
             viewModel.PageOptions.Rows = count;
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+
+            //filteredPremisesIds = new List<int>();
+            //if (!viewModel.FilterOptions.IsEmpty())
+                filteredPremisesIds = query.Select(p => p.IdPremises).ToList();
+
+
             if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
                 viewModel.PageOptions.CurrentPage = 1;
             viewModel.Premises = GetQueryPage(query, viewModel.PageOptions).ToList();
@@ -724,5 +732,80 @@ namespace RegistryWeb.DataServices
                         select bui;
             return house.ToList();
         }
+
+        public void UpdateRestrictionInPremises(Restriction restriction, List<Premise> premises)
+        {
+            if (premises != null && restriction!=null)
+            {
+                foreach (Premise premise in premises)
+                {
+                    if (restriction.IdRestriction == 0)
+                    {
+                        registryContext.Restrictions.Add(restriction);
+                        //registryContext.SaveChanges();
+                        
+						var rpa = new RestrictionPremiseAssoc()
+						{
+							IdPremises = premise.IdPremises,
+							IdRestriction = restriction.IdRestriction
+						};
+						registryContext.RestrictionPremisesAssoc.Add(rpa);
+						//registryContext.SaveChanges();
+						
+
+                        //return Json(new { restriction.IdRestriction, restriction.FileOriginName });
+                    }
+                }
+            }
+        }
+
+        public void UpdateOwnershipRightInPremises(OwnershipRight ownershipRight, List<Premise> premises)
+        {
+            if (premises != null && ownershipRight!=null)
+            {
+                foreach (Premise premise in premises)
+                {
+                    if (ownershipRight.IdOwnershipRight == 0)
+                    {
+                        registryContext.OwnershipRights.Add(ownershipRight);
+                        //registryContext.SaveChanges();
+                        
+						var opa = new OwnershipPremiseAssoc()
+						{
+							IdPremises = premise.IdPremises,
+                            IdOwnershipRight = ownershipRight.IdOwnershipRight
+                        };
+						registryContext.OwnershipPremisesAssoc.Add(opa);
+						//registryContext.SaveChanges();
+						
+
+                        //return Json(new { restriction.IdRestriction, restriction.FileOriginName });
+                    }
+                }
+            }
+        }
+
+        public void UpdateInfomationInPremises(List<Premise> premises, string Description, DateTime regdate, int StateId)
+        {            
+            foreach (Premise premise in premises)
+            {
+                if (Description != null)
+                {
+                    if (premise.Description == "" || premise.Description == null)
+                        premise.Description = Description;
+                    else premise.Description += ("\n" + Description);
+                }
+
+                if (regdate!=new DateTime())
+                    premise.RegDate=regdate;
+                if (StateId != 0)
+                    premise.IdState=StateId;
+
+                registryContext.Premises.Update(premise);
+            }
+            registryContext.SaveChanges();
+        }
+
+
     }
 }

@@ -103,3 +103,7 @@ input.input-validation-error, button.input-validation-error {
     margin-bottom: 0.24rem;
 }
 
+.addselect{
+    cursor: pointer;
+}
+

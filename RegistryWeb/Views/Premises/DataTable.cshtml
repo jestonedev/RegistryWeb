@@ -37,7 +37,9 @@
 <table class="table table-hover p-table">
     <thead>
         <tr>
-            <th class="r-table-header-cell align-middle"></th>
+            <th class="r-table-header-cell align-middle">                
+                    <input type="checkbox" class="AllPremiseCheckbox" title="Выделить/Снять все на странице" />  <span class="custom-control-indicator"></span>              
+            </th>
             <th class="r-table-header-cell" style="width:155px;">
                 № по рeестру
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "IdPremises")

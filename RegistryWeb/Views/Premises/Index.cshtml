@@ -18,8 +18,10 @@
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
 }
 
-<h2>@ViewData["Title"] @text</h2>
+<div class="col info">
 
+</div>
+<h2>@ViewData["Title"] @text</h2>
 <partial name="Filter" model="@Model">
 <partial name="DataTable" model="@Model">
 <partial name="ReportsModals" model="@Model">
