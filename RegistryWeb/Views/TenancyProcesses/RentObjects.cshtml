@@ -1,0 +1,32 @@
+﻿@using RegistryWeb.Models
+@model IList<TenancyRentObject>
+
+<link rel="stylesheet" href="~/css/tenancy.rent.objects.css" />
+<script src="~/js/tenancyProcess.rentObjects.js"></script>
+
+<form id="TenancyProcessRentObjectsForm">
+    <div class="card rr-rent-objects-card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Нанимаемое жилье</h3>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                    <a href="#" id="rentObjectAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить нанимаемое жилья">&#10010;</a>
+                }
+                <a href="#" data-for="TenancyProcessRentObjects" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель нанимаемого жилья" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush toggle-hide" id="TenancyProcessRentObjects" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
+            <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
+                <i>Нанимаемое жилье отсутствует</i>
+            </li>
+            @if (Model != null && Model.Any())
+            {
+                for (var i = 0; i < Model.Count; i++)
+                {
+                    <partial name="RentObject" model="Model[i]" />
+                }
+            }
+        </ul>
+    </div>
+</form>

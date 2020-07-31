@@ -330,84 +330,11 @@
             </div>
         </div>
 
-        @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
-        {
-            <div class="row">
-                <div class="col-12">
-                    <div class="card rr-tenancy-card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3>Нанимаемое жилье</h3>
-                            <div>
-                                <a href="#" data-for="TenancyProcessAddresses" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель нанимаемого жилья" style="font-weight:bold;">∨</a>
-                            </div>
-                        </div>
-                        <table id="TenancyProcessAddresses" class="table table-bordered card-body toggle-hide">
-                            <thead>
-                                <tr>
-                                    <th>Адрес</th>
-                                    <th>Общая площадь</th>
-                                    <th>Жилая площадь</th>
-                                    <th>Площадь койко-места</th>
-                                    <th style="width: 67px"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.RentObjects != null && Model.RentObjects.Any())
-                                {
-                                    for (var i = 0; i < Model.RentObjects.Count; i++)
-                                    {
-                                        <tr>
-                                            <td style="width: 50%">
-                                                <input type="hidden" asp-for="RentObjects[i].Address.Id">
-                                                <input type="hidden" asp-for="RentObjects[i].Address.AddressType">
-                                                <input type="text" class="form-control" asp-for="RentObjects[i].Address.Text" title="@Model.RentObjects[i].Address.Text">
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control" asp-for="RentObjects[i].TotalArea" title="Общая площадь">
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control" asp-for="RentObjects[i].LivingArea" title="Жилая площадь">
-                                            </td>
-                                            <td>
-
-                                                <input type="text" class="form-control" asp-for="RentObjects[i].RentArea" title="Арендуемая площадь койко-места">
-                                            </td>
-                                            <td>
-                                                @if (Model.RentObjects[i].Address.AddressType == AddressTypes.Building)
-                                                {
-                                                    <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
-                                                       asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@Model.RentObjects[i].Address.Id" asp-route-action="Details"
-                                                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                                }
-                                                else
-                                            if (Model.RentObjects[i].Address.AddressType == AddressTypes.Premise)
-                                                {
-                                                    <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
-                                                       asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.RentObjects[i].Address.Id" asp-route-action="Details"
-                                                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                                }
-                                                else
-                                                {
-                                                    <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
-                                                       asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.RentObjects[i].Address.IdParents[AddressTypes.Premise.ToString()]" asp-route-action="Details"
-                                                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td class="text-center" colspan="5"><i>Нанимаемое жилье отсутствует</i></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <div class="row">
+            <div class="col-12">
+                <partial name="RentObjects" model="Model.RentObjects" />
             </div>
-        }
+        </div>
     </div>
 </div>
 

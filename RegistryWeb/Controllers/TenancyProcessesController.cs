@@ -12,6 +12,7 @@ using RegistryWeb.Extensions;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.Models.Entities;
+using RegistryWeb.Models;
 
 namespace RegistryWeb.Controllers
 {
@@ -79,12 +80,11 @@ namespace RegistryWeb.Controllers
         {
             if (tenancyProcessVM == null || tenancyProcessVM.TenancyProcess == null)
                 return NotFound();
-
             if (!securityService.HasPrivilege(Privileges.TenancyWrite))
                 return View("NotAccess");
             if (ModelState.IsValid)
             {
-                dataService.Create(tenancyProcessVM.TenancyProcess);
+                dataService.Create(tenancyProcessVM.TenancyProcess, tenancyProcessVM.RentObjects);
                 return RedirectToAction("Details", new { tenancyProcessVM.TenancyProcess.IdProcess });
             }
             ViewBag.Action = "Create";
@@ -210,6 +210,23 @@ namespace RegistryWeb.Controllers
             ViewBag.Kinships = dataService.Kinships;
 
             return PartialView("TenancyPerson", person);
+        }
+
+        [HttpPost]
+        public IActionResult AddRentObject(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+
+            var rentObject = new TenancyRentObject { Address = new Address {
+                AddressType = AddressTypes.None
+            } };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+            ViewBag.Streets = dataService.Streets;
+
+            return PartialView("RentObject", rentObject);
         }
     }
 }

@@ -124,7 +124,12 @@ $(function () {
             isReasonsValid = $("#TenancyProcessReasonsForm").valid();
         }
 
-        if (!isFormValid || !isReasonsValid) {
+        var isRentObjectsValid = true;
+        if (action === "Create") {
+            isRentObjectsValid = $("#TenancyProcessRentObjectsForm").valid();
+        }
+
+        if (!isFormValid || !isReasonsValid || !isRentObjectsValid) {
             $("select").each(function (idx, elem) {
                 var id = $(elem).prop("id");
                 var name = $(elem).prop("name");
@@ -168,6 +173,13 @@ $(function () {
                 for (var field in tenancyPersons[i]) {
                     $(this).append(inputTemplate.replace('{0}', tp + field).replace('{1}', tenancyPersons[i][field]));
                 }
+            }
+
+            let tenancyRentObjects = getTenancyRentObjects();
+            for (let i = 0; i < tenancyRentObjects.length; i++) {
+                let ro = "RentObjects[" + i + "].";
+                $(this).append(inputTemplate.replace('{0}', ro + "Address.AddressType").replace('{1}', tenancyRentObjects[i].AddressType));
+                $(this).append(inputTemplate.replace('{0}', ro + "Address.Id").replace('{1}', tenancyRentObjects[i].IdObject));
             }
         }
     });

@@ -54,7 +54,7 @@ function GetRessetleInfoTo(resettleElem, postfix) {
     var subPremisesSelect = resettleElem.find('select[name="ResettleToSubPremises' + postfix+'"]');
     var premisesSelect = resettleElem.find('select[name="ResettleToIdPremise' + postfix +'"]');
     var buildingsSelect = resettleElem.find('select[name="ResettleToIdBuilding' + postfix +'"]');
-    if (subPremisesSelect.val().length !== 0) {
+    if (subPremisesSelect.val() !== null && subPremisesSelect.val().length !== 0) {
         return $(subPremisesSelect.val()).map(function (idx, val) {
             return {
                 ObjectType: 'SubPremise',
@@ -63,14 +63,14 @@ function GetRessetleInfoTo(resettleElem, postfix) {
             };
         });
     }
-    if (premisesSelect.val() !== "") {
+    if (premisesSelect.val() !== "" && premisesSelect.val() !== null) {
         return [{
             ObjectType: 'Premise',
             IdObject: premisesSelect.val(),
             IdResettleInfo: 0
         }];
     }
-    if (buildingsSelect.val() !== "") {
+    if (buildingsSelect.val() !== "" && buildingsSelect.val() !== null) {
         return [{
             ObjectType: 'Building',
             IdObject: buildingsSelect.val(),

@@ -26,7 +26,6 @@
 
 function editTenancyReason(e) {
     let tenancyReason = $(this).closest(".list-group-item");
-    let self = this;
     let fields = tenancyReason.find('input, select, textarea');
     let yesNoPanel = tenancyReason.find('.yes-no-panel');
     let editDelPanel = tenancyReason.find('.edit-del-panel');

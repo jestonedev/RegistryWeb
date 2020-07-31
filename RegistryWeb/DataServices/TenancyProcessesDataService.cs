@@ -151,7 +151,9 @@ namespace RegistryWeb.DataServices
                                     {
                                         AddressType = AddressTypes.Building,
                                         Id = buildingRow.IdBuilding.ToString(),
-                                        IdParents = new Dictionary<string, string>(),
+                                        IdParents = new Dictionary<string, string> {
+                                            { AddressTypes.Street.ToString(), buildingRow.IdStreet }
+                                        },
                                         Text = string.Concat(streetRow.StreetName, ", д.", buildingRow.House)
                                     },
                                     TotalArea = buildingRow.TotalArea,
@@ -180,6 +182,7 @@ namespace RegistryWeb.DataServices
                                        Id = premiseRow.IdPremises.ToString(),
                                        IdParents = new Dictionary<string, string>
                                        {
+                                           { AddressTypes.Street.ToString(), buildingRow.IdStreet },
                                            { AddressTypes.Building.ToString(), buildingRow.IdBuilding.ToString() }
                                        },
                                        Text = string.Concat(streetRow.StreetName, ", д.", buildingRow.House, ", ",
@@ -213,8 +216,9 @@ namespace RegistryWeb.DataServices
                                           Id = subPremiseRow.IdSubPremises.ToString(),
                                           IdParents = new Dictionary<string, string>
                                            {
-                                                { AddressTypes.Building.ToString(), buildingRow.IdBuilding.ToString() },
-                                                { AddressTypes.Premise.ToString(), premiseRow.IdPremises.ToString() }
+                                              { AddressTypes.Street.ToString(), buildingRow.IdStreet },
+                                              { AddressTypes.Building.ToString(), buildingRow.IdBuilding.ToString() },
+                                              { AddressTypes.Premise.ToString(), premiseRow.IdPremises.ToString() }
                                            },
                                           Text = string.Concat(streetRow.StreetName, ", д.", buildingRow.House, ", ",
                                             premiseTypesRow.PremisesTypeShort, premiseRow.PremisesNum, ", к.", subPremiseRow.SubPremisesNum)
@@ -347,7 +351,7 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
-        internal void Create(TenancyProcess tenancyProcess)
+        internal void Create(TenancyProcess tenancyProcess, IList<TenancyRentObject> rentObjects)
         {
             if (tenancyProcess.TenancyReasons != null)
             {
@@ -359,6 +363,33 @@ namespace RegistryWeb.DataServices
                     reason.ReasonPrepared = tenancyReasonType.ReasonTemplate
                         .Replace("@reason_date@", reason.ReasonDate.HasValue ? reason.ReasonDate.Value.ToString("dd.MM.yyyy") : "")
                         .Replace("@reason_number@", reason.ReasonNumber);
+                }
+            }
+            if (rentObjects != null)
+            {
+                foreach (var rentObject in rentObjects)
+                {
+                    switch(rentObject.Address.AddressType)
+                    {
+                        case AddressTypes.Building:
+                            tenancyProcess.TenancyBuildingsAssoc.Add(new TenancyBuildingAssoc
+                            {
+                                IdBuilding = int.Parse(rentObject.Address.Id)
+                            });
+                            break;
+                        case AddressTypes.Premise:
+                            tenancyProcess.TenancyPremisesAssoc.Add(new TenancyPremiseAssoc
+                            {
+                                IdPremise = int.Parse(rentObject.Address.Id)
+                            });
+                            break;
+                        case AddressTypes.SubPremise:
+                            tenancyProcess.TenancySubPremisesAssoc.Add(new TenancySubPremiseAssoc
+                            {
+                                IdSubPremise = int.Parse(rentObject.Address.Id)
+                            });
+                            break;
+                    }
                 }
             }
             registryContext.TenancyProcesses.Add(tenancyProcess);
@@ -735,6 +766,10 @@ namespace RegistryWeb.DataServices
         public IEnumerable<Kinship> Kinships
         {
             get => registryContext.Kinships.AsNoTracking();
+        }
+        public IEnumerable<KladrStreet> Streets
+        {
+            get => registryContext.KladrStreets.AsNoTracking();
         }
     }
 }
