@@ -214,6 +214,21 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        public IActionResult AddTenancyAgreement(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+
+            var agreement = new TenancyAgreement { };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+            ViewBag.Executors = dataService.ActiveExecutors;
+
+            return PartialView("TenancyAgreement", agreement);
+        }
+
+        [HttpPost]
         public IActionResult AddRentObject(string action)
         {
             if (!securityService.HasPrivilege(Privileges.TenancyWrite))

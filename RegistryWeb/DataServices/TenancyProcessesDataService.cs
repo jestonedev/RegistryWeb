@@ -81,9 +81,9 @@ namespace RegistryWeb.DataServices
             };
         }
 
-        internal TenancyProcessVM GetTenancyProcessViewModel(TenancyProcess process)
+        internal TenancyProcessVM GetTenancyProcessViewModel(TenancyProcess process, [CallerMemberName]string action = "")
         {
-            var tenancyProcessVM = CreateTenancyProcessEmptyViewModel();
+            var tenancyProcessVM = CreateTenancyProcessEmptyViewModel(action);
             tenancyProcessVM.TenancyProcess = process;
             tenancyProcessVM.RentObjects = GetRentObjects(new List<TenancyProcess> { process }).SelectMany(r => r.Value).ToList();
             return tenancyProcessVM;
@@ -794,6 +794,12 @@ namespace RegistryWeb.DataServices
         {
             get => registryContext.Kinships.AsNoTracking();
         }
+
+        public IEnumerable<Executor> ActiveExecutors
+        {
+            get => registryContext.Executors.Where(e => !e.IsInactive).AsNoTracking();
+        }
+
         public IEnumerable<KladrStreet> Streets
         {
             get => registryContext.KladrStreets.AsNoTracking();

@@ -18,6 +18,7 @@
     ViewData["DocumentTypes"] = Model.DocumentTypes;
     ViewData["DocumentIssuedBy"] = Model.DocumentIssuedBy;
     ViewData["Streets"] = Model.Streets;
+    ViewData["Executors"] = Model.Executors;
 }
 
 @section validation
@@ -72,7 +73,7 @@
                 }
                 else
                 {
-                    <a class="form-control btn btn-primary" asp-controller="TenancyProcess" asp-action="Index" asp-route-isBack="true">Назад</a>
+                    <a class="form-control btn btn-primary" asp-controller="TenancyProcesses" asp-action="Index" asp-route-isBack="true">Назад</a>
                 }
                 @if (ViewBag.Action == "Create")
                 {
@@ -271,58 +272,11 @@
             </div>
         </div>
 
-        @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
-        {
-            <div class="row">
-                <div class="col-12">
-                    <div class="card rr-tenancy-card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3>Дополнительные соглашения</h3>
-                            <div>
-                                <a href="#" data-for="TenancyProcessAgreements" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель дополнительных соглашений" style="font-weight:bold;">∨</a>
-                            </div>
-                        </div>
-                        <table id="TenancyProcessAgreements" class="table table-bordered card-body toggle-hide">
-                            <thead>
-                                <tr>
-                                    <th>Дата</th>
-                                    <th>Содержание</th>
-                                    <th style="width: 67px"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.TenancyProcess.TenancyAgreements != null && Model.TenancyProcess.TenancyAgreements.Any())
-                                {
-                                    for (var i = 0; i < Model.TenancyProcess.TenancyAgreements.Count; i++)
-                                    {
-                                        <tr class="tenancy-agreement-item">
-                                            <td>
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyAgreements[i].IdAgreement" />
-                                                <input type="hidden" asp-for="TenancyProcess.TenancyAgreements[i].IdExecutor" />
-                                                <input type="date" class="form-control" asp-for="TenancyProcess.TenancyAgreements[i].AgreementDate"
-                                                       value="@(Model.TenancyProcess.TenancyAgreements[i].AgreementDate.HasValue ? Model.TenancyProcess.TenancyAgreements[i].AgreementDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата соглашения">
-                                            </td>
-                                            <td>
-                                                <textarea rows="1" class="form-control tenancy-agreement-content" asp-for="TenancyProcess.TenancyAgreements[i].AgreementContent" title="@Model.TenancyProcess.TenancyAgreements[i].AgreementContent"></textarea>
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-primary oi oi-eye tenancy-agreement-open" href="#" title="Открыть дополнительное соглашение" aria-label="Открыть дополнительное соглашение"></a>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td class="text-center" colspan="3"><i>Дополнительные соглашения отсутствуют</i></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <div class="row">
+            <div class="col-12">
+                <partial name="TenancyAgreements" model="Model.TenancyProcess.TenancyAgreements" />
             </div>
-        }
+        </div>
 
         <div class="row">
             <div class="col-12">
@@ -339,50 +293,6 @@
         <div class="row">
             <div class="col-12">
                 <partial name="AttachmentFiles" model="Model.TenancyProcess.TenancyFiles" />
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade bd-example-modal-xl" id="agreementModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Дополнительное соглашение</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-row">
-                    <div class="form-group col-md-6 col-lg-3">
-                        <label for="Agreement_Date">Дата составления</label>
-                        <div class="input-group date">
-                            <input type="date" id="Agreement_Date" name="Agreement.Date" class="form-control" atitle="Дата составления">
-                        </div>
-                    </div>
-                    <div class="form-group col-md-6 col-lg-9">
-                        <label for="Agreement_IdExecutor">Исполнитель/составитель</label>
-                        <select class="selectpicker form-control" data-actions-box="true" id="Agreement_IdExecutor" name="Agreement.IdExecutor" title="Исполнитель/составитель" asp-items="@(new SelectList(Model.Executors, "IdExecutor", "ExecutorName"))">
-                            <option></option>
-                        </select>
-                    </div>
-                    <div class="form-group col-md-12">
-                        <label for="Agreement_Content">Содержание соглашения</label>
-                        <textarea rows="15" id="Agreement_Content" name="Agreement.Content" class="form-control" title="Содержание дополнительного соглашения"></textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-                {
-                    <button id="insertAgreementModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Добавить</button>
-                    <button id="cancelAgreementModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
-                }
-                @if (ViewBag.Action == "Details")
-                {
-                    <button id="closeAgreementModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                }
             </div>
         </div>
     </div>

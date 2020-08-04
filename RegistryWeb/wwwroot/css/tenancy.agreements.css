@@ -1,0 +1,9 @@
+﻿.rr-tenancy-agreement-edit-buttons, .rr-tenancy-agreement-view-buttons {
+    margin-top: 0;
+}
+
+@media(min-width: 768px) {
+    .rr-tenancy-agreement-edit-buttons, .rr-tenancy-agreement-view-buttons {
+        margin-top: 32px;
+    }
+}

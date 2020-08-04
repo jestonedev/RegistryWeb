@@ -1,0 +1,83 @@
+﻿@using RegistryWeb.Models.Entities
+@model IList<TenancyAgreement>
+
+<link rel="stylesheet" href="~/css/tenancy.agreements.css" />
+<script src="~/js/tenancyProcess.agreements.js"></script>
+<form id="TenancyProcessAgreementsForm">
+    <div class="card rr-tenancy-card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Дополнительные соглашения</h3>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                <a href="#" id="tenancyAgreementAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить соглашение">&#10010;</a>
+                }
+                <a href="#" data-for="TenancyProcessAgreements" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель дополнительных соглашений" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush toggle-hide" id="TenancyProcessAgreements" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
+            <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
+                <i>Дополнительные соглашения отсутствуют</i>
+            </li>
+            @if (Model != null && Model.Any())
+            {
+                for (var i = 0; i < Model.Count; i++)
+                {
+                    <partial name="TenancyAgreement" model="Model[i]" />
+                }
+            }
+        </ul>
+    </div>
+</form>
+
+<form id="TenancyProcessAgreementsModalForm">
+    <div class="modal fade bd-example-modal-xl" id="agreementModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Дополнительное соглашение</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="Agreement_IdAgreement" name="Agreement.IdAgreement" />
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label for="Agreement_AgreementDate">Дата составления</label>
+                            <div class="input-group date">
+                                <input type="date" id="Agreement_AgreementDate" name="Agreement.AgreementDate" class="form-control" title="Дата составления"
+                                       data-val="true" data-val-required="Укажите дату составления соглашения">
+                            </div>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Agreement.AgreementDate" data-valmsg-replace="true"
+                                  </span>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-9">
+                            <label for="Agreement_IdExecutor">Исполнитель/составитель</label>
+                            <select class="selectpicker form-control" data-actions-box="true" id="Agreement_IdExecutor" name="Agreement.IdExecutor" title="Исполнитель/составитель" asp-items="@(new SelectList(ViewBag.Executors, "IdExecutor", "ExecutorName"))"
+                                    data-val="true" data-val-required="Выберите исполнителя">
+                                <option></option>
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Agreement.IdExecutor" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="Agreement_AgreementContent">Содержание соглашения</label>
+                            <textarea rows="15" id="Agreement_AgreementContent" name="Agreement.AgreementContent" class="form-control" title="Содержание дополнительного соглашения"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                    {
+                        <button id="saveAgreementModalBtn" type="button" class="btn btn-secondary">Сохранить</button>
+                        <button id="cancelAgreementModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                    }
+                    @if (ViewBag.Action == "Details")
+                    {
+                        <button id="closeAgreementModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -4,22 +4,6 @@ $(function () {
         $(e).on('click', $('#' + $(e).data("for")), elementToogleHide);
     });
 
-    $('body').on('click', '.tenancy-agreement-open', function (e) {
-        var wrapper = $(this).closest('.tenancy-agreement-item');
-        var idExecutor = wrapper.find('[id$="IdExecutor"]').val();
-        var agreementDate = wrapper.find('[id$="AgreementDate"]').val();
-        var agreementContent = wrapper.find('[id$="AgreementContent"]').val();
-        var modal = $("#agreementModal");
-        modal.find("#Agreement_Date").prop("disabled", "").val(agreementDate).prop("disabled", "disabled");
-        modal.find("select#Agreement_IdExecutor").val(idExecutor).selectpicker('render');
-        modal.find("#Agreement_Content").val(agreementContent);
-        modal.on('hide.bs.modal', function () {
-            modal.find("#Agreement_Content").scrollTop(0);
-        });
-        modal.modal('show');
-        e.preventDefault();
-    });
-
     var idRentTypeCategories = $("#TenancyProcess_IdRentTypeCategory option[value]").clone(true);
 
     $("#TenancyProcess_IdRentType").on("change", function (e) {
@@ -179,8 +163,16 @@ $(function () {
             let tenancyPersons = getTenancyPersons();
             for (let i = 0; i < tenancyPersons.length; i++) {
                 let tp = "TenancyProcess.TenancyPersons[" + i + "].";
-                for (var field in tenancyPersons[i]) {
+                for (let field in tenancyPersons[i]) {
                     $(this).append(inputTemplate.replace('{0}', tp + field).replace('{1}', tenancyPersons[i][field]));
+                }
+            }
+
+            let tenancyAgreements = getTenancyAgreements();
+            for (let i = 0; i < tenancyAgreements.length; i++) {
+                let tp = "TenancyProcess.TenancyAgreements[" + i + "].";
+                for (let field in tenancyAgreements[i]) {
+                    $(this).append(inputTemplate.replace('{0}', tp + field).replace('{1}', tenancyAgreements[i][field]));
                 }
             }
 
