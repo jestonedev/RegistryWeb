@@ -1,0 +1,75 @@
+﻿@using RegistryWeb.Models.Entities
+@model TenancyFile;
+
+@{
+    var id = Guid.NewGuid();
+    var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
+    var descriptionClass = "col-md-12 col-lg-10";
+    if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    {
+        descriptionClass = "col-md-12 col-lg-12";
+    }
+}
+
+<li class="list-group-item">
+    <input type="hidden" value="@Model.IdFile" name="IdFile_@id" />
+    <div class="form-row">
+        <div class="form-group @descriptionClass">
+            <label>Наименование и образ документа</label>
+            <div class="input-group">
+                <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="TenancyFileDescription_@id" title="Наименование">
+                <input type="file" name="TenancyFile_@id" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
+                <input type="hidden" name="TenancyFileRemove_@id" value="false" />
+                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+                {
+                    <div class="input-group-append">
+                        <a class="btn btn-success rr-tenancy-file-download @(string.IsNullOrEmpty(Model.FileName) ? "disabled" : "")"
+                           href="/TenancyFiles/DownloadFile/?idFile=@Model.IdFile" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
+                    </div>
+                }
+                @if (ViewBag.Action == "Edit")
+                {
+                    <div class="input-group-append rr-tenancy-file-buttons">
+                        <a class="btn btn-danger rr-tenancy-file-remove" style="display: none"
+                           href="#" title="Удалить образ документа" aria-label="Удалить образ документа"><span class="oi oi-trash"></span></a>
+                        <a class="btn btn-success rr-tenancy-file-attach" style="display: none"
+                           href="#" title="Прикрепить образ документа" aria-label="Прикрепить образ документа"><span class="oi oi-paperclip"></span></a>
+                        <a class="btn btn-success rr-tenancy-file-download @(string.IsNullOrEmpty(Model.FileName) ? "disabled" : "")"
+                           href="/TenancyFiles/DownloadFile/?idFile=@Model.IdFile" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
+                    </div>
+                }
+                @if (ViewBag.Action == "Create")
+                {
+                    <div class="input-group-append rr-tenancy-file-buttons">
+                        <a class="btn btn-danger rr-tenancy-file-remove" style="display: none"
+                           href="#" title="Удалить образ документа" aria-label="Удалить образ документа"><span class="oi oi-x"></span></a>
+                        <a class="btn btn-success rr-tenancy-file-attach" style="display: none"
+                           href="#" title="Прикрепить образ документа" aria-label="Прикрепить образ документа"><span class="oi oi-paperclip"></span></a>
+                    </div>
+                }
+            </div>
+        </div>
+        @if (ViewBag.Action == "Edit")
+        {
+            <div class="text-lg-right text-center col-lg-2 rr-tenancy-file-edit-buttons">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger tenancy-file-cancel-btn" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                    <a class="btn btn-success tenancy-file-save-btn" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                </div>
+                <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                    <a class="btn btn-primary tenancy-file-edit-btn" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                    <a class="btn btn-danger tenancy-file-delete-btn" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                </div>
+            </div>
+        }
+        @if (ViewBag.Action == "Create")
+        {
+            <a class="tenancy-file-edit-btn" style="display: none"></a>
+            <div class="text-lg-right text-center col-lg-2 rr-tenancy-file-edit-buttons">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger tenancy-file-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
+                </div>
+            </div>
+        }
+    </div>
+</li>

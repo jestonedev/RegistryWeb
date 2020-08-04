@@ -92,7 +92,7 @@
         </div>
     </div>
     <div class="card-body" id="TenancyProcess">
-        <form asp-controller="TenancyProcesses" asp-action="@ViewBag.Action" id="TenancyProcessForm" data-action="@ViewBag.Action" method="post">
+        <form asp-controller="TenancyProcesses" asp-action="@ViewBag.Action" id="TenancyProcessForm" data-action="@ViewBag.Action" method="post" enctype="multipart/form-data">
             <input type="hidden" asp-for="TenancyProcess.IdProcess" />
             <input type="hidden" value="@ViewBag.ReturnUrl" name="ReturnUrl" />
             <div class="row">
@@ -333,6 +333,12 @@
         <div class="row">
             <div class="col-12">
                 <partial name="RentObjects" model="Model.RentObjects" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <partial name="AttachmentFiles" model="Model.TenancyProcess.TenancyFiles" />
             </div>
         </div>
     </div>

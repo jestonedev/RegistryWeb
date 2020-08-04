@@ -9,6 +9,8 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using RegistryWeb.DataHelpers;
 using System.Runtime.CompilerServices;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace RegistryWeb.DataServices
 {
@@ -18,8 +20,9 @@ namespace RegistryWeb.DataServices
         private readonly IQueryable<TenancyPremiseAssoc> tenancyPremisesAssoc;
         private readonly IQueryable<TenancySubPremiseAssoc> tenancySubPremisesAssoc;
         private readonly SecurityServices.SecurityService securityService;
+        private readonly IConfiguration config;
 
-        public TenancyProcessesDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService) : base(registryContext)
+        public TenancyProcessesDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService, IConfiguration config) : base(registryContext)
         {
             tenancyBuildingsAssoc = registryContext.TenancyBuildingsAssoc
                     .Include(oba => oba.BuildingNavigation)
@@ -45,6 +48,7 @@ namespace RegistryWeb.DataServices
                 .Include(oba => oba.ProcessNavigation)
                 .AsNoTracking();
             this.securityService = securityService;
+            this.config = config;
         }
 
         public override TenancyProcessesVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, TenancyProcessesFilter filterOptions)
@@ -95,6 +99,7 @@ namespace RegistryWeb.DataServices
                  .Include(tp => tp.TenancySubPremisesAssoc)
                  .Include(tp => tp.TenancyRentPeriods)
                  .Include(tp => tp.TenancyAgreements)
+                 .Include(tp => tp.TenancyFiles)
                  .FirstOrDefault(tp => tp.IdProcess == idProcess);
         }
 
@@ -351,7 +356,7 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
-        internal void Create(TenancyProcess tenancyProcess, IList<TenancyRentObject> rentObjects)
+        internal void Create(TenancyProcess tenancyProcess, IList<TenancyRentObject> rentObjects, List<Microsoft.AspNetCore.Http.IFormFile> files)
         {
             if (tenancyProcess.TenancyReasons != null)
             {
@@ -395,6 +400,25 @@ namespace RegistryWeb.DataServices
                     }
                 }
             }
+
+            // Прикрепляем документы
+            var tenancyFilesPath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Tenancies\");
+            if (tenancyProcess.TenancyFiles != null)
+            {
+                for (var i = 0; i < tenancyProcess.TenancyFiles.Count; i++)
+                {
+                    tenancyProcess.TenancyFiles[i].FileName = "";
+                    var file = files.Where(r => r.Name == "TenancyFile[" + i + "]").FirstOrDefault();
+                    if (file == null) continue;
+                    tenancyProcess.TenancyFiles[i].DisplayName = file.FileName;
+                    tenancyProcess.TenancyFiles[i].FileName = Guid.NewGuid().ToString() + "." + new FileInfo(file.FileName).Extension;
+                    tenancyProcess.TenancyFiles[i].MimeType = file.ContentType;
+                    var fileStream = new FileStream(Path.Combine(tenancyFilesPath, tenancyProcess.TenancyFiles[i].FileName), FileMode.CreateNew);
+                    file.OpenReadStream().CopyTo(fileStream);
+                    fileStream.Close();
+                }
+            }
+
             registryContext.TenancyProcesses.Add(tenancyProcess);
             registryContext.SaveChanges();
         }

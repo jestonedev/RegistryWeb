@@ -84,7 +84,8 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             if (ModelState.IsValid)
             {
-                dataService.Create(tenancyProcessVM.TenancyProcess, tenancyProcessVM.RentObjects);
+                dataService.Create(tenancyProcessVM.TenancyProcess, tenancyProcessVM.RentObjects,
+                    HttpContext.Request.Form.Files.Select(f => f).ToList());
                 return RedirectToAction("Details", new { tenancyProcessVM.TenancyProcess.IdProcess });
             }
             ViewBag.Action = "Create";
@@ -227,6 +228,20 @@ namespace RegistryWeb.Controllers
             ViewBag.Streets = dataService.Streets;
 
             return PartialView("RentObject", rentObject);
+        }
+
+        [HttpPost]
+        public IActionResult AddTenancyFile(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+
+            var file = new TenancyFile { };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+
+            return PartialView("AttachmentFile", file);
         }
     }
 }

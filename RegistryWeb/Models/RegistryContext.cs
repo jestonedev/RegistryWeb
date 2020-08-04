@@ -101,6 +101,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<TenancyPremiseAssoc> TenancyPremisesAssoc { get; set; }
         public virtual DbSet<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
         public virtual DbSet<Executor> Executors { get; set; }
+        public virtual DbSet<TenancyFile> TenancyFiles { get; set; }
 
         // Переселение
 
@@ -235,6 +236,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new TenancySubPremiseAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ExecutorConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyRentPeriodConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancyFileConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new ResettleInfoConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleKindConfiguration(nameDatebase));

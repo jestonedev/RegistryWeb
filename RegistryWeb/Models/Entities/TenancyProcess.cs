@@ -49,5 +49,6 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<TenancyAgreement> TenancyAgreements { get; set; }
         public virtual IList<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
         public virtual IList<TenancyRentPeriod> TenancyRentPeriods { get; set; }
+        public virtual IList<TenancyFile> TenancyFiles { get; set; }
     }
 }

@@ -46,3 +46,7 @@
     overflow: hidden;
     resize: none;
 }
+
+button[id^="homesBtn_"] {
+    margin-bottom: 5px;
+}

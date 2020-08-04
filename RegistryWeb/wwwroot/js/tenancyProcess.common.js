@@ -191,6 +191,17 @@ $(function () {
                 $(this).append(inputTemplate.replace('{0}', ro + "Address.Id").replace('{1}', tenancyRentObjects[i].IdObject));
                 $(this).append(inputTemplate.replace('{0}', ro + "RentArea").replace('{1}', tenancyRentObjects[i].RentArea));
             }
+
+            let tenancyFiles = getTenancyFiles();
+            for (let i = 0; i < tenancyFiles.length; i++) {
+                let tf = "TenancyProcess.TenancyFiles[" + i + "].";
+                $(this).append(inputTemplate.replace('{0}', tf + "IdFile").replace('{1}', tenancyFiles[i].IdFile));
+                $(this).append(inputTemplate.replace('{0}', tf + "IdProcess").replace('{1}', tenancyFiles[i].IdProcess));
+                $(this).append(inputTemplate.replace('{0}', tf + "Description").replace('{1}', tenancyFiles[i].Description));
+                let file = $(tenancyFiles[i].AttachmentFile).clone();
+                file.attr("name", "TenancyFile[" + i + "]");
+                $(this).append(file);
+            }
         }
     });
 
