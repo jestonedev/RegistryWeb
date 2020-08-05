@@ -44,7 +44,7 @@
             <label>Дата рождения</label>
             <input type="date" class="form-control" disabled asp-for="DateOfBirth"
                    value="@(Model.DateOfBirth.HasValue ? Model.DateOfBirth.Value.ToString("yyyy-MM-dd") : "")"
-                   name="DateOfBirth_@id" title="Дата рождения">
+                   id="DateOfBirth_@id" name="DateOfBirth_@id" title="Дата рождения">
         </div>
         <div class="form-group col-9 col-md-6">
             <label>Родственное отношение</label>

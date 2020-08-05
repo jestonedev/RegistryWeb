@@ -18,6 +18,7 @@ namespace RegistryWeb.ViewModel
         public IList<KladrStreet> Streets { get; set; }
         public IList<DocumentType> DocumentTypes { get; set; }
         public IList<DocumentIssuedBy> DocumentIssuedBy { get; set; }
+        public IList<TenancyProlongRentReason> TenancyProlongRentReasons { get; set; }
         public Executor CurrentExecutor { get; set; }
     }
 }

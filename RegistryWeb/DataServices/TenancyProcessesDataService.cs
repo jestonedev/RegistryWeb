@@ -77,7 +77,8 @@ namespace RegistryWeb.DataServices
                 CurrentExecutor = registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null && 
                         e.ExecutorLogin.ToLowerInvariant() == userName),
                 DocumentTypes = registryContext.DocumentTypes.ToList(),
-                DocumentIssuedBy = registryContext.DocumentsIssuedBy.ToList()
+                DocumentIssuedBy = registryContext.DocumentsIssuedBy.ToList(),
+                TenancyProlongRentReasons = registryContext.TenancyProlongRentReasons.ToList()
             };
         }
 
@@ -803,6 +804,10 @@ namespace RegistryWeb.DataServices
         public IEnumerable<KladrStreet> Streets
         {
             get => registryContext.KladrStreets.AsNoTracking();
+        }
+
+        public IEnumerable<TenancyProlongRentReason> TenancyProlongRentReasons {
+            get => registryContext.TenancyProlongRentReasons.AsNoTracking();
         }
     }
 }

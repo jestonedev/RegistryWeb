@@ -124,6 +124,6 @@ h5.rr-resettle-card-header-sub-title {
     margin-bottom: 0.24rem;
 }
 
-input.input-validation-error, button.input-validation-error {
+input.input-validation-error, button.input-validation-error, textarea.input-validation-error {
     border: 1px solid #dc3545;
 }

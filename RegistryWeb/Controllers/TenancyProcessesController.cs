@@ -219,7 +219,12 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.TenancyWrite))
                 return Json(-2);
 
-            var agreement = new TenancyAgreement { };
+            var agreement = new TenancyAgreement {
+                IdExecutor = dataService.ActiveExecutors.FirstOrDefault(e => e.ExecutorLogin != null &&
+                        e.ExecutorLogin.ToLowerInvariant() == securityService.User.UserName.ToLowerInvariant())?.IdExecutor,
+                AgreementDate = DateTime.Now.Date,
+                AgreementContent = @"1.1. По настоящему Соглашению Стороны по договору № {0} от {1} {2} найма жилого помещения, расположенного по адресу: {3}, договорились:"
+            };
             ViewBag.SecurityService = securityService;
             ViewBag.Action = action;
             ViewBag.CanEditBaseInfo = true;

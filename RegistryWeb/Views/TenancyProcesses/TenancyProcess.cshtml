@@ -19,6 +19,7 @@
     ViewData["DocumentIssuedBy"] = Model.DocumentIssuedBy;
     ViewData["Streets"] = Model.Streets;
     ViewData["Executors"] = Model.Executors;
+    ViewData["TenancyProlongRentReasons"] = Model.TenancyProlongRentReasons;
 }
 
 @section validation
@@ -96,6 +97,10 @@
         <form asp-controller="TenancyProcesses" asp-action="@ViewBag.Action" id="TenancyProcessForm" data-action="@ViewBag.Action" method="post" enctype="multipart/form-data">
             <input type="hidden" asp-for="TenancyProcess.IdProcess" />
             <input type="hidden" value="@ViewBag.ReturnUrl" name="ReturnUrl" />
+            @foreach (var rentType in Model.RentTypes)
+            {
+                <input type="hidden" name="RentTypeGenetive" value="@rentType.IdRentType" data-genetive="@rentType.RentTypeGenetive" />
+            }
             <div class="row">
                 <div class="form-group col-md-6">
                     <label asp-for="TenancyProcess.IdRentType">Тип найма жилья</label>
@@ -159,7 +164,7 @@
                 @if (ViewBag.Action != "Edit")
                 {
                     <div class="form-group col-md-6">
-                        <label asp-for="TenancyProcess.IdRentTypeCategory">Дата окончания найма жилья</label>
+                        <label asp-for="TenancyProcess.EndDate">Дата окончания найма жилья</label>
                         <input type="date" class="form-control" asp-for="TenancyProcess.EndDate"
                                value="@(Model.TenancyProcess.EndDate.HasValue ? Model.TenancyProcess.EndDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата окончания найма жилья">
                     </div>
