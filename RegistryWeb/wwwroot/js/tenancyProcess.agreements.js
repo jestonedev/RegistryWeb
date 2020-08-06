@@ -58,12 +58,12 @@ $(function () {
         var surname = personElem.find("input[id^='Surname']").val();
         var name = personElem.find("input[id^='Name']").val();
         var patronymic = personElem.find("input[id^='Patronymic']").val();
-        var birthDate = personElem.find("input[id^='DateOfBirth']").val();
-        if (birthDate !== "" && birthDate !== null) {
-            var birthDateParts = birthDate.split("-");
-            birthDate = birthDateParts[2] + "." + birthDateParts[1] + "." + birthDateParts[0];
-        }
-        return "<option data-guid='" + guid + "' value='" + idPerson + "'>" +
+        var birthDate = formatDate(personElem.find("input[id^='DateOfBirth']").val());
+        var kinshipElem = personElem.find("select[id^='IdKinship']");
+        var kinship = kinshipElem.find("option[value='" + kinshipElem.val() + "']").text();
+        return "<option data-surname='" + surname + "' data-name='" + name + "'" +
+            " data-patronymic='" + patronymic + "' data-birthdate='" + birthDate + "'" +
+            " data-kinship='" + kinship + "' data-id='" + idPerson + "' value='" + guid + "'>" +
             surname + " " + name + (patronymic !== "" ? " " + patronymic : "") +
             ((birthDate !== "" && birthDate !== null) ? " (" + birthDate + " г.р.)" : "") +
             "</option>";
@@ -237,17 +237,36 @@ $(function () {
     }
 
     function reformAgreementContent(agreementContent) {
+        var tenancyBaseInfo = getTenancyBaseInfo();
+        var rentObjects = getRentObjects();
+        rentObjects = rentObjects.toArray().sort(sortRentObjects);
+        var rentAddress = buildFullRentAddress(rentObjects);
+
+        agreementContent = agreementContent.replace("{0}", tenancyBaseInfo.RegistrationNumber);
+        agreementContent = agreementContent.replace("{1}", tenancyBaseInfo.RegistrationDate);
+        agreementContent = agreementContent.replace("{2}", tenancyBaseInfo.RentTypeGenetive);
+        agreementContent = agreementContent.replace("{3}", rentAddress);
+
+        return agreementContent;
+    }
+
+    function getTenancyBaseInfo() {
         var idRentType = $('#TenancyProcessForm #TenancyProcess_IdRentType').val();
         var rentTypeGenetive = $('#TenancyProcessForm input[name="RentTypeGenetive"]').filter(function (idx, elem) { return $(elem).val() === idRentType; }).first().data("genetive");
         if (rentTypeGenetive === undefined) {
             rentTypeGenetive = "";
         }
         var regNumber = $("#TenancyProcessForm #TenancyProcess_RegistrationNum").val();
-        var regDate = $("#TenancyProcessForm #TenancyProcess_RegistrationDate").val();
-        if (regDate !== "" && regDate !== null) {
-            var regDateParts = regDate.split("-");
-            regDate = regDateParts[2] + "." + regDateParts[1] + "." + regDateParts[0];
-        }
+        var regDate = formatDate($("#TenancyProcessForm #TenancyProcess_RegistrationDate").val());
+        return {
+            IdRentType: idRentType,
+            RentTypeGenetive: rentTypeGenetive,
+            RegistrationNumber: regNumber,
+            RegistrationDate: regDate
+        };
+    }
+
+    function getRentObjects() {
         var rentObjects = $("#TenancyProcessRentObjects .list-group-item").filter(function (idx, elem) {
             return !$(elem).hasClass("rr-list-group-item-empty");
         }).map(function (idx, elem) {
@@ -262,16 +281,7 @@ $(function () {
                 SubPremise: subPremiseElem.find("option[value='" + subPremiseElem.val() + "']").text()
             };
             });
-        rentObjects = rentObjects.toArray().sort(sortRentObjects);
-
-        var rentAddress = buildFullRentAddress(rentObjects);
-
-        agreementContent = agreementContent.replace("{0}", regNumber);
-        agreementContent = agreementContent.replace("{1}", regDate);
-        agreementContent = agreementContent.replace("{2}", rentTypeGenetive);
-        agreementContent = agreementContent.replace("{3}", rentAddress);
-
-        return agreementContent;
+        return rentObjects;
     }
 
     function sortRentObjects(a, b) {
@@ -449,12 +459,491 @@ $(function () {
     $("#agreementModal #Agreement_Type").change();
 
     $("#agreementModal #Agreement_Type_Button").on("click", function (e) {
+        e.preventDefault();
         var isValid = $("#agreementModal .rr-agreement-type-field").find("input, select, textarea").valid();
         if (!isValid) {
             refreshSelectpickerValidationBorders($("#TenancyProcessAgreementsModalForm"));
+            return;
         }
-        e.preventDefault();
+        var agreementType = $("#agreementModal #Agreement_Type").val();
+        switch (agreementType) {
+            case "0":
+                var excludeTenantPersonInfo = getExcludeTenantPersonInfo();
+                addExcludeTenantPersonInfoToContent(excludeTenantPersonInfo);
+                addExcludeTenantPersonInfoToModifications(excludeTenantPersonInfo);
+                break;
+            case "1":
+                var includeTenantPersonInfo = getIncludeTenantPersonInfo();
+                addIncludeTenantPersonInfoToContent(includeTenantPersonInfo);
+                addIncludeTenantPersonInfoToModifications(includeTenantPersonInfo);
+                break;
+            case "2":
+                var explainPointInfo = getExplainPointInfo();
+                addExplainPointInfoToContent(explainPointInfo);
+                break;
+            case "3":
+                var terminateTenancyInfo = getTerminateTenancyInfo();
+                addTerminateTenancyInfoToContent(terminateTenancyInfo);
+                break;
+            case "4":
+                var prolongCommercialInfo = getProlongCommercialInfo();
+                addProlongCommercialInfoToContent(prolongCommercialInfo);
+                addProlongCommercialInfoToModifications(prolongCommercialInfo);
+                break;
+            case "5":
+                var prolongSpecialInfo = getProlongSpecialInfo();
+                addProlongSpecialInfoToContent(prolongSpecialInfo);
+                addProlongSpecialInfoToModifications(prolongSpecialInfo);
+                break;
+            case "6":
+                var changeTenantInfo = getChangeTenantInfo();
+                addChangeTenantInfoToContent(changeTenantInfo);
+                addChangeTenantInfoToModifications(changeTenantInfo);
+                break;
+        }
     });
+
+    function getExcludeTenantPersonInfo() {
+        var personElem = $("#agreementModal #Agreement_Type_TenancyPersons");
+        var personGuid = personElem.val();
+        var personOption = personElem.find("option[value='" + personGuid + "']");
+        return {
+            IdPerson: personOption.data("id"),
+            Guid: personGuid,
+            Surname: personOption.data("surname"),
+            Name: personOption.data("name"),
+            Patronymic: personOption.data("patronymic"),
+            Kinship: personOption.data("kinship"),
+            BirthDate: personOption.data("birthdate"),
+            Point: $("#agreementModal #Agreement_Type_Point").val(),
+            SubPoint: $("#agreementModal #Agreement_Type_SubPoint").val()
+        };
+    }
+
+    function addExcludeTenantPersonInfoToContent(personInfo) {
+        var contentElem = $("#agreementModal #Agreement_AgreementContent");
+        var content = contentElem.val();
+        var contentLines = content.split("\n");
+        var headerWildcard = "^\u200B.*?из договора исключить";
+        if (personInfo.Point !== "") {
+            headerWildcard = "^\u200B.*?из пункта " + personInfo.Point + " договора исключить";
+        }
+        if (personInfo.SubPoint !== "") {
+            headerWildcard += " подпункт " + personInfo.SubPoint + " следующего содержания";
+        }
+        if (!isHeaderInserted(contentLines, headerWildcard)) {
+            var nextPoint = getNextHeaderPoint(contentLines);
+            var header = "\u200B" + nextPoint + ") из договора исключить";
+            if (personInfo.Point !== "") {
+                header = "\u200B" + nextPoint + ") из пункта " + personInfo.Point + " договора исключить";
+            }
+            if (personInfo.SubPoint !== "") {
+                header += " подпункт " + personInfo.SubPoint + " следующего содержания";
+            }
+            header += ":";
+            contentLines.push(header);
+        }
+
+        var tenant = "";
+        if (personInfo.SubPoint !== "")
+            tenant += personInfo.SubPoint + ". ";
+        tenant += personInfo.Surname + " " + personInfo.Name + (personInfo.Patronymic !== "" ? " " + personInfo.Patronymic : "");
+        tenant += " - " + personInfo.Kinship;
+        if (personInfo.BirthDate !== "") {
+            tenant += ", " + personInfo.BirthDate + " г.р.";
+        }
+        tenant = "«" + tenant + "»";
+        contentLines = insertPoint(contentLines, tenant, headerWildcard);
+        contentElem.val(contentLines.join("\n"));
+    }
+
+    function addExcludeTenantPersonInfoToModifications(personInfo) {
+        // TODO:
+    }
+
+    function getIncludeTenantPersonInfo() {
+        var tenancyBaseInfo = getTenancyBaseInfo();
+        var kinshipElem = $("#agreementModal #Agreement_Type_TenancyPersonIdKinship");
+        var idKinship = kinshipElem.val();
+        var kinshipOption = kinshipElem.find("option[value='" + idKinship + "']");
+        return {
+            Surname: $("#agreementModal #Agreement_Type_TenancyPersonSurname").val(),
+            Name: $("#agreementModal #Agreement_Type_TenancyPersonName").val(),
+            Patronymic: $("#agreementModal #Agreement_Type_TenancyPersonPatronymic").val(),
+            Kinship: kinshipOption.text(),
+            IdKinship: idKinship,
+            BirthDate: formatDate($("#agreementModal #Agreement_Type_TenancyPersonBirthDate").val()),
+            Point: $("#agreementModal #Agreement_Type_Point").val(),
+            SubPoint: $("#agreementModal #Agreement_Type_SubPoint").val(),
+            RegistrationNum: tenancyBaseInfo.RegistrationNumber,
+            RegistrationDate: tenancyBaseInfo.RegistrationDate
+        };
+    }
+
+    function addIncludeTenantPersonInfoToContent(personInfo) {
+        let contentElem = $("#agreementModal #Agreement_AgreementContent");
+        let content = contentElem.val();
+        let contentLines = content.split("\n");
+        if (personInfo.IdKinship === "1") {
+            let nextPoint = getNextHeaderPoint(contentLines);
+            let header = "\u200B" + nextPoint + ") считать по договору";
+            if (personInfo.RegistrationNum !== "") {
+                header += " № " + personInfo.RegistrationNum;
+            }
+            if (personInfo.RegistrationDate !== "") {
+                header += " от " + personInfo.RegistrationDate;
+            }
+            let tenant = personInfo.Surname + " " + personInfo.Name + (personInfo.Patronymic !== "" ? " " + personInfo.Patronymic : "");
+            if (personInfo.BirthDate !== "") {
+                tenant += " - " + personInfo.BirthDate + " г.р.";
+            }
+            header += " нанимателем - «" + tenant + "»";
+            contentLines.push(header);
+        } else {
+            var headerWildcard = "^\u200B.*?договор дополнить";
+            if (personInfo.Point !== "") {
+                headerWildcard = "^\u200B.*?пункт " + personInfo.Point + " договора дополнить";
+            }
+            if (personInfo.SubPoint !== "") {
+                headerWildcard += " подпунктом " + personInfo.SubPoint + " следующего содержания";
+            }
+            if (!isHeaderInserted(contentLines, headerWildcard)) {
+                let nextPoint = getNextHeaderPoint(contentLines);
+                let header = "\u200B" + nextPoint + ") договор дополнить";
+                if (personInfo.Point !== "") {
+                    header = "\u200B" + nextPoint + ") пункт " + personInfo.Point + " договора дополнить";
+                }
+                if (personInfo.SubPoint !== "") {
+                    header += " подпунктом " + personInfo.SubPoint + " следующего содержания";
+                }
+                header += ":";
+                contentLines.push(header);
+            }
+
+            var tenant = "";
+            if (personInfo.SubPoint !== "")
+                tenant += personInfo.SubPoint + ". ";
+            tenant += personInfo.Surname + " " + personInfo.Name + (personInfo.Patronymic !== "" ? " " + personInfo.Patronymic : "");
+            tenant += " - " + personInfo.Kinship;
+            if (personInfo.BirthDate !== "") {
+                tenant += ", " + personInfo.BirthDate + " г.р.";
+            }
+            tenant = "«" + tenant + "»";
+            contentLines = insertPoint(contentLines, tenant, headerWildcard);
+        }
+        contentElem.val(contentLines.join("\n"));
+    }
+
+    function addIncludeTenantPersonInfoToModifications(personInfo) {
+        // TODO:
+    }
+
+    function getExplainPointInfo() {
+        return {
+            Content: $("#agreementModal #Agreement_Type_PointContent").val(),
+            Point: $("#agreementModal #Agreement_Type_Point").val(),
+            SubPoint: $("#agreementModal #Agreement_Type_SubPoint").val()
+        };
+    }
+
+    function addExplainPointInfoToContent(explainPointInfo) {
+        var contentElem = $("#agreementModal #Agreement_AgreementContent");
+        var content = contentElem.val();
+        var contentLines = content.split("\n");
+        var nextPoint = getNextHeaderPoint(contentLines);
+        var header = "\u200B" + nextPoint + ") изложить";
+        var pointHeader = "";
+        if (explainPointInfo.Point !== "" && explainPointInfo.SubPoint === "") {
+            pointHeader = " пункт " + explainPointInfo.Point;
+        }
+        if (explainPointInfo.SubPoint !== "" && explainPointInfo.Point === "") {
+            pointHeader = " подпункт " + explainPointInfo.SubPoint;
+        }
+        if (explainPointInfo.SubPoint !== "" && explainPointInfo.Point !== "") {
+            pointHeader = " подпункт " + explainPointInfo.SubPoint + " пункта " + explainPointInfo.Point;
+        }
+        header += pointHeader+" в новой редакции:";
+        contentLines.push(header);
+
+        pointContent = "«" + explainPointInfo.Content + "»";
+        contentLines.push(pointContent);
+        contentElem.val(contentLines.join("\n"));
+    }
+
+    function getTerminateTenancyInfo() {
+        var tenancyBaseInfo = getTenancyBaseInfo();
+        var rentObjects = getRentObjects();
+        rentObjects = rentObjects.toArray().sort(sortRentObjects);
+        var rentAddress = buildFullRentAddress(rentObjects);
+        return {
+            RegistrationNum: tenancyBaseInfo.RegistrationNumber,
+            RegistrationDate: tenancyBaseInfo.RegistrationDate,
+            RentTypeGenetive: tenancyBaseInfo.RentTypeGenetive,
+            RentAddress: rentAddress,
+            TerminateDate: formatDate($("#agreementModal #Agreement_Type_TenancyEndDate").val()),
+            TerminateReason: $("#agreementModal #Agreement_Type_TenancyEndReason").val()
+        };
+    }
+
+    function addTerminateTenancyInfoToContent(terminateTenancyInfo) {
+        var contentElem = $("#agreementModal #Agreement_AgreementContent");
+        var contentLines = [];
+
+        var text = "1.1. По настоящему Соглашению Стороны договорились расторгнуть с " + terminateTenancyInfo.TerminateDate + " договор";
+        contract = "";
+        if (terminateTenancyInfo.RegistrationNum !== "") {
+            contract += " № " + terminateTenancyInfo.RegistrationNum;
+        }
+        if (terminateTenancyInfo.RegistrationDate !== "") {
+            contract += " от " + terminateTenancyInfo.RegistrationDate;
+        }
+        text += contract;
+        if (terminateTenancyInfo.RentTypeGenetive !== "") {
+            text += " "+terminateTenancyInfo.RentTypeGenetive;
+        }
+        text += " найма жилого помещения";
+        if (terminateTenancyInfo.RentAddress !== "") {
+            text += ", расположенного по адресу: " + terminateTenancyInfo.RentAddress;
+        }
+        text += ", (далее - договор) по " + terminateTenancyInfo.TerminateReason + ".";
+        contentLines.push(text);
+        text = "1.2. Обязательства, возникшие из указанного договора до момента расторжения, подлежат исполнению в соответствии с указанным договором. Стороны не имеют взаимных претензий по исполнению условий договора";
+        text += contract;
+        text += ".";
+        contentLines.push(text);
+        contentElem.val(contentLines.join("\n"));
+    }
+
+    function getProlongCommercialInfo() {
+        var tenancyBaseInfo = getTenancyBaseInfo();
+        var reasonDocElem = $("#agreementModal #Agreement_Type_TenancyProlongRentReason");
+        var reasonDocId = reasonDocElem.val();
+        var reasonDocOption = reasonDocElem.find("option[value='" + reasonDocId + "']");
+        return {
+            RegistrationNum: tenancyBaseInfo.RegistrationNumber,
+            RegistrationDate: tenancyBaseInfo.RegistrationDate,
+            RentTypeGenetive: tenancyBaseInfo.RentTypeGenetive,
+            ReasonDoc: reasonDocOption.text(),
+            ReasonDocGenetive: reasonDocOption.data("genetive"),
+            ReasonDocDate: formatDate($("#agreementModal #Agreement_Type_TenancyProlongRentReasonDate").val()),
+            StartPeriod: formatDate($("#agreementModal #Agreement_Type_ProlongBeginDate").val()),
+            EndPeriod: formatDate($("#agreementModal #Agreement_Type_ProlongEndDate").val()),
+            UntilDismissal: $("#agreementModal #Agreement_Type_ProlongUntilDismissal").is(":checked"),
+            PointExclude: $("#agreementModal #Agreement_Type_PointExclude").val()
+        };
+    }
+
+    function addProlongCommercialInfoToContent(prolongInfo) {
+        var contentElem = $("#agreementModal #Agreement_AgreementContent");
+        var contentLines = [];
+
+        contentLines.push(getDefaultAgreementText());
+
+        var text = "1) на основании " + prolongInfo.ReasonDocGenetive + " от " + prolongInfo.ReasonDocDate + " продлить срок действия договора";
+        contract = "";
+        if (prolongInfo.RegistrationNum !== "") {
+            contract += " № " + prolongInfo.RegistrationNum;
+        }
+        if (prolongInfo.RegistrationDate !== "") {
+            contract += " от " + prolongInfo.RegistrationDate;
+        }
+        text += contract;
+        if (prolongInfo.RentTypeGenetive !== "") {
+            text += " " + prolongInfo.RentTypeGenetive;
+        }
+        text += " найма жилого помещения";
+
+        var period = "";
+        if (prolongInfo.StartPeriod !== "") {
+            period += " с " + prolongInfo.StartPeriod;
+        }
+        if (prolongInfo.EndPeriod !== "" && !prolongInfo.UntilDismissal) {
+            period += " по " + prolongInfo.EndPeriod;
+        }
+        if (prolongInfo.UntilDismissal) {
+            if (prolongInfo.StartPeriod === "")
+                period = "";
+            period += " на период трудовых отношений";
+        }
+
+        text += period + ".";
+        contentLines.push(text);
+        if (prolongInfo.PointExclude !== "") {
+            text = "2) пункт " + prolongInfo.PointExclude + " исключить.";
+            contentLines.push(text);
+        }
+        contentElem.val(contentLines.join("\n"));
+    }
+
+    function addProlongCommercialInfoToModifications(prolongInfo) {
+        // TODO:
+    }
+
+    function getProlongSpecialInfo() {
+        return {
+            Point: $("#agreementModal #Agreement_Type_Point").val(),
+            SubPoint: $("#agreementModal #Agreement_Type_SubPoint").val(),
+            StartPeriod: formatDate($("#agreementModal #Agreement_Type_ProlongBeginDate").val()),
+            EndPeriod: formatDate($("#agreementModal #Agreement_Type_ProlongEndDate").val()),
+            UntilDismissal: $("#agreementModal #Agreement_Type_ProlongUntilDismissal").is(":checked")
+        };
+    }
+
+    function addProlongSpecialInfoToContent(prolongInfo) {
+        var contentElem = $("#agreementModal #Agreement_AgreementContent");
+        var content = contentElem.val();
+        var contentLines = content.split("\n");
+
+        var nextPoint = getNextHeaderPoint(contentLines);
+        var headerWildcard = "^\u200B.*?изложить в новой редакции:";
+        if (!isHeaderInserted(contentLines, headerWildcard)) {
+            var header = "\u200B" + nextPoint + ") изложить в новой редакции:";
+            contentLines.push(header);
+        }
+
+        var text = "";
+        var pointHeader = "";
+        if (prolongInfo.Point !== "" && prolongInfo.SubPoint === "") {
+            pointHeader = "пункт " + prolongInfo.Point;
+        }
+        if (prolongInfo.SubPoint !== "" && prolongInfo.Point === "") {
+            pointHeader = "подпункт " + prolongInfo.SubPoint;
+        }
+        if (prolongInfo.SubPoint !== "" && prolongInfo.Point !== "") {
+            pointHeader = "подпункт " + prolongInfo.SubPoint + " пункта " + prolongInfo.Point;
+        }
+        if (pointHeader !== "")
+            pointHeader = pointHeader + ": ";
+        text += pointHeader;
+        text += "«Срок найма жилого помещения устанавливается";
+        var period = " на неопределенный период";
+        if (prolongInfo.StartPeriod !== "" || prolongInfo.EndPeriod !== "" || prolongInfo.UntilDismissal) {
+            period = "";
+        } 
+        if (prolongInfo.StartPeriod !== "") {
+            period += " с " + prolongInfo.StartPeriod;
+        }
+        if (prolongInfo.EndPeriod !== "" && !prolongInfo.UntilDismissal) {
+            period += " по " + prolongInfo.EndPeriod;
+        }
+        if (prolongInfo.UntilDismissal) {
+            if (prolongInfo.StartPeriod === "")
+                period = "";
+            period += " на период трудовых отношений";
+        }
+        text += period + "».";
+
+        contentLines = insertPoint(contentLines, text, headerWildcard);
+
+        contentElem.val(contentLines.join("\n"));
+    }
+
+    function addProlongSpecialInfoToModifications(prolongInfo) {
+        // TODO:
+    }
+
+
+    function getChangeTenantInfo() {
+        var kinshipElem = $("#agreementModal #Agreement_Type_TenantNewIdKinship");
+        var idKinship = kinshipElem.val();
+        var kinshipOption = kinshipElem.find("option[value='" + idKinship + "']");
+        var personsElem = $("#agreementModal #Agreement_Type_TenancyPersonsWithoutTenant");
+        var idPerson = personsElem.val();
+        var personOption = personsElem.find("option[value='" + idPerson + "']");
+        return {
+            CurrentTenant: $("#agreementModal #Agreement_Type_Tenant").val(),
+            CurrentTenantNewIdKinship: idKinship,
+            CurrentTenantNewKinship: kinshipOption.text(),
+            NetTenantSurname: personOption.data("surname"),
+            NetTenantName: personOption.data("name"),
+            NetTenantPatronymic: personOption.data("patronymic"),
+            NetTenantBirthDate: personOption.data("birthdate")
+        };
+    }
+
+    function addChangeTenantInfoToContent(changeTenantInfo) {
+        var contentElem = $("#agreementModal #Agreement_AgreementContent");
+        var contentLines = [];
+
+        var agreementDefaultText = getDefaultAgreementText();
+        var oldTenant = "";
+        if (changeTenantInfo.CurrentTenant !== "") {
+            oldTenant = " «" + changeTenantInfo.CurrentTenant + "»";
+        }
+        agreementDefaultText = agreementDefaultText.replace("договорились:",
+            "в связи c ________________________________________ нанимателя" + oldTenant + ", договорились:");
+        contentLines.push(agreementDefaultText);
+
+        var text = "1) считать стороной по договору - нанимателем - ";
+
+        var tenant = changeTenantInfo.NetTenantSurname + " " + changeTenantInfo.NetTenantName +
+            (changeTenantInfo.NetTenantPatronymic !== "" ? " " + changeTenantInfo.NetTenantPatronymic : "");
+        if (changeTenantInfo.NetTenantBirthDate !== "") {
+            tenant += ", " + changeTenantInfo.NetTenantBirthDate + " г.р.";
+        }
+        tenant = "«" + tenant + "»";
+        text += tenant;
+        contentLines.push(text);
+        contentElem.val(contentLines.join("\n"));
+    }
+
+    function addChangeTenantInfoToModifications(changeTenantInfo) {
+        // TODO:
+    }
+
+    function getDefaultAgreementText() {
+        return reformAgreementContent("1.1. По настоящему Соглашению Стороны по договору № {0} от {1} {2} найма жилого помещения, расположенного по адресу: {3}, договорились:");
+    }
+
+    function insertPoint(contentLines, point, headerWildcard) {
+        var newContentLines = [];
+        var customHeaderRegex = new RegExp(headerWildcard);
+        var commonHeaderRegex = new RegExp("^\u200B?\\s*([0-9]+)\\s*[)]");
+        var headerFounded = false;
+        var pointInserted = false;
+        for (var i = 0; i < contentLines.length; i++) {
+            if (headerFounded && commonHeaderRegex.test(contentLines[i])) {
+                newContentLines.push(point);
+                pointInserted = true;
+            }
+            if (!headerFounded && customHeaderRegex.test(contentLines[i])) {
+                headerFounded = true;
+            }
+            newContentLines.push(contentLines[i]);
+        }
+        if (!pointInserted) newContentLines.push(point);
+        return newContentLines;
+    }
+
+    function isHeaderInserted(contentLines, headerWildcard) {
+        var regex = new RegExp(headerWildcard);
+        for (var i = 0; i < contentLines.length; i++) {
+            if (regex.test(contentLines[i]))
+                return true;
+        }
+        return false;
+    }
+
+    function getNextHeaderPoint(contentLines) {
+        var regex = new RegExp("^\u200B?\\s*([0-9]+)\\s*[)]");
+        var index = 1;
+        for(var i = 0; i < contentLines.length; i++) {
+            if (regex.test(contentLines[i]))
+                index++;
+        }
+        return index;
+    }
+
+    function formatDate(date) {
+        if (date !== "" && date !== null) {
+            var dateParts = date.split('-');
+            if (dateParts.length === 3)
+                return dateParts[2] + "." + dateParts[1] + "." + dateParts[0];
+            else
+                return date;
+        }
+        return date;
+    }
 
     var lastAgreementEndDateBeforeDismissal = undefined;
 
