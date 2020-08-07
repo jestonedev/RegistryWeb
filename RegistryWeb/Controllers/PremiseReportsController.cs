@@ -112,21 +112,38 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult GetPremiseArea(int idPremise)
+        public IActionResult GetPremisesArea(string idPremise)
         {
+     
+       List<int> ids;
+            if (HttpContext.Session.Keys.Contains("idPremises"))
+                ids = HttpContext.Session.Get<List<int>>("idPremises");
+            else ids = new List<int>();
+
+            var idsstring = "";
+            if (!ids.Any() && idPremise == "0")
+                return NotFound();
+            else if (ids.Any() && idPremise == "0")
+            {
+                idsstring = ids
+                    .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
+            }
+            else if (!ids.Any() && idPremise != "0")
+                    idsstring = idPremise;
+
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
+
             try
             {
-                var file = reportService.PremiseArea(idPremise);
-                return File(file, odtMime, string.Format(@"Справка о площади помещения № {0}", idPremise));
+                var file = reportService.PremisesArea(idsstring);
+                return File(file, odtMime, string.Format(@"Справка о площади помещений"));
             }
             catch (Exception ex)
             {
                 return Error(ex.Message);
             }
         }
-
 
 //_________________Для массовых____________________ 
         public IActionResult GetMassExcerptPremise(string excerptNumber, DateTime excerptDateFrom, int signer)
@@ -155,33 +172,7 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
-
-        public IActionResult GetPremisesArea()
-        {
-            List<int> ids;
-            if (HttpContext.Session.Keys.Contains("idPremises"))
-                ids = HttpContext.Session.Get<List<int>>("idPremises");
-            else ids = new List<int>();
-
-            if (ids == null)
-                return NotFound();
-
-            var idsstring = ids
-                .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
-
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
-            try
-            {
-                var file = reportService.PremisesArea(idsstring);
-                return File(file, odtMime, string.Format(@"Справка о площади помещений"));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
-        }
-
+        
         public IActionResult GetPremisesAct(DateTime actDate, bool isNotResides, string commision, int clerk)
         {
             List<int> ids;
@@ -197,6 +188,7 @@ namespace RegistryWeb.Controllers
 
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
+
             try
             {
                 var file = reportService.MassActPremises(idsstring, actDate, isNotResides, commision, clerk);
@@ -223,6 +215,7 @@ namespace RegistryWeb.Controllers
 
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
+
             try
             {
                 var file = reportService.ExportPremises(idsstring);
@@ -249,6 +242,7 @@ namespace RegistryWeb.Controllers
 
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
+
             try
             {
                 var file = reportService.TenancyHistoryPremises(idsstring);

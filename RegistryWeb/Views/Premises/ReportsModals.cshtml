@@ -47,7 +47,6 @@
     </div>
 </form>
 
-
 <form id="noticeToBksForm">
     <div class="modal fade" id="noticeToBksModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
@@ -101,7 +100,6 @@
         </div>
     </div>
 </form>
-
 
 <form id="massactForm">
     <div class="modal fade" id="massactModal" tabindex="-1" role="dialog">
@@ -174,17 +172,17 @@
                             <input type="text" class="form-control" name="restriction.Number" title="Номер реквизита">
                         </div>
                         <div class="form-group col-sm-6 col-md-6">
-                            <label for="restriction.Date">Дата документа</label>
-                            <input type="date" class="form-control" name="restriction.Date" title="Дата документа" data-val="true" data-val-required="Заполните дату документа" value="@DateTime.Now.ToString("yyyy-MM-dd")">
-                            <span class="text-danger field-validation-valid" data-valmsg-for="restriction.Date" data-valmsg-replace="true"></span>
+                            <label for="restriction.ResDate">Дата документа</label>
+                            <input type="date" class="form-control" name="restriction.ResDate" title="Дата документа" data-val="true" data-val-required="Заполните дату документа" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="restriction.ResDate" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-sm-12 col-md-12">
-                            <label for="restriction.ResType">Тип права собственности</label>
-                            <select class="selectpicker form-control" title="Тип права собственности" name="restriction.ResType"
-                                    data-val="true" data-val-required="Тип права собственности обязателен для заполнения" id="restriction.ResType" asp-items="@Model.RestrictionsList"></select>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="restriction.ResType" data-valmsg-replace="true"></span>
+                            <label for="restriction.RestrictionType">Тип права собственности</label>
+                            <select class="selectpicker form-control" title="Тип права собственности" name="restriction.RestrictionType"
+                                    data-val="true" data-val-required="Тип права собственности обязателен для заполнения" id="restriction.RestrictionType" asp-items="@Model.RestrictionsList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="restriction.RestrictionType" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="form-row">
@@ -206,12 +204,12 @@
                     <div class="form-row">
                         <div class="form-group col-sm-12 col-md-12">
                             <label for="restriction.DateStateReg">Дата г/р в УЮ</label>
-                            <input type="date" class="form-control" name="restriction.DateStateReg" title="Выписка от" data-val="true" data-val-required="Заполните дату г/р в УЮ" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                            <input type="date" class="form-control" name="restriction.DateStateReg" title="Дата г/р в УЮ" data-val="true" data-val-required="Заполните дату г/р в УЮ" value="@DateTime.Now.ToString("yyyy-MM-dd")">
                             <span class="text-danger field-validation-valid" data-valmsg-for="restriction.DateStateReg" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary rr-report-submit">Добавить</button>
+                        <button type="button" class="btn btn-primary restriction-save-btn">Добавить</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
                     </div>
                 </div>
@@ -281,37 +279,44 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body ownershiprightblock">
                     <div class="form-row">
                         <div class="form-group col-sm-6 col-md-6">
                             <label for="ownershipright.Number">Номер ограничения</label>
-                            <input type="text" class="form-control" name="ownershipright.ActDate" title="Выписка от" data-val="true" data-val-required="Заполните дату">
-                            <span class="text-danger field-validation-valid" data-valmsg-for="ownershipright.ExcerptDate" data-valmsg-replace="true"></span>
+                            <input type="text" class="form-control" name="ownershipright.Number" title="Выписка от" data-val="true" data-val-required="Заполните дату">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="ownershipright.Number" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-sm-6 col-md-6">
-                            <label for="ownershipright.Date">Дата ограничения</label>
-                            <input type="date" class="form-control" name="ownershipright.Date" title="Выписка от" data-val="true" data-val-required="Заполните дату" value="@DateTime.Now.ToString("yyyy-MM-dd")">
-                            <span class="text-danger field-validation-valid" data-valmsg-for="ownershipright.Date" data-valmsg-replace="true"></span>
+                            <label for="ownershipright.OwrDate">Дата ограничения</label>
+                            <input type="date" class="form-control" name="ownershipright.OwrDate" title="Выписка от" data-val="true" data-val-required="Заполните дату" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="ownershipright.OwrDate" data-valmsg-replace="true"></span>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group col-sm-5 col-md-5">
-                            <label for="ownershipright.Type">Тип ограничения</label>
-                            <select class="selectpicker form-control" title="Тип ограничения" name="ownershipright.Type"
-                                    data-val="true" data-val-required="Подписывающий обязателен для заполнения" id="ownershipright.Type" asp-items="@Model.OwnershipRightTypesList"></select>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="ownershipright.Type" data-valmsg-replace="true"></span>
+                            <label for="ownershipright.OwrType">Тип ограничения</label>
+                            <select class="selectpicker form-control" title="Тип ограничения" name="ownershipright.OwrType"
+                                    data-val="true" data-val-required="Подписывающий обязателен для заполнения" id="ownershipright.OwrType" asp-items="@Model.OwnershipRightTypesList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="ownershipright.OwrType" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-sm-7 col-md-7">
-                            <label for="ownershipright.Description">Наименование</label>
-                            <input type="text" class="form-control" name="ownershipright.Description" title="Выписка от" data-val="true" data-val-required="Заполните дату">
-                            <input type="file" name="ownershipright.OwnershipRightFile" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
-                            <input type="hidden" name="ownershipright.OwnershipRightFileRemove" value="false" />
-                            <span class="text-danger field-validation-valid" data-valmsg-for="ownershipright.Description" data-valmsg-replace="true"></span>
+                            <label for="ownershipright.Description">Наименование и образ файла</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="ownershipright.Description" title="Выписка от" data-val="true" data-val-required="Заполните дату">
+                                <input type="file" name="ownershipright.OwnershipRightFile" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
+                                <input type="hidden" name="ownershipright.OwnershipRightFileRemove" value="false" />
+                                <div class="input-group-append rr-ownershipright-file-buttons">
+                                    <a class="btn btn-danger rr-ownershipright-file-remove" style="display: none"
+                                       href="#" title="Удалить образ документа" aria-label="Удалить образ документа"><span class="oi oi-x"></span></a>
+                                    <a class="btn btn-success rr-ownershipright-file-attach"
+                                       href="#" title="Прикрепить образ документа" aria-label="Прикрепить образ документа"><span class="oi oi-paperclip"></span></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary rr-report-submit">Добавить</button>
+                        <button type="button" class="btn btn-primary ownershipright-save-btn">Добавить</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
                     </div>
                 </div>

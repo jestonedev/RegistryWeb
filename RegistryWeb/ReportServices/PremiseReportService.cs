@@ -94,18 +94,21 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
-        public byte[] PremiseArea(int idPremise)
+        public byte[] PremisesArea(string idPremises)
         {
+            var fileName = Path.GetTempFileName();
+            using (var sw = new StreamWriter(fileName))
+                sw.Write(idPremises);
             var arguments = new Dictionary<string, object>
             {
-                { "filter", idPremise }
+                { "filterTmpFile", fileName },
             };
             var fileNameReport = GenerateReport(arguments, "registry\\registry\\area_premises");
+            //var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\area_premises");
             return DownloadFile(fileNameReport);
         }
 
-
-//___________для массовых______________
+        //___________для массовых______________
         public byte[] ExcerptPremises(string idPremises, string excerptNumber, DateTime excerptDateFrom, int signer)
         {
             var fileName = Path.GetTempFileName();
@@ -120,25 +123,11 @@ namespace RegistryWeb.ReportServices
                 { "executor", securityService.User.UserName },
                 { "signer", signer }
             };
-            //var fileNameReport = GenerateReport(arguments, "registry\\registry\\excerpt");
-            var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\premises_mx");
+            var fileNameReport = GenerateReport(arguments, "registry\\registry\\premises_mx");
+            //var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\premises_mx");
             return DownloadFile(fileNameReport);
         }
-
-        public byte[] PremisesArea(string idPremises)
-        {
-            var fileName = Path.GetTempFileName();
-            using (var sw = new StreamWriter(fileName))
-                sw.Write(idPremises);
-            var arguments = new Dictionary<string, object>
-            {
-                { "filterTmpFile", fileName },
-            };
-            //var fileNameReport = GenerateReport(arguments, "registry\\registry\\area_premises");
-            var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\area_premises");
-            return DownloadFile(fileNameReport);
-        }
-
+        
         public byte[] MassActPremises(string idPremises, DateTime actDate, bool isNotResides, string commision, int clerk)
         {
             var arguments = new Dictionary<string, object>
@@ -151,8 +140,8 @@ namespace RegistryWeb.ReportServices
                 { "ids_commission", commision },
                 { "id_clerk", clerk }
             };
-            //var fileNameReport = GenerateReport(arguments, "registry\\registry\\act_residence");
-            var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\act_residence");
+            var fileNameReport = GenerateReport(arguments, "registry\\registry\\act_residence");
+            //var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\act_residence");
             return DownloadFile(fileNameReport);
         }
 
@@ -211,8 +200,8 @@ namespace RegistryWeb.ReportServices
                 }
 
             };
-            //var fileNameReport = GenerateReport(arguments, "registry\\registry\\act_residence");
-            var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\export");
+            var fileNameReport = GenerateReport(arguments, "registry\\export");
+            //var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\export");
             return DownloadFile(fileNameReport);
         }
 
@@ -221,6 +210,7 @@ namespace RegistryWeb.ReportServices
             var fileName = Path.GetTempFileName();
             using (var sw = new StreamWriter(fileName))
                 sw.Write(string.Format("({0}) OR (id_state = 1 AND id_premises IN ({1}))", "id_state IN (4,5,9,11,12)", idPremises));
+
             var arguments = new Dictionary<string, object>
             {
                 //{ "filter", string.Format("({0}) OR (id_state = 1 AND id_premises IN ({1}))", "id_state IN (4,5,9,11,12)", idPremises) },
@@ -228,8 +218,8 @@ namespace RegistryWeb.ReportServices
                 { "executor", securityService.User.UserName }
 
             };
-            //var fileNameReport = GenerateReport(arguments, "registry\\registry\\act_residence");
-            var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\tenancy_history");
+            var fileNameReport = GenerateReport(arguments, "registry\\registry\\tenancy_history");
+            //var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\tenancy_history");
             return DownloadFile(fileNameReport);
         }
 
@@ -245,18 +235,17 @@ namespace RegistryWeb.ReportServices
                                select premisesRow.IdPremises;
             var ids = municipalIds
                 .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
-            //ids = ids.TrimEnd(',');
             var municipalStateIds = states
                 .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").Trim(',');
-            //municipalStateIds = municipalStateIds.Trim(',');
+
             var arguments = new Dictionary<string, object>
             {
                 { "filter", string.Format("(id_state IN ({0}) OR (id_state = 1 AND id_premises IN (0{1})))", municipalStateIds, ids) },
                 { "executor", securityService.User.UserName }
 
             };
-            //var fileNameReport = GenerateReport(arguments, "registry\\registry\\act_residence");
-            var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\tenancy_history");
+            var fileNameReport = GenerateReport(arguments, "registry\\registry\\tenancy_history");
+            //var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\tenancy_history");
             return DownloadFile(fileNameReport);
         }
     }

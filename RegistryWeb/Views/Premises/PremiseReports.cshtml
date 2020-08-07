@@ -11,21 +11,21 @@
 
 @section Scripts
 {
-    @*<script src="~/js/index.common.js" asp-append-version="true"></script>
-        <script src="~/js/premises.index.js" asp-append-version="true"></script>*@
     <script src="~/js/premises.reports.js" asp-append-version="true"></script>
+    <script src="~/js/premises.putdownRestrictions.js" asp-append-version="true"></script>
 }
 
 @section validation
-    {
+{
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
 }
 
+<div class="col status"></div>
+
 <h1>@ViewData["Title"]</h1>
 
 <h4>@text</h4>
-
 <div class="form-row">
     <div class="form-group col-md-3 col-lg-3">
         <a class="form-control btn btn-primary" asp-controller="Premises" asp-action="Index" asp-route-isBack="true">Назад</a>
@@ -46,7 +46,7 @@
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <button class="dropdown-item" href="#" id="massexcerpt">Выписка</button>
-                <button class="dropdown-item" href="#" id="massreference">Справки о площади помещения</button>
+                <button class="dropdown-item" href="#" id="massreference" data-id-premise="0">Справки о площади помещений</button>
                 <button class="dropdown-item" href="#" id="massact">Акт проверки факта о проживании</button>
                 <button class="dropdown-item" href="#" id="export">Экспорт</button>
                 <button class="dropdown-item" href="#" id="hiringhistory">История найма</button>
@@ -71,19 +71,6 @@
 
 </div>
 
-@*<div class="form-row">
-        <div class="form-group col-md-4">
-            <a class="btn btn-success" href="#" id="massexcerpt">Выписка</a>
-        </div>
-        <div class="form-group col-md-4">
-            <button class="btn btn-success" href="#" id="massreference">Справки о площади помещения</button>
-        </div>
-        <div class="form-group col-md-4">
-            <a class="btn  btn-success" href="#" id="massact">Акт проверки факта о проживании</a>
-        </div>
-    </div>*@
-
-
 <table class="table table-hover">
     <thead>
         <tr>
@@ -93,23 +80,29 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Premises)
+        @try
         {
-            <tr>
-                <td id="prem">@item.IdPremises</td>
-                <td>@item.IdBuildingNavigation?.IdStreetNavigation?.StreetLong, д. @item.IdBuildingNavigation?.House</td>
-                <td>
-                    <div class="btn-group" role="group" aria-label="Панель доступа">
-                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                           asp-action="Details" asp-controller="Premises" asp-route-idPremises="@item.IdPremises"></a>
-                        <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                           asp-action="SessionIdBuildingRemove" asp-controller="Premises" asp-route-idPremises="@item.IdPremises"></a>
-                    </div>
-                </td>
-            </tr>
+            foreach (var item in Model.Premises)
+            {
+                <tr>
+                    <td id="prem">@item.IdPremises</td>
+                    <td>@item.IdBuildingNavigation?.IdStreetNavigation?.StreetLong, д. @item.IdBuildingNavigation?.House</td>
+                    <td>
+                        <div class="btn-group" role="group" aria-label="Панель доступа">
+                            <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                               asp-action="Details" asp-controller="Premises" asp-route-idPremises="@item.IdPremises"></a>
+                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                               asp-action="SessionIdPremiseRemove" asp-controller="Premises" asp-route-idPremises="@item.IdPremises"></a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+        catch (Exception ex)
+        {
+            <tr><td colspan="3">Элементы отсутствуют</td></tr>
         }
     </tbody>
 </table>
-
 
 <partial name="ReportsModals" model="@Model">
