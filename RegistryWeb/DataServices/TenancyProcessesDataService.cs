@@ -357,6 +357,15 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
+        internal void UpdateExcludeDate(int? idProcess, DateTime? beginDate, DateTime? endDate, bool untilDismissal)
+        {
+            var process = registryContext.TenancyProcesses.FirstOrDefault(tp => tp.IdProcess == idProcess);
+            process.BeginDate = beginDate;
+            process.EndDate = endDate;
+            process.UntilDismissal = untilDismissal;
+            registryContext.SaveChanges();
+        }
+
         internal void Create(TenancyProcess tenancyProcess, IList<TenancyRentObject> rentObjects, List<Microsoft.AspNetCore.Http.IFormFile> files)
         {
             if (tenancyProcess.TenancyReasons != null)

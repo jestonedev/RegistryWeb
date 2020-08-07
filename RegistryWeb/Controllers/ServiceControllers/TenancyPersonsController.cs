@@ -87,5 +87,61 @@ namespace RegistryWeb.Controllers.ServiceControllers
             registryContext.SaveChanges();
             return Json(documentIssuedBy.IdDocumentIssuedBy);
         }
+
+        [HttpPost]
+        public IActionResult UpdateExcludeDate(int? idPerson, DateTime excludeDate)
+        {
+            if (idPerson == null || idPerson == 0)
+            {
+                return Json(new
+                {
+                    Code = -1,
+                    Text = "Не удалось найти участника найма"
+                });
+            }
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+            {
+                return Json(new
+                {
+                    Code = -1,
+                    Text = "У вас нет прав на редактирование найма жилья"
+                });
+            }
+            var person = registryContext.TenancyPersons.FirstOrDefault(p => p.IdPerson == idPerson);
+            person.ExcludeDate = excludeDate;
+            registryContext.SaveChanges();
+            return Json(new
+            {
+                Code = 0
+            });
+        }
+
+        [HttpPost]
+        public IActionResult UpdateIdKinship(int? idPerson, int idKinship)
+        {
+            if (idPerson == null || idPerson == 0)
+            {
+                return Json(new
+                {
+                    Code = -1,
+                    Text = "Не удалось найти участника найма"
+                });
+            }
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+            {
+                return Json(new
+                {
+                    Code = -1,
+                    Text = "У вас нет прав на редактирование найма жилья"
+                });
+            }
+            var person = registryContext.TenancyPersons.FirstOrDefault(p => p.IdPerson == idPerson);
+            person.IdKinship = idKinship;
+            registryContext.SaveChanges();
+            return Json(new
+            {
+                Code = 0
+            });
+        }
     }
 }

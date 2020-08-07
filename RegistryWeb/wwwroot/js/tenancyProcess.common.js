@@ -280,5 +280,6 @@ $(function () {
             }
         });
     });
+
+    $("#TenancyProcess_UntilDismissal").change();
 });
-;
