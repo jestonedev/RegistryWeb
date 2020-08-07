@@ -5,6 +5,7 @@ namespace RegistryWeb.ViewModel
 {
     public class BuildingsVM : ListVM<BuildingsFilter>
     {
-        public IEnumerable<Building> Buildings { get; set; }
+        public List<Building> Buildings { get; set; }
+        public Dictionary<int, bool> IsMunicipalDictionary { get; set; }
     }
 }

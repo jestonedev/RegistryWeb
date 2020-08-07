@@ -1,116 +1,161 @@
-﻿let getBuilding = function () {
-    let building = {
-        IdBuilding: $('#building [name="IdBuilding"]').val(),
-        IdStreet: $('#building [name="IdStreet"]').val(),
-        House: $('#building [name="House"]').val(),
-        IdDecree: $('#building [name="IdDecree"]').val(),
-        IdState: $('#building [name="IdState"]').val(),
-        IdStructureType: $('#building [name="IdStructureType"]').val(),
-        IdStructureTypeOverlap: $('#building [name="IdStructureTypeOverlap"]').val(),
-        IdHeatingType: $('#building [name="IdHeatingType"]').val(),
-        TotalArea: $('#building [name="TotalArea"]').val(),
-        LivingArea: $('#building [name="LivingArea"]').val(),
-        UnlivingArea: $('#building [name="UnlivingArea"]').val(),
-        CommonPropertyArea: $('#building [name="CommonPropertyArea"]').val(),
-        Floors: $('#building [name="Floors"]').val(),
-        Entrances: $('#building [name="Entrances"]').val(),
-        NumPremises: $('#building [name="NumPremises"]').val(),
-        NumRooms: $('#building [name="NumRooms"]').val(),
-        NumApartments: $('#building [name="NumApartments"]').val(),
-        NumSharedApartments: $('#building [name="NumSharedApartments"]').val(),
-        Series: $('#building [name="Series"]').val(),
-        CadastralNum: $('#building [name="CadastralNum"]').val(),
-        CadastralCost: $('#building [name="CadastralCost"]').val(),
-        BalanceCost: $('#building [name="BalanceCost"]').val(),
-        LandCadastralNum: $('#building [name="LandCadastralNum"]').val(),
-        LandCadastralDate: $('#building [name="LandCadastralDate"]').val(),
-        LandArea: $('#building [name="LandArea"]').val(),
-        StartupYear: $('#building [name="StartupYear"]').val(),
-        RegDate: $('#building [name="RegDate"]').val(),
-        DateOwnerEmergency: $('#building [name="DateOwnerEmergency"]').val(),
-        DemolishedFactDate: $('#building [name="DemolishedFactDate"]').val(),
-        IsMemorial: $('#building [name="IsMemorial"]').is(':checked'),
-        MemorialNumber: $('#building [name="MemorialNumber"]').val(),
-        MemorialDate: $('#building [name="MemorialDate"]').val(),
-        MemorialNameOrg: $('#building [name="MemorialNameOrg"]').val(),
-        Improvement: $('#building [name="Improvement"]').is(':checked'),
-        Elevator: $('#building [name="Elevator"]').is(':checked'),
-        RubbishChute: $('#building [name="RubbishChute.Value"]').is(':checked'),
-        Plumbing: $('#building [name="Plumbing.Value"]').is(':checked'),
-        HotWaterSupply: $('#building [name="HotWaterSupply.Value"]').is(':checked'),
-        Canalization: $('#building [name="Canalization.Value"]').is(':checked'),
-        Electricity: $('#building [name="Electricity.Value"]').is(':checked'),
-        RadioNetwork: $('#building [name="RadioNetwork.Value"]').is(':checked'),
-        Wear: $('#building [name="Wear"]').val(),
-        RentCoefficient: $('#building [name="RentCoefficient"]').val(),
-        HousingCooperative: $('#building [name="HousingCooperative"]').val(),
-        Description: $('#building [name="Description"]').val(),
-        BtiRooms: $('#building [name="BtiRooms"]').val(),
+﻿let getInputTemplate = function (name, value) {
+    return '<input type="hidden" name="' + name + '" value="' + value + '">';
+};
 
-        OwnershipBuildingsAssoc: CreateOwnershipBuildingsAssoc()
-    };
-    return building;
-}
-let createBuildingClick = function () {
-    console.log('createBuildingClick');
-    let building = getBuilding();
-    let jsonBuildingDemolitionInfo = _buildingDemolitionInfo.getJson();
-    building.BuildingDemolitionActFiles = jsonBuildingDemolitionInfo.BuildingDemolitionActFiles;
-    building.DemolishedPlanDate = jsonBuildingDemolitionInfo.DemolishedPlanDate;
-    console.log(_buildingDemolitionInfo.form);
-    //Запуск ручной валидации, тк отсутсвует submit
-    var buildingIsValid = $('#building').valid();
-    var ownershipRightsIsValid = $("#ownershipRightsForm").valid();
-    var buildingDemolitionInfoValid = _buildingDemolitionInfo.form.valid();
-    console.log(buildingDemolitionInfoValid);
-    if (buildingIsValid && ownershipRightsIsValid) {
-        //временное решение
-        if (building.OwnershipBuildingsAssoc != null) {
-            building.OwnershipBuildingsAssoc.forEach(function (value) {
-                value.OwnershipRightNavigation.OwnershipRightFile = null;
-            });
+let createBuildingClick = function (event) {
+    event.preventDefault();
+    $("input.decimal").each(function (idx, elem) {
+        $(elem).val($(elem).val().replace(".", ","));
+    });
+    $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
+    let buildingIsValid = $('#building').valid();
+    let restrictionsIsValid = $("#restrictionsForm").valid();
+    let ownershipRightsIsValid = $("#ownershipRightsForm").valid();
+    let buildingDemolitionInfoValid = _buildingDemolitionInfo.form.valid();
+    if (buildingIsValid && restrictionsIsValid && ownershipRightsIsValid && buildingDemolitionInfoValid) {
+        var restrictions = CreateRestrictionBuildingsAssoc();
+        for (let i = 0; i < restrictions.length; i++) {
+            let rba = "RestrictionBuildingsAssoc[" + i + "].";
+            let rn = rba + "RestrictionNavigation.";
+            $('#building').append(getInputTemplate(rba + 'IdBuilding', $('#building [name="IdBuilding"]').val()));
+            $('#building').append(getInputTemplate(rba + 'IdRestriction', restrictions[i].RestrictionNavigation.IdRestriction));
+            $('#building').append(getInputTemplate(rn + 'IdRestriction', restrictions[i].RestrictionNavigation.IdRestriction));
+            $('#building').append(getInputTemplate(rn + 'Number', restrictions[i].RestrictionNavigation.Number));
+            $('#building').append(getInputTemplate(rn + 'Date', restrictions[i].RestrictionNavigation.Date));
+            $('#building').append(getInputTemplate(rn + 'Description', restrictions[i].RestrictionNavigation.Description));
+            $('#building').append(getInputTemplate(rn + 'IdRestrictionType', restrictions[i].RestrictionNavigation.IdRestrictionType));
+            let file = $(restrictions[i].RestrictionNavigation.RestrictionFile).clone();
+            file.attr("name", "RestrictionFile[" + i + "]");
+            $('#building').append(file);
         }
-        $.ajax({
-            async: false,
-            type: 'POST',
-            url: window.location.origin + '/Buildings/Create',
-            data: { building },
-            success: function (idBuilding) {
-                if (idBuilding < 1) {
-                    alert('Ошибка создания!');
-                }
-                window.location.href = window.location.origin + '/Buildings';
-            }
-        });
+        let obas = CreateOwnershipBuildingsAssoc();
+        for (let i = 0; i < obas.length; i++) {
+            let oba = "OwnershipBuildingsAssoc[" + i + "].";
+            let orn = oba + "OwnershipRightNavigation.";
+            $('#building').append(getInputTemplate(oba + 'IdBuilding', $('#building [name="IdBuilding"]').val()));
+            $('#building').append(getInputTemplate(oba + 'IdOwnershipRight', obas[i].OwnershipRightNavigation.IdOwnershipRight));
+            $('#building').append(getInputTemplate(orn + 'IdOwnershipRight', obas[i].OwnershipRightNavigation.IdOwnershipRight));
+            $('#building').append(getInputTemplate(orn + 'Number', obas[i].OwnershipRightNavigation.Number));
+            $('#building').append(getInputTemplate(orn + 'Date', obas[i].OwnershipRightNavigation.Date));
+            $('#building').append(getInputTemplate(orn + 'Description', obas[i].OwnershipRightNavigation.Description));
+            $('#building').append(getInputTemplate(orn + 'IdOwnershipRightType', obas[i].OwnershipRightNavigation.IdOwnershipRightType));
+            $('#building').append(getInputTemplate(orn + 'ResettlePlanDate', obas[i].OwnershipRightNavigation.ResettlePlanDate));
+            $('#building').append(getInputTemplate(orn + 'DemolishPlanDate', obas[i].OwnershipRightNavigation.DemolishPlanDate));
+            let file = $(obas[i].OwnershipRightNavigation.OwnershipRightFile).clone();
+            file.attr("name", "OwnershipRightFile[" + i + "]");
+            $('#building').append(file);
+        }
+        let buildingDemolitionInfo = _buildingDemolitionInfo.getJson();
+        $('#building').append(getInputTemplate('DemolishedPlanDate', buildingDemolitionInfo.DemolishedPlanDate));
+        $('#building').append(getInputTemplate('DemolishedFactDate', buildingDemolitionInfo.DemolishedFactDate));
+        $('#building').append(getInputTemplate('DateOwnerEmergency', buildingDemolitionInfo.DateOwnerEmergency));
+        $('#building').append(getInputTemplate('DemandForDemolishingDeliveryDate', buildingDemolitionInfo.DemandForDemolishingDeliveryDate));
+        let buildingDemolitionActFiles = buildingDemolitionInfo.BuildingDemolitionActFiles;
+        for (let i = 0; i < buildingDemolitionActFiles.length; i++) {
+            let bdaf = "BuildingDemolitionActFiles[" + i + "].";
+            $('#building').append(getInputTemplate(bdaf + 'Id', buildingDemolitionActFiles[i].Id));
+            $('#building').append(getInputTemplate(bdaf + 'IdBuilding', buildingDemolitionActFiles[i].IdBuilding));
+            $('#building').append(getInputTemplate(bdaf + 'IdActFile', buildingDemolitionActFiles[i].IdActFile));
+            $('#building').append(getInputTemplate(bdaf + 'IdActTypeDocument', buildingDemolitionActFiles[i].IdActTypeDocument));
+            $('#building').append(getInputTemplate(bdaf + 'Number', buildingDemolitionActFiles[i].Number));
+            $('#building').append(getInputTemplate(bdaf + 'Date', buildingDemolitionActFiles[i].Date));
+            $('#building').append(getInputTemplate(bdaf + 'Name', buildingDemolitionActFiles[i].Name));
+            let file = $(buildingDemolitionActFiles[i].FileInput).clone();
+            file.attr("name", "BuildingDemolitionActFile[" + i + "]");
+            $('#building').append(file);
+        }
+        let attachmentFiles = CreateBuildingAttachmentFilesAssoc();
+        for (let i = 0; i < attachmentFiles.length; i++) {
+            let baf = "BuildingAttachmentFilesAssoc[" + i + "].";
+            let oaf = baf + "ObjectAttachmentFileNavigation.";
+            $('#building').append(getInputTemplate(baf + 'IdBuilding', $('#building [name="IdBuilding"]').val()));
+            $('#building').append(getInputTemplate(baf + 'IdAttachment', attachmentFiles[i].ObjectAttachmentFileNavigation.IdAttachment));
+            $('#building').append(getInputTemplate(oaf + 'IdAttachment', attachmentFiles[i].ObjectAttachmentFileNavigation.IdAttachment));
+            $('#building').append(getInputTemplate(oaf + 'Description', attachmentFiles[i].ObjectAttachmentFileNavigation.Description));
+            let file = $(attachmentFiles[i].ObjectAttachmentFileNavigation.AttachmentFile).clone();
+            file.attr("name", "AttachmentFile[" + i + "]");
+            $('#building').append(file);
+        }
+        $('#building').submit();
+    } else {
+        onSubmitErrorsPostProcessing();
     }
-}
-let editBuildingClick = function () {
-    let cadastralCost = $('#building [name="CadastralCost"]');
-    let balanceCost = $('#building [name="BalanceCost"]');
-    let rentCoefficient = $('#building [name="RentCoefficient"]');
-    cadastralCost.val(cadastralCost.val().replace('.', ','));
-    balanceCost.val(balanceCost.val().replace('.', ','));
-    rentCoefficient.val(rentCoefficient.val().replace('.', ','));
+};
+
+let editBuildingClick = function (e) {
+    $("input.decimal").each(function (idx, elem) {
+        $(elem).val($(elem).val().replace(".", ","));
+    });
+    $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
+    let buildingIsValid = $('#building').valid();
+    if (buildingIsValid) {
+        $('#building').submit();
+    } else {
+        onSubmitErrorsPostProcessing();
+    }
+    e.preventDefault();
+};
+
+let deleteBuildingClick = function (e) {
     $('#building').submit();
+    e.preventDefault();
 }
+
+let onSubmitErrorsPostProcessing = function () {
+    $("select").each(function (idx, elem) {
+        var id = $(elem).prop("id");
+        var name = $(elem).prop("name");
+        var errorSpan = $("span[data-valmsg-for='" + name + "']");
+        if (errorSpan.hasClass("field-validation-error")) {
+            $("button[data-id='" + id + "']").addClass("input-validation-error");
+        }
+    });
+
+    $(".toggle-hide").each(function (idx, elem) {
+        if ($(elem).find(".field-validation-error").length > 0) {
+            var toggler = $(elem).closest(".card").find("[id$='Toggle']");
+            if (!isExpandElemntArrow(toggler)) {
+                toggler.click();
+            }
+        }
+    });
+    $([document.documentElement, document.body]).animate({
+        scrollTop: $(".input-validation-error").first().offset().top - 35
+    }, 1000);
+};
+
 let memorialCardClick = function () {
     var isMemorial = $('#IsMemorial').is(':checked');
     $('#MemorialNumber').prop('disabled', !isMemorial);
     $('#MemorialDate').prop('disabled', !isMemorial);
     $('#MemorialNameOrg').prop('disabled', !isMemorial);
-}
+};
+
 $(function () {
     var action = $('#building').data("action");
-    if (action == "Details" || action == "Delete") {
+    var canEditBaseInfo = JSON.parse($('#building').data("caneditbaseinfo").toLowerCase());
+    memorialCardClick();
+    if (action === "Details" || action === "Delete" || !canEditBaseInfo) {
         $('#building select').prop('disabled', true);
         $('#building input').prop('disabled', true);
         $('#building textarea').prop('disabled', true);
         $('#building input[type="hidden"]').prop('disabled', false);
         $('#building input[type="submit"]').prop('disabled', false);
     }
-    memorialCardClick();
-    $('#buildingToggle').on('click', $('#building'), elementToogle);
+    $('#buildingToggle').on('click', $('#building'), elementToogleHide);
     $('#createBtn').click(createBuildingClick);
     $('#editBtn').click(editBuildingClick);
+    $('#deleteBtn').click(deleteBuildingClick);
     $('#IsMemorial').click(memorialCardClick);
+
+    $("form").on("change", "select", function () {
+        var isValid = $(this).valid();
+        var id = $(this).prop("id");
+        if (!isValid) {
+            $("button[data-id='" + id + "']").addClass("input-validation-error");
+        } else {
+
+            $("button[data-id='" + id + "']").removeClass("input-validation-error");
+        }
+    });
 });

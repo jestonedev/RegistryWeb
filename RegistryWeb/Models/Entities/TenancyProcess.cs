@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using RegistryWeb.Models.SqlViews;
 
 namespace RegistryWeb.Models.Entities
@@ -48,5 +49,6 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<TenancyAgreement> TenancyAgreements { get; set; }
         public virtual IList<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
         public virtual IList<TenancyRentPeriod> TenancyRentPeriods { get; set; }
+        public virtual IList<TenancyFile> TenancyFiles { get; set; }
     }
 }

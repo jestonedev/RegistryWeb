@@ -1,0 +1,9 @@
+﻿.rr-tenancy-reason-edit-buttons {
+    margin-top: 0;
+}
+
+@media(min-width: 768px) {
+    .rr-tenancy-reason-edit-buttons {
+        margin-top: 32px;
+    }
+}

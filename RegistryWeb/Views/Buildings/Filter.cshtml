@@ -1,4 +1,8 @@
 ﻿@model RegistryWeb.ViewModel.BuildingsVM;
+@using RegistryWeb.SecurityServices;
+@{
+    var securityService = (SecurityService)ViewData["SecurityService"];
+}
 <form asp-action="Index" method="get" class="filterForm">
     <input type="hidden" asp-for="OrderOptions.OrderDirection" />
     <input type="hidden" asp-for="OrderOptions.OrderField" />
@@ -8,10 +12,13 @@
     <input type="hidden" asp-for="FilterOptions.Address.Id" />
 
     <div class="form-row">
-        <div class="form-group col-1">
-            <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="Buildings" asp-action="Create">&#10010;</a>
-        </div>
-        <div class="input-group col-9">
+        @if ((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)))
+        {
+            <div class="form-group col-1">
+                <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="Buildings" asp-action="Create">&#10010;</a>
+            </div>
+         }
+        <div class="input-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-9" : "col-10")">
             <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
             <div class="input-group-append h-auto d-inline-block">
                 <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
@@ -20,19 +27,19 @@
         @if (Model.FilterOptions.IsModalEmpty())
         {
             <div class="form-group col-2">
-                <a class="btn btn-block btn-secondary" id="filterModalShow">Фильтр</a>
+                <a class="btn btn-block btn-secondary" id="filterModalShow" href="#">Фильтр</a>
             </div>
         }
         else
         {
             <div class="form-group btn-group col-2">
-                <a class="btn btn-block btn-secondary" id="filterModalShow">Фильтр</a>
+                <a class="btn btn-block btn-secondary" id="filterModalShow" href="#">Фильтр</a>
                 <a class="btn btn-outline-secondary" id="filterClearBtn">&#10006;</a>
             </div>
         }
         @*<div class="form-group col-2">
-            <a class="btn btn-block btn-success" asp-controller="Buildings" asp-action="BuildingReports">Отчеты</a>
-        </div>*@
+                <a class="btn btn-block btn-success" asp-controller="Buildings" asp-action="BuildingReports">Отчеты</a>
+            </div>*@
     </div>
     <!-- Modal -->
     <div class="modal fade bd-example-modal-xl" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
@@ -44,39 +51,37 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body"> 
+                <div class="modal-body">
                     <div class="form-row">
-                        <div class="form-group col-2">
-                            <label asp-for="FilterOptions.IdBuilding">Реестровый номер</label>
+                        <div class="form-group col-xl-2 col-md-4">
+                            <label asp-for="FilterOptions.IdBuilding" class="rr-building-label">Реестровый номер</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.IdBuilding" title="Реестровый номер здания">
                         </div>
-                        <div class="form-group col-8">
+                        <div class="form-group col-xl-8 col-md-8">
                             <label asp-for="FilterOptions.IdStreet">Улица</label>
                             <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@{
                             new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.FilterOptions.IdStreet)}">
                                 <option selected></option>
                             </select>
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-xl-2 col-md-4">
                             <label asp-for="FilterOptions.House">Номер дома</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.House" title="Номер дома">
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-2">
-                            <label asp-for="FilterOptions.Floors">Количество этажей</label>
+                        <div class="form-group col-xl-2 col-md-4">
+                            <label asp-for="FilterOptions.Floors" class="rr-building-label">Количество этажей</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.Floors" title="Количество этажей">
                         </div>
-                        <div class="form-group col-2">
-                            <label asp-for="FilterOptions.Entrances">Количество подъездов</label>
+                        <div class="form-group col-xl-2 col-md-4">
+                            <label asp-for="FilterOptions.Entrances" class="rr-building-label">Количество подъездов</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.Entrances" title="Количество подъездов">
                         </div>
-                        <div class="form-group col-6">
+                        <div class="form-group col-md-6">
                             <label asp-for="FilterOptions.IdsObjectState">Текущее состояние объекта</label>
                             <select multiple class="selectpicker form-control" data-actions-box="true" title="Текущее состояние объекта" asp-for="FilterOptions.IdsObjectState" asp-items="@{
                                 new SelectList(ViewBag.ObjectStates, "IdState", "StateNeutral", Model.FilterOptions.IdsObjectState)}"></select>
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-xl-2 col-md-6">
                             <label asp-for="FilterOptions.IdDecree">Постановление</label>
                             <select class="selectpicker form-control" title="Постановление" asp-for="FilterOptions.IdDecree" asp-items="@{
                                 new SelectList(ViewBag.GovernmentDecrees, "IdDecree", "Number", Model.FilterOptions.IdDecree)}">
@@ -85,15 +90,15 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-3">
+                        <div class="form-group col-md-6 col-lg-3">
                             <label asp-for="FilterOptions.DateOwnershipRight">Дата ограничения</label>
                             <input type="date" class="form-control" asp-for="FilterOptions.DateOwnershipRight" title="Дата ограничения">
                         </div>
-                        <div class="form-group col-3">
+                        <div class="form-group col-md-6 col-lg-3">
                             <label asp-for="FilterOptions.NumberOwnershipRight">Номер ограницения</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.NumberOwnershipRight" title="Номер ограницения">
                         </div>
-                        <div class="form-group col-6">
+                        <div class="form-group col-md-12 col-lg-6">
                             <label asp-for="FilterOptions.IdsOwnershipRightType">Тип ограничения <b>содержит</b></label>
                             <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип ограничения содержит" asp-for="FilterOptions.IdsOwnershipRightType" asp-items="@{
                                 new SelectList(ViewBag.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName", Model.FilterOptions.IdsOwnershipRightType)}"></select>

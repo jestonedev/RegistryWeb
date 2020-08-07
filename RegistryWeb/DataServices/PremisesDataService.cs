@@ -112,6 +112,10 @@ namespace RegistryWeb.DataServices
             {
                 query = query.Where(p => p.IdPremises == filterOptions.IdPremise.Value);
             }
+            if (filterOptions.IdBuilding.HasValue)
+            {
+                query = query.Where(p => p.IdBuilding == filterOptions.IdBuilding.Value);
+            }
             if (!string.IsNullOrEmpty(filterOptions.IdStreet))
             {
                 query = query.Where(b => b.IdBuildingNavigation.IdStreet == filterOptions.IdStreet);

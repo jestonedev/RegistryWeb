@@ -1,0 +1,31 @@
+﻿@using RegistryWeb.Models.Entities;
+@model IList<TenancyFile>;
+
+<link rel="stylesheet" href="~/css/tenancy.files.css" />
+<script src="~/js/tenancyProcess.files.js"></script>
+<form id="TenancyFilesForm">
+    <div class="card rr-tenancy-card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Прикрепленные образы документов</h3>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                    <a href="#" id="tenancyFileAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить образо документа">&#10010;</a>
+                }
+                <a href="#" data-for="TenancyProcessFiles" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель образов документов" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush toggle-hide" id="TenancyProcessFiles" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
+            <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
+                <i>Образы документов отсутствуют</i>
+            </li>
+            @if (Model != null && Model.Any())
+            {
+                for (var i = 0; i < Model.Count; i++)
+                {
+                    <partial name="AttachmentFile" model="Model[i]" />
+                }
+            }
+        </ul>
+    </div>
+</form>

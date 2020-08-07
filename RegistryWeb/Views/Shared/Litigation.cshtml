@@ -6,7 +6,7 @@
 @using RegistryWeb.DataHelpers;
 
 @{
-    var canEdit = ((bool?)ViewBag.CanEditExtInfo) ?? true;
+    var canEdit = ((bool?)ViewBag.CanEditLitigationInfo) ?? true;
     var litigationTypeClass = "col-md-10";
     if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
     {

@@ -7,7 +7,7 @@
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {
-                    <a href="#" id="resettleAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditExtInfo ?? true) ? "" : "disabled")" title="Добавить информацию о переселении">&#10010;</a>
+                    <a href="#" id="resettleAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditResettleInfo ?? true) ? "" : "disabled")" title="Добавить информацию о переселении">&#10010;</a>
                 }
                 <a href="#" id="resettlesToggle" class="form-control btn btn-primary" title="Развернуть информацию о переселении" style="font-weight:bold;">∨</a>
             </div>

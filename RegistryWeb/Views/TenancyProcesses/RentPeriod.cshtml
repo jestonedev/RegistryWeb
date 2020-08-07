@@ -1,0 +1,80 @@
+﻿@using RegistryWeb.Models.Entities;
+@model TenancyRentPeriod;
+
+@{ 
+    var widthClass = "col-lg-12";
+    if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+    {
+        widthClass = "col-lg-9";
+    }
+    var id = Guid.NewGuid();
+}
+
+<li class="list-group-item">
+    <input type="hidden" value="@Model.IdRentPeriod" name="IdRentPeriod_@id" />
+    <div class="form-row">
+        <div class="form-group col-lg-6">
+            <label>С</label>
+            <input type="date" class="form-control" disabled asp-for="BeginDate"
+                   value="@(Model.BeginDate.HasValue ? Model.BeginDate.Value.ToString("yyyy-MM-dd") : "")" id="BeginDate_@id" name="BeginDate_@id" title="Дата начала периода">
+        </div>
+        <div class="form-group col-lg-6">
+            <label>По</label>
+            <input type="date" class="form-control" disabled asp-for="EndDate"
+                   value="@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("yyyy-MM-dd") : "")" id="EndDate_@id" name="EndDate_@id" title="Дата окончания периода">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="@widthClass">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" asp-for="UntilDismissal" id="UntilDismissal_@id" name="UntilDismissal_@id" disabled />
+                <label class="form-check-label" title="На период трудовых отношений / пролонгирован">На период ТО / пролонгирован</label>
+            </div>
+        </div>
+        @if (ViewBag.Action == "Edit")
+        {
+            <div class="text-md-right text-center col-lg-3 rr-rent-period-edit-buttons d-none d-lg-block">
+                <div class="btn-group yes-no-panel" role="group" style="display: none" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger rent-period-cancel-btn" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                    <a class="btn btn-success rent-period-save-btn" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                </div>
+                <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                    <a class="btn btn-primary rent-period-edit-btn" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                    <a class="btn btn-danger rent-period-delete-btn" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                </div>
+            </div>
+        }
+        @if (ViewBag.Action == "Create")
+        {
+            <a class="rent-period-edit-btn" style="display: none"></a>
+            <div class="text-md-right text-center col-lg-3 rr-rent-period-edit-buttons d-none d-lg-block">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger rent-period-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (ViewBag.Action == "Edit")
+    {
+        <div class="text-center col-12 text-center rr-rent-period-edit-buttons d-lg-none">
+            <div class="btn-group yes-no-panel" role="group" style="display: none" aria-label="Панель подтверждения">
+                <a class="btn btn-danger rent-period-cancel-btn" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                <a class="btn btn-success rent-period-save-btn" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+            </div>
+            <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                <a class="btn btn-primary rent-period-edit-btn" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                <a class="btn btn-danger rent-period-delete-btn" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+            </div>
+        </div>
+    }
+    @if (ViewBag.Action == "Create")
+    {
+        <a class="rent-period-edit-btn" style="display: none"></a>
+        <div class="text-center col-12 rr-rent-period-edit-buttons d-lg-none">
+            <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                <a class="btn btn-danger rent-period-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
+            </div>
+        </div>
+    }
+</li>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,6 +10,7 @@ namespace RegistryWeb.Models.Entities
     {
         public int IdReason { get; set; }
         public int IdProcess { get; set; }
+        [Required(ErrorMessage = "Выберите тип основания")]
         public int IdReasonType { get; set; }
         public string ReasonNumber { get; set; }
         public DateTime? ReasonDate { get; set; }

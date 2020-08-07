@@ -33,7 +33,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         {
             if (idLitigation == null)
                 return -1;
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo))
                 return -2;
             try
             {
@@ -88,7 +88,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Litigations\");
             if (litigation == null)
                 return Json(new { Error = -1 });
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo))
                 return Json(new { Error = -2 });
             if (litigationFile != null && !litigationFileRemove)
             {
@@ -149,7 +149,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         [HttpPost]
         public IActionResult AddLitigation(AddressTypes addressType, string action)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo))
                 return Json(-2);
 
             var litigation = new Litigation { };

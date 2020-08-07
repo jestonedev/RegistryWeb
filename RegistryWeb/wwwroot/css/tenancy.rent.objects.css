@@ -1,0 +1,17 @@
+﻿.rr-tenancy-rent-objects-edit-buttons, .rr-tenancy-rent-objects-view-buttons {
+    margin-top: 0;
+}
+
+@media(min-width: 992px) {
+    .rr-tenancy-rent-objects-edit-buttons, .rr-tenancy-rent-objects-view-buttons {
+        margin-top: 32px;
+    }
+}
+
+.rr-tenancy-rent-object-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 0.24rem;
+}

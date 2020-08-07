@@ -11,6 +11,8 @@ using RegistryWeb.ViewModel;
 using RegistryWeb.Extensions;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
+using RegistryWeb.Models.Entities;
+using RegistryWeb.Models;
 
 namespace RegistryWeb.Controllers
 {
@@ -59,77 +61,207 @@ namespace RegistryWeb.Controllers
             var process = dataService.GetTenancyProcess(idProcess.Value);
             if (process == null)
                 return NotFound();
-
+            ViewBag.CanEditBaseInfo = securityService.HasPrivilege(Privileges.TenancyWrite);
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(process));
         }
-
-        // GET: TenancyProcesses/Create
+        
         public ActionResult Create()
         {
-            return View();
+            ViewBag.Action = "Create";
+            ViewBag.SecurityService = securityService;
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return View("NotAccess");
+            ViewBag.CanEditBaseInfo = true;
+            return View("TenancyProcess", dataService.CreateTenancyProcessEmptyViewModel());
         }
-
-        // POST: TenancyProcesses/Create
+        
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(TenancyProcessVM tenancyProcessVM)
         {
-            try
+            if (tenancyProcessVM == null || tenancyProcessVM.TenancyProcess == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return View("NotAccess");
+            if (ModelState.IsValid)
             {
-                // TODO: Add insert logic here
-
-                return RedirectToAction(nameof(Index));
+                dataService.Create(tenancyProcessVM.TenancyProcess, tenancyProcessVM.RentObjects,
+                    HttpContext.Request.Form.Files.Select(f => f).ToList());
+                return RedirectToAction("Details", new { tenancyProcessVM.TenancyProcess.IdProcess });
             }
-            catch
-            {
-                return View();
-            }
+            ViewBag.Action = "Create";
+            ViewBag.SecurityService = securityService;
+            ViewBag.CanEditBaseInfo = true;
+            return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcessVM.TenancyProcess));
         }
-
-        // GET: TenancyProcesses/Edit/5
-        public ActionResult Edit(int id)
+        
+        public ActionResult Edit(int? idProcess, string returnUrl)
         {
-            return View();
-        }
+            ViewBag.Action = "Edit";
+            ViewBag.ReturnUrl = returnUrl;
+            ViewBag.SecurityService = securityService;
+            if (idProcess == null)
+                return NotFound();
 
-        // POST: TenancyProcesses/Edit/5
+            var tenancyProcess = dataService.GetTenancyProcess(idProcess.Value);
+            if (tenancyProcess == null)
+                return NotFound();
+
+            ViewBag.CanEditBaseInfo = securityService.HasPrivilege(Privileges.TenancyWrite);
+
+            if (!(bool)ViewBag.CanEditBaseInfo)
+                return View("NotAccess");
+            return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcess));
+        }
+        
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(TenancyProcessVM tenancyProcessVM, string returnUrl)
         {
-            try
-            {
-                // TODO: Add update logic here
+            if (tenancyProcessVM == null || tenancyProcessVM.TenancyProcess == null)
+                return NotFound();
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
+            ViewBag.CanEditBaseInfo = securityService.HasPrivilege(Privileges.TenancyWrite);
+
+            if (!(bool)ViewBag.CanEditBaseInfo)
+                return View("NotAccess");
+
+            if (ModelState.IsValid)
             {
-                return View();
+                tenancyProcessVM.TenancyProcess.TenancyRentPeriods = null;
+                dataService.Edit(tenancyProcessVM.TenancyProcess);
+                return RedirectToAction("Details", new { tenancyProcessVM.TenancyProcess.IdProcess });
             }
+            ViewBag.Action = "Edit";
+            ViewBag.ReturnUrl = returnUrl;
+            ViewBag.SecurityService = securityService;
+            return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcessVM.TenancyProcess));
         }
-
-        // GET: TenancyProcesses/Delete/5
-        public ActionResult Delete(int id)
+        
+        public ActionResult Delete(int? idProcess, string returnUrl)
         {
-            return View();
-        }
+            ViewBag.Action = "Delete";
+            ViewBag.ReturnUrl = returnUrl;
+            ViewBag.SecurityService = securityService;
+            if (idProcess == null)
+                return NotFound();
 
-        // POST: TenancyProcesses/Delete/5
+            var tenancyProcess = dataService.GetTenancyProcess(idProcess.Value);
+            if (tenancyProcess == null)
+                return NotFound();
+
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return View("NotAccess");
+
+            ViewBag.CanEditBaseInfo = false;
+
+            return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcess));
+        }
+        
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(TenancyProcessVM tenancyProcessVM)
         {
-            try
-            {
-                // TODO: Add delete logic here
+            if (tenancyProcessVM == null || tenancyProcessVM.TenancyProcess == null)
+                return NotFound();
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return View("NotAccess");
+
+            dataService.Delete(tenancyProcessVM.TenancyProcess.IdProcess);
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult AddRentPeriod(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+
+            var rentPeriod = new TenancyRentPeriod { };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+
+            return PartialView("RentPeriod", rentPeriod);
+        }
+
+        [HttpPost]
+        public IActionResult AddTenancyReason(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+
+            var reason = new TenancyReason { };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+            ViewBag.TenancyReasonTypes = dataService.TenancyReasonTypes;
+
+            return PartialView("TenancyReason", reason);
+        }
+
+        [HttpPost]
+        public IActionResult AddTenancyPerson(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+
+            var person = new TenancyPerson { };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+            ViewBag.Kinships = dataService.Kinships;
+
+            return PartialView("TenancyPerson", person);
+        }
+
+        [HttpPost]
+        public IActionResult AddTenancyAgreement(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+
+            var agreement = new TenancyAgreement {
+                IdExecutor = dataService.ActiveExecutors.FirstOrDefault(e => e.ExecutorLogin != null &&
+                        e.ExecutorLogin.ToLowerInvariant() == securityService.User.UserName.ToLowerInvariant())?.IdExecutor,
+                AgreementDate = DateTime.Now.Date,
+                AgreementContent = @"1.1. По настоящему Соглашению Стороны по договору № {0} от {1} {2} найма жилого помещения, расположенного по адресу: {3}, договорились:"
+            };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+            ViewBag.Executors = dataService.ActiveExecutors;
+
+            return PartialView("TenancyAgreement", agreement);
+        }
+
+        [HttpPost]
+        public IActionResult AddRentObject(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+
+            var rentObject = new TenancyRentObject { Address = new Address {
+                AddressType = AddressTypes.None
+            } };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+            ViewBag.Streets = dataService.Streets;
+
+            return PartialView("RentObject", rentObject);
+        }
+
+        [HttpPost]
+        public IActionResult AddTenancyFile(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+
+            var file = new TenancyFile { };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+
+            return PartialView("AttachmentFile", file);
         }
     }
 }

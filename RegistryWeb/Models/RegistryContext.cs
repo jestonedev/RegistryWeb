@@ -47,17 +47,21 @@ namespace RegistryWeb.Models
         public virtual DbSet<FundSubPremiseAssoc> FundsSubPremisesAssoc { get; set; }
         public virtual DbSet<HeatingType> HeatingTypes { get; set; }
         public virtual DbSet<ObjectState> ObjectStates { get; set; }        
-        public virtual DbSet<OwnershipBuildingAssoc> OwnershipBuildingsAssoc { get; set; }
-        public virtual DbSet<OwnershipPremiseAssoc> OwnershipPremisesAssoc { get; set; }
-        public virtual DbSet<OwnershipRightType> OwnershipRightTypes { get; set; }
-        public virtual DbSet<OwnershipRight> OwnershipRights { get; set; }
         public virtual DbSet<TotalAreaAvgCost> TotalAreaAvgCosts { get; set; }
+        public virtual DbSet<PremisesComment> PremisesComments { get; set; }
+        public virtual DbSet<PremisesDoorKeys> PremisesDoorKeys { get; set; }
+        public virtual DbSet<PremisesKind> PremisesKinds { get; set; }
+        public virtual DbSet<PremisesType> PremisesTypes { get; set; }
+        public virtual DbSet<StructureType> StructureTypes { get; set; }
+        public virtual DbSet<StructureTypeOverlap> StructureTypeOverlaps { get; set; }
+        public virtual DbSet<FoundationType> FoundationTypes { get; set; }
+        public virtual DbSet<GovernmentDecree> GovernmentDecrees { get; set; }
+        public virtual DbSet<SelectableSigner> SelectableSigners { get; set; }
 
         //Документы
         public virtual DbSet<ActTypeDocument> ActTypeDocuments { get; set; }
         public virtual DbSet<ActFile> ActFiles { get; set; }
         public virtual DbSet<BuildingDemolitionActFile> BuildingDemolitionActFiles { get; set; }
-
         public virtual DbSet<RestrictionBuildingAssoc> RestrictionBuildingsAssoc { get; set; }
         public virtual DbSet<RestrictionPremiseAssoc> RestrictionPremisesAssoc { get; set; }
         public virtual DbSet<RestrictionType> RestrictionTypes { get; set; }
@@ -65,14 +69,12 @@ namespace RegistryWeb.Models
         public virtual DbSet<Litigation> Litigations { get; set; }
         public virtual DbSet<LitigationPremiseAssoc> LitigationPremisesAssoc { get; set; }
         public virtual DbSet<LitigationType> LitigationTypes { get; set; }
-        public virtual DbSet<PremisesComment> PremisesComments { get; set; }
-        public virtual DbSet<PremisesDoorKeys> PremisesDoorKeys { get; set; }
-        public virtual DbSet<PremisesKind> PremisesKinds { get; set; }
-        public virtual DbSet<PremisesType> PremisesTypes { get; set; }
-        public virtual DbSet<StructureType> StructureTypes { get; set; }
-        public virtual DbSet<StructureTypeOverlap> StructureTypeOverlaps { get; set; }
-        public virtual DbSet<GovernmentDecree> GovernmentDecrees { get; set; }
-        public virtual DbSet<SelectableSigner> SelectableSigners { get; set; }
+        public virtual DbSet<OwnershipBuildingAssoc> OwnershipBuildingsAssoc { get; set; }
+        public virtual DbSet<OwnershipPremiseAssoc> OwnershipPremisesAssoc { get; set; }
+        public virtual DbSet<OwnershipRightType> OwnershipRightTypes { get; set; }
+        public virtual DbSet<OwnershipRight> OwnershipRights { get; set; }
+        public virtual DbSet<ObjectAttachmentFile> ObjectAttachmentFiles { get; set; }
+        public virtual DbSet<BuildingAttachmentFileAssoc> BuildingAttachmentFilesAssoc { get; set; }
 
         //Собственники
         public virtual DbSet<Owner> Owners { get; set; }
@@ -100,12 +102,15 @@ namespace RegistryWeb.Models
         public virtual DbSet<TenancyPremiseAssoc> TenancyPremisesAssoc { get; set; }
         public virtual DbSet<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
         public virtual DbSet<Executor> Executors { get; set; }
+        public virtual DbSet<TenancyFile> TenancyFiles { get; set; }
+        public virtual DbSet<TenancyProlongRentReason> TenancyProlongRentReasons { get; set; }
 
         // Переселение
 
         public virtual DbSet<ResettleInfo> ResettleInfos { get; set; }
         public virtual DbSet<ResettleKind> ResettleKinds { get; set; }
         public virtual DbSet<ResettleInfoTo> ResettleInfoTo { get; set; }
+        public virtual DbSet<ResettleInfoToFact> ResettleInfoToFact { get; set; }
         public virtual DbSet<ResettleInfoSubPremiseFrom> ResettleInfoSubPremisesFrom { get; set; }
         public virtual DbSet<ResettleDocument> ResettleDocuments { get; set; }
         public virtual DbSet<ResettleDocumentType> ResettleDocumentTypes { get; set; }
@@ -126,8 +131,6 @@ namespace RegistryWeb.Models
         public virtual DbSet<AclUser> AclUsers { get; set; }
         public virtual DbSet<AclUserPrivilege> AclUserPrivileges { get; set; }
         public virtual DbSet<AclUserRole> AclUserRoles { get; set; }
-
-        public virtual DbSet<PersonalSetting> PersonalSettings { get; set; }
 
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
@@ -173,7 +176,6 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new BuildingDemolitionActFileConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new SelectableSignersConfiguration(nameDatebase));
-            modelBuilder.ApplyConfiguration(new PersonalSettingConfiguration(nameDatebase));
             
             modelBuilder.ApplyConfiguration(new DocumentTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new DocumentIssuedByConfiguration(nameDatebase));
@@ -191,6 +193,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new PremisesKindConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new StructureTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new StructureTypeOverlapConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new FoundationTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new GovernmentDecreeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TotalAreaAvgCostConfiguration(nameDatebase));
 
@@ -207,6 +210,9 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new LitigationConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LitigationTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LitigationPremiseAssocConfiguration(nameDatebase));
+
+            modelBuilder.ApplyConfiguration(new ObjectAttachmentFileConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new BuildingAttachmentFileAssocConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new FundBuildingAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new FundPremiseAssocConfiguration(nameDatebase));
@@ -238,10 +244,13 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new TenancySubPremiseAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ExecutorConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyRentPeriodConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancyFileConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancyProlongRentReasonTypeConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new ResettleInfoConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleKindConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleInfoToConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettleInfoToFactConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleInfoSubPremiseFromConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleDocumentTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleDocumentConfiguration(nameDatebase));

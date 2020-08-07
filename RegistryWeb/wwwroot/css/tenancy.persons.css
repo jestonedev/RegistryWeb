@@ -1,0 +1,9 @@
+﻿.rr-tenancy-person-edit-buttons, .rr-tenancy-person-view-buttons {
+    margin-top: 28px;
+}
+
+@media(min-width: 768px) {
+    .rr-tenancy-person-edit-buttons, .rr-tenancy-person-view-buttons {
+        margin-top: 32px;
+    }
+}

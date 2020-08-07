@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.Models.Entities;
@@ -20,6 +20,9 @@ namespace RegistryWeb.Controllers
     public class BuildingsController : ListController<BuildingsDataService>
     {
         OwnerReportService reportService;
+        bool canEditBaseInfo;
+        bool canEditDemolishingInfo;
+        bool canAttachAdditionalFiles;
 
         public BuildingsController(BuildingsDataService dataService, SecurityService securityService, OwnerReportService reportService)
             : base(dataService, securityService)
@@ -50,6 +53,10 @@ namespace RegistryWeb.Controllers
             ViewBag.OwnershipRightTypes = dataService.OwnershipRightTypes;
             ViewBag.GovernmentDecrees = dataService.GovernmentDecrees;
             ViewBag.SecurityService = securityService;
+            ViewBag.SignersList = new SelectList(dataService.SelectableSigners.Select(s => new {
+                s.IdRecord,
+                Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
+            }), "IdRecord", "Snp");
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
@@ -132,7 +139,10 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Create()
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
+            canEditBaseInfo = securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal);
+            canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+            canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
+            if (!canEditBaseInfo)
                 return View("NotAccess");
             return GetBuildingView(dataService.CreateBuilding());
         }
@@ -141,19 +151,31 @@ namespace RegistryWeb.Controllers
         public IActionResult Create(Building building)
         {
             if (building == null)
-                return Json(-1);
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
-                return Json(-2);
+                return NotFound();
+            canEditBaseInfo = securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal);
+            canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+            canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
+            if (!canEditBaseInfo)
+                return View("NotAccess");
+            if (!canEditDemolishingInfo)
+            {
+                building.BuildingDemolitionActFiles = null;
+            }
+            if (!canAttachAdditionalFiles)
+            {
+                building.BuildingAttachmentFilesAssoc = null;
+            }
             if (ModelState.IsValid)
             {
-                dataService.Create(building);
-                return Json(building.IdBuilding);
+                dataService.Create(building, HttpContext.Request.Form.Files.Select(f => f).ToList());
+                return RedirectToAction("Details", new { building.IdBuilding });
             }
-            return Json(0);
+            return GetBuildingView(building);
         }
 
-        public IActionResult Details(int? idBuilding)
+        public IActionResult Details(int? idBuilding, string returnUrl)
         {
+            ViewBag.ReturnUrl = returnUrl;
             if (idBuilding == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
@@ -161,19 +183,26 @@ namespace RegistryWeb.Controllers
             var building = dataService.GetBuilding(idBuilding.Value);
             if (building == null)
                 return NotFound();
+            canEditBaseInfo = CanEditBuildingBaseInfo(building);
+            canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+            canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
             return GetBuildingView(building);
         }
 
         [HttpGet]
-        public IActionResult Delete(int? idBuilding)
+        public IActionResult Delete(int? idBuilding, string returnUrl)
         {
+            ViewBag.ReturnUrl = returnUrl;
             if (idBuilding == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
-                return View("NotAccess");
             var building = dataService.GetBuilding(idBuilding.Value);
             if (building == null)
                 return NotFound();
+            if (!CanEditBuildingBaseInfo(building))
+                return View("NotAccess");
+            canEditBaseInfo = false;
+            canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+            canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
             return GetBuildingView(building);
         }
 
@@ -182,49 +211,76 @@ namespace RegistryWeb.Controllers
         {
             if (building == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
+            var b = dataService.GetBuilding(building.IdBuilding);
+            if (b == null)
+                return NotFound();
+            canEditBaseInfo = CanEditBuildingBaseInfo(building);
+            if (!canEditBaseInfo)
                 return View("NotAccess");
-            dataService.Delete(building.IdBuilding);
+            dataService.Delete(b.IdBuilding);
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Edit(int? idBuilding)
+        public IActionResult Edit(int? idBuilding, string returnUrl)
         {
+            ViewBag.ReturnUrl = returnUrl;
             if (idBuilding == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
-                return View("NotAccess");
             var building = dataService.GetBuilding(idBuilding.Value);
             if (building == null)
                 return NotFound();
+            canEditBaseInfo = CanEditBuildingBaseInfo(building);
+            canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+            canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
+            if (!(canEditBaseInfo || canEditDemolishingInfo || canAttachAdditionalFiles))
+                return View("NotAccess");
             return GetBuildingView(building);
         }
 
         [HttpPost]
-        public IActionResult Edit(Building building)
+        public IActionResult Edit(Building building, string returnUrl)
         {
+            ViewBag.ReturnUrl = returnUrl;
             if (building == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteAll))
+            canEditBaseInfo = CanEditBuildingBaseInfo(building);
+            canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+            canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
+            if (!canEditBaseInfo)
                 return View("NotAccess");
             if (ModelState.IsValid)
             {
                 dataService.Edit(building);
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", new { building.IdBuilding });
             }
             return GetBuildingView(building);
+        }
+
+        private bool CanEditBuildingBaseInfo(Building building)
+        {
+            return (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !dataService.IsMunicipal(building)) ||
+                (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && dataService.IsMunicipal(building));
         }
 
         public IActionResult GetBuildingView(Building building, [CallerMemberName]string action = "")
         {
             ViewBag.Action = action;
-            ViewBag.ObjectStates = dataService.ObjectStates;
+            ViewBag.SecurityService = securityService;
+            ViewBag.CanEditBaseInfo = canEditBaseInfo;
+            ViewBag.CanEditDemolishingInfo = canEditDemolishingInfo;
+            ViewBag.CanAttachAdditionalFiles = canAttachAdditionalFiles;
+            ViewBag.ObjectStates = dataService.GetObjectStates(securityService, action, canEditBaseInfo);
             ViewBag.StructureTypes = dataService.StructureTypes;
             ViewBag.StructureTypeOverlaps = dataService.StructureTypeOverlaps;
             ViewBag.KladrStreets = dataService.KladrStreets;
             ViewBag.HeatingTypes = dataService.HeatingTypes;
             ViewBag.GovernmentDecrees = dataService.GovernmentDecrees;
+            ViewBag.FoundationTypes = dataService.FoundationTypes;
+            ViewBag.SignersList = new SelectList(dataService.SelectableSigners.Select(s => new {
+                s.IdRecord,
+                Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
+            }), "IdRecord", "Snp");
             return View("Building", building);
         }
     }

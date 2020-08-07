@@ -36,9 +36,12 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 return Json(-1);
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return Json(-2);
-            var demolishedPlanDate = registryContext.Buildings
-                .FirstOrDefault(b => b.IdBuilding == idBuilding)
-                ?.DemolishedPlanDate;
+            var building = registryContext.Buildings
+                .FirstOrDefault(b => b.IdBuilding == idBuilding);
+            var demolishedPlanDate = building?.DemolishedPlanDate;
+            var demolishedFactDate = building?.DemolishedFactDate;
+            var dateOwnerEmergency = building?.DateOwnerEmergency;
+            var demandForDemolishingDeliveryDate = building?.DemandForDemolishingDeliveryDate;
             var actTypeDocuments = registryContext.ActTypeDocuments
                 .Where(atd => atd.ActFileType == ActFileTypes.BuildingDemolitionActFile.ToString())
                 .Select(atd => new
@@ -50,7 +53,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             var buildingDemolitionActFiles = registryContext.BuildingDemolitionActFiles
                 .Include(af => af.ActFile)
                 .Where(b => b.IdBuilding == idBuilding)
-                .OrderBy(b => b.Id)
+                .OrderBy(b => b.Id).ToList()
                 .Select(b => new
                 {
                     id = b.Id,
@@ -58,7 +61,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
                     idActFile = b.IdActFile,
                     idActTypeDocument = b.IdActTypeDocument,
                     number = b.Number,
-                    date = b.Date.ToString("yyyy-MM-dd"),
+                    date = b.Date.HasValue ? b.Date.Value.ToString("yyyy-MM-dd") : "",
                     name = b.Name,
                     originalNameActFile = b.ActFile == null ? "" : b.ActFile.OriginalName
                 })
@@ -68,6 +71,9 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 actTypeDocuments,
                 buildingDemolitionActFiles,
                 demolishedPlanDate = demolishedPlanDate.HasValue ? demolishedPlanDate.Value.ToString("yyyy-MM-dd") : "",
+                demolishedFactDate = demolishedFactDate.HasValue ? demolishedFactDate.Value.ToString("yyyy-MM-dd") : "",
+                dateOwnerEmergency = dateOwnerEmergency.HasValue ? dateOwnerEmergency.Value.ToString("yyyy-MM-dd") : "",
+                demandForDemolishingDeliveryDate = demandForDemolishingDeliveryDate.HasValue ? demandForDemolishingDeliveryDate.Value.ToString("yyyy-MM-dd") : "",
                 idBuilding = idBuilding.Value
             });
         }
@@ -96,12 +102,16 @@ namespace RegistryWeb.Controllers.ServiceControllers
             if (viewModel == null)
                 return Json(-1);
             var r = Request;
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo))
                 return Json(-2);
             var saveFileList = new List<string>();
             try
             {
-                registryContext.Buildings.SingleOrDefault(b => b.IdBuilding == viewModel.IdBuilding).DemolishedPlanDate = viewModel.DemolishedPlanDate;
+                var building = registryContext.Buildings.SingleOrDefault(b => b.IdBuilding == viewModel.IdBuilding);
+                building.DemolishedPlanDate = viewModel.DemolishedPlanDate;
+                building.DemolishedFactDate = viewModel.DemolishedFactDate;
+                building.DateOwnerEmergency = viewModel.DateOwnerEmergency;
+                building.DemandForDemolishingDeliveryDate = viewModel.DemandForDemolishingDeliveryDate;
                 var oldBDActFiles = registryContext.BuildingDemolitionActFiles
                     .Include(af => af.ActFile)
                     .Where(af => af.IdBuilding == viewModel.IdBuilding)
@@ -155,6 +165,8 @@ namespace RegistryWeb.Controllers.ServiceControllers
                         var oldActFile = registryContext.ActFiles.FirstOrDefault(af => af.IdFile == newBDActFile.IdActFile);
                         //Удаляем старый физический файл
                         registryContext.ActFiles.Remove(oldActFile);
+                        //Если файл был удален явно, то удаляем
+                        reportService.DeleteFileToRepository(oldActFile.FileName, ActFileTypes.BuildingDemolitionActFile);
                         removeFileList.Add(oldActFile.FileName);
                     }
                 }
@@ -184,47 +196,13 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 registryContext.SaveChanges();
                 //Старые файлы не удаляем, на случай ошибочного удаления
                 //removeFileList.ForEach(f => reportService.DeleteFileToRepository(f, ActFileTypes.BuildingDemolitionActFile));
-                return Json(1);
+                return Json(newBDActFiles.Select(f => f.IdActFile));
             }
             catch(Exception ex)
             {
                 saveFileList.ForEach(f => reportService.DeleteFileToRepository(f, ActFileTypes.BuildingDemolitionActFile));
                 return Json(-3);
             }
-        }
-
-        [HttpPost]
-        public IActionResult GetBuildingDemolitionActFile()
-        {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return Json(-1);
-            var actTypeDocuments = registryContext.ActTypeDocuments
-                .Where(atd => atd.ActFileType == ActFileTypes.BuildingDemolitionActFile.ToString())
-                .AsNoTracking();
-            var tr = new StringBuilder();
-            tr.Append("<tr class=\"ownership-right\" data-idownershipright=\"" + Guid.NewGuid() + "\">");
-            tr.Append("<td class=\"align-middle\"><input type=\"text\" class=\"form-control field-ownership-right\"></td>");
-            tr.Append("<td class=\"align-middle\"><input type=\"date\" class=\"form-control field-ownership-right\"></td>");
-            tr.Append("<td class=\"align-middle\"><input type=\"text\" class=\"form-control field-ownership-right\"></td>");
-            //Формирование селекта для ActTypeDocuments
-            var tdIdOwnershipRightType = new StringBuilder();
-            tdIdOwnershipRightType.Append("<td class=\"align-middle\">");
-            tdIdOwnershipRightType.Append("<select class=\"form-control field-ownership-right\">");
-            foreach (var type in actTypeDocuments)
-            {
-                tdIdOwnershipRightType.Append("<option value=\"" + type.Id + "\">" + type.Name + "</option>");
-            }
-            tdIdOwnershipRightType.Append("</select>");
-            tdIdOwnershipRightType.Append("</td>");
-            tr.Append(tdIdOwnershipRightType);
-            tr.Append("<td class=\"align-middle\"><input type=\"date\" class=\"form-control field-ownership-right\"></td>");
-            tr.Append("<td class=\"align-middle\"><input type=\"date\" class=\"form-control field-ownership-right\"></td>");
-            //Панели
-            tr.Append("<td class=\"align-middle\">");
-            tr.Append("<a class=\"btn btn-danger oi oi-x delete\" title=\"Удалить\" aria-label=\"Удалить\"></a>");
-            tr.Append("</td>");
-            tr.Append("</tr>");
-            return Content(tr.ToString());
         }
     }
 }

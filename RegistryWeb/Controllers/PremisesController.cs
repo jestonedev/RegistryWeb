@@ -78,7 +78,8 @@ namespace RegistryWeb.Controllers
             if (premise == null)
                 return NotFound();
             ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(premise);
-            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
+            ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
             return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: false));
         }
 
@@ -89,7 +90,8 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal))
                 return View("NotAccess");
             ViewBag.CanEditBaseInfo = true;
-            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
+            ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
             return View("Premise", dataService.GetPremiseView(dataService.CreatePremise(), canEditBaseInfo: true));
         }
 
@@ -101,9 +103,13 @@ namespace RegistryWeb.Controllers
 
             if (!CanEditPremiseBaseInfo(premise))
                 return View("NotAccess");
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteExtInfo))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo))
             {
                 premise.ResettlePremisesAssoc = null;
+            }
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo))
+            {
+                premise.LitigationPremisesAssoc = null;
             }
             if (ModelState.IsValid)
             {
@@ -137,8 +143,9 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = "Create";
             ViewBag.SecurityService = securityService;
             ViewBag.CanEditBaseInfo = true;
-            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
-            return View("Create", dataService.GetPremiseView(premise, canEditBaseInfo: true));
+            ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
+            ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
+            return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: true));
         }
 
         [HttpGet]
@@ -155,9 +162,10 @@ namespace RegistryWeb.Controllers
                 return NotFound();
 
             ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(premise);
-            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
+            ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
 
-            if (!(bool)ViewBag.CanEditBaseInfo && !(bool)ViewBag.CanEditExtInfo)
+            if (!(bool)ViewBag.CanEditBaseInfo && !(bool)ViewBag.CanEditResettleInfo && !(bool)ViewBag.CanEditLitigationInfo)
                 return View("NotAccess");
             return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: (bool)ViewBag.CanEditBaseInfo));
         }
@@ -169,7 +177,8 @@ namespace RegistryWeb.Controllers
                 return NotFound();
 
             ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(premise);
-            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
+            ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
 
             if (!(bool)ViewBag.CanEditBaseInfo)
                 return View("NotAccess");
@@ -182,7 +191,7 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = "Edit";
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.SecurityService = securityService;
-            return View("Edit", dataService.GetPremiseView(premise, canEditBaseInfo: (bool)ViewBag.CanEditBaseInfo));
+            return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: (bool)ViewBag.CanEditBaseInfo));
         }
 
         [HttpGet]
@@ -202,7 +211,8 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
 
             ViewBag.CanEditBaseInfo = false;
-            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
+            ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
 
             return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: false));
         }
@@ -481,7 +491,8 @@ namespace RegistryWeb.Controllers
                 return NotFound();
 
             var premise = dataService.GetPremises(ids);
-            ViewBag.CanEditExtInfo = securityService.HasPrivilege(Privileges.RegistryWriteExtInfo);
+            ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
+            ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
 
             if (ModelState.IsValid)
             {

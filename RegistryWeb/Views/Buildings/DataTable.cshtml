@@ -1,5 +1,6 @@
 ﻿@model RegistryWeb.ViewModel.BuildingsVM;
 @using RegistryWeb.ViewOptions;
+@using RegistryWeb.DataHelpers;
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.Extensions;
 @{
@@ -12,24 +13,46 @@
     var check = "";
     var securityService = (SecurityService)ViewData["SecurityService"];
 }
-<table class="table table-hover">
+<table class="table table-hover b-table">
     <thead>
         <tr>
-            @*<th class="r-table-header-cell">
-            <a href="#" data-order-field="IdBuilding" data-order-direction="@OrderDirection.Ascending">
+            <th class="align-middle" style="width:155px;">
                 № по реестру
-            </a>
-        </th>*@
-            @*<th class="align-middle"></th>*@
-            <th class="align-middle">№ по реестру</th>
-            <th class="align-middle">Адрес</th>
-            <th class="align-middle">Текущее состояние</th>
-            <th class="align-middle"></th>
-            @*<th class="r-table-header-cell">
-            <a href="#" data-order-field="ObjectState" data-order-direction="@OrderDirection.Ascending">
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "IdBuilding")
+                {
+                    <a href="#" class="oi oi-sort-descending sort b-sorted" data-order-field="IdBuilding" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "IdBuilding" ? "b-sorted" : "")"
+                       data-order-field="IdBuilding" data-order-direction="@(Model.OrderOptions.OrderField == "IdBuilding" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="align-middle">
+                Адрес
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Address")
+                {
+                    <a href="#" class="oi oi-sort-descending sort b-sorted" data-order-field="Address" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Address" ? "b-sorted" : "")"
+                       data-order-field="Address" data-order-direction="@(Model.OrderOptions.OrderField == "Address" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="align-middle">
                 Текущее состояние
-            </a>
-        </th>*@
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "ObjectState")
+                {
+                    <a href="#" class="oi oi-sort-descending sort b-sorted" data-order-field="ObjectState" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "ObjectState" ? "b-sorted" : "")"
+                       data-order-field="ObjectState" data-order-direction="@(Model.OrderOptions.OrderField == "ObjectState" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="align-middle"></th>
         </tr>
     </thead>
     <tbody>
@@ -37,54 +60,97 @@
         {
             <tr>
                 @*@if (ids.Contains(item.IdBuilding))
-                {
-                    check = "checked";
-                }
-                else
-                {
-                    check = "";
-                }
-                <td class="align-middle"><input type="checkbox" class="idBuildingCheckbox" data-id="@item.IdBuilding" @Html.Raw(check) /></td>*@
+                    {
+                        check = "checked";
+                    }
+                    else
+                    {
+                        check = "";
+                    }
+                    <td class="align-middle"><input type="checkbox" class="idBuildingCheckbox" data-id="@item.IdBuilding" @Html.Raw(check) /></td>*@
                 <td>@item.IdBuilding</td>
                 <td>
-                    @item.IdStreetNavigation.StreetName, д.@item.House
-                    <div class="dopinfo">
-                        @if (item.CadastralNum != null)
-                        {
-                            @Html.Raw("Кадастровый номер: " + item.CadastralNum + ";")
-                        }
-                        @if (item.CadastralNum != null && (item.TotalArea != 0 || item.LivingArea != 0)) {<br />}
-                        @if (item.TotalArea != 0)
-                        {
-                            @Html.Raw("Общая площадь: " + item.TotalArea + ";")
-                        }
-                        @if (item.LivingArea != 0)
-                        {
-                            @Html.Raw("Жилая площадь: " + item.LivingArea + ";")
-                        }
+                    <div class="row">
+                        <div class="col-auto">
+                            <a class="btn btn-success oi oi-home" title="Помещения здания" aria-label="Помещения здания" asp-action="Index" asp-controller="Premises" asp-route-FilterOptions.IdBuilding="@item.IdBuilding"></a>
+                        </div>
+                        <div class="col-xl-9 col-lg-12 col-md-8">
+                            @item.IdStreetNavigation.StreetName, д.@item.House
+                            <div class="dopinfo">
+                                @if (item.CadastralNum != null)
+                                {
+                                    <span>Кадастровый номер: </span>@item.CadastralNum
+                                }
+                                @if (item.CadastralNum != null && (item.TotalArea != 0 || item.LivingArea != 0))
+                                {
+                                    <br />
+                                }
+                                @if (item.TotalArea != 0)
+                                {
+                                    <span>Общая площадь: </span>@item.TotalArea<span> м<sup>2</sup></span>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </td>
                 <td>@item.IdStateNavigation.StateNeutral</td>
                 <td>
-                    @if (securityService.HasPrivilege(Privileges.RegistryWriteAll))
-                    {
                     <div class="btn-group" role="group" aria-label="Панель доступа">
-                        <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                        <div class="dropdown-menu dropdown-menu-right but text-center" aria-labelledby="toolsBtn_@item.IdBuilding">
+                        @{
+                            var canEditBaseInfo = (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !Model.IsMunicipalDictionary[item.IdBuilding]) ||
+                            (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && Model.IsMunicipalDictionary[item.IdBuilding]);
+                            var canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
+                            var canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
+                        }
+                        @if (canEditBaseInfo || canEditDemolishingInfo || canAttachAdditionalFiles)
+                        {
+                            <div class="btn-group" role="group" aria-label="Панель доступа">
+                                <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right but text-center" aria-labelledby="toolsBtn_@item.IdBuilding">
+                                    <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                                       asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@item.IdBuilding" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                    <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                                       asp-controller="Buildings" asp-action="Edit" asp-route-idBuilding="@item.IdBuilding" asp-route-action="Edit" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                    <a class="btn btn-danger oi oi-x @(canEditBaseInfo ? "" : "disabled")" title="Удалить" aria-label="Удалить"
+                                       asp-controller="Buildings" asp-action="Delete" asp-route-idBuilding="@item.IdBuilding" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
                             <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                               asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@item.IdBuilding" asp-route-action="Details"></a>
-                            <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
-                               asp-controller="Buildings" asp-action="Edit" asp-route-idBuilding="@item.IdBuilding" asp-route-action="Edit"></a>
-                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                               asp-controller="Buildings" asp-action="Delete" asp-route-idBuilding="@item.IdBuilding"></a>
+                               asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
+                        }
+                        <div class="btn-group" role="group" aria-label="Панель доступа">
+                            <button class="btn btn-dark oi oi-grid-two-up dropdown-toggle" type="button" title="Связанные объекты" aria-label="Связанные объекты" id="objectsBtn_@item.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@item.IdBuilding">
+                                <a class="dropdown-item" title="История фонда" aria-label="История фонда"
+                                   asp-controller="FundsHistory" asp-action="Index" asp-route-idObject="@item.IdBuilding" asp-route-typeObject="Building" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">История фонда</a>
+
+                                @if (securityService.HasPrivilege(Privileges.TenancyRead))
+                                {
+                                    <a class="dropdown-item" title="Найм помещения" aria-label="Найм помещения"
+                                       asp-controller="TenancyProcesses" asp-action="Index" asp-route-filterOptions.IdBuilding="@item.IdBuilding">Процессы найма</a>
+                                }
+                                @if (securityService.HasPrivilege(Privileges.OwnerRead))
+                                {
+                                    <a class="dropdown-item" title="Собственники помещения" aria-label="Собственники помещения"
+                                       asp-controller="OwnerProcesses" asp-action="Index" asp-route-filterOptions.IdBuilding="@item.IdBuilding">Процессы собственности</a>
+                                }
+                                @if (securityService.HasPrivilege(Privileges.ClaimsRead))
+                                {
+                                    <a class="dropdown-item" title="Лицевые счета БКС" aria-label="Лицевые счета"
+                                       asp-controller="PaymentAccount" asp-action="Index" asp-route-filterOptions.IdBuilding="@item.IdBuilding">Лицевые счета БКС</a>
+                                }
+                            </div>
+                        </div>
+                        <div class="btn-group" role="group" aria-label="Отчеты">
+                            <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="отчеты" id="reportsBtn_@item.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdBuilding">
+                                <a class="dropdown-item rr-report-building-excerpt" href="#" title="Выписка на здание" aria-label="Выписка на здание" data-id-building="@item.IdBuilding">Выписка на здание</a>
+                            </div>
                         </div>
                     </div>
-                    }
-                    else
-                    {
-                    <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                        asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
-                    }
                 </td>
             </tr>
         }

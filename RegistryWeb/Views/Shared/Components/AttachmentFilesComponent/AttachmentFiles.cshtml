@@ -1,0 +1,22 @@
+﻿@model IEnumerable<RegistryWeb.ViewModel.AttachmentFileVM>;
+<form id="attachmentFilesForm" autocomplete="off" >
+    <script src="~/js/attachment-files.common.js" asp-append-version="true"></script>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Прочие документы</h3>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                    <a href="#" id="attachmentFileAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanAttachAdditionalFiles ?? true) ? "" : "disabled")" title="Добавить документ">&#10010;</a>
+                }
+                <a href="#" id="attachmentFilesToggle" class="form-control btn btn-primary" title="Развернуть список документов" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush toggle-hide" id="attachmentFilesList" data-addresstype="@ViewBag.AddressType" data-id="@ViewBag.Id" data-action="@ViewBag.Action">
+            @foreach (var item in Model)
+            {
+                <partial name="AttachmentFile" model="item" />
+            }
+        </ul>
+    </div>
+</form>

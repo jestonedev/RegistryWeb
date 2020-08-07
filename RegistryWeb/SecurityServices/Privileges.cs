@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace RegistryWeb.SecurityServices
 {
     [Flags]
-    public enum Privileges
+    public enum Privileges: long
     {
         None = 0,
         RegistryRead = 1,
@@ -14,7 +14,10 @@ namespace RegistryWeb.SecurityServices
         RegistryReadWriteNotMunicipal = 3,
         RegistryWriteMunicipal = 268435456,
         RegistryReadWriteMunicipal = 268435457,
-        RegistryWriteExtInfo = 536870912,
+        RegistryWriteDemolishingInfo = 536870912,
+        RegistryWriteResettleInfo = 1073741824,
+        RegistryWriteLitigationInfo = 2147483648,
+        RegistryAttachAdditionalFiles = 4294967296,
         RegistryWriteAll = RegistryWriteMunicipal | RegistryWriteNotMunicipal,
         RegistryDirectoriesWrite = 4,
         RegistryDirectoriesReadWrite = 5,

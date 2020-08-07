@@ -1,0 +1,73 @@
+﻿@model RegistryWeb.ViewModel.AttachmentFileVM;
+
+@{ 
+    var canEdit = ((bool?)ViewBag.CanAttachAdditionalFiles) ?? true;
+    var descriptionClass = "col-md-12 col-lg-10";
+    if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    {
+        descriptionClass = "col-md-12 col-lg-12";
+    }
+}
+
+<li class="list-group-item">
+    <input type="hidden" value="@Model.IdAttachment" name="IdAttachment" />
+    <div class="form-row">
+        <div class="form-group @descriptionClass">
+            <label>Наименование и образ документа</label>
+            <div class="input-group">
+                <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="AttachmentFileDescription" title="Наименование">
+                <input type="file" name="AttachmentFile" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
+                <input type="hidden" name="AttachmentFileRemove" value="false" />
+                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+                {
+                    <div class="input-group-append">
+                        <a class="btn btn-success rr-attachment-file-download @(Model.FileOriginName == null ? "disabled" : "")"
+                           href="/AttachmentFiles/DownloadFile/?idAttachment=@Model.IdAttachment" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
+                    </div>
+                }
+                @if (ViewBag.Action == "Edit")
+                {
+                    <div class="input-group-append rr-attachment-file-buttons">
+                        <a class="btn btn-danger rr-attachment-file-remove" style="display: none"
+                           href="#" title="Удалить образ документа" aria-label="Удалить образ документа"><span class="oi oi-trash"></span></a>
+                        <a class="btn btn-success rr-attachment-file-attach" style="display: none"
+                           href="#" title="Прикрепить образ документа" aria-label="Прикрепить образ документа"><span class="oi oi-paperclip"></span></a>
+                        <a class="btn btn-success rr-attachment-file-download @(Model.FileOriginName == null ? "disabled" : "")"
+                           href="/AttachmentFiles/DownloadFile/?idAttachment=@Model.IdAttachment" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
+                    </div>
+                }
+                @if (ViewBag.Action == "Create")
+                {
+                    <div class="input-group-append rr-attachment-file-buttons">
+                        <a class="btn btn-danger rr-attachment-file-remove" style="display: none"
+                           href="#" title="Удалить образ документа" aria-label="Удалить образ документа"><span class="oi oi-x"></span></a>
+                        <a class="btn btn-success rr-attachment-file-attach" style="display: none"
+                           href="#" title="Прикрепить образ документа" aria-label="Прикрепить образ документа"><span class="oi oi-paperclip"></span></a>
+                    </div>
+                }
+            </div>
+        </div>
+        @if (ViewBag.Action == "Edit")
+        {
+            <div class="text-lg-right text-center col-lg-2 rr-attachment-file-edit-buttons">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger attachment-file-cancel-btn @(ViewBag.AddressType == Model.AddressType && canEdit ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                    <a class="btn btn-success attachment-file-save-btn @(ViewBag.AddressType == Model.AddressType && canEdit ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                </div>
+                <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                    <a class="btn btn-primary attachment-file-edit-btn @(ViewBag.AddressType == Model.AddressType && canEdit ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                    <a class="btn btn-danger attachment-file-delete-btn @(ViewBag.AddressType == Model.AddressType && canEdit ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                </div>
+            </div>
+        }
+        @if (ViewBag.Action == "Create")
+        {
+            <a class="attachment-file-edit-btn" style="display: none"></a>
+            <div class="text-lg-right text-center col-lg-2 rr-attachment-file-edit-buttons">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger attachment-file-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
+                </div>
+            </div>
+        }
+    </div>
+</li>

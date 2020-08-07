@@ -57,9 +57,11 @@ namespace RegistryWeb.ViewComponents
                 .Where(rpa => rpa.IdPremises == idPremise)
                 .Select(rpa => rpa.ResettleInfoNavigation)
                 .Include(ri => ri.ResettleInfoTo)
+                .Include(ri => ri.ResettleInfoToFact)
                 .Include(ri => ri.ResettleInfoSubPremisesFrom)
                 .Include(ri => ri.ResettleDocuments)
-                .Include(ri => ri.ResettleKindNavigation);
+                .Include(ri => ri.ResettleKindNavigation)
+                .Include(ri => ri.ResettleKindFactNavigation);
             var resettleVMs = resettles.ToList().Select(ri => new ResettleInfoVM(ri, address_p, registryContext));
             return resettleVMs.OrderBy(r => r.ResettleDate);
         }

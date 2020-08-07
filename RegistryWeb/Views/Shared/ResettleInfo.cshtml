@@ -6,11 +6,11 @@
 @using RegistryWeb.DataHelpers;
 
 @{
-    var canEdit = ((bool?)ViewBag.CanEditExtInfo) ?? true;
-    var ownershipRightTypeClass = "col-md-6 col-lg-4";
+    var canEdit = ((bool?)ViewBag.CanEditResettleInfo) ?? true;
+    var ownershipRightTypeClass = "col-md-9 col-lg-7";
     if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
     {
-        ownershipRightTypeClass = "col-md-6";
+        ownershipRightTypeClass = "col-md-9";
     }
 }
 
@@ -20,13 +20,6 @@
         <div class="form-group col-md-3">
             <label>Дата переселения</label>
             <input type="date" class="form-control" disabled value="@(Model.ResettleDate == null ? "" : Model.ResettleDate.Value.ToString("yyyy-MM-dd"))" name="ResettleDate" title="Планируемая дата переселения">
-        </div>
-        <div class="form-group col-md-3">
-            <label>Способ переселения</label>
-            <select disabled class="form-control field-resettle selectpicker" title="Способ переселения"
-                    asp-items="@{new SelectList(ViewBag.ResettleKinds, "IdResettleKind", "ResettleKindName",Model.IdResettleKind)}" name="IdResettleKind">
-                <option></option>
-            </select>
         </div>
         <div class="form-group @ownershipRightTypeClass">
             <label>Переселение из</label>
@@ -66,12 +59,28 @@
                 </div>
             </div>
         }
+        <div class="form-group col-md-6">
+            <label>Способ переселения (плановый)</label>
+            <select disabled class="form-control field-resettle selectpicker" title="Способ переселения (плановый)"
+                    asp-items="@{new SelectList(ViewBag.ResettleKinds, "IdResettleKind", "ResettleKindName",Model.IdResettleKind)}" name="IdResettleKindPlan">
+                <option></option>
+            </select>
+        </div>
+        <div class="form-group col-md-6">
+            <label>Способ переселения (фактический)</label>
+            <select disabled class="form-control field-resettle selectpicker" title="Способ переселения (фактический)"
+                    asp-items="@{new SelectList(ViewBag.ResettleKinds, "IdResettleKind", "ResettleKindName",Model.IdResettleKindFact)}" name="IdResettleKindFact">
+                <option></option>
+            </select>
+        </div>
     </div>
     <div class="card">
         <div class="card-header d-flex justify-content-between">
             <h5 class="rr-resettle-card-header-sub-title">Адрес переселения</h5>
         </div>
         <div class="card-body">
+            <h5>Плановый адрес</h5>
+            <hr class="mt-0" />
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label>Улица</label>
@@ -107,6 +116,43 @@
                             asp-items="@{new SelectList(Model.SubPremises, "IdSubPremises", "SubPremisesNum")}" asp-for="@Model.IdSubPremises" name="ResettleToSubPremises"></select>
                 </div>
             </div>
+            <h5>Фактический адрес</h5>
+            <hr class="mt-0" />
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label>Улица</label>
+                    <input type="hidden" value="@Model.IdStreetFact" name="ResettleToIdStreetFactPrev">
+                    <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Улица"
+                            asp-items="@{new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName",Model.IdStreetFact)}" name="ResettleToIdStreetFact">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Дом</label>
+                    <input type="hidden" value="@Model.IdBuildingFact" name="ResettleToIdBuildingFactPrev">
+                    <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Дом"
+                            asp-items="@{new SelectList(Model.BuildingsFact, "IdBuilding", "House",Model.IdBuildingFact)}" name="ResettleToIdBuildingFact">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Помещение</label>
+                    <input type="hidden" value="@Model.IdPremiseFact" name="ResettleToIdPremiseFactPrev">
+                    <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Помещение"
+                            asp-items="@{new SelectList(Model.PremisesFact, "IdPremises", "PremisesNum",Model.IdPremiseFact)}" name="ResettleToIdPremiseFact">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Комнаты</label>
+                    @foreach (var idSubPremise in Model.IdSubPremisesFact)
+                    {
+                        <input type="hidden" value="@idSubPremise" name="ResettleToSubPremisesFactPrev">
+                    }
+                    <select disabled multiple class="form-control field-resettle selectpicker" title="Комнаты"
+                            asp-items="@{new SelectList(Model.SubPremisesFact, "IdSubPremises", "SubPremisesNum")}" asp-for="@Model.IdSubPremisesFact" name="ResettleToSubPremisesFact"></select>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -116,37 +162,37 @@
         </div>
         <div class="card-body">
             <div class="form-row">
-                <div class="form-group col-lg-3 col-md-6">
-                    <label>Федеральный бюджет</label>
+                <div class="form-group col-lg-6 col-md-12">
+                    <label class="rr-resettle-label">Фонд содействия реформированию ЖКХ</label>
                     <div class="input-group">
-                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource1" name="FinanceSource1" title="Федеральный бюджет">
+                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource1" name="FinanceSource1" title="Фонд содействия реформированию ЖКХ">
                         <div class="input-group-append">
                             <span class="input-group-text" id="basic-addon2">руб.</span>
                         </div>
                     </div>
                 </div>
-                <div class="form-group col-lg-3 col-md-6">
-                    <label>Областной бюджет</label>
+                <div class="form-group col-lg-6 col-md-12">
+                    <label class="rr-resettle-label">Бюджет Иркутской области</label>
                     <div class="input-group">
-                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource2" name="FinanceSource2" title="Областной бюджет">
+                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource2" name="FinanceSource2" title="Бюджет Иркутской области">
                         <div class="input-group-append">
                             <span class="input-group-text" id="basic-addon2">руб.</span>
                         </div>
                     </div>
                 </div>
-                <div class="form-group col-lg-3 col-md-6">
-                    <label>Муниципальный бюджет</label>
+                <div class="form-group col-lg-6 col-md-12">
+                    <label class="rr-resettle-label">Бюджет города Братска (софинансирование)</label>
                     <div class="input-group">
-                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource3" name="FinanceSource3" title="Муниципальный бюджет">
+                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource3" name="FinanceSource3" title="Бюджет города Братска (софинансирование)">
                         <div class="input-group-append">
                             <span class="input-group-text" id="basic-addon2">руб.</span>
                         </div>
                     </div>
                 </div>
-                <div class="form-group col-lg-3 col-md-6">
-                    <label>Прочие источники</label>
+                <div class="form-group col-lg-6 col-md-12">
+                    <label class="rr-resettle-label">Бюджет города Братска (дополнительное финансирование)</label>
                     <div class="input-group">
-                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource4" name="FinanceSource4" title="Прочие источники">
+                        <input type="text" class="form-control decimal" disabled value="@Model.FinanceSource4" name="FinanceSource4" title="Бюджет города Братска (дополнительное финансирование)">
                         <div class="input-group-append">
                             <span class="input-group-text" id="basic-addon2">руб.</span>
                         </div>

@@ -1,42 +1,33 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
+using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers
 {
     public class PersonalSettingController : RegistryBaseController
     {
-        private RegistryContext registryContext;
         private SecurityService securityService;
-        public PersonalSettingController(RegistryContext registryContext, SecurityService securityService)
+        private IConfiguration config;
+
+        public PersonalSettingController(SecurityService securityService, IConfiguration configuration)
         {
-            this.registryContext = registryContext;
             this.securityService = securityService;
+            this.config = configuration;
         }
 
         [HttpGet]
         public IActionResult Details()
         {
-            var personalSetting = registryContext.PersonalSettings
-                .Include(ps => ps.IdUserNavigation)
-                .AsNoTracking()
-                .SingleOrDefault(ps => ps.IdUserNavigation == securityService.User);
-            return View(personalSetting);
-        }
-
-        [HttpPost]
-        public IActionResult Save(PersonalSetting personalSetting)
-        {
-            registryContext.Entry(personalSetting).State = EntityState.Unchanged;
-            registryContext.Entry(personalSetting).Property(ps => ps.SqlDriver).IsModified = true;
-            registryContext.Entry(personalSetting.IdUserNavigation).State = EntityState.Unchanged;
-            registryContext.Entry(personalSetting.IdUserNavigation).Property(user => user.UserDescription).IsModified = true;
-            registryContext.Update(personalSetting);
-            registryContext.SaveChanges();
-            return View("Details", personalSetting);
+            var personalSettingVM = new PersonalSettingVM();
+            personalSettingVM.User = securityService.User;
+            personalSettingVM.Privileges = securityService.Privileges;
+            personalSettingVM.Database = config.GetValue<string>("Database");
+            return View(personalSettingVM);
         }
     }
 }

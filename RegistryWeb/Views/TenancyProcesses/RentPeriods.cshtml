@@ -1,0 +1,30 @@
+﻿@using RegistryWeb.Models.Entities;
+@model IList<TenancyRentPeriod>;
+
+<link rel="stylesheet" href="~/css/tenancy.rent.periods.css"/>
+<script src="~/js/tenancyProcess.rentPeriods.js"></script>
+
+<div class="card rr-rent-periods-card">
+    <div class="card-header d-flex justify-content-between">
+        <h3>Предыдущие периоды найма</h3>
+        <div class="btn-group" role="group">
+            @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+            {
+                <a href="#" id="rentPeriodAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить период найма">&#10010;</a>
+            }
+                <a href="#" data-for="TenancyProcessRentPeriods" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель предыдущих периодов найма" style="font-weight:bold;">∨</a>
+        </div>
+    </div>
+    <ul class="list-group list-group-flush toggle-hide" id="TenancyProcessRentPeriods" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
+        <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
+            <i>Предыдущие периоды найма отсутстувуют</i>
+        </li>
+        @if (Model != null && Model.Any())
+        {
+            for (var i = 0; i < Model.Count; i++)
+            {
+                <partial name="RentPeriod" model="Model[i]" />
+            }
+        }
+    </ul>
+</div>

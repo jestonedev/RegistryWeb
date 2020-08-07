@@ -1,0 +1,229 @@
+﻿@using RegistryWeb.Models.Entities
+@model IList<TenancyAgreement>
+
+<link rel="stylesheet" href="~/css/tenancy.agreements.css" />
+<script src="~/js/tenancyProcess.agreements.js"></script>
+<form id="TenancyProcessAgreementsForm">
+    <div class="card rr-tenancy-card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Дополнительные соглашения</h3>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                <a href="#" id="tenancyAgreementAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить соглашение">&#10010;</a>
+                }
+                <a href="#" data-for="TenancyProcessAgreements" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель дополнительных соглашений" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush toggle-hide" id="TenancyProcessAgreements" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
+            <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
+                <i>Дополнительные соглашения отсутствуют</i>
+            </li>
+            @if (Model != null && Model.Any())
+            {
+                for (var i = 0; i < Model.Count; i++)
+                {
+                    <partial name="TenancyAgreement" model="Model[i]" />
+                }
+            }
+        </ul>
+    </div>
+</form>
+
+<form id="TenancyProcessAgreementsModalForm">
+    <div class="modal fade bd-example-modal-xl" id="agreementModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Дополнительное соглашение</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="Agreement_IdAgreement" name="Agreement.IdAgreement" />
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label for="Agreement_AgreementDate">Дата составления</label>
+                            <div class="input-group date">
+                                <input type="date" id="Agreement_AgreementDate" name="Agreement.AgreementDate" class="form-control" title="Дата составления"
+                                       data-val="true" data-val-required="Укажите дату составления соглашения">
+                            </div>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Agreement.AgreementDate" data-valmsg-replace="true">
+                            </span>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-9">
+                            <label for="Agreement_IdExecutor">Исполнитель/составитель</label>
+                            <select class="selectpicker form-control" data-actions-box="true" id="Agreement_IdExecutor" name="Agreement.IdExecutor" title="Исполнитель/составитель" asp-items="@(new SelectList(ViewBag.Executors, "IdExecutor", "ExecutorName"))"
+                                    data-val="true" data-val-required="Выберите исполнителя">
+                                <option></option>
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Agreement.IdExecutor" data-valmsg-replace="true"></span>
+                        </div>
+                        @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                        {
+                            <hr class="col-md-12 p-0" />
+                            <h5 class="col-12 pb-2">Конструктор соглашения</h5>
+                            <div class="form-group col-11">
+                                <label for="Agreement_Type">Пункт соглашения</label>
+                                <select class="selectpicker form-control" data-actions-box="true" id="Agreement_Type" name="Agreement.Type" title="Пункт соглашения">
+                                    <option></option>
+                                    <option value="0">Исключить участника найма</option>
+                                    <option value="1">Включить нового участника найма</option>
+                                    <option value="2">Изложить в новой редакции</option>
+                                    <option value="3">Расторгнуть договор</option>
+                                    <option value="4">Изменить срок по коммерческому найму</option>
+                                    <option value="5">Изменить срок по специализированному найму</option>
+                                    <option value="6">Сменить нанимателя</option>
+                                </select>
+                            </div>
+                            <div class="col-1 text-right" style="margin-top: 32px">
+                                <button id="Agreement_Type_Button" class="btn btn-outline-secondary" title="Добавить в соглашение">
+                                    <span class="oi oi-collapse-down"></span>
+                                </button>
+                            </div>
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="0,1,2,5">
+                                <label for="Agreement_Type_Point">Пункт</label>
+                                <input type="text" class="form-control" id="Agreement_Type_Point" title="Пункт">
+                            </div>
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="0,1,2,5">
+                                <label for="Agreement_Type_SubPoint">Подпункт</label>
+                                <input type="text" class="form-control" id="Agreement_Type_SubPoint" title="Подпункт">
+                            </div>
+                            <div class="form-group col-md-12 rr-agreement-type-field" data-agreement-types="0">
+                                <label for="Agreement_Type_TenancyPersons">Участники найма</label>
+                                <select class="selectpicker form-control" data-val="true" data-val-required="Выберите участника найма" id="Agreement_Type_TenancyPersons" name="Agreement_Type_TenancyPersons" title="Участники найма">
+                                    <option></option>
+                                </select>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenancyPersons" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group col-md-4 rr-agreement-type-field" data-agreement-types="1">
+                                <label for="Agreement_Type_TenancyPersonSurname">Фамилия</label>
+                                <input type="text" class="form-control" id="Agreement_Type_TenancyPersonSurname" name="Agreement_Type_TenancyPersonSurname" title="Фамилия" data-val="true" data-val-required="Укажите фамилию">
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenancyPersonSurname" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group col-md-4 rr-agreement-type-field" data-agreement-types="1">
+                                <label for="Agreement_Type_TenancyPersonName">Имя</label>
+                                <input type="text" class="form-control" id="Agreement_Type_TenancyPersonName" name="Agreement_Type_TenancyPersonName" title="Имя" data-val="true" data-val-required="Укажите имя">
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenancyPersonName" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group col-md-4 rr-agreement-type-field" data-agreement-types="1">
+                                <label for="Agreement_Type_TenancyPersonPatronymic">Отчетство</label>
+                                <input type="text" class="form-control" id="Agreement_Type_TenancyPersonPatronymic" title="Отчетство">
+                            </div>
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="1">
+                                <label for="Agreement_Type_TenancyPersonBirthDate">Дата рождения</label>
+                                <input type="date" class="form-control" id="Agreement_Type_TenancyPersonBirthDate" title="Дата рождения">
+                            </div>
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="1">
+                                <label for="Agreement_Type_TenancyPersonIdKinship">Родственное отношение</label>
+                                <select class="selectpicker form-control" disabled asp-items="@(new SelectList(ViewBag.Kinships, "IdKinship", "KinshipName"))" id="Agreement_Type_TenancyPersonIdKinship" name="Agreement_Type_TenancyPersonIdKinship" title="Родственные отношения"
+                                        data-val="true" data-val-required="Выберите родственное отношение">
+                                    <option></option>
+                                </select>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenancyPersonIdKinship" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group col-md-12 rr-agreement-type-field" data-agreement-types="2">
+                                <label for="Agreement_Type_PointContent">Содержание пункта</label>
+                                <textarea rows="4" id="Agreement_Type_PointContent" name="Agreement_Type_PointContent" class="form-control" title="Содержание дополнительного соглашения" data-val="true" data-val-required="Укажите содержание пункта"></textarea>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_PointContent" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="3">
+                                <label for="Agreement_Type_TenancyEndReason">По какой причине?</label>
+                                <input type="text" class="form-control" id="Agreement_Type_TenancyEndReason" name="Agreement_Type_TenancyEndReason" title="По какой причине?" data-val="true" data-val-required="Укажите причину расторжения договора">
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenancyEndReason" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="3">
+                                <label for="Agreement_Type_TenancyEndDate">Дата расторжения</label>
+                                <input type="date" class="form-control" id="Agreement_Type_TenancyEndDate" name="Agreement_Type_TenancyEndDate" title="Дата расторжения" data-val="true" data-val-required="Укажите дату расторжения договора">
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenancyEndDate" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="4">
+                                <label for="Agreement_Type_TenancyProlongRentReason">Документ-оснвоание</label>
+                                <select class="selectpicker form-control" disabled id="Agreement_Type_TenancyProlongRentReason" name="Agreement_Type_TenancyProlongRentReason" title="Документ-оснвоание"
+                                        data-val="true" data-val-required="Выберите документ-основание">
+                                    <option></option>
+                                    @foreach (var prolongReason in ViewBag.TenancyProlongRentReasons)
+                                    {
+                                        <option value="@prolongReason.IdReasonType" data-genetive="@prolongReason.ReasonTemplateGenetive">@prolongReason.ReasonName</option>
+                                    }
+                                </select>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenancyProlongRentReason" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="4">
+                                <label for="Agreement_Type_TenancyProlongRentReasonDate">Дата докумнта-основания</label>
+                                <input type="date" class="form-control" id="Agreement_Type_TenancyProlongRentReasonDate" name="Agreement_Type_TenancyProlongRentReasonDate" title="Дата докумнта-основания" data-val="true" data-val-required="Укажите дату докумнта-основания">
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenancyProlongRentReasonDate" data-valmsg-replace="true"></span>
+                            </div>
+
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="4,5">
+                                <label for="Agreement_Type_ProlongBeginDate">Дата начала нового периода найма</label>
+                                <input type="date" class="form-control" value="" title="Дата начала нового периода найма" id="Agreement_Type_ProlongBeginDate" name="Agreement_Type_ProlongBeginDate">
+                            </div>
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="4,5">
+                                <label for="Agreement_Type_ProlongEndDate">Дата окончания нового периода найма</label>
+                                <input type="date" class="form-control" value="" title="Дата окончания нового периода найма" id="Agreement_Type_ProlongEndDate" name="Agreement_Type_ProlongEndDate">
+                            </div>
+                            <div class="offset-md-6 col-md-6 rr-agreement-type-field" data-agreement-types="4,5">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="Agreement_Type_ProlongUntilDismissal" name="Agreement_Type_ProlongUntilDismissal">
+                                    <label class="form-check-label" title="На период трудовых отношений / пролонгирован" for="Agreement_Type_ProlongUntilDismissal">На период ТО / пролонгирован</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12 rr-agreement-type-field" data-agreement-types="4">
+                                <label for="Agreement_Type_PointExclude">Пункт исключить</label>
+                                <input type="text" class="form-control" id="Agreement_Type_PointExclude" name="Agreement_Type_PointExclude" title="Пункт исключить">
+                            </div>
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="6">
+                                <label for="Agreement_Type_Tenant">Текущий наниматель</label>
+                                <input type="text" class="form-control" id="Agreement_Type_Tenant" name="Agreement_Type_Tenant" title="Текущий наниматель">
+                            </div>
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="6">
+                                <label for="Agreement_Type_TenantNewIdKinship">Новая родственная связь</label>
+                                <select class="selectpicker form-control" disabled id="Agreement_Type_TenantNewIdKinship" name="Agreement_Type_TenantNewIdKinship" title="Новая родственная связь"
+                                        data-val="true" data-val-required="Выберите новую родственную связь">
+                                    <option></option>
+                                    @foreach (var kinship in ViewBag.Kinships)
+                                    {
+                                        if (kinship.IdKinship == 1) { continue; }
+                                        <option value="@kinship.IdKinship">@kinship.KinshipName</option>
+                                    }
+                                </select>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenantNewIdKinship" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group col-md-12 rr-agreement-type-field" data-agreement-types="6">
+                                <label for="Agreement_Type_TenancyPersonsWithoutTenant">Новый наниматель</label>
+                                <select class="selectpicker form-control" data-val="true" data-val-required="Выберите нового нанимателя" id="Agreement_Type_TenancyPersonsWithoutTenant" name="Agreement_Type_TenancyPersonsWithoutTenant" title="Новый наниматель">
+                                    <option></option>
+                                </select>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenancyPersonsWithoutTenant" data-valmsg-replace="true"></span>
+                            </div>
+                        }
+                        <hr class="col-md-12 p-0" />
+                        <h5 class="col-12 pb-2">Содержание соглашения</h5>
+                        <div class="form-group col-md-12">
+                            <textarea rows="15" id="Agreement_AgreementContent" name="Agreement.AgreementContent" class="form-control" title="Содержание дополнительного соглашения"></textarea>
+                        </div>
+                        @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                        {
+                            <hr class="col-md-12 p-0" />
+                            <h5 class="col-12 pb-2">Автоматические операции</h5>
+                            <ul class="Agreement_AutomateOperations"></ul>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                    {
+                        <button id="saveAgreementModalBtn" type="button" class="btn btn-secondary">Сохранить</button>
+                        <button id="cancelAgreementModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                    }
+                    @if (ViewBag.Action == "Details")
+                    {
+                        <button id="closeAgreementModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

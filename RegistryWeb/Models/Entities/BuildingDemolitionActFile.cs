@@ -9,7 +9,7 @@ namespace RegistryWeb.Models.Entities
         public int? IdActFile  { get; set; }
         public int IdActTypeDocument  { get; set; }
         public string Number  { get; set; }
-        public DateTime Date  { get; set; }
+        public DateTime? Date  { get; set; }
         public string Name  { get; set; }
         public byte Deleted  { get; set; }
 

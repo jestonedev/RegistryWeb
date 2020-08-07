@@ -12,7 +12,7 @@ namespace RegistryWeb.SecurityServices
     {
         public AclUser User { get; set; }
         public List<AclPrivilege> Privileges { get; set; }
-        public uint PrivelegesFlagValue { get; set; }
+        public long PrivelegesFlagValue { get; set; }
 
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly RegistryContext registryContext;
@@ -25,7 +25,7 @@ namespace RegistryWeb.SecurityServices
             Privileges = GetUserPriveleges();
             var pr = Privileges.Select(p => p.PrivilegeMask).ToList();
             if (Privileges.Count() == 0)
-                PrivelegesFlagValue = (uint)SecurityServices.Privileges.None;
+                PrivelegesFlagValue = (long)SecurityServices.Privileges.None;
             else
                 PrivelegesFlagValue = Privileges.Select(p => p.PrivilegeMask).Aggregate((x, y) => x | y);
         }
@@ -33,7 +33,7 @@ namespace RegistryWeb.SecurityServices
         public bool HasPrivilege(Privileges privilege)
         {
             //return Privileges.Any(p => p.PrivilegeMask == (uint)privilege);
-            return (PrivelegesFlagValue & (uint)privilege) == (uint)privilege;
+            return (PrivelegesFlagValue & (long)privilege) == (long)privilege;
         }
 
         private AclUser GetUser()

@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using RegistryWeb.DataHelpers;
+using System.Runtime.CompilerServices;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace RegistryWeb.DataServices
 {
@@ -16,8 +19,10 @@ namespace RegistryWeb.DataServices
         private readonly IQueryable<TenancyBuildingAssoc> tenancyBuildingsAssoc;
         private readonly IQueryable<TenancyPremiseAssoc> tenancyPremisesAssoc;
         private readonly IQueryable<TenancySubPremiseAssoc> tenancySubPremisesAssoc;
+        private readonly SecurityServices.SecurityService securityService;
+        private readonly IConfiguration config;
 
-        public TenancyProcessesDataService(RegistryContext registryContext) : base(registryContext)
+        public TenancyProcessesDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService, IConfiguration config) : base(registryContext)
         {
             tenancyBuildingsAssoc = registryContext.TenancyBuildingsAssoc
                     .Include(oba => oba.BuildingNavigation)
@@ -42,6 +47,8 @@ namespace RegistryWeb.DataServices
                         .ThenInclude(p => p.IdPremisesTypeNavigation)
                 .Include(oba => oba.ProcessNavigation)
                 .AsNoTracking();
+            this.securityService = securityService;
+            this.config = config;
         }
 
         public override TenancyProcessesVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, TenancyProcessesFilter filterOptions)
@@ -55,21 +62,32 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
-        internal TenancyProcessVM GetTenancyProcessViewModel(TenancyProcess process)
+        internal TenancyProcessVM CreateTenancyProcessEmptyViewModel([CallerMemberName]string action = "")
         {
+            var userName = securityService.User.UserName.ToLowerInvariant();
             return new TenancyProcessVM
             {
-                TenancyProcess = process,
-                RentObjects = GetRentObjects(new List<TenancyProcess> { process }).SelectMany(r => r.Value).ToList(),
+                TenancyProcess = new TenancyProcess(),
                 Kinships = registryContext.Kinships.ToList(),
                 RentTypeCategories = registryContext.RentTypeCategories.ToList(),
                 RentTypes = registryContext.RentTypes.ToList(),
                 TenancyReasonTypes = registryContext.TenancyReasonTypes.ToList(),
                 Streets = registryContext.KladrStreets.ToList(),
-                Executors = registryContext.Executors.ToList(),
+                Executors = (action == "Details" || action == "Delete") ? registryContext.Executors.ToList() : registryContext.Executors.Where(e => !e.IsInactive).ToList(),
+                CurrentExecutor = registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null && 
+                        e.ExecutorLogin.ToLowerInvariant() == userName),
                 DocumentTypes = registryContext.DocumentTypes.ToList(),
-                DocumentIssuedBy = registryContext.DocumentsIssuedBy.ToList()
+                DocumentIssuedBy = registryContext.DocumentsIssuedBy.ToList(),
+                TenancyProlongRentReasons = registryContext.TenancyProlongRentReasons.ToList()
             };
+        }
+
+        internal TenancyProcessVM GetTenancyProcessViewModel(TenancyProcess process, [CallerMemberName]string action = "")
+        {
+            var tenancyProcessVM = CreateTenancyProcessEmptyViewModel(action);
+            tenancyProcessVM.TenancyProcess = process;
+            tenancyProcessVM.RentObjects = GetRentObjects(new List<TenancyProcess> { process }).SelectMany(r => r.Value).ToList();
+            return tenancyProcessVM;
         }
 
         internal TenancyProcess GetTenancyProcess(int idProcess)
@@ -82,6 +100,7 @@ namespace RegistryWeb.DataServices
                  .Include(tp => tp.TenancySubPremisesAssoc)
                  .Include(tp => tp.TenancyRentPeriods)
                  .Include(tp => tp.TenancyAgreements)
+                 .Include(tp => tp.TenancyFiles)
                  .FirstOrDefault(tp => tp.IdProcess == idProcess);
         }
 
@@ -138,7 +157,9 @@ namespace RegistryWeb.DataServices
                                     {
                                         AddressType = AddressTypes.Building,
                                         Id = buildingRow.IdBuilding.ToString(),
-                                        IdParents = new Dictionary<string, string>(),
+                                        IdParents = new Dictionary<string, string> {
+                                            { AddressTypes.Street.ToString(), buildingRow.IdStreet }
+                                        },
                                         Text = string.Concat(streetRow.StreetName, ", д.", buildingRow.House)
                                     },
                                     TotalArea = buildingRow.TotalArea,
@@ -167,6 +188,7 @@ namespace RegistryWeb.DataServices
                                        Id = premiseRow.IdPremises.ToString(),
                                        IdParents = new Dictionary<string, string>
                                        {
+                                           { AddressTypes.Street.ToString(), buildingRow.IdStreet },
                                            { AddressTypes.Building.ToString(), buildingRow.IdBuilding.ToString() }
                                        },
                                        Text = string.Concat(streetRow.StreetName, ", д.", buildingRow.House, ", ",
@@ -200,8 +222,9 @@ namespace RegistryWeb.DataServices
                                           Id = subPremiseRow.IdSubPremises.ToString(),
                                           IdParents = new Dictionary<string, string>
                                            {
-                                                { AddressTypes.Building.ToString(), buildingRow.IdBuilding.ToString() },
-                                                { AddressTypes.Premise.ToString(), premiseRow.IdPremises.ToString() }
+                                              { AddressTypes.Street.ToString(), buildingRow.IdStreet },
+                                              { AddressTypes.Building.ToString(), buildingRow.IdBuilding.ToString() },
+                                              { AddressTypes.Premise.ToString(), premiseRow.IdPremises.ToString() }
                                            },
                                           Text = string.Concat(streetRow.StreetName, ", д.", buildingRow.House, ", ",
                                             premiseTypesRow.PremisesTypeShort, premiseRow.PremisesNum, ", к.", subPremiseRow.SubPremisesNum)
@@ -332,6 +355,90 @@ namespace RegistryWeb.DataServices
                 .Select(r => new { IdProcess = r.Key, RentObject = r.Select(v => v.RentObject) })
                 .ToDictionary(v => v.IdProcess, v => v.RentObject.ToList());
             return result;
+        }
+
+        internal void Create(TenancyProcess tenancyProcess, IList<TenancyRentObject> rentObjects, List<Microsoft.AspNetCore.Http.IFormFile> files)
+        {
+            if (tenancyProcess.TenancyReasons != null)
+            {
+                foreach(var reason in tenancyProcess.TenancyReasons)
+                {
+                    var tenancyReasonType = registryContext.TenancyReasonTypes.FirstOrDefault(tr => tr.IdReasonType == reason.IdReasonType);
+                    if (tenancyReasonType == null)
+                        throw new Exception("Некорректный тип основания найма");
+                    reason.ReasonPrepared = tenancyReasonType.ReasonTemplate
+                        .Replace("@reason_date@", reason.ReasonDate.HasValue ? reason.ReasonDate.Value.ToString("dd.MM.yyyy") : "")
+                        .Replace("@reason_number@", reason.ReasonNumber);
+                }
+            }
+            if (rentObjects != null)
+            {
+                foreach (var rentObject in rentObjects)
+                {
+                    switch(rentObject.Address.AddressType)
+                    {
+                        case AddressTypes.Building:
+                            tenancyProcess.TenancyBuildingsAssoc.Add(new TenancyBuildingAssoc
+                            {
+                                IdBuilding = int.Parse(rentObject.Address.Id),
+                                RentTotalArea = rentObject.RentArea
+                            });
+                            break;
+                        case AddressTypes.Premise:
+                            tenancyProcess.TenancyPremisesAssoc.Add(new TenancyPremiseAssoc
+                            {
+                                IdPremise = int.Parse(rentObject.Address.Id),
+                                RentTotalArea = rentObject.RentArea
+                            });
+                            break;
+                        case AddressTypes.SubPremise:
+                            tenancyProcess.TenancySubPremisesAssoc.Add(new TenancySubPremiseAssoc
+                            {
+                                IdSubPremise = int.Parse(rentObject.Address.Id),
+                                RentTotalArea = rentObject.RentArea
+                            });
+                            break;
+                    }
+                }
+            }
+
+            // Прикрепляем документы
+            var tenancyFilesPath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Tenancies\");
+            if (tenancyProcess.TenancyFiles != null)
+            {
+                for (var i = 0; i < tenancyProcess.TenancyFiles.Count; i++)
+                {
+                    tenancyProcess.TenancyFiles[i].FileName = "";
+                    var file = files.Where(r => r.Name == "TenancyFile[" + i + "]").FirstOrDefault();
+                    if (file == null) continue;
+                    tenancyProcess.TenancyFiles[i].DisplayName = file.FileName;
+                    tenancyProcess.TenancyFiles[i].FileName = Guid.NewGuid().ToString() + "." + new FileInfo(file.FileName).Extension;
+                    tenancyProcess.TenancyFiles[i].MimeType = file.ContentType;
+                    var fileStream = new FileStream(Path.Combine(tenancyFilesPath, tenancyProcess.TenancyFiles[i].FileName), FileMode.CreateNew);
+                    file.OpenReadStream().CopyTo(fileStream);
+                    fileStream.Close();
+                }
+            }
+
+            registryContext.TenancyProcesses.Add(tenancyProcess);
+            registryContext.SaveChanges();
+        }
+
+        internal void Edit(TenancyProcess tenancyProcess)
+        {
+            registryContext.TenancyProcesses.Update(tenancyProcess);
+            registryContext.SaveChanges();
+        }
+
+        internal void Delete(int idProcess)
+        {
+            var tenancyProcesses = registryContext.TenancyProcesses
+                    .FirstOrDefault(op => op.IdProcess == idProcess);
+            if (tenancyProcesses != null)
+            {
+                tenancyProcesses.Deleted = 1;
+                registryContext.SaveChanges();
+            }
         }
 
         private IQueryable<TenancyProcess> GetQueryFilter(IQueryable<TenancyProcess> query, TenancyProcessesFilter filterOptions)
@@ -677,6 +784,30 @@ namespace RegistryWeb.DataServices
             return query
                 .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
                 .Take(pageOptions.SizePage);
+        }
+
+        public IEnumerable<TenancyReasonType> TenancyReasonTypes
+        {
+            get => registryContext.TenancyReasonTypes.AsNoTracking();
+        }
+
+        public IEnumerable<Kinship> Kinships
+        {
+            get => registryContext.Kinships.AsNoTracking();
+        }
+
+        public IEnumerable<Executor> ActiveExecutors
+        {
+            get => registryContext.Executors.Where(e => !e.IsInactive).AsNoTracking();
+        }
+
+        public IEnumerable<KladrStreet> Streets
+        {
+            get => registryContext.KladrStreets.AsNoTracking();
+        }
+
+        public IEnumerable<TenancyProlongRentReason> TenancyProlongRentReasons {
+            get => registryContext.TenancyProlongRentReasons.AsNoTracking();
         }
     }
 }
