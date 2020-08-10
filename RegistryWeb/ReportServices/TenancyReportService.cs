@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using RegistryWeb.SecurityServices;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -90,6 +91,35 @@ namespace RegistryWeb.ReportServices
                 { "id_agreement", idAgreement }
             };
             var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\agreement");
+            return DownloadFile(fileNameReport);
+        }
+
+        public byte[] NotifySingleDocument(int idProcess, int reportType)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "id_process", idProcess },
+                { "report_type", reportType }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\notify_single_document");
+            return DownloadFile(fileNameReport);
+        }
+
+        public byte[] RequestToMvd(int idProcess, int requestType)
+        {
+            var tmpFileName = Path.GetTempFileName();
+            using (var sw = new StreamWriter(tmpFileName))
+                sw.Write(idProcess);
+            var arguments = new Dictionary<string, object>
+            {
+                { "idsTmpFile", tmpFileName }
+            };
+            var fileName = "registry\\tenancy\\requestMVD";
+            if (requestType == 2)
+            {
+                fileName = "registry\\tenancy\\requestMVDNew";
+            }
+            var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
     }

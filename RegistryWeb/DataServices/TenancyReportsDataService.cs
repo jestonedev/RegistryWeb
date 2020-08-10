@@ -47,5 +47,10 @@ namespace RegistryWeb.DataServices
         {
             return registryContext.TenancyAgreements.FirstOrDefault(t => t.IdAgreement == idAgreement)?.IdProcess ?? 0;
         }
+
+        internal bool HasTenancies(int idProcess)
+        {
+            return registryContext.TenancyPersons.FirstOrDefault(t => t.IdProcess == idProcess) != null;
+        }
     }
 }

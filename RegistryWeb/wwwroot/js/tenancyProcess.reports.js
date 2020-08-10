@@ -101,6 +101,23 @@
         e.preventDefault();
     });
 
+    $("body").on('click', ".rr-report-excerpt", function (e) {
+        var idProcess = $(this).data("id-process");
+        var reportType = $(this).data("report-type");
+        var reportTitle = $(this).text();
+        url = "/TenancyReports/GetNotifySingleDocument?idProcess=" + idProcess + "&reportType=" + reportType + "&reportTitle="+reportTitle;
+        downloadFile(url);
+        e.preventDefault();
+    });
+
+    $("body").on('click', ".rr-report-mvd", function (e) {
+        var idProcess = $(this).data("id-process");
+        var requestType = $(this).data("request-type");
+        url = "/TenancyReports/GetRequestToMvd?idProcess=" + idProcess + "&requestType=" + requestType;
+        downloadFile(url);
+        e.preventDefault();
+    });
+
     $("#preContractModal, #openDateModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });

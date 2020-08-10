@@ -179,5 +179,55 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
+
+        public IActionResult GetNotifySingleDocument(int idProcess, int reportType, string reportTitle)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+            try
+            {
+                if (new int[] { 1, 7 }.Contains(reportType) && !dataService.HasRegistrationDateAndNum(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан номер и/или дата договора найма", idProcess));
+                }
+                if (!dataService.HasRentObjects(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
+                }
+                if (!dataService.HasTenant(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
+                }
+                var file = reportService.NotifySingleDocument(idProcess, reportType);
+                return File(file, odtMime, string.Format(@reportTitle+" (найм № {0})", idProcess));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetRequestToMvd(int idProcess, int requestType)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+            try
+            {
+                if (!dataService.HasRentObjects(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
+                }
+                if (!dataService.HasTenancies(idProcess))
+                {
+                    return Error(string.Format("В найме {0} отсутствуют участники", idProcess));
+                }
+                var file = reportService.RequestToMvd(idProcess, requestType);
+                return File(file, odtMime, string.Format("Запрос в МВД (найм № {0})", idProcess));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
     }
 }
