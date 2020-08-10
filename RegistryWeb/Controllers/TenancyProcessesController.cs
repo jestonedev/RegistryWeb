@@ -263,5 +263,31 @@ namespace RegistryWeb.Controllers
 
             return PartialView("AttachmentFile", file);
         }
+
+        [HttpPost]
+        public IActionResult UpdateRentPeriod(int? idProcess, DateTime? beginDate, DateTime? endDate, bool untilDismissal)
+        {
+            if (idProcess == null || idProcess == 0)
+            {
+                return Json(new
+                {
+                    Code = -1,
+                    Text = "Не удалось найти процесс найма"
+                });
+            }
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+            {
+                return Json(new
+                {
+                    Code = -1,
+                    Text = "У вас нет прав на редактирование найма жилья"
+                });
+            }
+            dataService.UpdateExcludeDate(idProcess, beginDate, endDate, untilDismissal);
+            return Json(new
+            {
+                Code = 0
+            });
+        }
     }
 }
