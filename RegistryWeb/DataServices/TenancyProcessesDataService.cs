@@ -818,5 +818,15 @@ namespace RegistryWeb.DataServices
         public IEnumerable<TenancyProlongRentReason> TenancyProlongRentReasons {
             get => registryContext.TenancyProlongRentReasons.AsNoTracking();
         }
+
+        public IEnumerable<DistrictCommittee> DistrictCommittees
+        {
+            get => registryContext.DistrictCommittees.AsNoTracking();
+        }
+
+        public IEnumerable<DistrictCommitteesPreContractPreamble> DistrictCommitteesPreContractPreambles
+        {
+            get => registryContext.DistrictCommitteesPreContractPreambles.AsNoTracking();
+        }
     }
 }

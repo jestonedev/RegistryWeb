@@ -1,12 +1,4 @@
 ﻿$(document).ready(function () {
-    function downloadFile(url) {
-        var link = document.createElement('a');
-        link.href = url;
-        link.target = "_blank";
-        link.style.display = "none";
-        document.getElementsByTagName("body")[0].appendChild(link);
-        link.click();
-    }
 
     $("body").on('click', ".rr-report-premise-excerpt", function (e) {
         var idPremise = $(this).data("id-premise");

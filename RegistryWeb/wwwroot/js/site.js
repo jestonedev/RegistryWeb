@@ -97,6 +97,15 @@ function uuidv4() {
     });
 }
 
+function downloadFile(url) {
+    var link = document.createElement('a');
+    link.href = url;
+    link.target = "_blank";
+    link.style.display = "none";
+    document.getElementsByTagName("body")[0].appendChild(link);
+    link.click();
+}
+
 function fixBootstrapSelectHighlight(form) {
     form.find("select").each(function (idx, elem) {
         var id = $(elem).prop("id");

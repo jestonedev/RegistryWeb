@@ -13,6 +13,7 @@ using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace RegistryWeb.Controllers
 {
@@ -43,17 +44,30 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("FilterOptions");
             }
             ViewBag.SecurityService = securityService;
+            ViewBag.DistrictCommittees = new SelectList(dataService.DistrictCommittees, "IdCommittee", "NameNominative");
+            ViewBag.DistrictCommitteesPreambles = new SelectList(dataService.DistrictCommitteesPreContractPreambles, "IdPreamble", "Name");
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
                 viewModel.FilterOptions));
         }
 
+        private void InitializeViewBag(string action, string returnUrl, bool canEditBaseInfo)
+        {
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = canEditBaseInfo;
+            if (returnUrl != null)
+            {
+                ViewBag.ReturnUrl = returnUrl;
+            }
+            ViewBag.SecurityService = securityService;
+            ViewBag.DistrictCommittees = new SelectList(dataService.DistrictCommittees, "IdCommittee", "NameNominative");
+            ViewBag.DistrictCommitteesPreambles = new SelectList(dataService.DistrictCommitteesPreContractPreambles, "IdPreamble", "Name");
+        }
+
         // GET: TenancyProcesses/Details/5
         public ActionResult Details(int? idProcess, string returnUrl)
         {
-            ViewBag.Action = "Details";
-            ViewBag.ReturnUrl = returnUrl;
             if (idProcess == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.TenancyRead))
@@ -61,17 +75,15 @@ namespace RegistryWeb.Controllers
             var process = dataService.GetTenancyProcess(idProcess.Value);
             if (process == null)
                 return NotFound();
-            ViewBag.CanEditBaseInfo = securityService.HasPrivilege(Privileges.TenancyWrite);
+            InitializeViewBag("Details", returnUrl, securityService.HasPrivilege(Privileges.TenancyWrite));
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(process));
         }
         
         public ActionResult Create()
         {
-            ViewBag.Action = "Create";
-            ViewBag.SecurityService = securityService;
             if (!securityService.HasPrivilege(Privileges.TenancyWrite))
                 return View("NotAccess");
-            ViewBag.CanEditBaseInfo = true;
+            InitializeViewBag("Create", null, true);
             return View("TenancyProcess", dataService.CreateTenancyProcessEmptyViewModel());
         }
         
@@ -88,17 +100,12 @@ namespace RegistryWeb.Controllers
                     HttpContext.Request.Form.Files.Select(f => f).ToList());
                 return RedirectToAction("Details", new { tenancyProcessVM.TenancyProcess.IdProcess });
             }
-            ViewBag.Action = "Create";
-            ViewBag.SecurityService = securityService;
-            ViewBag.CanEditBaseInfo = true;
+            InitializeViewBag("Create", null, true);
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcessVM.TenancyProcess));
         }
         
         public ActionResult Edit(int? idProcess, string returnUrl)
         {
-            ViewBag.Action = "Edit";
-            ViewBag.ReturnUrl = returnUrl;
-            ViewBag.SecurityService = securityService;
             if (idProcess == null)
                 return NotFound();
 
@@ -106,10 +113,12 @@ namespace RegistryWeb.Controllers
             if (tenancyProcess == null)
                 return NotFound();
 
-            ViewBag.CanEditBaseInfo = securityService.HasPrivilege(Privileges.TenancyWrite);
+            var canEditBaseInfo = securityService.HasPrivilege(Privileges.TenancyWrite);
 
-            if (!(bool)ViewBag.CanEditBaseInfo)
+            if (!canEditBaseInfo)
                 return View("NotAccess");
+
+            InitializeViewBag("Edit", returnUrl, canEditBaseInfo);
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcess));
         }
         
@@ -119,9 +128,9 @@ namespace RegistryWeb.Controllers
             if (tenancyProcessVM == null || tenancyProcessVM.TenancyProcess == null)
                 return NotFound();
 
-            ViewBag.CanEditBaseInfo = securityService.HasPrivilege(Privileges.TenancyWrite);
+            var canEditBaseInfo = securityService.HasPrivilege(Privileges.TenancyWrite);
 
-            if (!(bool)ViewBag.CanEditBaseInfo)
+            if (!canEditBaseInfo)
                 return View("NotAccess");
 
             if (ModelState.IsValid)
@@ -130,17 +139,12 @@ namespace RegistryWeb.Controllers
                 dataService.Edit(tenancyProcessVM.TenancyProcess);
                 return RedirectToAction("Details", new { tenancyProcessVM.TenancyProcess.IdProcess });
             }
-            ViewBag.Action = "Edit";
-            ViewBag.ReturnUrl = returnUrl;
-            ViewBag.SecurityService = securityService;
+            InitializeViewBag("Edit", returnUrl, canEditBaseInfo);
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcessVM.TenancyProcess));
         }
         
         public ActionResult Delete(int? idProcess, string returnUrl)
         {
-            ViewBag.Action = "Delete";
-            ViewBag.ReturnUrl = returnUrl;
-            ViewBag.SecurityService = securityService;
             if (idProcess == null)
                 return NotFound();
 
@@ -150,8 +154,8 @@ namespace RegistryWeb.Controllers
 
             if (!securityService.HasPrivilege(Privileges.TenancyWrite))
                 return View("NotAccess");
-
-            ViewBag.CanEditBaseInfo = false;
+            
+            InitializeViewBag("Delete", returnUrl, false);
 
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcess));
         }

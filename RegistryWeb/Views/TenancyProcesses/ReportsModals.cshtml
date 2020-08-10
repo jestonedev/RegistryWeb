@@ -1,0 +1,70 @@
+﻿@{
+    var preamblesList = (SelectList)ViewBag.DistrictCommitteesPreambles;
+    var comitteesList = (SelectList)ViewBag.DistrictCommittees;
+}
+
+<a id="target" style="display: none"></a>
+
+<form id="preContractForm">
+    <div class="modal fade" id="preContractModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Предварительный договор</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="PreContract.IdProcess" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="PreContract.IdCommittee">Комитет</label>
+                            <select class="selectpicker form-control" title="Комитет" name="PreContract.IdCommittee"
+                                    data-val="true" data-val-required="Выберите комитет" id="PreContract_IdCommittee" asp-items="@comitteesList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="PreContract.IdCommittee" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="PreContract.IdPreamble">Преамбула</label>
+                            <select class="selectpicker form-control" title="Преамбула" name="PreContract.IdPreamble"
+                                    data-val="true" data-val-required="Выберите преамбулу" id="PreContract_IdPreamble" asp-items="@preamblesList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="PreContract.IdPreamble" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="openDateForm">
+    <div class="modal fade" id="openDateModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Договор</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="OpenDate.IdProcess" />
+                    <input type="hidden" name="OpenDate.ReportType" />
+                    <input type="hidden" name="OpenDate.IdRentType" />
+                    <input type="hidden" name="OpenDate.ContractType" />
+                    Печатать с открытой датой?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit" data-val="1">Да</button>
+                    <button type="button" class="btn btn-primary rr-report-submit" data-val="0">Нет</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

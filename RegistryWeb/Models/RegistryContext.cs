@@ -56,6 +56,8 @@ namespace RegistryWeb.Models
         public virtual DbSet<FoundationType> FoundationTypes { get; set; }
         public virtual DbSet<GovernmentDecree> GovernmentDecrees { get; set; }
         public virtual DbSet<SelectableSigner> SelectableSigners { get; set; }
+        public virtual DbSet<DistrictCommittee> DistrictCommittees { get; set; }
+        public virtual DbSet<DistrictCommitteesPreContractPreamble> DistrictCommitteesPreContractPreambles { get; set; }
 
         //Документы
         public virtual DbSet<ActTypeDocument> ActTypeDocuments { get; set; }
@@ -170,7 +172,9 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new BuildingDemolitionActFileConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new SelectableSignersConfiguration(nameDatebase));
-            
+            modelBuilder.ApplyConfiguration(new DistrictCommitteeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new DistrictCommitteesPreContractPreambleConfiguration(nameDatebase));
+
             modelBuilder.ApplyConfiguration(new DocumentTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new DocumentIssuedByConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new DocumentResidenceConfiguration(nameDatebase));

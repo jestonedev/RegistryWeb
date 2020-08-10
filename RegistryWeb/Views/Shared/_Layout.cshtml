@@ -29,20 +29,22 @@
 
 </head>
 <body>
-    <nav class="navbar navbar-expand-md navbar-toggleable-md navbar-light bg-white border-bottom box-shadow mb-3">
+    <nav class="navbar navbar-expand-lg navbar-toggleable-lg navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container">
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Главная</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="navbar-collapse collapse d-md-inline-flex flex-sm-row-reverse">
+            <div class="navbar-collapse collapse d-lg-inline-flex flex-sm-row-reverse">
                 <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a a class="nav-link" asp-area="" asp-controller="Buildings" asp-action="Index">Здания</a>
-                    </li>
-                    <li class="nav-item">
-                        <a a class="nav-link" asp-area="" asp-controller="Premises" asp-action="Index">Помещения</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownObjects" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Жилые объекты</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownObjects">
+                            <a class="dropdown-item" asp-area="" asp-controller="Buildings" asp-action="Index">Здания</a>
+                            <a class="dropdown-item" asp-area="" asp-controller="Premises" asp-action="Index">Помещения</a>
+                            <a class="dropdown-item disabled" asp-area="" asp-controller="RegistryObjectsReports" asp-action="Index">Отчеты</a>
+                        </div>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownOwners" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Собственность</a>
@@ -54,10 +56,17 @@
                         </div>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownOwners" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Найм жилья</a>
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownTenancies" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Найм жилья</a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownTenancies">
                             <a class="dropdown-item" asp-area="" asp-controller="TenancyProcesses" asp-action="Index">Процессы найма</a>
-                            <a class="dropdown-item" asp-area="" asp-controller="TenancyReports" asp-action="Index">Отчеты</a>
+                            <a class="dropdown-item disabled" asp-area="" asp-controller="TenancyReports" asp-action="Index">Отчеты</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownClaims" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Исковая работа</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownClaims">
+                            <a class="dropdown-item disabled" asp-area="" asp-controller="PaymentAccounts" asp-action="Index">Лицевые счета БКС</a>
+                            <a class="dropdown-item disabled" asp-area="" asp-controller="Claims" asp-action="Index">Претензионно-исковая работа</a>
                         </div>
                     </li>
                 </ul>

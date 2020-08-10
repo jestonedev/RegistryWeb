@@ -22,7 +22,7 @@
         @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
         {
             <div class="text-center text-md-right col-12 col-md-2 rr-tenancy-agreement-edit-buttons">
-                <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                <div class="btn-group edit-del-panel" role="group" aria-label="Панель редактирования">
                     <a class="btn btn-primary tenancy-agreement-edit-btn" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
                     <a class="btn btn-danger tenancy-agreement-delete-btn" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
                 </div>
@@ -31,9 +31,14 @@
         @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
         {
             <div class="text-center text-md-right col-12 col-md-2 rr-tenancy-agreement-view-buttons">
-                <a class="btn btn-primary tenancy-agreement-open-btn" href="#" title="Открыть дополнительное соглашения" aria-label="Открыть дополнительное соглашения">
-                    <span class="oi oi-eye"></span>
-                </a>
+                <div class="btn-group" role="group" aria-label="Панель инструментов">
+                    <a class="btn btn-primary tenancy-agreement-open-btn" href="#" title="Открыть дополнительное соглашения" aria-label="Открыть дополнительное соглашения">
+                        <span class="oi oi-eye"></span>
+                    </a>
+                    <a class="btn btn-success rr-report-agreement" href="#" title="Распечатать соглашение" aria-label="Распечатать соглашение" data-id-agreement="@Model.IdAgreement">
+                        <span class="oi oi-document"></span>
+                    </a>
+                </div>
             </div>
         }
     </div>
