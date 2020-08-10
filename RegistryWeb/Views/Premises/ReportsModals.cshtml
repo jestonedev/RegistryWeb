@@ -5,47 +5,47 @@
 <a id="target" style="display: none"></a>
 
 <form id="excerptForm">
-<div class="modal fade" id="excerptModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Выписка</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" name="Excerpt.IdObject" />
-                <input type="hidden" name="Excerpt.ExcerptType" />
-                <div class="form-row">
-                    <div class="form-group col-sm-6">
-                        <label for="Excerpt.ExcerptNumber">Номер выписки</label>
-                        <input type="text" class="form-control" name="Excerpt.ExcerptNumber" title="Номер выписки">
+    <div class="modal fade" id="excerptModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Выписка</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Excerpt.IdObject" />
+                    <input type="hidden" name="Excerpt.IdObjects" />
+                    <input type="hidden" name="Excerpt.ExcerptType" />
+                    <div class="form-row">
+                        <div class="form-group col-sm-6">
+                            <label for="Excerpt.ExcerptNumber">Номер выписки</label>
+                            <input type="text" class="form-control" name="Excerpt.ExcerptNumber" title="Номер выписки">
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label for="Excerpt.ExcerptDate">Выписка от</label>
+                            <input type="date" class="form-control" name="Excerpt.ExcerptDate" title="Выписка от" data-val="true" data-val-required="Заполните дату" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Excerpt.ExcerptDate" data-valmsg-replace="true"></span>
+                        </div>
                     </div>
-                    <div class="form-group col-sm-6">
-                        <label for="Excerpt.ExcerptDate">Выписка от</label>
-                        <input type="date" class="form-control" name="Excerpt.ExcerptDate" title="Выписка от" data-val="true" data-val-required="Заполните дату">
-                        <span class="text-danger field-validation-valid" data-valmsg-for="Excerpt.ExcerptDate" data-valmsg-replace="true"></span>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="Excerpt.Signer">Подписывающий</label>
+                            <select class="selectpicker form-control" title="Подписывающий" name="Excerpt.Signer"
+                                    data-val="true" data-val-required="Подписывающий обязателен для заполнения" id="Excerpt.Signer" asp-items="@Model.SignersList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Excerpt.Signer" data-valmsg-replace="true"></span>
+                        </div>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group col-12">
-                        <label for="Excerpt.Signer">Подписывающий</label>
-                        <select class="selectpicker form-control" title="Состояние помещения" name="Excerpt.Signer"
-                            data-val="true" data-val-required="Подписывающий обязателен для заполнения" id="Excerpt.Signer" asp-items="@Model.SignersList"></select>
-                        <span class="text-danger field-validation-valid" data-valmsg-for="Excerpt.Signer" data-valmsg-replace="true"></span>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
             </div>
         </div>
     </div>
-</div>
 </form>
-
 
 <form id="noticeToBksForm">
     <div class="modal fade" id="noticeToBksModal" tabindex="-1" role="dialog">
@@ -95,6 +95,230 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="massactForm">
+    <div class="modal fade" id="massactModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Акт проверки факта о проживаении</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="massact.IdObjects" />
+                    <input type="hidden" name="massact.ActType" />
+                    <div class="form-row">
+                        <div class="form-group col-sm-12 col-md-12">
+                            <label for="Excerpt.ActDate">Дата акта</label>
+                            <input type="date" class="form-control" name="massact.ActDate" title="Выписка от" data-val="true" data-val-required="Заполните дату" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="massact.ExcerptDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="checkbox">
+                            <label class="col-xs-12 col-md-12">
+                                <input type="checkbox" name="massact.isNotResides" />
+                                На момент проверки никого не было дома
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-sm-6 col-md-6">
+                            <label for="massact.Commision">Состав комиссии</label>
+                            <select multiple data-actions-box="true" class="selectpicker form-control" title="Состав комисии" name="massact.Commision"
+                                    data-val="true" data-val-required="Состав комисии обязателен для заполнения" id="massact.Commision" asp-items="@Model.PreparersList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="massact.Commision" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-sm-6 col-md-6">
+                            <label for="massact.Signer">Составил акт</label>
+                            <select class="selectpicker form-control" title="Составил акт" name="massact.Clerk"
+                                    data-val="true" data-val-required="Подписывающий обязателен для заполнения" id="massact.Clerk" asp-items="@Model.PreparersList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="massact.Clerk" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<!--для операций проставления-->
+<form id="restrictionForm">
+    <div class="modal fade" id="restrictionModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить реквизит</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body restrictionblock">
+                    <div class="form-row">
+                        <div class="form-group col-sm-6 col-md-6">
+                            <label for="restriction.Number">Номер реквизита</label>
+                            <input type="text" class="form-control" name="restriction.Number" title="Номер реквизита">
+                        </div>
+                        <div class="form-group col-sm-6 col-md-6">
+                            <label for="restriction.ResDate">Дата документа</label>
+                            <input type="date" class="form-control" name="restriction.ResDate" title="Дата документа" data-val="true" data-val-required="Заполните дату документа" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="restriction.ResDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-sm-12 col-md-12">
+                            <label for="restriction.RestrictionType">Тип права собственности</label>
+                            <select class="selectpicker form-control" title="Тип права собственности" name="restriction.RestrictionType"
+                                    data-val="true" data-val-required="Тип права собственности обязателен для заполнения" id="restriction.RestrictionType" asp-items="@Model.RestrictionsList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="restriction.RestrictionType" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-sm-12 col-md-12">
+                            <label for="restriction.Description">Наименование и образ файла</label>
+                            <div class="input-group">
+                                <input type="text" maxlength="255" class="form-control" name="restriction.Description" title="Выписка от" data-val="true" data-val-required="Заполните поле">
+                                <input type="file" name="restriction.RestrictionFile" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
+                                <input type="hidden" name="restriction.RestrictionFileRemove" value="false" />
+                                <div class="input-group-append rr-restriction-file-buttons">
+                                    <a class="btn btn-danger rr-restriction-file-remove" style="display: none"
+                                       href="#" title="Удалить образ документа" aria-label="Удалить образ документа"><span class="oi oi-x"></span></a>
+                                    <a class="btn btn-success rr-restriction-file-attach"
+                                       href="#" title="Прикрепить образ документа" aria-label="Прикрепить образ документа"><span class="oi oi-paperclip"></span></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-sm-12 col-md-12">
+                            <label for="restriction.DateStateReg">Дата г/р в УЮ</label>
+                            <input type="date" class="form-control" name="restriction.DateStateReg" title="Дата г/р в УЮ" data-val="true" data-val-required="Заполните дату г/р в УЮ" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="restriction.DateStateReg" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary restriction-save-btn">Добавить</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="putdownForm">
+    <div class="modal fade" id="putdownModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title putdowntitle">_пустота_</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="blocker">
+                        <div class="row0">
+                            <div class="form-row">
+                                <div class="form-group col-sm-12 col-md-12">
+                                    <label for="premise.Description">Дополнительные сведения</label>
+                                    <textarea type="text" class="form-control" name="premise.Description" title="Дополнительные сведения" data-val="true" data-val-required="Заполните сведения"></textarea>
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="premise.Description" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row1">
+                            <div class="form-row">
+                                <div class="form-group col-sm-12 col-md-12">
+                                    <label for="premise.State">Текущее состояние</label>
+                                    <select class="selectpicker form-control" title="Тип права собственности" name="premise.State"
+                                            data-val="true" data-val-required="Подписывающий обязателен для заполнения" id="premise.State" asp-items="@Model.ObjectStatesList"></select>
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="premise.State" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row2">
+                            <div class="form-row">
+                                <div class="form-group col-sm-12 col-md-12">
+                                    <label for="premise.RegDate">Дата включения в РМИ</label>
+                                    <input type="date" class="form-control" name="premise.RegDate" title="Выписка от" data-val="true" data-val-required="Заполните дату" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="premise.RegDate" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary rr-report-submit putdownbut">_пустота_</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="ownershiprightForm">
+    <div class="modal fade" id="ownershiprightModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить ограничение</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body ownershiprightblock">
+                    <div class="form-row">
+                        <div class="form-group col-sm-6 col-md-6">
+                            <label for="ownershipright.Number">Номер ограничения</label>
+                            <input type="text" class="form-control" name="ownershipright.Number" title="Выписка от" data-val="true" data-val-required="Заполните дату">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="ownershipright.Number" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-sm-6 col-md-6">
+                            <label for="ownershipright.OwrDate">Дата ограничения</label>
+                            <input type="date" class="form-control" name="ownershipright.OwrDate" title="Выписка от" data-val="true" data-val-required="Заполните дату" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="ownershipright.OwrDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-sm-5 col-md-5">
+                            <label for="ownershipright.OwrType">Тип ограничения</label>
+                            <select class="selectpicker form-control" title="Тип ограничения" name="ownershipright.OwrType"
+                                    data-val="true" data-val-required="Подписывающий обязателен для заполнения" id="ownershipright.OwrType" asp-items="@Model.OwnershipRightTypesList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="ownershipright.OwrType" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-sm-7 col-md-7">
+                            <label for="ownershipright.Description">Наименование и образ файла</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="ownershipright.Description" title="Выписка от" data-val="true" data-val-required="Заполните дату">
+                                <input type="file" name="ownershipright.OwnershipRightFile" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
+                                <input type="hidden" name="ownershipright.OwnershipRightFileRemove" value="false" />
+                                <div class="input-group-append rr-ownershipright-file-buttons">
+                                    <a class="btn btn-danger rr-ownershipright-file-remove" style="display: none"
+                                       href="#" title="Удалить образ документа" aria-label="Удалить образ документа"><span class="oi oi-x"></span></a>
+                                    <a class="btn btn-success rr-ownershipright-file-attach"
+                                       href="#" title="Прикрепить образ документа" aria-label="Прикрепить образ документа"><span class="oi oi-paperclip"></span></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary ownershipright-save-btn">Добавить</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -53,12 +53,98 @@
         e.preventDefault();
     });
 
-    $("body").on('click', ".rr-report-premise-area", function (e) {
+    $("body").on('click', ".rr-report-premise-area, #massreference", function (e) {
         var idPremise = $(this).data("id-premise");
-        url = "/PremiseReports/GetPremiseArea?idPremise=" + idPremise;
+        url = "/PremiseReports/GetPremisesArea?idPremise=" + idPremise;
         downloadFile(url);
         e.preventDefault();
     });
+
+/*__________для массовых__________*/
+    $("body").on('click', "#massact", function (e) {
+        $("#massactModal").find("[name='massact.ActType']").val(1);
+        $("#massactModal").find("input, textarea, select").prop("disabled", false);
+        $("#massactModal").modal("show");
+
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#massexcerpt", function (e) {
+        $("#excerptModal").find("[name='Excerpt.ExcerptType']").val(4);
+        $("#excerptModal").find("input, textarea, select").prop("disabled", false);
+        //$("#excerptModal").modal("show");
+        $('#excerptModal').modal('toggle');
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#restriction", function (e) {
+        $("#restrictionModal").find("input, textarea, select").prop("disabled", false);
+        $("#restrictionModal").modal("toggle");
+
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#ownershipright", function (e) {
+        var idPremises = "";
+
+        $('table tr').each(function (row) {
+            $(this).find('#prem').each(function (cell) {
+                idPremises += ($(this).html() + ', ');
+            });
+        });
+        idPremises = idPremises.substring(0, idPremises.length - 2);
+        $("#ownershiprightModal").find("[name='ownershipright.IdObjects']").val(idPremises);
+        $("#ownershiprightModal").find("[name='ownershipright.ActType']").val(1);
+        $("#ownershiprightModal").find("input, textarea, select").prop("disabled", false);
+        $("#ownershiprightModal").modal("toggle");
+
+        e.preventDefault();
+    });
+
+    var row0 = $(".row0").clone();
+    var row1 = $(".row1").clone();
+    var row2 = $(".row2").clone();
+    $("body").on('click', "#moreinformation, #currentstate, #dateRMI", function (e) {
+        $(".blocker").empty();
+        $("#putdownModal").find("[name='putdown.ActType']").val(1);
+        switch ($(this).data("id-modal"))
+        {
+            case 0:
+                $(".blocker").html(row0);
+                $(".putdownbut").html("Добавить");
+                $(".putdowntitle").html("Проставить дополнительные сведения");
+                break;
+            case 1:
+                $(".blocker").html(row1);
+                $(".blocker [data-id], .blocker .selectpicker option.bs-title-option").remove();
+                $(".blocker .selectpicker ").selectpicker('refresh');
+                $(".putdownbut").html("Изменить");
+                $(".putdowntitle").html("Изменить состояние");
+                break;
+            case 2:
+                $(".blocker").html(row2);
+                $(".putdownbut").html("Изменить");
+                $(".putdowntitle").html("Изменить дату включения в РМИ");
+                break;
+        }
+        $("#putdownModal").find("input, textarea, select").prop("disabled", false);
+        $("#putdownModal").modal("toggle");
+
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#export", function (e) {
+        url = "/PremiseReports/GetPremisesExport";
+        downloadFile(url);
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#hiringhistory", function (e) {
+        url = "/PremiseReports/GetPremisesTenancyHistory";
+        downloadFile(url);
+        e.preventDefault();
+    });
+
 
     $("#excerptForm, #noticeToBksForm").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
@@ -70,7 +156,8 @@
         if (!isValid) {
             fixBootstrapSelectHighlight($(this).closest("#excerptForm"));
             return false;
-        } 
+        }
+        
         var idObject = $("#excerptModal").find("[name='Excerpt.IdObject']").val();
         var excerptType = $("#excerptModal").find("[name='Excerpt.ExcerptType']").val();
         var excerptNumber = $("#excerptModal").find("[name='Excerpt.ExcerptNumber']").val();
@@ -91,6 +178,10 @@
                 break;
             case "3":
                 url = "/PremiseReports/GetExcerptMunSubPremise?idPremise=" + idObject + "&excerptNumber=" + encodeURIComponent(excerptNumber)
+                    + "&excerptDateFrom=" + excerptDate + "&signer=" + signer;
+                break;
+            case "4":
+                url = "/PremiseReports/GetMassExcerptPremise?excerptNumber=" + encodeURIComponent(excerptNumber)
                     + "&excerptDateFrom=" + excerptDate + "&signer=" + signer;
                 break;
         }
@@ -132,4 +223,83 @@
 
         $("#noticeToBksModal").modal("hide");
     });
+
+
+    $("#massactModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var isValid = $(this).closest("#massactForm").valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight($(this).closest("#massactForm"));
+            return false;
+        }
+        var actType = $("#massactModal").find("[name='massact.ActType']").val();
+        var actdate = $("#massactModal").find("[name='massact.ActDate']").val();
+        var commision = $("#massactModal").find("[name='massact.Commision']").val();
+        var clerk = $("#massactModal").find("[name='massact.Clerk']").val();
+        var isNotResides = null;
+        if ($("#massactModal").find("[name='massact.isNotResides']").is(':checked')) {
+            isNotResides = "True";
+        } else {
+            isNotResides = "False";
+        }
+
+        if ($("#massactModal").find(".input-validation-error").length > 0) {
+            return false;
+        }
+        switch (actType) {
+            case "1":
+                var url = "/PremiseReports/GetPremisesAct?actDate=" + actdate
+                    + "&isNotResides=" + isNotResides + "&commision=" + commision + "&clerk=" + clerk;
+                break;
+            /*case "2":
+                var url = "/PremiseReports/GetSubPremiseActs?idSubPremise=" + idPremises + "&actdate=" + actdate
+                    + "&home=" + home + "&participants=" + participants + "&signer=" + signer;
+                break;*/
+        }
+        if (url !== undefined) {
+            downloadFile(url);
+        }
+
+        $("#massactModal").modal("hide");
+    });
+
+//________для проставлений________
+    $("#putdownModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var isValid = $(this).closest("#putdownForm").valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight($(this).closest("#putdownForm"));
+            return false;
+        }
+
+        var description = $("#putdownModal").find("[name='premise.Description']").val();
+        var regdate = $("#putdownModal").find("[name='premise.RegDate']").val();
+        var state = $("#putdownModal").find("[name='premise.State']").val();
+
+        if ($("#putdownModal").find(".input-validation-error").length > 0) {
+            return false;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/Premises/UpdatePremises',
+            data: { description: description, regDate: regdate, stateId: state },
+            success: function (status) {
+                if (status == 0) {
+                    $(".status").html("Операция выполнена успешно!");
+                    $(".status").addClass("alert alert-success");
+                    $("#putdownModal").modal("toggle");
+                }
+                else {
+                    $(".status").html("Ошибка!");
+                    $(".status").addClass("alert alert-danger");
+                    $("#putdownModal").modal("toggle");
+                }
+            }
+
+        });
+
+        $("#putdownModal").modal("hide");
+    });
+
 });
