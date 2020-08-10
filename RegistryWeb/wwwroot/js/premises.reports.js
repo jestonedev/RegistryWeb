@@ -233,9 +233,15 @@
         }
         var actType = $("#massactModal").find("[name='massact.ActType']").val();
         var actdate = $("#massactModal").find("[name='massact.ActDate']").val();
-        var isNotResides = $("#massactModal").find("[name='massact.isNotResides']").val();
         var commision = $("#massactModal").find("[name='massact.Commision']").val();
         var clerk = $("#massactModal").find("[name='massact.Clerk']").val();
+		var isNotResides = null;
+        if ($("#massactModal").find("[name='massact.isNotResides']").is(':checked')) {
+            isNotResides = "True";
+        } else {
+            isNotResides = "False";
+        }
+		
         if ($("#massactModal").find(".input-validation-error").length > 0) {
             return false;
         }
@@ -256,4 +262,43 @@
         $("#massactModal").modal("hide");
     });
 
+	//________для проставлений________
+    $("#putdownModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var isValid = $(this).closest("#putdownForm").valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight($(this).closest("#putdownForm"));
+            return false;
+        }
+
+        var description = $("#putdownModal").find("[name='premise.Description']").val();
+        var regdate = $("#putdownModal").find("[name='premise.RegDate']").val();
+        var state = $("#putdownModal").find("[name='premise.State']").val();
+
+        if ($("#putdownModal").find(".input-validation-error").length > 0) {
+            return false;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/Premises/UpdatePremises',
+            data: { description: description, regDate: regdate, stateId: state },
+            success: function (status) {
+                if (status == 0) {
+                    $(".status").html("Операция выполнена успешно!");
+                    $(".status").addClass("alert alert-success");
+                    $("#putdownModal").modal("toggle");
+                }
+                else {
+                    $(".status").html("Ошибка!");
+                    $(".status").addClass("alert alert-danger");
+                    $("#putdownModal").modal("toggle");
+                }
+            }
+
+        });
+
+        $("#putdownModal").modal("hide");
+    });
+											 
 });

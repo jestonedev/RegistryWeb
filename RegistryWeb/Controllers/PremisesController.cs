@@ -254,9 +254,9 @@ namespace RegistryWeb.Controllers
                 ids = HttpContext.Session.Get<List<int>>("idPremises");            
             else ids = new List<int>();
             
-            if (isCheck)            
-                ids.Add(idPremise);            
-            else if (ids.Any())            
+            if (isCheck)
+                ids.Add(idPremise);
+            else if (ids.Any())
                 ids.Remove(idPremise);
             
             HttpContext.Session.Set("idPremises", ids);
@@ -326,7 +326,7 @@ namespace RegistryWeb.Controllers
                 if (ids.Any())
                 {
                     ViewBag.Count = ids.Count();
-                    var viewModel = new PremisesVM<Premise> {
+                    var viewModel = new PremisesVM<Premise> 
                         Premises = dataService.GetPremises(ids) ?? new List<Premise>(),
                         SignersList = new SelectList(rc.SelectableSigners.Where(s => s.IdSignerGroup == 1).ToList().Select(s => new {
                             s.IdRecord,
@@ -340,7 +340,7 @@ namespace RegistryWeb.Controllers
                         ObjectStatesList= new SelectList(rc.ObjectStates, "IdState", "StateFemale"),
                         OwnershipRightTypesList = new SelectList(rc.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName"),
                         RestrictionsList = new SelectList(rc.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName")
-                    };                    
+                    };
                     return View("PremiseReports", viewModel);
                 }
             }
@@ -368,6 +368,12 @@ namespace RegistryWeb.Controllers
                 return NotFound();
 
             var premise = dataService.GetPremises(ids);
+            foreach (Premise pr in premise)
+            {
+                ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(pr);
+                if (!ViewBag.CanEditBaseInfo)
+                    premise.Remove(pr);
+            }			 
 
             for (var i=0;i<ids.Count();i++)
             {
@@ -399,20 +405,17 @@ namespace RegistryWeb.Controllers
                 if (rest.IdRestriction == 0)
                 {
                     rc.Restrictions.Add(rest);
-                    //rc.SaveChanges();
+                    rc.SaveChanges();
                     var rpa = new RestrictionPremiseAssoc()
                     {
                         IdPremises = premise[i].IdPremises,
                         IdRestriction = rest.IdRestriction
                     };
                     rc.RestrictionPremisesAssoc.Add(rpa);
-                    //rc.SaveChanges();
+                    rc.SaveChanges();
                 }
             }
-            //rc.SaveChanges();
             return Json(0);
-            //return PremiseReports();
-            //return Json(new { restriction.IdRestriction, restriction.FileOriginName });
         }        
 
         [HttpPost]
@@ -433,6 +436,12 @@ namespace RegistryWeb.Controllers
                 return NotFound();
 
             var premise = dataService.GetPremises(ids);
+            foreach (Premise pr in premise)
+            {
+                ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(pr);
+                if (!ViewBag.CanEditBaseInfo)
+                    premise.Remove(pr);
+            }
 
             for (var i = 0; i < ids.Count(); i++)
             {
@@ -463,20 +472,17 @@ namespace RegistryWeb.Controllers
                 if (owr.IdOwnershipRight == 0)
                 {
                     rc.OwnershipRights.Add(owr);
-                    //rc.SaveChanges();
+                    rc.SaveChanges();
                     var opa = new OwnershipPremiseAssoc()
                     {
                         IdPremises = premise[i].IdPremises,
                         IdOwnershipRight = owr.IdOwnershipRight
                     };
                     rc.OwnershipPremisesAssoc.Add(opa);
-                    //rc.SaveChanges();
+                    rc.SaveChanges();
                 }
             }
-            //rc.SaveChanges();
             return Json(0);
-            //return PremiseReports();
-            //return Json(new { ownershipRight.IdOwnershipRight, ownershipRight.FileOriginName });
         }
 
         [HttpPost]
@@ -485,20 +491,26 @@ namespace RegistryWeb.Controllers
             List<int> ids;
             if (HttpContext.Session.Keys.Contains("idPremises"))            
                 ids = HttpContext.Session.Get<List<int>>("idPremises");            
-            else ids = new List<int>();            
+            else ids = new List<int>();
 
             if (ids == null)
                 return NotFound();
 
             var premise = dataService.GetPremises(ids);
+            foreach (Premise pr in premise)
+            {
+                ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(pr);
+                if (!ViewBag.CanEditBaseInfo)
+                    premise.Remove(pr);
+            }
+			
             ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
             ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
 
             if (ModelState.IsValid)
             {
                 dataService.UpdateInfomationInPremises(premise, description, regDate, stateId);
-                //return RedirectToAction("PremiseReports", new { premise.IdPremises });
-            }            
+            }
 
             ViewBag.SecurityService = securityService;
             //return Json(0);

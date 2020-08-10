@@ -119,7 +119,8 @@ $(document).ready(function () {
         $("form.filterForm").submit();
     });
 
-    $('.idPremiseCheckbox').click(function (e) {
+    $('.idPremiseCheckbox').click(function (e) 
+	{
         var id = +$(this).data('id');
         $.ajax({
             type: 'POST',
@@ -135,7 +136,8 @@ $(document).ready(function () {
         else $('td input:checkbox').prop('checked', false);        
     });
 
-    $('.addselect').click(function (e) {
+    $('.addselect').click(function (e)
+	{
         var filterOptions = $(".filterForm").find("input, select, textarea").filter(function (idx, elem) {
             return /^FilterOptions\./.test($(elem).attr("name"));
         });

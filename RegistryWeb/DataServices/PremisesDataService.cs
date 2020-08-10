@@ -735,59 +735,7 @@ namespace RegistryWeb.DataServices
                         where bui.IdStreet.Contains(streetId)
                         select bui;
             return house.ToList();
-        }
-
-        public void UpdateRestrictionInPremises(Restriction restriction, List<Premise> premises)
-        {
-            if (premises != null && restriction!=null)
-            {
-                foreach (Premise premise in premises)
-                {
-                    if (restriction.IdRestriction == 0)
-                    {
-                        registryContext.Restrictions.Add(restriction);
-                        //registryContext.SaveChanges();
-                        
-						var rpa = new RestrictionPremiseAssoc()
-						{
-							IdPremises = premise.IdPremises,
-							IdRestriction = restriction.IdRestriction
-						};
-						registryContext.RestrictionPremisesAssoc.Add(rpa);
-						//registryContext.SaveChanges();
-						
-
-                        //return Json(new { restriction.IdRestriction, restriction.FileOriginName });
-                    }
-                }
-            }
-        }
-
-        public void UpdateOwnershipRightInPremises(OwnershipRight ownershipRight, List<Premise> premises)
-        {
-            if (premises != null && ownershipRight!=null)
-            {
-                foreach (Premise premise in premises)
-                {
-                    if (ownershipRight.IdOwnershipRight == 0)
-                    {
-                        registryContext.OwnershipRights.Add(ownershipRight);
-                        //registryContext.SaveChanges();
-                        
-						var opa = new OwnershipPremiseAssoc()
-						{
-							IdPremises = premise.IdPremises,
-                            IdOwnershipRight = ownershipRight.IdOwnershipRight
-                        };
-						registryContext.OwnershipPremisesAssoc.Add(opa);
-						//registryContext.SaveChanges();
-						
-
-                        //return Json(new { restriction.IdRestriction, restriction.FileOriginName });
-                    }
-                }
-            }
-        }
+        }        
 
         public void UpdateInfomationInPremises(List<Premise> premises, string Description, DateTime regdate, int StateId)
         {            
