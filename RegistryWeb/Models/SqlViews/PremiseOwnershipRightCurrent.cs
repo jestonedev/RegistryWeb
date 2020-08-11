@@ -4,14 +4,14 @@ namespace RegistryWeb.Models.SqlViews
 {
     public class PremiseOwnershipRightCurrent
     {
-        public int id_premises { get; set; }
-        public string ownership_right_type { get; set; }
-        public int id_ownership_right { get; set; }
-        public int id_ownership_right_type { get; set; }
-        public string number { get; set; }
-        public DateTime date { get; set; }
-        public string description { get; set; }
-        public DateTime? resettle_plan_date { get; set; }
-        public DateTime? demolish_plan_date { get; set; }
+        public int IdPremises { get; set; }
+        public string OwnershipRightType { get; set; }
+        public int IdOwnershipRight { get; set; }
+        public int IdOwnershipRightType { get; set; }
+        public string Number { get; set; }
+        public DateTime Date { get; set; }
+        public string Description { get; set; }
+        public DateTime? ResettlePlanDate { get; set; }
+        public DateTime? DemolishPlanDate { get; set; }
     }
 }

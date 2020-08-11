@@ -602,6 +602,7 @@ namespace RegistryWeb.DataServices
                             select new
                             {
                                 tbaRow.IdProcess,
+                                tbaRow.IdBuilding,
                                 streetRow.IdStreet,
                                 buildingRow.House,
                                 buildingRow.IdState
@@ -618,6 +619,7 @@ namespace RegistryWeb.DataServices
                            select new
                            {
                                tpaRow.IdProcess,
+                               tpaRow.IdPremise,
                                streetRow.IdStreet,
                                buildingRow.House,
                                premiseRow.PremisesNum,
@@ -637,6 +639,7 @@ namespace RegistryWeb.DataServices
                               select new
                               {
                                   tspaRow.IdProcess,
+                                  tspaRow.IdSubPremise,
                                   streetRow.IdStreet,
                                   buildingRow.House,
                                   premiseRow.PremisesNum,
@@ -725,7 +728,59 @@ namespace RegistryWeb.DataServices
 
             if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Any())
             {
-                // TODO
+                var specialOwnershipRightTypeIds = new int[] { 1, 2, 6, 7 };
+                var specialIds = filterOptions.IdsOwnershipRightType.Where(id => specialOwnershipRightTypeIds.Contains(id));
+                var generalIds = filterOptions.IdsOwnershipRightType.Where(id => !specialOwnershipRightTypeIds.Contains(id));
+                var generalOwnershipRightsPremises = from owrRow in registryContext.OwnershipRights
+                                                     join pRow in registryContext.OwnershipPremisesAssoc
+                                                     on owrRow.IdOwnershipRight equals pRow.IdOwnershipRight
+                                                     where generalIds.Contains(owrRow.IdOwnershipRightType)
+                                                     select pRow.IdPremises;
+
+                var specialOwnershipRightsPremises = from owrRow in registryContext.PremisesOwnershipRightCurrent
+                                                     where specialIds.Contains(owrRow.IdOwnershipRightType)
+                                                     select owrRow.IdPremises;
+
+                var ownershipRightsPremisesList = generalOwnershipRightsPremises.Union(specialOwnershipRightsPremises).ToList();
+
+                var generalOwnershipRightsBuildings = from owrRow in registryContext.OwnershipRights
+                                                     join bRow in registryContext.OwnershipBuildingsAssoc
+                                                     on owrRow.IdOwnershipRight equals bRow.IdOwnershipRight
+                                                     where generalIds.Contains(owrRow.IdOwnershipRightType)
+                                                     select bRow.IdBuilding;
+
+                var specialOwnershipRightsBuildings = from owrRow in registryContext.BuildingsOwnershipRightCurrent
+                                                     where specialIds.Contains(owrRow.IdOwnershipRightType)
+                                                     select owrRow.IdBuilding;
+
+                var ownershipRightsBuildingsList = generalOwnershipRightsBuildings.Union(specialOwnershipRightsBuildings).ToList(); //
+
+                var premisesInBuildingsOwnershipRights = (from pRow in registryContext.Premises
+                                                          where ownershipRightsBuildingsList.Contains(pRow.IdBuilding)
+                                                          select pRow.IdPremises).ToList();
+
+                ownershipRightsPremisesList = ownershipRightsPremisesList.Union(premisesInBuildingsOwnershipRights).ToList(); //
+
+                var ownershipRightsSubPremisesList = (from spRow in registryContext.SubPremises
+                                                      where ownershipRightsPremisesList.Contains(spRow.IdPremises)
+                                                      select spRow.IdSubPremises).ToList(); //
+
+                var buildingProcesses = from bRow in buildings
+                                        where ownershipRightsBuildingsList.Contains(bRow.IdBuilding)
+                                        select bRow.IdProcess;
+
+                var premisesProcesses = from pRow in premises
+                                        where ownershipRightsPremisesList.Contains(pRow.IdPremise)
+                                        select pRow.IdProcess;
+
+                var subPremisesProcesses = from spRow in subPremises
+                                        where ownershipRightsSubPremisesList.Contains(spRow.IdSubPremise)
+                                        select spRow.IdProcess;
+
+                query = (from row in query
+                         join id in buildingProcesses.Union(premisesProcesses).Union(subPremisesProcesses)
+                         on row.IdProcess equals id
+                         select row).Distinct();
             }
             return query;
         }

@@ -733,8 +733,8 @@ namespace RegistryWeb.DataServices
         {
             var ids = premises.Select(p => p.IdPremises).ToList();
             return registryContext.PremisesOwnershipRightCurrent
-                .Where(p => ids.Contains(p.id_premises))
-                .Select(p => new PremiseOwnershipRightCurrent { id_premises = p.id_premises, id_ownership_right_type = p.id_ownership_right_type })
+                .Where(p => ids.Contains(p.IdPremises))
+                .Select(p => new PremiseOwnershipRightCurrent { IdPremises = p.IdPremises, IdOwnershipRightType = p.IdOwnershipRightType })
                 .ToList();            
         }
 

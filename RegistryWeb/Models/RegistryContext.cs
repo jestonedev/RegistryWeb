@@ -141,8 +141,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<TenancyPaymentAfter28082019> TenancyPaymentsAfter28082019 { get; set; }
         public virtual DbSet<OwnerActiveProcess> OwnerActiveProcesses { get; set; }
         public virtual DbSet<BuildingOwnershipRightCurrent> BuildingsOwnershipRightCurrent { get; set; }
-
-        public DbQuery<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
+        public virtual DbSet<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -155,8 +154,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new TenancyPaymentAfter28082019Configuration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerActiveProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new BuildingOwnershipRightCurrentConfiguration(nameDatebase));
-
-            modelBuilder.Query<PremiseOwnershipRightCurrent>().ToView("v_premises_ownership_rights_1_current");
+            modelBuilder.ApplyConfiguration(new PremiseOwnershipRightCurrentConfiguration(nameDatebase));
 
 
             modelBuilder.ApplyConfiguration(new ChangeLogConfiguration(nameDatebase));

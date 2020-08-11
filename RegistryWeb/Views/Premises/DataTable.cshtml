@@ -102,8 +102,8 @@
             <td class="align-middle"><input type="checkbox" class="idPremiseCheckbox" data-id="@item.IdPremises" @Html.Raw(check) /></td>
             @{
                 var idCurrentOwhershipType = Model.PremisesOwnershipRightCurrent
-                    .FirstOrDefault(p => p.id_premises == item.IdPremises)
-                    ?.id_ownership_right_type;
+                    .FirstOrDefault(p => p.IdPremises == item.IdPremises)
+                    ?.IdOwnershipRightType;
                 var backgroundColor =
                     idCurrentOwhershipType == 1 ? "#FEDCDC" :
                     idCurrentOwhershipType == 2 ? "#BBFEE8" :
