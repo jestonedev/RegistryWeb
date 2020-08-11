@@ -1,0 +1,114 @@
+﻿@using RegistryWeb.ViewModel
+@using RegistryWeb.Models.Entities
+@using RegistryWeb.Extensions;
+@model PremisesVM<Premise>;
+@{
+    Context.Session.Set("Controller", "Premises");
+    Context.Session.Set("Action", "PremiseReports");
+    ViewData["Title"] = "Мастер массовых операций над помещениями";
+    var text = "Количество записей: " + ViewBag.Count;
+    var canEdit = (bool)ViewData["CanEditBaseInfo"];
+    var errorPremises = (List<Premise>)ViewData["ErrorPremises"];
+}
+
+@section Scripts
+    {
+    <script src="~/js/premises.reports.js" asp-append-version="true"></script>
+}
+
+@section validation
+    {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+}
+
+<div class="col status"></div>
+
+<h1>@ViewData["Title"]</h1>
+
+<h4 class="mb-3">@text</h4>
+
+@if (errorPremises != null && errorPremises.Any())
+{
+    <div class="alert alert-danger text-center">
+        <p class="mb-0">Во время массовой операции были пропущены помещения со следующими реестровыми номерами: 
+            @(errorPremises.Select(v => v.IdPremises.ToString()).Aggregate((acc, v) => acc + "," + v))
+        </p>
+        <p class="mb-0">Причина: недостаточно прав на редактирование данных помещений.</p>
+    </div>
+}
+
+<div class="form-row">
+    <div class="form-group col-md-3 col-lg-3">
+        <a class="form-control btn btn-primary" asp-controller="Premises" asp-action="Index" asp-route-isBack="true">Назад</a>
+    </div>
+    <div class="form-group col-md-3 col-lg-3">
+        <a class="form-control btn btn-primary" asp-controller="Premises" asp-action="SessionIdPremisesClear">Очистить</a>
+    </div>
+    <div class="form-group col-md-3 col-lg-3">
+        <div class="dropdown">
+            <button class="btn btn-success dropdown-toggle col-md-12" type="button" id="reportButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="oi oi-document"></span>  Отчёты
+            </button>
+            <div class="dropdown-menu" aria-labelledby="reportButton">
+                <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="massExcerptBtn">Выписка</button>
+                <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="massReferenceBtn">Справки о площади помещений</button>
+                <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="massActBtn">Акт проверки факта о проживании</button>
+                <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="exportBtn">Экспорт</button>
+                <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="historyBtn">История найма</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group col-md-3 col-lg-3">
+        <div class="dropdown">
+            <button class="btn btn-info dropdown-toggle col-md-12" type="button" id="operatonsButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="oi oi-pencil"></span>  Операции
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="operatonsButton">
+                <button class="dropdown-item" @(canEdit && Model.Premises.Any() ? "" : "disabled") href="#" id="restrictionBtn">Добавить документ права собственности</button>
+                <button class="dropdown-item" @(canEdit && Model.Premises.Any() ? "" : "disabled") href="#" id="ownershipRightBtn">Добавить ограничение</button>
+                <button class="dropdown-item" @(canEdit && Model.Premises.Any() ? "" : "disabled") href="#" id="updateDescriptionBtn" data-id-modal="0">Обновить дополнительные сведения</button>
+                <button class="dropdown-item" @(canEdit && Model.Premises.Any() ? "" : "disabled") href="#" id="updateCurrentStateBtn" data-id-modal="1">Изменить текущее состояние</button>
+                <button class="dropdown-item" @(canEdit && Model.Premises.Any() ? "" : "disabled") href="#" id="updateRegDateBtn" data-id-modal="2">Изменить дату включения в РМИ</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>№ по реестру</th>
+            <th>Адрес</th>
+            <th width="100px"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if(Model.Premises.Any())
+        { 
+            foreach (var item in Model.Premises)
+            {
+                <tr>
+                    <td id="prem">@item.IdPremises</td>
+                    <td>@item.IdBuildingNavigation?.IdStreetNavigation?.StreetLong, д. @item.IdBuildingNavigation?.House, кв. @item.PremisesNum</td>
+                    <td>
+                        <div class="btn-group" role="group" aria-label="Панель доступа">
+                            <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                                asp-action="Details" asp-controller="Premises" asp-route-idPremises="@item.IdPremises"></a>
+                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                                asp-action="SessionIdPremiseRemove" asp-controller="Premises" asp-route-idPremises="@item.IdPremises"></a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        } else
+        {
+            <tr><td colspan="3" class="text-center"><i>Элементы отсутствуют</i></td></tr>
+        }
+        
+    </tbody>
+</table>
+
+<partial name="ReportsModals" model="@Model">
