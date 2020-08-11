@@ -59,8 +59,8 @@ var searchModal = function () {
 };
 
 var filterClearModal = function () {
-    $("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal select").val("");
-    $('#FilterOptions_IdStreet').selectpicker('render');
+    $("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal input[type='hidden'], #filterModal select").val("");
+    $('#FilterOptions_IdStreet, #FilterOptions_IdPreset').selectpicker('render');
     $('#FilterOptions_IdsRentType').selectpicker('deselectAll');
     $('#FilterOptions_IdsObjectState').selectpicker("deselectAll");
     $('#FilterOptions_IdsOwnershipRightType').selectpicker("deselectAll");

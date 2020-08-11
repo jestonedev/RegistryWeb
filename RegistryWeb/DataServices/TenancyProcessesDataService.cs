@@ -589,6 +589,37 @@ namespace RegistryWeb.DataServices
                                  string.Concat(tpRow.Surname, " ", tpRow.Name, " ", tpRow.Patronymic).Contains(tenancyParticipantSnp)))
                          select tRow).Distinct();
             }
+            if (filterOptions.IdPreset != null)
+            {
+                switch (filterOptions.IdPreset)
+                {
+                    case 1:
+                        var filterEndDate = DateTime.Now.AddMonths(4).Date;
+                        var filterStartDate = DateTime.Now.Date;
+                        query = from tRow in query
+                                where tRow.EndDate >= filterStartDate && tRow.EndDate < filterEndDate
+                                select tRow;
+                        break;
+                    case 2:
+                        filterEndDate = DateTime.Now.Date;
+                        query = from tRow in query
+                                where tRow.EndDate < filterEndDate
+                                select tRow;
+                        break;
+                    case 3:
+                        query = (from tRow in query
+                                join rpRow in registryContext.TenancyRentPeriods
+                                on tRow.IdProcess equals rpRow.IdProcess into gs
+                                from gsRow in gs.DefaultIfEmpty()
+                                where gsRow != null
+                                select tRow).Distinct();
+                        break;
+                    case 4:
+                        // В MunObjectFilter
+                        break;
+                }
+            }
+
             return query;
         }
 
@@ -781,6 +812,66 @@ namespace RegistryWeb.DataServices
                          join id in buildingProcesses.Union(premisesProcesses).Union(subPremisesProcesses)
                          on row.IdProcess equals id
                          select row).Distinct();
+            }
+            if (filterOptions.IdPreset != null)
+            {
+                switch (filterOptions.IdPreset)
+                {
+                    case 1:
+                    case 2:
+                    case 3:
+                        //В TenancyFilter
+                        break;
+                    case 4:
+                        var ownershipRightTypeIds = new int[] { 2, 7 };
+                        var ownershipRightsPremises = (from owrRow in registryContext.PremisesOwnershipRightCurrent
+                                                             where ownershipRightTypeIds.Contains(owrRow.IdOwnershipRightType)
+                                                             select owrRow.IdPremises).ToList();
+                        var ownershipRightsBuildings = (from owrRow in registryContext.BuildingsOwnershipRightCurrent
+                                                       where ownershipRightTypeIds.Contains(owrRow.IdOwnershipRightType)
+                                                       select owrRow.IdBuilding).ToList();
+
+                        var premisesInBuildingsOwnershipRights = (from pRow in registryContext.Premises
+                                                                  where ownershipRightsPremises.Contains(pRow.IdBuilding)
+                                                                  select pRow.IdPremises).ToList();
+                        ownershipRightsPremises = ownershipRightsPremises.Union(premisesInBuildingsOwnershipRights).ToList();
+
+                        var ownershipRightsSubPremises = (from spRow in registryContext.SubPremises
+                                                          where ownershipRightsPremises.Contains(spRow.IdPremises)
+                                                          select spRow.IdSubPremises).ToList();
+
+                        var subPremisesTenancyIds = from tspaRow in registryContext.TenancySubPremisesAssoc
+                                                    join sRow in registryContext.SubPremises
+                                                    on tspaRow.IdSubPremise equals sRow.IdSubPremises
+                                                    join id in ownershipRightsSubPremises
+                                                    on sRow.IdSubPremises equals id
+                                                    where sRow.IdState == 4
+                                                    select tspaRow.IdProcess;
+
+                        var premisesTenancyIds = from tpaRow in registryContext.TenancyPremisesAssoc
+                                                    join pRow in registryContext.Premises
+                                                    on tpaRow.IdPremise equals pRow.IdPremises
+                                                    join id in ownershipRightsPremises
+                                                    on pRow.IdPremises equals id
+                                                    where pRow.IdState == 4
+                                                    select tpaRow.IdProcess;
+
+                        var buildingsTenancyIds = from tbaRow in registryContext.TenancyBuildingsAssoc
+                                                 join bRow in registryContext.Buildings
+                                                 on tbaRow.IdBuilding equals bRow.IdBuilding
+                                                  join id in ownershipRightsBuildings
+                                                 on bRow.IdBuilding equals id
+                                                 where bRow.IdState == 4
+                                                 select tbaRow.IdProcess;
+
+                        var tenancyIds = subPremisesTenancyIds.Union(premisesTenancyIds).Union(buildingsTenancyIds).ToList();
+
+                        query = from row in query
+                                where row.IdRentType == 1 && tenancyIds.Contains(row.IdProcess)
+                                select row;
+
+                        break;
+                }
             }
             return query;
         }

@@ -26,7 +26,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public int? IdSubPremises { get; set; }
         public int? IdPremises { get; set; }
         public int? IdBuilding { get; set; }
-
+        public int? IdPreset { get; set; } // Поисковые пресеты
         public bool IsEmpty()
         {
             return IsAddressEmpty() && IsModalEmpty() && IdPremises == null && IdBuilding == null && IdSubPremises == null;
@@ -44,7 +44,7 @@ namespace RegistryWeb.ViewOptions.Filter
                 IdStreet == null && House == null && PremisesNum == null &&
                 (IdsOwnershipRightType == null || IdsOwnershipRightType.Count == 0) &&
                 (IdsObjectState == null || IdsObjectState.Count == 0) &&
-                (!RegistrationNumIsEmpty);
+                (!RegistrationNumIsEmpty) && IdPreset == null;
         }
     }
 }
