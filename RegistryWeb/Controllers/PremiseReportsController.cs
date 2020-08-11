@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
-using RegistryWeb.Models;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 
@@ -16,19 +15,15 @@ namespace RegistryWeb.Controllers
 {
     public class PremiseReportsController : RegistryBaseController
     {
-        private readonly RegistryContext rc;
         private readonly PremiseReportService reportService;
         private readonly PremiseReportsDataService dataService;
-        private readonly PremisesDataService premdataService;
         private readonly SecurityService securityService;
         private const string odtMime = "application/vnd.oasis.opendocument.text";
         private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
 
-        public PremiseReportsController(RegistryContext rc, PremisesDataService premdataService, PremiseReportService reportService, PremiseReportsDataService dataService, SecurityService securityService)
+        public PremiseReportsController(PremiseReportService reportService, PremiseReportsDataService dataService, SecurityService securityService)
         {
-            this.rc = rc;
             this.reportService = reportService;
-            this.premdataService = premdataService;
             this.dataService = dataService;
             this.securityService = securityService;
         }
@@ -112,31 +107,26 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult GetPremisesArea(string idPremise)
+        private List<int> GetSessionPremisesIds()
         {
-     
-       List<int> ids;
             if (HttpContext.Session.Keys.Contains("idPremises"))
-                ids = HttpContext.Session.Get<List<int>>("idPremises");
-            else ids = new List<int>();
+                return HttpContext.Session.Get<List<int>>("idPremises");
+            return new List<int>();
+        }
 
-            var idsstring = "";
-            if (!ids.Any() && idPremise == "0")
+        public IActionResult GetPremisesArea()
+        {
+            List<int> ids = GetSessionPremisesIds();
+            
+            if (!ids.Any())
                 return NotFound();
-            else if (ids.Any() && idPremise == "0")
-            {
-                idsstring = ids
-                    .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
-            }
-            else if (!ids.Any() && idPremise != "0")
-                    idsstring = idPremise;
 
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
 
             try
             {
-                var file = reportService.PremisesArea(idsstring);
+                var file = reportService.PremisesArea(ids);
                 return File(file, odtMime, string.Format(@"Справка о площади помещений"));
             }
             catch (Exception ex)
@@ -145,26 +135,35 @@ namespace RegistryWeb.Controllers
             }
         }
 
-//_________________Для массовых____________________ 
+        public IActionResult GetPremiseArea(int idPremise)
+        {
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.PremisesArea(new List<int> { idPremise });
+                return File(file, odtMime, string.Format(@"Справка о площади помещения № {0}", idPremise));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        //_________________Для массовых____________________ 
         public IActionResult GetMassExcerptPremise(string excerptNumber, DateTime excerptDateFrom, int signer)
         {
-            List<int> ids;
-            if (HttpContext.Session.Keys.Contains("idPremises"))
-                ids = HttpContext.Session.Get<List<int>>("idPremises");
-            else ids = new List<int>();
+            List<int> ids = GetSessionPremisesIds();
 
-            if (ids == null)
+            if (!ids.Any())
                 return NotFound();
-
-            var idsstring = ids
-                .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
 
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
 
             try
             {
-                var file = reportService.ExcerptPremises(idsstring, excerptNumber, excerptDateFrom, signer);
+                var file = reportService.ExcerptPremises(ids, excerptNumber, excerptDateFrom, signer);
                 return File(file, odsMime, string.Format(@"Массовая выписка"));
             }
             catch (Exception ex)
@@ -172,26 +171,20 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
-        
-        public IActionResult GetPremisesAct(DateTime actDate, bool isNotResides, string commision, int clerk)
+
+        public IActionResult GetPremisesAct(DateTime actDate, string isNotResides, string commision, int clerk)
         {
-            List<int> ids;
-            if (HttpContext.Session.Keys.Contains("idPremises"))
-                ids = HttpContext.Session.Get<List<int>>("idPremises");
-            else ids = new List<int>();
+            List<int> ids = GetSessionPremisesIds();
 
-            if (ids == null)
+            if (!ids.Any())
                 return NotFound();
-
-            var idsstring = ids
-                .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
 
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
 
             try
             {
-                var file = reportService.MassActPremises(idsstring, actDate, isNotResides, commision, clerk);
+                var file = reportService.MassActPremises(ids, actDate, isNotResides, commision, clerk);
                 return File(file, odsMime, string.Format(@"Акт о факте проживания"));
             }
             catch (Exception ex)
@@ -202,23 +195,17 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPremisesExport()
         {
-            List<int> ids;
-            if (HttpContext.Session.Keys.Contains("idPremises"))
-                ids = HttpContext.Session.Get<List<int>>("idPremises");
-            else ids = new List<int>();
+            List<int> ids = GetSessionPremisesIds();
 
-            if (ids == null)
+            if (!ids.Any())
                 return NotFound();
-
-            var idsstring = ids
-                .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
 
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
 
             try
             {
-                var file = reportService.ExportPremises(idsstring);
+                var file = reportService.ExportPremises(ids);
                 return File(file, odsMime, string.Format(@"Экспорт данных"));
             }
             catch (Exception ex)
@@ -229,15 +216,12 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPremisesTenancyHistory()
         {
-            List<int> ids;
-            if (HttpContext.Session.Keys.Contains("idPremises"))
-                ids = HttpContext.Session.Get<List<int>>("idPremises");
-            else ids = new List<int>();
+            List<int> ids = GetSessionPremisesIds();
 
             if (ids == null)
                 return NotFound();
 
-            var idsstring = ids
+            var idsString = ids
                 .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
 
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
@@ -245,7 +229,7 @@ namespace RegistryWeb.Controllers
 
             try
             {
-                var file = reportService.TenancyHistoryPremises(idsstring);
+                var file = reportService.TenancyHistoryPremises(ids);
                 return File(file, odsMime, string.Format(@"История найма помещений"));
             }
             catch (Exception ex)

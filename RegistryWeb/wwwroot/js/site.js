@@ -12,11 +12,25 @@
     });
     $(document).ready(function () {
         $("[data-val-number]").attr("data-val-number", "Введите числовое значение");
-        var form = $("form")
-            .removeData("validator")
-            .removeData("unobtrusiveValidation");
-        $.validator.unobtrusive.parse(form);
-        form.validate();
+        $("input[type='number']").each(function (idx, elem) {
+            $(elem).inputSpinner();
+            var formGroup = $(elem).closest(".form-group");
+            var input = formGroup.find("[inputmode='decimal']");
+            input.attr("data-val", $(elem).attr("data-val"));
+            input.attr("data-val-required", $(elem).attr("data-val-required"));
+            input.attr("id", $(elem).attr("id") + "_decimal");
+            input.attr("name", $(elem).attr("name") + "_decimal");
+            var span = formGroup.find("[data-valmsg-for='" + $(elem).attr("name") + "']");
+            span.attr("data-valmsg-for", $(elem).attr("name") + "_decimal");
+        });
+
+        if ($.validator !== undefined) {
+            var form = $("form")
+                .removeData("validator")
+                .removeData("unobtrusiveValidation");
+            $.validator.unobtrusive.parse(form);
+            form.validate();
+        }
     });
 }
 
@@ -76,31 +90,20 @@ let isExpandElemntArrow = function (elemntArrow) {
     return false;
 };
 
-$(function () {
-    $("input[type='number']").each(function (idx, elem) {
-        $(elem).inputSpinner();
-        var formGroup = $(elem).closest(".form-group");
-        var input = formGroup.find("[inputmode='decimal']");
-        input.attr("data-val", $(elem).attr("data-val"));
-        input.attr("data-val-required", $(elem).attr("data-val-required"));
-        input.attr("id", $(elem).attr("id") + "_decimal");
-        input.attr("name", $(elem).attr("name") + "_decimal");
-        var span = formGroup.find("[data-valmsg-for='" + $(elem).attr("name") + "']");
-        span.attr("data-valmsg-for", $(elem).attr("name") + "_decimal");
-    });
-    var form = $("form").each(function (idx, elem) {
-        $(elem).removeData("validator")
-            .removeData("unobtrusiveValidation");
-        $.validator.unobtrusive.parse($(elem));
-        $(elem).validate();
-    });
-});
-
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
+}
+
+function downloadFile(url) {
+    var link = document.createElement('a');
+    link.href = url;
+    link.target = "_blank";
+    link.style.display = "none";
+    document.getElementsByTagName("body")[0].appendChild(link);
+    link.click();
 }
 
 function fixBootstrapSelectHighlight(form) {
@@ -126,6 +129,14 @@ function fixBootstrapSelectHighlightOnChange(select) {
         select.closest("form").find("button[data-id='" + id + "']").removeClass("input-validation-error");
     }
 }
+
+function refreshValidationForm(form) {
+    form
+        .removeData("validator")
+        .removeData("unobtrusiveValidation");
+    $.validator.unobtrusive.parse(form);
+    form.validate();
+};
 
 function clearValidationError(elem) {
     var spanError = $("span[data-valmsg-for='" + elem.attr("name") + "']");

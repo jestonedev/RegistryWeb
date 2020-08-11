@@ -24,12 +24,10 @@ namespace RegistryWeb.Controllers
     [Authorize]
     public class PremisesController : ListController<PremisesDataService>
     {
-        private readonly RegistryContext rc;
         private readonly IConfiguration config;
-        public PremisesController(RegistryContext rc, PremisesDataService dataService, SecurityService securityService, IConfiguration config)
+        public PremisesController(PremisesDataService dataService, SecurityService securityService, IConfiguration config)
             : base(dataService, securityService)
         {
-            this.rc = rc;
             this.config = config;
         }
 
@@ -53,13 +51,13 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("FilterOptions");
             }
             ViewBag.SecurityService = securityService;
-            ViewBag.PremiseService = dataService;
+            //ViewBag.PremiseService = dataService;
 
             var vm = dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
                 viewModel.FilterOptions, out List<int> filteredPremisesIds);
-            
+
             AddSearchPremisesIdsToSession(vm.FilterOptions, filteredPremisesIds);
 
             return View(vm);
@@ -239,26 +237,23 @@ namespace RegistryWeb.Controllers
                 (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) || premise.SubPremises == null || !premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) ||
                (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(premise.IdState)));
         }
-        
+
         public JsonResult GetHouse(string streetId)
         {
             IEnumerable<Building> buildings = dataService.GetHouses(streetId);
             return Json(buildings);
         }
-        
+
         [HttpPost]
         public void SessionIdPremises(int idPremise, bool isCheck)
         {
-            List<int> ids;
-            if (HttpContext.Session.Keys.Contains("idPremises"))            
-                ids = HttpContext.Session.Get<List<int>>("idPremises");            
-            else ids = new List<int>();
-            
+            List<int> ids = GetSessionPremisesIds();
+
             if (isCheck)
                 ids.Add(idPremise);
             else if (ids.Any())
                 ids.Remove(idPremise);
-            
+
             HttpContext.Session.Set("idPremises", ids);
         }
 
@@ -266,32 +261,30 @@ namespace RegistryWeb.Controllers
         {
             var filteredPremisesIdsDict = new Dictionary<string, List<int>>();
 
-            if (HttpContext.Session.Keys.Contains("filteredPremisesIdsDict"))            
+            if (HttpContext.Session.Keys.Contains("filteredPremisesIdsDict"))
                 filteredPremisesIdsDict = HttpContext.Session.Get<Dictionary<string, List<int>>>("filteredPremisesIdsDict");
-            
+
             var filterOptionsSerialized = JsonConvert.SerializeObject(filterOptions).ToString();
 
-            if (filteredPremisesIdsDict.Keys.Contains(filterOptionsSerialized))            
+            if (filteredPremisesIdsDict.Keys.Contains(filterOptionsSerialized))
                 filteredPremisesIdsDict[filterOptionsSerialized] = filteredPremisesIds;
-            else filteredPremisesIdsDict.Add(filterOptionsSerialized, filteredPremisesIds);            
+            else filteredPremisesIdsDict.Add(filterOptionsSerialized, filteredPremisesIds);
 
-            HttpContext.Session.Set("filteredPremisesIdsDict", filteredPremisesIdsDict);            
+            HttpContext.Session.Set("filteredPremisesIdsDict", filteredPremisesIdsDict);
         }
 
         public IActionResult AddSessionSelectedAndFilteredPremises(PremisesListFilter filterOptions)
         {
-            if (!HttpContext.Session.Keys.Contains("filteredPremisesIdsDict"))            
+            if (!HttpContext.Session.Keys.Contains("filteredPremisesIdsDict"))
                 return Json(0);
-            
+
             var filteredPremisesIdsDict = HttpContext.Session.Get<Dictionary<string, List<int>>>("filteredPremisesIdsDict");
             var filterOptionsSerialized = JsonConvert.SerializeObject(filterOptions).ToString();
 
             if (filteredPremisesIdsDict.Keys.Contains(filterOptionsSerialized))
             {
                 List<int> filterOptionsIds = filteredPremisesIdsDict[filterOptionsSerialized];
-                List<int> ids = new List<int>();
-                if (HttpContext.Session.Keys.Contains("idPremises"))
-                    ids = HttpContext.Session.Get<List<int>>("idPremises");
+                List<int> ids = GetSessionPremisesIds();
                 ids.AddRange(filterOptionsIds);
                 ids = ids.Distinct().ToList();
                 HttpContext.Session.Set("idPremises", ids);
@@ -304,217 +297,153 @@ namespace RegistryWeb.Controllers
         {
             HttpContext.Session.Remove("idPremises");
             ViewBag.Count = 0;
-            return PremiseReports();
+            return RedirectToAction("PremiseReports");
         }
 
         public IActionResult SessionIdPremiseRemove(int idPremises)
         {
-            var ids = HttpContext.Session.Get<List<int>>("idPremises");
+            var ids = GetSessionPremisesIds();
             ids.Remove(idPremises);
             ViewBag.Count = ids.Count();
             HttpContext.Session.Set("idPremises", ids);
-            return PremiseReports();
+            return RedirectToAction("PremiseReports");
         }
 
-        public IActionResult PremiseReports()
+        public IActionResult PremiseReports(PageOptions pageOptions)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
-            if (HttpContext.Session.Keys.Contains("idPremises"))
+            var canEditBaseInfo =   
+                securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) ||
+                securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal);
+            ViewBag.CanEditBaseInfo = canEditBaseInfo;
+            var errorIds = new List<int>();
+            if (TempData.ContainsKey("ErrorPremisesIds"))
             {
-                var ids = HttpContext.Session.Get<List<int>>("idPremises");
-                if (ids.Any())
+                try
                 {
-                    ViewBag.Count = ids.Count();
-                    var viewModel = new PremisesVM<Premise> 
-                        Premises = dataService.GetPremises(ids) ?? new List<Premise>(),
-                        SignersList = new SelectList(rc.SelectableSigners.Where(s => s.IdSignerGroup == 1).ToList().Select(s => new {
-                            s.IdRecord,
-                            Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
-                        }), "IdRecord", "Snp"),
-                        CommisionList = new SelectList(rc.SelectableSigners.Where(s => s.IdSignerGroup == 1).ToList().Select(s => new {
-                            s.IdRecord,
-                            Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
-                        }), "IdRecord", "Snp"),
-                        PreparersList = new SelectList(rc.Preparers, "IdPreparer", "PreparerName"),
-                        ObjectStatesList= new SelectList(rc.ObjectStates, "IdState", "StateFemale"),
-                        OwnershipRightTypesList = new SelectList(rc.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName"),
-                        RestrictionsList = new SelectList(rc.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName")
-                    };
-                    return View("PremiseReports", viewModel);
+                    errorIds = JsonConvert.DeserializeObject<List<int>>(TempData["ErrorPremisesIds"].ToString());
                 }
+                catch
+                {
+                }
+                TempData.Remove("ErrorPremisesIds");
             }
-            ViewBag.Count = 0;
-            return View("PremiseReports", new PremisesVM<Premise>());
+
+            ViewBag.ErrorPremises = dataService.GetPremisesForMassReports(errorIds).ToList();
+            var ids = GetSessionPremisesIds();
+            var viewModel = dataService.GetPremisesViewModelForMassReports(ids, pageOptions, canEditBaseInfo);
+            ViewBag.Count = viewModel.Premises.Count();
+            return View("PremiseReports", viewModel);
         }
 
-
-//_________________Для проставления____________________ 
+        private List<int> GetSessionPremisesIds()
+        {
+            if (HttpContext.Session.Keys.Contains("idPremises"))
+                return HttpContext.Session.Get<List<int>>("idPremises");
+            return new List<int>();
+        }
+        
         [HttpPost]
-        public IActionResult AddRestrictionInPremises(Restriction restriction, Address address, IFormFile restrictionFile, bool restrictionFileRemove)
+        public IActionResult AddRestrictionInPremises(Restriction restriction, IFormFile restrictionFile)
         {
             if (restriction == null)
-                return Json(new { Error = -1 });
+                return Error("Не передана ссылка на реквизит права муниципальной собственности");
             if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
                 !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
-                return Json(new { Error = -2 });
+                return Error("У вас нет прав на выполнение данной операции");
 
-            List<int> ids;
-            if (HttpContext.Session.Keys.Contains("idPremises"))
-                ids = HttpContext.Session.Get<List<int>>("idPremises");
-            else ids = new List<int>();
+            List<int> ids = GetSessionPremisesIds();
 
-            if (ids == null)
+            if (!ids.Any())
                 return NotFound();
 
-            var premise = dataService.GetPremises(ids);
-            foreach (Premise pr in premise)
+            var premises = dataService.GetPremisesForMassReports(ids).ToList();
+            var processingPremises = new List<Premise>();
+            var errorPremisesIds = new List<int>();
+            foreach (Premise premise in premises) 
             {
-                ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(pr);
-                if (!ViewBag.CanEditBaseInfo)
-                    premise.Remove(pr);
-            }			 
-
-            for (var i=0;i<ids.Count();i++)
-            {
-                var rest = new Restriction
+                var canEditBaseInfo = CanEditPremiseBaseInfo(premise);
+                if (canEditBaseInfo)
                 {
-                    Number=restriction.Number,
-                    Date=restriction.Date,
-                    DateStateReg=restriction.DateStateReg,
-                    Description=restriction.Description,
-                    IdRestrictionType=restriction.IdRestrictionType,
-                    FileDisplayName=restriction.FileDisplayName,
-                    FileMimeType=restriction.FileMimeType,
-                    FileOriginName=restriction.FileOriginName
-                };
-
-                var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Restrictions\");
-
-                if (restrictionFile != null && !restrictionFileRemove)
+                    processingPremises.Add(premise);
+                } else
                 {
-                    rest.FileDisplayName = restrictionFile.FileName;
-                    rest.FileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(restrictionFile.FileName).Extension;
-                    rest.FileMimeType = restrictionFile.ContentType;
-                    var fileStream = new FileStream(Path.Combine(path, rest.FileOriginName), FileMode.CreateNew);
-                    restrictionFile.OpenReadStream().CopyTo(fileStream);
-                    fileStream.Close();
-                }
-
-                //Создать
-                if (rest.IdRestriction == 0)
-                {
-                    rc.Restrictions.Add(rest);
-                    rc.SaveChanges();
-                    var rpa = new RestrictionPremiseAssoc()
-                    {
-                        IdPremises = premise[i].IdPremises,
-                        IdRestriction = rest.IdRestriction
-                    };
-                    rc.RestrictionPremisesAssoc.Add(rpa);
-                    rc.SaveChanges();
+                    errorPremisesIds.Add(premise.IdPremises); // Уведомление
                 }
             }
-            return Json(0);
-        }        
 
-        [HttpPost]
-        public IActionResult AddOwnershipInPremises(OwnershipRight ownershipRight, Address address, IFormFile ownershipRightFile, bool ownershipRightFileRemove)
-        {
-            if (ownershipRight == null)
-                return Json(new { Error = -1 });
-            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
-                !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
-                return Json(new { Error = -2 });
-
-            List<int> ids;
-            if (HttpContext.Session.Keys.Contains("idPremises"))
-                ids = HttpContext.Session.Get<List<int>>("idPremises");
-            else ids = new List<int>();
-
-            if (ids == null)
-                return NotFound();
-
-            var premise = dataService.GetPremises(ids);
-            foreach (Premise pr in premise)
-            {
-                ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(pr);
-                if (!ViewBag.CanEditBaseInfo)
-                    premise.Remove(pr);
-            }
-
-            for (var i = 0; i < ids.Count(); i++)
-            {
-                var owr = new OwnershipRight
-                {
-                    Number = ownershipRight.Number,
-                    Date = ownershipRight.Date,
-                    Description = ownershipRight.Description,
-                    IdOwnershipRightType = ownershipRight.IdOwnershipRightType,
-                    FileDisplayName = ownershipRight.FileDisplayName,
-                    FileMimeType = ownershipRight.FileMimeType,
-                    FileOriginName = ownershipRight.FileOriginName
-                };
-
-                var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Restrictions\");
-
-                if (ownershipRightFile != null && !ownershipRightFileRemove)
-                {
-                    owr.FileDisplayName = ownershipRightFile.FileName;
-                    owr.FileOriginName = Guid.NewGuid().ToString() + "." + new FileInfo(ownershipRightFile.FileName).Extension;
-                    owr.FileMimeType = ownershipRightFile.ContentType;
-                    var fileStream = new FileStream(Path.Combine(path, owr.FileOriginName), FileMode.CreateNew);
-                    ownershipRightFile.OpenReadStream().CopyTo(fileStream);
-                    fileStream.Close();
-                }
-
-                //Создать
-                if (owr.IdOwnershipRight == 0)
-                {
-                    rc.OwnershipRights.Add(owr);
-                    rc.SaveChanges();
-                    var opa = new OwnershipPremiseAssoc()
-                    {
-                        IdPremises = premise[i].IdPremises,
-                        IdOwnershipRight = owr.IdOwnershipRight
-                    };
-                    rc.OwnershipPremisesAssoc.Add(opa);
-                    rc.SaveChanges();
-                }
-            }
-            return Json(0);
+            dataService.AddRestrictionsInPremises(processingPremises, restriction, restrictionFile);
+            TempData["ErrorPremisesIds"] = JsonConvert.SerializeObject(errorPremisesIds);
+            return RedirectToAction("PremiseReports");
         }
 
         [HttpPost]
-        public IActionResult UpdatePremises(string description, DateTime regDate, int stateId)
+        public IActionResult AddOwnershipInPremises(OwnershipRight ownershipRight, IFormFile ownershipRightFile)
         {
-            List<int> ids;
-            if (HttpContext.Session.Keys.Contains("idPremises"))            
-                ids = HttpContext.Session.Get<List<int>>("idPremises");            
-            else ids = new List<int>();
+            if (ownershipRight == null)
+                return Error("Не передана ссылка на ограничение");
+            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
+                !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
+                return Error("У вас нет прав на выполнение данной операции");
 
-            if (ids == null)
+            List<int> ids = GetSessionPremisesIds();
+
+            if (!ids.Any())
                 return NotFound();
 
-            var premise = dataService.GetPremises(ids);
-            foreach (Premise pr in premise)
+            var premises = dataService.GetPremisesForMassReports(ids).ToList();
+            var processingPremises = new List<Premise>();
+            var errorPremisesIds = new List<int>();
+            foreach (Premise premise in premises)
             {
-                ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(pr);
-                if (!ViewBag.CanEditBaseInfo)
-                    premise.Remove(pr);
+                var canEditBaseInfo = CanEditPremiseBaseInfo(premise);
+                if (canEditBaseInfo)
+                {
+                    processingPremises.Add(premise);
+                }
+                else
+                {
+                    errorPremisesIds.Add(premise.IdPremises); // Уведомление
+                }
             }
-			
-            ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
-            ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
 
-            if (ModelState.IsValid)
+            dataService.AddOwnershipRightInPremises(processingPremises, ownershipRight, ownershipRightFile);
+            TempData["ErrorPremisesIds"] = JsonConvert.SerializeObject(errorPremisesIds);
+            return RedirectToAction("PremiseReports");
+        }
+
+        [HttpPost]
+        public IActionResult UpdateInfoInPremises(string description, DateTime? regDate, int? stateId)
+        {
+            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
+                 !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
+                return Json(new { Error = -2 });
+
+            List<int> ids = GetSessionPremisesIds();
+
+            if (!ids.Any())
+                return NotFound();
+
+            var premises = dataService.GetPremisesForMassReports(ids).ToList();
+            var processingPremises = new List<Premise>();
+            var errorPremisesIds = new List<int>();
+            foreach (Premise premise in premises)
             {
-                dataService.UpdateInfomationInPremises(premise, description, regDate, stateId);
+                var canEditBaseInfo = CanEditPremiseBaseInfo(premise);
+                if (canEditBaseInfo)
+                {
+                    processingPremises.Add(premise);
+                }
+                else
+                {
+                    errorPremisesIds.Add(premise.IdPremises);
+                }
             }
 
-            ViewBag.SecurityService = securityService;
-            //return Json(0);
-            return PremiseReports();
+            dataService.UpdateInfomationInPremises(processingPremises, description, regDate, stateId);
+            TempData["ErrorPremisesIds"] = JsonConvert.SerializeObject(errorPremisesIds);
+            return RedirectToAction("PremiseReports");
         }
 
     }

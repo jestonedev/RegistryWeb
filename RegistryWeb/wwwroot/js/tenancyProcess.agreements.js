@@ -28,9 +28,15 @@ $(function () {
             modalFields.prop("disabled", "disabled");
         else {
             modalFields.prop("disabled", "");
+            if ($("#Agreement_Type_ProlongUntilDismissal").is(":checked")) {
+                $("#Agreement_Type_ProlongEndDate").prop("disabled", "disabled");
+            }
+            if ($("#Agreement_Type_TenantExclude").is(":checked")) {
+                $("#Agreement_Type_TenantNewIdKinship").prop("disabled", "disabled").selectpicker("refresh");
+            }
             $("#Agreement_Type_TenancyPersonsWithoutTenant option[value]").remove();
             $("#Agreement_Type_TenancyPersons option[value]").remove();
-            $("#Agreement_Type_Tenant").val("");
+            $("#Agreement_Type_Tenant").val("").attr("data-id", "").attr("data-guid", "");
             $("#Agreement_Type_Tenant").prop("disabled", "disabled");
             var personsElems = $("#TenancyProcessPersons .list-group-item").filter(function (idx, elem) {
                 return !$(elem).hasClass("rr-list-group-item-empty");
@@ -44,7 +50,10 @@ $(function () {
                     var surname = $(elem).find("input[id^='Surname']").val();
                     var name = $(elem).find("input[id^='Name']").val();
                     var patronymic = $(elem).find("input[id^='Patronymic']").val();
+                    var idPersonElem = $(elem).find("input[id^='IdPerson']");
                     $("#Agreement_Type_Tenant").val(surname + " " + name + (patronymic !== "" ? " " + patronymic : ""));
+                    $("#Agreement_Type_Tenant").attr("data-id", idPersonElem.val());
+                    $("#Agreement_Type_Tenant").attr("data-guid", idPersonElem.attr("id").split("_")[1]);
                 } else {
                     $("#Agreement_Type_TenancyPersonsWithoutTenant").append(createPersonOptionByElem($(elem)));
                 }
@@ -110,6 +119,8 @@ $(function () {
         var tenancyAgreementElem = $('#TenancyProcessAgreements .list-group-item[data-processing]');
         tenancyAgreementElem.removeAttr("data-processing");
         addingTenancyAgreementElem = undefined;
+        modifications = [];
+        $("#agreementModal #Agreement_AutomateOperations").empty();
     });
 
     function updateInsertTenancyAgreementElem() {
@@ -134,34 +145,320 @@ $(function () {
         }
     }
 
+    function updateExcludePersonOnClient(currentOperation) {
+        var excludeDateElem = $("#TenancyProcessPersons").find("input[id='ExcludeDate_" + currentOperation.Info.Guid + "']");
+        var personElem = excludeDateElem.closest(".list-group-item");
+        var markingElems = $(personElem).find("[id^='Surname'], [id^='Name'], [id^='Patronymic']");
+        markingElems.addClass("text-danger");
+        excludeDateElem.val($("#agreementModal #Agreement_AgreementDate").val());
+    }
+
+    function executeAutomateOperationExcludePerson(currentOperation, action, operations, onSuccess, onError) {
+        if (action === "Create") {
+            updateExcludePersonOnClient(currentOperation);
+            currentOperation.Checkbox.prop("checked", false);
+            executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+            return;
+        }
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/TenancyPersons/UpdateExcludeDate',
+            data: { idPerson: currentOperation.Info.IdPerson, excludeDate: $("#agreementModal #Agreement_AgreementDate").val() },
+            async: false,
+            success: function (error) {
+                if (error.code === 0) {
+                    updateExcludePersonOnClient(currentOperation);
+                    currentOperation.Checkbox.prop("checked", false);
+                    executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+                } else {
+                    onError("Во время исключения участника найма произошла ошибка: "+error.text);
+                }
+            }
+        });
+    }
+
+    function updateIncludePersonOnClient(elem, currentOperation) {
+        let list = $('#TenancyProcessPersons');
+        list.find(".rr-list-group-item-empty").hide();
+        list.append(elem);
+        let tenancyPersonElem = $('#TenancyProcessPersons .list-group-item').last();
+        tenancyPersonElem.find("select").selectpicker("render");
+        tenancyPersonElem.find("input[id^='IdPerson']").val(currentOperation.Info.IdPerson);
+        tenancyPersonElem.find("input[id^='IdDocumentType']").val(1);
+        tenancyPersonElem.find("input[id^='Surname']").val(currentOperation.Info.Surname);
+        tenancyPersonElem.find("input[id^='Name']").val(currentOperation.Info.Name);
+        tenancyPersonElem.find("input[id^='Patronymic']").val(currentOperation.Info.Patronymic);
+        tenancyPersonElem.find("input[id^='DateOfBirth']").val(parseDate(currentOperation.Info.BirthDate));
+        tenancyPersonElem.find("select[id^='IdKinship']").val(currentOperation.Info.IdKinship).selectpicker("refresh");
+    }
+
+    function executeAutomateOperationIncludePerson(currentOperation, action, operations, onSuccess, onError) {
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/TenancyProcesses/AddTenancyPerson',
+            data: { action },
+            success: function (elem) {
+                if (action === "Create") {
+                    currentOperation.Info.IdPerson = 0;
+                    updateIncludePersonOnClient(elem, currentOperation);
+                    currentOperation.Checkbox.prop("checked", false);
+                    executeAutomateOperationsRecursive(action, operations, onSuccess, onError);     
+                    return;
+                }
+
+                let tenancyPerson = {
+                    "Person.IdProcess": $("#TenancyProcessPersons").data("id"),
+                    "Person.Surname": currentOperation.Info.Surname,
+                    "Person.Name": currentOperation.Info.Name,
+                    "Person.Patronymic": currentOperation.Info.Patronymic,
+                    "Person.DateOfBirth": parseDate(currentOperation.Info.BirthDate),
+                    "Person.IdKinship": currentOperation.Info.IdKinship,
+                    "Person.IdDocumentType": 1
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: window.location.origin + '/TenancyPersons/SavePerson',
+                    data: tenancyPerson,
+                    success: function (tenancyPersonReturn) {
+                        if (tenancyPersonReturn.idPerson > 0) {
+                            currentOperation.Info.IdPerson = tenancyPersonReturn.idPerson;
+                            updateIncludePersonOnClient(elem, currentOperation);
+                            currentOperation.Checkbox.prop("checked", false);
+                            executeAutomateOperationsRecursive(action, operations, onSuccess, onError);                
+                        } else {
+                            onError("Во время добавления участника найма «" +
+                                tenancyPerson["Person.Surname"] + " " + tenancyPerson["Person.Name"] +
+                                (tenancyPerson["Person.Patronymic"] !== "" ? " " + tenancyPerson["Person.Patronymic"] : "") + "» произошла непредвиденная ошибка");
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function addProlongOnClient(elem, currentOperation) {
+        let list = $('#TenancyProcessRentPeriods');
+        list.find(".rr-list-group-item-empty").hide();
+        list.append(elem);
+        let rentPeriodElem = $('#TenancyProcessRentPeriods .list-group-item').last();
+        rentPeriodElem.find("input[name^='IdRentPeriod']").val(currentOperation.Info.IdRentPeriod);
+        rentPeriodElem.find("input[id^='BeginDate']").val(parseDate(currentOperation.Info.OldStartPeriod));
+        rentPeriodElem.find("input[id^='EndDate']").val(parseDate(currentOperation.Info.OldEndPeriod));
+        rentPeriodElem.find("input[id^='UntilDismissal']").prop("checked", currentOperation.Info.OldUntilDismissal);
+    }
+
+    function updateRentPeriodOnClient(currentOperation) {
+        var startDate = parseDate(currentOperation.Info.StartPeriod);
+        var endDate = parseDate(currentOperation.Info.EndPeriod);
+        var untilDismissal = currentOperation.Info.UntilDismissal;
+        $("#TenancyProcess_BeginDate").val(startDate);
+        $("#TenancyProcess_UntilDismissal").prop("checked", untilDismissal);
+        if (untilDismissal) {
+            $("#TenancyProcess_EndDate").val("");
+            $("#TenancyProcess_EndDate").prop("disabled", "disabled");
+        } else {
+            $("#TenancyProcess_EndDate").val(endDate);
+            $("#TenancyProcess_EndDate").prop("disabled", "");
+        }
+    }
+
+    function updateRentPeriod(currentOperation, onSuccess, onError) {
+        var startDate = parseDate(currentOperation.Info.StartPeriod);
+        var endDate = parseDate(currentOperation.Info.EndPeriod);
+        var untilDismissal = currentOperation.Info.UntilDismissal;
+        var idProcess = $("#TenancyProcess_IdProcess").val();
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/TenancyProcesses/UpdateRentPeriod',
+            data: { idProcess: idProcess, beginDate: startDate, endDate: endDate, untilDismissal: untilDismissal },
+            success: function (error) {
+                if (error.code === 0) {
+                    updateRentPeriodOnClient(currentOperation);
+                    onSuccess();
+                } else {
+                    onError("Во время обновления периода найма произошла ошибка: "+error.text);
+                }
+            }
+        });
+    }
+
+    function executeAutomateOperationProlong(currentOperation, action, operations, onSuccess, onError) {
+        var startDate = parseDate(currentOperation.Info.StartPeriod);
+        var endDate = parseDate(currentOperation.Info.EndPeriod);
+        var oldStartDate = parseDate(currentOperation.Info.OldStartPeriod);
+        var oldEndDate = parseDate(currentOperation.Info.OldEndPeriod);
+        if (startDate === "" && endDate === "" && currentOperation.Info.UntilDismissal === false &&
+            oldStartDate === "" && oldEndDate === "" && currentOperation.Info.OldUntilDismissal === false) {
+            executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+            return;
+        }
+        
+        var equalPeriod = $("#TenancyProcessRentPeriods .list-group-item").filter(function (idx, elem) {
+            return !$(elem).hasClass("rr-list-group-item-empty") &&
+                $(elem).find("input[id^='BeginDate']").val() === oldStartDate &&
+                $(elem).find("input[id^='EndDate']").val() === oldEndDate &&
+                $(elem).find("input[id^='UntilDismissal']").is(":checked") === currentOperation.Info.OldUntilDismissal;
+        });
+        if (equalPeriod.length > 0) {
+            updateRentPeriod(currentOperation, function () {
+                currentOperation.Checkbox.prop("checked", false);
+                executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+            }, function (error) {
+                onError(error);
+            });
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/TenancyProcesses/AddRentPeriod',
+            data: { action },
+            success: function (elem) {
+                if (action === "Create") {
+                    currentOperation.Info.IdRentPeriod = 0;
+                    if (oldStartDate !== "" || oldEndDate !== "" || currentOperation.Info.OldUntilDismissal !== false)
+                        addProlongOnClient(elem, currentOperation);
+
+                    updateRentPeriodOnClient(currentOperation);
+                    currentOperation.Checkbox.prop("checked", false);
+                    executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+                    return;
+                }
+
+                let rentPeriod = {
+                    "RentPeriod.IdProcess": $("#TenancyProcessRentPeriods").data("id"),
+                    "RentPeriod.BeginDate": oldStartDate,
+                    "RentPeriod.EndDate": oldEndDate,
+                    "RentPeriod.UntilDismissal": currentOperation.Info.OldUntilDismissal
+                };
+
+                if (oldStartDate !== "" || oldEndDate !== "" || currentOperation.Info.OldUntilDismissal !== false) {
+                    $.ajax({
+                        type: 'POST',
+                        url: window.location.origin + '/TenancyRentPeriods/SaveRentPeriod',
+                        data: rentPeriod,
+                        success: function (rentPeriodReturn) {
+                            if (rentPeriodReturn.idRentPeriod > 0) {
+                                currentOperation.Info.IdRentPeriod = rentPeriodReturn.idRentPeriod;
+                                addProlongOnClient(elem, currentOperation);
+                                updateRentPeriod(currentOperation, function () {
+                                    currentOperation.Checkbox.prop("checked", false);
+                                    executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+                                }, function () {
+                                    onError();
+                                });
+                            } else {
+                                onError("Во время во время продления найма произошла непредвиденная ошибка");
+                            }
+                        }
+                    });
+                } else {
+                    updateRentPeriod(currentOperation, function () {
+                        currentOperation.Checkbox.prop("checked", false);
+                        executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+                    }, function () {
+                        onError();
+                    });
+                }
+            }
+        });
+    }
+
+    function updateIdKinshipPersonOnClient(currentOperation) {
+        var idKinshipDateElem = $("#TenancyProcessPersons").find("select[id='IdKinship_" + currentOperation.Info.Guid + "']");
+        idKinshipDateElem.val(currentOperation.Info.IdKinship).selectpicker("refresh");
+    }
+
+    function executeAutomateOperationChangeKinship(currentOperation, action, operations, onSuccess, onError) {
+        if (action === "Create") {
+            updateIdKinshipPersonOnClient(currentOperation);
+            currentOperation.Checkbox.prop("checked", false);
+            executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+            return;
+        }
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/TenancyPersons/UpdateIdKinship',
+            data: { idPerson: currentOperation.Info.IdPerson, idKinship: currentOperation.Info.IdKinship },
+            async: false,
+            success: function (error) {
+                if (error.code === 0) {
+                    updateIdKinshipPersonOnClient(currentOperation);
+                    currentOperation.Checkbox.prop("checked", false);
+                    executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+                } else {
+                    onError("Во время исключения участника найма произошла ошибка: " + error.text);
+                }
+            }
+        });
+        executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+    }
+
+    function executeAutomateOperationsRecursive(action, operations, onSuccess, onError) {
+        if (operations.length === 0) {
+            onSuccess();
+            return;
+        }
+        var operation = operations.pop();
+        switch (operation.Operation) {
+            case "ExcludePerson":
+                executeAutomateOperationExcludePerson(operation, action, operations, onSuccess, onError);
+                break;
+            case "IncludePerson":
+                executeAutomateOperationIncludePerson(operation, action, operations, onSuccess, onError);
+                break;
+            case "Prolong":
+                executeAutomateOperationProlong(operation, action, operations, onSuccess, onError);
+                break;
+            case "ChangeKinship":
+                executeAutomateOperationChangeKinship(operation, action, operations, onSuccess, onError);
+                break;
+            default:
+                onError("Неизвестный тип автоматической операции");
+                break;
+        }
+    }
+
+    function executeAutomateOperations(action, operations, onSuccess, onError) {
+        operations = $(operations).filter(function (idx, elem) {
+            return $(elem.Checkbox).is(":checked");
+        }).toArray().sort(function () { return 1; });
+        executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+    }
+
     $("#agreementModal").on("click", "#saveAgreementModalBtn", function (e) {
+        e.preventDefault();
         let action = $('#TenancyProcessAgreements').data('action');
         var form = $("#TenancyProcessAgreementsModalForm");
         form.find("#Agreement_Type").val("").selectpicker("refresh").change();
         var isValid = form.valid();
 
         if (isValid) {
-            if (action === "Create") {
-                updateInsertTenancyAgreementElem();
-                return;
-            }
-            let tenancyAgreement = tenancyAgreementToFormData(getTenancyAgreement(form));
-            $.ajax({
-                type: 'POST',
-                url: window.location.origin + '/TenancyAgreements/SaveAgreement',
-                data: tenancyAgreement,
-                processData: false,
-                contentType: false,
-                success: function (tenancyAgreementReturn) {
-                    if (tenancyAgreementReturn.idAgreement > 0) {
-                        form.find("[name='Agreement.IdAgreement']").val(tenancyAgreementReturn.idAgreement);
-                        updateInsertTenancyAgreementElem();
-                    } else {
-                        alert('Произошла ошибка при сохранении');
-                    }
+            executeAutomateOperations(action, modifications, function () {
+                if (action === "Create") {
+                    updateInsertTenancyAgreementElem();
+                    return;
                 }
+                let tenancyAgreement = tenancyAgreementToFormData(getTenancyAgreement(form));
+                $.ajax({
+                    type: 'POST',
+                    url: window.location.origin + '/TenancyAgreements/SaveAgreement',
+                    data: tenancyAgreement,
+                    processData: false,
+                    contentType: false,
+                    success: function (tenancyAgreementReturn) {
+                        if (tenancyAgreementReturn.idAgreement > 0) {
+                            form.find("[name='Agreement.IdAgreement']").val(tenancyAgreementReturn.idAgreement);
+                            updateInsertTenancyAgreementElem();
+                        } else {
+                            alert('Произошла ошибка при сохранении');
+                        }
+                    }
+                });
+            }, function (error) {
+                alert(error);
             });
-
         } else {
             refreshSelectpickerValidationBorders(form);
             $([document.documentElement, document.body]).animate({
@@ -503,6 +800,19 @@ $(function () {
         }
     });
 
+    var modifications = [];
+
+    function formatTenantPerson(personInfo) {
+        var tenant = "";
+        tenant += personInfo.Surname + " " + personInfo.Name + (personInfo.Patronymic !== "" ? " " + personInfo.Patronymic : "");
+        tenant += " - " + personInfo.Kinship;
+        if (personInfo.BirthDate !== "") {
+            tenant += ", " + personInfo.BirthDate + " г.р.";
+        }
+        tenant = tenant;
+        return tenant;
+    }
+
     function getExcludeTenantPersonInfo() {
         var personElem = $("#agreementModal #Agreement_Type_TenancyPersons");
         var personGuid = personElem.val();
@@ -547,18 +857,15 @@ $(function () {
         var tenant = "";
         if (personInfo.SubPoint !== "")
             tenant += personInfo.SubPoint + ". ";
-        tenant += personInfo.Surname + " " + personInfo.Name + (personInfo.Patronymic !== "" ? " " + personInfo.Patronymic : "");
-        tenant += " - " + personInfo.Kinship;
-        if (personInfo.BirthDate !== "") {
-            tenant += ", " + personInfo.BirthDate + " г.р.";
-        }
+        tenant += formatTenantPerson(personInfo);
         tenant = "«" + tenant + "»";
         contentLines = insertPoint(contentLines, tenant, headerWildcard);
         contentElem.val(contentLines.join("\n"));
     }
 
     function addExcludeTenantPersonInfoToModifications(personInfo) {
-        // TODO:
+        var checkbox = insertAutomateOperationsCheckBox("Исключить участника найма «" + formatTenantPerson(personInfo) + "»");
+        modifications.push({ Checkbox: checkbox, Operation: "ExcludePerson", Info: personInfo });
     }
 
     function getIncludeTenantPersonInfo() {
@@ -566,6 +873,7 @@ $(function () {
         var kinshipElem = $("#agreementModal #Agreement_Type_TenancyPersonIdKinship");
         var idKinship = kinshipElem.val();
         var kinshipOption = kinshipElem.find("option[value='" + idKinship + "']");
+        var tenantElem = $("#agreementModal #Agreement_Type_Tenant");
         return {
             Surname: $("#agreementModal #Agreement_Type_TenancyPersonSurname").val(),
             Name: $("#agreementModal #Agreement_Type_TenancyPersonName").val(),
@@ -576,7 +884,10 @@ $(function () {
             Point: $("#agreementModal #Agreement_Type_Point").val(),
             SubPoint: $("#agreementModal #Agreement_Type_SubPoint").val(),
             RegistrationNum: tenancyBaseInfo.RegistrationNumber,
-            RegistrationDate: tenancyBaseInfo.RegistrationDate
+            RegistrationDate: tenancyBaseInfo.RegistrationDate,
+            CurrentTenantIdPerson: tenantElem.attr("data-id"),
+            CurrentTenantGuid: tenantElem.attr("data-guid"),
+            CurrentTenant: tenantElem.val()
         };
     }
 
@@ -623,11 +934,7 @@ $(function () {
             var tenant = "";
             if (personInfo.SubPoint !== "")
                 tenant += personInfo.SubPoint + ". ";
-            tenant += personInfo.Surname + " " + personInfo.Name + (personInfo.Patronymic !== "" ? " " + personInfo.Patronymic : "");
-            tenant += " - " + personInfo.Kinship;
-            if (personInfo.BirthDate !== "") {
-                tenant += ", " + personInfo.BirthDate + " г.р.";
-            }
+            tenant += formatTenantPerson(personInfo);
             tenant = "«" + tenant + "»";
             contentLines = insertPoint(contentLines, tenant, headerWildcard);
         }
@@ -635,7 +942,17 @@ $(function () {
     }
 
     function addIncludeTenantPersonInfoToModifications(personInfo) {
-        // TODO:
+        if (personInfo.IdKinship === "1") {
+            let checkbox = insertAutomateOperationsCheckBox("Исключить нанимателя «" + personInfo.CurrentTenant + "»");
+            modifications.push({
+                Checkbox: checkbox, Operation: "ExcludePerson", Info: {
+                    IdPerson: personInfo.CurrentTenantIdPerson,
+                    Guid: personInfo.CurrentTenantGuid
+                }
+            });
+        }
+        let checkbox = insertAutomateOperationsCheckBox("Включить нового участника найма «" + formatTenantPerson(personInfo) + "»");
+        modifications.push({ Checkbox: checkbox, Operation: "IncludePerson", Info: personInfo });
     }
 
     function getExplainPointInfo() {
@@ -714,6 +1031,25 @@ $(function () {
         contentElem.val(contentLines.join("\n"));
     }
 
+    function formatTenancyPeriod(prolongInfo) {
+        var period = " на неопределенный период";
+        if (prolongInfo.StartPeriod !== "" || prolongInfo.EndPeriod !== "" || prolongInfo.UntilDismissal) {
+            period = "";
+        } 
+        if (prolongInfo.StartPeriod !== "") {
+            period += " с " + prolongInfo.StartPeriod;
+        }
+        if (prolongInfo.EndPeriod !== "" && !prolongInfo.UntilDismissal) {
+            period += " по " + prolongInfo.EndPeriod;
+        }
+        if (prolongInfo.UntilDismissal) {
+            if (prolongInfo.StartPeriod === "")
+                period = "";
+            period += " на период трудовых отношений";
+        }
+        return period;
+    }
+
     function getProlongCommercialInfo() {
         var tenancyBaseInfo = getTenancyBaseInfo();
         var reasonDocElem = $("#agreementModal #Agreement_Type_TenancyProlongRentReason");
@@ -729,7 +1065,10 @@ $(function () {
             StartPeriod: formatDate($("#agreementModal #Agreement_Type_ProlongBeginDate").val()),
             EndPeriod: formatDate($("#agreementModal #Agreement_Type_ProlongEndDate").val()),
             UntilDismissal: $("#agreementModal #Agreement_Type_ProlongUntilDismissal").is(":checked"),
-            PointExclude: $("#agreementModal #Agreement_Type_PointExclude").val()
+            PointExclude: $("#agreementModal #Agreement_Type_PointExclude").val(),
+            OldStartPeriod: $("#TenancyProcess_BeginDate").val(),
+            OldEndPeriod: $("#TenancyProcess_EndDate").val(),
+            OldUntilDismissal: $("#TenancyProcess_UntilDismissal").is(":checked")
         };
     }
 
@@ -752,21 +1091,7 @@ $(function () {
             text += " " + prolongInfo.RentTypeGenetive;
         }
         text += " найма жилого помещения";
-
-        var period = "";
-        if (prolongInfo.StartPeriod !== "") {
-            period += " с " + prolongInfo.StartPeriod;
-        }
-        if (prolongInfo.EndPeriod !== "" && !prolongInfo.UntilDismissal) {
-            period += " по " + prolongInfo.EndPeriod;
-        }
-        if (prolongInfo.UntilDismissal) {
-            if (prolongInfo.StartPeriod === "")
-                period = "";
-            period += " на период трудовых отношений";
-        }
-
-        text += period + ".";
+        text += formatTenancyPeriod(prolongInfo) + ".";
         contentLines.push(text);
         if (prolongInfo.PointExclude !== "") {
             text = "2) пункт " + prolongInfo.PointExclude + " исключить.";
@@ -776,7 +1101,8 @@ $(function () {
     }
 
     function addProlongCommercialInfoToModifications(prolongInfo) {
-        // TODO:
+        var checkbox = insertAutomateOperationsCheckBox("Продлить найм" + formatTenancyPeriod(prolongInfo));
+        modifications.push({ Checkbox: checkbox, Operation: "Prolong", Info: prolongInfo });
     }
 
     function getProlongSpecialInfo() {
@@ -785,7 +1111,10 @@ $(function () {
             SubPoint: $("#agreementModal #Agreement_Type_SubPoint").val(),
             StartPeriod: formatDate($("#agreementModal #Agreement_Type_ProlongBeginDate").val()),
             EndPeriod: formatDate($("#agreementModal #Agreement_Type_ProlongEndDate").val()),
-            UntilDismissal: $("#agreementModal #Agreement_Type_ProlongUntilDismissal").is(":checked")
+            UntilDismissal: $("#agreementModal #Agreement_Type_ProlongUntilDismissal").is(":checked"),
+            OldStartPeriod: $("#TenancyProcess_BeginDate").val(),
+            OldEndPeriod: $("#TenancyProcess_EndDate").val(),
+            OldUntilDismissal: $("#TenancyProcess_UntilDismissal").is(":checked")
         };
     }
 
@@ -816,22 +1145,7 @@ $(function () {
             pointHeader = pointHeader + ": ";
         text += pointHeader;
         text += "«Срок найма жилого помещения устанавливается";
-        var period = " на неопределенный период";
-        if (prolongInfo.StartPeriod !== "" || prolongInfo.EndPeriod !== "" || prolongInfo.UntilDismissal) {
-            period = "";
-        } 
-        if (prolongInfo.StartPeriod !== "") {
-            period += " с " + prolongInfo.StartPeriod;
-        }
-        if (prolongInfo.EndPeriod !== "" && !prolongInfo.UntilDismissal) {
-            period += " по " + prolongInfo.EndPeriod;
-        }
-        if (prolongInfo.UntilDismissal) {
-            if (prolongInfo.StartPeriod === "")
-                period = "";
-            period += " на период трудовых отношений";
-        }
-        text += period + "».";
+        text += formatTenancyPeriod(prolongInfo) + "».";
 
         contentLines = insertPoint(contentLines, text, headerWildcard);
 
@@ -839,9 +1153,9 @@ $(function () {
     }
 
     function addProlongSpecialInfoToModifications(prolongInfo) {
-        // TODO:
+        var checkbox = insertAutomateOperationsCheckBox("Продлить найм" + formatTenancyPeriod(prolongInfo));
+        modifications.push({ Checkbox: checkbox, Operation: "Prolong", Info: prolongInfo });
     }
-
 
     function getChangeTenantInfo() {
         var kinshipElem = $("#agreementModal #Agreement_Type_TenantNewIdKinship");
@@ -850,14 +1164,20 @@ $(function () {
         var personsElem = $("#agreementModal #Agreement_Type_TenancyPersonsWithoutTenant");
         var idPerson = personsElem.val();
         var personOption = personsElem.find("option[value='" + idPerson + "']");
+        var tenantElem = $("#agreementModal #Agreement_Type_Tenant");
         return {
-            CurrentTenant: $("#agreementModal #Agreement_Type_Tenant").val(),
+            CurrentTenantIdPerson: tenantElem.attr("data-id"),
+            CurrentTenantGuid: tenantElem.attr("data-guid"),
+            CurrentTenant: tenantElem.val(),
             CurrentTenantNewIdKinship: idKinship,
             CurrentTenantNewKinship: kinshipOption.text(),
-            NetTenantSurname: personOption.data("surname"),
-            NetTenantName: personOption.data("name"),
-            NetTenantPatronymic: personOption.data("patronymic"),
-            NetTenantBirthDate: personOption.data("birthdate")
+            NewTenantIdPerson: personOption.data("id"),
+            NewTenantGuid: personOption.val(),
+            NewTenantSurname: personOption.data("surname"),
+            NewTenantName: personOption.data("name"),
+            NewTenantPatronymic: personOption.data("patronymic"),
+            NewTenantBirthDate: personOption.data("birthdate"),
+            ExcludeCurrentTenant: $("#agreementModal #Agreement_Type_TenantExclude").is(":checked")
         };
     }
 
@@ -876,10 +1196,10 @@ $(function () {
 
         var text = "1) считать стороной по договору - нанимателем - ";
 
-        var tenant = changeTenantInfo.NetTenantSurname + " " + changeTenantInfo.NetTenantName +
-            (changeTenantInfo.NetTenantPatronymic !== "" ? " " + changeTenantInfo.NetTenantPatronymic : "");
-        if (changeTenantInfo.NetTenantBirthDate !== "") {
-            tenant += ", " + changeTenantInfo.NetTenantBirthDate + " г.р.";
+        var tenant = changeTenantInfo.NewTenantSurname + " " + changeTenantInfo.NewTenantName +
+            (changeTenantInfo.NewTenantPatronymic !== "" ? " " + changeTenantInfo.NewTenantPatronymic : "");
+        if (changeTenantInfo.NewTenantBirthDate !== "") {
+            tenant += ", " + changeTenantInfo.NewTenantBirthDate + " г.р.";
         }
         tenant = "«" + tenant + "»";
         text += tenant;
@@ -888,11 +1208,54 @@ $(function () {
     }
 
     function addChangeTenantInfoToModifications(changeTenantInfo) {
-        // TODO:
+        if (changeTenantInfo.CurrentTenantGuid !== "") {
+            if (changeTenantInfo.ExcludeCurrentTenant) {
+                let checkbox = insertAutomateOperationsCheckBox("Исключить нанимателя «" + changeTenantInfo.CurrentTenant + "»");
+                modifications.push({
+                    Checkbox: checkbox, Operation: "ExcludePerson", Info: {
+                        IdPerson: changeTenantInfo.CurrentTenantIdPerson,
+                        Guid: changeTenantInfo.CurrentTenantGuid
+                    }
+                });
+            } else {
+                let checkbox =
+                    insertAutomateOperationsCheckBox("Сменить родственное отношение текущего нанимателя на «" + changeTenantInfo.CurrentTenantNewKinship + "»");
+                modifications.push({
+                    Checkbox: checkbox, Operation: "ChangeKinship", Info: {
+                        IdPerson: changeTenantInfo.CurrentTenantIdPerson,
+                        Guid: changeTenantInfo.CurrentTenantGuid,
+                        IdKinship: changeTenantInfo.CurrentTenantNewIdKinship
+                    }
+                });
+            }
+        }
+        var newTenant = changeTenantInfo.NewTenantSurname + " " + changeTenantInfo.NewTenantName +
+            (changeTenantInfo.NewTenantPatronymic !== "" ? " " + changeTenantInfo.NewTenantPatronymic : "");
+        if (changeTenantInfo.NewTenantBirthDate !== "") {
+            newTenant += ", " + changeTenantInfo.NewTenantBirthDate + " г.р.";
+        }
+        let checkbox = insertAutomateOperationsCheckBox("Установить новым нанимателем «" + newTenant + "»");
+        modifications.push({
+            Checkbox: checkbox, Operation: "ChangeKinship", Info: {
+                IdPerson: changeTenantInfo.NewTenantIdPerson,
+                Guid: changeTenantInfo.NewTenantGuid,
+                IdKinship: "1"
+            }
+        });
     }
 
     function getDefaultAgreementText() {
         return reformAgreementContent("1.1. По настоящему Соглашению Стороны по договору № {0} от {1} {2} найма жилого помещения, расположенного по адресу: {3}, договорились:");
+    }
+
+    function insertAutomateOperationsCheckBox(title) {
+        var guid = uuidv4();
+        $("#agreementModal #Agreement_AutomateOperations").append(
+            '<div class="form-group form-check ml-1">' +
+            '<input checked type="checkbox" class="form-check-input" id="AutomateOperation_' + guid+'">' + 
+            '<label class="form-check-label" for="AutomateOperation_' + guid +'">'+title+'</label>' + 
+            '</div>');
+        return $("#agreementModal #Agreement_AutomateOperations").find("input[id^='AutomateOperation']").last();
     }
 
     function insertPoint(contentLines, point, headerWildcard) {
@@ -935,14 +1298,25 @@ $(function () {
     }
 
     function formatDate(date) {
-        if (date !== "" && date !== null) {
+        if (date !== "" && date !== null && date !== undefined) {
             var dateParts = date.split('-');
             if (dateParts.length === 3)
                 return dateParts[2] + "." + dateParts[1] + "." + dateParts[0];
             else
                 return date;
         }
-        return date;
+        return "";
+    }
+
+    function parseDate(date) {
+        if (date !== "" && date !== null && date !== undefined) {
+            var dateParts = date.split('.');
+            if (dateParts.length === 3)
+                return dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
+            else
+                return date;
+        }
+        return "";
     }
 
     var lastAgreementEndDateBeforeDismissal = undefined;
@@ -959,6 +1333,22 @@ $(function () {
                 endDateElem.val(lastAgreementEndDateBeforeDismissal);
             }
         }
+        e.preventDefault();
+    });
+
+    $("#agreementModal #Agreement_Type_TenantExclude").on("change", function (e) {
+        var tenantNewKinshipElem = $("#Agreement_Type_TenantNewIdKinship");
+        if ($(this).is(":checked")) {
+            tenantNewKinshipElem.prop("disabled", "disabled");
+            tenantNewKinshipElem.attr("data-val", false);
+            clearValidationError(tenantNewKinshipElem);
+            clearValidationError(tenantNewKinshipElem.closest(".bootstrap-select").find("button[data-id]"));
+        } else {
+            tenantNewKinshipElem.prop("disabled", "");
+            tenantNewKinshipElem.attr("data-val", true);
+        }
+        tenantNewKinshipElem.selectpicker("refresh");
+        refreshValidationForm($("#TenancyProcessAgreementsModalForm"));
         e.preventDefault();
     });
 

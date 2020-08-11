@@ -93,7 +93,7 @@ var filterClear = function () {
 };
 
 
-$(document).ready(function () {    
+$(document).ready(function () {
     autocompleteFilterOptionsAddress();
     addressFilterClearBtnVisibility();
     $('#FilterOptions_Address_Text').focusout(focusOutFilterOptionsAddress);
@@ -119,8 +119,8 @@ $(document).ready(function () {
         $("form.filterForm").submit();
     });
 
-    $('.idPremiseCheckbox').click(function (e) 
-	{
+    $('.idPremiseCheckbox').click(function (e)
+    {
         var id = +$(this).data('id');
         $.ajax({
             type: 'POST',
@@ -133,11 +133,11 @@ $(document).ready(function () {
     {
         if ($(this).is(':checked'))
             $('td input:checkbox').prop('checked', true);
-        else $('td input:checkbox').prop('checked', false);        
+        else $('td input:checkbox').prop('checked', false);
     });
 
     $('.addselect').click(function (e)
-	{
+    {
         var filterOptions = $(".filterForm").find("input, select, textarea").filter(function (idx, elem) {
             return /^FilterOptions\./.test($(elem).attr("name"));
         });

@@ -62,7 +62,28 @@
                             <span class="oi oi-document"></span>
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.TenancyProcess.IdProcess">
-                            <a class="dropdown-item rr-report-tenancy-process" href="#" title="Договор найма" aria-label="Договор найма" data-id-process="@Model.TenancyProcess.IdProcess">Договор найма</a>
+                            <a class="dropdown-item rr-report-pre-contract" href="#" title="Предварительный договор" aria-label="Предварительный договор" data-id-process="@Model.TenancyProcess.IdProcess">Предварительный договор</a>
+                            <a class="dropdown-item rr-report-dksr-contract" href="#" title="Договор (ДКСР)" aria-label="Договор (ДКСР)" data-id-process="@Model.TenancyProcess.IdProcess">Договор (ДКСР)</a>
+                            @if (Model.TenancyProcess.IdRentType == 2)
+                            {
+                                <a class="dropdown-item rr-report-contract" href="#" title="Договор (форма 1711)" aria-label="Договор (форма 1711)" data-id-rent-type="@Model.TenancyProcess.IdRentType" data-contract-type="1" data-id-process="@Model.TenancyProcess.IdProcess">Договор (форма 1711)</a>
+                                <a class="dropdown-item rr-report-contract" href="#" title="Договор (форма 1712)" aria-label="Договор (форма 1712)" data-id-rent-type="@Model.TenancyProcess.IdRentType" data-contract-type="2" data-id-process="@Model.TenancyProcess.IdProcess">Договор (форма 1712)</a>
+                            }
+                            else
+                            {
+                                <a class="dropdown-item rr-report-contract" href="#" title="Договор" aria-label="Договор" data-contract-type="1" data-id-rent-type="@Model.TenancyProcess.IdRentType" data-id-process="@Model.TenancyProcess.IdProcess">Договор</a>
+                            }
+                            <a class="dropdown-item rr-report-act-to-tenant" href="#" title="Акт передачи в найм" aria-label="Акт передачи в найм" data-id-process="@Model.TenancyProcess.IdProcess">Акт передачи в найм</a>
+                            <a class="dropdown-item rr-report-act-from-tenant" href="#" title="Акт приема из найма" aria-label="Акт приема из найма" data-id-process="@Model.TenancyProcess.IdProcess">Акт приема из найма</a>
+                            <a class="dropdown-item rr-report-excerpt" href="#" title="Уведомление о готовности документов" aria-label="Уведомление о готовности документов" data-report-type="1" data-id-process="@Model.TenancyProcess.IdProcess">Уведомление о готовности документов</a>
+                            <a class="dropdown-item rr-report-excerpt" href="#" title="Уведомление о незаконном проживании" aria-label="Уведомление о незаконном проживании" data-report-type="4" data-id-process="@Model.TenancyProcess.IdProcess">Уведомление о незаконном проживании</a>
+                            <a class="dropdown-item rr-report-excerpt" href="#" title="Уведомление о непродлении (аварийное)" aria-label="Уведомление о непродлении (аварийное)" data-report-type="5" data-id-process="@Model.TenancyProcess.IdProcess">Уведомление о непродлении (аварийное)</a>
+                            <a class="dropdown-item rr-report-excerpt" href="#" title="Уведомление о непродлении (категории)" aria-label="Уведомление о непродлении (категории)" data-report-type="6" data-id-process="@Model.TenancyProcess.IdProcess">Уведомление о непродлении (категории)</a>
+                            <a class="dropdown-item rr-report-excerpt" href="#" title="Предупреждение о нарушении условий" aria-label="Предупреждение о нарушении условий" data-report-type="3" data-id-process="@Model.TenancyProcess.IdProcess">Предупреждение о нарушении условий</a>
+                            <a class="dropdown-item rr-report-excerpt" href="#" title="Уведомление о выселении из АФ" aria-label="Уведомление о выселении из АФ" data-report-type="7" data-id-process="@Model.TenancyProcess.IdProcess">Уведомление о выселении из АФ</a>
+                            <a class="dropdown-item rr-report-excerpt" href="#" title="Уведомление по счетчикам" aria-label="Уведомление по счетчикам" data-report-type="8" data-id-process="@Model.TenancyProcess.IdProcess">Уведомление по счетчикам</a>
+                            <a class="dropdown-item rr-report-mvd" href="#" title="Запрос в МВД (старый)" aria-label="Запрос в МВД (старый)" data-request-type="1" data-id-process="@Model.TenancyProcess.IdProcess">Запрос в МВД (старый)</a>
+                            <a class="dropdown-item rr-report-mvd" href="#" title="Запрос в МВД (новый)" aria-label="Запрос в МВД (новый)" data-request-type="2" data-id-process="@Model.TenancyProcess.IdProcess">Запрос в МВД (новый)</a>
                         </div>
                     </div>
                 </div>
@@ -303,9 +324,12 @@
     </div>
 </div>
 
+<partial name="ReportsModals">
+
 @section Scripts {
     <script src="~/js/address.common.js" asp-append-version="true"></script>
     <script src="~/js/tenancyProcess.common.js" asp-append-version="true"></script>
+    <script src="~/js/tenancyProcess.reports.js" asp-append-version="true"></script>
     <script src="~/lib/bootstrap4-toggle/js/bootstrap4-toggle.min.js"></script>
     @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
     {
@@ -320,3 +344,4 @@
         </script>
     }
 }
+

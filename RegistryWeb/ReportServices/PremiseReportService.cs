@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using RegistryWeb.DataHelpers;
 using RegistryWeb.Models;
 using RegistryWeb.SecurityServices;
 using System;
@@ -13,12 +14,10 @@ namespace RegistryWeb.ReportServices
 {
     public class PremiseReportService : ReportService
     {
-        private readonly RegistryContext rc;
         private readonly SecurityService securityService;
 
-        public PremiseReportService(RegistryContext rc, IConfiguration config, IHttpContextAccessor httpContextAccessor, SecurityService securityService) : base(config, httpContextAccessor)
+        public PremiseReportService(IConfiguration config, IHttpContextAccessor httpContextAccessor, SecurityService securityService) : base(config, httpContextAccessor)
         {
-            this.rc = rc;
             this.securityService = securityService;
         }
 
@@ -94,26 +93,30 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
-        public byte[] PremisesArea(string idPremises)
+        private string PremisesIdsToString(List<int> idPremises)
+        {
+            return idPremises.Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
+        }
+
+        public byte[] PremisesArea(List<int> idPremises)
         {
             var fileName = Path.GetTempFileName();
             using (var sw = new StreamWriter(fileName))
-                sw.Write(idPremises);
+                sw.Write(PremisesIdsToString(idPremises));
             var arguments = new Dictionary<string, object>
             {
                 { "filterTmpFile", fileName },
             };
             var fileNameReport = GenerateReport(arguments, "registry\\registry\\area_premises");
-            //var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\area_premises");
             return DownloadFile(fileNameReport);
         }
 
         //___________для массовых______________
-        public byte[] ExcerptPremises(string idPremises, string excerptNumber, DateTime excerptDateFrom, int signer)
+        public byte[] ExcerptPremises(List<int> idPremises, string excerptNumber, DateTime excerptDateFrom, int signer)
         {
             var fileName = Path.GetTempFileName();
             using (var sw = new StreamWriter(fileName))
-                sw.Write(idPremises);
+                sw.Write(PremisesIdsToString(idPremises));
             var arguments = new Dictionary<string, object>
             {
                 { "filterTmpFile", fileName },
@@ -124,15 +127,14 @@ namespace RegistryWeb.ReportServices
                 { "signer", signer }
             };
             var fileNameReport = GenerateReport(arguments, "registry\\registry\\premises_mx");
-            //var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\premises_mx");
             return DownloadFile(fileNameReport);
         }
-        
-        public byte[] MassActPremises(string idPremises, DateTime actDate, bool isNotResides, string commision, int clerk)
+
+        public byte[] MassActPremises(List<int> idPremises, DateTime actDate, string isNotResides, string commision, int clerk)
         {
             var arguments = new Dictionary<string, object>
             {
-                { "filter", idPremises },
+                { "filter", PremisesIdsToString(idPremises) },
                 { "acttype", 1 },
                 { "executor", securityService.User.UserName },
                 { "date_act", actDate },
@@ -141,11 +143,10 @@ namespace RegistryWeb.ReportServices
                 { "id_clerk", clerk }
             };
             var fileNameReport = GenerateReport(arguments, "registry\\registry\\act_residence");
-            //var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\act_residence");
             return DownloadFile(fileNameReport);
         }
 
-        public byte[] ExportPremises(string idPremises)
+        public byte[] ExportPremises(List<int> idPremises)
         {
             string columnHeaders;
             string columnPatterns;
@@ -180,12 +181,11 @@ namespace RegistryWeb.ReportServices
 
             var fileName = Path.GetTempFileName();
             using (var sw = new StreamWriter(fileName))
-                sw.Write(string.Format("({0}) OR (id_premises IN ({1}))", "0 = 1", idPremises));
+                sw.Write(string.Format("(id_premises IN ({0}))", PremisesIdsToString(idPremises)));
 
             var arguments = new Dictionary<string, object>
             {
                 { "filterTmpFile", fileName },
-                //{ "filter", string.Format("({0}) OR (id_premises IN ({1}))", "0 = 1", idPremises) },
                 { "type", "2"},
                 { "executor", securityService.User.UserName },
                 {
@@ -201,51 +201,21 @@ namespace RegistryWeb.ReportServices
 
             };
             var fileNameReport = GenerateReport(arguments, "registry\\export");
-            //var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\export");
             return DownloadFile(fileNameReport);
         }
 
-        public byte[] TenancyHistoryPremises(string idPremises)
+        public byte[] TenancyHistoryPremises(List<int> idPremises)
         {
             var fileName = Path.GetTempFileName();
             using (var sw = new StreamWriter(fileName))
-                sw.Write(string.Format("({0}) OR (id_state = 1 AND id_premises IN ({1}))", "id_state IN (4,5,9,11,12)", idPremises));
+                sw.Write(string.Format("(id_premises IN ({0}))", PremisesIdsToString(idPremises)));
 
             var arguments = new Dictionary<string, object>
             {
-                //{ "filter", string.Format("({0}) OR (id_state = 1 AND id_premises IN ({1}))", "id_state IN (4,5,9,11,12)", idPremises) },
                 { "filterTmpFile", fileName },
                 { "executor", securityService.User.UserName }
-
             };
             var fileNameReport = GenerateReport(arguments, "registry\\registry\\tenancy_history");
-            //var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\tenancy_history");
-            return DownloadFile(fileNameReport);
-        }
-
-
-        public byte[] TotalTenancyHistoryPremises() //метод для получения Истории найма для всех муниципальных помещ-й
-        {
-            var states = new List<int> { 4, 5, 9, 11, 12 };
-            var municipalIds = from premisesRow in rc.Premises
-                               join subPremisesRow in rc.SubPremises
-                               on premisesRow.IdPremises equals subPremisesRow.IdPremises into ps
-                               from psRow in ps.DefaultIfEmpty()
-                               where psRow != null && states.Contains(psRow.IdState)
-                               select premisesRow.IdPremises;
-            var ids = municipalIds
-                .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
-            var municipalStateIds = states
-                .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").Trim(',');
-
-            var arguments = new Dictionary<string, object>
-            {
-                { "filter", string.Format("(id_state IN ({0}) OR (id_state = 1 AND id_premises IN (0{1})))", municipalStateIds, ids) },
-                { "executor", securityService.User.UserName }
-
-            };
-            var fileNameReport = GenerateReport(arguments, "registry\\registry\\tenancy_history");
-            //var fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\tenancy_history");
             return DownloadFile(fileNameReport);
         }
     }

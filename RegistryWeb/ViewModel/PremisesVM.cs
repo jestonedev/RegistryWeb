@@ -47,6 +47,5 @@ namespace RegistryWeb.ViewModel
         public SelectList PreparersList { get; set; }
         public List<PaymentsInfo> PaymentsInfo { get; set; }
         public List<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
-        //public IQueryable<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
     }
 }

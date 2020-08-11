@@ -113,27 +113,55 @@
                     }
                 </td>
                 <td>
-                    @if (securityService.HasPrivilege(Privileges.TenancyWrite))
-                    {
-                        <div class="btn-group" role="group" aria-label="Панель доступа">
+                    <div  class="btn-group" role="group" aria-label="Панель доступа">
+                        @if (securityService.HasPrivilege(Privileges.TenancyWrite))
+                        {
                             <div class="btn-group" role="group" aria-label="Панель доступа">
                                 <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                                 <div class="dropdown-menu dropdown-menu-right but text-center" aria-labelledby="toolsBtn_@item.IdProcess">
                                     <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                                       asp-controller="TenancyProcesses" asp-action="Details" asp-route-idProcess="@item.IdProcess" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                        asp-controller="TenancyProcesses" asp-action="Details" asp-route-idProcess="@item.IdProcess" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                     <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
-                                       asp-controller="TenancyProcesses" asp-action="Edit" asp-route-idProcess="@item.IdProcess" asp-route-action="Edit" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                        asp-controller="TenancyProcesses" asp-action="Edit" asp-route-idProcess="@item.IdProcess" asp-route-action="Edit" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                     <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                                       asp-controller="TenancyProcesses" asp-action="Delete" asp-route-idProcess="@item.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                        asp-controller="TenancyProcesses" asp-action="Delete" asp-route-idProcess="@item.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                 </div>
                             </div>
+                        }
+                        else
+                        {
+                            <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                               asp-controller="TenancyProcesses" asp-action="Details" asp-route-idProcess="@item.IdProcess" asp-route-action="Details"></a>
+                        }
+
+                        <div class="btn-group" role="group" aria-label="Отчеты">
+                            <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="отчеты" id="reportsBtn_@item.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdProcess">
+                                <a class="dropdown-item rr-report-pre-contract" href="#" title="Предварительный договор" aria-label="Предварительный договор" data-id-process="@item.IdProcess">Предварительный договор</a>
+                                <a class="dropdown-item rr-report-dksr-contract" href="#" title="Договор (ДКСР)" aria-label="Договор (ДКСР)" data-id-process="@item.IdProcess">Договор (ДКСР)</a>
+                                @if (item.IdRentType == 2)
+                                {
+                                    <a class="dropdown-item rr-report-contract" href="#" title="Договор (форма 1711)" aria-label="Договор (форма 1711)" data-id-rent-type="@item.IdRentType" data-contract-type="1" data-id-process="@item.IdProcess">Договор (форма 1711)</a>
+                                    <a class="dropdown-item rr-report-contract" href="#" title="Договор (форма 1712)" aria-label="Договор (форма 1712)" data-id-rent-type="@item.IdRentType" data-contract-type="2" data-id-process="@item.IdProcess">Договор (форма 1712)</a>
+                                }
+                                else
+                                {
+                                    <a class="dropdown-item rr-report-contract" href="#" title="Договор" aria-label="Договор" data-contract-type="1" data-id-rent-type="@item.IdRentType" data-id-process="@item.IdProcess">Договор</a>
+                                }
+                                <a class="dropdown-item rr-report-act-to-tenant" href="#" title="Акт передачи в найм" aria-label="Акт передачи в найм" data-id-process="@item.IdProcess">Акт передачи в найм</a>
+                                <a class="dropdown-item rr-report-act-from-tenant" href="#" title="Акт приема из найма" aria-label="Акт приема из найма" data-id-process="@item.IdProcess">Акт приема из найма</a>
+                                <a class="dropdown-item rr-report-excerpt" href="#" title="Уведомление о готовности документов" aria-label="Уведомление о готовности документов" data-report-type="1" data-id-process="@item.IdProcess">Уведомление о готовности документов</a>
+                                <a class="dropdown-item rr-report-excerpt" href="#" title="Уведомление о незаконном проживании" aria-label="Уведомление о незаконном проживании" data-report-type="4" data-id-process="@item.IdProcess">Уведомление о незаконном проживании</a>
+                                <a class="dropdown-item rr-report-excerpt" href="#" title="Уведомление о непродлении (аварийное)" aria-label="Уведомление о непродлении (аварийное)" data-report-type="5" data-id-process="@item.IdProcess">Уведомление о непродлении (аварийное)</a>
+                                <a class="dropdown-item rr-report-excerpt" href="#" title="Уведомление о непродлении (категории)" aria-label="Уведомление о непродлении (категории)" data-report-type="6" data-id-process="@item.IdProcess">Уведомление о непродлении (категории)</a>
+                                <a class="dropdown-item rr-report-excerpt" href="#" title="Предупреждение о нарушении условий" aria-label="Предупреждение о нарушении условий" data-report-type="3" data-id-process="@item.IdProcess">Предупреждение о нарушении условий</a>
+                                <a class="dropdown-item rr-report-excerpt" href="#" title="Уведомление о выселении из АФ" aria-label="Уведомление о выселении из АФ" data-report-type="7" data-id-process="@item.IdProcess">Уведомление о выселении из АФ</a>
+                                <a class="dropdown-item rr-report-excerpt" href="#" title="Уведомление по счетчикам" aria-label="Уведомление по счетчикам" data-report-type="8" data-id-process="@item.IdProcess">Уведомление по счетчикам</a>
+                                <a class="dropdown-item rr-report-mvd" href="#" title="Запрос в МВД (старый)" aria-label="Запрос в МВД (старый)" data-request-type="1" data-id-process="@item.IdProcess">Запрос в МВД (старый)</a>
+                                <a class="dropdown-item rr-report-mvd" href="#" title="Запрос в МВД (новый)" aria-label="Запрос в МВД (новый)" data-request-type="2" data-id-process="@item.IdProcess">Запрос в МВД (новый)</a>
+                            </div>
                         </div>
-                    }
-                    else
-                    {
-                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                           asp-controller="TenancyProcesses" asp-action="Details" asp-route-idProcess="@item.IdProcess" asp-route-action="Details"></a>
-                    }
+                    </div>
                 </td>
             </tr>
         }

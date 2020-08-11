@@ -1,12 +1,4 @@
 ﻿$(document).ready(function () {
-    function downloadFile(url) {
-        var link = document.createElement('a');
-        link.href = url;
-        link.target = "_blank";
-        link.style.display = "none";
-        document.getElementsByTagName("body")[0].appendChild(link);
-        link.click();
-    }
 
     $("body").on('click', ".rr-report-premise-excerpt", function (e) {
         var idPremise = $(this).data("id-premise");
@@ -53,100 +45,122 @@
         e.preventDefault();
     });
 
-    $("body").on('click', ".rr-report-premise-area, #massreference", function (e) {
-        var idPremise = $(this).data("id-premise");
-        url = "/PremiseReports/GetPremisesArea?idPremise=" + idPremise;
+    $("body").on('click', ".rr-report-premise-area, #massReferenceBtn", function (e) {
+        url = "/PremiseReports/GetPremisesArea";
+        if ($(this).data("id-premise") !== undefined) {
+            var idPremise = $(this).data("id-premise");
+            url = "/PremiseReports/GetPremiseArea?idPremise=" + idPremise;
+        }
         downloadFile(url);
         e.preventDefault();
     });
-
-/*__________для массовых__________*/
-    $("body").on('click', "#massact", function (e) {
-        $("#massactModal").find("[name='massact.ActType']").val(1);
-        $("#massactModal").find("input, textarea, select").prop("disabled", false);
-        $("#massactModal").modal("show");
+    
+    $("body").on('click', "#massActBtn", function (e) {
+        $("#massActModal").find("input, textarea, select").prop("disabled", false);
+        $("#massActModal").modal("show");
 
         e.preventDefault();
     });
 
-    $("body").on('click', "#massexcerpt", function (e) {
+    $("body").on('click', "#massExcerptBtn", function (e) {
         $("#excerptModal").find("[name='Excerpt.ExcerptType']").val(4);
         $("#excerptModal").find("input, textarea, select").prop("disabled", false);
-        //$("#excerptModal").modal("show");
         $('#excerptModal').modal('toggle');
         e.preventDefault();
     });
 
-    $("body").on('click', "#restriction", function (e) {        
+    function attachFileForPaste(e) {
+        var fileWrapper = $(this).closest(".form-group");
+        fileWrapper.find('input[type="file"]').click();
+        e.preventDefault();
+    }
+
+    function changeFileAttachmentForPaste() {
+        var fileWrapper = $(this).closest(".form-group");
+        var nameParts = $(this).val().split('\\');
+        var name = nameParts[nameParts.length - 1];
+        if ($(this).val() !== "") {
+            var elem = fileWrapper.find("[name$='Description']");
+            if (elem.val() === "" || elem.val() === null)
+                elem.val(name);
+            let fileBtns = fileWrapper.find(".rr-file-buttons");
+            fileWrapper.find(".rr-file-attach").hide();
+            fileBtns.append(fileWrapper.find(".rr-file-remove").show());
+        } else {
+            let fileBtns = fileWrapper.find(".rr-file-buttons");
+            fileWrapper.find(".rr-file-remove").hide();
+            fileBtns.append(fileWrapper.find(".rr-file-attach").show());
+        }
+    }
+
+    function removeFileForPaste(e) {
+        var fileWrapper = $(this).closest(".form-group");
+        fileWrapper.find('input[type="file"]').val("").change();
+        e.preventDefault();
+    }
+
+    $("#restrictionForm .rr-file-attach, #ownershipRightForm .rr-file-attach").on('click', attachFileForPaste);
+    $('#restrictionForm .rr-file-remove, #ownershipRightForm .rr-file-remove').on('click', removeFileForPaste);
+    $('#restrictionForm input[name="RestrictionFile"], #ownershipRightForm input[name="OwnershipRightFile"]').on('change', changeFileAttachmentForPaste);
+
+    $("body").on('click', "#restrictionBtn", function (e) {
         $("#restrictionModal").find("input, textarea, select").prop("disabled", false);
         $("#restrictionModal").modal("toggle");
-
         e.preventDefault();
     });
 
-    $("body").on('click', "#ownershipright", function (e) {
-        var idPremises = "";
-
-        $('table tr').each(function (row) {
-            $(this).find('#prem').each(function (cell) {
-                idPremises += ($(this).html() + ', ');
-            });
-        });
-        idPremises = idPremises.substring(0, idPremises.length - 2);
-        $("#ownershiprightModal").find("[name='ownershipright.IdObjects']").val(idPremises);
-        $("#ownershiprightModal").find("[name='ownershipright.ActType']").val(1);
-        $("#ownershiprightModal").find("input, textarea, select").prop("disabled", false);
-        $("#ownershiprightModal").modal("toggle");
-
+    $("body").on('click', "#ownershipRightBtn", function (e) {
+        $("#ownershipRightModal").find("input, textarea, select").prop("disabled", false);
+        $("#ownershipRightModal").modal("toggle");
         e.preventDefault();
     });
 
-        var row0 = $(".row0").clone();
-        var row1 = $(".row1").clone();
-        var row2 = $(".row2").clone();
-    $("body").on('click', "#moreinformation, #currentstate, #dateRMI", function (e) {
-        $(".blocker").empty();        
-        $("#putdownModal").find("[name='putdown.ActType']").val(1);
+    var row0 = $(".row0").clone();
+    var row1 = $(".row1").clone();
+    var row2 = $(".row2").clone();
+
+    $("body").on('click', "#updateDescriptionBtn, #updateCurrentStateBtn, #updateRegDateBtn", function (e) {
+        var modal = $("#updatePremiseModal");
+        modal.find(".modal-body").empty();
         switch ($(this).data("id-modal"))
         {
             case 0:
-                $(".blocker").html(row0);
-                $(".putdownbut").html("Добавить");
-                $(".putdowntitle").html("Проставить дополнительные сведения");
+                modal.find(".modal-body").html(row0);
+                modal.find(".rr-report-submit").html("Добавить");
+                modal.find(".modal-title").html("Обновить дополнительные сведения");
                 break;
             case 1:
-                $(".blocker").html(row1);
-                $(".blocker [data-id], .blocker .selectpicker option.bs-title-option").remove();
-                $(".blocker .selectpicker ").selectpicker('refresh');
-                $(".putdownbut").html("Изменить");
-                $(".putdowntitle").html("Изменить состояние");
+                modal.find(".modal-body").html(row1);
+                modal.find(".rr-report-submit").html("Изменить");
+                modal.find(".modal-title").html("Изменить текущее состояние");
                 break;
             case 2:
-                $(".blocker").html(row2);
-                $(".putdownbut").html("Изменить");
-                $(".putdowntitle").html("Изменить дату включения в РМИ");
+                modal.find(".modal-body").html(row2);
+                modal.find(".rr-report-submit").html("Изменить");
+                modal.find(".modal-title").html("Изменить дату включения в РМИ");
                 break;
         }
-        $("#putdownModal").find("input, textarea, select").prop("disabled", false);
-        $("#putdownModal").modal("toggle");
+        modal.find("input, textarea, select").prop("disabled", false);
+        modal.find("[data-id], .selectpicker option.bs-title-option").remove();
+        modal.find(".selectpicker").selectpicker('refresh');
+        modal.modal("toggle");
 
         e.preventDefault();
     });
 
-    $("body").on('click', "#export", function (e) {
+    $("body").on('click', "#exportBtn", function (e) {
         url = "/PremiseReports/GetPremisesExport";
         downloadFile(url);
         e.preventDefault();
     });
 
-    $("body").on('click', "#hiringhistory", function (e) {
+    $("body").on('click', "#historyBtn", function (e) {
         url = "/PremiseReports/GetPremisesTenancyHistory";
         downloadFile(url);
         e.preventDefault();
     });
 
-    $("#excerptForm, #noticeToBksForm, #massactForm, #restrictionForm, #putdownForm, #ownershiprightForm")
-        .on("change", "select", function () {
+    $("#excerptForm, #noticeToBksForm, #massActForm, #restrictionForm, #ownershipRightForm, #updatePremiseForm").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
     
@@ -157,7 +171,7 @@
             fixBootstrapSelectHighlight($(this).closest("#excerptForm"));
             return false;
         }
-
+        
         var idObject = $("#excerptModal").find("[name='Excerpt.IdObject']").val();
         var excerptType = $("#excerptModal").find("[name='Excerpt.ExcerptType']").val();
         var excerptNumber = $("#excerptModal").find("[name='Excerpt.ExcerptNumber']").val();
@@ -213,7 +227,7 @@
                     + "&paymentType=" + paymentType + "&signer=" + signer;
                 break;
             case "2":
-                var url = "/PremiseReports/GetSubPremiseNoticeToBks?idSubPremise=" + idObject + "&actionText=" + actionText
+                url = "/PremiseReports/GetSubPremiseNoticeToBks?idSubPremise=" + idObject + "&actionText=" + actionText
                     + "&paymentType=" + paymentType + "&signer=" + signer;
                 break;
         }
@@ -223,82 +237,60 @@
 
         $("#noticeToBksModal").modal("hide");
     });
-    
-    $("#massactModal .rr-report-submit").on("click", function (e) {
+
+    $("#massActModal .rr-report-submit").on("click", function (e) {
         e.preventDefault();
-        var isValid = $(this).closest("#massactForm").valid();
+        var isValid = $(this).closest("#massActForm").valid();
         if (!isValid) {
-            fixBootstrapSelectHighlight($(this).closest("#massactForm"));
+            fixBootstrapSelectHighlight($(this).closest("#massActForm"));
             return false;
         }
-        var actType = $("#massactModal").find("[name='massact.ActType']").val();
-        var actdate = $("#massactModal").find("[name='massact.ActDate']").val();
-        var commision = $("#massactModal").find("[name='massact.Commision']").val();
-        var clerk = $("#massactModal").find("[name='massact.Clerk']").val();
-		var isNotResides = null;
-        if ($("#massactModal").find("[name='massact.isNotResides']").is(':checked')) {
+        var actdate = $("#massActModal").find("[name='MassAct.ActDate']").val();
+        var commision = $("#massActModal").find("[name='MassAct.Commision']").val();
+        var clerk = $("#massActModal").find("[name='MassAct.Clerk']").val();
+        var isNotResides = null;
+        if ($("#massActModal").find("[name='MassAct.IsNotResides']").is(':checked')) {
             isNotResides = "True";
         } else {
             isNotResides = "False";
         }
-		
-        if ($("#massactModal").find(".input-validation-error").length > 0) {
+
+        if ($("#massActModal").find(".input-validation-error").length > 0) {
             return false;
         }
-        switch (actType) {
-            case "1":
-                var url = "/PremiseReports/GetPremisesAct?actDate=" + actdate
-                    + "&isNotResides=" + isNotResides + "&commision=" + commision + "&clerk=" + clerk;
-                break;
-            /*case "2":
-                var url = "/PremiseReports/GetSubPremiseActs?idSubPremise=" + idPremises + "&actdate=" + actdate
-                    + "&home=" + home + "&participants=" + participants + "&signer=" + signer;
-                break;*/
-        }
-        if (url !== undefined) {
-            downloadFile(url);
-        }
-
-        $("#massactModal").modal("hide");
+        var url = "/PremiseReports/GetPremisesAct?actDate=" + actdate
+            + "&isNotResides=" + isNotResides + "&commision=" + commision + "&clerk=" + clerk;
+        downloadFile(url);
+        $("#massActModal").modal("hide");
     });
 
-	//________для проставлений________
-    $("#putdownModal .rr-report-submit").on("click", function (e) {
+    $("#restrictionModal .rr-report-submit, #ownershipRightModal .rr-report-submit").on("click", function (e) {
         e.preventDefault();
-        var isValid = $(this).closest("#putdownForm").valid();
+        var form = $(this).closest("form");
+        var isValid = form.valid();
         if (!isValid) {
-            fixBootstrapSelectHighlight($(this).closest("#putdownForm"));
+            fixBootstrapSelectHighlight(form);
             return false;
         }
-
-        var description = $("#putdownModal").find("[name='premise.Description']").val();
-        var regdate = $("#putdownModal").find("[name='premise.RegDate']").val();
-        var state = $("#putdownModal").find("[name='premise.State']").val();
-
-        if ($("#putdownModal").find(".input-validation-error").length > 0) {
-            return false;
-        }
-
-        $.ajax({
-            type: 'POST',
-            url: window.location.origin + '/Premises/UpdatePremises',
-            data: { description: description, regDate: regdate, stateId: state },
-            success: function (status) {
-                if (status == 0) {
-                    $(".status").html("Операция выполнена успешно!");
-                    $(".status").addClass("alert alert-success");
-                    $("#putdownModal").modal("toggle");
-                }
-                else {
-                    $(".status").html("Ошибка!");
-                    $(".status").addClass("alert alert-danger");
-                    $("#putdownModal").modal("toggle");
-                }
-            }
-
-        });
-
-        $("#putdownModal").modal("hide");
+        form.submit();
     });
-											 
+
+    $("#updatePremiseModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("#updatePremiseForm");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return false;
+        }
+
+        form.submit();
+    });
+
+    $(".pagination .page-link").on("click", function (e) {
+        var path = location.pathname;
+        var page = $(this).data("page");
+        location.href = path + "?PageOptions.CurrentPage=" + page;
+        e.preventDefault();
+    });
 });

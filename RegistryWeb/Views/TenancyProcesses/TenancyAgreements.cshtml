@@ -191,6 +191,12 @@
                                 </select>
                                 <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenantNewIdKinship" data-valmsg-replace="true"></span>
                             </div>
+                            <div class="col-md-12 rr-agreement-type-field" data-agreement-types="6">
+                                <div class="form-group form-check">
+                                    <input type="checkbox" class="form-check-input" id="Agreement_Type_TenantExclude">
+                                    <label class="form-check-label" for="Agreement_Type_TenantExclude">Исключить текущего нанимателя из найма</label>
+                                </div>
+                            </div>
                             <div class="form-group col-md-12 rr-agreement-type-field" data-agreement-types="6">
                                 <label for="Agreement_Type_TenancyPersonsWithoutTenant">Новый наниматель</label>
                                 <select class="selectpicker form-control" data-val="true" data-val-required="Выберите нового нанимателя" id="Agreement_Type_TenancyPersonsWithoutTenant" name="Agreement_Type_TenancyPersonsWithoutTenant" title="Новый наниматель">
@@ -208,7 +214,9 @@
                         {
                             <hr class="col-md-12 p-0" />
                             <h5 class="col-12 pb-2">Автоматические операции</h5>
-                            <ul class="Agreement_AutomateOperations"></ul>
+                            <div id="Agreement_AutomateOperations">
+
+                            </div>
                         }
                     </div>
                 </div>

@@ -19,8 +19,6 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.HasKey(e => e.IdPreparer);
 
-            builder.ToTable("preparers", "registry_test");
-
             builder.Property(e => e.IdPreparer)
                     .HasColumnName("id_preparer")
                     .HasColumnType("int(11)");
