@@ -286,4 +286,11 @@
 
         form.submit();
     });
+
+    $(".pagination .page-link").on("click", function (e) {
+        var path = location.pathname;
+        var page = $(this).data("page");
+        location.href = path + "?PageOptions.CurrentPage=" + page;
+        e.preventDefault();
+    });
 });

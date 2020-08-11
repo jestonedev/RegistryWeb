@@ -6,7 +6,7 @@
     Context.Session.Set("Controller", "Premises");
     Context.Session.Set("Action", "PremiseReports");
     ViewData["Title"] = "Мастер массовых операций над помещениями";
-    var text = "Количество записей: " + ViewBag.Count;
+    var text = "Количество записей: " + Model.PageOptions.TotalRows;
     var canEdit = (bool)ViewData["CanEditBaseInfo"];
     var errorPremises = (List<Premise>)ViewData["ErrorPremises"];
 }
@@ -31,7 +31,8 @@
 @if (errorPremises != null && errorPremises.Any())
 {
     <div class="alert alert-danger text-center">
-        <p class="mb-0">Во время массовой операции были пропущены помещения со следующими реестровыми номерами: 
+        <p class="mb-0">
+            Во время массовой операции были пропущены помещения со следующими реестровыми номерами:
             @(errorPremises.Select(v => v.IdPremises.ToString()).Aggregate((acc, v) => acc + "," + v))
         </p>
         <p class="mb-0">Причина: недостаточно прав на редактирование данных помещений.</p>
@@ -86,8 +87,8 @@
         </tr>
     </thead>
     <tbody>
-        @if(Model.Premises.Any())
-        { 
+        @if (Model.Premises.Any())
+        {
             foreach (var item in Model.Premises)
             {
                 <tr>
@@ -96,19 +97,22 @@
                     <td>
                         <div class="btn-group" role="group" aria-label="Панель доступа">
                             <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                                asp-action="Details" asp-controller="Premises" asp-route-idPremises="@item.IdPremises"></a>
+                               asp-action="Details" asp-controller="Premises" asp-route-idPremises="@item.IdPremises"></a>
                             <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                                asp-action="SessionIdPremiseRemove" asp-controller="Premises" asp-route-idPremises="@item.IdPremises"></a>
+                               asp-action="SessionIdPremiseRemove" asp-controller="Premises" asp-route-idPremises="@item.IdPremises"></a>
                         </div>
                     </td>
                 </tr>
             }
-        } else
+        }
+        else
         {
             <tr><td colspan="3" class="text-center"><i>Элементы отсутствуют</i></td></tr>
         }
-        
+
     </tbody>
 </table>
+
+<page-link page-model="Model.PageOptions" page-action="Index"></page-link>
 
 <partial name="ReportsModals" model="@Model">

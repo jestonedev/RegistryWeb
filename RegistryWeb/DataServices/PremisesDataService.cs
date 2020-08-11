@@ -774,11 +774,27 @@ namespace RegistryWeb.DataServices
                 .SingleOrDefault(b => b.IdPremises == idPremise);
         }
 
-        public List<Premise> GetPremises(List<int> ids)
+        public IQueryable<Premise> GetPremisesForMassReports(List<int> ids)
         {
             return registryContext.Premises
                 .Include(b => b.IdBuildingNavigation).ThenInclude(b => b.IdStreetNavigation)
-                .Where(b => ids.Contains(b.IdPremises)).ToList();
+                .Where(b => ids.Contains(b.IdPremises));
+        }
+
+        public PremisesVM<Premise> GetPremisesViewModelForMassReports(List<int> ids, PageOptions pageOptions, bool canEditBaseInfo)
+        {
+            var viewModel = InitializeViewModel(null, pageOptions, null);
+            viewModel.ObjectStatesList = new SelectList(GetObjectStatesWithRights("Edit", canEditBaseInfo), "IdState", "StateFemale");
+            viewModel.CommisionList = viewModel.SignersList;
+            var premises = GetPremisesForMassReports(ids);
+            var count = premises.Count();
+            viewModel.PageOptions.TotalRows = count;
+            viewModel.PageOptions.Rows = count;
+            viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+            if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
+                viewModel.PageOptions.CurrentPage = 1;
+            viewModel.Premises = GetQueryPage(premises, viewModel.PageOptions).ToList();
+            return viewModel;
         }
 
         public IEnumerable<ObjectState> ObjectStates

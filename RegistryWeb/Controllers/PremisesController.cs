@@ -309,7 +309,7 @@ namespace RegistryWeb.Controllers
             return RedirectToAction("PremiseReports");
         }
 
-        public IActionResult PremiseReports()
+        public IActionResult PremiseReports(PageOptions pageOptions)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
@@ -329,21 +329,10 @@ namespace RegistryWeb.Controllers
                 }
                 TempData.Remove("ErrorPremisesIds");
             }
-            if (errorIds.Any())
-            {
-                ViewBag.ErrorPremises = dataService.GetPremises(errorIds);
-            }
-            var viewModel = dataService.InitializeViewModel(null, null, null);
-            viewModel.ObjectStatesList = new SelectList(dataService.GetObjectStatesWithRights("Edit", canEditBaseInfo), "IdState", "StateFemale");
-            viewModel.CommisionList = viewModel.SignersList;
+
+            ViewBag.ErrorPremises = dataService.GetPremisesForMassReports(errorIds).ToList();
             var ids = GetSessionPremisesIds();
-            if (ids.Any())
-            {
-                viewModel.Premises = dataService.GetPremises(ids);
-            } else
-            {
-                viewModel.Premises = new List<Premise>();
-            }
+            var viewModel = dataService.GetPremisesViewModelForMassReports(ids, pageOptions, canEditBaseInfo);
             ViewBag.Count = viewModel.Premises.Count();
             return View("PremiseReports", viewModel);
         }
@@ -369,7 +358,7 @@ namespace RegistryWeb.Controllers
             if (!ids.Any())
                 return NotFound();
 
-            var premises = dataService.GetPremises(ids);
+            var premises = dataService.GetPremisesForMassReports(ids).ToList();
             var processingPremises = new List<Premise>();
             var errorPremisesIds = new List<int>();
             foreach (Premise premise in premises) 
@@ -403,7 +392,7 @@ namespace RegistryWeb.Controllers
             if (!ids.Any())
                 return NotFound();
 
-            var premises = dataService.GetPremises(ids);
+            var premises = dataService.GetPremisesForMassReports(ids).ToList();
             var processingPremises = new List<Premise>();
             var errorPremisesIds = new List<int>();
             foreach (Premise premise in premises)
@@ -436,7 +425,7 @@ namespace RegistryWeb.Controllers
             if (!ids.Any())
                 return NotFound();
 
-            var premises = dataService.GetPremises(ids);
+            var premises = dataService.GetPremisesForMassReports(ids).ToList();
             var processingPremises = new List<Premise>();
             var errorPremisesIds = new List<int>();
             foreach (Premise premise in premises)
