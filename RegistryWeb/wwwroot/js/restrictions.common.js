@@ -35,6 +35,7 @@ function getRestriction(restrictionElem) {
         IdRestriction: restrictionElem.find("[name^='IdRestriction']").val(),
         Number: restrictionElem.find("[name^='RestrictionNum']").val(),
         Date: restrictionElem.find("[name^='RestrictionDate']").val(),
+        DateStateReg: restrictionElem.find("[name^='RestrictionDateStateReg']").val(),  
         Description: restrictionElem.find("[name^='RestrictionDescription']").val(),
         IdRestrictionType: restrictionElem.find("[name^='IdRestrictionType']").val(),
         RestrictionFile: restrictionElem.find("[name^='RestrictionFile']")[0],
@@ -47,6 +48,7 @@ function restrictionToFormData(restriction, address) {
     formData.append("Restriction.IdRestriction", restriction.IdRestriction);
     formData.append("Restriction.Number", restriction.Number);
     formData.append("Restriction.Date", restriction.Date);
+    formData.append("Restriction.DateStateReg", restriction.DateStateReg);
     formData.append("Restriction.Description", restriction.Description);
     formData.append("Restriction.IdRestrictionType", restriction.IdRestrictionType);
     formData.append("RestrictionFile", restriction.RestrictionFile.files[0]);
@@ -75,7 +77,7 @@ let initializeVilidationRestriction = function (restrictionElem) {
     if (idRestriction === "0") idRestriction = uuidv4();
     //Дата документа
     let date = 'RestrictionDate_' + idRestriction;
-    restrictionElem.find("[name^='RestrictionDate']").addClass('valid')
+    restrictionElem.find("[name='RestrictionDate'], [name^='RestrictionDate_']").addClass('valid')
         .attr('data-val', 'true')
         .attr('data-val-required', 'Поле "Дата документа" является обязательным')
         .attr('id', date)
@@ -241,6 +243,7 @@ function showEditDelPanelRestriction(restrictionElem) {
 function refreshRestriction(restrictionElem, restriction) {
     restrictionElem.find("[name^='RestrictionNum']").val(restriction.number);
     restrictionElem.find("[name^='RestrictionDate']").val(restriction.date);
+    restrictionElem.find("[name^='RestrictionDateStateReg']").val(restriction.dateStateReg);
     restrictionElem.find("[name^='RestrictionDescription']").val(restriction.description);
     restrictionElem.find("[name^='IdRestrictionType']").val(restriction.idRestrictionType).selectpicker('refresh');
     restrictionElem.find("[name^='RestrictionFile']").val("");

@@ -22,6 +22,7 @@ let createBuildingClick = function (event) {
             $('#building').append(getInputTemplate(rn + 'IdRestriction', restrictions[i].RestrictionNavigation.IdRestriction));
             $('#building').append(getInputTemplate(rn + 'Number', restrictions[i].RestrictionNavigation.Number));
             $('#building').append(getInputTemplate(rn + 'Date', restrictions[i].RestrictionNavigation.Date));
+            $('#building').append(getInputTemplate(rn + 'DateStateReg', restrictions[i].RestrictionNavigation.DateStateReg));
             $('#building').append(getInputTemplate(rn + 'Description', restrictions[i].RestrictionNavigation.Description));
             $('#building').append(getInputTemplate(rn + 'IdRestrictionType', restrictions[i].RestrictionNavigation.IdRestrictionType));
             let file = $(restrictions[i].RestrictionNavigation.RestrictionFile).clone();

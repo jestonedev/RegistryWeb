@@ -8,7 +8,7 @@
 @{ 
     var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
     var attachment = Model.Address.AddressType == AddressTypes.Premise ? "Помещение" : "Здание";
-    var ownershipRightTypeClass = "col-md-6 col-lg-6";
+    var ownershipRightTypeClass = "col-md-9 col-lg-7";
     if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
     {
         if (ViewBag.Address.AddressType == AddressTypes.Building)
@@ -31,15 +31,15 @@
 <li class="list-group-item">
     <input type="hidden" value="@Model.IdOwnershipRight" name="IdOwnershipRight" />
     <div class="form-row">
-        <div class="form-group col-sm-6 col-md-3 col-lg-2">
+        <div class="form-group col-sm-6 col-md-3">
             <label>Номер документа</label>
             <input type="text" maxlength="10" class="form-control" disabled value="@Model.Number" name="OwnershipRightNum" title="Номер документа">
         </div>
-        <div class="form-group col-sm-6 col-md-3 col-lg-2">
+        <div class="form-group col-sm-6 col-md-3">
             <label>Дата документа</label>
             <input type="date" class="form-control" disabled value="@(Model.Date.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : Model.Date.ToString("yyyy-MM-dd"))" name="OwnershipRightDate" title="Дата документа">
         </div>
-        <div class="form-group col-md-6 col-lg-8">
+        <div class="form-group col-md-6">
             <label>Наименование и образ документа</label>
             <div class="input-group">
                 <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="OwnershipRightDescription" title="Наименование">
@@ -84,7 +84,7 @@
         </div>
         @if (ViewBag.Address.AddressType == AddressTypes.Premise)
         {
-            <div class="form-group col-md-6 col-lg-4">
+            <div class="form-group col-md-3">
                 <label>Принадлежность</label>
 
                 <input type="text" maxlength="255" class="form-control" disabled value="@attachment" name="OwnershipRightAttachment" title="Принадлежность">

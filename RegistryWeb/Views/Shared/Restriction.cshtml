@@ -8,22 +8,22 @@
 @{ 
     var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
     var attachment = Model.AddressType == AddressTypes.Premise ? "Помещение" : "Здание";
-    var restrictionTypeClass = "col-md-6 col-lg-6";
+    var restrictionTypeClass = "col-md-6 col-lg-4";
     if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
     {
         if (ViewBag.AddressType == AddressTypes.Building)
         {
-            restrictionTypeClass = "col-md-12 col-lg-10";
+            restrictionTypeClass = "col-md-9 col-lg-7";
         }
     }
     if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
     {
         if (ViewBag.AddressType == AddressTypes.Premise)
         {
-            restrictionTypeClass = "col-md-6 col-lg-8";
+            restrictionTypeClass = "col-md-6";
         } else
         {
-            restrictionTypeClass = "col-md-12 col-lg-12";
+            restrictionTypeClass = "col-md-9";
         }
     }
 }
@@ -31,15 +31,15 @@
 <li class="list-group-item">
     <input type="hidden" value="@Model.IdRestriction" name="IdRestriction" />
     <div class="form-row">
-        <div class="form-group col-sm-6 col-md-3 col-lg-2">
+        <div class="form-group col-sm-6 col-md-3">
             <label>Номер документа</label>
             <input type="text" maxlength="10" class="form-control" disabled value="@Model.Number" name="RestrictionNum" title="Номер документа">
         </div>
-        <div class="form-group col-sm-6 col-md-3 col-lg-2">
+        <div class="form-group col-sm-6 col-md-3">
             <label>Дата документа</label>
             <input type="date" class="form-control" disabled value="@(Model.Date.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : Model.Date.ToString("yyyy-MM-dd"))" name="RestrictionDate" title="Дата документа">
         </div>
-        <div class="form-group col-md-6 col-lg-8">
+        <div class="form-group col-md-6">
             <label>Наименование и образ документа</label>
             <div class="input-group">
                 <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="RestrictionDescription" title="Наименование">
@@ -76,18 +76,23 @@
         </div>
         @if (ViewBag.AddressType == AddressTypes.Premise)
         {
-            <div class="form-group col-md-6 col-lg-4">
+            <div class="form-group col-md-3">
                 <label>Принадлежность</label>
 
                 <input type="text" maxlength="255" class="form-control" disabled value="@attachment" name="RestrictionAttachment" title="Принадлежность">
             </div>
         }
+
+        <div class="form-group col-md-3">
+            <label>Дата г/р в УО</label>
+            <input type="date" class="form-control" disabled value="@(Model.DateStateReg.HasValue ? Model.DateStateReg.Value.ToString("yyyy-MM-dd") : "")" name="RestrictionDateStateReg" title="Дата г/р в УО">
+        </div>
         <div class="form-group @restrictionTypeClass">
             <label>Тип документа</label>
             <select disabled class="form-control field-restriction selectpicker" title="Тип документа"
                     asp-items="@{new SelectList(ViewBag.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName",Model.IdRestrictionType)}" name="IdRestrictionType">
                 <option></option>
-            </select>   
+            </select>
         </div>
         @if (ViewBag.Action == "Edit")
         {

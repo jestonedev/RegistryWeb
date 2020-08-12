@@ -63,6 +63,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             return Json(new {
                 number = restriction.Number,
                 date = restriction.Date.ToString("yyyy-MM-dd"),
+                dateStateReg = restriction.DateStateReg?.ToString("yyyy-MM-dd"),
                 description = restriction.Description,
                 idRestrictionType = restriction.IdRestrictionType,
                 fileOriginName = restriction.FileOriginName

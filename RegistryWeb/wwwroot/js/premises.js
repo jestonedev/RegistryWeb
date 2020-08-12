@@ -81,6 +81,7 @@
                 $(this).append(inputTemplate.replace('{0}', rpa + "IdRestriction").replace('{1}', restrictions[j].IdRestriction));
                 $(this).append(inputTemplate.replace('{0}', rpa + "IdPremises").replace('{1}', restrictions[j].IdPremises));
                 $(this).append(inputTemplate.replace('{0}', rrn + "Date").replace('{1}', restrictions[j].RestrictionNavigation.Date));
+                $(this).append(inputTemplate.replace('{0}', rrn + "DateStateReg").replace('{1}', restrictions[j].RestrictionNavigation.DateStateReg));
                 $(this).append(inputTemplate.replace('{0}', rrn + "Number").replace('{1}', restrictions[j].RestrictionNavigation.Number));
                 $(this).append(inputTemplate.replace('{0}', rrn + "Description").replace('{1}', restrictions[j].RestrictionNavigation.Description));
                 $(this).append(inputTemplate.replace('{0}', rrn + "IdRestrictionType").replace('{1}', restrictions[j].RestrictionNavigation.IdRestrictionType));
