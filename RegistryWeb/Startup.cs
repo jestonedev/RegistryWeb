@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using RegistryWeb.SecurityServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using RegistryWeb.ReportServices;
 using Microsoft.AspNetCore.Http.Features;
@@ -40,7 +41,8 @@ namespace RegistryWeb
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => //CookieAuthenticationOptions
                 {
-                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+                    options.LoginPath = new PathString("/Account/Login");
+                    options.AccessDeniedPath = new PathString("/Account/Login");
                 });
 
             services.AddDbContext<RegistryContext>();
@@ -55,6 +57,19 @@ namespace RegistryWeb
                 options.IdleTimeout = TimeSpan.FromSeconds(3600);
                 options.Cookie.IsEssential = true;
             });
+
+            services.AddTransient<IAuthorizationHandler, CookieUserWithConnectionStringHandler>();
+
+            services.AddAuthorization(opts => {
+                var requirements = new List<IAuthorizationRequirement>();
+                foreach(var req in opts.DefaultPolicy.Requirements)
+                {
+                    requirements.Add(req);
+                }
+                requirements.Add(new CookieUserWithConnectionStringRequirement());
+                opts.DefaultPolicy = new AuthorizationPolicy(requirements, opts.DefaultPolicy.AuthenticationSchemes);
+            });
+
 
             services.AddTransient<BuildingsDataService>();
             services.AddTransient<PremisesDataService>();
