@@ -143,6 +143,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<BuildingOwnershipRightCurrent> BuildingsOwnershipRightCurrent { get; set; }
 
         public DbQuery<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
+        public DbQuery<KladrRegion> KladrRegions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -156,7 +157,9 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new OwnerActiveProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new BuildingOwnershipRightCurrentConfiguration(nameDatebase));
 
+            //modelBuilder.Query<BuildingOwnershipRightCurrent>().ToView("v_buildings_ownership_rights_1_current");
             modelBuilder.Query<PremiseOwnershipRightCurrent>().ToView("v_premises_ownership_rights_1_current");
+            modelBuilder.Query<KladrRegion>().ToView("v_kladr_regions");
 
 
             modelBuilder.ApplyConfiguration(new ChangeLogConfiguration(nameDatebase));

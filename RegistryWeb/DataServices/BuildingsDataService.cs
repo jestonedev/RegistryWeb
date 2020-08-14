@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
+using RegistryWeb.Models.SqlViews;
 
 namespace RegistryWeb.DataServices
 {
@@ -43,7 +44,17 @@ namespace RegistryWeb.DataServices
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
             viewModel.Buildings = GetQueryPage(query, viewModel.PageOptions).ToList();
             viewModel.IsMunicipalDictionary = IsMunicipalDictionary(viewModel.Buildings);
+            viewModel.BuildingsOwnershipRightCurrent = GetBuildingsOwnershipRightCurrent(viewModel.Buildings);
             return viewModel;
+        }
+
+        private List<BuildingOwnershipRightCurrent> GetBuildingsOwnershipRightCurrent(List<Building> buildings)
+        {
+            var ids = buildings.Select(p => p.IdBuilding).ToList();
+            return registryContext.BuildingsOwnershipRightCurrent
+                .Where(p => ids.Contains(p.IdBuilding))
+                .Select(p => new BuildingOwnershipRightCurrent { IdBuilding = p.IdBuilding, IdOwnershipRightType = p.IdOwnershipRightType })
+                .ToList();
         }
 
         private Dictionary<int, bool> IsMunicipalDictionary(List<Building> buildings)
