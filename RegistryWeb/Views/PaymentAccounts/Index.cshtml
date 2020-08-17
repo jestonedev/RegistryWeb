@@ -1,0 +1,28 @@
+﻿@model RegistryWeb.ViewModel.PaymentsVM;
+@{
+    ViewData["Title"] = "Лицевые счета БКС";
+    var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
+        "(" + Model.PageOptions.TotalRows + ")" :
+        "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
+}
+
+@section styles
+{
+    <link rel="stylesheet" href="~/css/payment.accounts.css" runat="server" />
+}
+
+<h2>@ViewData["Title"] @text</h2>
+
+<partial name="Filter" model="Model" />
+<partial name="DataTable" model="Model" />
+
+<page-link page-model="Model.PageOptions" page-action="Index"></page-link>
+@section validation
+{
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+}
+@section Scripts {
+    <script src="~/js/index.common.js" asp-append-version="true"></script>
+    <script src="~/js/index.PaymentAccounts.js" asp-append-version="true"></script>
+}
