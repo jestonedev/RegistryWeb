@@ -17,7 +17,7 @@ using System.Runtime.CompilerServices;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
-    public class BuildingsController : ListController<BuildingsDataService>
+    public class BuildingsController : ListController<BuildingsDataService, BuildingsFilter>
     {
         OwnerReportService reportService;
         bool canEditBaseInfo;

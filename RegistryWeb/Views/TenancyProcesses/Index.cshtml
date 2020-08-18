@@ -11,12 +11,14 @@
     <link rel="stylesheet" href="~/css/tenancy.processes.css" runat="server" />
 }
 
-<h2>@ViewData["Title"] @text</h2>
+<div class="col info text-center" data-controller="TenancyProcesses"></div>
 
-@Html.Partial("Filter", Model)
-@Html.Partial("DataTable", Model)
+<h2>@ViewData["Title"] @text</h2>
+<partial name="Filter" model="@Model">
+<partial name="DataTable" model="@Model">
 <partial name="ReportsModals">
 <page-link page-model="Model.PageOptions" page-action="Index"></page-link>
+
 @section validation
 {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
@@ -26,4 +28,5 @@
     <script src="~/js/index.common.js" asp-append-version="true"></script>
     <script src="~/js/index.TenancyProcesses.js" asp-append-version="true"></script>
     <script src="~/js/tenancyProcess.reports.js" asp-append-version="true"></script>
+    <script src="~/js/multimaster.js" asp-append-version="true"></script>
 }
