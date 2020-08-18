@@ -967,22 +967,31 @@ namespace RegistryWeb.DataServices
                                          IdState = gs.Max()
                                      };
 
-            var claimsInfo = from claimRow in claims
-                             join claimLastStateRow in claimLastStatesIds
-                             on claimRow.IdClaim equals claimLastStateRow.IdClaim
+            var claimsInfo = from claimLastStateRow in claimLastStatesIds
                              join claimStateRow in registryContext.ClaimStates.Where(cs => claimIds.Contains(cs.IdClaim))
                              on claimLastStateRow.IdState equals claimStateRow.IdState
                              join claimStateTypeRow in registryContext.ClaimStateTypes
                              on claimStateRow.IdStateType equals claimStateTypeRow.IdStateType
                              select new ClaimInfo
                              {
-                                 IdClaim = claimRow.IdClaim,
-                                 StartDeptPeriod = claimRow.StartDeptPeriod,
-                                 EndDeptPeriod = claimRow.EndDeptPeriod,
-                                 IdAccount = claimRow.IdAccount,
-                                 IdClaimCurrentState = claimStateRow.IdStateType,
+                                 IdClaim = claimStateRow.IdClaim,
+                                 IdClaimCurrentState = claimStateTypeRow.IdStateType,
                                  ClaimCurrentState = claimStateTypeRow.StateType
                              };
+
+            claimsInfo = from claimRow in claims
+                         join claimsInfoRow in claimsInfo
+                         on claimRow.IdClaim equals claimsInfoRow.IdClaim into c
+                         from cRow in c.DefaultIfEmpty()
+                         select new ClaimInfo
+                         {
+                             IdClaim = claimRow.IdClaim,
+                             StartDeptPeriod = claimRow.StartDeptPeriod,
+                             EndDeptPeriod = claimRow.EndDeptPeriod,
+                             IdAccount = claimRow.IdAccount,
+                             IdClaimCurrentState = cRow.IdClaimCurrentState,
+                             ClaimCurrentState = cRow.ClaimCurrentState
+                         };
 
             var result =
                     claimsInfo
