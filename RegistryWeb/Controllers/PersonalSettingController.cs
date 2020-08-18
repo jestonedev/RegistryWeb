@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +10,7 @@ using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers
 {
+    [Authorize]
     public class PersonalSettingController : RegistryBaseController
     {
         private SecurityService securityService;

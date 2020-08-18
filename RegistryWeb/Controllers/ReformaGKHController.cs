@@ -7,9 +7,11 @@ using RegistryWeb.ViewModel;
 using System;
 using RegistryWeb.Models.Api;
 using RegistryWeb.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RegistryWeb.Controllers
 {
+    [Authorize]
     public class ReformaGKHController : RegistryBaseController
     {
         private readonly ReformaGKHService reformaGKH;

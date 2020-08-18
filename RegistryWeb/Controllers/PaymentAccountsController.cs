@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
@@ -13,6 +14,7 @@ using RegistryWeb.ViewOptions.Filter;
 
 namespace RegistryWeb.Controllers
 {
+    [Authorize]
     public class PaymentAccountsController : ListController<PaymentAccountsDataService>
     {
         public PaymentAccountsController(PaymentAccountsDataService dataService, SecurityService securityService)

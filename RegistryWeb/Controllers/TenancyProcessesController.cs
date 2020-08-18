@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace RegistryWeb.Controllers
 {
+    [Authorize]
     public class TenancyProcessesController : ListController<TenancyProcessesDataService>
     {
         public TenancyProcessesController(TenancyProcessesDataService dataService, SecurityService securityService)
