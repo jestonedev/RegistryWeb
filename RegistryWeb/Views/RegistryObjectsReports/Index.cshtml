@@ -1,0 +1,190 @@
+﻿@using RegistryWeb.ViewModel
+@using RegistryWeb.Models.Entities
+@model RegistryObjectReportsVM;
+@{
+    ViewData["Title"] = "Отчёты по жилым объектам";
+}
+
+@section styles
+    {
+    <link rel="stylesheet" href="~/css/registry.object.report.css" runat="server" />
+}
+@section Scripts
+    {
+    <script src="~/js/registryobjects.report.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+}
+
+<div>
+    <h2>@ViewData["Title"]</h2>
+    <br />
+    <div class="row">
+        <div class="col-md-4 col-lg-4">
+            <div class="card mb-3 cardreport type1" data-id-modal="3" title="Социальный жилой фонд">
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        <img src="~/image/img_142549.png" class="card-img img-fluid" alt="Отчёт" style="width:110%; margin: 80% 90%;">
+                    </div>
+                    <div class="col-md-10">
+                        <div class="card-body center-block">
+                            <p class="card-text text-justify">Социальный ЖФ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-4">
+            <div class="card mb-3 cardreport type1" data-id-modal="1" title="Коммерческий жилой фонд">
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        <img src="~/image/img_142549.png" class="card-img img-fluid" alt="Отчёт" style="width:110%; margin: 80% 90%;">
+                    </div>
+                    <div class="col-md-10">
+                        <div class="card-body center-block">
+                            <p class="card-text text-justify">Коммерческий ЖФ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-4">
+            <div class="card mb-3 cardreport type1" data-id-modal="2" title="Специализированный жилой фонд">
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        <img src="~/image/img_142549.png" class="card-img img-fluid" alt="Отчёт" style="width:110%; margin: 80% 90%;">
+                    </div>
+                    <div class="col-md-10">
+                        <div class="card-body center-block">
+                            <p class="card-text text-justify">Специализированный ЖФ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 col-lg-4">
+            <div class="card mb-3 cardreport type1" data-id-modal="0" title="Аварийные и снесённые жилые помещения">
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        <img src="~/image/img_142549.png" class="card-img img-fluid" alt="Отчёт" style="width:110%; margin: 80% 90%;">
+                    </div>
+                    <div class="col-md-10">
+                        <div class="card-body center-block">
+                            <p class="card-text text-justify">Аварийные ЖП</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-4">
+            <div class="card mb-3 cardreport reestr" data-id-bupr="0" title="Реестр муниципальных зданий">
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        <img src="~/image/img_142549.png" class="card-img img-fluid" alt="Отчёт" style="width:110%; margin: 80% 90%;">
+                    </div>
+                    <div class="col-md-10">
+                        <div class="card-body">
+                            <p class="card-text">Реестр МЖД</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-4">
+            <div class="card mb-3 cardreport reestr" data-id-bupr="1" title="Реестр муниципальных помещений">
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        <img src="~/image/img_142549.png" class="card-img img-fluid" alt="Отчёт" style="width:110%; margin: 80% 90%;">
+                    </div>
+                    <div class="col-md-10">
+                        <div class="card-body center-block">
+                            <p class="card-text text-justify">Реестр МЖП</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 col-lg-4"></div>
+        <div class="col-md-4 col-lg-4">
+            <div class="card mb-3 cardreport type1" data-id-modal="4" title="Текущие фонды муниципально жилых помещений">
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        <img src="~/image/img_142549.png" class="card-img img-fluid" alt="Отчёт" style="width:110%; margin: 80% 90%;">
+                    </div>
+                    <div class="col-md-10">
+                        <div class="card-body">
+                            <p class="card-text text-justify">Текущие фонды МЖП</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<form id="JFForm">
+    <div class="modal fade" id="JFModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">__</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="JF.JFType" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="JF.Regions">Выберете жилой район</label>
+                            <select multiple data-actions-box="true" class="selectpicker form-control" title="Жилой район" name="JF.Regions"
+                                    data-val="true" data-val-required="Не указан жилой район" id="JF.Regions" asp-items="@Model.KladrRegionsList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="JF.Regions" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="reestrForm">
+    <div class="modal fade" id="reestrModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Формирование статистики</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="reestr.RepType" />
+                    <div class="form-row">
+                        <div class="col-5">
+                            <button class="btn btn-primary rr-report-submit btn-block but1" data-id-typerep="1">__</button>
+                        </div>
+                        <div class="col-7">
+                            <button class="btn btn-primary rr-report-submit btn-block but2" data-id-typerep="2">__</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+

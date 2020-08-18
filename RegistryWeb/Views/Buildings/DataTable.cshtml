@@ -59,16 +59,22 @@
         @foreach (var item in Model.Buildings)
         {
             <tr>
-                @*@if (ids.Contains(item.IdBuilding))
-                    {
-                        check = "checked";
-                    }
-                    else
-                    {
-                        check = "";
-                    }
-                    <td class="align-middle"><input type="checkbox" class="idBuildingCheckbox" data-id="@item.IdBuilding" @Html.Raw(check) /></td>*@
-                <td>@item.IdBuilding</td>
+                @{
+                var idCurrentOwhershipType = Model.BuildingsOwnershipRightCurrent
+                    .FirstOrDefault(p => p.IdBuilding == item.IdBuilding)
+                    ?.IdOwnershipRightType;
+                var backgroundColor =
+                    idCurrentOwhershipType == 1 ? "#FEDCDC" :
+                    idCurrentOwhershipType == 2 ? "#BBFEE8" :
+                    idCurrentOwhershipType == 7 ? "#88FF63" :
+                    "white";
+                var title =
+                    idCurrentOwhershipType == 1 ? "Присутствует реквизит \"Снесено\"" :
+                    idCurrentOwhershipType == 2 ? "Присутствует реквизит \"Аварийное\"" :
+                    idCurrentOwhershipType == 7 ? "Присутствует реквизит \"Аварийное после 01.01.2012\"" :
+                    "";
+            }
+            <td style="background-color: @backgroundColor; font-weight: bold;" title="@title">@item.IdBuilding</td>
                 <td>
                     <div class="row">
                         <div class="col-auto">

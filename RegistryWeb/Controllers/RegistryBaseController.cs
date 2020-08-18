@@ -15,7 +15,7 @@ namespace RegistryWeb.Controllers
         }
 
         public IActionResult Error(string msg = "")
-        {
+        {            
             ViewData["TextError"] = new HtmlString(msg);
             ViewData["Controller"] = Name;
             return View("Error");

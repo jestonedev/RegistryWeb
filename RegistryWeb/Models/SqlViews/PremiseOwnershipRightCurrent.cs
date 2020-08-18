@@ -12,6 +12,5 @@ namespace RegistryWeb.Models.SqlViews
         public DateTime Date { get; set; }
         public string Description { get; set; }
         public DateTime? ResettlePlanDate { get; set; }
-        public DateTime? DemolishPlanDate { get; set; }
-    }
+        public DateTime? DemolishPlanDate { get; set; }    }
 }

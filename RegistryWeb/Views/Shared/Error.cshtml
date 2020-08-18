@@ -12,9 +12,21 @@
             </div>
         </div>
     }
-    else
-    {
-        <h1 class="text-danger">Ошибка!</h1>
-        <h2 class="text-danger">@ViewData["TextError"]</h2>
-    }
 }
+
+<style>
+    .err {
+        font-weight: bold;
+        font-size: 14pt;
+        margin-bottom: 3%;
+    }
+
+    h1 {
+        margin-top: 3%;
+    }
+</style>
+
+<body>
+    <h1 class="text-danger">Ошибка!</h1>
+    <div class="text-danger err text-break">@ViewData["TextError"]</div>
+</body>
