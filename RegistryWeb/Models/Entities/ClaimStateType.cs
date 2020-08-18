@@ -12,6 +12,6 @@ namespace RegistryWeb.Models.Entities
         public string StateType { get; set; }
         public byte IsStartStateType { get; set; }
         public byte Deleted { get; set; }
-        public virtual IList<ClaimState> ClaimStates { get; set; }
+        public virtual ICollection<ClaimState> ClaimStates { get; set; }
     }
 }

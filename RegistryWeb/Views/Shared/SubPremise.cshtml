@@ -145,7 +145,7 @@
                                 @if (securityService.HasPrivilege(Privileges.ClaimsRead))
                                 {
                                     <a class="dropdown-item" title="Лицевые счета БКС" aria-label="Лицевые счета"
-                                       asp-controller="PaymentAccount" asp-action="Index" asp-route-filterOptions.IdSubPremises="@Model.IdSubPremises">Лицевые счета БКС</a>
+                                       asp-controller="PaymentAccounts" asp-action="Index" asp-route-filterOptions.IdSubPremises="@Model.IdSubPremises">Лицевые счета БКС</a>
                                 }
                             </div>
                         </div>

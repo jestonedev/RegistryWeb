@@ -13,3 +13,11 @@
 .tp-table > thead > tr > th a.sort.tp-sorted:hover {
     color: #0056b3;
 }
+
+.rr-payment-filter-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 0.24rem;
+}

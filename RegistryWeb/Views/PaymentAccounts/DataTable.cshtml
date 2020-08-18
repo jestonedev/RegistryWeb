@@ -248,13 +248,14 @@
                             }
                         </div>
                     }
-                    <div>
-                        <b>По БКС: </b><br />@item.PaymentAccountNavigation.RawAddress
-                    </div>
+                        <div>
+                            <b>По БКС: </b><br />@item.PaymentAccountNavigation.RawAddress<br />
+                            @item.PaymentAccountNavigation.Crn
+                        </div>
                 </td>
                 <td>
                     <div class="btn-group" role="group" aria-label="Панель доступа">
-                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее" asp-action="Details" asp-route-idAccount="@item.IdAccount"></a>
+                        <a class="btn btn-primary oi oi-eye disabled" title="Подробнее" aria-label="Подробнее" asp-action="Details" asp-route-idAccount="@item.IdAccount"></a>
                     </div>
                 </td>
             </tr>

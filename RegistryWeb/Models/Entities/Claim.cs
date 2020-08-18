@@ -27,6 +27,6 @@ namespace RegistryWeb.Models.Entities
         public decimal? LastAccountBalanceOutput { get; set; }
         public byte Deleted { get; set; }
         public virtual PaymentAccount IdAccountNavigation { get; set; }
-        public virtual IList<ClaimState> ClaimStates { get; set; }
+        public virtual ICollection<ClaimState> ClaimStates { get; set; }
     }
 }

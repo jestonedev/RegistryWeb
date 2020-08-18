@@ -55,7 +55,13 @@ var addressFilterClear = function () {
 };
 var searchModal = function () {
     addressClear();
-    $("form.filterForm").submit();
+    if ($("form.filterForm").valid()) {
+        $("#AccountSumFilters").find("input[type='text']").each(function (idx, elem) {
+            $(elem).val($(elem).val().replace(',', '.'));
+        });
+        $("form.filterForm").submit();
+        $("#filterModal").modal("hide");
+    }
 };
 
 var filterClearModal = function () {
@@ -83,6 +89,7 @@ var togglePaymentDetails = function (e) {
 };
 
 $(function () {
+    $('#AccountSumFiltersToggler').on("click", $("#AccountSumFilters"), elementToogleHide);
     autocompleteFilterOptionsAddress();
     addressFilterClearBtnVisibility();
     $('#FilterOptions_Address_Text').focusout(focusOutFilterOptionsAddress);
@@ -113,4 +120,50 @@ $(function () {
     });
 
     $(".rr-payments-details").on("click", togglePaymentDetails);
+
+    $("#AccountSumFilterCriteria").on("change", function () {
+        var val = $(this).val();
+        if (val === "1")
+            $("#FilterOptions_AtDate").val("");
+        $("#FilterOptions_AtDate").prop("disabled", val === "2" ? "" : "disabled");
+    });
+
+    $("#AccountSumFilters input[type='hidden']").each(function (idx, elem) {
+        var op = $(elem).val();
+        var formGroup = $(elem).next(".form-group");
+        var prepend = formGroup.find(".input-group .input-group-prepend button");
+        switch (op) {
+            case "1":
+                prepend.text("≥");
+                break;
+            case "2":
+                prepend.text("≤");
+                break;
+            default:
+                prepend.text("≤");
+                $(elem).val("2");
+        }
+    });
+
+    $("#AccountSumFilters .input-group .dropdown-menu .dropdown-item").on("click", function (e) {
+        var op = $(this).text();
+        var prepend = $(this).closest(".input-group-prepend").find("button");
+        prepend.text(op);
+        var formGroup = prepend.closest(".form-group");
+        var input = formGroup.prev("input[type='hidden']");
+        switch (op) {
+            case "≥":
+                input.val("1");
+                break;
+            case "≤":
+                input.val("2");
+                break;
+            default:
+                input.val("");
+        }
+    });
+
+    $("#AccountSumFilters").find("input[type='text']").each(function (idx, elem) {
+        $(elem).val($(elem).val().replace('.', ','));
+    });
 });
