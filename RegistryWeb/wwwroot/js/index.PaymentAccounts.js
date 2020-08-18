@@ -163,7 +163,17 @@ $(function () {
         }
     });
 
+    var hasAccountSumFilter = false;
     $("#AccountSumFilters").find("input[type='text']").each(function (idx, elem) {
+        if ($(elem).val() != "" && $(elem).val() != null) {
+            hasAccountSumFilter = true;
+        }
         $(elem).val($(elem).val().replace('.', ','));
     });
+    if (hasAccountSumFilter) {
+        var toggler = $("#AccountSumFiltersToggler").first();
+        if (!isExpandElemntArrow(toggler)) {
+            toggler.click();
+        }
+    }
 });

@@ -216,6 +216,7 @@ namespace RegistryWeb.DataServices
             query = RecalcFilter(query, filterOptions);
             query = PaymentFilter(query, filterOptions);
             query = OutputBalanceFilter(query, filterOptions);
+            query = PresetsFilter(query, filterOptions);
             return query;
         }
 
@@ -669,6 +670,77 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        private IQueryable<Payment> PresetsFilter(IQueryable<Payment> query, PaymentsFilter filterOptions)
+        {
+            var claimsInfo = new Dictionary<int, List<ClaimInfo>>();
+            if (filterOptions.IdPreset != null)
+            {
+                claimsInfo = GetClaimsByAddresses(query.ToList());
+            }
+            switch (filterOptions.IdPreset)
+            {
+                case 1:
+                case 2:
+                    var ids = new List<int>();
+                    foreach(var claimInfo in claimsInfo)
+                    {
+                        if (claimInfo.Value.Any())
+                        {
+                            ids.Add(claimInfo.Key);
+                        }
+                    }
+                    if (filterOptions.IdPreset == 1)
+                    {
+                        // Лицевые счета без исковых работ
+                        query = from row in query
+                                where !ids.Contains(row.IdAccount)
+                                select row;
+                    } else
+                    {
+                        // Лицевые счета с исковыми работами (включая завершенные)
+                        query = from row in query
+                                where ids.Contains(row.IdAccount)
+                                select row;
+                    }
+                    
+                    break;
+                case 3:
+                case 4:
+                    ids = new List<int>();
+                    foreach (var claimInfo in claimsInfo)
+                    {
+                        if (claimInfo.Value.Any())
+                        {
+                            foreach(var claimStateInfo in claimInfo.Value)
+                            {
+                                if (claimStateInfo.IdClaimCurrentState != 6)
+                                {
+                                    ids.Add(claimInfo.Key);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (filterOptions.IdPreset == 3)
+                    {
+                        // Лицевые счета с незавершенными исковыми работами
+                        query = from row in query
+                                where ids.Contains(row.IdAccount)
+                                select row;
+                    } else
+                    {
+                        // Лицевые счета, в которых отсутствуют незавершенные исковые работы
+                        query = from row in query
+                                where !ids.Contains(row.IdAccount)
+                                select row;
+                    }
+                    break;
+                case 5:
+                    // В суд
+                    break;
+            }
+            return query;
+        }
         private IQueryable<Payment> GetQueryOrder(IQueryable<Payment> query, OrderOptions orderOptions)
         {
             if (string.IsNullOrEmpty(orderOptions.OrderField))
@@ -897,22 +969,19 @@ namespace RegistryWeb.DataServices
 
             var claimsInfo = from claimRow in claims
                              join claimLastStateRow in claimLastStatesIds
-                             on claimRow.IdClaim equals claimLastStateRow.IdClaim into cls
-                             from clsRow in cls.DefaultIfEmpty()
+                             on claimRow.IdClaim equals claimLastStateRow.IdClaim
                              join claimStateRow in registryContext.ClaimStates.Where(cs => claimIds.Contains(cs.IdClaim))
-                             on clsRow.IdState equals claimStateRow.IdState into cs
-                             from csRow in cs.DefaultIfEmpty()
+                             on claimLastStateRow.IdState equals claimStateRow.IdState
                              join claimStateTypeRow in registryContext.ClaimStateTypes
-                             on csRow.IdStateType equals claimStateTypeRow.IdStateType into cst
-                             from cstRow in cst.DefaultIfEmpty()
+                             on claimStateRow.IdStateType equals claimStateTypeRow.IdStateType
                              select new ClaimInfo
                              {
                                  IdClaim = claimRow.IdClaim,
                                  StartDeptPeriod = claimRow.StartDeptPeriod,
                                  EndDeptPeriod = claimRow.EndDeptPeriod,
                                  IdAccount = claimRow.IdAccount,
-                                 IdClaimCurrentState = csRow != null ? (int?)csRow.IdStateType : null,
-                                 ClaimCurrentState = cstRow != null ? cstRow.StateType : null
+                                 IdClaimCurrentState = claimStateRow.IdStateType,
+                                 ClaimCurrentState = claimStateTypeRow.StateType
                              };
 
             var result =
@@ -923,7 +992,8 @@ namespace RegistryWeb.DataServices
                         IdClaim = c.IdClaim,
                         StartDeptPeriod = c.StartDeptPeriod,
                         EndDeptPeriod = c.EndDeptPeriod,
-                        IdAccount = accountsAssoc.First(a => a.IdAccountActual == c.IdAccount).IdAccountFiltered
+                        IdAccount = accountsAssoc.Any(a => a.IdAccountActual == c.IdAccount) 
+                        ? accountsAssoc.First(a => a.IdAccountActual == c.IdAccount).IdAccountFiltered : 0
                     })
                     .GroupBy(r => r.IdAccount)
                     .Select(r => new { IdAccount = r.Key, Claims = r.OrderByDescending(v => v.IdClaim).Select(v => v) })
