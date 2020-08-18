@@ -164,7 +164,8 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new TenancyPaymentAfter28082019Configuration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerActiveProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new BuildingOwnershipRightCurrentConfiguration(nameDatebase));
-            modelBuilder.ApplyConfiguration(new PremiseOwnershipRightCurrentConfiguration(nameDatebase));            modelBuilder.Query<KladrRegion>().ToView("v_kladr_regions");
+            modelBuilder.ApplyConfiguration(new PremiseOwnershipRightCurrentConfiguration(nameDatebase));
+            modelBuilder.Query<KladrRegion>().ToView("v_kladr_regions");
 
             modelBuilder.ApplyConfiguration(new ChangeLogConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LogOwnerProcessConfiguration(nameDatebase));
