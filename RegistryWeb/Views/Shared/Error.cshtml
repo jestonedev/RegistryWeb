@@ -7,8 +7,6 @@
     }
 }
 
-
-
 <style>
     .err {
         font-weight: bold;
@@ -24,6 +22,4 @@
 <body>
     <h1 class="text-danger">Ошибка!</h1>
     <div class="text-danger err text-break">@ViewData["TextError"]</div>
-    <a class="btn btn-primary" asp-controller="@ViewData["Controller"]" asp-action="Index">Назад</a>
-    @*<a class="btn btn-primary" href="@ViewData["ReturnUrl"]">Назад</a>*@
 </body>
