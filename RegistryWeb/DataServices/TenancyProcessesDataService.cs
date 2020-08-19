@@ -655,6 +655,7 @@ namespace RegistryWeb.DataServices
                                tpaRow.IdProcess,
                                tpaRow.IdPremise,
                                streetRow.IdStreet,
+                               buildingRow.IdBuilding,
                                buildingRow.House,
                                premiseRow.PremisesNum,
                                premiseRow.IdState
@@ -675,7 +676,9 @@ namespace RegistryWeb.DataServices
                                   tspaRow.IdProcess,
                                   tspaRow.IdSubPremise,
                                   streetRow.IdStreet,
+                                  buildingRow.IdBuilding,
                                   buildingRow.House,
+                                  premiseRow.IdPremises,
                                   premiseRow.PremisesNum,
                                   subPremiseRow.SubPremisesNum,
                                   subPremiseRow.IdState
@@ -744,20 +747,23 @@ namespace RegistryWeb.DataServices
 
             if (filterOptions.IdPremises != null)
             {
+                var ids = premises.Where(p => p.IdPremise == filterOptions.IdPremises).Select(p => p.IdProcess).Union(
+                        subPremises.Where(p => p.IdPremises == filterOptions.IdPremises).Select(p => p.IdProcess));
                 query = (from row in query
-                 join premise in tenancyPremisesAssoc
-                 on row.IdProcess equals premise.IdProcess
-                 where premise.IdPremise == filterOptions.IdPremises
-                 select row).Distinct();
+                         join id in ids
+                         on row.IdProcess equals id
+                         select row).Distinct();
             }
 
             if (filterOptions.IdBuilding != null)
             {
+                var ids = premises.Where(p => p.IdBuilding == filterOptions.IdBuilding).Select(p => p.IdProcess).Union(
+                        subPremises.Where(p => p.IdBuilding == filterOptions.IdBuilding).Select(p => p.IdProcess)).Union(
+                        buildings.Where(p => p.IdBuilding == filterOptions.IdBuilding).Select(p => p.IdProcess));
                 query = (from row in query
-                 join building in tenancyBuildingsAssoc
-                 on row.IdProcess equals building.IdProcess
-                 where building.IdBuilding == filterOptions.IdBuilding
-                 select row).Distinct();
+                         join id in ids
+                         on row.IdProcess equals id
+                         select row).Distinct();
             }
 
             if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Any())

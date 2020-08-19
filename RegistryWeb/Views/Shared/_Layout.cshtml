@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ЖФ</title>
-
+    <link rel="shortcut icon" href="~/icon.ico" type="image/x-icon">
     <link href="~/lib/bootstrap-4.3.1/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/lib/open-iconic-master/font/css/open-iconic-bootstrap.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-datepicker/css/bootstrap-datepicker.css" />
@@ -43,7 +43,7 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownObjects">
                             <a class="dropdown-item" asp-area="" asp-controller="Buildings" asp-action="Index">Здания</a>
                             <a class="dropdown-item" asp-area="" asp-controller="Premises" asp-action="Index">Помещения</a>
-                            <a class="dropdown-item disabled" asp-area="" asp-controller="RegistryObjectsReports" asp-action="Index">Отчеты</a>
+                            <a class="dropdown-item" asp-area="" asp-controller="RegistryObjectsReports" asp-action="Index">Отчеты</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -65,7 +65,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownClaims" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Исковая работа</a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownClaims">
-                            <a class="dropdown-item disabled" asp-area="" asp-controller="PaymentAccounts" asp-action="Index">Лицевые счета БКС</a>
+                            <a class="dropdown-item" asp-area="" asp-controller="PaymentAccounts" asp-action="Index">Лицевые счета БКС</a>
                             <a class="dropdown-item disabled" asp-area="" asp-controller="Claims" asp-action="Index">Претензионно-исковая работа</a>
                         </div>
                     </li>
@@ -73,7 +73,6 @@
             </div>
             <div class="ml-auto align-middle">
                 <a asp-controller="PersonalSetting" asp-action="Details" class="btn btn-link">@User.Identity.Name</a>
-                <a asp-controller="Account" asp-action="Logout" class="btn text-danger oi oi-power-standby"></a>
             </div>
         </div>
     </nav>

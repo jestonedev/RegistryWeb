@@ -33,6 +33,7 @@ namespace RegistryWeb.ReportServices
             try
             {
                 var configXml = activityManagerPath + "templates\\" + config + ".xml";
+                //var configXml = config + ".xml";
                 var configParts = config.Split('\\');
                 var fileNameReport = configParts[configParts.Length - 1] + Guid.NewGuid().ToString() + ".docx";
                 var destFileName = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", fileNameReport);
@@ -40,7 +41,7 @@ namespace RegistryWeb.ReportServices
                 arguments.Add("config", configXml);
                 arguments.Add("destFileName", destFileName);
                 arguments.Add("force-move-to", destFileName);
-                arguments.Add("connectionString", "Driver={" + sqlDriver + "};" + connString);
+                arguments.Add("connectionString", "Driver={" + sqlDriver + "};" + connString);                
 
                 using (var p = new Process())
                 {

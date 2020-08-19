@@ -118,6 +118,15 @@ namespace RegistryWeb.Models
         public virtual DbSet<ResettleDocumentType> ResettleDocumentTypes { get; set; }
         public virtual DbSet<ResettlePremiseAssoc> ResettlePremiseAssoc { get; set; }
 
+        // Претензионно-исковая работа (БКС)
+        public virtual DbSet<PaymentAccount> PaymentAccounts { get; set; }
+        public virtual DbSet<Payment> Payments { get; set; }
+        public virtual DbSet<PaymentAccountPremiseAssoc> PaymentAccountPremisesAssoc { get; set; }
+        public virtual DbSet<PaymentAccountSubPremiseAssoc> PaymentAccountSubPremisesAssoc { get; set; }
+        public virtual DbSet<Claim> Claims { get; set; }
+        public virtual DbSet<ClaimState> ClaimStates { get; set; }
+        public virtual DbSet<ClaimStateType> ClaimStateTypes { get; set; }
+
         //Журнал изменений
         public virtual DbSet<ChangeLog> ChangeLogs { get; set; }
         public virtual DbSet<LogObject> LogObjects { get; set; }
@@ -142,6 +151,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<OwnerActiveProcess> OwnerActiveProcesses { get; set; }
         public virtual DbSet<BuildingOwnershipRightCurrent> BuildingsOwnershipRightCurrent { get; set; }
         public virtual DbSet<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
+        public DbQuery<KladrRegion> KladrRegions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -155,7 +165,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new OwnerActiveProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new BuildingOwnershipRightCurrentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremiseOwnershipRightCurrentConfiguration(nameDatebase));
-
+            modelBuilder.Query<KladrRegion>().ToView("v_kladr_regions");
 
             modelBuilder.ApplyConfiguration(new ChangeLogConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LogOwnerProcessConfiguration(nameDatebase));
@@ -257,6 +267,14 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new ResettleDocumentTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleDocumentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettlePremiseAssocConfiguration(nameDatebase));
+
+            modelBuilder.ApplyConfiguration(new PaymentAccountConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PaymentConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PaymentAccountPremiseAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PaymentAccountSubPremiseAssocConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ClaimConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ClaimStateConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ClaimStateTypeConfiguration(nameDatebase));
 
         }
     }

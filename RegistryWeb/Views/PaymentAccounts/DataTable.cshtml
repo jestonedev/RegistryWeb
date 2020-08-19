@@ -1,0 +1,264 @@
+﻿@using RegistryWeb.Extensions;
+@using RegistryWeb.ViewOptions;
+@using RegistryWeb.SecurityServices;
+@using RegistryWeb.ViewModel;
+@model RegistryWeb.ViewModel.PaymentsVM;
+@{
+    Context.Session.Set("Controller", "PaymentAccounts");
+    Context.Session.Set("Action", "Index");
+    Context.Session.Set("OrderOptions", Model.OrderOptions);
+    Context.Session.Set("FilterOptions", Model.FilterOptions);
+    Context.Session.Set("PageOptions", Model.PageOptions);
+    var securityService = (SecurityService)ViewData["SecurityService"];
+}
+
+<table class="table table-hover tp-table">
+    <thead>
+        <tr style="align-content: center;">
+            <th class="r-table-header-cell" style="width:200px;">
+                Лицевой счет
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Account")
+                {
+                    <a href="#" title="Сортировка по номеру лицевого счета"  class="oi oi-sort-descending sort tp-sorted" data-order-field="Account" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" title="Сортировка по номеру лицевого счета" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Account" ? "tp-sorted" : "")"
+                       data-order-field="Account" data-order-direction="@(Model.OrderOptions.OrderField == "Account" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="r-table-header-cell">
+                Информация о ЛС
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Date")
+                {
+                    <a href="#" title="Сортировка по дате последнего начисления" 
+                       class="oi oi-sort-descending sort tp-sorted" data-order-field="Date" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" title="Сортировка по дате последнего начисления" 
+                       class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Date" ? "tp-sorted" : "")"
+                       data-order-field="Date" data-order-direction="@(Model.OrderOptions.OrderField == "Date" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="r-table-header-cell">
+                Адрес
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Address")
+                {
+                    <a href="#" title="Сортировка по адресу жилищного фонда"  class="oi oi-sort-descending sort tp-sorted" data-order-field="Address" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" title="Сортировка по адресу жилищного фонда" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Address" ? "tp-sorted" : "")"
+                       data-order-field="Address" data-order-direction="@(Model.OrderOptions.OrderField == "Address" ? "1" : "0")"></a>
+                }
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Payments)
+        {
+            var lastClaimInfo = new ClaimInfo();
+            if (Model.ClaimsByAddresses.ContainsKey(item.IdAccount))
+            {
+                lastClaimInfo = Model.ClaimsByAddresses[item.IdAccount].First();
+                if (Model.ClaimsByAddresses[item.IdAccount].Any(r => r.IdClaimCurrentState != 6))
+                {
+                    lastClaimInfo = Model.ClaimsByAddresses[item.IdAccount].FirstOrDefault(r => r.IdClaimCurrentState != 6);
+                }
+            }
+            <tr>
+                @{ 
+                    var hasOpenedClaims = Model.ClaimsByAddresses.ContainsKey(item.IdAccount) && lastClaimInfo.IdClaimCurrentState != 6;
+                }
+                <td style="@(hasOpenedClaims ? "background-color: #FEDCDC" : "")" title="@(hasOpenedClaims ? "По данному адресу имеются незавершенные претензионно-исковые работы" : "")">
+                    @item.PaymentAccountNavigation.Account
+                </td>
+                <td>
+                    <div>
+                        <b>Наниматель:</b> @item.Tenant
+                    </div>
+                    <div>
+                        <b>Дата начисления (посл.):</b> @item.Date.ToString("dd.MM.yyyy")
+                    </div>
+                    <hr class="m-0 mt-2 mb-1" />
+                    <div>
+
+                        <a class="float-right text-dark rr-payments-details" title="Детальная информация" href="#"><span class="oi oi-chevron-bottom"></span></a>
+                        <b>Сальдо (вх. <span class="oi oi-arrow-right"></span> исх.):</b><br />
+                        <div>
+                            Найм: @item.BalanceTenancy руб. <span class="oi oi-arrow-right"></span>  @item.BalanceOutputTenancy руб.
+                        </div>
+                        @if (item.BalanceInputPenalties != 0 || item.BalanceOutputPenalties != 0)
+                        {
+                            <div>
+                                Пени: @item.BalanceInputPenalties руб. <span class="oi oi-arrow-right"></span>  @item.BalanceOutputPenalties руб.
+                            </div>
+                        }
+                        @if (item.BalanceDgi != 0 || item.BalanceOutputDgi != 0)
+                        {
+                            <div>
+                                ДГИ: @item.BalanceDgi руб. <span class="oi oi-arrow-right"></span>  @item.BalanceOutputDgi руб.
+                            </div>
+                        }
+                        @if (item.BalancePadun != 0 || item.BalanceOutputPadun != 0)
+                        {
+                            <div>
+                                Падун: @item.BalancePadun руб. <span class="oi oi-arrow-right"></span>  @item.BalanceOutputPadun руб.
+                            </div>
+                        }
+                        @if (item.BalancePkk != 0 || item.BalanceOutputPkk != 0)
+                        {
+                            <div>
+                                ПКК: @item.BalancePkk руб. <span class="oi oi-arrow-right"></span>  @item.BalanceOutputPkk руб.
+                            </div>
+                        }
+                        <div class="rr-payments-detail" style="display: none"><b>Начисление:</b><br /></div>
+                        <div class="rr-payments-detail" style="display: none">
+                            Найм: @item.ChargingTenancy руб.
+                        </div>
+                        @if (item.ChargingPenalties != 0)
+                        {
+                            <div class="rr-payments-detail" style="display: none">
+                                Пени: @item.ChargingPenalties руб.
+                            </div>
+                        }
+                        @if (item.ChargingDgi != 0)
+                        {
+                            <div class="rr-payments-detail" style="display: none">
+                                ДГИ: @item.ChargingDgi руб.
+                            </div>
+                        }
+                        @if (item.ChargingPadun != 0)
+                        {
+                            <div class="rr-payments-detail" style="display: none">
+                                Падун: @item.ChargingPadun руб.
+                            </div>
+                        }
+                        @if (item.ChargingPkk != 0)
+                        {
+                            <div class="rr-payments-detail" style="display: none">
+                                ПКК: @item.ChargingPkk руб.
+                            </div>
+                        }
+                        <div class="rr-payments-detail" style="display: none"><b>Перерасчет:</b><br /></div>
+                        <div class="rr-payments-detail" style="display: none">
+                            Найм: @item.RecalcTenancy руб.
+                        </div>
+                        @if (item.RecalcPenalties != 0)
+                        {
+                            <div class="rr-payments-detail" style="display: none">
+                                Пени: @item.RecalcPenalties руб.
+                            </div>
+                        }
+                        @if (item.RecalcDgi != 0)
+                        {
+                            <div class="rr-payments-detail" style="display: none">
+                                ДГИ: @item.RecalcDgi руб.
+                            </div>
+                        }
+                        @if (item.RecalcPadun != 0)
+                        {
+                            <div class="rr-payments-detail" style="display: none">
+                                Падун: @item.RecalcPadun руб.
+                            </div>
+                        }
+                        @if (item.RecalcPkk != 0)
+                        {
+                            <div class="rr-payments-detail" style="display: none">
+                                ПКК: @item.RecalcPkk руб.
+                            </div>
+                        }
+                        @if (item.TransferBalance != 0)
+                        {
+                            <div class="rr-payments-detail" style="display: none">
+                                Перенос сальдо: @item.TransferBalance руб.
+                            </div>
+                        }
+                        <div class="rr-payments-detail" style="display: none"><b>Оплата:</b><br /></div>
+                        <div class="rr-payments-detail" style="display: none">
+                            Найм: @item.PaymentTenancy руб.
+                        </div>
+                        @if (item.PaymentPenalties != 0)
+                        {
+                            <div class="rr-payments-detail" style="display: none">
+                                Пени: @item.PaymentPenalties руб.
+                            </div>
+                        }
+                        @if (item.PaymentDgi != 0)
+                        {
+                            <div class="rr-payments-detail" style="display: none">
+                                ДГИ: @item.PaymentDgi руб.
+                            </div>
+                        }
+                        @if (item.PaymentPadun != 0)
+                        {
+                            <div class="rr-payments-detail" style="display: none">
+                                Падун: @item.PaymentPadun руб.
+                            </div>
+                        }
+                        @if (item.PaymentPkk != 0)
+                        {
+                            <div class="rr-payments-detail" style="display: none">
+                                ПКК: @item.PaymentPkk руб.
+                            </div>
+                        }
+                        <div>
+                            <b>Итого:</b> @item.BalanceInput руб. <span class="oi oi-arrow-right"></span>  @item.BalanceOutputTotal руб.
+                        </div>
+                    </div>
+
+                    @if (Model.ClaimsByAddresses.ContainsKey(item.IdAccount))
+                    {
+                        <hr class="m-0 mt-2 mb-1" />
+                        <b>Исковая работа:</b><br />
+                        <div>
+                            @if (lastClaimInfo.ClaimCurrentState != null)
+                            {
+                                <span>@lastClaimInfo.ClaimCurrentState</span><br />
+                            }
+                            @if (lastClaimInfo?.StartDeptPeriod != null || lastClaimInfo?.EndDeptPeriod != null)
+                            {
+                                <span>Период:</span>
+                                if(lastClaimInfo?.StartDeptPeriod != null)
+                                {
+                                    <span>с </span>@lastClaimInfo.StartDeptPeriod.Value.ToString("dd.MM.yyyy")
+                                }
+                                @if (lastClaimInfo?.EndDeptPeriod != null)
+                                {
+                                    <span>по </span>@lastClaimInfo.EndDeptPeriod.Value.ToString("dd.MM.yyyy")
+                                }
+                                else
+                                {
+                                    <span>бессрочно</span>
+                                }
+                            }
+                        </div>
+                    }
+                </td>
+                <td>
+                    @if (Model.RentObjects.ContainsKey(item.IdAccount))
+                    {
+                        <div class="mb-2">
+                            <b>По жилищному фонду: </b><br />
+                            @foreach (var address in Model.RentObjects[item.IdAccount])
+                            {
+                                @await Component.InvokeAsync("PaymentsAddressComponent", new { address = address, idAccount = item.IdAccount })
+                            }
+                        </div>
+                    }
+                        <div>
+                            <b>По БКС: </b><br />@item.PaymentAccountNavigation.RawAddress<br />
+                            @item.PaymentAccountNavigation.Crn
+                        </div>
+                </td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        <a class="btn btn-primary oi oi-eye disabled" title="Подробнее" aria-label="Подробнее" asp-action="Details" asp-route-idAccount="@item.IdAccount"></a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

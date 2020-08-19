@@ -10,6 +10,7 @@ namespace RegistryWeb.Models.Entities
             FundsSubPremisesAssoc = new List<FundSubPremiseAssoc>();
             OwnerSubPremisesAssoc = new List<OwnerSubPremiseAssoc>();
             TenancySubPremisesAssoc = new List<TenancySubPremiseAssoc>();
+            PaymentAccountSubPremisesAssoc = new List<PaymentAccountSubPremiseAssoc>();
         }
 
         public int IdSubPremises { get; set; }
@@ -32,6 +33,7 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<OwnerSubPremiseAssoc> OwnerSubPremisesAssoc { get; set; }
         public IList<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
         public virtual IList<ResettleInfoSubPremiseFrom> ResettleInfoSubPremisesFrom { get; set; }
+        public virtual IList<PaymentAccountSubPremiseAssoc> PaymentAccountSubPremisesAssoc { get; set; }
 
         public string GetAddress()
         {

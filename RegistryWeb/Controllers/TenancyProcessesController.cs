@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 
 namespace RegistryWeb.Controllers
 {
+    [Authorize]
     public class TenancyProcessesController : ListController<TenancyProcessesDataService, TenancyProcessesFilter>
     {
         public TenancyProcessesController(TenancyProcessesDataService dataService, SecurityService securityService)
