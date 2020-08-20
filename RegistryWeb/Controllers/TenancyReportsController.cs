@@ -8,11 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
+using RegistryWeb.ViewOptions.Filter;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
-    public class TenancyReportsController : RegistryBaseController
+    public class TenancyReportsController : SessionController<TenancyProcessesFilter>
     {
         private readonly TenancyReportService reportService;
         private readonly TenancyReportsDataService dataService;
@@ -25,6 +26,10 @@ namespace RegistryWeb.Controllers
             this.reportService = reportService;
             this.dataService = dataService;
             this.securityService = securityService;
+
+            nameFilteredIdsDict = "filteredTenancyProcessesIdsDict";
+            nameIds = "idTenancyProcesses";
+            nameMultimaster = "TenancyProcessesReports";
         }
 
         public IActionResult GetPreContract(int idProcess, int idPreamble, int idCommittee)
@@ -230,6 +235,42 @@ namespace RegistryWeb.Controllers
             {
                 return Error(ex.Message);
             }
+        }
+
+        //_________________Для массовых____________________ 
+        private IActionResult GetNotifies(TenancyNotifiesReportTypeEnum reportType, string fileName)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+            try
+            {
+                List<int> ids = GetSessionIds();
+                var file = reportService.GetNotifies(ids, reportType);
+                return File(file, odtMime, string.Format(fileName));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetNotifiesPrimary()
+        {
+            return GetNotifies(TenancyNotifiesReportTypeEnum.PrintNotifiesPrimary, @"Первичное уведомление");
+        }
+
+        public IActionResult GetNotifiesSecondary()
+        {
+            return GetNotifies(TenancyNotifiesReportTypeEnum.PrintNotifiesSecondary, @"Повторное уведомление");
+        }
+        public IActionResult GetNotifiesProlongContract()
+        {
+            return GetNotifies(TenancyNotifiesReportTypeEnum.PrintNotifiesProlongContract, @"Ответ на обращение по продлению");
+        }
+
+        public IActionResult GetNotifiesEvictionFromEmergencyFund()
+        {
+            return GetNotifies(TenancyNotifiesReportTypeEnum.PrintNotifiesEvictionFromEmergencyFund, @"Уведомление о выселении из АФ");
         }
     }
 }

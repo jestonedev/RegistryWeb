@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using RegistryWeb.SecurityServices;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -120,6 +121,20 @@ namespace RegistryWeb.ReportServices
                 fileName = "registry\\tenancy\\requestMVDNew";
             }
             var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+
+        public byte[] GetNotifies(List<int> ids, TenancyNotifiesReportTypeEnum reportType)
+        {
+            var tenacyProcessesStr = ids.Select(id => id.ToString()).Aggregate((x,y) => x + "," + y);
+            var idExecutor = securityService.Executor?.IdExecutor.ToString() ?? "0";
+            var arguments = new Dictionary<string, object>
+            {
+                { "id_executor", idExecutor },
+                { "report_type", ((int)reportType).ToString() },
+                { "process_ids", tenacyProcessesStr }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\notifies");
             return DownloadFile(fileNameReport);
         }
     }

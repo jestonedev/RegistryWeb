@@ -121,4 +121,37 @@
     $("#preContractModal, #openDateModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
+
+    /*      МУЛЬТИМАСТЕР        */
+
+    $(".pagination .page-link").on("click", function (e) {
+        var path = location.pathname;
+        var page = $(this).data("page");
+        location.href = path + "?PageOptions.CurrentPage=" + page;
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#notifiesPrimaryBtn", function (e) {
+        console.log($(this));
+        downloadFile("/TenancyReports/GetNotifiesPrimary");
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#notifiesSecondaryBtn", function (e) {
+        console.log($(this));
+        downloadFile("/TenancyReports/GetNotifiesSecondary");
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#notifiesProlongContractBtn", function (e) {
+        console.log($(this));
+        downloadFile("/TenancyReports/GetNotifiesProlongContract");
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#notifiesEvictionFromEmergencyFundBtn", function (e) {
+        console.log($(this));
+        downloadFile("/TenancyReports/GetNotifiesEvictionFromEmergencyFund");
+        e.preventDefault();
+    });
 });

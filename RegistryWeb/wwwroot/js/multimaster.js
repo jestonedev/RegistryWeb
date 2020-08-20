@@ -10,12 +10,6 @@
         });
     });
 
-    //$(".AllPremiseCheckbox").click(function () {
-    //    if ($(this).is(':checked'))
-    //        $('td input:checkbox').prop('checked', true);
-    //    else $('td input:checkbox').prop('checked', false);
-    //});
-
     $('.addselect').click(function (e) {
         var filterOptions = $(".filterForm").find("input, select, textarea").filter(function (idx, elem) {
             return /^FilterOptions\./.test($(elem).attr("name"));
