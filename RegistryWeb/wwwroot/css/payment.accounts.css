@@ -21,3 +21,42 @@
     max-width: 100%;
     margin-bottom: 0.24rem;
 }
+
+.vis-timeline {
+    border: none;
+    overflow: visible;
+}
+
+.vis-item {
+    border-color: #bfbfbf;
+}
+
+.vis-item.vis-selected {
+    border-color: #ff7f6e;
+}
+
+.vis-panel.vis-center, .vis-panel.vis-left, .vis-panel.vis-right, .vis-panel.vis-bottom {
+    border-left-color: white;
+    border-right-color: white;
+    border-top-color: white;
+}
+
+div.vis-tooltip {
+    background-color: white;
+}
+
+.pa-open-claim-btn {
+    margin-top: 0;
+}
+
+@media(min-width: 576px) {
+    .pa-open-claim-btn {
+        margin-top: 27px;
+    }
+}
+
+@media(min-width: 768px) {
+    .pa-open-claim-btn {
+        margin-top: 31px;
+    }
+}
