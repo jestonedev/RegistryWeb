@@ -74,7 +74,285 @@ namespace RegistryWeb.DataServices
         {
             if (!filterOptions.IsEmpty())
             {
-                // TODO: 
+                query = AddressFilter(query, filterOptions);
+                query = PaymentAccountFilter(query, filterOptions);
+                query = ClaimFilter(query, filterOptions);
+            }
+            return query;
+        }
+
+        public IQueryable<Claim> AddressFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
+        {
+            if (filterOptions.IsAddressEmpty() &&
+                string.IsNullOrEmpty(filterOptions.IdStreet) &&
+                string.IsNullOrEmpty(filterOptions.House) &&
+                string.IsNullOrEmpty(filterOptions.PremisesNum) &&
+                filterOptions.IdBuilding == null &&
+                filterOptions.IdPremises == null &&
+                filterOptions.IdSubPremises == null)
+                return query;
+
+            var premisesAssoc = registryContext.PaymentAccountPremisesAssoc
+                .Include(p => p.PremiseNavigation)
+                .ThenInclude(b => b.IdBuildingNavigation);
+
+            var subPremisesAssoc = registryContext.PaymentAccountSubPremisesAssoc
+                .Include(sp => sp.SubPremiseNavigation)
+                .ThenInclude(p => p.IdPremisesNavigation)
+                .ThenInclude(b => b.IdBuildingNavigation);
+
+            IEnumerable<int> idAccounts = new List<int>();
+
+            if (filterOptions.Address.AddressType == AddressTypes.Street || !string.IsNullOrEmpty(filterOptions.IdStreet))
+            {
+                var street = filterOptions.Address.AddressType == AddressTypes.Street ? filterOptions.Address.Id : filterOptions.IdStreet;
+                var idPremiseAccounts = premisesAssoc
+                    .Where(opa => opa.PremiseNavigation.IdBuildingNavigation.IdStreet.Equals(street))
+                    .Select(opa => opa.IdAccount);
+                var idSubPremiseAccounts = subPremisesAssoc
+                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet.Equals(street))
+                    .Select(ospa => ospa.IdAccount);
+                idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
+            }
+            var id = 0;
+            if ((filterOptions.Address.AddressType == AddressTypes.Building && int.TryParse(filterOptions.Address.Id, out id)) || filterOptions.IdBuilding != null)
+            {
+                if (filterOptions.IdBuilding != null)
+                {
+                    id = filterOptions.IdBuilding.Value;
+                }
+                var idPremiseAccounts = premisesAssoc
+                    .Where(opa => opa.PremiseNavigation.IdBuilding == id)
+                    .Select(opa => opa.IdAccount);
+                var idSubPremiseAccounts = subPremisesAssoc
+                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuilding == id)
+                    .Select(ospa => ospa.IdAccount);
+                idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
+            }
+            if ((filterOptions.Address.AddressType == AddressTypes.Premise && int.TryParse(filterOptions.Address.Id, out id)) || filterOptions.IdPremises != null)
+            {
+                if (filterOptions.IdPremises != null)
+                {
+                    id = filterOptions.IdPremises.Value;
+                }
+                var idPremiseAccounts = premisesAssoc
+                    .Where(opa => opa.PremiseNavigation.IdPremises == id)
+                    .Select(opa => opa.IdAccount);
+                var idSubPremiseAccounts = subPremisesAssoc
+                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdPremises == id)
+                    .Select(ospa => ospa.IdAccount);
+                idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
+            }
+            if ((filterOptions.Address.AddressType == AddressTypes.SubPremise && int.TryParse(filterOptions.Address.Id, out id)) || filterOptions.IdSubPremises != null)
+            {
+                if (filterOptions.IdSubPremises != null)
+                {
+                    id = filterOptions.IdSubPremises.Value;
+                }
+                idAccounts = subPremisesAssoc
+                    .Where(ospa => ospa.SubPremiseNavigation.IdSubPremises == id)
+                    .Select(ospa => ospa.IdAccount);
+            }
+            if (idAccounts.Any())
+            {
+                query = from q in query
+                        join idAccount in idAccounts on q.IdAccount equals idAccount
+                        select q;
+            }
+            if (!string.IsNullOrEmpty(filterOptions.House))
+            {
+                var idPremiseAccounts = premisesAssoc
+                    .Where(opa => opa.PremiseNavigation.IdBuildingNavigation.House.ToLowerInvariant().Equals(filterOptions.House.ToLowerInvariant()))
+                    .Select(opa => opa.IdAccount);
+                var idSubPremiseAccounts = subPremisesAssoc
+                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.House.ToLowerInvariant().Equals(filterOptions.House.ToLowerInvariant()))
+                    .Select(ospa => ospa.IdAccount);
+                query = from q in query
+                        join idAccount in idPremiseAccounts.Union(idSubPremiseAccounts) on q.IdAccount equals idAccount
+                        select q;
+            }
+            if (!string.IsNullOrEmpty(filterOptions.PremisesNum))
+            {
+                var idPremiseAccounts = premisesAssoc
+                    .Where(opa => opa.PremiseNavigation.PremisesNum.ToLowerInvariant().Equals(filterOptions.PremisesNum.ToLowerInvariant()))
+                    .Select(opa => opa.IdAccount);
+                var idSubPremiseAccounts = subPremisesAssoc
+                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.PremisesNum.ToLowerInvariant().Equals(filterOptions.PremisesNum.ToLowerInvariant()))
+                    .Select(ospa => ospa.IdAccount);
+                query = from q in query
+                        join idAccount in idPremiseAccounts.Union(idSubPremiseAccounts) on q.IdAccount equals idAccount
+                        select q;
+            }
+            return query;
+        }
+
+        public IQueryable<Claim> PaymentAccountFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
+        {
+            if (!string.IsNullOrEmpty(filterOptions.Crn))
+            {
+                query = query.Where(p => p.IdAccountNavigation.Crn.Contains(filterOptions.Crn));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.Account))
+            {
+                query = query.Where(p => p.IdAccountNavigation.Account.Contains(filterOptions.Account));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.RawAddress))
+            {
+                query = query.Where(p => p.IdAccountNavigation.RawAddress.Contains(filterOptions.RawAddress));
+            }
+            return query;
+        }
+
+        public IQueryable<Claim> ClaimFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
+        {
+            if (filterOptions.AmountTotal != null)
+            {
+                query = query.Where(p => filterOptions.AmountTotalOp == 1 ?
+                    p.AmountTenancy+p.AmountPenalties+p.AmountDgi+p.AmountPadun+p.AmountPkk >= filterOptions.AmountTotal :
+                    p.AmountTenancy + p.AmountPenalties + p.AmountDgi + p.AmountPadun + p.AmountPkk <= filterOptions.AmountTotal);
+            }
+            if (filterOptions.AmountTenancy != null)
+            {
+                query = query.Where(p => filterOptions.AmountTenancyOp == 1 ?
+                    p.AmountTenancy >= filterOptions.AmountTenancy :
+                    p.AmountTenancy <= filterOptions.AmountTenancy);
+            }
+            if (filterOptions.AmountPenalties != null)
+            {
+                query = query.Where(p => filterOptions.AmountPenaltiesOp == 1 ?
+                    p.AmountPenalties >= filterOptions.AmountPenalties :
+                    p.AmountPenalties <= filterOptions.AmountPenalties);
+            }
+            if (filterOptions.AmountDgiPadunPkk != null)
+            {
+                query = query.Where(p => filterOptions.AmountDgiPadunPkkOp == 1 ?
+                    (p.AmountDgi >= filterOptions.AmountDgiPadunPkk ||
+                     p.AmountPadun >= filterOptions.AmountDgiPadunPkk ||
+                     p.AmountPkk >= filterOptions.AmountDgiPadunPkk) :
+                    (p.AmountDgi <= filterOptions.AmountDgiPadunPkk ||
+                     p.AmountPadun <= filterOptions.AmountDgiPadunPkk ||
+                     p.AmountPkk <= filterOptions.AmountDgiPadunPkk));
+            }
+
+            if (filterOptions.AtDate != null)
+            {
+                query = query.Where(p => p.AtDate == filterOptions.AtDate);
+            }
+
+            if (!string.IsNullOrEmpty(filterOptions.CourtOrderNum))
+            {
+                var idClaims = registryContext.ClaimStates.Where(cs => cs.IdStateType == 4 && cs.CourtOrderNum.Contains(filterOptions.CourtOrderNum)).Select(r => r.IdClaim).ToList();
+                query = query.Where(p => idClaims.Contains(p.IdClaim));
+            }
+
+            if(filterOptions.IdClaimState != null || filterOptions.ClaimStateDate != null)
+            {
+                var maxDateClaimStates = from row in registryContext.ClaimStates
+                                      group row.IdState by row.IdClaim into gs
+                                      select new
+                                      {
+                                          IdClaim = gs.Key,
+                                          IdState = gs.Max()
+                                      };
+
+                var lastClaimsStates = (from row in registryContext.ClaimStates
+                                    join maxDateClaimStatesRow in maxDateClaimStates
+                                    on row.IdState equals maxDateClaimStatesRow.IdState
+                                    select new
+                                    {
+                                        row.IdClaim,
+                                        row.IdStateType,
+                                        row.DateStartState
+                                    }).ToList();
+                if (filterOptions.IdClaimState != null)
+                {
+                    query = from row in query
+                            join lastClaimsStatesRow in lastClaimsStates
+                            on row.IdClaim equals lastClaimsStatesRow.IdClaim
+                            where lastClaimsStatesRow.IdStateType == filterOptions.IdClaimState
+                            select row;
+                }
+
+                if (filterOptions.ClaimStateDate != null)
+                {
+                    query = from row in query
+                            join lastClaimsStatesRow in lastClaimsStates
+                            on row.IdClaim equals lastClaimsStatesRow.IdClaim
+                            where filterOptions.ClaimStateDateOp == 1 ?
+                               lastClaimsStatesRow.DateStartState >= filterOptions.ClaimStateDate :
+                               lastClaimsStatesRow.DateStartState <= filterOptions.ClaimStateDate
+                            select row;
+                }
+            }
+
+            if (filterOptions.BalanceOutputTotal != null || filterOptions.BalanceOutputTenancy != null ||
+                filterOptions.BalanceOutputPenalties != null || filterOptions.BalanceOutputDgiPadunPkk != null)
+            {
+                var maxDatePayments = from row in registryContext.Payments
+                                      group row.Date by row.IdAccount into gs
+                                      select new
+                                      {
+                                          IdAccount = gs.Key,
+                                          Date = gs.Max()
+                                      };
+
+                var lastPayments = (from row in registryContext.Payments
+                                    join maxDatePaymentsRow in maxDatePayments
+                                    on new { row.IdAccount, row.Date } equals new { maxDatePaymentsRow.IdAccount, maxDatePaymentsRow.Date }
+                                    select new {
+                                        row.IdAccount,
+                                        row.BalanceOutputTotal,
+                                        row.BalanceOutputTenancy,
+                                        row.BalanceOutputPenalties,
+                                        row.BalanceOutputDgi,
+                                        row.BalanceOutputPkk,
+                                        row.BalanceOutputPadun,
+                                    }).ToList();
+
+                if (filterOptions.BalanceOutputTotal != null)
+                {
+                    query = from row in query
+                             join lastPaymentsRow in lastPayments
+                             on row.IdAccount equals lastPaymentsRow.IdAccount
+                             where filterOptions.BalanceOutputTotalOp == 1 ? 
+                                lastPaymentsRow.BalanceOutputTotal >= filterOptions.BalanceOutputTotal :
+                                lastPaymentsRow.BalanceOutputTotal <= filterOptions.BalanceOutputTotal
+                             select row;
+                }
+                if (filterOptions.BalanceOutputTenancy != null)
+                {
+                    query = from row in query
+                             join lastPaymentsRow in lastPayments
+                             on row.IdAccount equals lastPaymentsRow.IdAccount
+                             where filterOptions.BalanceOutputTenancyOp == 1 ?
+                                lastPaymentsRow.BalanceOutputTenancy >= filterOptions.BalanceOutputTenancy :
+                                lastPaymentsRow.BalanceOutputTenancy <= filterOptions.BalanceOutputTenancy
+                            select row;
+                }
+                if (filterOptions.BalanceOutputPenalties != null)
+                {
+                    query = from row in query
+                            join lastPaymentsRow in lastPayments
+                            on row.IdAccount equals lastPaymentsRow.IdAccount
+                            where filterOptions.BalanceOutputPenaltiesOp == 1 ?
+                               lastPaymentsRow.BalanceOutputPenalties >= filterOptions.BalanceOutputPenalties :
+                               lastPaymentsRow.BalanceOutputPenalties <= filterOptions.BalanceOutputPenalties
+                            select row;
+                }
+                if (filterOptions.BalanceOutputDgiPadunPkk != null)
+                {
+                    query = from row in query
+                            join lastPaymentsRow in lastPayments
+                            on row.IdAccount equals lastPaymentsRow.IdAccount
+                            where filterOptions.BalanceOutputDgiPadunPkkOp == 1 ?
+                                (lastPaymentsRow.BalanceOutputDgi >= filterOptions.BalanceOutputDgiPadunPkk ||
+                                 lastPaymentsRow.BalanceOutputPadun >= filterOptions.BalanceOutputDgiPadunPkk ||
+                                 lastPaymentsRow.BalanceOutputPkk >= filterOptions.BalanceOutputDgiPadunPkk) :
+                                (lastPaymentsRow.BalanceOutputDgi <= filterOptions.BalanceOutputDgiPadunPkk ||
+                                 lastPaymentsRow.BalanceOutputPadun <= filterOptions.BalanceOutputDgiPadunPkk ||
+                                 lastPaymentsRow.BalanceOutputPkk <= filterOptions.BalanceOutputDgiPadunPkk)
+                            select row;
+                }
             }
             return query;
         }

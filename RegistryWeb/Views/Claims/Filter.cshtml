@@ -39,13 +39,192 @@
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalLabel">Фильтр лицевых счетов</h5>
+                    <h5 class="modal-title" id="modalLabel">Фильтр исковых работ</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-
+                    <div class="form-row">
+                        <div class="form-group col-6 col-lg-3">
+                            <label asp-for="FilterOptions.Crn">СРН</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.Crn" title="СРН">
+                        </div>
+                        <div class="form-group col-6 col-lg-3">
+                            <label asp-for="FilterOptions.Account">Лицевой счет</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.Account" title="Лицевой счет">
+                        </div>
+                        <div class="form-group col-12 col-lg-6">
+                            <label asp-for="FilterOptions.RawAddress">Адрес по БКС</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.RawAddress" title="Адрес по БКС">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12 col-lg-6">
+                            <label asp-for="FilterOptions.IdStreet">Улица</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@(new SelectList(Model.Streets, "IdStreet", "StreetName"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.House">Номер дома</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.House" title="Номер дома">
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.PremisesNum">Номер помещения</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.PremisesNum" title="Номер помещения">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label asp-for="FilterOptions.AtDate">Дата формирования</label>
+                            <div class="input-group date">
+                                <input type="date" class="form-control" asp-for="FilterOptions.AtDate" title="Дата формирования">
+                            </div>
+                        </div>
+                        <div class="form-group col-6">
+                            <label asp-for="FilterOptions.CourtOrderNum">Номер судебного приказа</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.CourtOrderNum" title="Номер судебного приказа">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <input type="hidden" class="c-arithmetic-op" asp-for="FilterOptions.BalanceOutputTotalOp" />
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.BalanceOutputTotal" class="rr-claim-filter-label">Сальдо тек. исх. (Итого)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">≥</a>
+                                        <a class="dropdown-item" href="#">≤</a>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" asp-for="FilterOptions.BalanceOutputTotal">
+                            </div>
+                        </div>
+                        <input type="hidden" class="c-arithmetic-op" asp-for="FilterOptions.BalanceOutputTenancyOp" />
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.BalanceOutputTenancy" class="rr-claim-filter-label">Сальдо тек. исх. (Найм)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">≥</a>
+                                        <a class="dropdown-item" href="#">≤</a>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" asp-for="FilterOptions.BalanceOutputTenancy">
+                            </div>
+                        </div>
+                        <input type="hidden" class="c-arithmetic-op" asp-for="FilterOptions.BalanceOutputPenaltiesOp" />
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.BalanceOutputPenalties" class="rr-claim-filter-label">Сальдо тек. исх. (Пени)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">≥</a>
+                                        <a class="dropdown-item" href="#">≤</a>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" asp-for="FilterOptions.BalanceOutputPenalties">
+                            </div>
+                        </div>
+                        <input type="hidden" class="c-arithmetic-op" asp-for="FilterOptions.BalanceOutputDgiPadunPkkOp" />
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.BalanceOutputDgiPadunPkk" class="rr-claim-filter-label">Сальдо тек. исх. (ДГИ/Падун/ПКК)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">≥</a>
+                                        <a class="dropdown-item" href="#">≤</a>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" asp-for="FilterOptions.BalanceOutputDgiPadunPkk">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <input type="hidden" class="c-arithmetic-op" asp-for="FilterOptions.AmountTotalOp" />
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.AmountTotal" class="rr-claim-filter-label">К взысканию (Итого)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">≥</a>
+                                        <a class="dropdown-item" href="#">≤</a>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" asp-for="FilterOptions.AmountTotal">
+                            </div>
+                        </div>
+                        <input type="hidden" class="c-arithmetic-op" asp-for="FilterOptions.AmountTenancyOp" />
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.AmountTenancy" class="rr-claim-filter-label">К взысканию (Найм)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">≥</a>
+                                        <a class="dropdown-item" href="#">≤</a>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" asp-for="FilterOptions.AmountTenancy">
+                            </div>
+                        </div>
+                        <input type="hidden" class="c-arithmetic-op" asp-for="FilterOptions.AmountPenaltiesOp" />
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.AmountPenalties" class="rr-claim-filter-label">К взысканию (Пени)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">≥</a>
+                                        <a class="dropdown-item" href="#">≤</a>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" asp-for="FilterOptions.AmountPenalties">
+                            </div>
+                        </div>
+                        <input type="hidden" class="c-arithmetic-op" asp-for="FilterOptions.AmountDgiPadunPkkOp" />
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.AmountDgiPadunPkk" class="rr-claim-filter-label">К взысканию (ДГИ/Падун/ПКК)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">≥</a>
+                                        <a class="dropdown-item" href="#">≤</a>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" asp-for="FilterOptions.AmountDgiPadunPkk">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label asp-for="FilterOptions.IdClaimState">Текущее состояние</label>
+                            <select class="selectpicker form-control" title="Текущее состояние" asp-for="FilterOptions.IdClaimState" asp-items="@(new SelectList(Model.StateTypes, "IdStateType", "StateType"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <input type="hidden" class="c-arithmetic-op" asp-for="FilterOptions.ClaimStateDateOp" />
+                        <div class="form-group col-6">
+                            <label asp-for="FilterOptions.ClaimStateDate" class="rr-claim-filter-label">Дата установки состояния</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">≥</a>
+                                        <a class="dropdown-item" href="#">≤</a>
+                                    </div>
+                                </div>
+                                <input type="date" class="form-control" asp-for="FilterOptions.ClaimStateDate">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button id="filterClearModalBtn" type="button" class="btn btn-secondary">Очистить</button>
@@ -55,4 +234,3 @@
         </div>
     </div>
 </form>
-

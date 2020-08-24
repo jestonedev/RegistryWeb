@@ -67,6 +67,7 @@ var searchModal = function () {
 var filterClearModal = function () {
     $("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal input[type='hidden'], #filterModal select").val("");
     $('#FilterOptions_IdStreet, #FilterOptions_IdPreset').selectpicker('render');
+    $("form.filterForm").valid();
 };
 var filterClear = function () {
     filterClearModal();
@@ -165,7 +166,7 @@ $(function () {
 
     var hasAccountSumFilter = false;
     $("#AccountSumFilters").find("input[type='text']").each(function (idx, elem) {
-        if ($(elem).val() != "" && $(elem).val() != null) {
+        if ($(elem).val() !== "" && $(elem).val() !== null) {
             hasAccountSumFilter = true;
         }
         $(elem).val($(elem).val().replace('.', ','));

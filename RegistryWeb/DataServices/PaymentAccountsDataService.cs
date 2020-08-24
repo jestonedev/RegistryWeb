@@ -91,9 +91,9 @@ namespace RegistryWeb.DataServices
         private IQueryable<Payment> AddressFilter(IQueryable<Payment> query, PaymentsFilter filterOptions)
         {
             if (filterOptions.IsAddressEmpty() &&
-                !string.IsNullOrEmpty(filterOptions.IdStreet) &&
-                !string.IsNullOrEmpty(filterOptions.House) &&
-                !string.IsNullOrEmpty(filterOptions.PremisesNum) &&
+                string.IsNullOrEmpty(filterOptions.IdStreet) &&
+                string.IsNullOrEmpty(filterOptions.House) &&
+                string.IsNullOrEmpty(filterOptions.PremisesNum) &&
                 filterOptions.IdBuilding == null &&
                 filterOptions.IdPremises == null &&
                 filterOptions.IdSubPremises == null)

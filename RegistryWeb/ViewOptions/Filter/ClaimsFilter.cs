@@ -10,7 +10,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public string Account { get; set; }
         public int? IdClaimState { get; set; }
         public DateTime? ClaimStateDate { get; set; }
-        public bool ClaimStateLastOnly { get; set; }
+        public int? ClaimStateDateOp { get; set; }
         public string Crn { get; set; }
         public string RawAddress { get; set; }
         public string IdStreet { get; set; }
@@ -21,9 +21,22 @@ namespace RegistryWeb.ViewOptions.Filter
         public int? IdBuilding { get; set; }
         public DateTime? AtDate { get; set; }
         public string CourtOrderNum { get; set; }
+        public int BalanceOutputTotalOp { get; set; }
+        public decimal? BalanceOutputTotal { get; set; }
+        public int BalanceOutputTenancyOp { get; set; }
         public decimal? BalanceOutputTenancy { get; set; }
+        public int BalanceOutputPenaltiesOp { get; set; }
         public decimal? BalanceOutputPenalties { get; set; }
+        public int BalanceOutputDgiPadunPkkOp { get; set; }
         public decimal? BalanceOutputDgiPadunPkk { get; set; }
+        public int AmountTotalOp { get; set; }
+        public decimal? AmountTotal { get; set; }
+        public int AmountTenancyOp { get; set; }
+        public decimal? AmountTenancy { get; set; }
+        public int AmountPenaltiesOp { get; set; }
+        public decimal? AmountPenalties { get; set; }
+        public int AmountDgiPadunPkkOp { get; set; }
+        public decimal? AmountDgiPadunPkk { get; set; }
 
         public bool IsEmpty()
         {
@@ -35,7 +48,8 @@ namespace RegistryWeb.ViewOptions.Filter
             return Account == null && Crn == null && IdClaim == null && RawAddress == null &&
                 IdStreet == null && House == null && PremisesNum == null && IdClaimState == null &&
                 ClaimStateDate == null && AtDate == null && CourtOrderNum == null &&
-                BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null;
+                 BalanceOutputTotal == null && BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null &&
+                 AmountTotal == null && AmountTenancy == null && AmountPenalties == null && AmountDgiPadunPkk == null;
         }
     }
 }
