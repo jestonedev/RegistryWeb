@@ -102,6 +102,7 @@ namespace RegistryWeb.DataServices
                 .ThenInclude(b => b.IdBuildingNavigation);
 
             IEnumerable<int> idAccounts = new List<int>();
+            var filtered = false;
 
             if (filterOptions.Address.AddressType == AddressTypes.Street || !string.IsNullOrEmpty(filterOptions.IdStreet))
             {
@@ -113,6 +114,7 @@ namespace RegistryWeb.DataServices
                     .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet.Equals(street))
                     .Select(ospa => ospa.IdAccount);
                 idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
+                filtered = true;
             }
             var id = 0;
             if ((filterOptions.Address.AddressType == AddressTypes.Building && int.TryParse(filterOptions.Address.Id, out id)) || filterOptions.IdBuilding != null)
@@ -128,6 +130,7 @@ namespace RegistryWeb.DataServices
                     .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuilding == id)
                     .Select(ospa => ospa.IdAccount);
                 idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
+                filtered = true;
             }
             if ((filterOptions.Address.AddressType == AddressTypes.Premise && int.TryParse(filterOptions.Address.Id, out id)) || filterOptions.IdPremises != null)
             {
@@ -142,6 +145,7 @@ namespace RegistryWeb.DataServices
                     .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdPremises == id)
                     .Select(ospa => ospa.IdAccount);
                 idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
+                filtered = true;
             }
             if ((filterOptions.Address.AddressType == AddressTypes.SubPremise && int.TryParse(filterOptions.Address.Id, out id)) || filterOptions.IdSubPremises != null)
             {
@@ -152,8 +156,9 @@ namespace RegistryWeb.DataServices
                 idAccounts = subPremisesAssoc
                     .Where(ospa => ospa.SubPremiseNavigation.IdSubPremises == id)
                     .Select(ospa => ospa.IdAccount);
+                filtered = true;
             }
-            if (idAccounts.Any())
+            if (filtered)
             {
                 query = from q in query
                         join idAccount in idAccounts on q.IdAccount equals idAccount
@@ -203,8 +208,71 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        private List<int> GetAccountIdsWithSameAddress(int idAccount)
+        {
+            var filteredObjects = (from row in
+                            (from row in registryContext.PaymentAccountPremisesAssoc
+                             where row.IdAccount == idAccount
+                             select new
+                             {
+                                 row.IdAccount,
+                                 Infix = string.Concat("p", row.IdPremise)
+                             }).Union(from row in registryContext.PaymentAccountSubPremisesAssoc
+                                      where row.IdAccount == idAccount
+                                      select new
+                                      {
+                                          row.IdAccount,
+                                          Infix = string.Concat("sp", row.IdSubPremise)
+                                      })
+                                   orderby row.Infix
+                                   group row.Infix by row.IdAccount into gs
+                                   select new
+                                   {
+                                       IdAccount = gs.Key,
+                                       AddressCode = string.Join("", gs)
+                                   }).AsEnumerable();
+
+            var allObjects = (from row in (from row in registryContext.PaymentAccountPremisesAssoc
+                                            select new PaymentAddressInfix
+                                            {
+                                                IdAccount = row.IdAccount,
+                                                Infix = string.Concat("p", row.IdPremise)
+                                            }).Union(from row in registryContext.PaymentAccountSubPremisesAssoc
+                                                    select new PaymentAddressInfix
+                                                    {
+                                                        IdAccount = row.IdAccount,
+                                                        Infix = string.Concat("sp", row.IdSubPremise)
+                                                    })
+                                orderby row.Infix
+                                group row.Infix by row.IdAccount into gs
+                                select new
+                                {
+                                    IdAccount = gs.Key,
+                                    AddressCode = string.Join("", gs)
+                                }).AsEnumerable();
+            allObjects = from paymentsRow in registryContext.PaymentAccounts
+                            join allObjectsRow in allObjects
+                            on paymentsRow.IdAccount equals allObjectsRow.IdAccount into ao
+                            from aoRow in ao.DefaultIfEmpty()
+                            select new
+                            {
+                                paymentsRow.IdAccount,
+                                AddressCode = aoRow != null ? aoRow.AddressCode : paymentsRow.RawAddress
+                            };
+            return (from filteredRow in filteredObjects
+                    join allRow in allObjects
+                    on filteredRow.AddressCode equals allRow.AddressCode
+                    select allRow.IdAccount).ToList();
+        }
+
         public IQueryable<Claim> ClaimFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
         {
+            if (filterOptions.IdAccount != null)
+            {
+                var ids = GetAccountIdsWithSameAddress(filterOptions.IdAccount.Value);
+                query = query.Where(p => ids.Contains(p.IdAccount));
+            }
+
             if (filterOptions.AmountTotal != null)
             {
                 query = query.Where(p => filterOptions.AmountTotalOp == 1 ?

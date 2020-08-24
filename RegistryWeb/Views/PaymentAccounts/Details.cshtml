@@ -34,7 +34,7 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn">
                     <a class="dropdown-item" title="Претензионно-исковые работы" aria-label="Претензионно-исковые работы"
-                        asp-controller="Claims" asp-action="Index" asp-route-idAccount="@account?.IdAccount" asp-route-typeObject="Premise" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Претензионно-исковые работы</a>
+                        asp-controller="Claims" asp-action="Index" asp-route-filterOptions.IdAccount="@account?.IdAccount" asp-route-typeObject="Premise" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Претензионно-исковые работы</a>
                 </div>
             </div>
             <div class="btn-group" role="group" aria-label="Панель доступа">
