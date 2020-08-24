@@ -1,0 +1,15 @@
+﻿.c-table > thead > tr > th a.sort {
+    color: #888;
+}
+
+.c-table > thead > tr > th a.sort:hover {
+    color: black;
+}
+
+.c-table > thead > tr > th a.sort.c-sorted {
+    color: #007bff;
+}
+
+.c-table > thead > tr > th a.sort.c-sorted:hover {
+    color: #0056b3;
+}
