@@ -163,5 +163,11 @@ namespace RegistryWeb.Controllers
             }
             ViewBag.SecurityService = securityService;
         }
+
+        [HttpPost]
+        public JsonResult GetAccounts(string text)
+        {
+            return Json(dataService.GetAccounts(text).Select(pa => new { pa.IdAccount, pa.Account }));
+        }
     }
 }

@@ -81,14 +81,28 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        private Claim FillClaimAmount(Claim claim)
+        {
+            claim.AmountTenancy = claim.AmountTenancy ?? 0;
+            claim.AmountPenalties = claim.AmountPenalties ?? 0;
+            claim.AmountDgi = claim.AmountDgi ?? 0;
+            claim.AmountPadun = claim.AmountPadun ?? 0;
+            claim.AmountPkk = claim.AmountPkk ?? 0;
+            return claim;
+        }
+
         internal void Create(Claim claim)
         {
+            claim.IdAccountNavigation = null;
+            claim = FillClaimAmount(claim);
             registryContext.Claims.Add(claim);
             registryContext.SaveChanges();
         }
 
         internal void Edit(Claim claim)
         {
+            claim.IdAccountNavigation = null;
+            claim = FillClaimAmount(claim);
             registryContext.Claims.Update(claim);
             registryContext.SaveChanges();
         }
@@ -212,6 +226,12 @@ namespace RegistryWeb.DataServices
                         select q;
             }
             return query;
+        }
+
+        internal IList<PaymentAccount> GetAccounts(string text)
+        {
+            return registryContext.PaymentAccounts
+                .Where(pa => pa.Account.Contains(text)).ToList();
         }
 
         public IQueryable<Claim> PaymentAccountFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
@@ -639,6 +659,7 @@ namespace RegistryWeb.DataServices
         public Claim GetClaim(int idClaim)
         {
             return registryContext.Claims.Include(r => r.IdAccountNavigation)
+                .Include(r => r.ClaimStates)
                 .FirstOrDefault(r => r.IdClaim == idClaim);
         }
     }
