@@ -162,6 +162,11 @@
         e.preventDefault();
     });
 
+    $("body").on('click', "#tenancyContractRegDateBtn", function (e) {
+        $('#tenancyContractRegDateModal').modal('toggle');
+        e.preventDefault();
+    });
+
     $("#tenancyWarningModal .rr-report-submit").on("click", function (e) {
         e.preventDefault();
         var form = $(this).closest("#tenancyWarningForm");
@@ -185,5 +190,24 @@
         }
 
         $("#tenancyWarningModal").modal("hide");
+    });
+
+    $("#tenancyContractRegDateModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("#tenancyContractRegDateForm");
+        var isValid = form.valid();
+        if (!isValid) {
+            return false;
+        }
+        var regDate = $("#tenancyContractRegDateModal").find("[name='TenancyContractRegDate.RegDate']").val();
+        $.ajax({
+            type: 'GET',
+            url: window.location.origin + '/TenancyReports/SetTenancyContractRegDate?regDate=' + regDate,
+            success: function (data) {
+                console.log(data);
+                $('.status').text(data);
+                $("#tenancyContractRegDateModal").modal("hide");
+            }
+        });
     });
 });

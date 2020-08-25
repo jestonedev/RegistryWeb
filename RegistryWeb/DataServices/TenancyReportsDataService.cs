@@ -52,5 +52,23 @@ namespace RegistryWeb.DataServices
         {
             return registryContext.TenancyPersons.FirstOrDefault(t => t.IdProcess == idProcess) != null;
         }
+
+        internal List<int> GetNoValidateContracts(List<int> ids)
+        {
+            return registryContext
+                .TenancyProcesses.Where(tp => ids.Contains(tp.IdProcess) && string.IsNullOrEmpty(tp.RegistrationNum))
+                .Select(tp => tp.IdProcess)
+                .ToList();
+        }
+
+        internal void SetTenancyContractRegDate(List<int> ids, DateTime regDate)
+        {
+            foreach (var id in ids) {
+                registryContext.TenancyProcesses
+                    .FirstOrDefault(tp => tp.IdProcess == id)
+                    .RegistrationDate = regDate;
+            }
+            registryContext.SaveChanges();
+        }
     }
 }
