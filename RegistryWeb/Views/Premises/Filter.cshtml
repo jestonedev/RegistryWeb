@@ -27,14 +27,23 @@
                 <a class="btn btn-success" title="Добавить" aria-label="Добавить помещение" asp-controller="Premises" asp-action="Create">&#10010;</a>
             </div>
         }
-        <div class="form-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-10 col-md-4 col-lg-6" : "col-12 col-md-5 col-lg-7")">
-            <div class="input-group">
+        @if (Model.FilterOptions.IsAddressEmpty())
+        {
+            <div class="form-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-10 col-md-4 col-lg-6" : "col-12 col-md-5 col-lg-7")">
                 <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
-                <div class="input-group-append h-auto d-inline-block">
-                    <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
+            </div>
+        }
+        else
+        {
+            <div class="form-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-10 col-md-4 col-lg-6" : "col-12 col-md-5 col-lg-7")">
+                <div class="input-group">
+                    <input type="text" class="form-control col" disabled asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                    <div class="input-group-append h-auto d-inline-block">
+                        <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
+                    </div>
                 </div>
             </div>
-        </div>
+        }
 
         @if (Model.FilterOptions.IsModalEmpty())
         {
