@@ -107,7 +107,7 @@ namespace RegistryWeb.ReportServices
             {
                 { "filterTmpFile", fileName },
             };
-            var fileNameReport = GenerateReport(arguments, "registry\\registry\\area_premises");
+            var fileNameReport = GenerateReport(arguments, "registry\\registry\\area_premises_web");
             return DownloadFile(fileNameReport);
         }
 
