@@ -35,7 +35,7 @@ namespace RegistryWeb.Models
 
         public virtual DbSet<Building> Buildings { get; set; }
         public virtual DbSet<Premise> Premises { get; set; }
-        public virtual DbSet<Preparers> Preparers { get; set; }
+        public virtual DbSet<Preparer> Preparers { get; set; }
         public virtual DbSet<SubPremise> SubPremises { get; set; }
         public virtual DbSet<DocumentType> DocumentTypes { get; set; }
         public virtual DbSet<DocumentIssuedBy> DocumentsIssuedBy { get; set; }

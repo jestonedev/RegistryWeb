@@ -1005,5 +1005,10 @@ namespace RegistryWeb.DataServices
         {
             get => registryContext.DistrictCommitteesPreContractPreambles.AsNoTracking();
         }
+
+        public IEnumerable<Preparer> Preparers
+        {
+            get => registryContext.Preparers.AsNoTracking();
+        }
     }
 }

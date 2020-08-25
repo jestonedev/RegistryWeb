@@ -9,6 +9,7 @@ using System.Diagnostics;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.Models;
 using System.Globalization;
+using System.IO.Compression;
 
 namespace RegistryWeb.ReportServices
 {
@@ -33,11 +34,9 @@ namespace RegistryWeb.ReportServices
             try
             {
                 var configXml = activityManagerPath + "templates\\" + config + ".xml";
-                //var configXml = config + ".xml";
                 var configParts = config.Split('\\');
                 var fileNameReport = configParts[configParts.Length - 1] + Guid.NewGuid().ToString() + ".docx";
                 var destFileName = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", fileNameReport);
-
                 arguments.Add("config", configXml);
                 arguments.Add("destFileName", destFileName);
                 arguments.Add("force-move-to", destFileName);
@@ -55,6 +54,43 @@ namespace RegistryWeb.ReportServices
                 }
 
                 return fileNameReport;
+            }
+            catch (Exception ex)
+            {
+                logStr.Append("<dl>\n<dt>Error\n<dd>" + ex.Message + "\n</dl>");
+                throw new Exception(logStr.ToString());
+            }
+        }
+
+        protected string GenerateMultiFileReport(Dictionary<string, object> arguments, string config)
+        {
+            var logStr = new StringBuilder();
+            try
+            {
+                var configXml = activityManagerPath + "templates\\" + config + ".xml";
+                var configParts = config.Split('\\');
+                var directoryName = configParts[configParts.Length - 1] + Guid.NewGuid().ToString();
+                var destDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", directoryName);
+                Directory.CreateDirectory(destDirectory);
+                
+                arguments.Add("config", configXml);
+                arguments.Add("destDirectoryName", destDirectory);
+                arguments.Add("connectionString", "Driver={" + sqlDriver + "};" + connString);
+                using (var p = new Process())
+                {
+                    p.StartInfo.UseShellExecute = false;
+                    p.StartInfo.FileName = activityManagerPath + "ActivityManager.exe";
+                    p.StartInfo.Arguments = GetArguments(arguments);
+                    logStr.Append("<dl>\n<dt>Arguments\n<dd>" + p.StartInfo.Arguments + "\n");
+                    p.StartInfo.CreateNoWindow = true;
+                    p.Start();
+                    p.WaitForExit();
+                }
+
+                var destZipFile = destDirectory + ".zip";
+                ZipFile.CreateFromDirectory(destDirectory, destZipFile);
+                Directory.Delete(destDirectory, true);
+                return destZipFile;
             }
             catch (Exception ex)
             {
