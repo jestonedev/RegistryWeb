@@ -146,11 +146,11 @@
                     else
                     {
                         <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                           asp-controller="TenancyProcesses" asp-action="Details" asp-route-idProcess="@item.IdProcess" asp-route-action="Details"></a>
+                           asp-controller="TenancyProcesses" asp-action="Details" asp-route-idProcess="@item.IdProcess" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                     }
 
                     <div class="btn-group" role="group" aria-label="Отчеты">
-                        <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="отчеты" id="reportsBtn_@item.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@item.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdProcess">
                             <a class="dropdown-item rr-report-pre-contract" href="#" title="Предварительный договор" aria-label="Предварительный договор" data-id-process="@item.IdProcess">Предварительный договор</a>
                             <a class="dropdown-item rr-report-dksr-contract" href="#" title="Договор (ДКСР)" aria-label="Договор (ДКСР)" data-id-process="@item.IdProcess">Договор (ДКСР)</a>

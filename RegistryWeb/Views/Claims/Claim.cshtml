@@ -1,0 +1,115 @@
+﻿@using RegistryWeb.Extensions
+@model RegistryWeb.ViewModel.ClaimVM;
+@{
+
+    if (ViewBag.Action == "Create")
+    {
+        ViewData["Title"] = "Создание новой исковой работы";
+    }
+    else
+    {
+        ViewData["Title"] = "Исковая работа №" + Model.Claim.IdClaim;
+    }
+    ViewData["Id"] = Model.Claim.IdClaim;
+}
+
+@section validation
+{
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+}
+
+@section styles {
+    <link href="~/lib/bootstrap4-toggle/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/claims.css" runat="server" />
+}
+
+
+<div class="card">
+    <div class="card-header d-flex flex-column flex-lg-row">
+        <label class="form-check-label h2 col-sm-12 col-lg-6 col-xl-7 pl-0">@ViewData["Title"]</label>
+
+        <div class="col-sm-12 col-lg-6 col-xl-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
+            @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+            {
+                <div class="btn-group" role="group" aria-label="Панель доступа">
+                    @if (ViewBag.Action == "Details" && (ViewBag.CanEditBaseInfo ?? false))
+                    {
+                        <div class="btn-group" role="group" aria-label="Панель доступа">
+                            <button class="btn btn-primary dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@Model.Claim.IdClaim" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="oi oi-wrench"></span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@Model.Claim.IdClaim">
+                                <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                                   asp-controller="Claims" asp-action="Edit" asp-route-idClaim="@Model.Claim.IdClaim" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                <a class="btn btn-danger oi oi-x @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" title="Удалить" aria-label="Удалить"
+                                   asp-controller="Claims" asp-action="Delete" asp-route-idClaim="@Model.Claim.IdClaim" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="btn-group" role="group" aria-label="Отчеты">
+                        <button class="btn btn-success dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@Model.Claim.IdClaim" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-document"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.Claim.IdClaim">
+                            <a class="dropdown-item rr-report-request-to-bsk disabled" href="#" title="Запрос в БКС" aria-label="Запрос в БКС" data-id-claim="@Model.Claim.IdClaim">Запрос в БКС</a>
+                            <a class="dropdown-item rr-report-memo-to-lawyers disabled" href="#" title="СЗ в юридический отдел" aria-label="СЗ в юридический отдел" data-id-claim="@Model.Claim.IdClaim">СЗ в юридический отдел</a>
+                       </div>
+                    </div>
+                </div>
+            }
+            <div class="btn-group" role="group" aria-label="Панель доступа">
+                @if (@ViewBag.ReturnUrl != null)
+                {
+                    <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+                }
+                else
+                {
+                    <a class="form-control btn btn-primary" asp-controller="Claims" asp-action="Index" asp-route-isBack="true">Назад</a>
+                }
+                @if (ViewBag.Action == "Create")
+                {
+                    <input type="submit" value="Создать" id="createBtn" class="form-control btn btn-success" />
+                }
+                @if (ViewBag.Action == "Edit")
+                {
+                    <input type="submit" value="Сохранить" id="editBtn" class="form-control btn btn-success" />
+                }
+                @if (ViewBag.Action == "Delete")
+                {
+                    <input type="submit" value="Удалить" id="deleteBtn" class="form-control btn btn-danger" />
+                }
+
+                <a href="#" data-for="Claim" class="form-control btn btn-primary claim-toggler" title="Развернуть исковую работу" style="font-weight:bold;">∧</a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body" id="Claim">
+        <form asp-controller="Claims" asp-action="@ViewBag.Action" id="ClaimForm" data-action="@ViewBag.Action" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Claim.IdClaim" />
+            <input type="hidden" value="@ViewBag.ReturnUrl" name="ReturnUrl" />
+        </form>
+    </div>
+</div>
+
+<partial name="ReportsModals">
+
+@section Scripts {
+    <script src="~/js/claim.common.js" asp-append-version="true"></script>
+    <script src="~/js/claim.reports.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap4-toggle/js/bootstrap4-toggle.min.js"></script>
+    @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    {
+        <script>
+            $(function () {
+                $('select').prop('disabled', true);
+                $('input').prop('disabled', true);
+                $('textarea').prop('disabled', true);
+                $('input[type="hidden"]').prop('disabled', false);
+                $('input[type="submit"]').prop('disabled', false);
+            })
+        </script>
+    }
+}
+

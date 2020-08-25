@@ -47,15 +47,121 @@ namespace RegistryWeb.Controllers
                 viewModel.FilterOptions));
         }
 
-        public IActionResult Details(int idClaim, string returnUrl)
+        public IActionResult Details(int? idClaim, string returnUrl)
         {
+            if (idClaim == null)
+                return NotFound();
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
                 return View("NotAccess");
+            var claim = dataService.GetClaim(idClaim.Value);
+            if (claim == null)
+                return NotFound();
+            InitializeViewBag("Details", returnUrl, securityService.HasPrivilege(Privileges.ClaimsWrite));
+            var claimVM = dataService.GetClaimViewModel(claim);
+            return View("Claim", claimVM);
+        }
+
+        public ActionResult Create()
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
+                return View("NotAccess");
+            InitializeViewBag("Create", null, true);
+            return View("Claim", dataService.CreateClaimEmptyViewModel());
+        }
+
+        [HttpPost]
+        public ActionResult Create(ClaimVM claimVM)
+        {
+            if (claimVM == null || claimVM.Claim == null)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
+                return View("NotAccess");
+            if (ModelState.IsValid)
+            {
+                dataService.Create(claimVM.Claim);
+                return RedirectToAction("Details", new { claimVM.Claim.IdClaim });
+            }
+            InitializeViewBag("Create", null, true);
+            return View("Claim", dataService.GetClaimViewModel(claimVM.Claim));
+        }
+
+        public ActionResult Edit(int? idClaim, string returnUrl)
+        {
+            if (idClaim == null)
+                return NotFound();
+
+            var claim = dataService.GetClaim(idClaim.Value);
+            if (claim == null)
+                return NotFound();
+
+            var canEditBaseInfo = securityService.HasPrivilege(Privileges.ClaimsWrite);
+
+            if (!canEditBaseInfo)
+                return View("NotAccess");
+
+            InitializeViewBag("Edit", returnUrl, canEditBaseInfo);
+            return View("Claim", dataService.GetClaimViewModel(claim));
+        }
+
+        [HttpPost]
+        public ActionResult Edit(ClaimVM claimVM, string returnUrl)
+        {
+            if (claimVM == null || claimVM.Claim == null)
+                return NotFound();
+
+            var canEditBaseInfo = securityService.HasPrivilege(Privileges.ClaimsWrite);
+
+            if (!canEditBaseInfo)
+                return View("NotAccess");
+
+            if (ModelState.IsValid)
+            {
+                dataService.Edit(claimVM.Claim);
+                return RedirectToAction("Details", new { claimVM.Claim.IdClaim });
+            }
+            InitializeViewBag("Edit", returnUrl, canEditBaseInfo);
+            return View("Claim", dataService.GetClaimViewModel(claimVM.Claim));
+        }
+
+        public ActionResult Delete(int? idClaim, string returnUrl)
+        {
+            if (idClaim == null)
+                return NotFound();
+
+            var claim = dataService.GetClaim(idClaim.Value);
+            if (claim == null)
+                return NotFound();
+
+            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
+                return View("NotAccess");
+
+            InitializeViewBag("Delete", returnUrl, false);
+
+            return View("Claim", dataService.GetClaimViewModel(claim));
+        }
+
+        [HttpPost]
+        public ActionResult Delete(ClaimVM claimVM)
+        {
+            if (claimVM == null || claimVM.Claim == null)
+                return NotFound();
+
+            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
+                return View("NotAccess");
+
+            dataService.Delete(claimVM.Claim.IdClaim);
+            return RedirectToAction("Index");
+        }
+
+        private void InitializeViewBag(string action, string returnUrl, bool canEditBaseInfo)
+        {
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = canEditBaseInfo;
+            if (returnUrl != null)
+            {
+                ViewBag.ReturnUrl = returnUrl;
+            }
             ViewBag.SecurityService = securityService;
-            ViewBag.IdClaim = idClaim;
-            ViewBag.ReturnUrl = returnUrl;
-            var claimVM = dataService.GetClaim(idClaim);
-            return View(claimVM);
         }
     }
 }

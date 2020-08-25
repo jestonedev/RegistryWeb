@@ -81,6 +81,29 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        internal void Create(Claim claim)
+        {
+            registryContext.Claims.Add(claim);
+            registryContext.SaveChanges();
+        }
+
+        internal void Edit(Claim claim)
+        {
+            registryContext.Claims.Update(claim);
+            registryContext.SaveChanges();
+        }
+
+        internal void Delete(int idClaim)
+        {
+            var claims = registryContext.Claims
+                    .FirstOrDefault(op => op.IdClaim == idClaim);
+            if (claims != null)
+            {
+                claims.Deleted = 1;
+                registryContext.SaveChanges();
+            }
+        }
+
         public IQueryable<Claim> AddressFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
         {
             if (filterOptions.IsAddressEmpty() &&
@@ -592,12 +615,31 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
-        public ClaimsVM GetClaim(int idClaim)
+        internal ClaimVM CreateClaimEmptyViewModel([CallerMemberName]string action = "")
         {
-            var viewModel = InitializeViewModel(null, null, null);
-            var claim = GetQuery().Where(r => r.IdClaim == idClaim).ToList();
-            viewModel.Claims = claim;
-            return viewModel;
+            var userName = securityService.User.UserName.ToLowerInvariant();
+            return new ClaimVM
+            {
+                Claim = new Claim(),
+                CurrentExecutor = registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
+                        e.ExecutorLogin.ToLowerInvariant() == userName),
+                StateTypes = registryContext.ClaimStateTypes.ToList()
+            };
+        }
+
+        internal ClaimVM GetClaimViewModel(Claim claim, [CallerMemberName]string action = "")
+        {
+            var claimVM = CreateClaimEmptyViewModel(action);
+            claimVM.Claim = claim;
+            claimVM.RentObjects = GetRentObjects(new List<Claim> { claim }).SelectMany(r => r.Value).ToList();
+            claimVM.LastPaymentInfo = GetLastPaymentsInfo(new List<Claim> { claim }).Select(r => r.Value).FirstOrDefault();
+            return claimVM;
+        }
+
+        public Claim GetClaim(int idClaim)
+        {
+            return registryContext.Claims.Include(r => r.IdAccountNavigation)
+                .FirstOrDefault(r => r.IdClaim == idClaim);
         }
     }
 }
