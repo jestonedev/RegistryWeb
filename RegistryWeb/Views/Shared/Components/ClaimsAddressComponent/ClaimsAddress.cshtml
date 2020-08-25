@@ -3,8 +3,8 @@
     var address = (Address)ViewData["Address"];
 }
 <div>
-        <button class="btn btn-success oi oi-home dropdown-toggle mr-1" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="homesBtn_@ViewData["IdAccount"]_@address.Id" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-        <div class="dropdown-menu" aria-labelledby="homesBtn_@ViewData["IdAccount"]_@address.Id">
+        <button class="btn btn-success oi oi-home dropdown-toggle mr-1" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="homesBtn_@ViewData["IdClaim"]_@address.Id" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+        <div class="dropdown-menu" aria-labelledby="homesBtn_@ViewData["IdClaim"]_@address.Id">
             @foreach (var addr in Model)
             {
                 if (addr.AddressType == AddressTypes.Building)

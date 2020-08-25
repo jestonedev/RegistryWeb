@@ -1,6 +1,6 @@
-﻿@model RegistryWeb.ViewModel.PaymentsVM;
+﻿@model RegistryWeb.ViewModel.ClaimsVM;
 @{
-    ViewData["Title"] = "Лицевые счета БКС";
+    ViewData["Title"] = "Претензионно-исковые работы";
     var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
         "(" + Model.PageOptions.TotalRows + ")" :
         "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
@@ -8,7 +8,7 @@
 
 @section styles
     {
-    <link rel="stylesheet" href="~/css/payment.accounts.css" runat="server" />
+    <link rel="stylesheet" href="~/css/claims.css" runat="server" />
 }
 
 <h2>@ViewData["Title"] @text</h2>
@@ -26,5 +26,5 @@
     <script src="~/js/index.common.js" asp-append-version="true"></script>
     <script src="~/js/address.filter.js" asp-append-version="true"></script>
     <script src="~/js/index.common.js" asp-append-version="true"></script>
-    <script src="~/js/index.PaymentAccounts.js" asp-append-version="true"></script>
+    <script src="~/js/index.Claims.js" asp-append-version="true"></script>
 }

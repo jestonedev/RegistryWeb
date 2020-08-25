@@ -44,6 +44,47 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("description")
                 .IsUnicode(false);
 
+            builder.Property(e => e.BksRequester)
+                .HasColumnName("bks_requester")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.TransferToLegalDepartmentDate)
+                .HasColumnName("transfert_to_legal_department_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.TransferToLegalDepartmentWho)
+                .HasColumnName("transfer_to_legal_department_who")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.AcceptedByLegalDepartmentDate)
+                .HasColumnName("accepted_by_legal_department_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.AcceptedByLegalDepartmentWho)
+                .HasColumnName("accepted_by_legal_department_who")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.ClaimDirectionDate)
+                .HasColumnName("claim_direction_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.ClaimDirectionDescription)
+                .HasColumnName("claim_direction_description")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.CourtOrderDate)
+                .HasColumnName("court_order_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.CourtOrderNum)
+                .HasColumnName("court_order_num")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
             builder.Property(e => e.Deleted)
                 .HasColumnName("deleted")
                 .HasColumnType("tinyint(1)")

@@ -1,7 +1,7 @@
 ﻿var searchModal = function () {
     addressClear();
     if ($("form.filterForm").valid()) {
-        $("#AccountSumFilters").find("input[type='text']").each(function (idx, elem) {
+        $(".c-arithmetic-op").next(".form-group").find("input[type='text']").each(function (idx, elem) {
             $(elem).val($(elem).val().replace(',', '.'));
         });
         $("form.filterForm").submit();
@@ -11,7 +11,7 @@
 
 var filterClearModal = function () {
     $("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal input[type='hidden'], #filterModal select").val("");
-    $('#FilterOptions_IdStreet, #FilterOptions_IdPreset').selectpicker('render');
+    $('#FilterOptions_IdStreet, #FilterOptions_IdClaimState').selectpicker('render');
     $("form.filterForm").valid();
 };
 var filterClear = function () {
@@ -19,23 +19,31 @@ var filterClear = function () {
     $("form.filterForm").submit();
 };
 
-var togglePaymentDetails = function (e) {
-    var paymentsDetail = $(this).closest("td").find(".rr-payments-detail");
-    var icon = $(this).find(".oi");
+var toggleDetails = function (self, selector) {
+    var claimDetail = $(self).closest("td").find(selector);
+    var icon = $(self).find(".oi");
     if (icon.hasClass("oi-chevron-bottom")) {
         icon.removeClass("oi-chevron-bottom");
         icon.addClass("oi-chevron-top");
-        paymentsDetail.show();
+        claimDetail.show();
     } else {
         icon.addClass("oi-chevron-bottom");
         icon.removeClass("oi-chevron-top");
-        paymentsDetail.hide();
+        claimDetail.hide();
     }
+};
+
+var toggleClaimDetails = function (e) {
+    toggleDetails(this, ".rr-claim-detail");
+    e.preventDefault();
+};
+
+var toggleAmountDetails = function (e) {
+    toggleDetails(this, ".rr-amount-detail");
     e.preventDefault();
 };
 
 $(function () {
-    $('#AccountSumFiltersToggler').on("click", $("#AccountSumFilters"), elementToogleHide);
     $('#searchModalBtn').click(searchModal);
     $('#filterClearModalBtn').click(filterClearModal);
     $('#filterClearBtn').click(filterClear);
@@ -46,16 +54,10 @@ $(function () {
         modal.modal('show');
     });
 
-    $(".rr-payments-details").on("click", togglePaymentDetails);
+    $(".rr-claim-details").on("click", toggleClaimDetails);
+    $(".rr-amount-details").on("click", toggleAmountDetails);
 
-    $("#AccountSumFilterCriteria").on("change", function () {
-        var val = $(this).val();
-        if (val === "1")
-            $("#FilterOptions_AtDate").val("");
-        $("#FilterOptions_AtDate").prop("disabled", val === "2" ? "" : "disabled");
-    });
-
-    $("#AccountSumFilters input[type='hidden']").each(function (idx, elem) {
+    $(".c-arithmetic-op").each(function (idx, elem) {
         var op = $(elem).val();
         var formGroup = $(elem).next(".form-group");
         var prepend = formGroup.find(".input-group .input-group-prepend button");
@@ -72,12 +74,12 @@ $(function () {
         }
     });
 
-    $("#AccountSumFilters .input-group .dropdown-menu .dropdown-item").on("click", function (e) {
+    $("#filterModal .input-group .dropdown-menu .dropdown-item").on("click", function (e) {
         var op = $(this).text();
         var prepend = $(this).closest(".input-group-prepend").find("button");
         prepend.text(op);
         var formGroup = prepend.closest(".form-group");
-        var input = formGroup.prev("input[type='hidden']");
+        var input = formGroup.prev(".c-arithmetic-op");
         switch (op) {
             case "≥":
                 input.val("1");
@@ -90,17 +92,11 @@ $(function () {
         }
     });
 
-    var hasAccountSumFilter = false;
-    $("#AccountSumFilters").find("input[type='text']").each(function (idx, elem) {
+    $(".c-arithmetic-op").next(".form-group").find("input[type='text']").each(function (idx, elem) {
         if ($(elem).val() !== "" && $(elem).val() !== null) {
             hasAccountSumFilter = true;
         }
         $(elem).val($(elem).val().replace('.', ','));
     });
-    if (hasAccountSumFilter) {
-        var toggler = $("#AccountSumFiltersToggler").first();
-        if (!isExpandElemntArrow(toggler)) {
-            toggler.click();
-        }
-    }
+
 });

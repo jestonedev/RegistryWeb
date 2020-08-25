@@ -1,0 +1,23 @@
+﻿.c-table > thead > tr > th a.sort {
+    color: #888;
+}
+
+.c-table > thead > tr > th a.sort:hover {
+    color: black;
+}
+
+.c-table > thead > tr > th a.sort.c-sorted {
+    color: #007bff;
+}
+
+.c-table > thead > tr > th a.sort.c-sorted:hover {
+    color: #0056b3;
+}
+
+.rr-claim-filter-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 0.24rem;
+}
