@@ -4,7 +4,7 @@ using RegistryWeb.Models.Entities;
 
 namespace RegistryWeb.Models.IEntityTypeConfiguration
 {
-    public class PreparersConfiguration: IEntityTypeConfiguration<Preparers>
+    public class PreparersConfiguration: IEntityTypeConfiguration<Preparer>
     {
         private string nameDatebase;
 
@@ -13,7 +13,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             this.nameDatebase = nameDatebase;
         }
 
-        public void Configure(EntityTypeBuilder<Preparers> builder)
+        public void Configure(EntityTypeBuilder<Preparer> builder)
         {
             builder.ToTable("preparers", nameDatebase);
 

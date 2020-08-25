@@ -118,7 +118,7 @@
         e.preventDefault();
     });
 
-    $("#preContractModal, #openDateModal").on("change", "select", function () {
+    $("#preContractModal, #openDateModal, #tenancyWarningModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
 
@@ -132,26 +132,58 @@
     });
 
     $("body").on('click', "#notifiesPrimaryBtn", function (e) {
-        console.log($(this));
         downloadFile("/TenancyReports/GetNotifiesPrimary");
         e.preventDefault();
     });
 
     $("body").on('click', "#notifiesSecondaryBtn", function (e) {
-        console.log($(this));
         downloadFile("/TenancyReports/GetNotifiesSecondary");
         e.preventDefault();
     });
 
     $("body").on('click', "#notifiesProlongContractBtn", function (e) {
-        console.log($(this));
         downloadFile("/TenancyReports/GetNotifiesProlongContract");
         e.preventDefault();
     });
 
     $("body").on('click', "#notifiesEvictionFromEmergencyFundBtn", function (e) {
-        console.log($(this));
         downloadFile("/TenancyReports/GetNotifiesEvictionFromEmergencyFund");
         e.preventDefault();
+    });
+
+    $("body").on('click', "#requestToMvdBtn, #requestToMvdNewBtn", function (e) {
+        var requestType = $(this).data("request-type");
+        downloadFile("/TenancyReports/GetRequestToMvd?requestType=" + requestType);
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#tenancyWarningBtn", function (e) {
+        $('#tenancyWarningModal').modal('toggle');
+        e.preventDefault();
+    });
+
+    $("#tenancyWarningModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("#tenancyWarningForm");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return false;
+        }
+        var idPreparer = $("#tenancyWarningModal").find("[name='TenancyWarning.IdPreparer']").val();
+        var isMultipageDocument = null;
+        if ($("#tenancyWarningModal").find("[name='TenancyWarning.IsMultipageDocument']").is(':checked')) {
+            isMultipageDocument = "True";
+        } else {
+            isMultipageDocument = "False";
+        }
+
+        var url = "/TenancyReports/GetTenancyWarning?idPreparer=" + idPreparer + "&isMultipageDocument=" + isMultipageDocument;
+
+        if (url !== undefined) {
+            downloadFile(url);
+        }
+
+        $("#tenancyWarningModal").modal("hide");
     });
 });

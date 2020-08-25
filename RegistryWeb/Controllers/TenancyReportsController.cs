@@ -18,6 +18,7 @@ namespace RegistryWeb.Controllers
         private readonly TenancyReportService reportService;
         private readonly TenancyReportsDataService dataService;
         private readonly SecurityService securityService;
+        private const string zipMime = "application/zip";
         private const string odtMime = "application/vnd.oasis.opendocument.text";
         private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
 
@@ -214,22 +215,37 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult GetRequestToMvd(int idProcess, int requestType)
+        public IActionResult GetRequestToMvd(int requestType, int idProcess = 0)
         {
             if (!securityService.HasPrivilege(Privileges.TenancyRead))
                 return View("NotAccess");
             try
             {
-                if (!dataService.HasRentObjects(idProcess))
+                List<int> ids = new List<int>();
+                var fileName = @"Запрос в МВД";
+                if (requestType == 2)
                 {
-                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
+                    fileName = @"Запрос в МВД - новый шаблон";
                 }
-                if (!dataService.HasTenancies(idProcess))
+                if (idProcess == 0)
                 {
-                    return Error(string.Format("В найме {0} отсутствуют участники", idProcess));
+                    ids = GetSessionIds();
                 }
-                var file = reportService.RequestToMvd(idProcess, requestType);
-                return File(file, odtMime, string.Format("Запрос в МВД (найм № {0})", idProcess));
+                else
+                {
+                    if (!dataService.HasRentObjects(idProcess))
+                    {
+                        return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
+                    }
+                    if (!dataService.HasTenancies(idProcess))
+                    {
+                        return Error(string.Format("В найме {0} отсутствуют участники", idProcess));
+                    }
+                    ids.Add(idProcess);
+                    fileName += string.Format(" (найм № {0})", idProcess);
+                }
+                var file = reportService.RequestToMvd(ids, requestType);
+                return File(file, odtMime, fileName);
             }
             catch (Exception ex)
             {
@@ -237,7 +253,6 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        //_________________Для массовых____________________ 
         private IActionResult GetNotifies(TenancyNotifiesReportTypeEnum reportType, string fileName)
         {
             if (!securityService.HasPrivilege(Privileges.TenancyRead))
@@ -245,7 +260,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 List<int> ids = GetSessionIds();
-                var file = reportService.GetNotifies(ids, reportType);
+                var file = reportService.Notifies(ids, reportType);
                 return File(file, odtMime, string.Format(fileName));
             }
             catch (Exception ex)
@@ -271,6 +286,24 @@ namespace RegistryWeb.Controllers
         public IActionResult GetNotifiesEvictionFromEmergencyFund()
         {
             return GetNotifies(TenancyNotifiesReportTypeEnum.PrintNotifiesEvictionFromEmergencyFund, @"Уведомление о выселении из АФ");
+        }
+
+        public IActionResult GetTenancyWarning(int idPreparer, bool isMultipageDocument)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+            try
+            {
+                List<int> ids = GetSessionIds();
+                var file = reportService.TenancyWarning(ids, idPreparer, isMultipageDocument);
+                if (isMultipageDocument)
+                    return File(file, odtMime, @"Предупреждения");
+                return File(file, zipMime, @"Предупреждения"); 
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
         }
     }
 }

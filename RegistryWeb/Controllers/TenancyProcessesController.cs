@@ -311,6 +311,7 @@ namespace RegistryWeb.Controllers
             var ids = GetSessionIds();
             var viewModel = dataService.GetPremisesViewModelForMassReports(ids, pageOptions);
             ViewBag.Count = viewModel.TenancyProcesses.Count();
+            ViewBag.Preparers = new SelectList(dataService.Preparers, "IdPreparer", "PreparerName");
             return View("TenancyProcessesReports", viewModel);
         }
     }
