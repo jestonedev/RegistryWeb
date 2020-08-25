@@ -6,13 +6,17 @@ $(function () {
 
     function claimCustomValidations(validator) {
         var isValid = true;
-        // TODO: Валидация состояний при добавлении
+
         return isValid;
     }
 
     $("#ClaimForm").on("submit", function (e) {
         var action = $("#ClaimForm").data("action");
         $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
+        $("input.decimal").each(function (idx, elem) {
+            $(elem).val($(elem).val().replace(".", ","));
+        });
+
         var validator = $(this).validate();
         var isFormValid = $(this).valid();
         if (!claimCustomValidations(validator)) {
@@ -62,5 +66,72 @@ $(function () {
 
     $("#createBtn, #editBtn, #deleteBtn").on("click", function () {
         $("#ClaimForm").submit();
+    });
+
+    $("#ClaimAmount .decimal").on("focusout", function () {
+        var totalSum = 0;
+        var tenancyElem = $("#Claim_AmountTenancy");
+        if (tenancyElem.valid() && tenancyElem.val() !== "" && tenancyElem.val() !== null) {
+            let sum = parseFloat(tenancyElem.val().replace(",", "."));
+            tenancyElem.val(sum.toFixed(2).replace(".", ","));
+            totalSum += sum;
+        }
+        var penaltiesElem = $("#Claim_AmountPenalties");
+        if (penaltiesElem.valid() && penaltiesElem.val() !== "" && penaltiesElem.val() !== null) {
+            let sum = parseFloat(penaltiesElem.val().replace(",", "."));
+            penaltiesElem.val(sum.toFixed(2).replace(".", ","));
+            totalSum += sum;
+        }
+        var dgiElem = $("#Claim_AmountDgi");
+        if (dgiElem.valid() && dgiElem.val() !== "" && dgiElem.val() !== null) {
+            let sum = parseFloat(dgiElem.val().replace(",", "."));
+            dgiElem.val(sum.toFixed(2).replace(".", ","));
+            totalSum += sum;
+        }
+        var padunElem = $("#Claim_AmountPadun");
+        if (padunElem.valid() && padunElem.val() !== "" && padunElem.val() !== null) {
+            let sum = parseFloat(padunElem.val().replace(",", "."));
+            padunElem.val(sum.toFixed(2).replace(".", ","));
+            totalSum += sum;
+        }
+        var pkkElem = $("#Claim_AmountPkk");
+        if (pkkElem.valid() && pkkElem.val() !== "" && pkkElem.val() !== null) {
+            let sum = parseFloat(pkkElem.val().replace(",", "."));
+            pkkElem.val(sum.toFixed(2).replace(".", ","));
+            totalSum += sum;
+        }
+        $("#Claim_AmountTotal").val(totalSum.toFixed(2).replace(".", ","));
+    });
+
+
+    $("#Claim_IdAccountNavigation_Account").on("input", function () {
+        $("#Claim_IdAccount").val("");
+    });
+
+    $("#Claim_IdAccountNavigation_Account").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + '/Claims/GetAccounts',
+                dataType: 'json',
+                data: { text: request.term },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        return { label: item.account, value: item.account, idAccount: item.idAccount };
+                    }));
+                }
+            });
+        },
+        select: function (event, ui) {
+            $("#Claim_IdAccount").val(ui.item.idAccount);
+            $("#Claim_IdAccountNavigation_Account").val(ui.item.value);
+        },
+        minLength: 3
+    });
+
+    $("#Claim_IdAccountNavigation_Account").on("focusout", function () {
+        if ($('#Claim_IdAccount').val() === "") {
+            $('#Claim_IdAccountNavigation_Account').val("");
+        }
     });
 });

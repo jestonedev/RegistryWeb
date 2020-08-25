@@ -23,7 +23,7 @@ namespace RegistryWeb.Models.Entities
         public DateTime? StartDeptPeriod { get; set; }
         public DateTime? EndDeptPeriod { get; set; }
         public string Description { get; set; }
-        public byte EndedForFilter { get; set; }
+        public bool EndedForFilter { get; set; }
         public decimal? LastAccountBalanceOutput { get; set; }
         public byte Deleted { get; set; }
         public virtual PaymentAccount IdAccountNavigation { get; set; }
