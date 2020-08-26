@@ -22,7 +22,7 @@ using Microsoft.Extensions.Configuration;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
-    public class PremisesController : ListController<PremisesDataService>
+    public class PremisesController : ListController<PremisesDataService, PremisesListFilter>
     {
         private readonly IConfiguration config;
         public PremisesController(PremisesDataService dataService, SecurityService securityService, IConfiguration config)

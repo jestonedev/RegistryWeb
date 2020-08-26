@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
+using RegistryWeb.ViewOptions.Filter;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
-    public class ChangeLogController : ListController<ChangeLogsDataService>
+    public class ChangeLogController : ListController<ChangeLogsDataService, ChangeLogsFilter>
     {
         public ChangeLogController(ChangeLogsDataService dataService, SecurityService securityService)
             : base(dataService, securityService)

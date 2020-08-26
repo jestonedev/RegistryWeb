@@ -13,7 +13,16 @@ namespace RegistryWeb.Models.Entities
         public DateTime? DateStartState { get; set; }
         public string Executor { get; set; }
         public string Description { get; set; }
-        // TODO: Вставить недостающие поля по этапам состояний
+        public string BksRequester { get; set; }
+        public DateTime? TransferToLegalDepartmentDate { get; set; }
+        public string TransferToLegalDepartmentWho { get; set; }
+        public DateTime? AcceptedByLegalDepartmentDate { get; set; }
+        public string AcceptedByLegalDepartmentWho { get; set; }
+        public DateTime? ClaimDirectionDate { get; set; }
+        public string ClaimDirectionDescription { get; set; }
+        public DateTime? CourtOrderDate { get; set; }
+        public string CourtOrderNum { get; set; }
+        // TODO obtaining_court_order_date - claim_complete_reason
         public byte Deleted { get; set; }
         public virtual Claim IdClaimNavigation { get; set; }
         public virtual ClaimStateType IdStateTypeNavigation { get; set; }

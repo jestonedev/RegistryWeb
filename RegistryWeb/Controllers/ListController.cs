@@ -1,9 +1,10 @@
 ﻿using RegistryWeb.DataServices;
 using RegistryWeb.SecurityServices;
+using RegistryWeb.ViewOptions;
 
 namespace RegistryWeb.Controllers
 {
-    public class ListController<LDS> : RegistryBaseController where LDS : IListDataService
+    public class ListController<LDS, F> : SessionController<F> where LDS : IListDataService where F : FilterOptions
     {
         protected readonly LDS dataService;
         protected readonly SecurityService securityService;

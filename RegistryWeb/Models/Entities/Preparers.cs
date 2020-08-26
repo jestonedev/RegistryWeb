@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace RegistryWeb.Models.Entities
 {
-    public partial class Preparers
+    public partial class Preparer
     {
         public int IdPreparer { get; set; }
         public string PreparerName { get; set; }

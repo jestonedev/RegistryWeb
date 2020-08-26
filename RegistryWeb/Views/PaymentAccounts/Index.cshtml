@@ -7,7 +7,7 @@
 }
 
 @section styles
-{
+    {
     <link rel="stylesheet" href="~/css/payment.accounts.css" runat="server" />
 }
 
@@ -18,11 +18,13 @@
 
 <page-link page-model="Model.PageOptions" page-action="Index"></page-link>
 @section validation
-{
+    {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
 }
 @section Scripts {
+    <script src="~/js/index.common.js" asp-append-version="true"></script>
+    <script src="~/js/address.filter.js" asp-append-version="true"></script>
     <script src="~/js/index.common.js" asp-append-version="true"></script>
     <script src="~/js/index.PaymentAccounts.js" asp-append-version="true"></script>
 }

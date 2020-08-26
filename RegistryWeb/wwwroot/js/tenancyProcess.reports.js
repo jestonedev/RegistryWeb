@@ -118,7 +118,96 @@
         e.preventDefault();
     });
 
-    $("#preContractModal, #openDateModal").on("change", "select", function () {
+    $("#preContractModal, #openDateModal, #tenancyWarningModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
+    });
+
+    /*      МУЛЬТИМАСТЕР        */
+
+    $(".pagination .page-link").on("click", function (e) {
+        var path = location.pathname;
+        var page = $(this).data("page");
+        location.href = path + "?PageOptions.CurrentPage=" + page;
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#notifiesPrimaryBtn", function (e) {
+        downloadFile("/TenancyReports/GetNotifiesPrimary");
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#notifiesSecondaryBtn", function (e) {
+        downloadFile("/TenancyReports/GetNotifiesSecondary");
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#notifiesProlongContractBtn", function (e) {
+        downloadFile("/TenancyReports/GetNotifiesProlongContract");
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#notifiesEvictionFromEmergencyFundBtn", function (e) {
+        downloadFile("/TenancyReports/GetNotifiesEvictionFromEmergencyFund");
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#requestToMvdBtn, #requestToMvdNewBtn", function (e) {
+        var requestType = $(this).data("request-type");
+        downloadFile("/TenancyReports/GetRequestToMvd?requestType=" + requestType);
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#tenancyWarningBtn", function (e) {
+        $('#tenancyWarningModal').modal('toggle');
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#tenancyContractRegDateBtn", function (e) {
+        $('#tenancyContractRegDateModal').modal('toggle');
+        e.preventDefault();
+    });
+
+    $("#tenancyWarningModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("#tenancyWarningForm");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return false;
+        }
+        var idPreparer = $("#tenancyWarningModal").find("[name='TenancyWarning.IdPreparer']").val();
+        var isMultipageDocument = null;
+        if ($("#tenancyWarningModal").find("[name='TenancyWarning.IsMultipageDocument']").is(':checked')) {
+            isMultipageDocument = "True";
+        } else {
+            isMultipageDocument = "False";
+        }
+
+        var url = "/TenancyReports/GetTenancyWarning?idPreparer=" + idPreparer + "&isMultipageDocument=" + isMultipageDocument;
+
+        if (url !== undefined) {
+            downloadFile(url);
+        }
+
+        $("#tenancyWarningModal").modal("hide");
+    });
+
+    $("#tenancyContractRegDateModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("#tenancyContractRegDateForm");
+        var isValid = form.valid();
+        if (!isValid) {
+            return false;
+        }
+        var regDate = $("#tenancyContractRegDateModal").find("[name='TenancyContractRegDate.RegDate']").val();
+        $.ajax({
+            type: 'GET',
+            url: window.location.origin + '/TenancyReports/SetTenancyContractRegDate?regDate=' + regDate,
+            success: function (data) {
+                console.log(data);
+                $('.status').text(data);
+                $("#tenancyContractRegDateModal").modal("hide");
+            }
+        });
     });
 });

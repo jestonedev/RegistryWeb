@@ -15,7 +15,7 @@ using RegistryWeb.ViewOptions.Filter;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
-    public class PaymentAccountsController : ListController<PaymentAccountsDataService>
+    public class PaymentAccountsController : ListController<PaymentAccountsDataService, PaymentsFilter>
     {
         public PaymentAccountsController(PaymentAccountsDataService dataService, SecurityService securityService)
             : base(dataService, securityService)
@@ -47,9 +47,17 @@ namespace RegistryWeb.Controllers
                 viewModel.FilterOptions));
         }
 
-        public IActionResult Details(int idAccount)
+        public IActionResult Details(int idAccount, string returnUrl)
         {
-            return NotFound();
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+            ViewBag.SecurityService = securityService;
+            ViewBag.IdAccount = idAccount;
+            ViewBag.ReturnUrl = returnUrl;
+            var paymentsVM = dataService.GetPaymentsHistory(idAccount);
+            if (!paymentsVM.Payments.Any())
+                return Error("Ошибка формирования списка платежей по лицевому счету");
+            return View(paymentsVM);
         }
     }
 }

@@ -107,7 +107,7 @@ namespace RegistryWeb.DataServices
         internal TenancyProcessesVM GetViewModel(
             OrderOptions orderOptions,
             PageOptions pageOptions,
-            TenancyProcessesFilter filterOptions)
+            TenancyProcessesFilter filterOptions, out List<int> filteredIds)
         {
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
             var tenancyProcesses = GetQuery();
@@ -118,6 +118,9 @@ namespace RegistryWeb.DataServices
             var count = query.Count();
             viewModel.PageOptions.Rows = count;
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+
+            filteredIds = query.Select(p => p.IdProcess).ToList();
+
             if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
                 viewModel.PageOptions.CurrentPage = 1;
             query = GetQueryPage(query, viewModel.PageOptions);
@@ -947,6 +950,28 @@ namespace RegistryWeb.DataServices
                 .Take(pageOptions.SizePage);
         }
 
+        public IQueryable<TenancyProcess> GetTenancyProcessesForMassReports(List<int> ids)
+        {
+            return registryContext.TenancyProcesses
+                .Where(tp => ids.Contains(tp.IdProcess));
+        }
+
+        public TenancyProcessesVM GetPremisesViewModelForMassReports(List<int> ids, PageOptions pageOptions)
+        {
+            var viewModel = InitializeViewModel(null, pageOptions, null);
+            var tenancyProcesses = GetTenancyProcessesForMassReports(ids);
+            viewModel.PageOptions.TotalRows = tenancyProcesses.Count();
+            var count = tenancyProcesses.Count();
+            viewModel.PageOptions.Rows = count;
+            viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+
+            if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
+                viewModel.PageOptions.CurrentPage = 1;
+            viewModel.TenancyProcesses = GetQueryPage(tenancyProcesses, viewModel.PageOptions).ToList();
+            viewModel.RentObjects = GetRentObjects(viewModel.TenancyProcesses);
+            return viewModel;
+        }
+
         public IEnumerable<TenancyReasonType> TenancyReasonTypes
         {
             get => registryContext.TenancyReasonTypes.AsNoTracking();
@@ -979,6 +1004,11 @@ namespace RegistryWeb.DataServices
         public IEnumerable<DistrictCommitteesPreContractPreamble> DistrictCommitteesPreContractPreambles
         {
             get => registryContext.DistrictCommitteesPreContractPreambles.AsNoTracking();
+        }
+
+        public IEnumerable<Preparer> Preparers
+        {
+            get => registryContext.Preparers.AsNoTracking();
         }
     }
 }

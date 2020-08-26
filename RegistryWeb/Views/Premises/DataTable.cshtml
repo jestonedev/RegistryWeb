@@ -176,7 +176,7 @@
                     else
                     {
                         <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                           asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises" asp-route-action="Details"></a>
+                           asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
 
                     }
 
@@ -201,12 +201,14 @@
                             {
                                 <a class="dropdown-item" title="Лицевые счета БКС" aria-label="Лицевые счета"
                                    asp-controller="PaymentAccounts" asp-action="Index" asp-route-filterOptions.IdPremises="@item.IdPremises">Лицевые счета БКС</a>
+                                <a class="dropdown-item" title="Исковые работы" aria-label="Исковые работы"
+                                   asp-controller="Claims" asp-action="Index" asp-route-filterOptions.IdPremises="@item.IdPremises">Исковые работы</a>
                             }
                         </div>
                     </div>
 
                     <div class="btn-group" role="group" aria-label="Отчеты">
-                        <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="отчеты" id="reportsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdPremises">
                             <a class="dropdown-item rr-report-premise-excerpt" href="#" title="Выписка на помещение" aria-label="Выписка на помещение" data-id-premise="@item.IdPremises">Выписка на помещение</a>
                             <a class="dropdown-item rr-report-mun-sub-premises-excerpt" href="#" title="Выписка на мун. комнаты" aria-label="Выписка на мун. комнаты" data-id-premise="@item.IdPremises">Выписка на мун. комнаты</a>

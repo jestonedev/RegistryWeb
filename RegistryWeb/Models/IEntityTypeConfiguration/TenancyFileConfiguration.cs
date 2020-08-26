@@ -32,7 +32,6 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.Property(e => e.FileName)
                 .HasColumnName("file_name")
-                .IsRequired()
                 .HasMaxLength(255)
                 .IsUnicode(false);
 

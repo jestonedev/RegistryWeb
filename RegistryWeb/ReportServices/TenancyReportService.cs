@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using RegistryWeb.SecurityServices;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -105,11 +106,12 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
-        public byte[] RequestToMvd(int idProcess, int requestType)
+        public byte[] RequestToMvd(List<int> ids, int requestType)
         {
             var tmpFileName = Path.GetTempFileName();
+            var tenacyProcessesStr = ids.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
             using (var sw = new StreamWriter(tmpFileName))
-                sw.Write(idProcess);
+                sw.Write(tenacyProcessesStr);
             var arguments = new Dictionary<string, object>
             {
                 { "idsTmpFile", tmpFileName }
@@ -120,6 +122,41 @@ namespace RegistryWeb.ReportServices
                 fileName = "registry\\tenancy\\requestMVDNew";
             }
             var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+
+        public byte[] Notifies(List<int> ids, TenancyNotifiesReportTypeEnum reportType)
+        {
+            var tenacyProcessesStr = ids.Select(id => id.ToString()).Aggregate((x,y) => x + "," + y);
+            var idExecutor = securityService.Executor?.IdExecutor.ToString() ?? "0";
+            var arguments = new Dictionary<string, object>
+            {
+                { "id_executor", idExecutor },
+                { "report_type", ((int)reportType).ToString() },
+                { "process_ids", tenacyProcessesStr }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\notifies");
+            return DownloadFile(fileNameReport);
+        }
+
+        public byte[] TenancyWarning(List<int> ids, int idPreparer, bool isMultipageDocument)
+        {
+            var tenacyProcessesStr = ids.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
+            var tempFileName = Path.GetTempFileName();
+            using (var sw = new StreamWriter(tempFileName))
+                sw.Write(tenacyProcessesStr);
+            var arguments = new Dictionary<string, object>
+            {
+                { "idPreparer", idPreparer.ToString() },
+                { "idsTmpFile", tempFileName }
+            };
+            string fileNameReport = "";
+            if (isMultipageDocument)
+            {
+                fileNameReport = GenerateReport(arguments, "registry\\tenancy\\tenancy_warning_multipage_web");
+                return DownloadFile(fileNameReport);
+            }
+            fileNameReport = GenerateMultiFileReport(arguments, "registry\\tenancy\\tenancy_warning_web");
             return DownloadFile(fileNameReport);
         }
     }

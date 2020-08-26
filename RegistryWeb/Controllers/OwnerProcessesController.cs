@@ -16,7 +16,7 @@ using RegistryWeb.ViewOptions.Filter;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
-    public class OwnerProcessesController : ListController<OwnerProcessesDataService>
+    public class OwnerProcessesController : ListController<OwnerProcessesDataService, OwnerProcessesFilter>
     {
         public OwnerProcessesController(OwnerProcessesDataService dataService, SecurityService securityService)
             : base(dataService, securityService)

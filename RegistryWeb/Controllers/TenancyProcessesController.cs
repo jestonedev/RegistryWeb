@@ -14,15 +14,19 @@ using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
-    public class TenancyProcessesController : ListController<TenancyProcessesDataService>
+    public class TenancyProcessesController : ListController<TenancyProcessesDataService, TenancyProcessesFilter>
     {
         public TenancyProcessesController(TenancyProcessesDataService dataService, SecurityService securityService)
             : base(dataService, securityService)
         {
+            nameFilteredIdsDict = "filteredTenancyProcessesIdsDict";
+            nameIds = "idTenancyProcesses";
+            nameMultimaster = "TenancyProcessesReports";
         }
 
         // GET: TenancyProcesses
@@ -47,10 +51,15 @@ namespace RegistryWeb.Controllers
             ViewBag.SecurityService = securityService;
             ViewBag.DistrictCommittees = new SelectList(dataService.DistrictCommittees, "IdCommittee", "NameNominative");
             ViewBag.DistrictCommitteesPreambles = new SelectList(dataService.DistrictCommitteesPreContractPreambles, "IdPreamble", "Name");
-            return View(dataService.GetViewModel(
+
+            var vm = dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
-                viewModel.FilterOptions));
+                viewModel.FilterOptions, out List<int> filteredTenancyProcessesIds);
+
+            AddSearchIdsToSession(vm.FilterOptions, filteredTenancyProcessesIds);
+
+            return View(vm);
         }
 
         private void InitializeViewBag(string action, string returnUrl, bool canEditBaseInfo)
@@ -293,6 +302,17 @@ namespace RegistryWeb.Controllers
             {
                 Code = 0
             });
+        }      
+
+        public IActionResult TenancyProcessesReports(PageOptions pageOptions)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+            var ids = GetSessionIds();
+            var viewModel = dataService.GetPremisesViewModelForMassReports(ids, pageOptions);
+            ViewBag.Count = viewModel.TenancyProcesses.Count();
+            ViewBag.Preparers = new SelectList(dataService.Preparers, "IdPreparer", "PreparerName");
+            return View("TenancyProcessesReports", viewModel);
         }
     }
 }

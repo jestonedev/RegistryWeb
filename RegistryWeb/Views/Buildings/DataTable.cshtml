@@ -40,7 +40,7 @@
                        data-order-field="Address" data-order-direction="@(Model.OrderOptions.OrderField == "Address" ? "1" : "0")"></a>
                 }
             </th>
-            <th class="align-middle">
+            <th class="align-middle d-none d-md-table-cell">
                 Текущее состояние
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "ObjectState")
                 {
@@ -99,7 +99,7 @@
                         </div>
                     </div>
                 </td>
-                <td>@item.IdStateNavigation.StateNeutral</td>
+                <td class="d-none d-md-table-cell">@item.IdStateNavigation.StateNeutral</td>
                 <td>
                     <div class="btn-group" role="group" aria-label="Панель доступа">
                         @{
@@ -125,7 +125,7 @@
                         else
                         {
                             <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                               asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding"></a>
+                               asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                         }
                         <div class="btn-group" role="group" aria-label="Панель доступа">
                             <button class="btn btn-dark oi oi-grid-two-up dropdown-toggle" type="button" title="Связанные объекты" aria-label="Связанные объекты" id="objectsBtn_@item.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
@@ -151,7 +151,7 @@
                             </div>
                         </div>
                         <div class="btn-group" role="group" aria-label="Отчеты">
-                            <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="отчеты" id="reportsBtn_@item.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@item.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdBuilding">
                                 <a class="dropdown-item rr-report-building-excerpt" href="#" title="Выписка на здание" aria-label="Выписка на здание" data-id-building="@item.IdBuilding">Выписка на здание</a>
                             </div>

@@ -1,0 +1,261 @@
+﻿@using RegistryWeb.Extensions;
+@using RegistryWeb.ViewOptions;
+@using RegistryWeb.SecurityServices;
+@using RegistryWeb.ViewModel;
+@model RegistryWeb.ViewModel.ClaimsVM;
+@{
+    Context.Session.Set("Controller", "Claims");
+    Context.Session.Set("Action", "Index");
+    Context.Session.Set("OrderOptions", Model.OrderOptions);
+    Context.Session.Set("FilterOptions", Model.FilterOptions);
+    Context.Session.Set("PageOptions", Model.PageOptions);
+    var securityService = (SecurityService)ViewData["SecurityService"];
+}
+
+<table class="table table-hover c-table">
+    <thead>
+        <tr style="align-content: center;">
+            <th class="r-table-header-cell" style="width:155px;">
+                № по реестру
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "IdClaim")
+                {
+                    <a href="#" title="Сортировка по реестровому номеру"  class="oi oi-sort-descending sort c-sorted" data-order-field="IdClaim" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" title="Сортировка по реестровому номеру" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "IdClaim" ? "c-sorted" : "")"
+                       data-order-field="IdClaim" data-order-direction="@(Model.OrderOptions.OrderField == "IdClaim" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="r-table-header-cell">
+                Информация об ИР
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "AtDate")
+                {
+                    <a href="#" title="Сортировка по дате формирования" 
+                       class="oi oi-sort-descending sort c-sorted" data-order-field="AtDate" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" title="Сортировка по дате формирования" 
+                       class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "AtDate" ? "c-sorted" : "")"
+                       data-order-field="AtDate" data-order-direction="@(Model.OrderOptions.OrderField == "AtDate" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="r-table-header-cell">
+                Адрес
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Address")
+                {
+                    <a href="#" title="Сортировка по адресу жилищного фонда"  class="oi oi-sort-descending sort c-sorted" data-order-field="Address" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" title="Сортировка по адресу жилищного фонда" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Address" ? "c-sorted" : "")"
+                       data-order-field="Address" data-order-direction="@(Model.OrderOptions.OrderField == "Address" ? "1" : "0")"></a>
+                }
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Claims)
+        {
+            RegistryWeb.Models.Entities.Payment lastPaymentInfo = null;
+            if (Model.LastPaymentInfo.ContainsKey(item.IdAccount))
+            {
+                lastPaymentInfo = Model.LastPaymentInfo[item.IdAccount];
+            }
+            var lastClaimState = item.ClaimStates.OrderByDescending(cs => cs.IdState).FirstOrDefault();
+            var isOpenedClaim = lastClaimState == null || lastClaimState.IdStateType != 6;
+            <tr>
+                <td style="@(isOpenedClaim ? "background-color: #FEDCDC" : "")" title="@(isOpenedClaim ? "Претензионно-исковая работа не завершена" : "")">
+                    @item.IdClaim
+                </td>
+                <td>
+                    <a class="float-right ml-2 text-dark rr-claim-details" title="Детальная информация" href="#"><span class="oi oi-chevron-bottom"></span></a>
+                    <div>
+                        <b>Лицевой счет:</b> @item.IdAccountNavigation.Account
+                    </div>
+                    <div>
+                        @if (lastPaymentInfo != null)
+                        {
+                            <b>Наниматель:</b> @lastPaymentInfo.Tenant
+                        }
+                    </div>
+                    <div class="rr-claim-detail" style="display: none">
+                        <b>Дата формирования:</b> @(item.AtDate != null ? item.AtDate.Value.ToString("dd.MM.yyyy") : "н/а")
+                    </div>
+                    <div class="rr-claim-detail" style="display: none">
+                        @if (item.StartDeptPeriod != null || item.EndDeptPeriod != null)
+                        {
+                            <b>Предъявлен период:</b><br />
+                            if (item.StartDeptPeriod != null)
+                            {
+                                <span>с </span>@item.StartDeptPeriod.Value.ToString("dd.MM.yyyy")
+                            }
+                            @if (item.EndDeptPeriod != null)
+                            {
+                                <span>по </span>@item.EndDeptPeriod.Value.ToString("dd.MM.yyyy")
+                            }
+                            else
+                            {
+                                <span>бессрочно</span>
+                            }
+                        }
+                    </div>
+
+                    <div class="rr-claim-detail" style="display: none">
+                        @{ 
+                            var courtClaimState = item.ClaimStates.FirstOrDefault(r => r.IdStateType == 4);
+                        }
+                        @if (courtClaimState != null && !string.IsNullOrEmpty(courtClaimState.CourtOrderNum))
+                        {
+                            <b>Номер с/п:</b> @courtClaimState.CourtOrderNum
+                        }
+                    </div>
+
+                    @if (lastClaimState != null)
+                    {
+                        var stateType = Model.StateTypes.FirstOrDefault(st => st.IdStateType == lastClaimState.IdStateType);
+                        <div class="rr-claim-detail" style="display: none">
+                            <b>Текущее состояние: </b><br />@stateType.StateType
+                        </div>
+                        @if (lastClaimState.DateStartState != null)
+                        {
+                            <div class="rr-claim-detail" style="display: none">
+                                <b>Дата установки: </b>@lastClaimState.DateStartState.Value.ToString("dd.MM.yyyy")
+                            </div>
+                        }
+                    }
+
+                    <hr class="m-0 mt-2 mb-1" />
+                    <div>
+                        <a class="float-right ml-2 text-dark rr-amount-details" title="Детальная информация" href="#"><span class="oi oi-chevron-bottom"></span></a>
+                        <b>Сумма к взысканию:</b><br />
+                        <div>
+                            Найм: @item.AmountTenancy руб.
+                        </div>
+                        @if (item.AmountPenalties != null && item.AmountPenalties != 0)
+                        {
+                            <div>
+                                Пени: @item.AmountPenalties руб.
+                            </div>
+                        }
+                        @if (item.AmountDgi != null && item.AmountDgi != 0)
+                        {
+                            <div>
+                                ДГИ: @item.AmountDgi руб.
+                            </div>
+                        }
+                        @if (item.AmountPadun != null && item.AmountPadun != 0)
+                        {
+                            <div>
+                                Падун: @item.AmountPadun руб.
+                            </div>
+                        }
+                        @if (item.AmountPkk != null && item.AmountPkk != 0)
+                        {
+                            <div>
+                                ПКК: @item.AmountPkk руб.
+                            </div>
+                        }
+                        <div>
+                            <b>Итого:</b> @(item.AmountTenancy + item.AmountPenalties + item.AmountPkk + item.AmountPadun + item.AmountDgi)  руб.
+                        </div>
+                        @if (lastPaymentInfo != null)
+                        {
+                            <div class="rr-amount-detail" style="display: none">
+                                <b>Сальдо (посл. мес.) (вх. <span class="oi oi-arrow-right"></span> исх.):</b><br />
+                                <div>
+                                    Найм: @lastPaymentInfo.BalanceTenancy руб. <span class="oi oi-arrow-right"></span>  @lastPaymentInfo.BalanceOutputTenancy руб.
+                                </div>
+                                @if (lastPaymentInfo.BalanceInputPenalties != 0 || lastPaymentInfo.BalanceOutputPenalties != 0)
+                                {
+                                    <div>
+                                        Пени: @lastPaymentInfo.BalanceInputPenalties руб. <span class="oi oi-arrow-right"></span>  @lastPaymentInfo.BalanceOutputPenalties руб.
+                                    </div>
+                                }
+                                @if (lastPaymentInfo.BalanceDgi != 0 || lastPaymentInfo.BalanceOutputDgi != 0)
+                                {
+                                    <div>
+                                        ДГИ: @lastPaymentInfo.BalanceDgi руб. <span class="oi oi-arrow-right"></span>  @lastPaymentInfo.BalanceOutputDgi руб.
+                                    </div>
+                                }
+                                @if (lastPaymentInfo.BalancePadun != 0 || lastPaymentInfo.BalanceOutputPadun != 0)
+                                {
+                                    <div>
+                                        Падун: @lastPaymentInfo.BalancePadun руб. <span class="oi oi-arrow-right"></span>  @lastPaymentInfo.BalanceOutputPadun руб.
+                                    </div>
+                                }
+                                @if (lastPaymentInfo.BalancePkk != 0 || lastPaymentInfo.BalanceOutputPkk != 0)
+                                {
+                                    <div>
+                                        ПКК: @lastPaymentInfo.BalancePkk руб. <span class="oi oi-arrow-right"></span>  @lastPaymentInfo.BalanceOutputPkk руб.
+                                    </div>
+                                }
+                                <div>
+                                    <b>Итого:</b> @lastPaymentInfo.BalanceInput руб. <span class="oi oi-arrow-right"></span>  @lastPaymentInfo.BalanceOutputTotal руб.
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </td>
+                <td>
+                    @if (Model.RentObjects.ContainsKey(item.IdAccount))
+                    {
+                        <div class="mb-2">
+                            <b>По жилищному фонду: </b><br />
+                            @foreach (var address in Model.RentObjects[item.IdAccount])
+                            {
+                                @await Component.InvokeAsync("ClaimsAddressComponent", new { address = address, idClaim = item.IdClaim })
+                            }
+                        </div>
+                    }
+                    <div>
+                        <b>По БКС: </b><br />@item.IdAccountNavigation.RawAddress<br />
+                        @item.IdAccountNavigation.Crn
+                    </div>
+                </td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        @if (securityService.HasPrivilege(Privileges.ClaimsWrite))
+                        {
+                            <div class="btn-group" role="group" aria-label="Панель доступа">
+                                <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdClaim" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right but text-center" aria-labelledby="toolsBtn_@item.IdClaim">
+                                    <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                                       asp-controller="Claims" asp-action="Details" asp-route-idClaim="@item.IdClaim" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                    <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                                       asp-controller="Claims" asp-action="Edit" asp-route-idClaim="@item.IdClaim" asp-route-action="Edit" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                    <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                                       asp-controller="Claims" asp-action="Delete" asp-route-idClaim="@item.IdClaim" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                               asp-controller="Claims" asp-action="Details" asp-route-idClaim="@item.IdClaim" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                        }
+
+                        <div class="btn-group" role="group" aria-label="Панель доступа">
+
+                            <button class="btn btn-dark oi oi-grid-two-up dropdown-toggle" type="button" title="Связанные объекты" aria-label="Связанные объекты" id="objectsBtn_@item.IdClaim" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@item.IdClaim">
+                                <a class="dropdown-item" title="Лицевой счет БКС" aria-label="Лицевой счет БКС"
+                                   asp-controller="PaymentAccounts" asp-action="Details" asp-route-idAccount="@item.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет БКС</a>
+                            </div>
+                        </div>
+
+                        <div class="btn-group" role="group" aria-label="Отчеты">
+                            <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@item.IdClaim" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdClaim">
+                                <a class="dropdown-item rr-report-request-to-bsk disabled" href="#" title="Запрос в БКС" aria-label="Запрос в БКС" data-id-claim="@item.IdClaim">Запрос в БКС</a>
+                                <a class="dropdown-item rr-report-memo-to-lawyers disabled" href="#" title="СЗ в юридический отдел" aria-label="СЗ в юридический отдел" data-id-claim="@item.IdClaim">СЗ в юридический отдел</a>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -11,6 +11,7 @@ namespace RegistryWeb.SecurityServices
     public class SecurityService
     {
         public AclUser User { get; set; }
+        public Executor Executor { get; set; }
         public List<AclPrivilege> Privileges { get; set; }
         public long PrivelegesFlagValue { get; set; }
 
@@ -22,6 +23,7 @@ namespace RegistryWeb.SecurityServices
             this.httpContextAccessor = httpContextAccessor;
             this.registryContext = registryContext;
             User = GetUser();
+            Executor = GetExecutor();
             Privileges = GetUserPriveleges();
             var pr = Privileges.Select(p => p.PrivilegeMask).ToList();
             if (Privileges.Count() == 0)
@@ -34,6 +36,12 @@ namespace RegistryWeb.SecurityServices
         {
             //return Privileges.Any(p => p.PrivilegeMask == (uint)privilege);
             return (PrivelegesFlagValue & (long)privilege) == (long)privilege;
+        }
+
+        private Executor GetExecutor()
+        {
+            return registryContext.Executors
+                .SingleOrDefault(e => e.ExecutorLogin == User.UserName || e.ExecutorName == User.UserDescription);
         }
 
         private AclUser GetUser()
