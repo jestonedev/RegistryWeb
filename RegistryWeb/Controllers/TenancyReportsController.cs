@@ -259,7 +259,7 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             try
             {
-                List<int> ids = GetSessionIds();
+                var ids = GetSessionIds();
                 var file = reportService.Notifies(ids, reportType);
                 return File(file, odtMime, string.Format(fileName));
             }
@@ -294,7 +294,7 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             try
             {
-                List<int> ids = GetSessionIds();
+                var ids = GetSessionIds();
                 var file = reportService.TenancyWarning(ids, idPreparer, isMultipageDocument);
                 if (isMultipageDocument)
                     return File(file, odtMime, @"Предупреждения");
@@ -303,6 +303,34 @@ namespace RegistryWeb.Controllers
             catch (Exception ex)
             {
                 return Error(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult SetTenancyContractRegDate(DateTime regDate)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return View("NotAccess");
+
+            try
+            {
+                var ids = GetSessionIds();
+                var noValidateContracts = dataService.GetNoValidateContracts(ids);
+
+                if (noValidateContracts.Any())
+                {
+                    var message = @"Для процессов найма №" +
+                        noValidateContracts.Select(id => id.ToString()).Aggregate((x, y) => x + ", " + y) +
+                        "не проставлен номер договора. Для проставления даты регистрации номер должен быть присвоен!";
+                    return Json(message);
+                }
+
+                dataService.SetTenancyContractRegDate(ids, regDate);
+                return Json("Для всех процессов найма дата регистрации была успешно присвоена!");
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
             }
         }
     }
