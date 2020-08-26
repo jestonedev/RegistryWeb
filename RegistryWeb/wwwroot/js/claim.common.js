@@ -19,11 +19,12 @@ $(function () {
 
         var validator = $(this).validate();
         var isFormValid = $(this).valid();
+        var isStateFormValid = $("#ClaimStatesForm").valid();
         if (!claimCustomValidations(validator)) {
             isFormValid = false;
         }
 
-        if (!isFormValid) {
+        if (!isFormValid || !isStateFormValid) {
             $("select").each(function (idx, elem) {
                 var id = $(elem).prop("id");
                 var name = $(elem).prop("name");
@@ -49,7 +50,18 @@ $(function () {
         } else {
             if (action !== "Create") return true;
             var inputTemplate = "<input type='hidden' name='{0}' value='{1}'>";
-            // TODO: перенос компонентных данных в hidden поля
+            let claimStates = getClaimStates();
+            for (let i = 0; i < claimStates.length; i++) {
+                let tr = "Claim.ClaimStates[" + i + "].";
+                $(this).append(inputTemplate.replace('{0}', tr + "IdState").replace('{1}', claimStates[i].IdState));
+                $(this).append(inputTemplate.replace('{0}', tr + "IdClaim").replace('{1}', claimStates[i].IdClaim));
+                $(this).append(inputTemplate.replace('{0}', tr + "IdStateType").replace('{1}', claimStates[i].IdStateType));
+                $(this).append(inputTemplate.replace('{0}', tr + "DateStartState").replace('{1}', claimStates[i].DateStartState));
+                $(this).append(inputTemplate.replace('{0}', tr + "Description").replace('{1}', claimStates[i].Description));
+                $(this).append(inputTemplate.replace('{0}', tr + "Executor").replace('{1}', claimStates[i].Executor));
+                // При создании исковой работы разрешено добавлять только первый этап "Запрос в БКС"
+                $(this).append(inputTemplate.replace('{0}', tr + "BksRequester").replace('{1}', claimStates[i].BksRequester));
+            }
         }
     });
 
