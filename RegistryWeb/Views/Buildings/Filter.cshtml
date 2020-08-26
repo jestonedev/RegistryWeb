@@ -53,50 +53,77 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-row">
-                        <div class="form-group col-xl-2 col-md-4">
+                        <div class="form-group col-xl-4 col-md-4">
                             <label asp-for="FilterOptions.IdBuilding" class="rr-building-label">Реестровый номер</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.IdBuilding" title="Реестровый номер здания">
+                            <input type="text" class="form-control only_number" asp-for="FilterOptions.IdBuilding" title="Реестровый номер здания">
                         </div>
-                        <div class="form-group col-xl-8 col-md-8">
-                            <label asp-for="FilterOptions.IdStreet">Улица</label>
-                            <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@{
-                            new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.FilterOptions.IdStreet)}">
-                                <option selected></option>
-                            </select>
-                        </div>
-                        <div class="form-group col-xl-2 col-md-4">
-                            <label asp-for="FilterOptions.House">Номер дома</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.House" title="Номер дома">
-                        </div>
-                        <div class="form-group col-xl-2 col-md-4">
-                            <label asp-for="FilterOptions.Floors" class="rr-building-label">Количество этажей</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.Floors" title="Количество этажей">
-                        </div>
-                        <div class="form-group col-xl-2 col-md-4">
-                            <label asp-for="FilterOptions.Entrances" class="rr-building-label">Количество подъездов</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.Entrances" title="Количество подъездов">
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label asp-for="FilterOptions.IdsObjectState">Текущее состояние объекта</label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Текущее состояние объекта" asp-for="FilterOptions.IdsObjectState" asp-items="@{
-                                new SelectList(ViewBag.ObjectStates, "IdState", "StateNeutral", Model.FilterOptions.IdsObjectState)}"></select>
-                        </div>
-                        <div class="form-group col-xl-2 col-md-6">
+                        <div class="form-group col-xl-4 col-md-4">
                             <label asp-for="FilterOptions.IdDecree">Постановление</label>
                             <select class="selectpicker form-control" title="Постановление" asp-for="FilterOptions.IdDecree" asp-items="@{
                                 new SelectList(ViewBag.GovernmentDecrees, "IdDecree", "Number", Model.FilterOptions.IdDecree)}">
                                 <option selected></option>
                             </select>
                         </div>
+                        <div class="form-group col-xl-4 col-md-4">
+                            <label asp-for="FilterOptions.IdsObjectState">Текущее состояние</label>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Текущее состояние" asp-for="FilterOptions.IdsObjectState" asp-items="@{
+                                new SelectList(ViewBag.ObjectStates, "IdState", "StateNeutral", Model.FilterOptions.IdsObjectState)}"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-xl-8 col-md-7 col-lg-6">
+                            <label asp-for="FilterOptions.IdStreet">Улица</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@{
+                            new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.FilterOptions.IdStreet)}">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-xl-2 col-md-5 col-lg-3">
+                            <label asp-for="FilterOptions.House">Номер дома</label>
+                            <input type="text" class="form-control homecadastral" asp-for="FilterOptions.House" title="Номер дома">
+                        </div>
+                        <div class="form-group col-xl-2 col-md-12 col-lg-3">
+                            <label asp-for="FilterOptions.CadastralNum" class="rr-building-label">Кадастровый номер</label>
+                            <input type="text" class="form-control homecadastral" asp-for="FilterOptions.CadastralNum" title="Кадастровый номер">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-xl-4 col-md-4">
+                            <label asp-for="FilterOptions.Floors" class="rr-building-label">Количество этажей</label>
+                            <input type="text" class="form-control only_number" asp-for="FilterOptions.Floors" title="Количество этажей">
+                        </div>
+                        <div class="form-group col-xl-4 col-md-4">
+                            <label asp-for="FilterOptions.Entrances" class="rr-building-label">Количество подъездов</label>
+                            <input type="text" class="form-control only_number" asp-for="FilterOptions.Entrances" title="Количество подъездов">
+                        </div>
+                        <div class="form-group col-xl-4 col-md-4">
+                            <label asp-for="FilterOptions.StartupYear" class="rr-building-label">Год ввода в эксплуатацию</label>
+                            <input type="text" class="form-control only_number" asp-for="FilterOptions.StartupYear" title="Год ввода в эксплуатацию">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-lg-3 col-md-6">
+                            <label asp-for="FilterOptions.RestrictionNum">Номер реквизита п/с</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.RestrictionNum" title="Номер реквизита">
+                        </div>
+                        <div class="form-group col-lg-3 col-md-6">
+                            <label asp-for="FilterOptions.RestrictionDate">Дата реквизита п/с</label>
+                            <input type="date" class="form-control" asp-for="FilterOptions.RestrictionDate" value="@(Model.FilterOptions.RestrictionDate==null ? "" : Model.FilterOptions.RestrictionDate?.ToString("yyyy-MM-dd"))" title="Дата реквизита права собственности">
+                        </div>
+                        <div class="form-group col-lg-6 col-md-12">
+                            <label asp-for="FilterOptions.IdsRestrictionType">Тип права собственности</label>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип права собственности" asp-for="FilterOptions.IdsRestrictionType" asp-items="@Model.RestrictionsList"></select>
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6 col-lg-3">
-                            <label asp-for="FilterOptions.DateOwnershipRight">Дата ограничения</label>
-                            <input type="date" class="form-control" asp-for="FilterOptions.DateOwnershipRight" title="Дата ограничения">
-                        </div>
-                        <div class="form-group col-md-6 col-lg-3">
                             <label asp-for="FilterOptions.NumberOwnershipRight">Номер ограницения</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.NumberOwnershipRight" title="Номер ограницения">
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.DateOwnershipRight">Дата ограничения</label>
+                            <input type="date" class="form-control" asp-for="FilterOptions.DateOwnershipRight" title="Дата ограничения">
                         </div>
                         <div class="form-group col-md-12 col-lg-6">
                             <label asp-for="FilterOptions.IdsOwnershipRightType">Тип ограничения <b>содержит</b></label>

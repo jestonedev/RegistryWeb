@@ -27,18 +27,27 @@ namespace RegistryWeb.ViewOptions.Filter
         public List<int> IdsComment { get; set; }
         public List<int> IdsDoorKeys { get; set; }
 
+        public bool IsRestrictionEmpty()
+        {
+            return (IdsRestrictionType == null || IdsRestrictionType.Count == 0) &&
+                RestrictionNum == null && RestrictionDate == null;
+        }
+
+        public bool IsOwnershipRightEmpty()
+        {
+            return (NumberOwnershipRight == null) && (DateOwnershipRight == null) &&
+                (IdsOwnershipRightType == null || IdsOwnershipRightType.Count == 0);
+        }
+
         public bool IsModalEmpty()
         {
             return
+                IsOwnershipRightEmpty() && IsRestrictionEmpty() &&
                 (IdPremise == null || IdPremise == 0) &&
                 IdStreet == null && House == null && PremisesNum == null &&
                 (IdFundType == null || IdFundType.Count == 0) &&
-                (IdsRestrictionType == null || IdsRestrictionType.Count == 0) &&
-                RestrictionNum == null && RestrictionDate == null &&
                 (Floors == null) && CadastralNum == null &&
                 (IdsObjectState == null || IdsObjectState.Count == 0) &&
-                (IdsOwnershipRightType == null || IdsOwnershipRightType.Count == 0) &&
-                NumberOwnershipRight == null && DateOwnershipRight == null &&
                 (IdsComment == null || IdsComment.Count == 0) &&
                 (IdsDoorKeys == null || IdsDoorKeys.Count == 0) &&
                 StDateOwnershipRight == null && EndDateOwnershipRight == null;

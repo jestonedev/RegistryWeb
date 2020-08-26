@@ -78,15 +78,15 @@
                     <div class="form-row">
                         <div class="form-group col-lg-4 col-md-4">
                             <label asp-for="FilterOptions.IdPremise">Реестровый номер</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.IdPremise" title="Реестровый номер помещения">
+                            <input type="text" class="form-control only_number" asp-for="FilterOptions.IdPremise" title="Реестровый номер помещения">
                         </div>
                         <div class="form-group col-lg-4 col-md-8">
                             <label asp-for="FilterOptions.IdFundType">Тип жилого фонда</label>
                             <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип жилого фонда" asp-for="FilterOptions.IdFundType" asp-items="@Model.FundTypesList"></select>
                         </div>
                         <div class="form-group col-lg-4 col-md-12">
-                            <label asp-for="FilterOptions.IdsObjectState">Состояние помещения</label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Состояние помещения" asp-for="FilterOptions.IdsObjectState" asp-items="@Model.ObjectStatesList"></select>
+                            <label asp-for="FilterOptions.IdsObjectState">Текущее состояние</label>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Текущее состояние" asp-for="FilterOptions.IdsObjectState" asp-items="@Model.ObjectStatesList"></select>
                         </div>
                     </div>
                     <div class="form-row">
@@ -98,21 +98,21 @@
                         </div>
                         <div class="form-group col-lg-3 col-md-6">
                             <label asp-for="FilterOptions.House">Номер дома</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.House" title="Номер дома">
+                            <input type="text" class="form-control homecadastral" asp-for="FilterOptions.House" title="Номер дома">
                         </div>
                         <div class="form-group col-lg-3 col-md-6">
                             <label asp-for="FilterOptions.PremisesNum">Номер помещения</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.PremisesNum" title="Номер помещенияв">
+                            <input type="text" class="form-control only_number" asp-for="FilterOptions.PremisesNum" title="Номер помещения">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-lg-2 col-md-3">
                             <label asp-for="FilterOptions.Floors">Этаж</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.Floors" title="Этаж">
+                            <input type="text" class="form-control only_number" asp-for="FilterOptions.Floors" title="Этаж">
                         </div>
                         <div class="form-group col-lg-4 col-md-9">
                             <label asp-for="FilterOptions.CadastralNum">Кадастровый номер</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.CadastralNum" title="Кадастровый номер">
+                            <input type="text" class="form-control homecadastral" asp-for="FilterOptions.CadastralNum" title="Кадастровый номер">
                         </div>
 
                         <div class="form-group col-lg-3 col-md-6">

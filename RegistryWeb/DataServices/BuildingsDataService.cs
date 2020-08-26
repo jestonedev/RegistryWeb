@@ -11,6 +11,7 @@ using System;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.Models.SqlViews;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace RegistryWeb.DataServices
 {
@@ -26,6 +27,7 @@ namespace RegistryWeb.DataServices
         public override BuildingsVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, BuildingsFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
+            viewModel.RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName");
             return viewModel;
         }
 
@@ -39,6 +41,7 @@ namespace RegistryWeb.DataServices
             viewModel.PageOptions.TotalRows = query.Count();
             query = GetQueryFilter(query, viewModel.FilterOptions);
             query = GetQueryOrder(query, viewModel.OrderOptions);
+            query = GetQueryIncludes(query);
             var count = query.Count();
             viewModel.PageOptions.Rows = count;
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
@@ -105,8 +108,14 @@ namespace RegistryWeb.DataServices
         {
             return registryContext.Buildings
                 .Include(b => b.IdStreetNavigation)
-                .Include(b => b.IdStateNavigation)
-                .OrderBy(b => b.IdBuilding);
+                .Include(b => b.IdStateNavigation);
+        }
+
+        public IQueryable<Building> GetQueryIncludes(IQueryable<Building> query)
+        {
+            return query
+                .Include(b => b.IdStreetNavigation)
+                .Include(b => b.IdStateNavigation);
         }
 
         private IQueryable<Building> GetQueryFilter(IQueryable<Building> query, BuildingsFilter filterOptions)
@@ -119,8 +128,11 @@ namespace RegistryWeb.DataServices
                 query = StreetFilter(query, filterOptions);
                 query = HouseFilter(query, filterOptions);
                 query = FloorsFilter(query, filterOptions);
+                query = CadastralNumFilter(query, filterOptions);
+                query = StartupDateFilter(query, filterOptions);
                 query = EntrancesFilter(query, filterOptions);
                 query = OwnershipRightFilter(query, filterOptions);
+                query = RestrictionFilter(query, filterOptions);
                 query = ObjectStateFilter(query, filterOptions);
             }
             return query;
@@ -130,19 +142,90 @@ namespace RegistryWeb.DataServices
         {
             if (!filterOptions.IsOwnershipRightEmpty())
             {
+                
                 var obas = registryContext.OwnershipBuildingsAssoc
                     .Include(oba => oba.OwnershipRightNavigation)
                     .AsTracking();
-                if (filterOptions.DateOwnershipRight.HasValue)
-                    obas = obas.Where(oba => oba.OwnershipRightNavigation.Date == filterOptions.DateOwnershipRight.Value);
-                if (!string.IsNullOrEmpty(filterOptions.NumberOwnershipRight))
-                    obas = obas.Where(oba => oba.OwnershipRightNavigation.Number == filterOptions.NumberOwnershipRight);
+                if (!string.IsNullOrEmpty(filterOptions.NumberOwnershipRight) || filterOptions.DateOwnershipRight != null)
+                {
+                    if (filterOptions.DateOwnershipRight.HasValue)
+                        obas = obas.Where(oba => oba.OwnershipRightNavigation.Date == filterOptions.DateOwnershipRight.Value);
+                    if (!string.IsNullOrEmpty(filterOptions.NumberOwnershipRight))
+                        obas = obas.Where(oba => oba.OwnershipRightNavigation.Number == filterOptions.NumberOwnershipRight);
+                
+                    query = from q in query
+                            join idBuilding in obas.Select(oba => oba.IdBuilding).Distinct()
+                                on q.IdBuilding equals idBuilding
+                            select q;
+                }
+
+
                 if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Count != 0)
-                        obas = obas.Where(oba => filterOptions.IdsOwnershipRightType.Contains(oba.OwnershipRightNavigation.IdOwnershipRightType));
-                query = from q in query
-                        join idBuilding in obas.Select(oba => oba.IdBuilding).Distinct()
-                            on q.IdBuilding equals idBuilding
-                        select q;
+                {
+
+                    var buildings = from tbaRow in registryContext.OwnershipBuildingsAssoc
+                                    join buildingRow in registryContext.Buildings
+                                    on tbaRow.IdBuilding equals buildingRow.IdBuilding
+                                    join streetRow in registryContext.KladrStreets
+                                    on buildingRow.IdStreet equals streetRow.IdStreet
+                                    select tbaRow;
+                    if (filterOptions.DateOwnershipRight.HasValue)
+                        buildings = buildings.Where(oba => oba.OwnershipRightNavigation.Date == filterOptions.DateOwnershipRight.Value);
+                    if (!string.IsNullOrEmpty(filterOptions.NumberOwnershipRight))
+                        buildings = buildings.Where(oba => oba.OwnershipRightNavigation.Number == filterOptions.NumberOwnershipRight);
+
+                    if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Any())
+                    {
+                        var specialOwnershipRightTypeIds = new int[] { 1, 2, 6, 7 };
+                        var specialIds = filterOptions.IdsOwnershipRightType.Where(id => specialOwnershipRightTypeIds.Contains(id));
+                        var generalIds = filterOptions.IdsOwnershipRightType.Where(id => !specialOwnershipRightTypeIds.Contains(id));
+
+                        var generalOwnershipRightsBuildings = from owrRow in registryContext.OwnershipRights
+                                                              join bRow in registryContext.OwnershipBuildingsAssoc
+                                                              on owrRow.IdOwnershipRight equals bRow.IdOwnershipRight
+                                                              where generalIds.Contains(owrRow.IdOwnershipRightType)
+                                                              select bRow.IdBuilding;
+
+                        var specialOwnershipRightsBuildings = from owrRow in registryContext.BuildingsOwnershipRightCurrent
+                                                              where specialIds.Contains(owrRow.IdOwnershipRightType)
+                                                              select owrRow.IdBuilding;
+
+                        var ownershipRightsBuildingsList = generalOwnershipRightsBuildings.Union(specialOwnershipRightsBuildings).ToList();
+
+                        var buildingIds = from bRow in buildings
+                                          where ownershipRightsBuildingsList.Contains(bRow.IdBuilding)
+                                          select bRow.IdBuilding;
+
+                        query = (from row in query
+                                 where buildingIds.Contains(row.IdBuilding)
+                                 select row).Distinct();
+                    }
+                }
+            }
+            
+            return query;
+        }
+
+        private IQueryable<Building> RestrictionFilter(IQueryable<Building> query, BuildingsFilter filterOptions)
+        {
+            if ((filterOptions.IdsRestrictionType != null && filterOptions.IdsRestrictionType.Any()) ||
+                !string.IsNullOrEmpty(filterOptions.RestrictionNum) || filterOptions.RestrictionDate != null)
+            {
+                query = (from q in query
+                         join rbaRow in registryContext.RestrictionBuildingsAssoc
+                         on q.IdBuilding equals rbaRow.IdBuilding into b
+                         from bRow in b.DefaultIfEmpty()
+                         join rRow in registryContext.Restrictions
+                         on bRow.IdRestriction equals rRow.IdRestriction into bor
+                         from borRow in bor.DefaultIfEmpty()
+
+                         where (borRow != null &&
+                            ((filterOptions.IdsRestrictionType == null || !filterOptions.IdsRestrictionType.Any() ||
+                            filterOptions.IdsRestrictionType.Contains(borRow.IdRestrictionType)) &&
+                            (string.IsNullOrEmpty(filterOptions.RestrictionNum) ||
+                             borRow.Number.ToLower() == filterOptions.RestrictionNum.ToLower()) &&
+                             (filterOptions.RestrictionDate == null || borRow.Date == filterOptions.RestrictionDate)))
+                         select q).Distinct();
             }
             return query;
         }
@@ -210,6 +293,15 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        private IQueryable<Building> CadastralNumFilter(IQueryable<Building> query, BuildingsFilter filterOptions)
+        {
+            if (!string.IsNullOrEmpty(filterOptions.CadastralNum))
+            {
+                query = query.Where(b => b.CadastralNum == filterOptions.CadastralNum);
+            }
+            return query;
+        }
+
         private IQueryable<Building> EntrancesFilter(IQueryable<Building> query, BuildingsFilter filterOptions)
         {
             if (filterOptions.Entrances.HasValue)
@@ -224,6 +316,15 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IdsObjectState != null && filterOptions.IdsObjectState.Count != 0)
             {
                 query = query.Where(b => filterOptions.IdsObjectState.Contains(b.IdStateNavigation.IdState));
+            }
+            return query;
+        }
+
+        private IQueryable<Building> StartupDateFilter(IQueryable<Building> query, BuildingsFilter filterOptions)
+        {
+            if (filterOptions.StartupYear.HasValue)
+            {
+                query = query.Where(b => b.StartupYear == filterOptions.StartupYear.Value);
             }
             return query;
         }
