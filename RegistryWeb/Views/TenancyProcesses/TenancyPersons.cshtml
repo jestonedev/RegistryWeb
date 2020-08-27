@@ -120,8 +120,12 @@
                                        placeholder="Наименование органа" title="Наименование органа" data-val="true" data-val-required="Укажите наименование органа">
                                 <span class="text-danger field-validation-valid" data-valmsg-for="CustomDocumentIssuedBy" data-valmsg-replace="true"></span>
                             }
-                            <select class="selectpicker form-control" data-live-search="true" id="Person_IdDocumentIssuedBy" name="Person.IdDocumentIssuedBy" title="Кем выдан документ, удостоверяющий личность" asp-items="@(new SelectList(ViewBag.DocumentIssuedBy, "IdDocumentIssuedBy", "DocumentIssuedByName"))">
+                            <select class="selectpicker form-control" data-live-search="true" id="Person_IdDocumentIssuedBy" name="Person.IdDocumentIssuedBy" title="Кем выдан документ, удостоверяющий личность">
                                 <option></option>
+                                @foreach(DocumentIssuedBy documentIssudeBy in ViewBag.DocumentIssuedBy)
+                                {
+                                <option data-tokens="@documentIssudeBy.DocumentIssuedByName" title="@documentIssudeBy.DocumentIssuedByName" value="@documentIssudeBy.IdDocumentIssuedBy">@(documentIssudeBy.DocumentIssuedByName.Length > 50 ? documentIssudeBy.DocumentIssuedByName.Substring(0, 50) + "..." : documentIssudeBy.DocumentIssuedByName)</option>
+                                }
                             </select>
                         </div>
                         <div class="form-group col-md-6 col-lg-4">
