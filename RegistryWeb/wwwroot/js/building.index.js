@@ -1,12 +1,11 @@
 ﻿var searchModal = function () {
-    addressClear();
-
     var isValid = $(this).closest(".filterForm").valid();
     if (!isValid) {
         fixBootstrapSelectHighlight($(this).closest(".filterForm"));
         return false;
     }
 
+    addressClear();
     $("form.filterForm").submit();
 };
 var filterClearModal = function () {
@@ -36,27 +35,5 @@ $(function () {
         e.preventDefault();
         var modal = $("#filterModal");
         modal.modal('show');
-    });
-
-    $('body').on('keydown', '.only_number', function (event) // Запрещаем все, кроме цифр на основной клавиатуре, а так же Num-клавиатуре
-    {
-        //console.log(event.keyCode + "   " + event.key);
-
-        if (event.keyCode == 46 || event.keyCode == 8)
-            return;
-        else if (event.key.match(/([а-яА-Я]+)/) || event.key.match(/([a-zA-Z]+)/) || event.key != "Backspace" || event.key != "Delete")
-            event.preventDefault();
-        banLetters();
-    });
-
-    $('body').on('keydown', '.homecadastral', function (event) // Запрещаем все, кроме цифр на основной клавиатуре, а так же Num-клавиатуре
-    {
-        //console.log(event.keyCode + "   " + event.key);
-
-        if (event.keyCode == 46 || event.keyCode == 8 || (event.shiftKey && event.keyCode == 54) || event.keyCode == 191 || (event.shiftKey && event.keyCode == 220) || event.keyCode == 220 || (event.shiftKey && (event.keyCode == 54 || event.keyCode == 186)))
-            return;
-        else if (event.key.match(/([а-яА-Я]+)/) || event.key.match(/([a-zA-Z]+)/) || event.key != "Backspace" || event.key != "Delete")
-            event.preventDefault();
-        banLetters();
     });
 });
