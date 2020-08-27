@@ -169,7 +169,22 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public JsonResult GetAccounts(string text)
         {
-            return Json(dataService.GetAccounts(text).Select(pa => new { pa.IdAccount, pa.Account }));
+            var accounts = dataService.GetAccounts(text);
+            return Json(accounts.Select(pa => new {
+                pa.IdAccount,
+                pa.Account
+            }));
+        }
+
+        [HttpPost]
+        public JsonResult GetRentAddress(int idAccount)
+        {
+            var account = dataService.GetAccount(idAccount);
+            var rentObjects = dataService.GetRentObjects(new List<int> { idAccount });
+            return Json(new {
+                BksAddress = account?.RawAddress,
+                RegistryAddress = rentObjects.ContainsKey(idAccount) ? rentObjects[idAccount].Select(r => r.Text).Aggregate((acc, v) => acc + ", " + v) : ""
+            });
         }
 
         [HttpPost]

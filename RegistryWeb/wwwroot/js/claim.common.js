@@ -131,6 +131,23 @@ $(function () {
         $("#Claim_IdAccount").val("");
     });
 
+    function selectAccount(account) {
+        $("#Claim_IdAccount").val(account.idAccount);
+        $("#Claim_IdAccountNavigation_Account").val(account.value);
+        if (account.idAccount !== "" && account.idAccount !== null) {
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + '/Claims/GetRentAddress',
+                dataType: 'json',
+                data: { idAccount: account.idAccount },
+                success: function (address) {
+                    $("input[name='Claim.BksAddress']").val(address.bksAddress);
+                    $("input[name='Claim.RegistryAddress']").val(address.registryAddress);
+                }
+            });
+        }
+    }
+
     $("#Claim_IdAccountNavigation_Account").autocomplete({
         source: function (request, response) {
             $.ajax({
@@ -140,14 +157,17 @@ $(function () {
                 data: { text: request.term },
                 success: function (data) {
                     response($.map(data, function (item) {
-                        return { label: item.account, value: item.account, idAccount: item.idAccount };
+                        let account = { label: item.account, value: item.account, idAccount: item.idAccount };
+                        if (data.length === 1) {
+                            selectAccount(account);
+                        }
+                        return account;
                     }));
                 }
             });
         },
         select: function (event, ui) {
-            $("#Claim_IdAccount").val(ui.item.idAccount);
-            $("#Claim_IdAccountNavigation_Account").val(ui.item.value);
+            selectAccount(ui.item);
         },
         minLength: 3
     });
@@ -155,6 +175,8 @@ $(function () {
     $("#Claim_IdAccountNavigation_Account").on("focusout", function () {
         if ($('#Claim_IdAccount').val() === "") {
             $('#Claim_IdAccountNavigation_Account').val("");
+            $("input[name='Claim.BksAddress']").val("");
+            $("input[name='Claim.RegistryAddress']").val("");
         }
     });
 });
