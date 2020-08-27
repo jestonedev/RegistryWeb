@@ -192,4 +192,5 @@ $(function () {
 
     $('.input-filter-house').inputFilter(function (value) {
         return /^[0-9\\/а-яА-Я]*$/.test(value);
+    });
 });
