@@ -311,7 +311,9 @@ namespace RegistryWeb.Controllers
             var ids = GetSessionIds();
             var viewModel = dataService.GetPremisesViewModelForMassReports(ids, pageOptions);
             ViewBag.Count = viewModel.TenancyProcesses.Count();
-            ViewBag.Preparers = new SelectList(dataService.Preparers, "IdPreparer", "PreparerName");
+            ViewBag.PreparersSelectList = new SelectList(dataService.Preparers, "IdPreparer", "PreparerName");
+            ViewBag.TenancyReasonTypesSelectList = new SelectList(dataService.TenancyReasonTypes, "IdReasonType", "ReasonName");
+            ViewBag.CanEdit = securityService.HasPrivilege(Privileges.TenancyWrite);
             return View("TenancyProcessesReports", viewModel);
         }
     }

@@ -167,6 +167,21 @@
         e.preventDefault();
     });
 
+    $("body").on('click', "#tenancyReasonBtn", function (e) {
+        $('#tenancyReasonModal').modal('toggle');
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#exportReasonsForGisZkhBtn", function (e) {
+        downloadFile("/TenancyReports/GetExportReasonsForGisZkh");
+        e.preventDefault();
+    });
+
+    $("body").on('click', "#gisZkhExportBtn", function (e) {
+        downloadFile("/TenancyReports/GetGisZkhExport");
+        e.preventDefault();
+    });
+
     $("#tenancyWarningModal .rr-report-submit").on("click", function (e) {
         e.preventDefault();
         var form = $(this).closest("#tenancyWarningForm");
@@ -207,6 +222,34 @@
                 console.log(data);
                 $('.status').text(data);
                 $("#tenancyContractRegDateModal").modal("hide");
+            }
+        });
+    });
+
+    $("#tenancyReasonModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("#tenancyReasonForm");
+        var isValid = form.valid();
+        if (!isValid) {
+            return false;
+        }
+        var reasonNumber = $("#tenancyReasonModal").find("[name='TenancyReason.ReasonNumber']").val();
+        var reasonDate = $("#tenancyReasonModal").find("[name='TenancyReason.ReasonDate']").val();
+        var idReasonType = $("#tenancyReasonModal").find("[name='TenancyReason.IdReasonType']").val();
+        var isDeletePrevReasons = null;
+        if ($("#tenancyReasonModal").find("[name='TenancyReason.IsDeletePrevReasons']").is(':checked')) {
+            isDeletePrevReasons = "True";
+        } else {
+            isDeletePrevReasons = "False";
+        }
+        $.ajax({
+            type: 'GET',
+            url: window.location.origin + '/TenancyReports/SetTenancyReason?reasonNumber=' + reasonNumber +
+                '&reasonDate=' + reasonDate + '&idReasonType=' + idReasonType + '&isDeletePrevReasons=' + isDeletePrevReasons,
+            success: function (data) {
+                console.log(data);
+                $('.status').text(data);
+                $("#tenancyReasonModal").modal("hide");
             }
         });
     });
