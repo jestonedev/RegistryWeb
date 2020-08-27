@@ -333,5 +333,39 @@ namespace RegistryWeb.Controllers
                 return Json(ex.Message);
             }
         }
+
+        [HttpGet]
+        public IActionResult SetTenancyReason(string reasonNumber, DateTime reasonDate, int idReasonType, bool isDeletePrevReasons)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return View("NotAccess");
+
+            try
+            {
+                var ids = GetSessionIds();
+                dataService.SetTenancyReason(ids, reasonNumber, reasonDate, idReasonType, isDeletePrevReasons);
+                return Json("Для всех процессов найма проставление документа-основания успешно завершено!");
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
+        }
+
+        public IActionResult GetExportReasonsForGisZkh()
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+            try
+            {
+                var ids = GetSessionIds();
+                var file = reportService.ExportReasonsForGisZkh(ids);
+                return File(file, zipMime, "Документ-оснвоания для ГИС \"ЖКХ\""); 
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
     }
 }

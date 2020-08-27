@@ -159,5 +159,19 @@ namespace RegistryWeb.ReportServices
             fileNameReport = GenerateMultiFileReport(arguments, "registry\\tenancy\\tenancy_warning_web");
             return DownloadFile(fileNameReport);
         }
+
+        public byte[] ExportReasonsForGisZkh(List<int> ids)
+        {
+            var tenacyProcessesStr = ids.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
+            var tempFileName = Path.GetTempFileName();
+            using (var sw = new StreamWriter(tempFileName))
+                sw.Write(tenacyProcessesStr);
+            var arguments = new Dictionary<string, object>
+            {
+                { "idsTmpFile", tempFileName }
+            };
+            var fileNameReport = GenerateMultiFileReport(arguments, "registry\\tenancy\\gis_zkh_rent_reason_web");
+            return DownloadFile(fileNameReport);
+        }
     }
 }

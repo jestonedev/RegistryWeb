@@ -70,5 +70,34 @@ namespace RegistryWeb.DataServices
             }
             registryContext.SaveChanges();
         }
+
+        internal void SetTenancyReason(List<int> ids, string reasonNumber, DateTime reasonDate, int idReasonType, bool isDeletePrevReasons)
+        {
+            foreach (var id in ids)
+            {
+                if (isDeletePrevReasons)
+                {
+                    var reasons = registryContext.TenancyReasons.Where(r => r.IdProcess == id);
+                    foreach (var reason in reasons)
+                    {
+                        reason.Deleted = 1;
+                    }
+                }
+                var reasonTemplate = registryContext.TenancyReasonTypes
+                    .FirstOrDefault(rt => rt.IdReasonType == idReasonType)
+                    ?.ReasonTemplate;
+                var reasonPrepared = reasonTemplate.Replace("@reason_number@", reasonNumber).Replace("@reason_date@", reasonDate.ToString("dd.MM.yyyy"));
+                var newReason = new TenancyReason
+                {
+                    IdProcess = id,
+                    IdReasonType = idReasonType,
+                    ReasonDate = reasonDate,
+                    ReasonNumber = reasonNumber,
+                    ReasonPrepared = reasonPrepared
+                };
+                registryContext.TenancyReasons.Add(newReason);
+            }
+            registryContext.SaveChanges();
+        }
     }
 }

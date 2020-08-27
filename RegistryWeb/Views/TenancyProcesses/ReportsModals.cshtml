@@ -1,7 +1,8 @@
 ﻿@{
     var preamblesList = (SelectList)ViewBag.DistrictCommitteesPreambles;
     var comitteesList = (SelectList)ViewBag.DistrictCommittees;
-    var preparersList = (SelectList)ViewBag.Preparers;
+    var preparersList = (SelectList)ViewBag.PreparersSelectList;
+    var reasonTypeList = (SelectList)ViewBag.TenancyReasonTypesSelectList;
 }
 
 <a id="target" style="display: none"></a>
@@ -129,6 +130,57 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary rr-report-submit">Изменить</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="tenancyReasonForm">
+    <div class="modal fade" id="tenancyReasonModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить основание найма</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="TenancyReason.ReasonNumber">Номер основания</label>
+                            <input type="text" class="form-control" title="Номер основания" name="TenancyReason.ReasonNumber"
+                                   data-val="true" data-val-required="Проставьте номер основания" id="TenancyReason_ReasonNumber" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyReason.ReasonNumber" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="TenancyReason.ReasonDate">Дата основания</label>
+                            <input type="date" class="form-control" title="Дата основания" name="TenancyReason.ReasonDate"
+                                   data-val="true" data-val-required="Проставьте дату основания" id="TenancyReason_ReasonDate" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyReason.ReasonDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label for="TenancyReason.IdReasonType">Тип основания</label>
+                        <select class="selectpicker form-control" title="Тип основания" name="TenancyReason.IdReasonType"
+                                data-val="true" data-val-required="Выберите тип основания" id="TenancyReason_IdReasonType" asp-items="@reasonTypeList"></select>
+                        <span class="text-danger field-validation-valid" data-valmsg-for="TenancyReason.IdReasonType" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-check col-12">
+                            <label>
+                                <input type="checkbox" name="TenancyReason.IsDeletePrevReasons" />
+                                Удалить существующие основания
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Добавить</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
                 </div>
             </div>
