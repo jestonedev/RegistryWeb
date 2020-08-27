@@ -21,6 +21,7 @@ namespace RegistryWeb.Controllers
         private const string zipMime = "application/zip";
         private const string odtMime = "application/vnd.oasis.opendocument.text";
         private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
+        private const string xlsxMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
         public TenancyReportsController(TenancyReportService reportService, TenancyReportsDataService dataService, SecurityService securityService)
         {
@@ -359,8 +360,23 @@ namespace RegistryWeb.Controllers
             try
             {
                 var ids = GetSessionIds();
-                var file = reportService.ExportReasonsForGisZkh(ids);
+                var file = reportService.GisZkhExport(ids);
                 return File(file, zipMime, "Документ-оснвоания для ГИС \"ЖКХ\""); 
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+        public IActionResult GetGisZkhExport()
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+            try
+            {
+                var ids = GetSessionIds();
+                var file = reportService.GisZkhExport(ids);
+                return File(file, xlsxMime, "Экспорт для ГИС \"ЖКХ\""); 
             }
             catch (Exception ex)
             {

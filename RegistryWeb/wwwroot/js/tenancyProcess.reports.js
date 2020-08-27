@@ -177,6 +177,11 @@
         e.preventDefault();
     });
 
+    $("body").on('click', "#gisZkhExportBtn", function (e) {
+        downloadFile("/TenancyReports/GetGisZkhExport");
+        e.preventDefault();
+    });
+
     $("#tenancyWarningModal .rr-report-submit").on("click", function (e) {
         e.preventDefault();
         var form = $(this).closest("#tenancyWarningForm");

@@ -65,7 +65,7 @@
             </button>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="operatonsButton">
                 <button class="dropdown-item" @(canEdit && Model.TenancyProcesses.Any() ? "" : "disabled") href="#" id="exportReasonsForGisZkhBtn">Экспорт файлов-оснований найма для ГИС ЖКХ</button>
-                <button class="dropdown-item" @(canEdit && Model.TenancyProcesses.Any() ? "" : "disabled") href="#" id="">Экспорт для ГИС ЖКХ</button>
+                <button class="dropdown-item" @(canEdit && Model.TenancyProcesses.Any() ? "" : "disabled") href="#" id="gisZkhExportBtn">Экспорт для ГИС ЖКХ</button>
                 <button class="dropdown-item" @(canEdit && Model.TenancyProcesses.Any() ? "" : "disabled") href="#" id="tenancyContractRegDateBtn">Проставить дату регистрации договора</button>
                 <button class="dropdown-item" @(canEdit && Model.TenancyProcesses.Any() ? "" : "disabled") href="#" id="tenancyReasonBtn">Проставить документ-основание</button>
             </div>

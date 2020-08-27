@@ -160,17 +160,19 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
-        public byte[] ExportReasonsForGisZkh(List<int> ids)
+        public byte[] GisZkhExport(List<int> ids)
         {
             var tenacyProcessesStr = ids.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
+            var filter = string.Format("tp.id_process IN ({0}) AND ", tenacyProcessesStr);
             var tempFileName = Path.GetTempFileName();
             using (var sw = new StreamWriter(tempFileName))
-                sw.Write(tenacyProcessesStr);
+                sw.Write(filter);
             var arguments = new Dictionary<string, object>
             {
-                { "idsTmpFile", tempFileName }
+                { "filterTmpFile", tempFileName }
+
             };
-            var fileNameReport = GenerateMultiFileReport(arguments, "registry\\tenancy\\gis_zkh_rent_reason_web");
+            var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\gis_zkh_export");
             return DownloadFile(fileNameReport);
         }
     }
