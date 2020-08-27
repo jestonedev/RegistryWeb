@@ -13,5 +13,6 @@ namespace RegistryWeb.ViewModel
         public string ClaimCurrentState { get; set; }
         public DateTime? StartDeptPeriod { get; set; }
         public DateTime? EndDeptPeriod { get; set; }
+        public bool EndedForFilter { get; set; }
     }
 }

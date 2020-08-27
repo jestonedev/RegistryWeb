@@ -246,10 +246,16 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        internal PaymentAccount GetAccount(int idAccount)
+        {
+            return registryContext.PaymentAccounts
+                .FirstOrDefault(pa => pa.IdAccount == idAccount);
+        }
+
         internal IList<PaymentAccount> GetAccounts(string text)
         {
             return registryContext.PaymentAccounts
-                .Where(pa => pa.Account.Contains(text)).ToList();
+                .Where(pa => pa.Account.Contains(text)).Take(100).ToList();
         }
 
         public IQueryable<Claim> PaymentAccountFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
@@ -559,9 +565,8 @@ namespace RegistryWeb.DataServices
         }
 
 
-        private Dictionary<int, List<Address>> GetRentObjects(IEnumerable<Claim> claims)
+        internal Dictionary<int, List<Address>> GetRentObjects(IEnumerable<int> idAccounts)
         {
-            var ids = claims.Select(r => r.IdAccount).Distinct();
             var premises = from paRow in registryContext.PaymentAccountPremisesAssoc
                            join premiseRow in registryContext.Premises
                            on paRow.IdPremise equals premiseRow.IdPremises
@@ -571,7 +576,7 @@ namespace RegistryWeb.DataServices
                            on buildingRow.IdStreet equals streetRow.IdStreet
                            join premiseTypesRow in registryContext.PremisesTypes
                            on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
-                           where ids.Contains(paRow.IdAccount)
+                           where idAccounts.Contains(paRow.IdAccount)
                            select new
                            {
                                paRow.IdAccount,
@@ -599,7 +604,7 @@ namespace RegistryWeb.DataServices
                               on buildingRow.IdStreet equals streetRow.IdStreet
                               join premiseTypesRow in registryContext.PremisesTypes
                               on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
-                              where ids.Contains(paRow.IdAccount)
+                              where idAccounts.Contains(paRow.IdAccount)
                               select new
                               {
                                   paRow.IdAccount,
@@ -625,6 +630,12 @@ namespace RegistryWeb.DataServices
                 .Select(r => new { IdAccount = r.Key, Addresses = r.Select(v => v.Address) })
                 .ToDictionary(v => v.IdAccount, v => v.Addresses.ToList());
             return result;
+        }
+
+        internal Dictionary<int, List<Address>> GetRentObjects(IEnumerable<Claim> claims)
+        {
+            var ids = claims.Select(r => r.IdAccount).Distinct();
+            return GetRentObjects(ids);
         }
 
         private Dictionary<int, Payment> GetLastPaymentsInfo(IEnumerable<Claim> claims)

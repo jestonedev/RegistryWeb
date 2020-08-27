@@ -65,7 +65,7 @@
                 lastPaymentInfo = Model.LastPaymentInfo[item.IdAccount];
             }
             var lastClaimState = item.ClaimStates.OrderByDescending(cs => cs.IdState).FirstOrDefault();
-            var isOpenedClaim = lastClaimState == null || lastClaimState.IdStateType != 6;
+            var isOpenedClaim = (lastClaimState == null || lastClaimState.IdStateType != 6) && !item.EndedForFilter;
             <tr>
                 <td style="@(isOpenedClaim ? "background-color: #FEDCDC" : "")" title="@(isOpenedClaim ? "Претензионно-исковая работа не завершена" : "")">
                     @item.IdClaim
@@ -117,7 +117,7 @@
                     {
                         var stateType = Model.StateTypes.FirstOrDefault(st => st.IdStateType == lastClaimState.IdStateType);
                         <div class="rr-claim-detail" style="display: none">
-                            <b>Текущее состояние: </b><br />@stateType.StateType
+                            <b>Текущее состояние: </b><br />@stateType.StateType <sup><span class="badge badge-danger pb-1">@(item.EndedForFilter ? "помечена завершенной" : "")</span></sup>
                         </div>
                         @if (lastClaimState.DateStartState != null)
                         {

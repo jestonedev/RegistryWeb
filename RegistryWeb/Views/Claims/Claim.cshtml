@@ -35,6 +35,51 @@
         <div class="col-sm-12 col-lg-6 col-xl-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
             @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
             {
+
+                @if (Model.RentObjects.Any())
+                {
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        <button class="btn btn-success dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="registryBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-home"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="registryBtn">
+                            @{
+                                var rentObjects = Model.RentObjects;
+                                var premisesIds = rentObjects.Where(r => r.AddressType == AddressTypes.Premise).Select(r => r.Id)
+                                                .Union(rentObjects.Where(r => r.AddressType == AddressTypes.SubPremise).Select(r => r.IdParents["Premise"]))
+                                                .Select(r => int.Parse(r));
+                                var buildingIds = rentObjects.Where(r => r.AddressType == AddressTypes.Building).Select(r => r.Id)
+                                                .Union(rentObjects.Where(r => r.AddressType == AddressTypes.Premise).Select(r => r.IdParents["Building"]))
+                                                .Union(rentObjects.Where(r => r.AddressType == AddressTypes.SubPremise).Select(r => r.IdParents["Building"]))
+                                                .Select(r => int.Parse(r));
+
+                                foreach (int buildingId in buildingIds)
+                                {
+                                    var btnTitle = "Здание";
+                                    if (buildingIds.Count() > 1)
+                                    {
+                                        btnTitle += " № " + buildingId;
+                                    }
+
+                                    <a class="dropdown-item" title="@btnTitle" aria-label="@btnTitle"
+                                       asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@buildingId" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">@btnTitle</a>
+                                }
+                                foreach (int premisesId in premisesIds)
+                                {
+                                    var btnTitle = "Помещение";
+                                    if (premisesIds.Count() > 1)
+                                    {
+                                        btnTitle += " № " + premisesId;
+                                    }
+
+                                    <a class="dropdown-item" title="@btnTitle" aria-label="@btnTitle"
+                                       asp-controller="Premises" asp-action="Details" asp-route-idPremises="@premisesId" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">@btnTitle</a>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+
                 <div class="btn-group" role="group" aria-label="Панель доступа">
                     @if (ViewBag.Action == "Details" && (ViewBag.CanEditBaseInfo ?? false))
                     {
@@ -57,7 +102,7 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@Model.Claim.IdClaim">
                             <a class="dropdown-item" title="Лицевой счет БКС" aria-label="Лицевой счет БКС"
-                                asp-controller="PaymentAccounts" asp-action="Details" asp-route-idAccount="@Model.Claim.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет БКС</a>
+                               asp-controller="PaymentAccounts" asp-action="Details" asp-route-idAccount="@Model.Claim.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет БКС</a>
                         </div>
                     </div>
 
@@ -68,7 +113,7 @@
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.Claim.IdClaim">
                             <a class="dropdown-item rr-report-request-to-bsk disabled" href="#" title="Запрос в БКС" aria-label="Запрос в БКС" data-id-claim="@Model.Claim.IdClaim">Запрос в БКС</a>
                             <a class="dropdown-item rr-report-memo-to-lawyers disabled" href="#" title="СЗ в юридический отдел" aria-label="СЗ в юридический отдел" data-id-claim="@Model.Claim.IdClaim">СЗ в юридический отдел</a>
-                       </div>
+                        </div>
                     </div>
                 </div>
             }
@@ -126,10 +171,28 @@
                 </div>
             </div>
             <div class="row">
+                @{ 
+                    var bksAddress = Model.Claim.IdAccountNavigation?.RawAddress;
+                    var registryAddress = "";
+                    if (Model.RentObjects != null && Model.RentObjects.Any())
+                    {
+                        registryAddress = Model.RentObjects.Select(r => r.Text).Aggregate((acc, v) => acc + ", " + v);
+                    }
+                }
+                <div class="form-group col-12 col-lg-6">
+                    <label for="Claim.BksAddress">Адрес по БКС</label>
+                    <input type="text" disabled name="Claim.BksAddress" value="@bksAddress" class="form-control" title="Адрес по БКСа">
+                </div>
+                <div class="form-group col-12 col-lg-6">
+                    <label for="Claim.RegistryAddress">Адрес по жилищному фонду</label>
+                    <input type="text" disabled class="form-control" value="@registryAddress" name="Claim.RegistryAddress" title="Адрес по жилищному фонду">
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" asp-for="Claim.EndedForFilter">
-                        <label class="form-check-label" asp-for="Claim.EndedForFilter" title="Считать завершенной при фильтрации">Считать завершенной при фильтрации</label>
+                        <label class="form-check-label" asp-for="Claim.EndedForFilter" title="Считать исковую работу завершенной">Считать исковую работу завершенной</label>
                     </div>
                 </div>
             </div>
