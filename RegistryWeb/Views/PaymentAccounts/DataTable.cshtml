@@ -63,9 +63,9 @@
             if (Model.ClaimsByAddresses.ContainsKey(item.IdAccount))
             {
                 lastClaimInfo = Model.ClaimsByAddresses[item.IdAccount].First();
-                if (Model.ClaimsByAddresses[item.IdAccount].Any(r => r.IdClaimCurrentState != 6))
+                if (Model.ClaimsByAddresses[item.IdAccount].Any(r => r.IdClaimCurrentState != 6 && !r.EndedForFilter))
                 {
-                    lastClaimInfo = Model.ClaimsByAddresses[item.IdAccount].FirstOrDefault(r => r.IdClaimCurrentState != 6);
+                    lastClaimInfo = Model.ClaimsByAddresses[item.IdAccount].FirstOrDefault(r => r.IdClaimCurrentState != 6 && !r.EndedForFilter);
                 }
             }
             <tr>

@@ -718,7 +718,7 @@ namespace RegistryWeb.DataServices
                         {
                             foreach (var claimStateInfo in claimInfo.Value)
                             {
-                                if (claimStateInfo.IdClaimCurrentState != 6)
+                                if (claimStateInfo.IdClaimCurrentState != 6 && !claimStateInfo.EndedForFilter)
                                 {
                                     ids.Add(claimInfo.Key);
                                     break;
@@ -1015,7 +1015,8 @@ namespace RegistryWeb.DataServices
                              EndDeptPeriod = claimRow.EndDeptPeriod,
                              IdAccount = claimRow.IdAccount,
                              IdClaimCurrentState = cRow.IdClaimCurrentState,
-                             ClaimCurrentState = cRow.ClaimCurrentState
+                             ClaimCurrentState = cRow.ClaimCurrentState,
+                             EndedForFilter = claimRow.EndedForFilter
                          };
 
             var result =
@@ -1026,6 +1027,7 @@ namespace RegistryWeb.DataServices
                         IdClaim = c.IdClaim,
                         StartDeptPeriod = c.StartDeptPeriod,
                         EndDeptPeriod = c.EndDeptPeriod,
+                        EndedForFilter = c.EndedForFilter,
                         IdAccount = accountsAssoc.Any(a => a.IdAccountActual == c.IdAccount) 
                         ? accountsAssoc.First(a => a.IdAccountActual == c.IdAccount).IdAccountFiltered : 0
                     })
