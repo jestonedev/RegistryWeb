@@ -108,7 +108,6 @@ namespace RegistryWeb.Models
         public virtual DbSet<TenancyProlongRentReason> TenancyProlongRentReasons { get; set; }
 
         // Переселение
-
         public virtual DbSet<ResettleInfo> ResettleInfos { get; set; }
         public virtual DbSet<ResettleKind> ResettleKinds { get; set; }
         public virtual DbSet<ResettleInfoTo> ResettleInfoTo { get; set; }
@@ -126,6 +125,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<Claim> Claims { get; set; }
         public virtual DbSet<ClaimState> ClaimStates { get; set; }
         public virtual DbSet<ClaimStateType> ClaimStateTypes { get; set; }
+        public virtual DbSet<ClaimStateTypeRelation> ClaimStateTypeRelations { get; set; }
 
         //Журнал изменений
         public virtual DbSet<ChangeLog> ChangeLogs { get; set; }
@@ -275,6 +275,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new ClaimConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ClaimStateConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ClaimStateTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ClaimStateTypeRelationConfiguration(nameDatebase));
 
         }
     }

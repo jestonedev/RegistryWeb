@@ -168,6 +168,7 @@ function removeErrorFromValidator(validator, elem) {
 
     delete validator.errorMap[elem.attr("name")];
 }
+
 $(function () {
     $('.input-filter-numbers').inputFilter(function (value) {
         return /^\d*$/.test(value);
@@ -191,5 +192,4 @@ $(function () {
 
     $('.input-filter-house').inputFilter(function (value) {
         return /^[0-9\\/а-яА-Я]*$/.test(value);
-    });
 });

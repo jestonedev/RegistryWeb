@@ -3,7 +3,6 @@
     $("form.filterForm").submit();
 };
 
-
 var filterClearModal = function () {
     $("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal input[type='hidden'], #filterModal select").val("");
     $('#FilterOptions_IdStreet, #FilterOptions_IdPreset').selectpicker('render');

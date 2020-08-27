@@ -25,3 +25,7 @@
 .rr-claim-card {
     margin-top: 10pt;
 }
+
+.rr-claim-ext-info {
+    display: none;
+}

@@ -276,32 +276,32 @@ namespace RegistryWeb.DataServices
                                    }).AsEnumerable();
 
             var allObjects = (from row in (from row in registryContext.PaymentAccountPremisesAssoc
-                                            select new PaymentAddressInfix
-                                            {
-                                                IdAccount = row.IdAccount,
-                                                Infix = string.Concat("p", row.IdPremise)
-                                            }).Union(from row in registryContext.PaymentAccountSubPremisesAssoc
+                                           select new PaymentAddressInfix
+                                           {
+                                               IdAccount = row.IdAccount,
+                                               Infix = string.Concat("p", row.IdPremise)
+                                           }).Union(from row in registryContext.PaymentAccountSubPremisesAssoc
                                                     select new PaymentAddressInfix
                                                     {
                                                         IdAccount = row.IdAccount,
                                                         Infix = string.Concat("sp", row.IdSubPremise)
                                                     })
-                                orderby row.Infix
-                                group row.Infix by row.IdAccount into gs
-                                select new
-                                {
-                                    IdAccount = gs.Key,
-                                    AddressCode = string.Join("", gs)
-                                }).AsEnumerable();
+                              orderby row.Infix
+                              group row.Infix by row.IdAccount into gs
+                              select new
+                              {
+                                  IdAccount = gs.Key,
+                                  AddressCode = string.Join("", gs)
+                              }).AsEnumerable();
             allObjects = from paymentsRow in registryContext.PaymentAccounts
-                            join allObjectsRow in allObjects
-                            on paymentsRow.IdAccount equals allObjectsRow.IdAccount into ao
-                            from aoRow in ao.DefaultIfEmpty()
-                            select new
-                            {
-                                paymentsRow.IdAccount,
-                                AddressCode = aoRow != null ? aoRow.AddressCode : paymentsRow.RawAddress
-                            };
+                         join allObjectsRow in allObjects
+                         on paymentsRow.IdAccount equals allObjectsRow.IdAccount into ao
+                         from aoRow in ao.DefaultIfEmpty()
+                         select new
+                         {
+                             paymentsRow.IdAccount,
+                             AddressCode = aoRow != null ? aoRow.AddressCode : paymentsRow.RawAddress
+                         };
             return (from filteredRow in filteredObjects
                     join allRow in allObjects
                     on filteredRow.AddressCode equals allRow.AddressCode
@@ -319,7 +319,7 @@ namespace RegistryWeb.DataServices
             if (filterOptions.AmountTotal != null)
             {
                 query = query.Where(p => filterOptions.AmountTotalOp == 1 ?
-                    p.AmountTenancy+p.AmountPenalties+p.AmountDgi+p.AmountPadun+p.AmountPkk >= filterOptions.AmountTotal :
+                    p.AmountTenancy + p.AmountPenalties + p.AmountDgi + p.AmountPadun + p.AmountPkk >= filterOptions.AmountTotal :
                     p.AmountTenancy + p.AmountPenalties + p.AmountDgi + p.AmountPadun + p.AmountPkk <= filterOptions.AmountTotal);
             }
             if (filterOptions.AmountTenancy != null)
@@ -356,25 +356,25 @@ namespace RegistryWeb.DataServices
                 query = query.Where(p => idClaims.Contains(p.IdClaim));
             }
 
-            if(filterOptions.IdClaimState != null || filterOptions.ClaimStateDate != null)
+            if (filterOptions.IdClaimState != null || filterOptions.ClaimStateDate != null)
             {
                 var maxDateClaimStates = from row in registryContext.ClaimStates
-                                      group row.IdState by row.IdClaim into gs
-                                      select new
-                                      {
-                                          IdClaim = gs.Key,
-                                          IdState = gs.Max()
-                                      };
+                                         group row.IdState by row.IdClaim into gs
+                                         select new
+                                         {
+                                             IdClaim = gs.Key,
+                                             IdState = gs.Max()
+                                         };
 
                 var lastClaimsStates = (from row in registryContext.ClaimStates
-                                    join maxDateClaimStatesRow in maxDateClaimStates
-                                    on row.IdState equals maxDateClaimStatesRow.IdState
-                                    select new
-                                    {
-                                        row.IdClaim,
-                                        row.IdStateType,
-                                        row.DateStartState
-                                    }).ToList();
+                                        join maxDateClaimStatesRow in maxDateClaimStates
+                                        on row.IdState equals maxDateClaimStatesRow.IdState
+                                        select new
+                                        {
+                                            row.IdClaim,
+                                            row.IdStateType,
+                                            row.DateStartState
+                                        }).ToList();
                 if (filterOptions.IdClaimState != null)
                 {
                     query = from row in query
@@ -423,21 +423,21 @@ namespace RegistryWeb.DataServices
                 if (filterOptions.BalanceOutputTotal != null)
                 {
                     query = from row in query
-                             join lastPaymentsRow in lastPayments
-                             on row.IdAccount equals lastPaymentsRow.IdAccount
-                             where filterOptions.BalanceOutputTotalOp == 1 ? 
-                                lastPaymentsRow.BalanceOutputTotal >= filterOptions.BalanceOutputTotal :
-                                lastPaymentsRow.BalanceOutputTotal <= filterOptions.BalanceOutputTotal
-                             select row;
+                            join lastPaymentsRow in lastPayments
+                            on row.IdAccount equals lastPaymentsRow.IdAccount
+                            where filterOptions.BalanceOutputTotalOp == 1 ?
+                               lastPaymentsRow.BalanceOutputTotal >= filterOptions.BalanceOutputTotal :
+                               lastPaymentsRow.BalanceOutputTotal <= filterOptions.BalanceOutputTotal
+                            select row;
                 }
                 if (filterOptions.BalanceOutputTenancy != null)
                 {
                     query = from row in query
-                             join lastPaymentsRow in lastPayments
-                             on row.IdAccount equals lastPaymentsRow.IdAccount
-                             where filterOptions.BalanceOutputTenancyOp == 1 ?
-                                lastPaymentsRow.BalanceOutputTenancy >= filterOptions.BalanceOutputTenancy :
-                                lastPaymentsRow.BalanceOutputTenancy <= filterOptions.BalanceOutputTenancy
+                            join lastPaymentsRow in lastPayments
+                            on row.IdAccount equals lastPaymentsRow.IdAccount
+                            where filterOptions.BalanceOutputTenancyOp == 1 ?
+                               lastPaymentsRow.BalanceOutputTenancy >= filterOptions.BalanceOutputTenancy :
+                               lastPaymentsRow.BalanceOutputTenancy <= filterOptions.BalanceOutputTenancy
                             select row;
                 }
                 if (filterOptions.BalanceOutputPenalties != null)
@@ -623,9 +623,9 @@ namespace RegistryWeb.DataServices
                                   };
 
             var lastPayments = from row in registryContext.Payments
-                    join maxDatePaymentsRow in maxDatePayments
-                    on new { row.IdAccount, row.Date } equals new { maxDatePaymentsRow.IdAccount, maxDatePaymentsRow.Date }
-                    select row;
+                               join maxDatePaymentsRow in maxDatePayments
+                               on new { row.IdAccount, row.Date } equals new { maxDatePaymentsRow.IdAccount, maxDatePaymentsRow.Date }
+                               select row;
 
             var result =
                 lastPayments.GroupBy(r => r.IdAccount)
@@ -637,13 +637,12 @@ namespace RegistryWeb.DataServices
 
         internal ClaimVM CreateClaimEmptyViewModel([CallerMemberName]string action = "")
         {
-            var userName = securityService.User.UserName.ToLowerInvariant();
             return new ClaimVM
             {
                 Claim = new Claim(),
-                CurrentExecutor = registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
-                        e.ExecutorLogin.ToLowerInvariant() == userName),
-                StateTypes = registryContext.ClaimStateTypes.ToList()
+                CurrentExecutor = CurrentExecutor,
+                StateTypes = registryContext.ClaimStateTypes.ToList(),
+                StateTypeRelations = registryContext.ClaimStateTypeRelations.ToList()
             };
         }
 
@@ -661,6 +660,19 @@ namespace RegistryWeb.DataServices
             return registryContext.Claims.Include(r => r.IdAccountNavigation)
                 .Include(r => r.ClaimStates)
                 .FirstOrDefault(r => r.IdClaim == idClaim);
+        }
+
+        public List<ClaimStateType> StateTypes => registryContext.ClaimStateTypes.ToList();
+        public List<ClaimStateTypeRelation> StateTypeRelations => registryContext.ClaimStateTypeRelations.ToList();
+
+        public Executor CurrentExecutor
+        {
+            get
+            {
+                var userName = securityService.User.UserName.ToLowerInvariant();
+                return registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
+                                e.ExecutorLogin.ToLowerInvariant() == userName);
+            }
         }
     }
 }

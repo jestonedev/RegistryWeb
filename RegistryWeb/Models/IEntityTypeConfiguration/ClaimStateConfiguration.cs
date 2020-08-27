@@ -85,6 +85,101 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
+            builder.Property(e => e.ObtainingCourtOrderDate)
+                .HasColumnName("obtaining_court_order_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.ObtainingCourtOrderDescription)
+                .HasColumnName("obtaining_court_order_description")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.DirectionCourtOrderBailiffsDate)
+                .HasColumnName("direction_court_order_bailiffs_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.DirectionCourtOrderBailiffsDescription)
+                .HasColumnName("direction_court_order_bailiffs_description")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.EnforcementProceedingStartDate)
+                .HasColumnName("enforcement_proceeding_start_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.EnforcementProceedingStartDescription)
+                .HasColumnName("enforcement_proceeding_start_description")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.EnforcementProceedingEndDate)
+                .HasColumnName("enforcement_proceeding_end_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.EnforcementProceedingEndDescription)
+                .HasColumnName("enforcement_proceeding_end_description")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.EnforcementProceedingTerminateDate)
+                .HasColumnName("enforcement_proceeding_terminate_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.EnforcementProceedingTerminateDescription)
+                .HasColumnName("enforcement_proceeding_terminate_description")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.RepeatedDirectionCourtOrderBailiffsDate)
+                .HasColumnName("repeated_direction_court_order_bailiffs_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.RepeatedDirectionCourtOrderBailiffsDescription)
+                .HasColumnName("repeated_direction_court_order_bailiffs_description")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.RepeatedEnforcementProceedingStartDate)
+                .HasColumnName("repeated_enforcement_proceeding_start_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.RepeatedEnforcementProceedingStartDescription)
+                .HasColumnName("repeated_enforcement_proceeding_start_description")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.RepeatedEnforcementProceedingEndDate)
+                .HasColumnName("repeated_enforcement_proceeding_end_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.RepeatedEnforcementProceedingEndDescription)
+                .HasColumnName("repeated_enforcement_proceeding_end_description")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.CourtOrderCancelDate)
+                .HasColumnName("court_order_cancel_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.CourtOrderCancelDescription)
+                .HasColumnName("court_order_cancel_description")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.CourtOrderCompleteDate)
+            .HasColumnName("claim_complete_date")
+            .HasColumnType("date");
+
+            builder.Property(e => e.CourtOrderCompleteDescription)
+                .HasColumnName("claim_complete_description")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.CourtOrderCompleteReason)
+                .HasColumnName("claim_complete_reason")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
             builder.Property(e => e.Deleted)
                 .HasColumnName("deleted")
                 .HasColumnType("tinyint(1)")

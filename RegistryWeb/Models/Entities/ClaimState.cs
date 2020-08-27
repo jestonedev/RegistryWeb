@@ -22,7 +22,27 @@ namespace RegistryWeb.Models.Entities
         public string ClaimDirectionDescription { get; set; }
         public DateTime? CourtOrderDate { get; set; }
         public string CourtOrderNum { get; set; }
-        // TODO obtaining_court_order_date - claim_complete_reason
+        public DateTime? ObtainingCourtOrderDate { get; set; }
+        public string ObtainingCourtOrderDescription { get; set; }
+        public DateTime? DirectionCourtOrderBailiffsDate { get; set; }
+        public string DirectionCourtOrderBailiffsDescription { get; set; }
+        public DateTime? EnforcementProceedingStartDate { get; set; }
+        public string EnforcementProceedingStartDescription { get; set; }
+        public DateTime? EnforcementProceedingEndDate { get; set; }
+        public string EnforcementProceedingEndDescription { get; set; }
+        public DateTime? EnforcementProceedingTerminateDate { get; set; }
+        public string EnforcementProceedingTerminateDescription { get; set; }
+        public DateTime? RepeatedDirectionCourtOrderBailiffsDate { get; set; }
+        public string RepeatedDirectionCourtOrderBailiffsDescription { get; set; }
+        public DateTime? RepeatedEnforcementProceedingStartDate { get; set; }
+        public string RepeatedEnforcementProceedingStartDescription { get; set; }
+        public DateTime? RepeatedEnforcementProceedingEndDate { get; set; }
+        public string RepeatedEnforcementProceedingEndDescription { get; set; }
+        public DateTime? CourtOrderCancelDate { get; set; }
+        public string CourtOrderCancelDescription { get; set; }
+        public DateTime? CourtOrderCompleteDate { get; set; }
+        public string CourtOrderCompleteDescription { get; set; }
+        public string CourtOrderCompleteReason { get; set; }
         public byte Deleted { get; set; }
         public virtual Claim IdClaimNavigation { get; set; }
         public virtual ClaimStateType IdStateTypeNavigation { get; set; }

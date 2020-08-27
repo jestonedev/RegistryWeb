@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.Models;
+using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
@@ -168,6 +169,27 @@ namespace RegistryWeb.Controllers
         public JsonResult GetAccounts(string text)
         {
             return Json(dataService.GetAccounts(text).Select(pa => new { pa.IdAccount, pa.Account }));
+        }
+
+        [HttpPost]
+        public IActionResult AddClaimState(string action, int idClaim)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
+                return Json(-2);
+
+            var claim= dataService.GetClaim(idClaim) ?? new Claim { ClaimStates = new List<ClaimState>() };
+            var claimStates = claim.ClaimStates;
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.StateTypes = dataService.StateTypes;
+            ViewBag.StateTypeRelations = dataService.StateTypeRelations;
+            claimStates.Add(new ClaimState {
+                Executor = dataService.CurrentExecutor?.ExecutorName,
+                DateStartState = DateTime.Now.Date
+            });
+            ViewBag.ClaimStateIndex = claimStates.Count - 1;
+
+            return PartialView("ClaimState", claimStates);
         }
     }
 }

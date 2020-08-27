@@ -13,5 +13,6 @@ namespace RegistryWeb.ViewModel
         public Payment LastPaymentInfo { get; set; }
         public IEnumerable<ClaimStateType> StateTypes { get; set; }
         public Executor CurrentExecutor { get; set; }
+        public IEnumerable<ClaimStateTypeRelation> StateTypeRelations { get; set; }
     }
 }
