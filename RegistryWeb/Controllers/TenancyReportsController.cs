@@ -360,14 +360,15 @@ namespace RegistryWeb.Controllers
             try
             {
                 var ids = GetSessionIds();
-                var file = reportService.GisZkhExport(ids);
-                return File(file, zipMime, "Документ-оснвоания для ГИС \"ЖКХ\""); 
+                var file = reportService.ExportReasonsForGisZkh(ids);
+                return File(file, zipMime, "Документ-оснвоания для ГИС \"ЖКХ\"");
             }
             catch (Exception ex)
             {
                 return Error(ex.Message);
             }
         }
+
         public IActionResult GetGisZkhExport()
         {
             if (!securityService.HasPrivilege(Privileges.TenancyRead))
