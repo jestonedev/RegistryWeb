@@ -79,7 +79,8 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             if (ModelState.IsValid)
             {
-                dataService.Create(claimVM.Claim);
+                dataService.Create(claimVM.Claim,
+                    HttpContext.Request.Form.Files.Select(f => f).ToList());
                 return RedirectToAction("Details", new { claimVM.Claim.IdClaim });
             }
             InitializeViewBag("Create", null, true);
@@ -185,11 +186,29 @@ namespace RegistryWeb.Controllers
             ViewBag.StateTypeRelations = dataService.StateTypeRelations;
             claimStates.Add(new ClaimState {
                 Executor = dataService.CurrentExecutor?.ExecutorName,
-                DateStartState = DateTime.Now.Date
+                DateStartState = DateTime.Now.Date,
+                BksRequester = dataService.CurrentExecutor?.ExecutorName,
+                TransferToLegalDepartmentWho = dataService.CurrentExecutor?.ExecutorName,
+                AcceptedByLegalDepartmentWho = dataService.CurrentExecutor?.ExecutorName
             });
             ViewBag.ClaimStateIndex = claimStates.Count - 1;
 
             return PartialView("ClaimState", claimStates);
         }
+
+        [HttpPost]
+        public IActionResult AddClaimFile(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
+                return Json(-2);
+
+            var file = new ClaimFile { };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+
+            return PartialView("AttachmentFile", file);
+        }
+
     }
 }

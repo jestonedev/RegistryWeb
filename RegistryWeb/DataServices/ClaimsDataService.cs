@@ -91,8 +91,26 @@ namespace RegistryWeb.DataServices
             return claim;
         }
 
-        internal void Create(Claim claim)
+        internal void Create(Claim claim, List<Microsoft.AspNetCore.Http.IFormFile> files)
         {
+            // Прикрепляем документы
+            var claimFilesPath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Claims\");
+            if (claim.ClaimFiles != null)
+            {
+                for (var i = 0; i < claim.ClaimFiles.Count; i++)
+                {
+                    claim.ClaimFiles[i].FileName = "";
+                    var file = files.Where(r => r.Name == "ClaimFile[" + i + "]").FirstOrDefault();
+                    if (file == null) continue;
+                    claim.ClaimFiles[i].DisplayName = file.FileName;
+                    claim.ClaimFiles[i].FileName = Guid.NewGuid().ToString() + "." + new FileInfo(file.FileName).Extension;
+                    claim.ClaimFiles[i].MimeType = file.ContentType;
+                    var fileStream = new FileStream(Path.Combine(claimFilesPath, claim.ClaimFiles[i].FileName), FileMode.CreateNew);
+                    file.OpenReadStream().CopyTo(fileStream);
+                    fileStream.Close();
+                }
+            }
+
             claim.IdAccountNavigation = null;
             claim = FillClaimAmount(claim);
             registryContext.Claims.Add(claim);
@@ -659,6 +677,7 @@ namespace RegistryWeb.DataServices
         {
             return registryContext.Claims.Include(r => r.IdAccountNavigation)
                 .Include(r => r.ClaimStates)
+                .Include(c => c.ClaimFiles)
                 .FirstOrDefault(r => r.IdClaim == idClaim);
         }
 
