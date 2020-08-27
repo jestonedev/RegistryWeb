@@ -11,6 +11,9 @@
         ViewData["Title"] = "Исковая работа №" + Model.Claim.IdClaim;
     }
     ViewData["Id"] = Model.Claim.IdClaim;
+    ViewData["StateTypes"] = Model.StateTypes;
+    ViewData["StateTypeRelations"] = Model.StateTypeRelations;
+    ViewData["CurrentExecutor"] = Model.CurrentExecutor;
 }
 
 @section validation
@@ -266,6 +269,7 @@
                 </div>
             </div>
         </form>
+        <partial name="ClaimStates" model="Model.Claim.ClaimStates"/>
     </div>
 </div>
 

@@ -74,11 +74,11 @@
                         </div>
                         <div class="form-group col-6 col-lg-3">
                             <label asp-for="FilterOptions.Account">Лицевой счет</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.Account" title="Лицевой счет">
+                            <input type="text" class="form-control input-filter-numbers" asp-for="FilterOptions.Account" title="Лицевой счет">
                         </div>
                         <div class="form-group col-6 col-lg-3">
                             <label asp-for="FilterOptions.Tenant">ФИО нанимателя</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.Tenant" title="ФИО нанимателя">
+                            <input type="text" class="form-control input-filter-snp" asp-for="FilterOptions.Tenant" title="ФИО нанимателя">
                         </div>
                         <div class="form-group col-6 col-lg-3">
                             <label asp-for="FilterOptions.RawAddress">Адрес по БКС</label>
@@ -94,11 +94,11 @@
                         </div>
                         <div class="form-group col-md-6 col-lg-3">
                             <label asp-for="FilterOptions.House">Номер дома</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.House" title="Номер дома">
+                            <input type="text" class="form-control input-filter-house" asp-for="FilterOptions.House" title="Номер дома">
                         </div>
                         <div class="form-group col-md-6 col-lg-3">
                             <label asp-for="FilterOptions.PremisesNum">Номер помещения</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.PremisesNum" title="Номер помещения">
+                            <input type="text" class="form-control input-filter-premise-num" asp-for="FilterOptions.PremisesNum" title="Номер помещения">
                         </div>
                     </div>
                     <div class="form-row">
@@ -165,7 +165,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control decimal" asp-for="FilterOptions.BalanceInputTotal">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceInputTotal">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.BalanceInputTenancyOp" />
@@ -179,7 +179,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.BalanceInputTenancy">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceInputTenancy">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.BalanceInputPenaltiesOp" />
@@ -193,7 +193,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.BalanceInputPenalties">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceInputPenalties">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.BalanceInputDgiPadunPkkOp" />
@@ -207,7 +207,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.BalanceInputDgiPadunPkk">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceInputDgiPadunPkk">
                                     </div>
                                 </div>
                             </div>
@@ -223,7 +223,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.ChargingTotal">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.ChargingTotal">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.ChargingTenancyOp" />
@@ -237,7 +237,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.ChargingTenancy">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.ChargingTenancy">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.ChargingPenaltiesOp" />
@@ -251,7 +251,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.ChargingPenalties">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.ChargingPenalties">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.ChargingDgiPadunPkkOp" />
@@ -265,7 +265,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.ChargingDgiPadunPkk">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.ChargingDgiPadunPkk">
                                     </div>
                                 </div>
                             </div>
@@ -281,7 +281,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.TransferBalance">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.TransferBalance">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.RecalcTenancyOp" />
@@ -295,7 +295,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.RecalcTenancy">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.RecalcTenancy">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.RecalcPenaltiesOp" />
@@ -309,7 +309,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.RecalcPenalties">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.RecalcPenalties">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.RecalcDgiPadunPkkOp" />
@@ -323,7 +323,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.RecalcDgiPadunPkk">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.RecalcDgiPadunPkk">
                                     </div>
                                 </div>
                             </div>
@@ -339,7 +339,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.PaymentTenancy">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.PaymentTenancy">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.PaymentPenaltiesOp" />
@@ -353,7 +353,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.PaymentPenalties">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.PaymentPenalties">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.PaymentDgiPadunPkkOp" />
@@ -367,7 +367,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.PaymentDgiPadunPkk">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.PaymentDgiPadunPkk">
                                     </div>
                                 </div>
                             </div>
@@ -383,7 +383,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.BalanceOutputTotal">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceOutputTotal">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.BalanceOutputTenancyOp" />
@@ -397,7 +397,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.BalanceOutputTenancy">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceOutputTenancy">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.BalanceOutputPenaltiesOp" />
@@ -411,7 +411,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.BalanceOutputPenalties">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceOutputPenalties">
                                     </div>
                                 </div>
                                 <input type="hidden" asp-for="FilterOptions.BalanceOutputDgiPadunPkkOp" />
@@ -425,7 +425,7 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control" asp-for="FilterOptions.BalanceOutputDgiPadunPkk">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceOutputDgiPadunPkk">
                                     </div>
                                 </div>
                             </div>

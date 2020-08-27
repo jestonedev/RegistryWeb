@@ -1,4 +1,10 @@
 ﻿var searchModal = function () {
+    var isValid = $(this).closest(".filterForm").valid();
+    if (!isValid) {
+        fixBootstrapSelectHighlight($(this).closest(".filterForm"));
+        return false;
+    }
+
     addressClear();
     $("form.filterForm").submit();
 };
