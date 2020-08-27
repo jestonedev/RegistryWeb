@@ -34,6 +34,23 @@
     });
 }
 
+(function ($) {
+    $.fn.inputFilter = function (inputFilter) {
+        return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function () {
+            if (inputFilter(this.value)) {
+                this.oldValue = this.value;
+                this.oldSelectionStart = this.selectionStart;
+                this.oldSelectionEnd = this.selectionEnd;
+            } else if (this.hasOwnProperty("oldValue")) {
+                this.value = this.oldValue;
+                this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+            } else {
+                this.value = "";
+            }
+        });
+    };
+}(jQuery));
+
 //Формат вызова:
 //$('1').on('click', 2, elementToogle);
 //  1 - элемент по которому щелкают (стрелочка)
@@ -152,3 +169,29 @@ function removeErrorFromValidator(validator, elem) {
 
     delete validator.errorMap[elem.attr("name")];
 }
+
+$(function () {
+    $('.input-filter-numbers').inputFilter(function (value) {
+        return /^\d*$/.test(value);
+    });
+
+    $('.input-filter-snp').inputFilter(function (value) {
+        return /^([а-яА-Я]+[ ]?)*$/.test(value);
+    });
+
+    $('.input-filter-cadastral-num').inputFilter(function (value) {
+        return /^(\d+:?)*$/.test(value);
+    });
+
+    $('.input-filter-decimal').inputFilter(function (value) {
+        return /^-?\d*[.,]?\d{0,2}$/.test(value);
+    });
+
+    $('.input-filter-premise-num').inputFilter(function (value) {
+        return /^[0-9\\/а-яА-Я,-]*$/.test(value);
+    });
+
+    $('.input-filter-house').inputFilter(function (value) {
+        return /^[0-9\\/а-яА-Я]*$/.test(value);
+    });
+});

@@ -99,40 +99,127 @@ namespace RegistryWeb.DataServices
             return GetQueryIncludes(registryContext.Premises);           
         }
 
+
         private IQueryable<Premise> GetQueryFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
         {
-            if (!filterOptions.IsAddressEmpty())
+            if (!filterOptions.IsEmpty())
             {
-                query = AddressFilter(query, filterOptions);
+                if (!filterOptions.IsAddressEmpty())
+                    query = AddressFilter(query, filterOptions);
+
+                query = IdPremisesFilter(query, filterOptions);
+                query = IdBuildingFilter(query, filterOptions);
+                query = StreetFilter(query, filterOptions);
+                query = HouseFilter(query, filterOptions);
+                query = PremiseNumFilter(query, filterOptions);
+                query = FloorsFilter(query, filterOptions);
+                query = CadastralNumFilter(query, filterOptions);
+                query = FundsFilter(query, filterOptions);
+                query = ObjectStateFilter(query, filterOptions);
+                query = CommentFilter(query, filterOptions);
+                query = DoorKeysFilter(query, filterOptions);
+                query = OwnershipRightFilter(query, filterOptions);
+                query = RestrictionFilter(query, filterOptions);
+                query = DateFilter(query, filterOptions);
             }
+            return query;
+        }
+
+        private IQueryable<Premise> AddressFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
+            if (filterOptions.IsAddressEmpty())
+                return query;
+
+            if (filterOptions.Address.AddressType == AddressTypes.Street)            
+                return query.Where(q => q.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id));
+
+            int id = 0;
+            if (!int.TryParse(filterOptions.Address.Id, out id))
+                return query;
+
+            if (filterOptions.Address.AddressType == AddressTypes.Building)            
+                return query.Where(q => q.IdBuilding == id);
+            
+            if (filterOptions.Address.AddressType == AddressTypes.Premise)            
+                return query.Where(q => q.IdPremises == id);
+            
+            if (filterOptions.Address.AddressType == AddressTypes.SubPremise)
+            {
+                return from q in query
+
+                       join sp in registryContext.SubPremises
+                       on q.IdPremises equals sp.IdPremises
+                       where sp.IdSubPremises == id
+                       select q;
+            }
+            return query;
+        }
+
+        private IQueryable<Premise> IdPremisesFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
             if (filterOptions.IdPremise.HasValue)
             {
                 query = query.Where(p => p.IdPremises == filterOptions.IdPremise.Value);
             }
+            return query;
+        }
+
+        private IQueryable<Premise> IdBuildingFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
             if (filterOptions.IdBuilding.HasValue)
             {
-                query = query.Where(p => p.IdBuilding == filterOptions.IdBuilding.Value);
+                query = query.Where(b => b.IdBuilding == filterOptions.IdBuilding.Value);
             }
+            return query;
+        }
+
+        private IQueryable<Premise> StreetFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
             if (!string.IsNullOrEmpty(filterOptions.IdStreet))
             {
                 query = query.Where(b => b.IdBuildingNavigation.IdStreet == filterOptions.IdStreet);
             }
+            return query;
+        }
+
+        private IQueryable<Premise> HouseFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
             if (!string.IsNullOrEmpty(filterOptions.House))
             {
                 query = query.Where(b => b.IdBuildingNavigation.House.ToLower() == filterOptions.House.ToLower());
             }
+            return query;
+        }
+
+        private IQueryable<Premise> PremiseNumFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
             if (!string.IsNullOrEmpty(filterOptions.PremisesNum))
             {
                 query = query.Where(b => b.PremisesNum.ToLower() == filterOptions.PremisesNum.ToLower());
             }
+            return query;
+        }
+
+        private IQueryable<Premise> FloorsFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
             if (filterOptions.Floors.HasValue)
             {
                 query = query.Where(b => b.Floor == filterOptions.Floors.Value);
             }
+            return query;
+        }
+
+        private IQueryable<Premise> CadastralNumFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
             if (!string.IsNullOrEmpty(filterOptions.CadastralNum))
             {
                 query = query.Where(b => b.CadastralNum == filterOptions.CadastralNum);
             }
+            return query;
+        }
+
+        private IQueryable<Premise> FundsFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
             if (filterOptions.IdFundType != null && filterOptions.IdFundType.Any())
             {
                 var maxFunds = from fundRow in registryContext.FundsHistory
@@ -155,23 +242,40 @@ namespace RegistryWeb.DataServices
                         on row.IdPremises equals idPremise
                         select row;
             }
+            return query;
+        }
+
+        private IQueryable<Premise> ObjectStateFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
             if (filterOptions.IdsObjectState != null && filterOptions.IdsObjectState.Any())
             {
                 query = query.Where(p => filterOptions.IdsObjectState.Contains(p.IdState));
             }
+            return query;
+        }
+        
+        private IQueryable<Premise> CommentFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
             if (filterOptions.IdsComment != null && filterOptions.IdsComment.Any())
             {
                 query = query.Where(p => filterOptions.IdsComment.Contains(p.IdPremisesComment));
             }
+            return query;
+        }
+
+        private IQueryable<Premise> DoorKeysFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
             if (filterOptions.IdsDoorKeys != null && filterOptions.IdsDoorKeys.Any())
             {
                 query = query.Where(p => filterOptions.IdsDoorKeys.Contains(p.IdPremisesDoorKeys));
             }
+            return query;
+        }
 
-            if ((filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Any()) ||
-                !string.IsNullOrEmpty(filterOptions.NumberOwnershipRight) || filterOptions.DateOwnershipRight != null)
+        private IQueryable<Premise> OwnershipRightFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
+            if (!string.IsNullOrEmpty(filterOptions.NumberOwnershipRight) || filterOptions.DateOwnershipRight != null)
             {
-                // TODO: Упрощенная фильтрация без учета исключения из аварийного
                 query = (from q in query
                          join obaRow in registryContext.OwnershipBuildingsAssoc
                          on q.IdBuilding equals obaRow.IdBuilding into b
@@ -188,20 +292,92 @@ namespace RegistryWeb.DataServices
                          from porRow in por.DefaultIfEmpty()
 
                          where (borRow != null &&
-                            ((filterOptions.IdsOwnershipRightType == null || !filterOptions.IdsOwnershipRightType.Any() ||
-                            filterOptions.IdsOwnershipRightType.Contains(borRow.IdOwnershipRightType)) &&
-                            (string.IsNullOrEmpty(filterOptions.NumberOwnershipRight) ||
+                            ((string.IsNullOrEmpty(filterOptions.NumberOwnershipRight) ||
                              borRow.Number.ToLower() == filterOptions.NumberOwnershipRight.ToLower()) &&
                              (filterOptions.DateOwnershipRight == null || borRow.Date == filterOptions.DateOwnershipRight))) ||
                              (porRow != null &&
-                            ((filterOptions.IdsOwnershipRightType == null || !filterOptions.IdsOwnershipRightType.Any() ||
-                            filterOptions.IdsOwnershipRightType.Contains(porRow.IdOwnershipRightType)) &&
-                            (string.IsNullOrEmpty(filterOptions.NumberOwnershipRight) ||
+                            ((string.IsNullOrEmpty(filterOptions.NumberOwnershipRight) ||
                              porRow.Number.ToLower() == filterOptions.NumberOwnershipRight.ToLower()) &&
                              (filterOptions.DateOwnershipRight == null || porRow.Date == filterOptions.DateOwnershipRight)))
                          select q).Distinct();
             }
+            if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Any())
+            {
+                var idBuildings = registryContext.Premises
+                .Select(p => p.IdBuilding);
 
+                var buildings = from tbaRow in registryContext.OwnershipBuildingsAssoc
+                                join buildingRow in registryContext.Buildings
+                                on tbaRow.IdBuilding equals buildingRow.IdBuilding
+                                join streetRow in registryContext.KladrStreets
+                                on buildingRow.IdStreet equals streetRow.IdStreet
+                                where idBuildings.Contains(tbaRow.IdBuilding)
+                                select tbaRow;
+
+                var premises = from tpaRow in registryContext.OwnershipPremisesAssoc
+                               join premiseRow in registryContext.Premises
+                               on tpaRow.IdPremises equals premiseRow.IdPremises
+                               join buildingRow in registryContext.Buildings
+                               on premiseRow.IdBuilding equals buildingRow.IdBuilding
+                               join streetRow in registryContext.KladrStreets
+                               on buildingRow.IdStreet equals streetRow.IdStreet
+                               join premiseTypesRow in registryContext.PremisesTypes
+                               on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
+                               select tpaRow;
+
+                if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Any())
+                {
+                    var specialOwnershipRightTypeIds = new int[] { 1, 2, 6, 7 };
+                    var specialIds = filterOptions.IdsOwnershipRightType.Where(id => specialOwnershipRightTypeIds.Contains(id));
+                    var generalIds = filterOptions.IdsOwnershipRightType.Where(id => !specialOwnershipRightTypeIds.Contains(id));
+                    var generalOwnershipRightsPremises = from owrRow in registryContext.OwnershipRights
+                                                         join pRow in registryContext.OwnershipPremisesAssoc
+                                                         on owrRow.IdOwnershipRight equals pRow.IdOwnershipRight
+                                                         where generalIds.Contains(owrRow.IdOwnershipRightType)
+                                                         select pRow.IdPremises;
+
+                    var specialOwnershipRightsPremises = from owrRow in registryContext.PremisesOwnershipRightCurrent
+                                                         where specialIds.Contains(owrRow.IdOwnershipRightType)
+                                                         select owrRow.IdPremises;
+
+                    var ownershipRightsPremisesList = generalOwnershipRightsPremises.Union(specialOwnershipRightsPremises).ToList();
+
+                    var generalOwnershipRightsBuildings = from owrRow in registryContext.OwnershipRights
+                                                          join bRow in registryContext.OwnershipBuildingsAssoc
+                                                          on owrRow.IdOwnershipRight equals bRow.IdOwnershipRight
+                                                          where generalIds.Contains(owrRow.IdOwnershipRightType)
+                                                          select bRow.IdBuilding;
+
+                    var specialOwnershipRightsBuildings = from owrRow in registryContext.BuildingsOwnershipRightCurrent
+                                                          where specialIds.Contains(owrRow.IdOwnershipRightType)
+                                                          select owrRow.IdBuilding;
+
+                    var ownershipRightsBuildingsList = generalOwnershipRightsBuildings.Union(specialOwnershipRightsBuildings).ToList(); //
+
+                    var premisesInBuildingsOwnershipRights = (from pRow in registryContext.Premises
+                                                              where ownershipRightsBuildingsList.Contains(pRow.IdBuilding)
+                                                              select pRow.IdPremises).ToList();
+
+                    ownershipRightsPremisesList = ownershipRightsPremisesList.Union(premisesInBuildingsOwnershipRights).ToList(); //
+
+                    var buildingIds = from bRow in buildings
+                                      where ownershipRightsBuildingsList.Contains(bRow.IdBuilding)
+                                      select bRow.IdBuilding;
+
+                    var premisesIds = from pRow in premises
+                                      where ownershipRightsPremisesList.Contains(pRow.IdPremises)
+                                      select pRow.IdPremises;
+
+                    query = (from row in query
+                             where buildingIds.Contains(row.IdBuilding) || premisesIds.Contains(row.IdPremises)
+                             select row).Distinct();
+                }
+            }
+            return query;
+        }
+
+        private IQueryable<Premise> RestrictionFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
             if ((filterOptions.IdsRestrictionType != null && filterOptions.IdsRestrictionType.Any()) ||
                 !string.IsNullOrEmpty(filterOptions.RestrictionNum) || filterOptions.RestrictionDate != null)
             {
@@ -234,7 +410,11 @@ namespace RegistryWeb.DataServices
                              (filterOptions.RestrictionDate == null || porRow.Date == filterOptions.RestrictionDate)))
                          select q).Distinct();
             }
+            return query;
+        }
 
+        private IQueryable<Premise> DateFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
             if (filterOptions.StDateOwnershipRight.HasValue && !filterOptions.EndDateOwnershipRight.HasValue)
             {
                 var stDate = filterOptions.StDateOwnershipRight.Value.Date;
@@ -250,37 +430,6 @@ namespace RegistryWeb.DataServices
                 var stDate = filterOptions.StDateOwnershipRight.Value.Date;
                 var fDate = filterOptions.EndDateOwnershipRight.Value.Date.AddDays(1);
                 query = query.Where(r => r.RegDate != null && r.RegDate >= stDate && r.RegDate < fDate);
-            }
-            return query;
-        }
-
-        private IQueryable<Premise> AddressFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
-        {
-            if (filterOptions.IsAddressEmpty())
-                return query;
-
-
-            if (filterOptions.Address.AddressType == AddressTypes.Street)            
-                return query.Where(q => q.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id));
-
-            int id = 0;
-            if (!int.TryParse(filterOptions.Address.Id, out id))
-                return query;
-
-            if (filterOptions.Address.AddressType == AddressTypes.Building)            
-                return query.Where(q => q.IdBuilding == id);
-            
-            if (filterOptions.Address.AddressType == AddressTypes.Premise)            
-                return query.Where(q => q.IdPremises == id);
-            
-            if (filterOptions.Address.AddressType == AddressTypes.SubPremise)
-            {
-                return from q in query
-
-                       join sp in registryContext.SubPremises
-                       on q.IdPremises equals sp.IdPremises
-                       where sp.IdSubPremises == id
-                       select q;
             }
             return query;
         }

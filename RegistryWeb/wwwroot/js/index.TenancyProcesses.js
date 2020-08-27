@@ -26,7 +26,7 @@ var initRegNumState = function () {
     }
 };
 
-var selectRegNumState = function(e) {
+var selectRegNumState = function (e) {
     var value = $(this).text();
     var wrapperDropDown = $(this).closest(".rr-registration-num-dropdown");
     var wrapper = wrapperDropDown.closest(".input-group");
@@ -49,7 +49,6 @@ $(function () {
     $('#filterClearBtn').click(filterClear);
     initRegNumState();
     $(".rr-registration-num-dropdown a.dropdown-item").click(selectRegNumState);
-
 
     $("#filterModalShow").on("click", function (e) {
         e.preventDefault();
