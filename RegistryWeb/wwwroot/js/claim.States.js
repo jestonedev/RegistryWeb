@@ -34,7 +34,9 @@ var claimStateDetailsBtnClosed = true;
 function editClaimState(e) {
     disableEditingMultiyClaimStates(true);
     let claimStateElem = $(this).closest(".list-group-item");
-    let fields = claimStateElem.find('input, select, textarea');
+    let fields = claimStateElem.find('input, select, textarea').filter(function (idx, elem) {
+        return !/^Executor_/.test($(elem).prop("name"));
+    });
     let yesNoPanel = claimStateElem.find('.yes-no-panel');
     let editDelPanel = claimStateElem.find('.edit-del-panel');
     fields.prop('disabled', false);

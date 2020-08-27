@@ -1,0 +1,9 @@
+﻿.rr-claim-file-edit-buttons {
+    margin-top: 0;
+}
+
+@media(min-width: 992px) {
+    .rr-claim-file-edit-buttons {
+        margin-top: 32px;
+    }
+}

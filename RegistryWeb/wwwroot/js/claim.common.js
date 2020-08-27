@@ -62,6 +62,17 @@ $(function () {
                 // При создании исковой работы разрешено добавлять только первый этап "Запрос в БКС"
                 $(this).append(inputTemplate.replace('{0}', tr + "BksRequester").replace('{1}', claimStates[i].BksRequester));
             }
+
+            let claimFiles = getClaimFiles();
+            for (let i = 0; i < claimFiles.length; i++) {
+                let tf = "Claim.ClaimFiles[" + i + "].";
+                $(this).append(inputTemplate.replace('{0}', tf + "IdFile").replace('{1}', claimFiles[i].IdFile));
+                $(this).append(inputTemplate.replace('{0}', tf + "IdClaim").replace('{1}', claimFiles[i].IdClaim));
+                $(this).append(inputTemplate.replace('{0}', tf + "Description").replace('{1}', claimFiles[i].Description));
+                let file = $(claimFiles[i].AttachmentFile).clone();
+                file.attr("name", "ClaimFile[" + i + "]");
+                $(this).append(file);
+            }
         }
     });
 

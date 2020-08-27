@@ -10,6 +10,7 @@ namespace RegistryWeb.Models.Entities
         public Claim()
         {
             ClaimStates = new List<ClaimState>();
+            ClaimFiles = new List<ClaimFile>();
         }
 
         public int IdClaim { get; set; }
@@ -28,5 +29,6 @@ namespace RegistryWeb.Models.Entities
         public byte Deleted { get; set; }
         public virtual PaymentAccount IdAccountNavigation { get; set; }
         public virtual ICollection<ClaimState> ClaimStates { get; set; }
+        public virtual IList<ClaimFile> ClaimFiles { get; set; }
     }
 }
