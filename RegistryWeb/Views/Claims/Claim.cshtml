@@ -171,7 +171,7 @@
                 </div>
             </div>
             <div class="row">
-                @{ 
+                @{
                     var bksAddress = Model.Claim.IdAccountNavigation?.RawAddress;
                     var registryAddress = "";
                     if (Model.RentObjects != null && Model.RentObjects.Any())
@@ -335,6 +335,12 @@
         <div class="row">
             <div class="col-12">
                 <partial name="ClaimStates" model="Model.Claim.ClaimStates" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <partial name="ClaimPersons" model="Model.Claim.ClaimPersons" />
             </div>
         </div>
 

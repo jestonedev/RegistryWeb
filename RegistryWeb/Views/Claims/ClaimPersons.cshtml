@@ -1,0 +1,31 @@
+﻿@using RegistryWeb.Models.Entities
+@model IList<ClaimPerson>
+
+<link rel="stylesheet" href="~/css/claim.persons.css" />
+<script src="~/js/claim.Persons.js"></script>
+<form id="ClaimPersonsForm">
+    <div class="card rr-claim-card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Члены семьи ответчика</h3>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                <a href="#" id="claimPersonAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить члена семьи">&#10010;</a>
+                }
+                <a href="#" data-for="ClaimPersons" class="form-control btn btn-primary claim-toggler" title="Развернуть панель членов семьи ответчика" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush toggle-hide" id="ClaimPersons" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
+            <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
+                <i>Члены семьи ответчика отсутствуют</i>
+            </li>
+            @if (Model != null && Model.Any())
+            {
+                for (var i = 0; i < Model.Count; i++)
+                {
+                    <partial name="ClaimPerson" model="Model[i]" />
+                }
+            }
+        </ul>
+    </div>
+</form>

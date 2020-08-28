@@ -1,0 +1,78 @@
+﻿@using RegistryWeb.Models.Entities
+@model ClaimPerson
+
+@{ 
+    var id = Guid.NewGuid();
+}
+
+<li class="list-group-item">
+    <input type="hidden" value="@Model.IdPerson" name="IdPerson_@id" />
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label>Фамилия</label>
+            <input type="text" class="form-control" maxlength="50" disabled
+                   data-val="true" data-val-required="Укажите фамилию"
+                   asp-for="Surname" id="Surname_@id" name="Surname_@id" title="Фамилия">
+            <span class="text-danger field-validation-valid" data-valmsg-for="Surname_@id" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group col-md-4">
+            <label>Имя</label>
+            <input type="text" class="form-control" maxlength="50" disabled 
+                    data-val="true" data-val-required="Укажите имя"
+                    asp-for="Name" id="Surname_@id" name="Name_@id" title="Имя">
+            <span class="text-danger field-validation-valid" data-valmsg-for="Name_@id" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group col-md-4">
+            <label>Отчество</label>
+            <input type="text" class="form-control" maxlength="255" disabled asp-for="Patronymic" id="Patronymic_@id" name="Patronymic_@id" title="Отчество">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label>Дата рождения</label>
+            <input type="date" class="form-control" disabled asp-for="DateOfBirth"
+                   value="@(Model.DateOfBirth.HasValue ? Model.DateOfBirth.Value.ToString("yyyy-MM-dd") : "")"
+                   id="DateOfBirth_@id" name="DateOfBirth_@id" title="Дата рождения">
+        </div>
+        <div class="form-group col-md-4">
+            <label>Место рождения</label>
+            <input type="text" class="form-control" maxlength="1024" disabled asp-for="PlaceOfBirth" id="PlaceOfBirth_@id" name="PlaceOfBirth_@id" title="Место рождения">
+        </div>
+
+        <div class="form-group col-md-4">
+            <label>Место работы</label>
+            <input type="text" class="form-control" maxlength="1024" disabled asp-for="WorkPlace" id="WorkPlace_@id" name="WorkPlace_@id" title="Место работы">
+        </div>
+
+        <div class="col-md-4 col-6">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" disabled asp-for="IsClaimer" id="IsClaimer_@id" name="IsClaimer_@id" title="Является нанимателем">
+                <label class="form-check-label" asp-for="IsClaimer" title="Является нанимателем">Является нанимателем</label>
+            </div>
+        </div>
+
+
+        @if (ViewBag.Action == "Edit")
+        {
+            <div class="text-right text-md-center col-6 col-md-4 rr-claim-person-edit-buttons">
+                <div class="btn-group yes-no-panel" role="group" style="display: none" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger claim-person-cancel-btn" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                    <a class="btn btn-success claim-person-save-btn" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                </div>
+                <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                    <a class="btn btn-primary claim-person-edit-btn" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                    <a class="btn btn-danger claim-person-delete-btn" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                </div>
+            </div>
+        }
+        @if (ViewBag.Action == "Create")
+        {
+            <a class="claim-person-edit-btn" style="display: none"></a>
+            <div class="text-right text-md-center col-6 col-md-4 rr-claim-person-edit-buttons">
+                <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
+                    <a class="btn btn-danger claim-person-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
+                </div>
+            </div>
+        }
+    </div>
+</li>

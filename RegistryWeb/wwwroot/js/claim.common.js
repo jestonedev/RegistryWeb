@@ -20,11 +20,12 @@ $(function () {
         var validator = $(this).validate();
         var isFormValid = $(this).valid();
         var isStateFormValid = $("#ClaimStatesForm").valid();
+        var isPersonsFormValid = $("#ClaimPersonsForm").valid();
         if (!claimCustomValidations(validator)) {
             isFormValid = false;
         }
 
-        if (!isFormValid || !isStateFormValid) {
+        if (!isFormValid || !isStateFormValid || !isPersonsFormValid) {
             $("select").each(function (idx, elem) {
                 var id = $(elem).prop("id");
                 var name = $(elem).prop("name");
@@ -72,6 +73,20 @@ $(function () {
                 let file = $(claimFiles[i].AttachmentFile).clone();
                 file.attr("name", "ClaimFile[" + i + "]");
                 $(this).append(file);
+            }
+
+            let claimPersons = getClaimPersons();
+            for (let i = 0; i < claimPersons.length; i++) {
+                let tr = "Claim.ClaimPersons[" + i + "].";
+                $(this).append(inputTemplate.replace('{0}', tr + "IdPerson").replace('{1}', claimPersons[i].IdPerson));
+                $(this).append(inputTemplate.replace('{0}', tr + "IdClaim").replace('{1}', claimPersons[i].IdClaim));
+                $(this).append(inputTemplate.replace('{0}', tr + "Surname").replace('{1}', claimPersons[i].Surname));
+                $(this).append(inputTemplate.replace('{0}', tr + "Name").replace('{1}', claimPersons[i].Name));
+                $(this).append(inputTemplate.replace('{0}', tr + "Patronymic").replace('{1}', claimPersons[i].Patronymic));
+                $(this).append(inputTemplate.replace('{0}', tr + "DateOfBirth").replace('{1}', claimPersons[i].DateOfBirth));
+                $(this).append(inputTemplate.replace('{0}', tr + "PlaceOfBirth").replace('{1}', claimPersons[i].PlaceOfBirth));
+                $(this).append(inputTemplate.replace('{0}', tr + "WorkPlace").replace('{1}', claimPersons[i].WorkPlace));
+                $(this).append(inputTemplate.replace('{0}', tr + "IsClaimer").replace('{1}', claimPersons[i].IsClaimer));
             }
         }
     });

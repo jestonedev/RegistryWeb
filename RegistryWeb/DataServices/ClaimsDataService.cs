@@ -110,11 +110,89 @@ namespace RegistryWeb.DataServices
                     fileStream.Close();
                 }
             }
+            if (claim.ClaimPersons == null || !claim.ClaimPersons.Any())
+            {
+                var addressInfix = GetPaymentAccountAddressInfix(claim.IdAccount);
+                var tenancyPersons = GetTenancyPersonForAddressInfix(addressInfix.Infix);
+                claim.ClaimPersons = tenancyPersons.Select(r => new ClaimPerson {
+                    Surname = r.Surname,
+                    Name = r.Name,
+                    Patronymic = r.Patronymic,
+                    DateOfBirth = r.DateOfBirth,
+                    IsClaimer = r.IdKinship == 1
+                }).ToList();
+            }
 
             claim.IdAccountNavigation = null;
             claim = FillClaimAmount(claim);
             registryContext.Claims.Add(claim);
             registryContext.SaveChanges();
+        }
+
+        private List<TenancyPerson> GetTenancyPersonForAddressInfix(string infix)
+        {
+            var allObjects = (from row in
+                                (from row in registryContext.TenancyBuildingsAssoc
+                                select new
+                                {
+                                    row.IdProcess,
+                                    Infix = string.Concat("b", row.IdBuilding)
+                                })
+                                .Union(from row in registryContext.TenancyPremisesAssoc
+                                        select new
+                                        {
+                                            row.IdProcess,
+                                            Infix = string.Concat("p", row.IdPremise)
+                                        })
+                                .Union(from row in registryContext.TenancySubPremisesAssoc
+                                        select new
+                                        {
+                                            row.IdProcess,
+                                            Infix = string.Concat("sp", row.IdSubPremise)
+                                        })
+                              orderby row.Infix
+                              group row.Infix by row.IdProcess into gs
+                              select new
+                              {
+                                  IdProcess = gs.Key,
+                                  AddressCode = string.Join("", gs)
+                              }).AsEnumerable();
+            var tenancyProcesses = (from tpRow in registryContext.TenancyProcesses
+                                    .Where(tp => tp.RegistrationNum == null || !tp.RegistrationNum.Contains("н"))
+                                 join allObjectsRow in allObjects
+                                 on tpRow.IdProcess equals allObjectsRow.IdProcess
+                                 where allObjectsRow.AddressCode == infix
+                                 select tpRow).ToList();
+            if (!tenancyProcesses.Any())
+                return new List<TenancyPerson>();
+
+            var idProcess = tenancyProcesses.OrderByDescending(tp => new { tp.RegistrationDate, tp.IdProcess }).First().IdProcess;
+            return registryContext.TenancyPersons.Where(tp => tp.IdProcess == idProcess && tp.ExcludeDate == null).ToList();
+        }
+
+        private PaymentAddressInfix GetPaymentAccountAddressInfix(int idAccount)
+        {
+            return (from row in
+                            (from row in registryContext.PaymentAccountPremisesAssoc
+                             where row.IdAccount == idAccount
+                             select new PaymentAddressInfix
+                             {
+                                 IdAccount = row.IdAccount,
+                                 Infix = string.Concat("p", row.IdPremise)
+                             }).Union(from row in registryContext.PaymentAccountSubPremisesAssoc
+                                      where row.IdAccount == idAccount
+                                      select new PaymentAddressInfix
+                                      {
+                                          IdAccount = row.IdAccount,
+                                          Infix = string.Concat("sp", row.IdSubPremise)
+                                      })
+                                   orderby row.Infix
+                                   group row.Infix by row.IdAccount into gs
+                                   select new PaymentAddressInfix
+                                   {
+                                       IdAccount = gs.Key,
+                                       Infix = string.Join("", gs)
+                                   }).FirstOrDefault();
         }
 
         internal void Edit(Claim claim)
@@ -277,27 +355,9 @@ namespace RegistryWeb.DataServices
 
         private List<int> GetAccountIdsWithSameAddress(int idAccount)
         {
-            var filteredObjects = (from row in
-                            (from row in registryContext.PaymentAccountPremisesAssoc
-                             where row.IdAccount == idAccount
-                             select new
-                             {
-                                 row.IdAccount,
-                                 Infix = string.Concat("p", row.IdPremise)
-                             }).Union(from row in registryContext.PaymentAccountSubPremisesAssoc
-                                      where row.IdAccount == idAccount
-                                      select new
-                                      {
-                                          row.IdAccount,
-                                          Infix = string.Concat("sp", row.IdSubPremise)
-                                      })
-                                   orderby row.Infix
-                                   group row.Infix by row.IdAccount into gs
-                                   select new
-                                   {
-                                       IdAccount = gs.Key,
-                                       AddressCode = string.Join("", gs)
-                                   }).AsEnumerable();
+            var paymentAddressInfix = GetPaymentAccountAddressInfix(idAccount);
+
+            var filteredObjects = paymentAddressInfix != null ? new List<PaymentAddressInfix> { paymentAddressInfix } : new List<PaymentAddressInfix>();
 
             var allObjects = (from row in (from row in registryContext.PaymentAccountPremisesAssoc
                                            select new PaymentAddressInfix
@@ -328,7 +388,7 @@ namespace RegistryWeb.DataServices
                          };
             return (from filteredRow in filteredObjects
                     join allRow in allObjects
-                    on filteredRow.AddressCode equals allRow.AddressCode
+                    on filteredRow.Infix equals allRow.AddressCode
                     select allRow.IdAccount).ToList();
         }
 
@@ -688,7 +748,8 @@ namespace RegistryWeb.DataServices
         {
             return registryContext.Claims.Include(r => r.IdAccountNavigation)
                 .Include(r => r.ClaimStates)
-                .Include(c => c.ClaimFiles)
+                .Include(r => r.ClaimPersons)
+                .Include(r => r.ClaimFiles)
                 .FirstOrDefault(r => r.IdClaim == idClaim);
         }
 

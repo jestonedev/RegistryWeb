@@ -225,5 +225,18 @@ namespace RegistryWeb.Controllers
             return PartialView("AttachmentFile", file);
         }
 
+        [HttpPost]
+        public IActionResult AddClaimPerson(string action)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
+                return Json(-2);
+
+            var file = new ClaimPerson { };
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.CanEditBaseInfo = true;
+
+            return PartialView("ClaimPerson", file);
+        }
     }
 }
