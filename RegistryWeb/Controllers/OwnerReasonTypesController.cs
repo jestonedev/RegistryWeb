@@ -28,12 +28,14 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
             var ownerReasonTypes = rc.OwnerReasonTypes.ToList();
+            ViewBag.Count = ownerReasonTypes.Count();
             ViewBag.SecurityService = securityService;
             return View(ownerReasonTypes);
         }
 
         public IActionResult Create()
         {
+            ViewBag.Action = "Create";
             if (!securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
                 return View("NotAccess");
             return View();
@@ -53,6 +55,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Edit(int? idReasonType)
         {
+            ViewBag.Action = "Edit";
             if (idReasonType == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
@@ -79,6 +82,7 @@ namespace RegistryWeb.Controllers
         [ActionName("Delete")]
         public IActionResult ConfirmDelete(int? idReasonType)
         {
+            ViewBag.Action = "Delete";
             if (idReasonType == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
