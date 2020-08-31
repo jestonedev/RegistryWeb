@@ -1,0 +1,165 @@
+﻿@using RegistryWeb.Models.Entities
+@model IList<ClaimCourtOrder>
+
+@{ 
+    var id = Guid.NewGuid();
+    var judges = ((IList<Judge>)ViewBag.Judges).Select(r => new
+    {
+        r.IdJudge,
+        Judge = r.Snp + " (участок №"+r.NumDistrict.ToString()+")"
+    });
+
+    var signers = ((IList<SelectableSigner>)ViewBag.Signers).Select(r => new
+    {
+        IdSigner = r.IdRecord,
+        Signer = r.Surname + " " + r.Name + (r.Patronymic != null ? " " + r.Patronymic : "")
+    });
+}
+
+<form id="ClaimCourtOrdersForm_@id">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>Версии судебных приказов</h3>
+            <div class="btn-group" role="group">
+                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                {
+                    <a href="#" id="claimCourtOrderAdd_@id" class="form-control btn btn-success disabled" title="Добавить версию судебного приказа">&#10010;</a>
+                }
+            </div>
+        </div>
+        <ul class="list-group list-group-flush" id="ClaimCourtOrders_@id" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
+            <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
+                <i>Версии судебных приказов отсутствуют</i>
+            </li>
+            @if (Model != null && Model.Any())
+            {
+                for (var i = 0; i < Model.Count; i++)
+                {
+                    <partial name="ClaimCourtOrder" model="Model[i]" />
+                }
+            }
+        </ul>
+    </div>
+</form>
+
+<form id="ClaimCourtOrdersModalForm_@id">
+    <div class="modal fade bd-example-modal-xl" id="ClaimCourtOrderModal_@id" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel_@id">Версия судебного приказа</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="CourtOrder_IdOrder_@id" name="CourtOrder.IdOrder" />
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="CourtOrder_CreateDate_@id">Дата создания</label>
+                            <div class="input-group date">
+                                <input type="date" id="CourtOrder_CreateDate_@id" name="CourtOrder.CreateDate.@id" class="form-control" title="Дата создания">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="CourtOrder_OrderDate_@id">Дата формирования</label>
+                            <input type="date" id="CourtOrder_OrderDate_@id" name="CourtOrder.OrderDate.@id" class="form-control" title="Дата формирования"
+                                   data-val="true" data-val-required="Укажите дату формирования">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="CourtOrder.OrderDate.@id" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="CourtOrder_IdExecutor_@id">Исполнитель</label>
+                            <select class="selectpicker form-control" id="CourtOrder_IdExecutor_@id" name="CourtOrder.IdExecutor.@id"
+                                    title="Исполнитель" asp-items="@(new SelectList(ViewBag.Executors, "IdExecutor", "ExecutorName"))"
+                                    data-val="true" data-val-required="Выберите исполнителя"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="CourtOrder.IdExecutor.@id" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="CourtOrder_OpenAccountDate_@id">Дата открытия ЛС</label>
+                            <input type="date" id="CourtOrder_OpenAccountDate_@id" name="CourtOrder.OpenAccountDate.@id" class="form-control" title="Дата открытия ЛС"
+                                   data-val="true" data-val-required="Укажите дату открытия ЛС">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="CourtOrder.OpenAccountDate.@id" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="CourtOrder_IdJudge_@id">Мировой судья</label>
+                            <select class="selectpicker form-control" id="CourtOrder_IdJudge_@id" name="CourtOrder.IdJudge.@id"
+                                    title="Мировой судья" asp-items="@(new SelectList(judges, "IdJudge", "Judge"))"
+                                    data-val="true" data-val-required="Выберите мирового судью"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="CourtOrder.IdJudge.@id" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="CourtOrder_IdSigner_@id">Подписывающий</label>
+                            <select class="selectpicker form-control" id="CourtOrder_IdSigner_@id" name="CourtOrder.IdSigner.@id"
+                                    title="Подписывающий" asp-items="@(new SelectList(signers, "IdSigner", "Signer"))"
+                                    data-val="true" data-val-required="Выберите подписывающего"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="CourtOrder.IdSigner.@id" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="CourtOrder_StartDeptPeriod_@id">Предъявлен период (с)</label>
+                            <input type="date" id="CourtOrder_StartDeptPeriod_@id" name="CourtOrder.StartDeptPeriod.@id" class="form-control" title="Дата начала предъявляемого периода">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="CourtOrder_EndDeptPeriod_@id">Предъявлен период (по)</label>
+                            <input type="date" id="CourtOrder_EndDeptPeriod_@id" name="CourtOrder.EndDeptPeriod.@id" class="form-control" title="Дата окончания предъявляемого периода">
+                        </div>
+                    </div>
+
+                    <h5>Сумма к взысканию</h5>
+                    <hr class="mt-1" />
+                    <div class="row">
+                        <div class="form-group col-4">
+                            <label for="CourtOrder_AmountTenancy_@id">Найм</label>
+                            <input type="text" class="form-control decimal" id="CourtOrder_AmountTenancy_@id" name="CourtOrder.AmountTenancy.@id"
+                                   title="Сумма к взысканию (найм)" data-val="true" data-val-number="Введите числовое значение">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="CourtOrder.AmountTenancy.@id" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="CourtOrder_AmountPenalties_@id">Пени</label>
+                            <input type="text" class="form-control decimal" id="CourtOrder_AmountPenalties_@id" name="CourtOrder.AmountPenalties.@id"
+                                   title="Сумма к взысканию (пени)" data-val="true" data-val-number="Введите числовое значение">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="CourtOrder.AmountPenalties.@id" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="CourtOrder_AmountTotal_@id">Итого</label>
+                            <input type="text" class="form-control decimal" id="CourtOrder_AmountTotal_@id" name="CourtOrder.AmountTotal.@id"
+                                   title="Сумма к взысканию (итого)">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="CourtOrder.AmountTotal.@id" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-4">
+                            <label for="CourtOrder_AmountDgi_@id">ДГИ</label>
+                            <input type="text" class="form-control decimal" id="CourtOrder_AmountDgi_@id" name="CourtOrder.AmountDgi.@id"
+                                   title="Сумма к взысканию (ДГИ)" data-val="true" data-val-number="Введите числовое значение">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="CourtOrder.AmountDgi.@id" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="CourtOrder_AmountPadun_@id">Падун</label>
+                            <input type="text" class="form-control decimal" id="CourtOrder_AmountPadun_@id" name="CourtOrder.AmountPadun.@id"
+                                   title="Сумма к взысканию (Падун)" data-val="true" data-val-number="Введите числовое значение">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="CourtOrder.AmountPadun.@id" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="CourtOrder_AmountPkk_@id">ПКК</label>
+                            <input type="text" class="form-control decimal" id="CourtOrder_AmountPkk_@id" name="CourtOrder.AmountPkk.@id"
+                                   title="Сумма к взысканию (ПКК)" data-val="true" data-val-number="Введите числовое значение">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="CourtOrder.AmountPkk.@id" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                    {
+                        <button id="saveClaimCourtOrderModalBtn_@id" type="button" class="btn btn-secondary">Сохранить</button>
+                        <button id="cancelClaimCourtOrderModalBtn_@id" type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                    }
+                    @if (ViewBag.Action == "Details")
+                    {
+                        <button id="closeClaimCourtOrderModalBtn_@id" type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

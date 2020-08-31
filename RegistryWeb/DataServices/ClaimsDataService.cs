@@ -195,6 +195,24 @@ namespace RegistryWeb.DataServices
                                    }).FirstOrDefault();
         }
 
+        internal int GetIdJudge(int idAccount)
+        {
+            var idBuilding = (from papRow in registryContext.PaymentAccountPremisesAssoc
+                              join pRow in registryContext.Premises
+                              on papRow.IdPremise equals pRow.IdPremises
+                              where papRow.IdAccount == idAccount
+                              select pRow.IdBuilding).Union(
+                                from paspRow in registryContext.PaymentAccountSubPremisesAssoc
+                                join spRow in registryContext.SubPremises
+                                on paspRow.IdSubPremise equals spRow.IdSubPremises
+                                join pRow in registryContext.Premises
+                                on spRow.IdPremises equals pRow.IdPremises
+                                where paspRow.IdAccount == idAccount
+                                select pRow.IdBuilding
+                            ).FirstOrDefault();
+            return registryContext.JudgeBuildingsAssoc.FirstOrDefault(r => r.IdBuilding == idBuilding)?.IdJudge ?? 0;
+        }
+
         internal void Edit(Claim claim)
         {
             claim.IdAccountNavigation = null;
@@ -731,6 +749,9 @@ namespace RegistryWeb.DataServices
                 Claim = new Claim(),
                 CurrentExecutor = CurrentExecutor,
                 StateTypes = registryContext.ClaimStateTypes.ToList(),
+                Executors = registryContext.Executors.Where(r => action == "Create" || !r.IsInactive).ToList(),
+                Judges = registryContext.Judges.Where(r => action == "Create" || !r.IsInactive).ToList(),
+                Signers = registryContext.SelectableSigners.Where(r => r.IdSignerGroup == 3).ToList(),
                 StateTypeRelations = registryContext.ClaimStateTypeRelations.ToList()
             };
         }
@@ -750,11 +771,15 @@ namespace RegistryWeb.DataServices
                 .Include(r => r.ClaimStates)
                 .Include(r => r.ClaimPersons)
                 .Include(r => r.ClaimFiles)
+                .Include(r => r.ClaimCourtOrders)
                 .FirstOrDefault(r => r.IdClaim == idClaim);
         }
 
         public List<ClaimStateType> StateTypes => registryContext.ClaimStateTypes.ToList();
         public List<ClaimStateTypeRelation> StateTypeRelations => registryContext.ClaimStateTypeRelations.ToList();
+        public List<Executor> Executors => registryContext.Executors.ToList();
+        public List<Judge> Judges => registryContext.Judges.ToList();
+        public List<SelectableSigner> Signers => registryContext.SelectableSigners.ToList();
 
         public Executor CurrentExecutor
         {

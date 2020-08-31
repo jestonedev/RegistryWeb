@@ -1,0 +1,9 @@
+﻿.rr-claim-court-order-edit-buttons, .rr-claim-court-order-view-buttons {
+    margin-top: 28px;
+}
+
+@media(min-width: 768px) {
+    .rr-claim-court-order-buttons, .rr-claim-court-order-view-buttons {
+        margin-top: 32px;
+    }
+}

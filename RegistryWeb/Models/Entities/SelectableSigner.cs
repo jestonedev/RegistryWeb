@@ -7,6 +7,7 @@ namespace RegistryWeb.Models.Entities
     {
         public SelectableSigner()
         {
+            ClaimCourtOrders = new List<ClaimCourtOrder>();
         }
 
         public int IdRecord { get; set; }
@@ -17,5 +18,7 @@ namespace RegistryWeb.Models.Entities
         public string Post { get; set; }
         public string Phone { get; set; }
         public byte Deleted { get; set; }
+
+        public virtual IList<ClaimCourtOrder> ClaimCourtOrders { get; set; }
     }
 }

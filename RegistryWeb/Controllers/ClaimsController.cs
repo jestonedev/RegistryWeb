@@ -193,7 +193,7 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
                 return Json(-2);
 
-            var claim= dataService.GetClaim(idClaim) ?? new Claim { ClaimStates = new List<ClaimState>() };
+            var claim= dataService.GetClaim(idClaim) ?? new Claim { ClaimStates = new List<ClaimState>(), ClaimCourtOrders = new List<ClaimCourtOrder>() };
             var claimStates = claim.ClaimStates;
             ViewBag.SecurityService = securityService;
             ViewBag.Action = action;
@@ -208,7 +208,30 @@ namespace RegistryWeb.Controllers
             });
             ViewBag.ClaimStateIndex = claimStates.Count - 1;
 
+            ViewBag.ClaimCourtOrders = claim.ClaimCourtOrders;
+            ViewBag.Executors = dataService.Executors.Where(r => action == "Create" || !r.IsInactive).ToList();
+            ViewBag.Judges = dataService.Judges.Where(r => action == "Create" || !r.IsInactive).ToList();
+            ViewBag.Signers = dataService.Signers.Where(r => r.IdSignerGroup == 3).ToList();
             return PartialView("ClaimState", claimStates);
+        }
+
+        [HttpPost]
+        public IActionResult AddCourtOrder(string action, int idAccount)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
+                return Json(-2);
+            var courtOrder = new ClaimCourtOrder {
+                IdExecutor = dataService.CurrentExecutor?.IdExecutor ?? 0,
+                CreateDate = DateTime.Now.Date,
+                IdJudge = dataService.GetIdJudge(idAccount)
+            };
+
+            ViewBag.SecurityService = securityService;
+            ViewBag.Action = action;
+            ViewBag.Executors = dataService.Executors.Where(r => action == "Create" || !r.IsInactive).ToList();
+            ViewBag.Judges = dataService.Judges.Where(r => action == "Create" || !r.IsInactive).ToList();
+            ViewBag.Signers = dataService.Signers.Where(r => r.IdSignerGroup == 3).ToList();
+            return PartialView("ClaimCourtOrder", courtOrder);
         }
 
         [HttpPost]

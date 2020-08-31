@@ -8,6 +8,7 @@
     ClaimState prevClaimState = null;
     ClaimState nextClaimState = null;
     List<ClaimStateType> claimStateTypes = (List<ClaimStateType>)ViewBag.StateTypes;
+    List<ClaimCourtOrder> claimCourtOrders = (List<ClaimCourtOrder>)ViewBag.ClaimCourtOrders;
     List<ClaimStateTypeRelation> claimStateTypeRelations = (List<ClaimStateTypeRelation>)ViewBag.StateTypeRelations;
     if (claimStateIndex > 0)
     {
@@ -142,6 +143,12 @@
         <div class="form-group col-12 col-md-8">
             <label>Номер с/п</label>
             <input type="text" disabled class="form-control" value="@claimState.CourtOrderNum" id="CourtOrderNum_@id" name="CourtOrderNum_@id" title="Номер с/п">
+        </div>
+    </div>
+
+    <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
+        <div class="col-12">
+            <partial name="ClaimCourtOrders" model="claimCourtOrders" />
         </div>
     </div>
 

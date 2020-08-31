@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -40,12 +41,22 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 var claimState = registryContext.ClaimStates
                     .FirstOrDefault(op => op.IdState == idState);
 
-                var claimStates = registryContext.ClaimStates.Where(cs => cs.IdClaim == claimState.IdClaim).AsNoTracking().ToList(); ;
+                var claimStates = registryContext.ClaimStates.Where(cs => cs.IdClaim == claimState.IdClaim).AsNoTracking().ToList();
                 if(claimStates[claimStates.Count - 1].IdState != claimState.IdState)
                 {
                     return -4;
                 }
                 claimState.Deleted = 1;
+
+                if (claimState.IdStateType == 4)
+                {
+                    var claimCourtOrders = registryContext.ClaimCourtOrders.Where(r => r.IdClaim == claimState.IdClaim);
+                    foreach (var courtOrder in claimCourtOrders)
+                    {
+                        courtOrder.Deleted = 1;
+                    }
+                }
+
                 registryContext.SaveChanges();
                 return 1;
             }
@@ -64,6 +75,10 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 return Json(-2);
             var claimState = registryContext.ClaimStates
                 .FirstOrDefault(op => op.IdState == idState);
+            if (claimState == null)
+                return Json(-3);
+            var courtOrders = claimState.IdStateType == 4 ? registryContext.ClaimCourtOrders.Where(r => r.IdClaim == claimState.IdClaim).ToList()
+                : new List<ClaimCourtOrder>();
             return Json(new {
                 idStateType = claimState.IdStateType,
                 dateStartState = claimState.DateStartState.HasValue ? claimState.DateStartState.Value.ToString("yyyy-MM-dd") : null,
@@ -96,12 +111,28 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 repeatedEnforcementProceedingEndDescription = claimState.RepeatedEnforcementProceedingEndDescription,
                 courtOrderCompleteDate = claimState.CourtOrderCompleteDate.HasValue ? claimState.CourtOrderCompleteDate.Value.ToString("yyyy-MM-dd") : null,
                 courtOrderCompleteReason = claimState.CourtOrderCompleteReason,
-                courtOrderCompleteDescription = claimState.CourtOrderCompleteDescription
+                courtOrderCompleteDescription = claimState.CourtOrderCompleteDescription,
+                courtOrders = courtOrders.Select(r => new {
+                    idOrder = r.IdOrder,
+                    idSigner = r.IdSigner,
+                    idJudge = r.IdJudge,
+                    idExecutor = r.IdExecutor,
+                    openAccountDate = r.OpenAccountDate.ToString("yyyy-MM-dd"),
+                    amountTenancy = r.AmountTenancy,
+                    amountPenalties = r.AmountPenalties,
+                    amountDgi = r.AmountDgi,
+                    amountPadun = r.AmountPadun,
+                    amountPkk = r.AmountPkk,
+                    startDeptPeriod = r.StartDeptPeriod.HasValue ? r.StartDeptPeriod.Value.ToString("yyyy-MM-dd") : null,
+                    endDeptPeriod = r.EndDeptPeriod.HasValue ? r.EndDeptPeriod.Value.ToString("yyyy-MM-dd") : null,
+                    createDate = r.CreateDate.HasValue ? r.CreateDate.Value.ToString("yyyy-MM-dd") : null,
+                    orderDate = r.OrderDate.ToString("yyyy-MM-dd")
+                })
             });
         }
 
         [HttpPost]
-        public IActionResult SaveClaimState(ClaimState claimState)
+        public IActionResult SaveClaimState(ClaimState claimState, List<ClaimCourtOrder> courtOrders)
         {
             if (claimState == null)
                 return Json(new { Error = -1 });
@@ -130,6 +161,9 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 }
 
                 registryContext.ClaimStates.Add(claimState);
+                if (claimState.IdStateType == 4)
+                    UpdateCourtOrders(courtOrders, claimState.IdClaim);
+
                 registryContext.SaveChanges();
 
                 return Json(new { claimState.IdState });
@@ -163,8 +197,47 @@ namespace RegistryWeb.Controllers.ServiceControllers
             }
 
             registryContext.ClaimStates.Update(claimState);
+            if (claimState.IdStateType == 4)
+                UpdateCourtOrders(courtOrders, claimState.IdClaim);
+
             registryContext.SaveChanges();
             return Json(new { claimState.IdState });
+        }
+
+        private void UpdateCourtOrders(List<ClaimCourtOrder> newCourtOrders, int idClaim)
+        {
+            var oldCourtOrders = registryContext.ClaimCourtOrders.Where(r => r.IdClaim == idClaim);
+            foreach(var oldCourtOrder in oldCourtOrders)
+            {
+                if (!newCourtOrders.Any(r => r.IdOrder == oldCourtOrder.IdOrder))
+                {
+                    oldCourtOrder.Deleted = 1;
+                }
+            }
+            foreach(var newCourtOrder in newCourtOrders)
+            {
+                var oldCourtOrder = oldCourtOrders.FirstOrDefault(r => r.IdOrder == newCourtOrder.IdOrder);
+                if (oldCourtOrder != null)
+                {
+                    oldCourtOrder.IdExecutor = newCourtOrder.IdExecutor;
+                    oldCourtOrder.CreateDate = newCourtOrder.CreateDate;
+                    oldCourtOrder.IdSigner = newCourtOrder.IdSigner;
+                    oldCourtOrder.IdJudge = newCourtOrder.IdJudge;
+                    oldCourtOrder.OrderDate = newCourtOrder.OrderDate;
+                    oldCourtOrder.OpenAccountDate = newCourtOrder.OpenAccountDate;
+                    oldCourtOrder.AmountTenancy = newCourtOrder.AmountTenancy;
+                    oldCourtOrder.AmountPenalties = newCourtOrder.AmountPenalties;
+                    oldCourtOrder.AmountDgi = newCourtOrder.AmountDgi;
+                    oldCourtOrder.AmountPadun = newCourtOrder.AmountPadun;
+                    oldCourtOrder.AmountPkk = newCourtOrder.AmountPkk;
+                    oldCourtOrder.StartDeptPeriod = newCourtOrder.StartDeptPeriod;
+                    oldCourtOrder.EndDeptPeriod = newCourtOrder.EndDeptPeriod;
+                    registryContext.ClaimCourtOrders.Update(oldCourtOrder);
+                } else
+                {
+                    registryContext.ClaimCourtOrders.Add(newCourtOrder);
+                }
+            }
         }
     }
 }

@@ -8,12 +8,12 @@
         data: { action, idClaim },
         success: function (elem) {
             let list = $('#ClaimStates');
-            list.find(".rr-list-group-item-empty").hide();
+            list.children(".rr-list-group-item-empty").hide();
             let claimToggle = $('#ClaimStatesForm .claim-toggler');
             if (!isExpandElemntArrow(claimToggle)) // развернуть при добавлении, если было свернуто 
                 claimToggle.click();
             list.append(elem);
-            elem = list.find(".list-group-item").last();
+            elem = list.children(".list-group-item").last();
             elem.find("select").selectpicker("refresh");
             elem.find(".claim-state-edit-btn").first().click();
 
@@ -30,12 +30,13 @@
 }
 
 var claimStateDetailsBtnClosed = true;
+let courtOrderTemplateForCancelation = undefined;
 
 function editClaimState(e) {
     disableEditingMultiyClaimStates(true);
     let claimStateElem = $(this).closest(".list-group-item");
     let fields = claimStateElem.find('input, select, textarea').filter(function (idx, elem) {
-        return !/^Executor_/.test($(elem).prop("name"));
+        return !/^Executor_/.test($(elem).prop("name")) && $(elem).closest("[id^='ClaimCourtOrders']").length === 0;
     });
     let yesNoPanel = claimStateElem.find('.yes-no-panel');
     let editDelPanel = claimStateElem.find('.edit-del-panel');
@@ -59,6 +60,18 @@ function editClaimState(e) {
         claimStateDetailsBtnClosed = false;
     }
 
+    claimStateElem.find("[id^='claimCourtOrderAdd']").removeClass("disabled");
+    claimStateElem.find(".edit-del-court-order-panel a").removeClass("disabled");
+
+    let courtOrderElems = claimStateElem.find("[id^='ClaimCourtOrders_'] > .list-group-item").filter(function (idx, elem) {
+        return !$(elem).hasClass("rr-list-group-item-empty");
+    });
+    if (courtOrderElems.length > 0) {
+        courtOrderTemplateForCancelation = courtOrderElems.first().clone();
+    } else {
+        courtOrderTemplateForCancelation = undefined;
+    }
+
     e.preventDefault();
 }
 
@@ -75,6 +88,8 @@ function cancelEditClaimState(e) {
                 refreshClaimState(claimStateElem, claimState);
                 showEditDelPanelClaimState(claimStateElem);
                 clearValidationError(claimStateElem);
+                claimStateElem.find("[id^='claimCourtOrderAdd']").addClass("disabled");
+                claimStateElem.find(".edit-del-court-order-panel a").addClass("disabled");
                 if (claimStateDetailsBtnClosed) {
                     var claimStateDetailsBtn = claimStateElem.find(".rr-claim-state-details");
                     var icon = $(claimStateDetailsBtn).find(".oi");
@@ -88,8 +103,8 @@ function cancelEditClaimState(e) {
     //Отменить вставку нового документа
     else {
         claimStateElem.remove();
-        if ($("#ClaimStates .list-group-item").length === 1) {
-            $("#ClaimStates .rr-list-group-item-empty").show();
+        if ($("#ClaimStates > .list-group-item").length === 1) {
+            $("#ClaimStates > .rr-list-group-item-empty").show();
         }
         disableEditingMultiyClaimStates(false);
     }
@@ -98,8 +113,8 @@ function cancelEditClaimState(e) {
 
 function disableEditingMultiyClaimStates(disable) {
     let addClaimStateBtn = $("#claimStateAdd");
-    let claimStatesEditBtns = $("#ClaimStates").find(".list-group-item").find(".claim-state-edit-btn");
-    let claimStatesDelBtns = $("#ClaimStates").find(".list-group-item").find(".claim-state-delete-btn");
+    let claimStatesEditBtns = $("#ClaimStates > .list-group-item").find(".claim-state-edit-btn");
+    let claimStatesDelBtns = $("#ClaimStates > .list-group-item").find(".claim-state-delete-btn");
     if (disable) {
         addClaimStateBtn.addClass("disabled");
         claimStatesEditBtns.addClass("disabled");
@@ -145,6 +160,37 @@ function refreshClaimState(claimStateElem, claimState) {
     claimStateElem.find("[name^='CourtOrderCompleteDate']").val(claimState.courtOrderCompleteDate);
     claimStateElem.find("[name^='CourtOrderCompleteReason']").val(claimState.courtOrderCompleteReason);
     claimStateElem.find("[name^='CourtOrderCompleteDescription']").val(claimState.courtOrderCompleteDescription);
+
+    var courtOrderListElem = claimStateElem.find("[id^='ClaimCourtOrders_']");
+    courtOrderListElem.empty();
+    if (courtOrderTemplateForCancelation !== undefined) {
+        for (let i = 0; i < claimState.courtOrders.length; i++) {
+            let courtOrder = claimState.courtOrders[i];
+            let courtOrderElem = courtOrderTemplateForCancelation.clone();
+            courtOrderListElem.append(courtOrderElem);
+            courtOrderElem = courtOrderListElem.find(".list-group-item").last();
+            courtOrderElem.find("[name^='IdOrder']").val(courtOrder.idOrder);
+            courtOrderElem.find("[name^='IdSigner']").val(courtOrder.idSigner);
+            courtOrderElem.find("[name^='IdJudge']").val(courtOrder.idJudge);
+            courtOrderElem.find("[name^='OpenAccountDate']").val(courtOrder.openAccountDate);
+            courtOrderElem.find("[name^='AmountTenancy']").val(courtOrder.amountTenancy);
+            courtOrderElem.find("[name^='AmountPenalties']").val(courtOrder.amountPenalties);
+            courtOrderElem.find("[name^='AmountDgi']").val(courtOrder.amountDgi);
+            courtOrderElem.find("[name^='AmountPadun']").val(courtOrder.amountPadun);
+            courtOrderElem.find("[name^='AmountPkk']").val(courtOrder.amountPkk);
+            courtOrderElem.find("[name^='StartDeptPeriod']").val(courtOrder.startDeptPeriod);
+            courtOrderElem.find("[name^='EndDeptPeriod']").val(courtOrder.endDeptPeriod);
+            courtOrderElem.find("[name^='CreateDate']").val(courtOrder.createDate);
+            courtOrderElem.find("[name^='OrderDate']").val(courtOrder.orderDate);
+
+            var idExecutorElem = courtOrderElem.find('select[name^="IdExecutor"]');
+            var formGroup = idExecutorElem.closest('.form-group');
+            idExecutorElem.closest('.bootstrap-select').remove();
+            $(idExecutorElem).insertAfter(formGroup.find("label"));
+            idExecutorElem.find("option[class='bs-title-option']").remove();
+            idExecutorElem.selectpicker().val(courtOrder.idExecutor).selectpicker('refresh');
+        }
+    }
 }
 
 function showEditDelPanelClaimState(claimStateElem) {
@@ -159,8 +205,11 @@ function showEditDelPanelClaimState(claimStateElem) {
 
 function saveClaimState(e) {
     let claimStateElem = $(this).closest(".list-group-item");
-    if (claimStateElem.find("input, textarea, select").valid()) {
-        let claimState = claimStateToFormData(getClaimState(claimStateElem));
+    if (claimStateElem.find("input, textarea, select")
+        .filter(function (idx, elem) {
+            return $(elem).closest(".modal").length === 0 && $(elem).closest("[id^='ClaimCourtOrdersForm']").length === 0;
+        }).valid()) {
+        let claimState = claimStateToFormData(getClaimState(claimStateElem), getCourtOrders(claimStateElem));
         $.ajax({
             type: 'POST',
             url: window.location.origin + '/ClaimStates/SaveClaimState',
@@ -171,8 +220,10 @@ function saveClaimState(e) {
                 if (claimState.idState > 0) {
                     showEditDelPanelClaimState(claimStateElem);
                     claimStateElem.find("input[name^='IdState']").val(claimState.idState);
+                    claimStateElem.find("[id^='claimCourtOrderAdd']").addClass("disabled");
+                    claimStateElem.find(".edit-del-court-order-panel a").addClass("disabled");
                 } else {
-                    alert("Произошла ошибка при изменении этапа исковой работы")
+                    alert("Произошла ошибка при изменении этапа исковой работы");
                 }
             }
         });
@@ -190,6 +241,37 @@ function saveClaimState(e) {
         }, 1000);
     }
     e.preventDefault();
+}
+
+function getCourtOrders(claimStateElem) {
+    var claimStateTypeId = claimStateElem.find("[name^='IdStateType']").val() | 0;
+    var courtOrders = [];
+    if (claimStateTypeId === 4) {
+        var courtOrderElems = $(claimStateElem).find("[id^=ClaimCourtOrders_] > .list-group-item").filter(function (idx, elem) {
+            return !$(elem).hasClass("rr-list-group-item-empty");
+        });
+        var idClaim = claimStateElem.closest("#ClaimStates").data("id");
+        courtOrders = courtOrderElems.map(function (idx, elem) {
+            return {
+                IdOrder: $(elem).find("input[id^='IdOrder']").val(),
+                IdClaim: idClaim,
+                IdSigner: $(elem).find("input[id^='IdSigner']").val(),
+                IdJudge: $(elem).find("input[id^='IdJudge']").val(),
+                OpenAccountDate: $(elem).find("input[id^='OpenAccountDate']").val(),
+                AmountTenancy: $(elem).find("input[id^='AmountTenancy']").val(),
+                AmountPenalties: $(elem).find("input[id^='AmountPenalties']").val(),
+                AmountDgi: $(elem).find("input[id^='AmountDgi']").val(),
+                AmountPadun: $(elem).find("input[id^='AmountPadun']").val(),
+                AmountPkk: $(elem).find("input[id^='AmountPkk']").val(),
+                StartDeptPeriod: $(elem).find("input[id^='StartDeptPeriod']").val(),
+                EndDeptPeriod: $(elem).find("input[id^='EndDeptPeriod']").val(),
+                CreateDate: $(elem).find("input[id^='CreateDate']").val(),
+                OrderDate: $(elem).find("input[id^='OrderDate']").val(),
+                IdExecutor: $(elem).find("select[id^='IdExecutor']").val()
+            };
+        });
+    }
+    return courtOrders;
 }
 
 function getClaimState(claimStateElem) {
@@ -253,10 +335,15 @@ function getClaimStates() {
     return items.map(function (idx, elem) { return getClaimState($(elem)); });
 }
 
-function claimStateToFormData(claimState) {
+function claimStateToFormData(claimState, courtOrders) {
     var formData = new FormData();
-    for (var field in claimState) {
+    for (let field in claimState) {
         formData.append("ClaimState." + field, claimState[field]);
+    }
+    for (let i = 0; i < courtOrders.length; i++) {
+        for (let field in courtOrders[i]) {
+            formData.append("CourtOrders[" + i + "]." + field, courtOrders[i][field]);
+        }
     }
     return formData;
 }
@@ -274,9 +361,9 @@ function deleteClaimState(e) {
             success: function (ind) {
                 if (ind === 1) {
                     claimStateElem.remove();
-                    var claimStates = $("#ClaimStates .list-group-item");
+                    var claimStates = $("#ClaimStates > .list-group-item");
                     if (claimStates.length === 1) {
-                        $("#ClaimStates .rr-list-group-item-empty").show();
+                        $("#ClaimStates > .rr-list-group-item-empty").show();
                     } else {
                         $(claimStates[claimStates.length - 1]).find(".claim-state-delete-btn").removeClass("disabled");
                     }

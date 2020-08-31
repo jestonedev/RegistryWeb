@@ -32,5 +32,6 @@ namespace RegistryWeb.Models.Entities
         public virtual ICollection<ClaimState> ClaimStates { get; set; }
         public virtual ICollection<ClaimPerson> ClaimPersons { get; set; }
         public virtual IList<ClaimFile> ClaimFiles { get; set; }
+        public virtual IList<ClaimCourtOrder> ClaimCourtOrders { get; set; }
     }
 }

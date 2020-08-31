@@ -1,0 +1,62 @@
+﻿@using RegistryWeb.Models.Entities
+@model ClaimCourtOrder
+
+@{
+    var id = Guid.NewGuid();
+}
+
+<li class="list-group-item">
+    <input type="hidden" asp-for="IdOrder" id="IdOrder_@id" name="IdOrder_@id" />
+    <input type="hidden" asp-for="IdSigner" id="IdSigner_@id" name="IdSigner_@id" />
+    <input type="hidden" asp-for="IdJudge" id="IdJudge_@id" name="IdJudge_@id" />
+    <input type="hidden" asp-for="OpenAccountDate" id="OpenAccountDate_@id" name="OpenAccountDate_@id"
+           value="@(Model.OpenAccountDate.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : Model.OpenAccountDate.ToString("yyyy-MM-dd"))" />
+    <input type="hidden" asp-for="AmountTenancy" id="AmountTenancy_@id" name="AmountTenancy_@id" />
+    <input type="hidden" asp-for="AmountPenalties" id="AmountPenalties_@id" name="AmountPenalties_@id" />
+    <input type="hidden" asp-for="AmountDgi" id="AmountDgi_@id" name="AmountDgi_@id" />
+    <input type="hidden" asp-for="AmountPadun" id="AmountPadun_@id" name="AmountPadun_@id" />
+    <input type="hidden" asp-for="AmountPkk" id="AmountPkk_@id" name="AmountPkk_@id" />
+    <input type="hidden" asp-for="StartDeptPeriod" id="StartDeptPeriod_@id" name="StartDeptPeriod_@id"
+           value="@(Model.StartDeptPeriod.HasValue ? Model.StartDeptPeriod.Value.ToString("yyyy-MM-dd") : "")" />
+    <input type="hidden" asp-for="EndDeptPeriod" id="EndDeptPeriod_@id" name="EndDeptPeriod_@id"
+           value="@(Model.EndDeptPeriod.HasValue ? Model.EndDeptPeriod.Value.ToString("yyyy-MM-dd") : "")" />
+    <div class="form-row">
+        <div class="form-group col-6 col-md-3">
+            <label>Дата создания</label>
+            <input type="date" class="form-control" disabled asp-for="CreateDate"
+                   value="@(Model.CreateDate.HasValue ? Model.CreateDate.Value.ToString("yyyy-MM-dd") : "")"
+                   id="CreateDate_@id" name="CreateDate_@id" title="Дата создания">
+        </div>
+        <div class="form-group col-6 col-md-3">
+            <label class="rr-claim-label">Дата формирования</label>
+            <input type="date" class="form-control" disabled asp-for="OrderDate"
+                   value="@(Model.OrderDate.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : Model.OrderDate.ToString("yyyy-MM-dd"))"
+                   id="OrderDate_@id" name="OrderDate_@id" title="Дата формирования">
+        </div>
+        <div class="form-group col-9 col-md-4">
+            <label>Исполнитель</label>
+            <select class="selectpicker form-control" disabled asp-for="IdExecutor"
+                    asp-items="@(new SelectList(ViewBag.Executors, "IdExecutor", "ExecutorName"))" id="IdExecutor_@id" name="IdExecutor_@id" title="Исполнитель">
+                <option></option>
+            </select>
+        </div>
+
+        @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+        {
+            <div class="text-right col-3 col-md-2 rr-claim-court-order-edit-buttons">
+                <div class="btn-group edit-del-court-order-panel" role="group" aria-label="Панель реадктирования">
+                    <a class="btn btn-primary claim-court-order-edit-btn disabled" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                    <a class="btn btn-danger claim-court-order-delete-btn disabled" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                </div>
+            </div>
+        }
+        @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+        {
+            <div class="text-right col-3 col-md-2 rr-claim-court-order-view-buttons">
+                <a class="btn btn-primary claim-court-order-open-btn" href="#" title="Открыть дополнительную информацию о версии судебного приказа" aria-label="Открыть дополнительную информацию о версии судебного приказа">
+                    <span class="oi oi-eye"></span>
+                </a>
+            </div>
+        }
+    </div>
+</li>
