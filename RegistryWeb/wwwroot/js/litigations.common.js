@@ -222,6 +222,7 @@ function showEditDelPanelLitigation(litegationElem) {
     let editDelPanel = litegationElem.find('.edit-del-panel');
     let yesNoPanel = litegationElem.find('.yes-no-panel');
     yesNoPanel.hide();
+    litegationElem.removeClass("list-group-item-warning");
     editDelPanel.show();
 }
 

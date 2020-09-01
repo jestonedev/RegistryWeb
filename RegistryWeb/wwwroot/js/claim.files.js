@@ -156,6 +156,7 @@ function showEditDelPanelClaimFile(attachmentFileElem) {
     let editDelPanel = attachmentFileElem.find('.edit-del-panel');
     let yesNoPanel = attachmentFileElem.find('.yes-no-panel');
     yesNoPanel.hide();
+    attachmentFileElem.removeClass("list-group-item-warning");
     editDelPanel.show();
 }
 

@@ -199,6 +199,7 @@ function showEditDelPanelClaimState(claimStateElem) {
     let editDelPanel = claimStateElem.find('.edit-del-panel');
     let yesNoPanel = claimStateElem.find('.yes-no-panel');
     yesNoPanel.hide();
+    claimStateElem.removeClass("list-group-item-warning");
     editDelPanel.show();
     disableEditingMultiyClaimStates(false);
 }

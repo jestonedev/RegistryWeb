@@ -1,96 +1,5 @@
 ﻿'use strict';
-//let getErrorSpan = function (dataValmsgFor) {
-//    return "<span class=\"text-danger field-validation-valid\" data-valmsg-for=\"" + dataValmsgFor +
-//        "\" data-valmsg-replace=\"true\"></span>";
-//}
-//let initializeVilidationTr = function (tr) {
-//    let fields = tr.find('.field-ownership-right');
-//    let idOwnershipRight = tr.data('idownershipright');
-//    //Номер
-//    let Number = 'Number_' + idOwnershipRight;
-//    $(fields[0]).addClass('valid');
-//    $(fields[0]).attr('data-val', 'true');
-//    $(fields[0]).attr('data-val-required', 'Поле "Номер" является обязательным');
-//    $(fields[0]).attr('id', Number);
-//    $(fields[0]).attr('name', Number);
-//    $(fields[0]).attr('aria-describedby', Number + '-error');
-//    $(fields[0]).after(getErrorSpan(Number));
-//    //Дата
-//    let Date = 'Date_' + idOwnershipRight;
-//    $(fields[1]).addClass('valid');
-//    $(fields[1]).attr('data-val', 'true');
-//    $(fields[1]).attr('data-val-required', 'Поле "Дата" является обязательным');
-//    $(fields[1]).attr('id', Date);
-//    $(fields[1]).attr('name', Date);
-//    $(fields[1]).attr('aria-describedby', Date + '-error');
-//    $(fields[1]).after(getErrorSpan(Date));
-//    //Тип ограничения
-//    let OwnershipRightType = 'IdOwnershipRightType_' + idOwnershipRight;
-//    $(fields[3]).addClass('valid');
-//    $(fields[3]).attr('data-val', 'true');
-//    $(fields[3]).attr('data-val-required', 'Поле "Тип" является обязательным');
-//    $(fields[3]).attr('id', OwnershipRightType);
-//    $(fields[3]).attr('name', OwnershipRightType);
-//    $(fields[3]).attr('aria-describedby', OwnershipRightType + '-error');
-//    $(fields[3]).after(getErrorSpan(OwnershipRightType));
 
-//    refreshValidationOwnershipRightsForm();
-//}
-//let refreshValidationOwnershipRightsForm = function () {
-//    var form = $("#ownershipRightsForm")
-//        .removeData("validator")
-//        .removeData("unobtrusiveValidation");
-//    $.validator.unobtrusive.parse(form);
-//    form.validate();
-//}
-//let initializeVilidationTrs = function () {
-//    let trs = $('#ownershipRights>tr');
-//    trs.each(function () {
-//        initializeVilidationTr($(this));
-//    });
-//}
-//let refreshOwnershipRight = function (tr, ownershipRight) {
-//    let fields = tr.find('.field-ownership-right');
-//    //Номер
-//    $(fields[0]).prop('value', ownershipRight.number);
-//    $(fields[0]).prop('title', ownershipRight.number);
-//    $(fields[0])
-//        .removeClass('input-validation-error')
-//        .addClass('valid');
-//    $(fields[0]).next()
-//        .removeClass('field-validation-error')
-//        .addClass('field-validation-valid')
-//        .text('');
-//    //Дата
-//    $(fields[1]).prop('value', ownershipRight.date);
-//    $(fields[1]).prop('title', ownershipRight.date);
-//    $(fields[0])
-//        .removeClass('input-validation-error')
-//        .addClass('valid');
-//    $(fields[1]).next()
-//        .removeClass('field-validation-error')
-//        .addClass('field-validation-valid')
-//        .text('');
-//    //Наименование
-//    $(fields[2]).prop('value', ownershipRight.description);
-//    $(fields[2]).prop('title', ownershipRight.description);
-//    //Тип ограничения
-//    $(fields[3]).prop('value', ownershipRight.idOwnershipRightType);
-//    $(fields[3]).prop('title', ownershipRight.idOwnershipRightType);
-//    $(fields[0])
-//        .removeClass('input-validation-error')
-//        .addClass('valid');
-//    $(fields[3]).next()
-//        .removeClass('field-validation-error')
-//        .addClass('field-validation-valid')
-//        .text('');
-//    //Планируемая дата переселения
-//    $(fields[4]).prop('value', ownershipRight.resettlePlanDate);
-//    $(fields[4]).prop('title', ownershipRight.resettlePlanDate);
-//    //Планируемая дата сноса
-//    $(fields[5]).prop('value', ownershipRight.demolishPlanDate);
-//    $(fields[5]).prop('title', ownershipRight.demolishPlanDate);
-//}
 let BuildingDemolitionActFile = class {
     constructor(idBuilding) {
         this.id = 0;
@@ -524,6 +433,7 @@ let buildingDemolitionInfoSaveClick = function (event) {
             }
             $('#buildingDemolitionInfoSave').hide();
             $('#buildingDemolitionInfoCancel').hide();
+            $("#buildingDemolitionInfoBlock").removeClass("list-group-item-warning");
             $('#buildingDemolitionInfoEdit').show();
             editFieldsAndBtnsDisabled(true);
             $(".act-file-block").each(function (idx, elem) {
@@ -546,6 +456,7 @@ let buildingDemolitionInfoCancelClick = function (event) {
     _buildingDemolitionInfo.updateDataInElements();
     $('#buildingDemolitionInfoSave').hide();
     $('#buildingDemolitionInfoCancel').hide();
+    $("#buildingDemolitionInfoBlock").removeClass("list-group-item-warning");
     $('#buildingDemolitionInfoEdit').show();
     editFieldsAndBtnsDisabled(true);
 };

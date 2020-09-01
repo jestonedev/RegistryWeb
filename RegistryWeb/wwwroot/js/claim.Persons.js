@@ -77,6 +77,7 @@ function showEditDelPanelClaimPerson(claimPersonElem) {
     let editDelPanel = claimPersonElem.find('.edit-del-panel');
     let yesNoPanel = claimPersonElem.find('.yes-no-panel');
     yesNoPanel.hide();
+    claimPersonElem.removeClass("list-group-item-warning");
     editDelPanel.show();
 }
 

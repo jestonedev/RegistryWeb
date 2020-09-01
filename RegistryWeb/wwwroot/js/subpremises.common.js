@@ -44,6 +44,7 @@ function showEditDelPanelSubPremise(subPremiseElem) {
     let editDelPanel = subPremiseElem.find('.edit-del-panel');
     let yesNoPanel = subPremiseElem.find('.yes-no-panel');
     yesNoPanel.hide();
+    subPremiseElem.removeClass("list-group-item-warning");
     editDelPanel.show();
 }
 

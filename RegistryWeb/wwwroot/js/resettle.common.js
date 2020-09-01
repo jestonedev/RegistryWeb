@@ -419,6 +419,7 @@ function showEditDelPanelResettle(resettleElem) {
     let editDelPanel = resettleElem.find('.edit-del-panel');
     let yesNoPanel = resettleElem.find('.yes-no-panel');
     yesNoPanel.hide();
+    resettleElem.removeClass("list-group-item-warning");
     editDelPanel.show();
 }
 

@@ -79,6 +79,7 @@ function showEditDelPanelTenancyReason(tenancyReasonElem) {
     let editDelPanel = tenancyReasonElem.find('.edit-del-panel');
     let yesNoPanel = tenancyReasonElem.find('.yes-no-panel');
     yesNoPanel.hide();
+    tenancyReasonElem.removeClass("list-group-item-warning");
     editDelPanel.show();
 }
 

@@ -79,6 +79,7 @@ function showEditDelPanelRentPeriod(rentPeriodElem) {
     let editDelPanel = rentPeriodElem.find('.edit-del-panel');
     let yesNoPanel = rentPeriodElem.find('.yes-no-panel');
     yesNoPanel.hide();
+    rentPeriodElem.removeClass("list-group-item-warning");
     editDelPanel.show();
 }
 

@@ -237,6 +237,7 @@ function showEditDelPanelRestriction(restrictionElem) {
     let editDelPanel = restrictionElem.find('.edit-del-panel');
     let yesNoPanel = restrictionElem.find('.yes-no-panel');
     yesNoPanel.hide();
+    restrictionElem.removeClass("list-group-item-warning");
     editDelPanel.show();
 }
 

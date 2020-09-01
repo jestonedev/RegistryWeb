@@ -194,6 +194,7 @@ function showEditDelPanelTenancyRentObject(tenancyRentObjectElem) {
     let editDelPanel = tenancyRentObjectElem.find('.edit-del-panel');
     let yesNoPanel = tenancyRentObjectElem.find('.yes-no-panel');
     yesNoPanel.hide();
+    tenancyRentObjectElem.removeClass("list-group-item-warning");
     editDelPanel.show();
 }
 

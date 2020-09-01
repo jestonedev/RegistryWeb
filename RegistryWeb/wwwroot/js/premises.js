@@ -33,6 +33,11 @@
         var isSubPremisesValid = $("#subpremisesForm").valid();
         var isResettlesValid = $("#resettlesForm").valid();
         var isLitigationsValid = $("#litigationsForm").valid();
+
+        var itemsInEditMode = $("ul.list-group .yes-no-panel").filter(function (idx, elem) {
+            return $(elem).css("display") !== "none";
+        });
+
         if (!isFormValid || !isOwnershipsValid || !isRestrictionsValid || !isSubPremisesValid || !isResettlesValid || !isLitigationsValid) {
             $("select").each(function (idx, elem) {
                 var id = $(elem).prop("id");
@@ -56,7 +61,25 @@
             }, 1000);
 
             e.preventDefault();
-        } else if ($(this).data("action") === "Create") {
+        } else
+        if (itemsInEditMode.length > 0 && action === "Edit") {
+            itemsInEditMode.each(function (idx, elem) {
+                if ($(elem).closest("ul.list-group").hasClass("toggle-hide")) {
+                    var toggler = $(elem).closest(".card").find("[id$='Toggle']").first();
+                    toggler.click();
+                }
+                var listGroupItem = $(elem).closest(".list-group-item");
+                if (!listGroupItem.hasClass("list-group-item-warning")) {
+                    listGroupItem.addClass("list-group-item-warning");
+                }
+            });
+            $([document.documentElement, document.body]).animate({
+                scrollTop: itemsInEditMode.first().closest(".list-group-item").offset().top
+            }, 1000);
+
+            e.preventDefault();
+        }
+        else if ($(this).data("action") === "Create") {
             var inputTemplate = "<input type='hidden' name='{0}' value='{1}'>";
             var ownerships = CreateOwnershipPremisesAssoc();
             for (var i = 0; i < ownerships.length; i++) {

@@ -238,6 +238,7 @@ function showEditDelPanelOwnershipRight(owrElem) {
     let editDelPanel = owrElem.find('.edit-del-panel');
     let yesNoPanel = owrElem.find('.yes-no-panel');
     yesNoPanel.hide();
+    owrElem.removeClass("list-group-item-warning");
     editDelPanel.show();
 }
 

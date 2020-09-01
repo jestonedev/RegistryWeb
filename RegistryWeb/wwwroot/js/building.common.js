@@ -89,10 +89,36 @@ let editBuildingClick = function (e) {
     });
     $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
     let buildingIsValid = $('#building').valid();
-    if (buildingIsValid) {
-        $('#building').submit();
-    } else {
+    let restrictionsIsValid = $("#restrictionsForm").valid();
+    let ownershipRightsIsValid = $("#ownershipRightsForm").valid();
+    let buildingDemolitionInfoValid = _buildingDemolitionInfo.form.valid();
+
+    var itemsInEditMode = $("ul.list-group .yes-no-panel, #buildingDemolitionInfoSave").filter(function (idx, elem) {
+        return $(elem).css("display") !== "none";
+    });
+
+    if (!buildingIsValid || !restrictionsIsValid || !ownershipRightsIsValid || !buildingDemolitionInfoValid) {
         onSubmitErrorsPostProcessing();
+    } else
+    if (itemsInEditMode.length > 0) {
+        itemsInEditMode.each(function (idx, elem) {
+            if ($(elem).closest("ul.list-group, .card-body").hasClass("toggle-hide")) {
+                var toggler = $(elem).closest(".card").find("[id$='Toggle']").first();
+                toggler.click();
+            }
+            var listGroupItem = $(elem).closest(".list-group-item, .card-body");
+            if (!listGroupItem.hasClass("list-group-item-warning")) {
+                listGroupItem.addClass("list-group-item-warning");
+            }
+        });
+        $([document.documentElement, document.body]).animate({
+            scrollTop: itemsInEditMode.first().closest(".list-group-item, .card-body").offset().top
+        }, 1000);
+
+        e.preventDefault();
+    }
+     else {
+        $('#building').submit();
     }
     e.preventDefault();
 };
