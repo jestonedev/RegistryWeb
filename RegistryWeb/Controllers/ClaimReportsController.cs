@@ -60,7 +60,8 @@ namespace RegistryWeb.Controllers
                 {
                     return Error(string.Format("В исковой работе {0} отсутствует стадия запроса в БКС", idClaim));
                 }
-                var file = reportService.RequestToBks(new List<int> { idClaim }, idSigner, dateValue);
+                var idAccounts = dataService.GetAccountIds(new List<int> { idClaim });
+                var file = reportService.RequestToBks(idAccounts, idSigner, dateValue);
                 return File(file, odtMime, string.Format(@"Запрос в БКС (иск. работа № {0})", idClaim));
             }
             catch (Exception ex)

@@ -24,5 +24,10 @@ namespace RegistryWeb.DataServices
         {
             return registryContext.ClaimStates.FirstOrDefault(r => r.IdClaim == idClaim && r.IdStateType == idStateType) != null;
         }
+
+        internal List<int> GetAccountIds(List<int> idClaims)
+        {
+            return registryContext.Claims.Where(r => idClaims.Contains(r.IdClaim)).Select(r => r.IdAccount).Distinct().ToList();
+        }
     }
 }

@@ -37,12 +37,12 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
-        public byte[] RequestToBks(List<int> idClaims, int idSigner, DateTime dateValue)
+        public byte[] RequestToBks(List<int> idAccounts, int idSigner, DateTime dateValue)
         {
             var tmpFileName = Path.GetTempFileName();
-            var idClaimsStr = idClaims.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
+            var idAccountsStr = idAccounts.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
             using (var sw = new StreamWriter(tmpFileName))
-                sw.Write(idClaimsStr);
+                sw.Write(idAccountsStr);
             var arguments = new Dictionary<string, object>
             {
                 { "filterTmpFile", tmpFileName },
