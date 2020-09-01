@@ -70,7 +70,7 @@
             }
             <tr>
                 @{ 
-                    var hasOpenedClaims = Model.ClaimsByAddresses.ContainsKey(item.IdAccount) && lastClaimInfo.IdClaimCurrentState != 6;
+                    var hasOpenedClaims = Model.ClaimsByAddresses.ContainsKey(item.IdAccount) && lastClaimInfo.IdClaimCurrentState != 6 && !lastClaimInfo.EndedForFilter;
                 }
                 <td style="@(hasOpenedClaims ? "background-color: #FEDCDC" : "")" title="@(hasOpenedClaims ? "По данному адресу имеются незавершенные претензионно-исковые работы" : "")">
                     @item.PaymentAccountNavigation.Account
