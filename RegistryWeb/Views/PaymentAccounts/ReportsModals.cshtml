@@ -1,3 +1,100 @@
-﻿
+﻿@using RegistryWeb.Models.Entities
+@{
+    var signers = (List<SelectableSigner>)ViewBag.SignersReports;
+    SelectList signersList = null;
+    if (signers != null)
+    {
+        signersList = new SelectList(signers.Select(r => new {
+            IdSigner = r.IdRecord,
+            Snp = r.Surname + " " + r.Name + (r.Patronymic !=null ? " " + r.Patronymic : "")
+        }), "IdSigner", "Snp");
+    }
+}
+
 
 <a id="target" style="display: none"></a>
+
+<form id="accountBksAndTransToLegalForm">
+    <div class="modal fade" id="accountBksAndTransToLegalModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Запрос в БКС</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Account.IdAccount" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="Account.IdSigner">Подписывающий</label>
+                            <select class="selectpicker form-control" title="Подписывающий" name="Account.IdSigner"
+                                    data-val="true" data-val-required="Выберите подписывающего" id="Account_IdSigner" asp-items="@signersList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Account.IdSigner" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="Account.Date">Дата запроса</label>
+                            <input type="date" class="form-control" title="Дата запроса" name="Account.Date"
+                                   data-val="true" data-val-required="Укажите дату запроса" id="Account_Date" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Account.Date" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="accountCalcDeptForm">
+    <div class="modal fade" id="accountCalcDeptModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Расчет суммы задолженности</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Account.IdAccount" />
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="Account.DateFrom">Период (с)</label>
+                            <input type="date" class="form-control" title="Период (с)" name="Account.DateFrom"
+                                   data-val="true" data-val-required="Укажите период (с)" id="Account_DateFrom" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Account.DateFrom" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="Account.DateTo">Период (по)</label>
+                            <input type="date" class="form-control" title="Период (по)" name="Account.DateTo"
+                                   data-val="true" data-val-required="Укажите период (по)" id="Account_DateTo" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Account.DateTo" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-auto pr-3">Выберите формат:</div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="Account.FormatFile" checked id="Account_FormatFile1" value="1">
+                            <label class="form-check-label" for="Account_FormatFile1">xlsx</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="Account.FormatFile" id="Account_FormatFile2" value="2">
+                            <label class="form-check-label" for="Account_FormatFile2">ods</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

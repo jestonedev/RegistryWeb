@@ -17,7 +17,7 @@ namespace RegistryWeb.ReportServices
     {
         private readonly string sqlDriver;
         private readonly string connString;
-        private readonly string activityManagerPath;
+        protected readonly string activityManagerPath;
         private readonly string attachmentsPath;
 
         public ReportService(IConfiguration config, IHttpContextAccessor httpContextAccessor)

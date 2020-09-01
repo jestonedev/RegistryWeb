@@ -68,8 +68,7 @@ namespace RegistryWeb.DataServices
             return (from row in registryContext.Payments
                     join maxDatePaymentsRow in maxDatePayments
                     on new { row.IdAccount, row.Date } equals new { maxDatePaymentsRow.IdAccount, maxDatePaymentsRow.Date }
-                    select row).Include(p => p.PaymentAccountNavigation)
-                .Include(p => p.PaymentAccountNavigation);
+                    select row).Include(p => p.PaymentAccountNavigation);
         }
 
         private IQueryable<Payment> GetQueryIncludes(IQueryable<Payment> query)
@@ -1036,5 +1035,7 @@ namespace RegistryWeb.DataServices
                     .ToDictionary(v => v.IdAccount, v => v.Claims.ToList());
             return result;
         }
+        
+        public List<SelectableSigner> Signers => registryContext.SelectableSigners.ToList();
     }
 }

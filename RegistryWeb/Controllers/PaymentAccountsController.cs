@@ -41,6 +41,7 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("FilterOptions");
             }
             ViewBag.SecurityService = securityService;
+            ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
@@ -52,6 +53,7 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
                 return View("NotAccess");
             ViewBag.SecurityService = securityService;
+            ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
             ViewBag.IdAccount = idAccount;
             ViewBag.ReturnUrl = returnUrl;
             var paymentsVM = dataService.GetPaymentsHistory(idAccount);
