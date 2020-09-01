@@ -15,6 +15,7 @@
 
 <partial name="Filter" model="Model" />
 <partial name="DataTable" model="Model" />
+<partial name="ReportsModals">
 
 <page-link page-model="Model.PageOptions" page-action="Index"></page-link>
 @section validation
@@ -23,6 +24,7 @@
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
 }
 @section Scripts {
+    <script src="~/js/claim.reports.js" asp-append-version="true"></script>
     <script src="~/js/index.common.js" asp-append-version="true"></script>
     <script src="~/js/address.filter.js" asp-append-version="true"></script>
     <script src="~/js/index.common.js" asp-append-version="true"></script>

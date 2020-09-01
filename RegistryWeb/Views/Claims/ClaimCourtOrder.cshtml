@@ -53,9 +53,19 @@
         @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
         {
             <div class="text-right col-3 col-md-2 rr-claim-court-order-view-buttons">
-                <a class="btn btn-primary claim-court-order-open-btn" href="#" title="Открыть дополнительную информацию о версии судебного приказа" aria-label="Открыть дополнительную информацию о версии судебного приказа">
-                    <span class="oi oi-eye"></span>
-                </a>
+                <div class="btn-group view-del-court-order-panel" role="group" aria-label="Панель реадктирования">
+                    <a class="btn btn-primary claim-court-order-open-btn" href="#" title="Открыть дополнительную информацию о версии судебного приказа" aria-label="Открыть дополнительную информацию о версии судебного приказа">
+                        <span class="oi oi-eye"></span>
+                    </a>
+                    <div class="btn-group" role="group" aria-label="Отчеты">
+                        <button class="btn btn-success dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@Model.IdOrder" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-document"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.IdOrder">
+                            <a class="dropdown-item rr-report-court-order-statement" href="#" title="Заявление о выдаче судебного приказа" aria-label="Заявление о выдаче судебного приказа" data-id-order="@Model.IdOrder">Заявление о выдаче судебного приказа</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         }
     </div>
