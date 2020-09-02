@@ -309,7 +309,7 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.TenancyRead))
                 return View("NotAccess");
             var ids = GetSessionIds();
-            var viewModel = dataService.GetPremisesViewModelForMassReports(ids, pageOptions);
+            var viewModel = dataService.GetTenancyProcessesViewModelForMassReports(ids, pageOptions);
             ViewBag.Count = viewModel.TenancyProcesses.Count();
             ViewBag.PreparersSelectList = new SelectList(dataService.Preparers, "IdPreparer", "PreparerName");
             ViewBag.TenancyReasonTypesSelectList = new SelectList(dataService.TenancyReasonTypes, "IdReasonType", "ReasonName");

@@ -956,7 +956,7 @@ namespace RegistryWeb.DataServices
                 .Where(tp => ids.Contains(tp.IdProcess));
         }
 
-        public TenancyProcessesVM GetPremisesViewModelForMassReports(List<int> ids, PageOptions pageOptions)
+        public TenancyProcessesVM GetTenancyProcessesViewModelForMassReports(List<int> ids, PageOptions pageOptions)
         {
             var viewModel = InitializeViewModel(null, pageOptions, null);
             var tenancyProcesses = GetTenancyProcessesForMassReports(ids);

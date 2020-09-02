@@ -4,6 +4,9 @@
 @using RegistryWeb.ViewModel;
 @model RegistryWeb.ViewModel.ClaimsVM;
 @{
+    var ids = Context.Session.Get<List<int>>("idClaims") ?? new List<int>();
+    var check = "";
+
     Context.Session.Set("Controller", "Claims");
     Context.Session.Set("Action", "Index");
     Context.Session.Set("OrderOptions", Model.OrderOptions);
@@ -15,11 +18,13 @@
 <table class="table table-hover c-table">
     <thead>
         <tr style="align-content: center;">
+            <th class="r-table-header-cell">
+            </th>
             <th class="r-table-header-cell" style="width:155px;">
                 № по реестру
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "IdClaim")
                 {
-                    <a href="#" title="Сортировка по реестровому номеру"  class="oi oi-sort-descending sort c-sorted" data-order-field="IdClaim" data-order-direction="0"></a>
+                    <a href="#" title="Сортировка по реестровому номеру" class="oi oi-sort-descending sort c-sorted" data-order-field="IdClaim" data-order-direction="0"></a>
                 }
                 else
                 {
@@ -31,12 +36,12 @@
                 Информация об ИР
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "AtDate")
                 {
-                    <a href="#" title="Сортировка по дате формирования" 
+                    <a href="#" title="Сортировка по дате формирования"
                        class="oi oi-sort-descending sort c-sorted" data-order-field="AtDate" data-order-direction="0"></a>
                 }
                 else
                 {
-                    <a href="#" title="Сортировка по дате формирования" 
+                    <a href="#" title="Сортировка по дате формирования"
                        class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "AtDate" ? "c-sorted" : "")"
                        data-order-field="AtDate" data-order-direction="@(Model.OrderOptions.OrderField == "AtDate" ? "1" : "0")"></a>
                 }
@@ -45,7 +50,7 @@
                 Адрес
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Address")
                 {
-                    <a href="#" title="Сортировка по адресу жилищного фонда"  class="oi oi-sort-descending sort c-sorted" data-order-field="Address" data-order-direction="0"></a>
+                    <a href="#" title="Сортировка по адресу жилищного фонда" class="oi oi-sort-descending sort c-sorted" data-order-field="Address" data-order-direction="0"></a>
                 }
                 else
                 {
@@ -67,6 +72,16 @@
             var lastClaimState = item.ClaimStates.OrderByDescending(cs => cs.IdState).FirstOrDefault();
             var isOpenedClaim = (lastClaimState == null || lastClaimState.IdStateType != 6) && !item.EndedForFilter;
             <tr>
+                @if (ids.Contains(item.IdClaim))
+                {
+                    check = "checked";
+                }
+                else
+                {
+                    check = "";
+                }
+                <td class="align-middle"><input type="checkbox" class="idCheckbox" data-id="@item.IdClaim" @Html.Raw(check) /></td>
+
                 <td style="@(isOpenedClaim ? "background-color: #FEDCDC" : "")" title="@(isOpenedClaim ? "Претензионно-исковая работа не завершена" : "")">
                     @item.IdClaim
                 </td>

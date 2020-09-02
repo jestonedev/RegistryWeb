@@ -24,9 +24,10 @@
             case "Premises": nameObject = "Помещения"; break;
             case "Buildings": nameObject = "Здания"; break;
             case "OwnerProcesses": nameObject = "Процессы собственности"; break;
-            case "TenancyProcesses": nameObject = "Процессы найма";
+            case "TenancyProcesses": nameObject = "Процессы найма"; break;
+            case "Claims": nameObject = "Претензионно-исковые работы"; break;
         }
-        if (nameObject == null) {
+        if (nameObject === null) {
             $(".info").html("Мультимастер для данного реестра отсутствует");
             $(".info").addClass("alert alert-danger");
         }

@@ -1,0 +1,111 @@
+﻿@using RegistryWeb.ViewModel
+@using RegistryWeb.Extensions;
+@model ClaimsVM;
+@{
+    Context.Session.Set("Controller", "Claims");
+    Context.Session.Set("Action", "ClaimsReports");
+    ViewData["Title"] = "Мастер массовых операций над исковыми работами";
+    var text = "Количество записей: " + Model.PageOptions.TotalRows;
+    var canEdit = ViewBag.CanEdit;
+}
+
+@section Scripts
+{
+    <script src="~/js/claim.reports.js" asp-append-version="true"></script>
+}
+
+@section validation
+{
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+}
+
+<div class="col status"></div>
+
+<h1>@ViewData["Title"]</h1>
+<h4 class="mb-3">@text</h4>
+
+<div class="form-row">
+    <div class="form-group col-md-1 col-lg-3">
+        <a class="form-control btn btn-primary" asp-controller="Claims" asp-action="Index" asp-route-isBack="true">Назад</a>
+    </div>
+    <div class="form-group col-md-2 col-lg-3">
+        <a class="form-control btn btn-primary" asp-controller="Claims" asp-action="ClearSessionIds">Очистить</a>
+    </div>
+    <div class="form-group col-md-3 col-lg-3">
+        <div class="dropdown">
+            <button class="btn btn-success dropdown-toggle col-md-12" type="button" id="reportButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="oi oi-document"></span>  Отчеты
+            </button>
+            <div class="dropdown-menu" aria-labelledby="reportButton">
+                <button class="dropdown-item rr-report-request-to-bsk" @(Model.Claims.Any() ? "" : "disabled") href="#" data-id-claim="0">Запрос в БКС</button>
+                <button class="dropdown-item rr-report-memo-to-lawyers" @(Model.Claims.Any() ? "" : "disabled") href="#" data-id-claim="0">СЗ в юридический отдел</button>
+            </div>
+        </div>
+    </div>
+    <div class="form-group col-md-3 col-lg-3">
+        <div class="dropdown">
+            <button class="btn btn-info dropdown-toggle col-md-12" type="button" id="operatonsButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="oi oi-pencil"></span>  Операции
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="operatonsButton">
+                <button class="dropdown-item" @(canEdit && Model.Claims.Any() ? "" : "disabled") href="#" id="createClaimState">Создать стадию претензионно-исковой работы</button>
+                <button class="dropdown-item" @(canEdit && Model.Claims.Any() ? "" : "disabled") href="#" id="setDeptPeriod">Установить период предъявления</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>№ по реестру</th>
+            <th>Адрес</th>
+            <th width="100px"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Claims.Any())
+        {
+            foreach (var item in Model.Claims)
+            {
+                <tr>
+                    <td>@item.IdClaim</td>
+                    <td>
+                        @if (Model.RentObjects.ContainsKey(item.IdAccount))
+                        {
+                            <div class="mb-2">
+                                <b>По жилищному фонду: </b><br />
+                                @foreach (var address in Model.RentObjects[item.IdAccount])
+                                {
+                                    @await Component.InvokeAsync("ClaimsAddressComponent", new { address = address, idClaim = item.IdClaim })
+                                }
+                            </div>
+                        }
+                        <div>
+                            <b>По БКС: </b><br />@item.IdAccountNavigation.RawAddress<br />
+                            @item.IdAccountNavigation.Crn
+                        </div>
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group" aria-label="Панель доступа">
+                            <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                               asp-action="Details" asp-controller="Claims" asp-route-idClaim="@item.IdClaim"></a>
+                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                               asp-action="RemoveSessionId" asp-controller="Claims" asp-route-id="@item.IdClaim"></a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr><td colspan="3" class="text-center"><i>Элементы отсутствуют</i></td></tr>
+        }
+
+    </tbody>
+</table>
+
+<page-link page-model="Model.PageOptions" page-action="Index"></page-link>
+
+<partial name="ReportsModals" model="@Model">

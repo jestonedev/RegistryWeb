@@ -36,7 +36,7 @@ namespace RegistryWeb.DataServices
         internal ClaimsVM GetViewModel(
             OrderOptions orderOptions,
             PageOptions pageOptions,
-            ClaimsFilter filterOptions)
+            ClaimsFilter filterOptions, out List<int> filteredIds)
         {
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
             var payments = GetQuery();
@@ -47,6 +47,9 @@ namespace RegistryWeb.DataServices
             var count = query.Count();
             viewModel.PageOptions.Rows = count;
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+
+            filteredIds = query.Select(c => c.IdClaim).ToList();
+
             if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
                 viewModel.PageOptions.CurrentPage = 1;
             query = GetQueryPage(query, viewModel.PageOptions);
@@ -230,6 +233,28 @@ namespace RegistryWeb.DataServices
                 claims.Deleted = 1;
                 registryContext.SaveChanges();
             }
+        }
+
+        internal ClaimsVM GetClaimsViewModelForMassReports(List<int> ids, PageOptions pageOptions)
+        {
+            var viewModel = InitializeViewModel(null, pageOptions, null);
+            var claims = GetClaimsForMassReports(ids);
+            viewModel.PageOptions.TotalRows = claims.Count();
+            var count = claims.Count();
+            viewModel.PageOptions.Rows = count;
+            viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+
+            if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
+                viewModel.PageOptions.CurrentPage = 1;
+            viewModel.Claims = GetQueryPage(claims, viewModel.PageOptions).ToList();
+            viewModel.RentObjects = GetRentObjects(viewModel.Claims);
+            return viewModel;
+        }
+
+        public IQueryable<Claim> GetClaimsForMassReports(List<int> ids)
+        {
+            return registryContext.Claims
+                .Where(c => ids.Contains(c.IdClaim)).Include(c => c.IdAccountNavigation);
         }
 
         public IQueryable<Claim> AddressFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)

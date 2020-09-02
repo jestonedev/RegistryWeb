@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.Models;
@@ -22,6 +23,9 @@ namespace RegistryWeb.Controllers
         public ClaimsController(ClaimsDataService dataService, SecurityService securityService)
             : base(dataService, securityService)
         {
+            nameFilteredIdsDict = "filteredClaimsIdsDict";
+            nameIds = "idClaims";
+            nameMultimaster = "ClaimsReports";
         }
 
         public IActionResult Index(ClaimsVM viewModel, bool isBack = false)
@@ -44,10 +48,15 @@ namespace RegistryWeb.Controllers
             }
             ViewBag.SecurityService = securityService;
             ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
-            return View(dataService.GetViewModel(
+
+            var vm = dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
-                viewModel.FilterOptions));
+                viewModel.FilterOptions, out List<int> filteredTenancyProcessesIds);
+
+            AddSearchIdsToSession(vm.FilterOptions, filteredTenancyProcessesIds);
+
+            return View(vm);
         }
 
         public IActionResult Details(int? idClaim, string returnUrl)
@@ -263,6 +272,35 @@ namespace RegistryWeb.Controllers
             ViewBag.CanEditBaseInfo = true;
 
             return PartialView("ClaimPerson", file);
+        }
+
+        public IActionResult ClaimsReports(PageOptions pageOptions)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            var errorIds = new List<int>();
+            if (TempData.ContainsKey("ErrorClaimsIds"))
+            {
+                try
+                {
+                    errorIds = JsonConvert.DeserializeObject<List<int>>(TempData["ErrorClaimsIds"].ToString());
+                }
+                catch
+                {
+                }
+                TempData.Remove("ErrorClaimsIds");
+            }
+
+            ViewBag.ErrorClaims = dataService.GetClaimsForMassReports(errorIds).ToList();
+
+            var ids = GetSessionIds();
+            var viewModel = dataService.GetClaimsViewModelForMassReports(ids, pageOptions);
+            ViewBag.Count = viewModel.Claims.Count();
+            ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
+            ViewBag.CurrentExecutor = dataService.CurrentExecutor?.ExecutorName;
+            ViewBag.CanEdit = securityService.HasPrivilege(Privileges.ClaimsWrite);
+            return View("ClaimsReports", viewModel);
         }
     }
 }

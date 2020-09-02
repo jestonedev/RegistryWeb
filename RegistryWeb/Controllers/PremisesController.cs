@@ -317,6 +317,7 @@ namespace RegistryWeb.Controllers
                 securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) ||
                 securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal);
             ViewBag.CanEditBaseInfo = canEditBaseInfo;
+            ViewBag.CanReadTenancyInfo = securityService.HasPrivilege(Privileges.TenancyRead);
             var errorIds = new List<int>();
             if (TempData.ContainsKey("ErrorPremisesIds"))
             {

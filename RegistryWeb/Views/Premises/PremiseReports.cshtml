@@ -8,6 +8,7 @@
     ViewData["Title"] = "Мастер массовых операций над помещениями";
     var text = "Количество записей: " + Model.PageOptions.TotalRows;
     var canEdit = (bool)ViewData["CanEditBaseInfo"];
+    var canReadTenancy = (bool)ViewData["CanReadTenancyInfo"];
     var errorPremises = (List<Premise>)ViewData["ErrorPremises"];
 }
 
@@ -56,7 +57,7 @@
                 <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="massReferenceBtn">Справки о площади помещений</button>
                 <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="massActBtn">Акт проверки факта о проживании</button>
                 <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="exportBtn">Экспорт</button>
-                <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="historyBtn">История найма</button>
+                <button class="dropdown-item" @(canReadTenancy && Model.Premises.Any() ? "" : "disabled") href="#" id="historyBtn">История найма</button>
             </div>
         </div>
     </div>

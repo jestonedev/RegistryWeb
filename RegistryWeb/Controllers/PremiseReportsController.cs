@@ -226,7 +226,7 @@ namespace RegistryWeb.Controllers
             var idsString = ids
                 .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
 
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryRead) || !securityService.HasPrivilege(Privileges.TenancyRead))
                 return View("NotAccess");
 
             try

@@ -223,6 +223,8 @@ namespace RegistryWeb.Controllers
             try
             {
                 List<int> ids = new List<int>();
+                var processingIds = new List<int>();
+                var errorIds = new List<int>();
                 var fileName = @"Запрос в МВД";
                 if (requestType == 2)
                 {
@@ -231,6 +233,26 @@ namespace RegistryWeb.Controllers
                 if (idProcess == 0)
                 {
                     ids = GetSessionIds();
+                    foreach (var id in ids)
+                    {
+                        if (!dataService.HasRentObjects(id))
+                        {
+                            errorIds.Add(id);
+                            continue;
+                        }
+                        if (!dataService.HasTenancies(id))
+                        {
+                            errorIds.Add(id);
+                            continue;
+                        }
+                        processingIds.Add(id);
+                    }
+                    if (errorIds.Any())
+                    {
+                        return Error(string.Format("В найм{1} {0} не указан адрес нанимаемого жилья или отсутствуют участники",
+                            errorIds.Select(r => r.ToString()).Aggregate((acc, v) => acc + ", " + v),
+                            errorIds.Count == 1 ? "е" : "ах"));
+                    }
                 }
                 else
                 {
@@ -242,10 +264,10 @@ namespace RegistryWeb.Controllers
                     {
                         return Error(string.Format("В найме {0} отсутствуют участники", idProcess));
                     }
-                    ids.Add(idProcess);
+                    processingIds.Add(idProcess);
                     fileName += string.Format(" (найм № {0})", idProcess);
                 }
-                var file = reportService.RequestToMvd(ids, requestType);
+                var file = reportService.RequestToMvd(processingIds, requestType);
                 return File(file, odtMime, fileName);
             }
             catch (Exception ex)

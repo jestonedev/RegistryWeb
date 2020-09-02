@@ -29,6 +29,10 @@ namespace RegistryWeb.Controllers
             this.reportService = reportService;
             this.dataService = dataService;
             this.securityService = securityService;
+
+            nameFilteredIdsDict = "filteredClaimsIdsDict";
+            nameIds = "idClaims";
+            nameMultimaster = "ClaimsReports";
         }
 
         public IActionResult GetTransferToLegal(int idClaim, int idSigner, DateTime dateValue)
@@ -37,11 +41,37 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             try
             {
-                if (!dataService.HasClaimState(idClaim, 2))
+                List<int> ids = new List<int>();
+                var processingIds = new List<int>();
+                var errorIds = new List<int>();
+                if (idClaim == 0)
                 {
-                    return Error(string.Format("В исковой работе {0} отсутствует стадия передачи в юридический отдел", idClaim));
+                    ids = GetSessionIds();
+                    foreach (var id in ids)
+                    {
+                        if (!dataService.HasClaimState(id, 2))
+                        {
+                            errorIds.Add(id);
+                            continue;
+                        }
+                        processingIds.Add(id);
+                    }
+                    if (errorIds.Any())
+                    {
+                        return Error(string.Format("В исков{1} работ{2} {0} отсутствует стадия передачи в юридический отдел", 
+                            errorIds.Select(r => r.ToString()).Aggregate((acc, v) => acc+", "+v),
+                            errorIds.Count == 1 ? "ой" : "ых", errorIds.Count == 1 ? "е" : "ах"));
+                    }
                 }
-                var file = reportService.TransferToLegal(new List<int> { idClaim }, idSigner, dateValue);
+                else
+                {
+                    if (!dataService.HasClaimState(idClaim, 2))
+                    {
+                        return Error(string.Format("В исковой работе {0} отсутствует стадия передачи в юридический отдел", idClaim));
+                    }
+                    processingIds.Add(idClaim);
+                }
+                var file = reportService.TransferToLegal(processingIds, idSigner, dateValue);
                 return File(file, docxMime, string.Format(@"Передача в юр. отдел исковой работы № {0}", idClaim));
             }
             catch (Exception ex)
@@ -56,11 +86,37 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             try
             {
-                if (!dataService.HasClaimState(idClaim, 1))
+                List<int> ids = new List<int>();
+                var processingIds = new List<int>();
+                var errorIds = new List<int>();
+                if (idClaim == 0)
                 {
-                    return Error(string.Format("В исковой работе {0} отсутствует стадия запроса в БКС", idClaim));
+                    ids = GetSessionIds();
+                    foreach (var id in ids)
+                    {
+                        if (!dataService.HasClaimState(id, 1))
+                        {
+                            errorIds.Add(id);
+                            continue;
+                        }
+                        processingIds.Add(id);
+                    }
+                    if (errorIds.Any())
+                    {
+                        return Error(string.Format("В исков{1} работ{2} {0} отсутствует стадия запроса в БКС",
+                            errorIds.Select(r => r.ToString()).Aggregate((acc, v) => acc + ", " + v),
+                            errorIds.Count == 1 ? "ой" : "ых", errorIds.Count == 1 ? "е" : "ах"));
+                    }
                 }
-                var idAccounts = dataService.GetAccountIds(new List<int> { idClaim });
+                else
+                {
+                    if (!dataService.HasClaimState(idClaim, 1))
+                    {
+                        return Error(string.Format("В исковой работе {0} отсутствует стадия запроса в БКС", idClaim));
+                    }
+                    processingIds.Add(idClaim);
+                }
+                var idAccounts = dataService.GetAccountIds(processingIds);
                 var file = reportService.RequestToBks(idAccounts, idSigner, dateValue);
                 return File(file, odtMime, string.Format(@"Запрос в БКС (иск. работа № {0})", idClaim));
             }
