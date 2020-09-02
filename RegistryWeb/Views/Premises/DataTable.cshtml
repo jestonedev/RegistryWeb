@@ -99,7 +99,7 @@
             {
                 check = "";
             }
-            <td class="align-middle"><input type="checkbox" class="idPremiseCheckbox" data-id="@item.IdPremises" @Html.Raw(check) /></td>
+            <td class="align-middle"><input type="checkbox" class="idCheckbox" data-id="@item.IdPremises" @Html.Raw(check) /></td>
             @{
                 var idCurrentOwhershipType = Model.PremisesOwnershipRightCurrent
                     .FirstOrDefault(p => p.IdPremises == item.IdPremises)

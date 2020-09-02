@@ -140,5 +140,27 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
+
+        public IActionResult GetClaimsExport()
+        {
+            List<int> ids = GetSessionIds();
+
+            if (!ids.Any())
+                return NotFound();
+
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.ExportClaims(ids);
+                return File(file, odsMime, string.Format(@"Экспорт данных"));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
     }
 }

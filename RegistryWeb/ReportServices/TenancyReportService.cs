@@ -188,6 +188,40 @@ namespace RegistryWeb.ReportServices
             };
             var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\gis_zkh_export");
             return DownloadFile(fileNameReport);
-        }        
+        }
+
+        internal byte[] TenanciesExport(List<int> idProcesses)
+        {
+            string columnHeaders;
+            string columnPatterns;
+
+            columnHeaders = "[{\"columnHeader\":\"№\"},{\"columnHeader\":\"№ договора\"},{\"columnHeader\":\"Дата регистрации договора\"},"+
+                "{\"columnHeader\":\"Дата окончания договора\"},{\"columnHeader\":\"№ ордера / другого документа-основания\"},"+
+                "{\"columnHeader\":\"Наниматель\"},{\"columnHeader\":\"Тип найма\"},{\"columnHeader\":\"Нанимаемое жилье\"},"+
+                "{\"columnHeader\":\"Дополнительные сведения\"}]";
+            columnPatterns = "[{\"columnPattern\":\"$column0$\"},{\"columnPattern\":\"$column1$\"},{\"columnPattern\":\"$column2$\"},"+
+                "{\"columnPattern\":\"$column3$\"},{\"columnPattern\":\"$column4$\"},{\"columnPattern\":\"$column5$\"},"+
+                "{\"columnPattern\":\"$column6$\"},{\"columnPattern\":\"$column7$\"},{\"columnPattern\":\"$description$\"}]";
+
+            var fileName = Path.GetTempFileName();
+            using (var sw = new StreamWriter(fileName))
+                sw.Write(string.Format("(id_process IN ({0}))", ProcessesIdsToString(idProcesses)));
+
+            var arguments = new Dictionary<string, object>
+            {
+                { "filterTmpFile", fileName },
+                { "type", "3"},
+                { "executor", securityService.User.UserName },
+                { "columnHeaders", columnHeaders },
+                { "columnPatterns", columnPatterns }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\export");
+            return DownloadFile(fileNameReport);
+        }
+
+        private string ProcessesIdsToString(List<int> idProcesses)
+        {
+            return idProcesses.Select(r => r.ToString()).Aggregate((v, acc) => v + "," + acc);
+        }
     }
 }

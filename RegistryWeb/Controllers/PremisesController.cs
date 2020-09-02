@@ -29,6 +29,10 @@ namespace RegistryWeb.Controllers
             : base(dataService, securityService)
         {
             this.config = config;
+
+            nameFilteredIdsDict = "filteredPremisesIdsDict";
+            nameIds = "idPremises";
+            nameMultimaster = "PremiseReports";
         }
 
         public IActionResult Index(PremisesVM<Premise> viewModel, string action="", bool isBack = false)
@@ -58,7 +62,7 @@ namespace RegistryWeb.Controllers
                 viewModel.PageOptions,
                 viewModel.FilterOptions, out List<int> filteredPremisesIds);
 
-            AddSearchPremisesIdsToSession(vm.FilterOptions, filteredPremisesIds);
+            AddSearchIdsToSession(vm.FilterOptions, filteredPremisesIds);
 
             return View(vm);
         }
@@ -255,58 +259,6 @@ namespace RegistryWeb.Controllers
                 ids.Remove(idPremise);
 
             HttpContext.Session.Set("idPremises", ids);
-        }
-
-        public void AddSearchPremisesIdsToSession(PremisesListFilter filterOptions, List<int> filteredPremisesIds)
-        {
-            var filteredPremisesIdsDict = new Dictionary<string, List<int>>();
-
-            if (HttpContext.Session.Keys.Contains("filteredPremisesIdsDict"))
-                filteredPremisesIdsDict = HttpContext.Session.Get<Dictionary<string, List<int>>>("filteredPremisesIdsDict");
-
-            var filterOptionsSerialized = JsonConvert.SerializeObject(filterOptions).ToString();
-
-            if (filteredPremisesIdsDict.Keys.Contains(filterOptionsSerialized))
-                filteredPremisesIdsDict[filterOptionsSerialized] = filteredPremisesIds;
-            else filteredPremisesIdsDict.Add(filterOptionsSerialized, filteredPremisesIds);
-
-            HttpContext.Session.Set("filteredPremisesIdsDict", filteredPremisesIdsDict);
-        }
-
-        public IActionResult AddSessionSelectedAndFilteredPremises(PremisesListFilter filterOptions)
-        {
-            if (!HttpContext.Session.Keys.Contains("filteredPremisesIdsDict"))
-                return Json(0);
-
-            var filteredPremisesIdsDict = HttpContext.Session.Get<Dictionary<string, List<int>>>("filteredPremisesIdsDict");
-            var filterOptionsSerialized = JsonConvert.SerializeObject(filterOptions).ToString();
-
-            if (filteredPremisesIdsDict.Keys.Contains(filterOptionsSerialized))
-            {
-                List<int> filterOptionsIds = filteredPremisesIdsDict[filterOptionsSerialized];
-                List<int> ids = GetSessionPremisesIds();
-                ids.AddRange(filterOptionsIds);
-                ids = ids.Distinct().ToList();
-                HttpContext.Session.Set("idPremises", ids);
-                return Json(0);
-            }
-            return Json(-1);
-        }
-
-        public IActionResult SessionIdPremisesClear()
-        {
-            HttpContext.Session.Remove("idPremises");
-            ViewBag.Count = 0;
-            return RedirectToAction("PremiseReports");
-        }
-
-        public IActionResult SessionIdPremiseRemove(int idPremises)
-        {
-            var ids = GetSessionPremisesIds();
-            ids.Remove(idPremises);
-            ViewBag.Count = ids.Count();
-            HttpContext.Session.Set("idPremises", ids);
-            return RedirectToAction("PremiseReports");
         }
 
         public IActionResult PremiseReports(PageOptions pageOptions)

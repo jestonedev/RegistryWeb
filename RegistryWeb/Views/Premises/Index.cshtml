@@ -18,7 +18,7 @@
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
 }
 
-<div class="col info text-center"></div>
+<div class="col info text-center" data-controller="Premises"></div>
 
 <h2>@ViewData["Title"] @text</h2>
 <partial name="Filter" model="@Model">
@@ -32,4 +32,5 @@
     <script src="~/js/address.filter.js" asp-append-version="true"></script>
     <script src="~/js/index.common.js" asp-append-version="true"></script>
     <script src="~/js/premises.index.js" asp-append-version="true"></script>
+    <script src="~/js/multimaster.js" asp-append-version="true"></script>
 }

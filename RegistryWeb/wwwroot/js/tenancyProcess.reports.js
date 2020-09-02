@@ -253,4 +253,10 @@
             }
         });
     });
+
+    $("#tenanciesExportBtn").on('click', function (e) {
+        url = "/TenancyReports/GetTenanciesExport";
+        downloadFile(url);
+        e.preventDefault();
+    });
 });

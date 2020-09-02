@@ -11,11 +11,12 @@ using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
+using RegistryWeb.ViewOptions.Filter;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
-    public class PremiseReportsController : RegistryBaseController
+    public class PremiseReportsController : SessionController<PremisesListFilter>
     {
         private readonly PremiseReportService reportService;
         private readonly PremiseReportsDataService dataService;
@@ -28,6 +29,10 @@ namespace RegistryWeb.Controllers
             this.reportService = reportService;
             this.dataService = dataService;
             this.securityService = securityService;
+
+            nameFilteredIdsDict = "filteredPremisesIdsDict";
+            nameIds = "idPremises";
+            nameMultimaster = "PremiseReports";
         }
 
         public IActionResult GetExcerptPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer)
@@ -109,16 +114,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        private List<int> GetSessionPremisesIds()
-        {
-            if (HttpContext.Session.Keys.Contains("idPremises"))
-                return HttpContext.Session.Get<List<int>>("idPremises");
-            return new List<int>();
-        }
-
         public IActionResult GetPremisesArea()
         {
-            List<int> ids = GetSessionPremisesIds();
+            List<int> ids = GetSessionIds();
             
             if (!ids.Any())
                 return NotFound();
@@ -155,7 +153,7 @@ namespace RegistryWeb.Controllers
         //_________________Для массовых____________________ 
         public IActionResult GetMassExcerptPremise(string excerptNumber, DateTime excerptDateFrom, int signer)
         {
-            List<int> ids = GetSessionPremisesIds();
+            List<int> ids = GetSessionIds();
 
             if (!ids.Any())
                 return NotFound();
@@ -176,7 +174,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPremisesAct(DateTime actDate, string isNotResides, string commision, int clerk)
         {
-            List<int> ids = GetSessionPremisesIds();
+            List<int> ids = GetSessionIds();
 
             if (!ids.Any())
                 return NotFound();
@@ -197,7 +195,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPremisesExport()
         {
-            List<int> ids = GetSessionPremisesIds();
+            List<int> ids = GetSessionIds();
 
             if (!ids.Any())
                 return NotFound();
@@ -218,7 +216,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPremisesTenancyHistory()
         {
-            List<int> ids = GetSessionPremisesIds();
+            List<int> ids = GetSessionIds();
 
             if (ids == null)
                 return NotFound();

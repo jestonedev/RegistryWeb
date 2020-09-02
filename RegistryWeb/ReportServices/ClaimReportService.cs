@@ -66,5 +66,41 @@ namespace RegistryWeb.ReportServices
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
+
+        internal byte[] ExportClaims(List<int> idClaims)
+        {
+            string columnHeaders;
+            string columnPatterns;
+
+            columnHeaders = "[{\"columnHeader\":\"№\"},{\"columnHeader\":\"Лицевой счет\"},{\"columnHeader\":\"Адрес\"},"+
+                "{\"columnHeader\":\"Наниматель\"},{\"columnHeader\":\"Дата формирования\"},{\"columnHeader\":\"Состояние установлено\"},"+
+                "{\"columnHeader\":\"Текущее состояние\"},{\"columnHeader\":\"Период с\"},{\"columnHeader\":\"Период по\"},"+
+                "{\"columnHeader\":\"Сумма долга найм\"},{\"columnHeader\":\"Сумма долга ДГИ\"},{\"columnHeader\":\"Сумма долга Падун\"},"+
+                "{\"columnHeader\":\"Сумма долга ПКК\"},{\"columnHeader\":\"Сумма долга пени\"},{\"columnHeader\":\"Примечание\"}]";
+            columnPatterns = "[{\"columnPattern\":\"$column0$\"},{\"columnPattern\":\"$column1$\"},{\"columnPattern\":\"$column2$\"},"+
+                "{\"columnPattern\":\"$column3$\"},{\"columnPattern\":\"$column4$\"},{\"columnPattern\":\"$column5$\"},{\"columnPattern\":\"$column6$\"},"+
+                "{\"columnPattern\":\"$column7$\"},{\"columnPattern\":\"$column8$\"},{\"columnPattern\":\"$column9$\"},{\"columnPattern\":\"$column10$\"},"+
+                "{\"columnPattern\":\"$column11$\"},{\"columnPattern\":\"$column12$\"},{\"columnPattern\":\"$column13$\"},{\"columnPattern\":\"$description$\"}]";
+
+            var fileName = Path.GetTempFileName();
+            using (var sw = new StreamWriter(fileName))
+                sw.Write(string.Format("(id_claim IN ({0}))", ClaimsIdsToString(idClaims)));
+
+            var arguments = new Dictionary<string, object>
+            {
+                { "filterTmpFile", fileName },
+                { "type", "4"},
+                { "executor", securityService.User.UserName },
+                { "columnHeaders", columnHeaders },
+                { "columnPatterns", columnPatterns }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\export");
+            return DownloadFile(fileNameReport);
+        }
+
+        private string ClaimsIdsToString(List<int> idClaims)
+        {
+            return idClaims.Select(r => r.ToString()).Aggregate((v, acc) => v+","+acc);
+        }
     }
 }

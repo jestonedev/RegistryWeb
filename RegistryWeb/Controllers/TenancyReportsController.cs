@@ -406,5 +406,26 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
+
+        public IActionResult GetTenanciesExport()
+        {
+            List<int> ids = GetSessionIds();
+
+            if (!ids.Any())
+                return NotFound();
+
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.TenanciesExport(ids);
+                return File(file, odsMime, string.Format(@"Экспорт данных"));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
     }
 }

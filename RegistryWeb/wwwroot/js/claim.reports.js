@@ -96,6 +96,12 @@
         form.submit();
     });
 
+    $("#exportBtn").on('click', function (e) {
+        url = "/ClaimReports/GetClaimsExport";
+        downloadFile(url);
+        e.preventDefault();
+    });
+
     $("#addClaimState").on('click', function (e) {
         var modal = $("#claimAddStateModal");
         modal.find("input, textarea, select").filter(function (idx, elem) {

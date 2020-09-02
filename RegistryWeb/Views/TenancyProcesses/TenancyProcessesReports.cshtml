@@ -55,6 +55,7 @@
                 <button class="dropdown-item" @(Model.TenancyProcesses.Any() ? "" : "disabled") href="#" id="requestToMvdBtn" data-request-type="1">Сформировать запрос в МВД</button>
                 <button class="dropdown-item" @(Model.TenancyProcesses.Any() ? "" : "disabled") href="#" id="requestToMvdNewBtn" data-request-type="2">Сформировать запрос в МВД (новый шаблон)</button>
                 <button class="dropdown-item" @(Model.TenancyProcesses.Any() ? "" : "disabled") href="#" id="tenancyWarningBtn">Сформировать предупреждения</button>
+                <button class="dropdown-item" id="tenanciesExportBtn" @(Model.TenancyProcesses.Any() ? "" : "disabled") href="#">Экспорт</button>
             </div>
         </div>
     </div>
