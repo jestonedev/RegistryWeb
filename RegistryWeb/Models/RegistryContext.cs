@@ -131,6 +131,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<ClaimCourtOrder> ClaimCourtOrders { get; set; }
         public virtual DbSet<Judge> Judges { get; set; }
         public virtual DbSet<JudgeBuildingAssoc> JudgeBuildingsAssoc { get; set; }
+        public virtual DbSet<Lawyer> Lawyers { get; set; }
 
         //Журнал изменений
         public virtual DbSet<ChangeLog> ChangeLogs { get; set; }
@@ -286,7 +287,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new ClaimCourtOrderConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new JudgeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new JudgeBuildingAssocConfiguration(nameDatebase));
-
+            modelBuilder.ApplyConfiguration(new LawyerConfiguration(nameDatebase));
         }
     }
 }
