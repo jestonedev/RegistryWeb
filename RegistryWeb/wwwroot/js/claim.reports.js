@@ -65,7 +65,7 @@
         e.preventDefault();
     });
 
-    $("#claimBksAndTransToLegalModal").on("change", "select", function () {
+    $("#claimBksAndTransToLegalModal, #claimAddStateModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
 
@@ -77,4 +77,63 @@
         location.href = path + "?PageOptions.CurrentPage=" + page;
         e.preventDefault();
     });
+
+    $("#setDeptPeriod").on('click', function (e) {
+        var modal = $("#claimDeptPeriodModal");
+        modal.find("input, textarea, select").prop("disabled", false);
+        modal.modal("show");
+        e.preventDefault();
+    });
+
+    $("#claimDeptPeriodModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("form");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return false;
+        }
+        form.submit();
+    });
+
+    $("#addClaimState").on('click', function (e) {
+        var modal = $("#claimAddStateModal");
+        modal.find("input, textarea, select").filter(function (idx, elem) {
+            return $(elem).prop("name") !== "ClaimState.Executor";
+        }).prop("disabled", false);
+        modal.modal("show");
+        e.preventDefault();
+    });
+
+    $("#claimAddStateModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("form");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return false;
+        }
+        
+        $("#claimAddStateModal .rr-claim-ext-info").each(function (idx, elem) {
+            if ($(elem).hasClass("d-none")) {
+                $(elem).find("input, textarea, select").val("");
+            }
+        });
+
+        form.submit();
+    });
+
+    $("#claimAddStateModal #ClaimState_IdStateType").on("change", function (e) {
+        var idStateType = $(this).val() | 0;
+        $("#claimAddStateModal .rr-claim-ext-info").each(function (idx, elem) {
+            if ($(elem).data("id-state-type") === idStateType) {
+                $(elem).removeClass("d-none");
+            } else
+                if (!$(elem).hasClass("d-none")) {
+                    $(elem).addClass("d-none");
+                }
+        });
+    });
+
+    $("#claimAddStateModal #ClaimState_IdStateType").change();
 });

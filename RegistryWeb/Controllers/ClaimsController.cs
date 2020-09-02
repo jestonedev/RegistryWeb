@@ -291,6 +291,14 @@ namespace RegistryWeb.Controllers
                 }
                 TempData.Remove("ErrorClaimsIds");
             }
+            if (TempData.ContainsKey("ErrorReason"))
+            {
+                ViewBag.ErrorReason = TempData["ErrorReason"];
+                TempData.Remove("ErrorReason");
+            } else
+            {
+                ViewBag.ErrorReason = "неизвестно";
+            }
 
             ViewBag.ErrorClaims = dataService.GetClaimsForMassReports(errorIds).ToList();
 
@@ -299,8 +307,67 @@ namespace RegistryWeb.Controllers
             ViewBag.Count = viewModel.Claims.Count();
             ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
             ViewBag.CurrentExecutor = dataService.CurrentExecutor?.ExecutorName;
+            ViewBag.StateTypes = dataService.StateTypes;
             ViewBag.CanEdit = securityService.HasPrivilege(Privileges.ClaimsWrite);
             return View("ClaimsReports", viewModel);
+        }
+
+        public IActionResult UpdateDeptPeriod(DateTime? startDeptPeriod, DateTime? endDeptPeriod)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
+                return Error("У вас нет прав на выполнение данной операции");
+
+            var ids = GetSessionIds();
+
+            if (!ids.Any())
+                return NotFound();
+
+            dataService.UpdateDeptPeriodInClaims(ids, startDeptPeriod, endDeptPeriod);
+
+            return RedirectToAction("ClaimsReports");
+        }
+
+        public IActionResult AddClaimStateMass(ClaimState claimState)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
+                return Error("У вас нет прав на выполнение данной операции");
+
+            var ids = GetSessionIds();
+
+            if (!ids.Any())
+                return NotFound();
+
+
+            var processingIds = new List<int>();
+            var errorIds = new List<int>();
+
+            foreach (var idClaim in ids)
+            {
+                var claimStates = dataService.GetClaimStates(idClaim);
+                var claimStateTypeRelations = dataService.StateTypeRelations;
+                var claimStateTypes = dataService.StateTypes;
+                ClaimState prevClaimState = null;
+                if (claimStates.Count > 0)
+                {
+                    prevClaimState = claimStates[claimStates.Count - 1];
+                }
+                if ((prevClaimState == null &&
+                    !claimStateTypes.Any(r => r.IsStartStateType && r.IdStateType == claimState.IdStateType)) ||
+                    (prevClaimState != null &&
+                    !claimStateTypeRelations.Any(r => r.IdStateFrom == prevClaimState.IdStateType && r.IdStateTo == claimState.IdStateType)))
+                {
+                    errorIds.Add(idClaim);
+                } else
+                {
+                    processingIds.Add(idClaim);
+                }
+            }
+
+            dataService.AddClaimStateMass(processingIds, claimState);
+
+            TempData["ErrorClaimsIds"] = JsonConvert.SerializeObject(errorIds);
+            TempData["ErrorReason"] = "нарушение порядка следования этапов исковой работы";
+            return RedirectToAction("ClaimsReports");
         }
     }
 }

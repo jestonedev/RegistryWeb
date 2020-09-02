@@ -4,10 +4,17 @@
     SelectList signersList = null;
     if (signers != null)
     {
-        signersList = new SelectList(signers.Select(r => new {
+        signersList = new SelectList(signers.Select(r => new
+        {
             IdSigner = r.IdRecord,
-            Snp = r.Surname + " " + r.Name + (r.Patronymic !=null ? " " + r.Patronymic : "")
+            Snp = r.Surname + " " + r.Name + (r.Patronymic != null ? " " + r.Patronymic : "")
         }), "IdSigner", "Snp");
+    }
+    var stateTypes = (List<ClaimStateType>)ViewBag.StateTypes;
+    SelectList stateTypesList = null;
+    if (stateTypes != null)
+    {
+        stateTypesList = new SelectList(ViewBag.StateTypes, "IdStateType", "StateType");
     }
 }
 
@@ -41,6 +48,280 @@
                             <input type="date" class="form-control" title="Дата" name="Claim.Date"
                                    data-val="true" data-val-required="Укажите дату" id="Claim_Date" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="Claim.Date" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="claimDeptPeriodForm" asp-action="UpdateDeptPeriod">
+    <div class="modal fade" id="claimDeptPeriodModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Установить период предъявления</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="StartDeptPeriod">Предъявлен период (с)</label>
+                            <input type="date" class="form-control" title="Предъявлен период (с)" name="StartDeptPeriod"
+                                   id="StartDeptPeriod" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="EndDeptPeriod">Предъявлен период (по)</label>
+                            <input type="date" class="form-control" title="Предъявлен период (по)" name="EndDeptPeriod"
+                                   id="EndDeptPeriod" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="claimAddStateForm" asp-action="AddClaimStateMass">
+    <div class="modal fade" id="claimAddStateModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Создать этап претензионно-исковой работы</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="form-row">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата установки</label>
+                            <input type="date" class="form-control" value="@(DateTime.Now.Date.ToString("yyyy-MM-dd"))" name="ClaimState.DateStartState" title="Дата установки состояния">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Этап</label>
+                            <select class="selectpicker form-control" name="ClaimState.IdStateType" id="ClaimState_IdStateType" title="Этап" asp-items="@stateTypesList"
+                                    data-val="true" data-val-required="Выберите этап исковой работы"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="ClaimState.IdStateType" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Исполнитель</label>
+                            <input type="text" disabled class="form-control" value="@ViewBag.CurrentExecutor" name="ClaimState.Executor" title="Исполнитель">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Примечание</label>
+                            <input type="text" class="form-control" name="ClaimState.Description" title="Примечание">
+                        </div>
+                    </div>
+
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="1">
+                        <div class="form-group col-12">
+                            <label>Кто сделал запрос</label>
+                            <input type="text" class="form-control" value="@ViewBag.CurrentExecutor" name="ClaimState.BksRequester" title="Кто сделал запрос">
+                        </div>
+                    </div>
+
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="2">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата передачи</label>
+                            <input type="date" class="form-control" name="ClaimState.TransferToLegalDepartmentDate" title="Дата передачи">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Кто передал</label>
+                            <input type="text" class="form-control" value="@ViewBag.CurrentExecutor" name="ClaimState.TransferToLegalDepartmentWho" title="Кто передал">
+                        </div>
+                    </div>
+
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="3">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата принятия</label>
+                            <input type="date" class="form-control" name="ClaimState.AcceptedByLegalDepartmentDate" title="Дата принятия">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Кто принял</label>
+                            <input type="text" class="form-control" value="@ViewBag.CurrentExecutor" name="ClaimState.AcceptedByLegalDepartmentWho" title="Кто принял">
+                        </div>
+                    </div>
+
+                    <div class="rr-claim-ext-info d-none" data-id-state-type="4">
+                        <h5>Направлено исковое заявление в суд</h5>
+                        <hr class="mt-1" />
+                    </div>
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="4">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата направления</label>
+                            <input type="date" disabled class="form-control" name="ClaimState.ClaimDirectionDate" title="Дата направления">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Примечание</label>
+                            <input type="text" disabled class="form-control" name="ClaimState.ClaimDirectionDescription" title="Примечание">
+                        </div>
+                    </div>
+
+                    <div class="rr-claim-ext-info d-none" data-id-state-type="4">
+                        <h5>Вынесение судебного приказа</h5>
+                        <hr class="mt-1" />
+                    </div>
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="4">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата вынесения с/п</label>
+                            <input type="date" disabled class="form-control" name="ClaimState.CourtOrderDate" title="Дата вынесения с/п">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Номер с/п</label>
+                            <input type="text" disabled class="form-control" name="ClaimState.CourtOrderNum" title="Номер с/п">
+                        </div>
+                    </div>
+
+                    <div class="rr-claim-ext-info d-none" data-id-state-type="4">
+                        <h5>Получение судебного приказа</h5>
+                        <hr class="mt-1" />
+                    </div>
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="4">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата получения с/п</label>
+                            <input type="date" disabled class="form-control" name="ClaimState.ObtainingCourtOrderDate" title="Дата получения с/п">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Примечание</label>
+                            <input type="text" disabled class="form-control" name="ClaimState.ObtainingCourtOrderDescription" title="Примечание">
+                        </div>
+                    </div>
+
+                    <div class="rr-claim-ext-info d-none" data-id-state-type="5">
+                        <h5>Направление с/п приставам</h5>
+                        <hr class="mt-1" />
+                    </div>
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="5">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата направления</label>
+                            <input type="date" disabled class="form-control" name="ClaimState.DirectionCourtOrderBailiffsDate" title="Дата направления">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Примечание</label>
+                            <input type="text" disabled class="form-control" name="ClaimState.DirectionCourtOrderBailiffsDescription" title="Примечание">
+                        </div>
+                    </div>
+
+                    <div class="rr-claim-ext-info d-none" data-id-state-type="5">
+                        <h5>Постановление о возбуждении исполнительного производства</h5>
+                        <hr class="mt-1" />
+                    </div>
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="5">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата возбуждения</label>
+                            <input type="date" disabled class="form-control" name="ClaimState.EnforcementProceedingStartDate" title="Дата возбуждения">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Примечание</label>
+                            <input type="text" disabled class="form-control" name="ClaimState.EnforcementProceedingStartDescription" title="Примечание">
+                        </div>
+                    </div>
+
+                    <div class="rr-claim-ext-info d-none" data-id-state-type="5">
+                        <h5>Постановление об окончании исполнительного производства</h5>
+                        <hr class="mt-1" />
+                    </div>
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="5">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата окончания</label>
+                            <input type="date" disabled class="form-control" name="ClaimState.EnforcementProceedingEndDate" title="Дата окончания">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Примечание</label>
+                            <input type="text" disabled class="form-control" name="ClaimState.EnforcementProceedingEndDescription" title="Примечание">
+                        </div>
+                    </div>
+
+                    <div class="rr-claim-ext-info d-none" data-id-state-type="5">
+                        <h5>Постановление о прекращении исполнительного производства</h5>
+                        <hr class="mt-1" />
+                    </div>
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="5">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата прекращения</label>
+                            <input type="date" disabled class="form-control" name="ClaimState.EnforcementProceedingTerminateDate" title="Дата прекращения">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Примечание</label>
+                            <input type="text" disabled class="form-control" name="ClaimState.EnforcementProceedingTerminateDescription" title="Примечание">
+                        </div>
+                    </div>
+
+                    <div class="rr-claim-ext-info d-none" data-id-state-type="5">
+                        <h5>Повторное направление с/п приставам</h5>
+                        <hr class="mt-1" />
+                    </div>
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="5">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата направления</label>
+                            <input type="date" disabled class="form-control" name="ClaimState.RepeatedDirectionCourtOrderBailiffsDate" title="Дата направления">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Примечание</label>
+                            <input type="text" disabled class="form-control" name="ClaimState.RepeatedDirectionCourtOrderBailiffsDescription" title="Примечание">
+                        </div>
+                    </div>
+
+                    <div class="rr-claim-ext-info d-none" data-id-state-type="5">
+                        <h5>Повторное постановление о возбуждении исполнительного производства</h5>
+                        <hr class="mt-1" />
+                    </div>
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="5">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата возбуждения</label>
+                            <input type="date" disabled class="form-control" name="ClaimState.RepeatedEnforcementProceedingStartDate" title="Дата возбуждения">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Примечание</label>
+                            <input type="text" disabled class="form-control" name="ClaimState.RepeatedEnforcementProceedingStartDescription" title="Примечание">
+                        </div>
+                    </div>
+
+                    <div class="rr-claim-ext-info d-none" data-id-state-type="5">
+                        <h5>Повторное постановление об окончании исполнительного производства</h5>
+                        <hr class="mt-1" />
+                    </div>
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="5">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата окончания</label>
+                            <input type="date" disabled class="form-control" name="ClaimState.RepeatedEnforcementProceedingEndDate" title="Дата окончания">
+                        </div>
+                        <div class="form-group col-12 col-md-8">
+                            <label>Примечание</label>
+                            <input type="text" disabled class="form-control" name="ClaimState.RepeatedEnforcementProceedingEndDescription" title="Примечание">
+                        </div>
+                    </div>
+
+                    <div class="form-row rr-claim-ext-info d-none" data-id-state-type="6">
+                        <div class="form-group col-12 col-md-4">
+                            <label>Дата завершения</label>
+                            <input type="date" disabled class="form-control" name="ClaimState.CourtOrderCompleteDate" title="Дата окончания">
+                        </div>
+                        <div class="form-group col-6 col-md-4">
+                            <label>Причина завершения</label>
+                            <input type="text" disabled class="form-control" name="ClaimState.CourtOrderCompleteReason" title="Причина завершения">
+                        </div>
+                        <div class="form-group col-6 col-md-4">
+                            <label>Примечание</label>
+                            <input type="text" disabled class="form-control" name="ClaimState.CourtOrderCompleteDescription" title="Примечание">
                         </div>
                     </div>
                 </div>

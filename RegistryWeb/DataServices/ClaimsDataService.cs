@@ -11,6 +11,7 @@ using RegistryWeb.DataHelpers;
 using System.Runtime.CompilerServices;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace RegistryWeb.DataServices
 {
@@ -365,6 +366,28 @@ namespace RegistryWeb.DataServices
                         select q;
             }
             return query;
+        }
+
+        internal void AddClaimStateMass(List<int> ids, ClaimState claimState)
+        {
+            foreach(var id in ids)
+            {
+                var claimStateCopy = JsonConvert.DeserializeObject<ClaimState>(JsonConvert.SerializeObject(claimState));
+                claimStateCopy.IdClaim = id;
+                registryContext.ClaimStates.Add(claimStateCopy);
+            }
+            registryContext.SaveChanges();
+        }
+
+        internal void UpdateDeptPeriodInClaims(List<int> claimIds, DateTime? startDeptPeriod, DateTime? endDeptPeriod)
+        {
+            var claims = registryContext.Claims.Where(r => claimIds.Contains(r.IdClaim));
+            foreach (var claim in claims)
+            {
+                claim.StartDeptPeriod = startDeptPeriod;
+                claim.EndDeptPeriod = endDeptPeriod;
+            }
+            registryContext.SaveChanges();
         }
 
         internal PaymentAccount GetAccount(int idAccount)
@@ -798,6 +821,11 @@ namespace RegistryWeb.DataServices
                 .Include(r => r.ClaimFiles)
                 .Include(r => r.ClaimCourtOrders)
                 .FirstOrDefault(r => r.IdClaim == idClaim);
+        }
+
+        public List<ClaimState> GetClaimStates(int idClaim)
+        {
+            return registryContext.ClaimStates.Where(cs => cs.IdClaim == idClaim).AsNoTracking().ToList();
         }
 
         public List<ClaimStateType> StateTypes => registryContext.ClaimStateTypes.ToList();

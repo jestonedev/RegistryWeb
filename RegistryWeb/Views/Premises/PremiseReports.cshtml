@@ -34,7 +34,7 @@
     <div class="alert alert-danger text-center">
         <p class="mb-0">
             Во время массовой операции были пропущены помещения со следующими реестровыми номерами:
-            @(errorPremises.Select(v => v.IdPremises.ToString()).Aggregate((acc, v) => acc + "," + v))
+            @(errorPremises.Select(v => v.IdPremises.ToString()).Aggregate((acc, v) => acc + ", " + v))
         </p>
         <p class="mb-0">Причина: недостаточно прав на редактирование данных помещений.</p>
     </div>
