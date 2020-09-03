@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace RegistryWeb.Models.Entities
 {
@@ -11,6 +12,7 @@ namespace RegistryWeb.Models.Entities
         }
 
         public int IdReasonType { get; set; }
+        [Required(ErrorMessage = "Введите название типа оснований собственности")]
         public string ReasonName { get; set; }
         public byte Deleted { get; set; }
 

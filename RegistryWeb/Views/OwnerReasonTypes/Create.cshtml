@@ -1,17 +1,62 @@
-﻿@model RegistryWeb.Models.Entities.OwnerReasonType;
+﻿@using RegistryWeb.Extensions
+@using RegistryWeb.ViewOptions
+@using RegistryWeb.Models.Entities
+@using RegistryWeb.ViewModel
+@using RegistryWeb.SecurityServices;
+@using RegistryWeb.DataHelpers;
+@model OwnerReasonTypesVM<OwnerReasonType>;
 @{
-    ViewData["Title"] = "Добавление типа оснований собственности";
+    ViewData["Title"] = "Создание типа оснований собственности";
 }
 
-<h2>@ViewData["Title"]</h2>
-<form asp-controller="OwnerReasonTypes" asp-action="Create">
-    <div class="form-group">
-        <label asp-for="ReasonName" class="control-label">Название</label>
-        <input type="text" asp-for="ReasonName" class="form-control" />
-    </div>
-    <div class="form-group">
-        <a class="btn btn-default" asp-controller="OwnerReasonTypes" asp-action="Index">Назад</a>
-        <input type="submit" value="Добавить" class="btn btn-success" />
+@section validation
+    {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+}
+
+@section scripts
+    {
+    <script src="~/js/ownershipReasonTypes.common.js" asp-append-version="true"></script>
+}
+<form asp-controller="OwnerReasonTypes" asp-action="Create" data-action="Create">
+    <div class="card">
+        <div class="card-header d-flex flex-column flex-lg-row">
+            <label class="form-check-labe h2 col-sm-12 col-lg-8 col-xl-8 pl-0">@ViewData["Title"]</label>
+            <div class="col-sm-12 col-lg-4 col-xl-4 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
+                <div class="btn-group" role="group" aria-label="Панель доступа">
+                    @if (@ViewBag.ReturnUrl != null)
+                    {
+                        <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+                    }
+                    else
+                    {
+                        <a class="form-control btn btn-primary" asp-controller="OwnerReasonTypes" asp-action="Index" asp-route-isBack="true">Назад</a>
+                    }
+                    @if (ViewBag.Action == "Create")
+                    {
+                        <input type="submit" value="Создать" class="form-control btn btn-success" />
+                    }
+                    @if (ViewBag.Action == "Edit")
+                    {
+                        <input type="submit" value="Сохранить" class="form-control btn btn-success" />
+                    }
+                    @if (ViewBag.Action == "Delete")
+                    {
+                        <input type="submit" value="Удалить" class="form-control btn btn-danger" />
+                    }
+                    <a href="#" data-for="ownerreasontype" class="form-control btn btn-primary owner-reason-type-toggler" title="Развернуть помещение" style="font-weight:bold;">∧</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body" id="ownerreasontype">
+            <div class="validation" asp-validation-summary="ModelOnly"></div>
+            <div class="form-group">
+                <label asp-for="ownerReasonType.ReasonName" class="control-label">Название</label>
+                <input type="text" asp-for="ownerReasonType.ReasonName" class="form-control" />
+                <span asp-validation-for="ownerReasonType.ReasonName" class="text-danger"></span>
+            </div>
+        </div>
     </div>
 </form>
 

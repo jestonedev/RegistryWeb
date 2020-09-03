@@ -4,9 +4,16 @@
 @using RegistryWeb.ViewModel
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.DataHelpers;
-@model OwnerReasonTypesVM<OwnerReasonType>;
+@model DocumentIssueVM<DocumentIssuedBy>
 @{
-    ViewData["Title"] = "Тип оснований собственности №" + Model.ownerReasonType.IdReasonType;
+    if (ViewBag.Action == "Create")
+    {
+        ViewData["Title"] = "Создание нового паспортного стола";
+    }
+    else
+    {
+        ViewData["Title"] = "Паспортный стол №" + Model.DocumentIssue.IdDocumentIssuedBy;
+    }
 }
 
 @section validation
@@ -14,12 +21,12 @@
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
 }
-
 @section scripts
     {
-    <script src="~/js/ownershipReasonTypes.common.js" asp-append-version="true"></script>
+    <script src="~/js/documentIssue.common.js" asp-append-version="true"></script>
 }
-<form asp-controller="OwnerReasonTypes" asp-action="Delete" id="deleteform" data-action="@ViewBag.Action">
+
+<form asp-controller="DocumentIssued" asp-action="@ViewBag.Action" id="deleteform" data-action="@ViewBag.Action">
     <div class="card">
         <div class="card-header d-flex flex-column flex-lg-row">
             <label class="form-check-labe h2 col-sm-12 col-lg-8 col-xl-7 pl-0">@ViewData["Title"]</label>
@@ -31,31 +38,31 @@
                     }
                     else
                     {
-                        <a class="form-control btn btn-primary" asp-controller="OwnerReasonTypes" asp-action="Index" asp-route-isBack="true">Назад</a>
+                        <a class="form-control btn btn-primary" asp-controller="DocumentIssued" asp-action="Index" asp-route-isBack="true">Назад</a>
                     }
                     @if (ViewBag.Action == "Create")
                     {
-                        <input type="submit" value="Создать" class="form-control btn btn-success" />
+                        <input type="submit" value="Создать" id="createBtn" class="form-control btn btn-success" />
                     }
                     @if (ViewBag.Action == "Edit")
                     {
-                        <input type="submit" value="Сохранить" class="form-control btn btn-success" />
+                        <input type="submit" value="Сохранить" id="editBtn" class="form-control btn btn-success" />
                     }
                     @if (ViewBag.Action == "Delete")
                     {
                         <input type="submit" value="Удалить" class="form-control btn btn-danger" />
                     }
-                    <a href="#" data-for="ownerreasontype" class="form-control btn btn-primary owner-reason-type-toggler" title="Развернуть помещение" style="font-weight:bold;">∧</a>
+                    <a href="#" data-for="documentIssuer" class="form-control btn btn-primary document-issuer-toggler" title="Развернуть помещение" style="font-weight:bold;">∧</a>
                 </div>
             </div>
         </div>
-        <div class="card-body" id="ownerreasontype">
+        <div class="card-body" id="documentIssuer">
             <div class="validation" asp-validation-summary="ModelOnly"></div>
             <div class="form-group">
-                <input type="hidden" asp-for="ownerReasonType.IdReasonType" />
-                <label asp-for="ownerReasonType.ReasonName" class="control-label">Название</label><br />
-                <input type="text" asp-for="ownerReasonType.ReasonName" class="form-control disabled" />
-                <span asp-validation-for="ownerReasonType.ReasonName" class="text-danger"></span>
+                <input type="hidden" asp-for="DocumentIssue.IdDocumentIssuedBy" />
+                <label asp-for="DocumentIssue.DocumentIssuedByName" class="control-label">Название паспортного стола</label>
+                <input type="text" asp-for="DocumentIssue.DocumentIssuedByName" class="form-control" />
+                <span asp-validation-for="DocumentIssue.DocumentIssuedByName" class="text-danger"></span>
             </div>
         </div>
     </div>
