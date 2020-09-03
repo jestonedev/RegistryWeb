@@ -35,6 +35,16 @@ namespace RegistryWeb.Controllers
             nameMultimaster = "ClaimsReports";
         }
 
+        public IActionResult Index()
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            var viewModel = dataService.GetViewModel();
+
+            return View("Index", viewModel);
+        }
+
         public IActionResult GetTransferToLegal(int idClaim, int idSigner, DateTime dateValue)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
@@ -154,7 +164,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ExportClaims(ids);
-                return File(file, odsMime, string.Format(@"Экспорт данных"));
+                return File(file, odsMime, "Экспорт данных");
             }
             catch (Exception ex)
             {
@@ -162,5 +172,85 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult GetSplitAccountsReport()
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.SplitAccountsReport();
+                return File(file, odsMime, "Статистика по разделенным лицевым счетам");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetClaimStatesReport(DateTime startDate, DateTime endDate, int idExecutor)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var executor = dataService.GetExecutor(idExecutor);
+                var file = reportService.ClaimStatesReport(startDate, endDate, executor);
+                return File(file, odsMime, "Отчет по стадиям исковых работ");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetClaimExecutorsReport(DateTime startDate, DateTime endDate, int idStateType, bool isCurrentState)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.ClaimExecutorsReport(startDate, endDate, idStateType, isCurrentState);
+                return File(file, odsMime, "Отчет по исполнителям исковой работы");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetClaimCourtReport(DateTime startDate, DateTime endDate)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.ClaimCourtReport(startDate, endDate);
+                return File(file, odsMime, "Подготовленные судебные приказы");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetClaimEmergencyTariffReport(DateTime startDate, DateTime endDate)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.ClaimEmergencyTariffReport(startDate, endDate);
+                return File(file, xlsxMime, "Отчет по тарифам аварийных помещений");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
     }
 }

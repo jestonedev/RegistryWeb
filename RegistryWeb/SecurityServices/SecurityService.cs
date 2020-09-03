@@ -41,7 +41,7 @@ namespace RegistryWeb.SecurityServices
         private Executor GetExecutor()
         {
             return registryContext.Executors
-                .SingleOrDefault(e => e.ExecutorLogin == User.UserName || e.ExecutorName == User.UserDescription);
+                .FirstOrDefault(e => e.ExecutorLogin == User.UserName || e.ExecutorName == User.UserDescription);
         }
 
         private AclUser GetUser()

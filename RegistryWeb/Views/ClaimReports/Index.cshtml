@@ -1,0 +1,132 @@
+﻿@using RegistryWeb.ViewModel
+@using RegistryWeb.Models.Entities
+@model ClaimReportsVM;
+@{
+    ViewData["Title"] = "Отчеты по претензионно-исковой работе";
+}
+
+@section styles
+    {
+    <link rel="stylesheet" href="~/css/registry.object.report.css" runat="server" />
+}
+@section Scripts
+    {
+    <script src="~/js/claim.reports.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+}
+
+<div>
+    <h2>@ViewData["Title"]</h2>
+    <br />
+    <div class="row mb-3">
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-claim-common-modal-report" title="Отчет по стадиям исковых работ" 
+             data-action="ClaimStatesReport">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Отчет по стадиям исковых работ</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-claim-common-modal-report" title="Отчет по исполнителям исковой работы" 
+             data-action="ClaimExecutorsReport">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Отчет по исполнителям исковой работы</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3" title="Статистика по разделенным лицевым счетам" id="ClaimSplitAccountsReport">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Статистика по разделенным лицевым счетам</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 offset-lg-2 col-lg-4 mb-3 rr-claim-common-modal-report" title="Подготовленные судебные приказы" 
+             data-action="ClaimCourtReport">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Подготовленные судебные приказы</div>
+            </div>
+        </div>
+        <div class="col-12 offset-md-3 col-md-6 offset-lg-0 col-lg-4 mb-3 rr-claim-common-modal-report" title="Отчет по тарифам аварийных помещений"
+             data-action="ClaimEmergencyTariffReport">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Отчет по тарифам аварийных помещений</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="ClaimCommonReportForm">
+    <div class="modal fade" id="ClaimCommonReportModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="ActionUrl" />
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="ClaimCommonReport_StartDate">С</label>
+                            <input type="date" class="form-control" title="Предъявлен период (с)" name="StartDate"
+                                   id="ClaimCommonReport_StartDate" data-val="true" data-val-required="Не указана начальная дата" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="StartDate" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="ClaimCommonReport_EndDate">По</label>
+                            <input type="date" class="form-control" title="Предъявлен период (по)" name="EndDate"
+                                   id="ClaimCommonReport_EndDate" data-val="true" data-val-required="Не указана конечная дата" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="EndDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="ClaimCommonReport_Executor">Исполнитель</label>
+                            <select class="selectpicker form-control" title="Исполнитель" name="Executor"
+                                    data-val="true" data-val-required="Не выбран исполнитель" id="ClaimCommonReport_Executor">
+                                @foreach (Executor executor in Model.Executors)
+                                {
+                                    if (Model.CurrentExecutor?.IdExecutor == executor.IdExecutor)
+                                    {
+                                        <option value="@executor.IdExecutor" selected>@executor.ExecutorName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@executor.IdExecutor">@executor.ExecutorName</option>
+                                    }
+                                }
+
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Executor" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="ClaimCommonReport_IdStateType">Этап исковой работы</label>
+                            <select class="selectpicker form-control" title="Этап исковой работы" name="IdStateType"
+                                    asp-items="@(new SelectList(Model.StateTypes, "IdStateType", "StateType"))"
+                                    data-val="true" data-val-required="Не выбран этап исковой работы" id="ClaimCommonReport_IdStateType"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="IdStateType" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-12 rr-claim-common-report-checkbox">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="IsCurrentState">
+                                <label class="form-check-label" for="IsCurrentState" title="Текущее состояние">Текущее состояние</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

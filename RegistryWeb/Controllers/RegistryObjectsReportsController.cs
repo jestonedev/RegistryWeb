@@ -13,12 +13,12 @@ namespace RegistryWeb.Controllers
     public class RegistryObjectsReportsController: RegistryBaseController
     {
         private readonly RegistryObjectsReportService reportService;
-        private readonly OwnerReportsDataService dataService;
+        private readonly RegistryObjectsDataService dataService;
         private readonly SecurityService securityService;
         private const string odtMime = "application/vnd.oasis.opendocument.text";
         private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
 
-        public RegistryObjectsReportsController(RegistryObjectsReportService reportService, OwnerReportsDataService dataService, SecurityService securityService)
+        public RegistryObjectsReportsController(RegistryObjectsReportService reportService, RegistryObjectsDataService dataService, SecurityService securityService)
         {
             this.reportService = reportService;
             this.dataService = dataService;
@@ -30,7 +30,7 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
 
-            var viewModel = reportService.GetViewModel();
+            var viewModel = dataService.GetViewModel();
             
             return View("Index", viewModel);
         }

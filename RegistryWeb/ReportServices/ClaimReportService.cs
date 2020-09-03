@@ -102,5 +102,60 @@ namespace RegistryWeb.ReportServices
         {
             return idClaims.Select(r => r.ToString()).Aggregate((v, acc) => v+","+acc);
         }
+
+        internal byte[] SplitAccountsReport()
+        {
+            var arguments = new Dictionary<string, object>();
+            var fileName = "registry\\claims\\payment_accounts_duplicate_statistic";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+
+        internal byte[] ClaimStatesReport(DateTime startDate, DateTime endDate, string executor)
+        {
+            var arguments = new Dictionary<string, object> {
+                { "date_from", startDate.ToString("dd.MM.yyyy") },
+                { "date_to", endDate.ToString("dd.MM.yyyy") },
+                { "implementer", executor }
+            };
+            var fileName = "registry\\claims\\claim_states";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+
+        internal byte[] ClaimExecutorsReport(DateTime startDate, DateTime endDate, int idStateType, bool isCurrentState)
+        {
+            var arguments = new Dictionary<string, object> {
+                { "date_from", startDate.ToString("dd.MM.yyyy") },
+                { "date_to", endDate.ToString("dd.MM.yyyy") },
+                { "claim_state_type", idStateType },
+                { "only_current_claim_state", isCurrentState ? "1" : "0" }
+            };
+            var fileName = "registry\\claims\\claim_states_executors";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+
+        internal byte[] ClaimCourtReport(DateTime startDate, DateTime endDate)
+        {
+            var arguments = new Dictionary<string, object> {
+                { "date_from", startDate.ToString("dd.MM.yyyy") },
+                { "date_to", endDate.ToString("dd.MM.yyyy") }
+            };
+            var fileName = "registry\\claims\\claim_сcourt_orders_prepare";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+
+        internal byte[] ClaimEmergencyTariffReport(DateTime startDate, DateTime endDate)
+        {
+            var arguments = new Dictionary<string, object> {
+                { "date_from", startDate.ToString("dd.MM.yyyy") },
+                { "date_to", endDate.ToString("dd.MM.yyyy") }
+            };
+            var fileName = "registry\\claims\\tariffs";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
     }
 }

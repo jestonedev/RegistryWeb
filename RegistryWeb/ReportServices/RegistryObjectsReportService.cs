@@ -15,21 +15,10 @@ namespace RegistryWeb.ReportServices
 {
     public class RegistryObjectsReportService: ReportService
     {
-        private readonly RegistryContext rc;
         private readonly SecurityService securityService;
-        public RegistryObjectsReportService(RegistryContext rc, IConfiguration config, IHttpContextAccessor httpContextAccessor, SecurityService securityService) : base(config, httpContextAccessor)
+        public RegistryObjectsReportService(IConfiguration config, IHttpContextAccessor httpContextAccessor, SecurityService securityService) : base(config, httpContextAccessor)
         {
-            this.rc = rc;
             this.securityService = securityService;
-        }
-
-        public RegistryObjectReportsVM GetViewModel()
-        {
-            var viewModel = new RegistryObjectReportsVM
-            {
-                KladrRegionsList = new SelectList(rc.KladrRegions, "id_region", "region")
-            };
-            return viewModel;
         }
 
         public byte[] GetJFReport(string JFType, string regions, out string NameReport)

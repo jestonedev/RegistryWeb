@@ -65,7 +65,7 @@
         e.preventDefault();
     });
 
-    $("#claimBksAndTransToLegalModal, #claimAddStateModal").on("change", "select", function () {
+    $("#claimBksAndTransToLegalModal, #claimAddStateModal, #ClaimCommonReportModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
 
@@ -142,4 +142,75 @@
     });
 
     $("#claimAddStateModal #ClaimState_IdStateType").change();
+
+    $(".rr-claim-common-modal-report").on("click", function (e) {
+        var modal = $("#ClaimCommonReportModal");
+        var title = $(this).find(".media-body").text();
+        modal.find(".modal-title").text(title);
+        var action = $(this).data("action");
+        modal.find("input[name='ActionUrl']").val(action);
+        modal.find("input, textarea, select").prop("disabled", false);
+
+        var executorWrapper = modal.find("select[name='Executor']").closest(".form-row");
+        var claimStateTypeWrapper = modal.find("select[name='IdStateType']").closest(".form-row");
+        var isCurrentStateWrapper = modal.find("input[name='IsCurrentState']").closest(".rr-claim-common-report-checkbox");
+
+        executorWrapper.hide();
+        claimStateTypeWrapper.hide();
+        isCurrentStateWrapper.hide();
+
+        switch (action) {
+            case "ClaimStatesReport":
+                executorWrapper.show();
+                break;
+            case "ClaimExecutorsReport":
+                claimStateTypeWrapper.show();
+                isCurrentStateWrapper.show();
+                break;
+        }
+
+        modal.modal("show");
+        e.preventDefault();
+    });
+
+    $("#ClaimCommonReportModal  .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("form");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return false;
+        }
+
+        var action = form.find("input[name='ActionUrl']").val();
+        var startDate = form.find("input[name='StartDate']").val();
+        var endDate = form.find("input[name='EndDate']").val();
+
+        var url = "/ClaimReports/Get" + action + "?startDate=" + startDate + "&endDate=" + endDate;
+
+        switch (action) {
+            case "ClaimStatesReport":
+                var idExecutor = form.find("select[name='Executor']").val();
+                url += "&idExecutor=" + idExecutor;
+                break;
+            case "ClaimExecutorsReport":
+                var idStateType = form.find("select[name='IdStateType']").val();
+                var isCurrentState = form.find("input[name='IsCurrentState']").is(":checked");
+                url += "&idStateType=" + idStateType + "&isCurrentState=" + isCurrentState;
+                break;
+        }
+
+        if (url !== undefined) {
+            downloadFile(url);
+        }
+
+        $("#ClaimCommonReportModal").modal("hide");
+
+    });
+
+    $("#ClaimSplitAccountsReport").on("click", function () {
+        url = "/ClaimReports/GetSplitAccountsReport";
+        downloadFile(url);
+        e.preventDefault();
+    });
 });
