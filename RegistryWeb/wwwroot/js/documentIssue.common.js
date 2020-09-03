@@ -1,5 +1,5 @@
-﻿$(document).ready(function ()
-{
+﻿$(document).ready(function () {
+
     var action = $('#deleteform').data("action");
     if (action === "Details" || action === "Delete" || $("form#deleteform input[type='submit']").hasClass("disabled")) {
         $('select').prop('disabled', true);
@@ -9,7 +9,7 @@
         $('input[type="submit"]').prop('disabled', false);
     }
 
-    $('.owner-reason-type-toggler').each(function (idx, e) {
+    $('.document-issuer-toggler').each(function (idx, e) {
         $(e).on('click', $('#' + $(e).data("for")), elementToogleHide);
     });
 
@@ -18,5 +18,5 @@
         $('input[name="PageOptions.CurrentPage"]').val($(this).data("page"));
         $("form.formsub").submit();
         e.preventDefault();
-    }); 
+    });  
 });

@@ -1,0 +1,53 @@
+﻿@using RegistryWeb.ViewModel
+@using RegistryWeb.Models.Entities
+@using RegistryWeb.DataServices
+@using RegistryWeb.SecurityServices;
+@using RegistryWeb.Extensions;
+@model DocumentIssueVM<DocumentIssuedBy>;
+@{
+    Context.Session.Set("Controller", "DocumentIssued");
+    Context.Session.Set("Action", "Index");
+    ViewData["Title"] = "Паспортные столы (" + Model.PageOptions.Rows + ")";
+    var securityService = (SecurityService)ViewData["SecurityService"];
+}
+
+@section scripts
+    {
+    <script src="~/js/documentIssue.common.js" asp-append-version="true"></script>
+}
+<h2>@ViewData["Title"]</h2>
+<form class="formsub" method="get" asp-controller="DocumentIssued" asp-action="Index" id="r-docissuer-form" data-action="@ViewBag.Action">
+    <input type="hidden" asp-for="PageOptions.CurrentPage" />
+    <input type="hidden" asp-for="PageOptions.SizePage" />
+    <a class="btn btn-success mb-3" title="Добавить" aria-label="Добавить новый паспортный стол" asp-controller="DocumentIssued" asp-action="Create">&#10010;</a>
+</form>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Паспортный стол</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.DocumentIssues)
+        {
+            <tr>
+                <td>@item.DocumentIssuedByName</td>
+                <td>
+
+                    <div class="btn-group">
+                        <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                           asp-controller="DocumentIssued" asp-action="Edit" asp-route-idDocumentIssue="@item.IdDocumentIssuedBy" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                        <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                           asp-controller="DocumentIssued" asp-action="Delete" asp-route-idDocumentIssue="@item.IdDocumentIssuedBy" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                    </div>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<page-link page-model="Model.PageOptions" page-action="Index"></page-link>
+

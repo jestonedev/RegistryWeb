@@ -1,13 +1,19 @@
-﻿@model RegistryWeb.Models.Entities.OwnerReasonType;
+﻿@using RegistryWeb.Extensions
+@using RegistryWeb.ViewOptions
+@using RegistryWeb.Models.Entities
+@using RegistryWeb.ViewModel
+@using RegistryWeb.SecurityServices;
+@using RegistryWeb.DataHelpers;
+@model OwnerReasonTypesVM<OwnerReasonType>;
 @{
-    ViewData["Title"] = "Тип оснований собственности №" + Model.IdReasonType;
+    ViewData["Title"] = "Тип оснований собственности №" + Model.ownerReasonType.IdReasonType;
 }
 
 @section scripts
     {
     <script src="~/js/ownershipReasonTypes.common.js" asp-append-version="true"></script>
 }
-<form asp-controller="OwnerReasonTypes" asp-action="Delete" asp-route-IdReasonType="@Model.IdReasonType">
+<form asp-controller="OwnerReasonTypes" asp-action="Delete" asp-route-IdReasonType="@Model.ownerReasonType.IdReasonType" id="deleteform" data-action="@ViewBag.Action">
     <div class="card">
         <div class="card-header d-flex flex-column flex-md-row flex-lg-row flex-lg-row">
             <label class="form-check-label h2 col-sm-9 col-md-9 col-lg-9 col-xl-9 pl-0">@ViewData["Title"]</label>
@@ -39,13 +45,8 @@
         <div class="card-body" id="ownerreasontype">
             <div class="validation" asp-validation-summary="ModelOnly"></div>
             <div class="form-group">
-                <label class="control-label">Название</label><br />
-                @Html.DisplayFor(ort => ort.ReasonName, new { @class = "form-control" });
-
-                @*<div class="form-group">
-                        <a class="btn btn-default" asp-controller="OwnerReasonTypes" asp-action="Index">Назад</a>
-                        <input type="submit" class="btn btn-danger" value="Удалить" />
-                    </div>*@
+                <label asp-for="ownerReasonType.ReasonName" class="control-label">Название</label><br />
+                <input type="text" asp-for="ownerReasonType.ReasonName" class="form-control disabled" />
             </div>
         </div>
     </div>
