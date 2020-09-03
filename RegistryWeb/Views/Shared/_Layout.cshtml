@@ -15,6 +15,12 @@
     <link rel="stylesheet" href="~/css/autocomplete.css" asp-append-version="true" />
     @RenderSection("Styles", required: false)
 
+    <script type="text/javascript">
+        if ((window.navigator.userAgent.indexOf("MSIE ") > 0 || window.navigator.userAgent.indexOf("Trident") > 0) &&
+            location.pathname != "/Home/UnsupportedBrowser") {
+            location.href ="/Home/UnsupportedBrowser"
+        }
+    </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/jquery-ui/jquery-ui.min.js"></script>
     <script src="~/lib/bootstrap-4.3.1/js/bootstrap.bundle.min.js"></script>
