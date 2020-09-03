@@ -1,15 +1,24 @@
-﻿@using RegistryWeb.SecurityServices;
-@model IEnumerable<RegistryWeb.Models.Entities.OwnerReasonType>;
+﻿@using RegistryWeb.ViewModel
+@using RegistryWeb.Models.Entities
+@using RegistryWeb.DataServices
+@using RegistryWeb.SecurityServices;
+@using RegistryWeb.Extensions;
+@model OwnerReasonTypesVM<OwnerReasonType>;
 @{
-    ViewData["Title"] = "Типы оснований собственности";
+    ViewData["Title"] = "Типы оснований собственности (" + ViewBag.Count + ")";
     var securityService = (SecurityService)ViewData["SecurityService"];
 }
 
 <h2>@ViewData["Title"]</h2>
-@if (securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
-{
-    <a class="btn btn-success" asp-controller="OwnerReasonTypes" asp-action="Create">Добавить</a>
-}
+<form class="formsub" method="get" asp-controller="DocumentIssued" asp-action="Index" id="r-owner-reason-type-form" data-action="@ViewBag.Action">
+    <input type="hidden" asp-for="PageOptions.CurrentPage" />
+    <input type="hidden" asp-for="PageOptions.SizePage" />
+    @if (securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
+    {
+        <a class="btn btn-success mb-3" title="Добавить" aria-label="Добавить тип оснований собственности" asp-controller="OwnerReasonTypes" asp-action="Create">&#10010;</a>
+    }
+</form>
+
 <table class="table table-hover">
     <thead>
         <tr>
@@ -18,21 +27,25 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.ownerReasonTypes)
         {
             <tr>
                 <td>@item.ReasonName</td>
-                <td>
+                <td class="text-right">
                     @if (securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
                     {
-                        <a class="btn btn-default oi oi-pencil" title="Изменить" aria-label="Изменить"
-                           asp-controller="OwnerReasonTypes" asp-action="Edit" asp-route-IdReasonType="@item.IdReasonType"></a>
-                        <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                           asp-controller="OwnerReasonTypes" asp-action="Delete" asp-route-IdReasonType="@item.IdReasonType"></a>
+                        <div class="btn-group">
+                            <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                               asp-controller="OwnerReasonTypes" asp-action="Edit" asp-route-IdReasonType="@item.IdReasonType" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                               asp-controller="OwnerReasonTypes" asp-action="Delete" asp-route-IdReasonType="@item.IdReasonType" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                        </div>
                     }
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<page-link page-model="Model.PageOptions" page-action="Index"></page-link>
 

@@ -72,6 +72,7 @@ namespace RegistryWeb
 
 
             services.AddTransient<BuildingsDataService>();
+            services.AddTransient<DocumentIssuerService>();
             services.AddTransient<PremisesDataService>();
             services.AddTransient<OwnerProcessesDataService>();
             services.AddTransient<TenancyProcessesDataService>();
