@@ -94,4 +94,23 @@
         downloadFile(url);
         e.preventDefault();
     });
+
+    $("#addClaim").on('click', function (e) {
+        var modal = $("#createClaimModal");
+        modal.find("input, textarea, select").prop("disabled", false);
+        modal.modal("show");
+        e.preventDefault();
+    });
+
+    $("#createClaimModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("#createClaimForm");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return false;
+        }
+
+        form.submit();
+    });
 });

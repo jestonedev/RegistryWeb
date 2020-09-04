@@ -200,6 +200,25 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        internal void CreateClaimMass(List<int> accountIds, DateTime atDate)
+        {
+            var payments = GetPaymentsForMassReports(accountIds).ToList();
+            foreach(var payment in payments)
+            {
+                var claim = new Claim {
+                    AtDate = atDate,
+                    IdAccount = payment.IdAccount,
+                    AmountTenancy = payment.BalanceOutputTenancy,
+                    AmountPenalties = payment.BalanceOutputPenalties,
+                    AmountDgi = payment.BalanceOutputDgi,
+                    AmountPadun = payment.BalanceOutputPadun,
+                    AmountPkk = payment.BalanceOutputPkk
+                };
+                registryContext.Claims.Add(claim);
+                registryContext.SaveChanges();
+            }
+        }
+
         private IQueryable<Payment> PaymentAccountFilter(IQueryable<Payment> query, PaymentsFilter filterOptions)
         {
             if (!string.IsNullOrEmpty(filterOptions.Crn))
@@ -953,7 +972,7 @@ namespace RegistryWeb.DataServices
                              paymentsRow.IdAccount,
                              AddressCode = aoRow != null ? aoRow.AddressCode : paymentsRow.RawAddress
                          };
-            return (from filteredRow in filteredObjects
+            var result = (from filteredRow in filteredObjects
                                  join allRow in allObjects
                                  on filteredRow.AddressCode equals allRow.AddressCode
                                  select new AccountIdsAssoc
@@ -961,6 +980,8 @@ namespace RegistryWeb.DataServices
                                      IdAccountFiltered = filteredRow.IdAccount,
                                      IdAccountActual = allRow.IdAccount
                                  }).ToList();
+
+            return result;
         }
 
         public PaymentsVM GetPaymentsHistory(int idAccount)
@@ -1007,6 +1028,8 @@ namespace RegistryWeb.DataServices
                              };
 
             claimsInfo = from claimRow in claims
+                         join accountsAssocRow in accountsAssoc
+                         on claimRow.IdAccount equals accountsAssocRow.IdAccountActual
                          join claimsInfoRow in claimsInfo
                          on claimRow.IdClaim equals claimsInfoRow.IdClaim into c
                          from cRow in c.DefaultIfEmpty()
@@ -1015,11 +1038,12 @@ namespace RegistryWeb.DataServices
                              IdClaim = claimRow.IdClaim,
                              StartDeptPeriod = claimRow.StartDeptPeriod,
                              EndDeptPeriod = claimRow.EndDeptPeriod,
-                             IdAccount = claimRow.IdAccount,
+                             IdAccount = accountsAssocRow.IdAccountFiltered,
                              IdClaimCurrentState = cRow.IdClaimCurrentState,
                              ClaimCurrentState = cRow.ClaimCurrentState,
                              EndedForFilter = claimRow.EndedForFilter
                          };
+
 
             var result =
                     claimsInfo
@@ -1030,8 +1054,7 @@ namespace RegistryWeb.DataServices
                         StartDeptPeriod = c.StartDeptPeriod,
                         EndDeptPeriod = c.EndDeptPeriod,
                         EndedForFilter = c.EndedForFilter,
-                        IdAccount = accountsAssoc.Any(a => a.IdAccountActual == c.IdAccount) 
-                        ? accountsAssoc.First(a => a.IdAccountActual == c.IdAccount).IdAccountFiltered : 0
+                        IdAccount = c.IdAccount
                     })
                     .GroupBy(r => r.IdAccount)
                     .Select(r => new { IdAccount = r.Key, Claims = r.OrderByDescending(v => v.IdClaim).Select(v => v) })
@@ -1052,12 +1075,13 @@ namespace RegistryWeb.DataServices
                 viewModel.PageOptions.CurrentPage = 1;
             viewModel.Payments = GetQueryPage(payments, viewModel.PageOptions).ToList();
             viewModel.RentObjects = GetRentObjects(viewModel.Payments);
+            viewModel.ClaimsByAddresses = GetClaimsByAddresses(viewModel.Payments);
             return viewModel;
         }
 
         public IQueryable<Payment> GetPaymentsForMassReports(List<int> ids)
         {
-            return GetQuery().Where(p => ids.Contains(p.IdAccount)).Include(p => p.PaymentAccountNavigation);
+            return GetQuery().Where(p => ids.Contains(p.IdAccount)).Include(p => p.PaymentAccountNavigation).AsNoTracking();
         }
 
         public List<SelectableSigner> Signers => registryContext.SelectableSigners.ToList();

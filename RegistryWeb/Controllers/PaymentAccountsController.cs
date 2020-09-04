@@ -108,5 +108,49 @@ namespace RegistryWeb.Controllers
             ViewBag.CanEdit = securityService.HasPrivilege(Privileges.ClaimsWrite);
             return View("AccountReports", viewModel);
         }
+
+        public IActionResult CreateClaimMass(DateTime atDate)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
+                return Error("У вас нет прав на выполнение данной операции");
+
+            var ids = GetSessionIds();
+
+            if (!ids.Any())
+                return NotFound();
+
+            var paymentsVM = dataService.GetPaymentsViewModelForMassReports(ids, new PageOptions { SizePage = int.MaxValue });
+            var processingIds = new List<int>();
+            var errorIds = new List<int>();
+
+            foreach (var payment in paymentsVM.Payments)
+            {
+                var hasOpenedClaims = false;
+                if (paymentsVM.ClaimsByAddresses.ContainsKey(payment.IdAccount))
+                {
+                    var lastClaimInfo = paymentsVM.ClaimsByAddresses[payment.IdAccount].First();
+                    if (paymentsVM.ClaimsByAddresses[payment.IdAccount].Any(r => r.IdClaimCurrentState != 6 && !r.EndedForFilter))
+                    {
+                        lastClaimInfo = paymentsVM.ClaimsByAddresses[payment.IdAccount].FirstOrDefault(r => r.IdClaimCurrentState != 6 && !r.EndedForFilter);
+                    }
+                    hasOpenedClaims = lastClaimInfo.IdClaimCurrentState != 6 && !lastClaimInfo.EndedForFilter;
+                }
+
+                if (hasOpenedClaims)
+                {
+                    errorIds.Add(payment.IdAccount);
+                }
+                else
+                {
+                    processingIds.Add(payment.IdAccount);
+                }
+            }
+
+            dataService.CreateClaimMass(processingIds, atDate);
+
+            TempData["ErrorAccountsIds"] = JsonConvert.SerializeObject(errorIds);
+            TempData["ErrorReason"] = "по указанным лицевым счетам уже имеются незавершенные исковые работы";
+            return RedirectToAction("AccountsReports");
+        }
     }
 }
