@@ -35,7 +35,7 @@ namespace RegistryWeb.DataServices
         internal PaymentsVM GetViewModel(
             OrderOptions orderOptions,
             PageOptions pageOptions,
-            PaymentsFilter filterOptions)
+            PaymentsFilter filterOptions, out List<int> filteredIds)
         {
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
             var payments = GetQuery();
@@ -46,6 +46,9 @@ namespace RegistryWeb.DataServices
             var count = query.Count();
             viewModel.PageOptions.Rows = count;
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+
+            filteredIds = query.Select(c => c.IdAccount).ToList();
+
             if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
                 viewModel.PageOptions.CurrentPage = 1;
             query = GetQueryPage(query, viewModel.PageOptions);
@@ -1035,7 +1038,38 @@ namespace RegistryWeb.DataServices
                     .ToDictionary(v => v.IdAccount, v => v.Claims.ToList());
             return result;
         }
-        
+
+        internal PaymentsVM GetPaymentsViewModelForMassReports(List<int> ids, PageOptions pageOptions)
+        {
+            var viewModel = InitializeViewModel(null, pageOptions, null);
+            var payments = GetPaymentsForMassReports(ids);
+            viewModel.PageOptions.TotalRows = payments.Count();
+            var count = payments.Count();
+            viewModel.PageOptions.Rows = count;
+            viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+
+            if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
+                viewModel.PageOptions.CurrentPage = 1;
+            viewModel.Payments = GetQueryPage(payments, viewModel.PageOptions).ToList();
+            viewModel.RentObjects = GetRentObjects(viewModel.Payments);
+            return viewModel;
+        }
+
+        public IQueryable<Payment> GetPaymentsForMassReports(List<int> ids)
+        {
+            return GetQuery().Where(p => ids.Contains(p.IdAccount)).Include(p => p.PaymentAccountNavigation);
+        }
+
         public List<SelectableSigner> Signers => registryContext.SelectableSigners.ToList();
+
+        public Executor CurrentExecutor
+        {
+            get
+            {
+                var userName = securityService.User.UserName.ToLowerInvariant();
+                return registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
+                                e.ExecutorLogin.ToLowerInvariant() == userName);
+            }
+        }
     }
 }

@@ -79,4 +79,19 @@
     $("#accountBksAndTransToLegalModal, #accountCalcDeptModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
+
+    /*      МУЛЬТИМАСТЕР        */
+
+    $(".pagination .page-link").on("click", function (e) {
+        var path = location.pathname;
+        var page = $(this).data("page");
+        location.href = path + "?PageOptions.CurrentPage=" + page;
+        e.preventDefault();
+    });
+
+    $("#exportBtn").on('click', function (e) {
+        url = "/PaymentAccountReports/GetPaymentsExport";
+        downloadFile(url);
+        e.preventDefault();
+    });
 });

@@ -29,6 +29,10 @@ namespace RegistryWeb.Controllers
             this.reportService = reportService;
             this.dataService = dataService;
             this.securityService = securityService;
+
+            nameFilteredIdsDict = "filteredAccountsIdsDict";
+            nameIds = "idAccounts";
+            nameMultimaster = "AccountsReports";
         }
 
         public IActionResult GetRequestToBks(int idAccount, int idSigner, DateTime dateValue)
@@ -37,8 +41,18 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             try
             {
-                var file = reportService.RequestToBks(new List<int> { idAccount }, idSigner, dateValue);
-                return File(file, odtMime, string.Format(@"Запрос в БКС (лицевой счет № {0})", idAccount));
+                List<int> ids = new List<int>();
+                if (idAccount == 0)
+                {
+                    ids = GetSessionIds();
+                }
+                else
+                {
+                    ids.Add(idAccount);
+                }
+
+                var file = reportService.RequestToBks(ids, idSigner, dateValue);
+                return File(file, odtMime, string.Format(@"Запрос в БКС{0}", idAccount == 0 ? "" : string.Format(" (лицевой счет № {0})", idAccount)));
             }
             catch (Exception ex)
             {
@@ -59,6 +73,27 @@ namespace RegistryWeb.Controllers
                 }
                 var file = reportService.CalDept(payment, dateFrom, dateTo, fileFormat);
                return File(file, fileFormat == 1 ? xlsxMime : odsMime, string.Format(@"Расчет суммы задолженности (лицевой счет № {0})", idAccount));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetPaymentsExport()
+        {
+            List<int> ids = GetSessionIds();
+
+            if (!ids.Any())
+                return NotFound();
+
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.ExportPayments(ids);
+                return File(file, odsMime, "Экспорт данных");
             }
             catch (Exception ex)
             {

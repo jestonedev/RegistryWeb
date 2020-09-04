@@ -82,7 +82,7 @@ namespace RegistryWeb.Controllers
                     processingIds.Add(idClaim);
                 }
                 var file = reportService.TransferToLegal(processingIds, idSigner, dateValue);
-                return File(file, docxMime, string.Format(@"Передача в юр. отдел исковой работы № {0}", idClaim));
+                return File(file, docxMime, string.Format(@"Передача в юр. отдел{0}", idClaim == 0 ? "" : string.Format(" (исковой работы № {0})", idClaim)));
             }
             catch (Exception ex)
             {
@@ -128,7 +128,7 @@ namespace RegistryWeb.Controllers
                 }
                 var idAccounts = dataService.GetAccountIds(processingIds);
                 var file = reportService.RequestToBks(idAccounts, idSigner, dateValue);
-                return File(file, odtMime, string.Format(@"Запрос в БКС (иск. работа № {0})", idClaim));
+                return File(file, odtMime, string.Format(@"Запрос в БКС{0}", idClaim == 0 ? "" : string.Format(" (иск. работа № {0})", idClaim)));
             }
             catch (Exception ex)
             {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.Models;
@@ -20,6 +21,9 @@ namespace RegistryWeb.Controllers
         public PaymentAccountsController(PaymentAccountsDataService dataService, SecurityService securityService)
             : base(dataService, securityService)
         {
+            nameFilteredIdsDict = "filteredAccountsIdsDict";
+            nameIds = "idAccounts";
+            nameMultimaster = "AccountsReports";
         }
 
         public IActionResult Index(PaymentsVM viewModel, bool isBack = false)
@@ -42,10 +46,15 @@ namespace RegistryWeb.Controllers
             }
             ViewBag.SecurityService = securityService;
             ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
-            return View(dataService.GetViewModel(
+
+            var vm = dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
-                viewModel.FilterOptions));
+                viewModel.FilterOptions, out List<int> filteredTenancyProcessesIds);
+
+            AddSearchIdsToSession(vm.FilterOptions, filteredTenancyProcessesIds);
+
+            return View(vm);
         }
 
         public IActionResult Details(int idAccount, string returnUrl)
@@ -60,6 +69,44 @@ namespace RegistryWeb.Controllers
             if (!paymentsVM.Payments.Any())
                 return Error("Ошибка формирования списка платежей по лицевому счету");
             return View(paymentsVM);
+        }
+
+        public IActionResult AccountsReports(PageOptions pageOptions)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            var errorIds = new List<int>();
+            if (TempData.ContainsKey("ErrorAccountsIds"))
+            {
+                try
+                {
+                    errorIds = JsonConvert.DeserializeObject<List<int>>(TempData["ErrorAccountsIds"].ToString());
+                }
+                catch
+                {
+                }
+                TempData.Remove("ErrorAccountsIds");
+            }
+            if (TempData.ContainsKey("ErrorReason"))
+            {
+                ViewBag.ErrorReason = TempData["ErrorReason"];
+                TempData.Remove("ErrorReason");
+            }
+            else
+            {
+                ViewBag.ErrorReason = "неизвестно";
+            }
+
+            ViewBag.ErrorPayments = dataService.GetPaymentsForMassReports(errorIds).ToList();
+
+            var ids = GetSessionIds();
+            var viewModel = dataService.GetPaymentsViewModelForMassReports(ids, pageOptions);
+            ViewBag.Count = viewModel.Payments.Count();
+            ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
+            ViewBag.CurrentExecutor = dataService.CurrentExecutor?.ExecutorName;
+            ViewBag.CanEdit = securityService.HasPrivilege(Privileges.ClaimsWrite);
+            return View("AccountReports", viewModel);
         }
     }
 }
