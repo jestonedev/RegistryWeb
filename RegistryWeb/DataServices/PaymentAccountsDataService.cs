@@ -212,7 +212,15 @@ namespace RegistryWeb.DataServices
                     AmountPenalties = payment.BalanceOutputPenalties,
                     AmountDgi = payment.BalanceOutputDgi,
                     AmountPadun = payment.BalanceOutputPadun,
-                    AmountPkk = payment.BalanceOutputPkk
+                    AmountPkk = payment.BalanceOutputPkk,
+                    ClaimStates = new List<ClaimState> {
+                        new ClaimState {
+                            IdStateType = registryContext.ClaimStateTypes.Where(r => r.IsStartStateType).First().IdStateType,
+                            BksRequester = CurrentExecutor?.ExecutorName,
+                            DateStartState = DateTime.Now.Date,
+                            Executor = CurrentExecutor?.ExecutorName
+                        }
+                    }
                 };
                 registryContext.Claims.Add(claim);
                 registryContext.SaveChanges();
