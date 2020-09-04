@@ -13,6 +13,7 @@ namespace RegistryWeb.Controllers
     public class RegistryObjectsReportsController: RegistryBaseController
     {
         private readonly RegistryObjectsReportService reportService;
+
         private readonly RegistryObjectsDataService dataService;
         private readonly SecurityService securityService;
         private const string odtMime = "application/vnd.oasis.opendocument.text";
@@ -27,7 +28,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Index()
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
 
             var viewModel = dataService.GetViewModel();
