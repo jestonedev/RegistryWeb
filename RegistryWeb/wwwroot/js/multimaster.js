@@ -26,6 +26,7 @@
             case "OwnerProcesses": nameObject = "Процессы собственности"; break;
             case "TenancyProcesses": nameObject = "Процессы найма"; break;
             case "Claims": nameObject = "Претензионно-исковые работы"; break;
+            case "PaymentAccounts": nameObject = "Лицевые счета"; break;
         }
         if (nameObject === null) {
             $(".info").html("Мультимастер для данного реестра отсутствует");

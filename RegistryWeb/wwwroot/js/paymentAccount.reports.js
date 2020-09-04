@@ -79,4 +79,38 @@
     $("#accountBksAndTransToLegalModal, #accountCalcDeptModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
+
+    /*      МУЛЬТИМАСТЕР        */
+
+    $(".pagination .page-link").on("click", function (e) {
+        var path = location.pathname;
+        var page = $(this).data("page");
+        location.href = path + "?PageOptions.CurrentPage=" + page;
+        e.preventDefault();
+    });
+
+    $("#exportBtn").on('click', function (e) {
+        url = "/PaymentAccountReports/GetPaymentsExport";
+        downloadFile(url);
+        e.preventDefault();
+    });
+
+    $("#addClaim").on('click', function (e) {
+        var modal = $("#createClaimModal");
+        modal.find("input, textarea, select").prop("disabled", false);
+        modal.modal("show");
+        e.preventDefault();
+    });
+
+    $("#createClaimModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("#createClaimForm");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return false;
+        }
+
+        form.submit();
+    });
 });

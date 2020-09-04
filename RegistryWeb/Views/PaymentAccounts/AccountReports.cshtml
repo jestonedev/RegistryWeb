@@ -1,23 +1,23 @@
 ﻿@using RegistryWeb.ViewModel
 @using RegistryWeb.Models.Entities
 @using RegistryWeb.Extensions;
-@model ClaimsVM;
+@model PaymentsVM;
 @{
-    Context.Session.Set("Controller", "Claims");
-    Context.Session.Set("Action", "ClaimsReports");
-    ViewData["Title"] = "Мастер массовых операций над исковыми работами";
+    Context.Session.Set("Controller", "PaymentAccounts");
+    Context.Session.Set("Action", "AccountReports");
+    ViewData["Title"] = "Мастер массовых операций над лицевыми счетами";
     var text = "Количество записей: " + Model.PageOptions.TotalRows;
     var canEdit = ViewBag.CanEdit;
-    var errorClaims = (List<Claim>)ViewData["ErrorClaims"];
+    var errorPayments = (List<Payment>)ViewData["ErrorPayments"];
 }
 
 @section Scripts
-    {
-    <script src="~/js/claim.reports.js" asp-append-version="true"></script>
+{
+    <script src="~/js/paymentAccount.reports.js" asp-append-version="true"></script>
 }
 
 @section validation
-    {
+{
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
 }
@@ -27,12 +27,12 @@
 <h1>@ViewData["Title"]</h1>
 <h4 class="mb-3">@text</h4>
 
-@if (errorClaims != null && errorClaims.Any())
+@if (errorPayments != null && errorPayments.Any())
 {
     <div class="alert alert-danger text-center">
         <p class="mb-0">
-            Во время массовой операции были пропущены исковые работы со следующими реестровыми номерами:
-            @(errorClaims.Select(v => v.IdClaim.ToString()).Aggregate((acc, v) => acc + ", " + v))
+            Во время массовой операции были пропущены лицевые счета со следующими номерами:
+            @(errorPayments.Select(v => v.PaymentAccountNavigation.Account.ToString()).Aggregate((acc, v) => acc + ", " + v))
         </p>
         <p class="mb-0">Причина: @ViewBag.ErrorReason</p>
     </div>
@@ -40,10 +40,10 @@
 
 <div class="form-row">
     <div class="form-group col-md-1 col-lg-3">
-        <a class="form-control btn btn-primary" asp-controller="Claims" asp-action="Index" asp-route-isBack="true">Назад</a>
+        <a class="form-control btn btn-primary" asp-controller="PaymentAccounts" asp-action="Index" asp-route-isBack="true">Назад</a>
     </div>
     <div class="form-group col-md-2 col-lg-3">
-        <a class="form-control btn btn-primary" asp-controller="Claims" asp-action="ClearSessionIds">Очистить</a>
+        <a class="form-control btn btn-primary" asp-controller="PaymentAccounts" asp-action="ClearSessionIds">Очистить</a>
     </div>
     <div class="form-group col-md-3 col-lg-3">
         <div class="dropdown">
@@ -51,9 +51,8 @@
                 <span class="oi oi-document"></span>  Отчеты
             </button>
             <div class="dropdown-menu" aria-labelledby="reportButton">
-                <button class="dropdown-item rr-report-request-to-bsk" @(Model.Claims.Any() ? "" : "disabled") href="#" data-id-claim="0">Запрос в БКС</button>
-                <button class="dropdown-item rr-report-memo-to-lawyers" @(Model.Claims.Any() ? "" : "disabled") href="#" data-id-claim="0">СЗ в юридический отдел</button>
-                <button class="dropdown-item" id="exportBtn" @(Model.Claims.Any() ? "" : "disabled") href="#">Экспорт</button>
+                <button class="dropdown-item rr-report-request-to-bsk" @(Model.Payments.Any() ? "" : "disabled") href="#" data-id-account="0">Запрос в БКС</button>
+                <button class="dropdown-item" id="exportBtn" @(Model.Payments.Any() ? "" : "disabled") href="#">Экспорт</button>
             </div>
         </div>
     </div>
@@ -63,8 +62,7 @@
                 <span class="oi oi-pencil"></span>  Операции
             </button>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="operationsButton">
-                <button class="dropdown-item" @(canEdit && Model.Claims.Any() ? "" : "disabled") href="#" id="addClaimState">Создать этап претензионно-исковой работы</button>
-                <button class="dropdown-item" @(canEdit && Model.Claims.Any() ? "" : "disabled") href="#" id="setDeptPeriod">Установить период предъявления</button>
+                <button class="dropdown-item" @(canEdit && Model.Payments.Any() ? "" : "disabled") href="#" id="addClaim">Создать претензионно-исковую работу</button>
             </div>
         </div>
     </div>
@@ -79,12 +77,12 @@
         </tr>
     </thead>
     <tbody>
-        @if (Model.Claims.Any())
+        @if (Model.Payments.Any())
         {
-            foreach (var item in Model.Claims)
+            foreach (var item in Model.Payments)
             {
                 <tr>
-                    <td>@item.IdClaim</td>
+                    <td>@item.PaymentAccountNavigation.Account</td>
                     <td>
                         @if (Model.RentObjects.ContainsKey(item.IdAccount))
                         {
@@ -92,21 +90,21 @@
                                 <b>По жилищному фонду: </b><br />
                                 @foreach (var address in Model.RentObjects[item.IdAccount])
                                 {
-                                    @await Component.InvokeAsync("ClaimsAddressComponent", new { address = address, idClaim = item.IdClaim })
+                                    @await Component.InvokeAsync("PaymentsAddressComponent", new { address = address, idAccount = item.IdAccount })
                                 }
                             </div>
                         }
                         <div>
-                            <b>По БКС: </b><br />@item.IdAccountNavigation.RawAddress<br />
-                            @item.IdAccountNavigation.Crn
+                            <b>По БКС: </b><br />@item.PaymentAccountNavigation.RawAddress<br />
+                            @item.PaymentAccountNavigation.Crn
                         </div>
                     </td>
                     <td>
                         <div class="btn-group" role="group" aria-label="Панель доступа">
                             <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                               asp-action="Details" asp-controller="Claims" asp-route-idClaim="@item.IdClaim"></a>
+                               asp-action="Details" asp-controller="PaymentAccounts" asp-route-idAccount="@item.IdAccount"></a>
                             <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                               asp-action="RemoveSessionId" asp-controller="Claims" asp-route-id="@item.IdClaim"></a>
+                               asp-action="RemoveSessionId" asp-controller="PaymentAccounts" asp-route-id="@item.IdAccount"></a>
                         </div>
                     </td>
                 </tr>

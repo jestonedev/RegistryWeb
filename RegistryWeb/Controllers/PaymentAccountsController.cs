@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.Models;
@@ -20,6 +21,9 @@ namespace RegistryWeb.Controllers
         public PaymentAccountsController(PaymentAccountsDataService dataService, SecurityService securityService)
             : base(dataService, securityService)
         {
+            nameFilteredIdsDict = "filteredAccountsIdsDict";
+            nameIds = "idAccounts";
+            nameMultimaster = "AccountsReports";
         }
 
         public IActionResult Index(PaymentsVM viewModel, bool isBack = false)
@@ -42,10 +46,15 @@ namespace RegistryWeb.Controllers
             }
             ViewBag.SecurityService = securityService;
             ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
-            return View(dataService.GetViewModel(
+
+            var vm = dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
-                viewModel.FilterOptions));
+                viewModel.FilterOptions, out List<int> filteredTenancyProcessesIds);
+
+            AddSearchIdsToSession(vm.FilterOptions, filteredTenancyProcessesIds);
+
+            return View(vm);
         }
 
         public IActionResult Details(int idAccount, string returnUrl)
@@ -60,6 +69,96 @@ namespace RegistryWeb.Controllers
             if (!paymentsVM.Payments.Any())
                 return Error("Ошибка формирования списка платежей по лицевому счету");
             return View(paymentsVM);
+        }
+
+        public IActionResult AccountsReports(PageOptions pageOptions)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            var errorIds = new List<int>();
+            if (TempData.ContainsKey("ErrorAccountsIds"))
+            {
+                try
+                {
+                    errorIds = JsonConvert.DeserializeObject<List<int>>(TempData["ErrorAccountsIds"].ToString());
+                }
+                catch
+                {
+                }
+                TempData.Remove("ErrorAccountsIds");
+            }
+            if (TempData.ContainsKey("ErrorReason"))
+            {
+                ViewBag.ErrorReason = TempData["ErrorReason"];
+                TempData.Remove("ErrorReason");
+            }
+            else
+            {
+                ViewBag.ErrorReason = "неизвестно";
+            }
+
+            ViewBag.ErrorPayments = dataService.GetPaymentsForMassReports(errorIds).ToList();
+
+            var ids = GetSessionIds();
+            var viewModel = dataService.GetPaymentsViewModelForMassReports(ids, pageOptions);
+            ViewBag.Count = viewModel.Payments.Count();
+            ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
+            ViewBag.CurrentExecutor = dataService.CurrentExecutor?.ExecutorName;
+            ViewBag.CanEdit = securityService.HasPrivilege(Privileges.ClaimsWrite);
+            return View("AccountReports", viewModel);
+        }
+
+        public IActionResult CreateClaimMass(DateTime atDate)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
+                return Error("У вас нет прав на выполнение данной операции");
+
+            var ids = GetSessionIds();
+
+            if (!ids.Any())
+                return NotFound();
+
+            var paymentsVM = dataService.GetPaymentsViewModelForMassReports(ids, new PageOptions { SizePage = int.MaxValue });
+            var processingIds = new List<int>();
+            var errorIds = new List<int>();
+            var accountsIdsAssoc = dataService.GetAccountIdsAssocs(paymentsVM.Payments);
+            foreach (var payment in paymentsVM.Payments)
+            {
+                var hasOpenedClaims = false;
+                if (paymentsVM.ClaimsByAddresses.ContainsKey(payment.IdAccount))
+                {
+                    var lastClaimInfo = paymentsVM.ClaimsByAddresses[payment.IdAccount].First();
+                    if (paymentsVM.ClaimsByAddresses[payment.IdAccount].Any(r => r.IdClaimCurrentState != 6 && !r.EndedForFilter))
+                    {
+                        lastClaimInfo = paymentsVM.ClaimsByAddresses[payment.IdAccount].FirstOrDefault(r => r.IdClaimCurrentState != 6 && !r.EndedForFilter);
+                    }
+                    hasOpenedClaims = lastClaimInfo.IdClaimCurrentState != 6 && !lastClaimInfo.EndedForFilter;
+                }
+                // Если в мастере есть лицевые счета на одно и то же помещение, то необходимо создать только одну искову работу:
+                // на последний по идентификатор лицевой счет
+                var accountsAssoc = accountsIdsAssoc.Where(r => r.IdAccountFiltered == payment.IdAccount);
+                var paymentsDuplicates = paymentsVM.Payments.Where(r => accountsAssoc.Select(a => a.IdAccountActual).Contains(r.IdAccount));
+                if (paymentsDuplicates.Max(r => r.IdAccount) > payment.IdAccount)
+                {
+                    continue;
+                }
+
+                if (hasOpenedClaims)
+                {
+                    errorIds.Add(payment.IdAccount);
+                }
+                else
+                {
+                    processingIds.Add(payment.IdAccount);
+                }
+            }
+
+            dataService.CreateClaimMass(processingIds, atDate);
+
+            TempData["ErrorAccountsIds"] = JsonConvert.SerializeObject(errorIds);
+            TempData["ErrorReason"] = "по указанным лицевым счетам уже имеются незавершенные исковые работы";
+            return RedirectToAction("AccountsReports");
         }
     }
 }

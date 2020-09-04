@@ -56,5 +56,57 @@ namespace RegistryWeb.ReportServices
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
+
+        internal byte[] ExportPayments(List<int> idAccounts)
+        {
+            string columnHeaders;
+            string columnPatterns;
+
+            columnHeaders = "[{\"columnHeader\":\"Состояние на дату\"},{\"columnHeader\":\"Дата последнего начисления\"},"+
+                "{\"columnHeader\":\"СРН\"},{\"columnHeader\":\"Адрес по БКС\"},{\"columnHeader\":\"Адрес в реестре ЖФ\"},"+
+                "{\"columnHeader\":\"Лицевой счет\"},{\"columnHeader\":\"Наниматель\"},"+
+                "{\"columnHeader\":\"Общая площадь\"},{\"columnHeader\":\"Жилая площадь\"},{\"columnHeader\":\"Прописано\"},"+
+                "{\"columnHeader\":\"Сальдо вх.\"},{\"columnHeader\":\"Сальдо вх. найм\"},{\"columnHeader\":\"Пени (вх.)\"},"+
+                "{\"columnHeader\":\"Сальдо вх. ДГИ\"},{\"columnHeader\":\"Сальдо вх. Падун\"},{\"columnHeader\":\"Сальдо вх. ПКК\"},"+
+                "{\"columnHeader\":\"Начисление итого\"},{\"columnHeader\":\"Начисление найм\"},{\"columnHeader\":\"Начисление пени\"},"+
+                "{\"columnHeader\":\"Начисление ДГИ\"},{\"columnHeader\":\"Начисление Падун\"},{\"columnHeader\":\"Начисление ПКК\"},"+
+                "{\"columnHeader\":\"Перенос сальдо\"},{\"columnHeader\":\"Перерасчет найм\"},{\"columnHeader\":\"Перерасчет пени\"},"+
+                "{\"columnHeader\":\"Перерасчет ДГИ\"},{\"columnHeader\":\"Перерасчет Падун\"},{\"columnHeader\":\"Перерасчет ПКК\"},"+
+                "{\"columnHeader\":\"Оплата найм\"},{\"columnHeader\":\"Оплата пени\"},{\"columnHeader\":\"Оплата ДГИ\"},"+
+                "{\"columnHeader\":\"Оплата Падун\"},{\"columnHeader\":\"Оплата ПКК\"},{\"columnHeader\":\"Сальдо исх.\"},"+
+                "{\"columnHeader\":\"Сальдо исх. найм\"},{\"columnHeader\":\"Пени исх.\"},{\"columnHeader\":\"Сальдо исх. ДГИ\"},"+
+                "{\"columnHeader\":\"Сальдо исх. Падун\"},{\"columnHeader\":\"Сальдо исх. ПКК\"}]";
+            columnPatterns = "[{\"columnPattern\":\"$column0$\"},{\"columnPattern\":\"$column1$\"},{\"columnPattern\":\"$column2$\"},"+
+                "{\"columnPattern\":\"$column3$\"},{\"columnPattern\":\"$column4$\"},{\"columnPattern\":\"$column5$\"},{\"columnPattern\":\"$column6$\"},"+
+                "{\"columnPattern\":\"$column7$\"},{\"columnPattern\":\"$column8$\"},{\"columnPattern\":\"$column9$\"},{\"columnPattern\":\"$column10$\"},"+
+                "{\"columnPattern\":\"$column11$\"},{\"columnPattern\":\"$column12$\"},{\"columnPattern\":\"$column13$\"},{\"columnPattern\":\"$column14$\"},"+
+                "{\"columnPattern\":\"$column15$\"},{\"columnPattern\":\"$column16$\"},{\"columnPattern\":\"$column17$\"},{\"columnPattern\":\"$column18$\"},"+
+                "{\"columnPattern\":\"$column19$\"},{\"columnPattern\":\"$column20$\"},{\"columnPattern\":\"$column21$\"},{\"columnPattern\":\"$column22$\"},"+
+                "{\"columnPattern\":\"$column23$\"},{\"columnPattern\":\"$column24$\"},{\"columnPattern\":\"$column25$\"},{\"columnPattern\":\"$column26$\"},"+
+                "{\"columnPattern\":\"$column27$\"},{\"columnPattern\":\"$column28$\"},{\"columnPattern\":\"$column29$\"},{\"columnPattern\":\"$column30$\"},"+
+                "{\"columnPattern\":\"$column31$\"},{\"columnPattern\":\"$column32$\"},{\"columnPattern\":\"$column33$\"},{\"columnPattern\":\"$column34$\"},"+
+                "{\"columnPattern\":\"$column35$\"},{\"columnPattern\":\"$column36$\"},{\"columnPattern\":\"$column37$\"},{\"columnPattern\":\"$column38$\"}]";
+
+            var fileName = Path.GetTempFileName();
+            using (var sw = new StreamWriter(fileName))
+                sw.Write(string.Format("(id_account IN ({0}))", AccountIdsToString(idAccounts)));
+
+            var arguments = new Dictionary<string, object>
+            {
+                { "filterTmpFile", fileName },
+                { "type", "5"},
+                { "executor", securityService.User.UserName },
+                { "columnHeaders", columnHeaders },
+                { "columnPatterns", columnPatterns },
+                { "orderColumn", "id_account" }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\export");
+            return DownloadFile(fileNameReport);
+        }
+
+        private string AccountIdsToString(List<int> idAccounts)
+        {
+            return idAccounts.Select(r => r.ToString()).Aggregate((v, acc) => v + "," + acc);
+        }
     }
 }
