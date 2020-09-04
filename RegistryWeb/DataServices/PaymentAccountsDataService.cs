@@ -911,7 +911,7 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
-        private List<AccountIdsAssoc> GetAccountIdsAssocs(IEnumerable<Payment> payments)
+        public List<AccountIdsAssoc> GetAccountIdsAssocs(IEnumerable<Payment> payments)
         {
             var ids = payments.Select(r => r.IdAccount);
             var filteredObjects = (from row in

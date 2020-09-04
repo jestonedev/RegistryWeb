@@ -122,7 +122,7 @@ namespace RegistryWeb.Controllers
             var paymentsVM = dataService.GetPaymentsViewModelForMassReports(ids, new PageOptions { SizePage = int.MaxValue });
             var processingIds = new List<int>();
             var errorIds = new List<int>();
-
+            var accountsIdsAssoc = dataService.GetAccountIdsAssocs(paymentsVM.Payments);
             foreach (var payment in paymentsVM.Payments)
             {
                 var hasOpenedClaims = false;
@@ -134,6 +134,14 @@ namespace RegistryWeb.Controllers
                         lastClaimInfo = paymentsVM.ClaimsByAddresses[payment.IdAccount].FirstOrDefault(r => r.IdClaimCurrentState != 6 && !r.EndedForFilter);
                     }
                     hasOpenedClaims = lastClaimInfo.IdClaimCurrentState != 6 && !lastClaimInfo.EndedForFilter;
+                }
+                // Если в мастере есть лицевые счета на одно и то же помещение, то необходимо создать только одну искову работу:
+                // на последний по идентификатор лицевой счет
+                var accountsAssoc = accountsIdsAssoc.Where(r => r.IdAccountFiltered == payment.IdAccount);
+                var paymentsDuplicates = paymentsVM.Payments.Where(r => accountsAssoc.Select(a => a.IdAccountActual).Contains(r.IdAccount));
+                if (paymentsDuplicates.Max(r => r.IdAccount) > payment.IdAccount)
+                {
+                    continue;
                 }
 
                 if (hasOpenedClaims)
