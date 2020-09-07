@@ -62,7 +62,7 @@
                             <label for="Statistic__Regions">Выберете жилой район</label>
                             <select data-actions-box="true" class="selectpicker form-control" title="Жилой район" name="Statistic.Regions"
                                     data-val="true" data-val-required="Не указан жилой район" id="Statistic__Regions" asp-items="@Model.RegionsList"></select>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic__Regions" data-valmsg-replace="true"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.Regions" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="form-row">
@@ -70,7 +70,7 @@
                             <label for="Statistic__Streets">Выберете улицу</label>
                             <select data-actions-box="true" data-live-search="true" class="selectpicker form-control" title="Улица" name="Statistic.Streets"
                                     data-val="true" data-val-required="Не указана улица" id="Statistic__Streets" asp-items="@Model.StreetsList"></select>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic__Streets" data-valmsg-replace="true"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.Streets" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="form-row">
@@ -78,13 +78,13 @@
                             <label for="Statistic__Houses">Выберете номер дома</label>
                             <input type="text" data-actions-box="true" class="form-control" title="Номер дома" name="Statistic.Houses"
                                    data-val="true" data-val-required="Не указан номер дома" id="Statistic__Houses" />
-                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic__Houses" data-valmsg-replace="true"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.Houses" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-6">
                             <label for="Statistic__PremisesNum">Выберете номер помещения</label>
                             <input type="text" data-actions-box="true" class="form-control" title="Номер помещения" name="Statistic.PremisesNum"
                                    data-val="true" data-val-required="Не указан номер помещения" id="Statistic__PremisesNum" />
-                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic__PremisesNum" data-valmsg-replace="true"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.PremisesNum" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="form-row">
@@ -92,13 +92,13 @@
                             <label for="Statistic__RentTypes">Выберете тип найма</label>
                             <select data-actions-box="true" class="selectpicker form-control" title="Тип найма" name="Statistic.RentTypes"
                                     data-val="true" data-val-required="Не указан тип найма" id="Statistic__RentTypes" asp-items="@Model.RentTypesList"></select>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic__RentTypes" data-valmsg-replace="true"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.RentTypes" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-6">
                             <label for="Statistic__TenancyReasonTypes">Выберете тип основания</label>
                             <select data-actions-box="true" class="selectpicker form-control" title="Тип основания" name="Statistic.TenancyReasonTypes"
                                     data-val="true" data-val-required="Не указан тип основания" id="Statistic__TenancyReasonTypes" asp-items="@Model.TenancyReasonTypesList"></select>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic__TenancyReasonTypes" data-valmsg-replace="true"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.TenancyReasonTypes" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -110,7 +110,7 @@
                             <div class="col-5">
                                 <input type="date" data-actions-box="true" class="form-control" title="Начало регистрации" name="Statistic.DateRegistrationFrom"
                                        data-val="true" data-val-required="Не указано начало регистрации" id="Statistic__DateRegistrationFrom" />
-                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic__DateRegistrationFrom" data-valmsg-replace="true"></span>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.DateRegistrationFrom" data-valmsg-replace="true"></span>
                             </div>
                             <div class="col-1">
                                 <label for="Statistic__DateRegistrationTo">По</label>
@@ -118,7 +118,7 @@
                             <div class="col-5">
                                 <input type="date" data-actions-box="true" class="form-control" title="Окончание регистрации" name="Statistic.DateRegistrationTo"
                                        data-val="true" data-val-required="Не указано окончание регистрации" id="Statistic__DateRegistrationTo" />
-                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic__DateRegistrationTo" data-valmsg-replace="true"></span>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.DateRegistrationTo" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                     </div>
@@ -131,7 +131,7 @@
                             <div class="col-5">
                                 <input type="date" data-actions-box="true" class="form-control" title="Начало действия договора с" name="Statistic.BeginDateFrom"
                                        data-val="true" data-val-required="Не указано начало действия договора с" id="Statistic__BeginDateFrom" />
-                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic__BeginDateFrom" data-valmsg-replace="true"></span>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.BeginDateFrom" data-valmsg-replace="true"></span>
                             </div>
                             <div class="col-1">
                                 <label for="Statistic__BeginDateTo">По</label>
@@ -139,7 +139,7 @@
                             <div class="col-5">
                                 <input type="date" data-actions-box="true" class="form-control" title="Начало действия договора по" name="Statistic.BeginDateTo"
                                        data-val="true" data-val-required="Не указано начало действия договора по" id="Statistic__BeginDateTo" />
-                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic__BeginDateTo" data-valmsg-replace="true"></span>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.BeginDateTo" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                     </div>
@@ -152,7 +152,7 @@
                             <div class="col-5">
                                 <input type="date" data-actions-box="true" class="form-control" title="Окончание действия договора с" name="Statistic.EndDateFrom"
                                        data-val="true" data-val-required="Не указано окончание действия договора с" id="Statistic__EndDateFrom" />
-                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic__EndDateFrom" data-valmsg-replace="true"></span>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.EndDateFrom" data-valmsg-replace="true"></span>
                             </div>
                             <div class="col-1">
                                 <label for="Statistic__EndDateTo">По</label>
@@ -160,7 +160,7 @@
                             <div class="col-5">
                                 <input type="date" data-actions-box="true" class="form-control" title="Окончание действия договора по" name="Statistic.EndDateTo"
                                        data-val="true" data-val-required="Не указано окончание действия договора по" id="Statistic__EndDateTo" />
-                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic__EndDateTo" data-valmsg-replace="true"></span>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.EndDateTo" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                     </div>
@@ -190,61 +190,54 @@
                             <label for="TenancyOrder__Preparer">Подготовил</label>
                             <select data-actions-box="true" class="selectpicker form-control" title="Подготовил" name="TenancyOrder.Preparer"
                                     data-val="true" data-val-required="Не указан тот кто подготовил" id="TenancyOrder__Preparer" asp-items="@Model.PreparersList"></select>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__Preparer" data-valmsg-replace="true"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.Preparer" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-6">
                             <label for="TenancyOrder__Lawyer">Юрист</label>
                             <select data-actions-box="true" class="selectpicker form-control" title="Юрист" name="TenancyOrder.Lawyer"
                                     data-val="true" data-val-required="Не указан юрист" id="TenancyOrder__Lawyer" asp-items="@Model.LawyersList"></select>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__Lawyer" data-valmsg-replace="true"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.Lawyer" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-12">
                             <label for="TenancyOrder__Streets">Улица</label>
                             <select data-actions-box="true" data-live-search="true" class="selectpicker form-control" title="Улица" name="TenancyOrder.Streets"
-                                    data-val="true" data-val-required="Не указана улица" id="TenancyOrder__Streets" asp-items="@Model.StreetsList"></select>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__Streets" data-valmsg-replace="true"></span>
+                                    id="TenancyOrder__Streets" asp-items="@Model.StreetsList"></select>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-4">
                             <label for="TenancyOrder__Houses">Номер дома</label>
                             <input type="text" data-actions-box="true" class="form-control" title="Номер дома" name="TenancyOrder.Houses"
-                                   data-val="true" data-val-required="Не указан номер дома" id="TenancyOrder__Houses" />
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__Houses" data-valmsg-replace="true"></span>
+                                   id="TenancyOrder__Houses" />
                         </div>
                         <div class="form-group col-4">
                             <label for="TenancyOrder__PremisesNum">Номер помещения</label>
                             <input type="text" data-actions-box="true" class="form-control" title="Номер помещения" name="TenancyOrder.PremisesNum"
-                                   data-val="true" data-val-required="Не указан номер помещения" id="TenancyOrder__PremisesNum" />
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__PremisesNum" data-valmsg-replace="true"></span>
+                                   id="TenancyOrder__PremisesNum" />
                         </div>
                         <div class="form-group col-4">
                             <label for="TenancyOrder__SubPremisesNum">Номер комнаты</label>
                             <input type="text" data-actions-box="true" class="form-control" title="Номер комнаты" name="TenancyOrder.SubPremisesNum"
-                                   data-val="true" data-val-required="Не указан номер комнаты" id="TenancyOrder__SubPremisesNum" />
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__SubPremisesNum" data-valmsg-replace="true"></span>
+                                   id="TenancyOrder__SubPremisesNum" />
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="col-4">
                             <label for="TenancyOrder__OrderDateFrom">Распоряжение от</label>
                             <input type="date" data-actions-box="true" class="form-control" title="Распоряжение от" name="TenancyOrder.OrderDateFrom"
-                                   data-val="true" data-val-required="Дата не указана" id="TenancyOrder__OrderDateFrom" />
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__OrderDateFrom" data-valmsg-replace="true"></span>
+                                   id="TenancyOrder__OrderDateFrom" />
                         </div>
                         <div class="col-4">
                             <label for="TenancyOrder__RegistrationDateFrom">Регистрация <b>с</b></label>
                             <input type="date" data-actions-box="true" class="form-control" title="Регистрация с" name="TenancyOrder.RegistrationDateFrom"
-                                   data-val="true" data-val-required="Дата не указана" id="TenancyOrder__RegistrationDateFrom" />
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__RegistrationDateFrom" data-valmsg-replace="true"></span>
+                                   id="TenancyOrder__RegistrationDateFrom" />
                         </div>
                         <div class="col-4">
                             <label for="TenancyOrder__RegistrationDateTo">Регистрация <b>по</b></label>
                             <input type="date" data-actions-box="true" class="form-control" title="Регистрация по" name="TenancyOrder.RegistrationDateTo"
-                                   data-val="true" data-val-required="Дата не указана" id="TenancyOrder__RegistrationDateTo" />
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__RegistrationDateTo" data-valmsg-replace="true"></span>
+                                   id="TenancyOrder__RegistrationDateTo" />
                         </div>
                     </div>
                     <div class="form-row">
@@ -252,7 +245,7 @@
                             <label for="TenancyOrder__RentTypes">Тип найма</label>
                             <select data-actions-box="true" class="selectpicker form-control" title="Тип найма" name="TenancyOrder.RentTypes"
                                     data-val="true" data-val-required="Не указан тип найма" id="TenancyOrder__RentTypes" asp-items="@Model.RentTypesList"></select>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__RentTypes" data-valmsg-replace="true"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.RentTypes" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-7">
                             <label for="TenancyOrder__OrderTypes">Вид распоряжения</label>
@@ -265,7 +258,7 @@
                                 <option value="4">По решению суда</option>
                                 <option value="5">Переселение 2013-2017</option>
                             </select>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__OrderTypes" data-valmsg-replace="true"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.OrderTypes" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <fieldset class="r-scheduler-border" data-selected-id="3">
@@ -278,13 +271,13 @@
                                     </div>
                                     <input type="text" data-actions-box="true" class="form-control" title="Номер служебной записки" name="TenancyOrder.OrphansNum"
                                            data-val="true" data-val-required="Не указан номер служебной записки" id="TenancyOrder__OrphansNum" />
-                                    <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__OrphansNum" data-valmsg-replace="true"></span>
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.OrphansNum" data-valmsg-replace="true"></span>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <input type="date" data-actions-box="true" class="form-control" title="Дата служебной записки" name="TenancyOrder.OrphansDate"
                                        data-val="true" data-val-required="Дата не указана" id="TenancyOrder__OrphansDate" />
-                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__OrphansDate" data-valmsg-replace="true"></span>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.OrphansDate" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                     </fieldset>
@@ -298,13 +291,13 @@
                                     </div>
                                     <input type="text" data-actions-box="true" class="form-control" title="Номер гражданского дела" name="TenancyOrder.CourtNum"
                                            data-val="true" data-val-required="Не указан номер гражданского дела" id="TenancyOrder__CourtNum" />
-                                    <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__CourtNum" data-valmsg-replace="true"></span>
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtNum" data-valmsg-replace="true"></span>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <input type="date" data-actions-box="true" class="form-control" title="Дата гражданского дела" name="TenancyOrder.CourtDate"
                                        data-val="true" data-val-required="Дата не указана" id="TenancyOrder__CourtDate" />
-                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__CourtDate" data-valmsg-replace="true"></span>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtDate" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                         <div class="form-row">
@@ -316,7 +309,7 @@
                                     <option value="2">Падунского районного суда Иркутской области</option>
                                     <option value="3">Иркутского областного суда</option>
                                 </select>
-                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__CourtType" data-valmsg-replace="true"></span>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtType" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                     </fieldset>
@@ -330,13 +323,13 @@
                                     </div>
                                     <input type="text" data-actions-box="true" class="form-control" title="Номер распоряжения" name="TenancyOrder.ResettleNum"
                                            data-val="true" data-val-required="Не указан номер распоряжения" id="TenancyOrder__ResettleNum" />
-                                    <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__ResettleNum" data-valmsg-replace="true"></span>
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.ResettleNum" data-valmsg-replace="true"></span>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <input type="date" data-actions-box="true" class="form-control" title="Дата распоряжения" name="TenancyOrder.ResettleDate"
                                        data-val="true" data-val-required="Дата не указана" id="TenancyOrder__ResettleDate" />
-                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__ResettleDate" data-valmsg-replace="true"></span>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.ResettleDate" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                         <div class="form-row">
@@ -348,7 +341,7 @@
                                     <option value="2">Перераспределение</option>
                                     <option value="3">Основное распоряжение</option>
                                 </select>
-                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder__ResettleType" data-valmsg-replace="true"></span>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.ResettleType" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                     </fieldset>
@@ -378,7 +371,7 @@
                             <label for="TenancyNotifiesList__DateFrom">Период формирования с</label>
                             <input type="date" data-actions-box="true" class="form-control" title="Период формирования с" name="TenancyNotifiesList.DateFrom"
                                    data-val="true" data-val-required="Не указана дата начала периода" id="TenancyNotifiesList__DateFrom" />
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyNotifiesList__DateFrom" data-valmsg-replace="true"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyNotifiesList.DateFrom" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="form-row">
@@ -386,7 +379,7 @@
                             <label for="TenancyNotifiesList__DateTo">по</label>
                             <input type="date" data-actions-box="true" class="form-control" title="Период формирования по" name="TenancyNotifiesList.DateTo"
                                    data-val="true" data-val-required="Не указана дата окончания периода" id="TenancyNotifiesList__DateTo" />
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyNotifiesList__DateTo" data-valmsg-replace="true"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyNotifiesList.DateTo" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                 </div>

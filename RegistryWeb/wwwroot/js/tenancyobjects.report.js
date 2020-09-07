@@ -69,6 +69,12 @@
 
     $("#tenancyOrderModal .rr-report-submit").on("click", function (e) {
         e.preventDefault();
+        var form = $("#tenancyOrderForm");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return false;
+        }
         var idPreparer = $("#tenancyOrderModal").find("[name='TenancyOrder.Preparer']").val();
         var idLawyer = $("#tenancyOrderModal").find("[name='TenancyOrder.Lawyer']").val();
         var idStreet = $("#tenancyOrderModal").find("[name='TenancyOrder.Streets']").val();
@@ -101,6 +107,12 @@
 
     $("#tenancyNotifiesListModal .rr-report-submit").on("click", function (e) {
         e.preventDefault();
+        var form = $("#tenancyNotifiesListForm");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return false;
+        }
         var dateFrom = $("#tenancyNotifiesListModal").find("[name='TenancyNotifiesList.DateFrom']").val();
         var dateTo = $("#tenancyNotifiesListModal").find("[name='TenancyNotifiesList.DateTo']").val();
         var url = "/TenancyObjectsReports/GetTenancyNotifiesList?dateFrom=" + dateFrom + "&dateTo=" + dateTo;
