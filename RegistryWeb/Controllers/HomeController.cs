@@ -15,5 +15,11 @@ namespace RegistryWeb.Controllers
         {
             return View();
         }
+
+        [AllowAnonymous]
+        public IActionResult UnsupportedBrowser()
+        {
+            return View("UnsupportedBrowser");
+        }
     }
 }

@@ -4,6 +4,9 @@
 @using RegistryWeb.ViewModel;
 @model RegistryWeb.ViewModel.PaymentsVM;
 @{
+    var ids = Context.Session.Get<List<int>>("idAccounts") ?? new List<int>();
+    var check = "";
+
     Context.Session.Set("Controller", "PaymentAccounts");
     Context.Session.Set("Action", "Index");
     Context.Session.Set("OrderOptions", Model.OrderOptions);
@@ -15,11 +18,13 @@
 <table class="table table-hover tp-table">
     <thead>
         <tr style="align-content: center;">
+            <th class="r-table-header-cell">
+            </th>
             <th class="r-table-header-cell" style="width:200px;">
                 Лицевой счет
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Account")
                 {
-                    <a href="#" title="Сортировка по номеру лицевого счета"  class="oi oi-sort-descending sort tp-sorted" data-order-field="Account" data-order-direction="0"></a>
+                    <a href="#" title="Сортировка по номеру лицевого счета" class="oi oi-sort-descending sort tp-sorted" data-order-field="Account" data-order-direction="0"></a>
                 }
                 else
                 {
@@ -31,12 +36,12 @@
                 Информация о ЛС
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Date")
                 {
-                    <a href="#" title="Сортировка по дате последнего начисления" 
+                    <a href="#" title="Сортировка по дате последнего начисления"
                        class="oi oi-sort-descending sort tp-sorted" data-order-field="Date" data-order-direction="0"></a>
                 }
                 else
                 {
-                    <a href="#" title="Сортировка по дате последнего начисления" 
+                    <a href="#" title="Сортировка по дате последнего начисления"
                        class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Date" ? "tp-sorted" : "")"
                        data-order-field="Date" data-order-direction="@(Model.OrderOptions.OrderField == "Date" ? "1" : "0")"></a>
                 }
@@ -45,7 +50,7 @@
                 Адрес
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Address")
                 {
-                    <a href="#" title="Сортировка по адресу жилищного фонда"  class="oi oi-sort-descending sort tp-sorted" data-order-field="Address" data-order-direction="0"></a>
+                    <a href="#" title="Сортировка по адресу жилищного фонда" class="oi oi-sort-descending sort tp-sorted" data-order-field="Address" data-order-direction="0"></a>
                 }
                 else
                 {
@@ -69,6 +74,15 @@
                 }
             }
             <tr>
+                @if (ids.Contains(item.IdAccount))
+                {
+                    check = "checked";
+                }
+                else
+                {
+                    check = "";
+                }
+                <td class="align-middle"><input type="checkbox" class="idCheckbox" data-id="@item.IdAccount" @Html.Raw(check) /></td>
                 @{ 
                     var hasOpenedClaims = Model.ClaimsByAddresses.ContainsKey(item.IdAccount) && lastClaimInfo.IdClaimCurrentState != 6 && !lastClaimInfo.EndedForFilter;
                 }

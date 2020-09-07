@@ -182,6 +182,8 @@
         e.preventDefault();
     });
 
+    $(".info").hide();
+
     $("#tenancyWarningModal .rr-report-submit").on("click", function (e) {
         e.preventDefault();
         var form = $(this).closest("#tenancyWarningForm");
@@ -220,7 +222,7 @@
             url: window.location.origin + '/TenancyReports/SetTenancyContractRegDate?regDate=' + regDate,
             success: function (data) {
                 console.log(data);
-                $('.status').text(data);
+                $('.info').text(data);
                 $("#tenancyContractRegDateModal").modal("hide");
             }
         });
@@ -248,7 +250,7 @@
                 '&reasonDate=' + reasonDate + '&idReasonType=' + idReasonType + '&isDeletePrevReasons=' + isDeletePrevReasons,
             success: function (data) {
                 console.log(data);
-                $('.status').text(data);
+                $('.info').text(data);
                 $("#tenancyReasonModal").modal("hide");
             }
         });

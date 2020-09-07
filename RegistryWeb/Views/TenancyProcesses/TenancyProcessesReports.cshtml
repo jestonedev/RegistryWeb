@@ -21,7 +21,11 @@
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
 }
 
-<div class="col status"></div>
+<div class="alert alert-warning alert-dismissible fade show info" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
 
 <h1>@ViewData["Title"]</h1>
 <h4 class="mb-3">@text</h4>

@@ -1,0 +1,393 @@
+﻿@using RegistryWeb.ViewModel
+@model TenancyObjectReportsVM;
+@{
+    ViewData["Title"] = "Отчеты по процессам найма";
+}
+
+@section styles
+    {
+    <link rel="stylesheet" href="~/css/object.report.css" runat="server" />
+}
+@section Scripts
+    {
+    <script src="~/js/tenancyobjects.report.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+}
+
+<div>
+    <h2>@ViewData["Title"]</h2>
+    <br />
+    <div class="row mb-3">
+        <div class="col-12 col-md-6 col-lg-4 mb-3 report" data-idreporttype="0" title="Статистика">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Статистика</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 report" data-idreporttype="1" title="Статистика для МКУ ЦПМУ">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Статистика для МКУ ЦПМУ</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 report" data-idreporttype="2" title="Распоряжения">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Распоряжения</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 offset-lg-4 col-lg-4 mb-3 report" data-idreporttype="3" title="Уведомления по счетчикам">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Уведомления по счетчикам</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="statisticForm">
+    <div class="modal fade" id="statisticModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Критерии отчета статистики найма</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="Statistic__Regions">Выберете жилой район</label>
+                            <select data-actions-box="true" class="selectpicker form-control" title="Жилой район" name="Statistic.Regions"
+                                    data-val="true" data-val-required="Не указан жилой район" id="Statistic__Regions" asp-items="@Model.RegionsList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.Regions" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="Statistic__Streets">Выберете улицу</label>
+                            <select data-actions-box="true" data-live-search="true" class="selectpicker form-control" title="Улица" name="Statistic.Streets"
+                                    data-val="true" data-val-required="Не указана улица" id="Statistic__Streets" asp-items="@Model.StreetsList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.Streets" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="Statistic__Houses">Выберете номер дома</label>
+                            <input type="text" data-actions-box="true" class="form-control" title="Номер дома" name="Statistic.Houses"
+                                   data-val="true" data-val-required="Не указан номер дома" id="Statistic__Houses" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.Houses" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="Statistic__PremisesNum">Выберете номер помещения</label>
+                            <input type="text" data-actions-box="true" class="form-control" title="Номер помещения" name="Statistic.PremisesNum"
+                                   data-val="true" data-val-required="Не указан номер помещения" id="Statistic__PremisesNum" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.PremisesNum" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="Statistic__RentTypes">Выберете тип найма</label>
+                            <select data-actions-box="true" class="selectpicker form-control" title="Тип найма" name="Statistic.RentTypes"
+                                    data-val="true" data-val-required="Не указан тип найма" id="Statistic__RentTypes" asp-items="@Model.RentTypesList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.RentTypes" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="Statistic__TenancyReasonTypes">Выберете тип основания</label>
+                            <select data-actions-box="true" class="selectpicker form-control" title="Тип основания" name="Statistic.TenancyReasonTypes"
+                                    data-val="true" data-val-required="Не указан тип основания" id="Statistic__TenancyReasonTypes" asp-items="@Model.TenancyReasonTypesList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.TenancyReasonTypes" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Дата регистрации</label>
+                        <div class="row">
+                            <div class="col-1">
+                                <label for="Statistic__DateRegistrationFrom">C</label>
+                            </div>
+                            <div class="col-5">
+                                <input type="date" data-actions-box="true" class="form-control" title="Начало регистрации" name="Statistic.DateRegistrationFrom"
+                                       data-val="true" data-val-required="Не указано начало регистрации" id="Statistic__DateRegistrationFrom" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.DateRegistrationFrom" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="col-1">
+                                <label for="Statistic__DateRegistrationTo">По</label>
+                            </div>
+                            <div class="col-5">
+                                <input type="date" data-actions-box="true" class="form-control" title="Окончание регистрации" name="Statistic.DateRegistrationTo"
+                                       data-val="true" data-val-required="Не указано окончание регистрации" id="Statistic__DateRegistrationTo" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.DateRegistrationTo" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Начало действия договора</label>
+                        <div class="row">
+                            <div class="col-1">
+                                <label for="Statistic__BeginDateFrom">C</label>
+                            </div>
+                            <div class="col-5">
+                                <input type="date" data-actions-box="true" class="form-control" title="Начало действия договора с" name="Statistic.BeginDateFrom"
+                                       data-val="true" data-val-required="Не указано начало действия договора с" id="Statistic__BeginDateFrom" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.BeginDateFrom" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="col-1">
+                                <label for="Statistic__BeginDateTo">По</label>
+                            </div>
+                            <div class="col-5">
+                                <input type="date" data-actions-box="true" class="form-control" title="Начало действия договора по" name="Statistic.BeginDateTo"
+                                       data-val="true" data-val-required="Не указано начало действия договора по" id="Statistic__BeginDateTo" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.BeginDateTo" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Окончание действия договора</label>
+                        <div class="row">
+                            <div class="col-1">
+                                <label for="Statistic__EndDateFrom">C</label>
+                            </div>
+                            <div class="col-5">
+                                <input type="date" data-actions-box="true" class="form-control" title="Окончание действия договора с" name="Statistic.EndDateFrom"
+                                       data-val="true" data-val-required="Не указано окончание действия договора с" id="Statistic__EndDateFrom" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.EndDateFrom" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="col-1">
+                                <label for="Statistic__EndDateTo">По</label>
+                            </div>
+                            <div class="col-5">
+                                <input type="date" data-actions-box="true" class="form-control" title="Окончание действия договора по" name="Statistic.EndDateTo"
+                                       data-val="true" data-val-required="Не указано окончание действия договора по" id="Statistic__EndDateTo" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.EndDateTo" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="tenancyOrderForm">
+    <div class="modal fade" id="tenancyOrderModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Распоряжение</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="TenancyOrder__Preparer">Подготовил</label>
+                            <select data-actions-box="true" class="selectpicker form-control" title="Подготовил" name="TenancyOrder.Preparer"
+                                    data-val="true" data-val-required="Не указан тот кто подготовил" id="TenancyOrder__Preparer" asp-items="@Model.PreparersList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.Preparer" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="TenancyOrder__Lawyer">Юрист</label>
+                            <select data-actions-box="true" class="selectpicker form-control" title="Юрист" name="TenancyOrder.Lawyer"
+                                    data-val="true" data-val-required="Не указан юрист" id="TenancyOrder__Lawyer" asp-items="@Model.LawyersList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.Lawyer" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="TenancyOrder__Streets">Улица</label>
+                            <select data-actions-box="true" data-live-search="true" class="selectpicker form-control" title="Улица" name="TenancyOrder.Streets"
+                                    id="TenancyOrder__Streets" asp-items="@Model.StreetsList"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-4">
+                            <label for="TenancyOrder__Houses">Номер дома</label>
+                            <input type="text" data-actions-box="true" class="form-control" title="Номер дома" name="TenancyOrder.Houses"
+                                   id="TenancyOrder__Houses" />
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="TenancyOrder__PremisesNum">Номер помещения</label>
+                            <input type="text" data-actions-box="true" class="form-control" title="Номер помещения" name="TenancyOrder.PremisesNum"
+                                   id="TenancyOrder__PremisesNum" />
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="TenancyOrder__SubPremisesNum">Номер комнаты</label>
+                            <input type="text" data-actions-box="true" class="form-control" title="Номер комнаты" name="TenancyOrder.SubPremisesNum"
+                                   id="TenancyOrder__SubPremisesNum" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-4">
+                            <label for="TenancyOrder__OrderDateFrom">Распоряжение от</label>
+                            <input type="date" data-actions-box="true" class="form-control" title="Распоряжение от" name="TenancyOrder.OrderDateFrom"
+                                   id="TenancyOrder__OrderDateFrom" />
+                        </div>
+                        <div class="col-4">
+                            <label for="TenancyOrder__RegistrationDateFrom">Регистрация <b>с</b></label>
+                            <input type="date" data-actions-box="true" class="form-control" title="Регистрация с" name="TenancyOrder.RegistrationDateFrom"
+                                   id="TenancyOrder__RegistrationDateFrom" />
+                        </div>
+                        <div class="col-4">
+                            <label for="TenancyOrder__RegistrationDateTo">Регистрация <b>по</b></label>
+                            <input type="date" data-actions-box="true" class="form-control" title="Регистрация по" name="TenancyOrder.RegistrationDateTo"
+                                   id="TenancyOrder__RegistrationDateTo" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-5">
+                            <label for="TenancyOrder__RentTypes">Тип найма</label>
+                            <select data-actions-box="true" class="selectpicker form-control" title="Тип найма" name="TenancyOrder.RentTypes"
+                                    data-val="true" data-val-required="Не указан тип найма" id="TenancyOrder__RentTypes" asp-items="@Model.RentTypesList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.RentTypes" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-7">
+                            <label for="TenancyOrder__OrderTypes">Вид распоряжения</label>
+                            <select data-actions-box="true" class="selectpicker form-control" title="Тип найма" name="TenancyOrder.OrderTypes"
+                                    data-val="true" data-val-required="Не указан тип найма" id="TenancyOrder__OrderTypes">
+                                <option value="0">Общее распоряжение</option>
+                                <option value="1">Продление найма</option>
+                                <option value="2">Чекановский (дело № 2-2355/2011)</option>
+                                <option value="3">Дети сироты</option>
+                                <option value="4">По решению суда</option>
+                                <option value="5">Переселение 2013-2017</option>
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.OrderTypes" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <fieldset class="r-scheduler-border" data-selected-id="3">
+                        <legend class="r-scheduler-border">Служебная записка</legend>
+                        <div class="form-row">
+                            <div class="col-6">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">№</div>
+                                    </div>
+                                    <input type="text" data-actions-box="true" class="form-control" title="Номер служебной записки" name="TenancyOrder.OrphansNum"
+                                           data-val="true" data-val-required="Не указан номер служебной записки" id="TenancyOrder__OrphansNum" />
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.OrphansNum" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <input type="date" data-actions-box="true" class="form-control" title="Дата служебной записки" name="TenancyOrder.OrphansDate"
+                                       data-val="true" data-val-required="Дата не указана" id="TenancyOrder__OrphansDate" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.OrphansDate" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="form-row r-scheduler-border" data-selected-id="4">
+                        <legend class="r-scheduler-border">Гражданское дело</legend>
+                        <div class="form-row">
+                            <div class="col-6">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">№</div>
+                                    </div>
+                                    <input type="text" data-actions-box="true" class="form-control" title="Номер гражданского дела" name="TenancyOrder.CourtNum"
+                                           data-val="true" data-val-required="Не указан номер гражданского дела" id="TenancyOrder__CourtNum" />
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtNum" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <input type="date" data-actions-box="true" class="form-control" title="Дата гражданского дела" name="TenancyOrder.CourtDate"
+                                       data-val="true" data-val-required="Дата не указана" id="TenancyOrder__CourtDate" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtDate" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-12">
+                                <label for="TenancyOrder__CourtType">Во исполнение решения</label>
+                                <select data-actions-box="true" data-live-search="true" class="selectpicker form-control" title="Во исполнение решения" name="TenancyOrder.CourtType"
+                                        data-val="true" data-val-required="Не указан орган" id="TenancyOrder__CourtType">
+                                    <option value="1">Братского городского суда Иркутской области</option>
+                                    <option value="2">Падунского районного суда Иркутской области</option>
+                                    <option value="3">Иркутского областного суда</option>
+                                </select>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtType" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="form-row r-scheduler-border" data-selected-id="5">
+                        <legend class="r-scheduler-border">Распоряжение</legend>
+                        <div class="form-row">
+                            <div class="col-6">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">№</div>
+                                    </div>
+                                    <input type="text" data-actions-box="true" class="form-control" title="Номер распоряжения" name="TenancyOrder.ResettleNum"
+                                           data-val="true" data-val-required="Не указан номер распоряжения" id="TenancyOrder__ResettleNum" />
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.ResettleNum" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <input type="date" data-actions-box="true" class="form-control" title="Дата распоряжения" name="TenancyOrder.ResettleDate"
+                                       data-val="true" data-val-required="Дата не указана" id="TenancyOrder__ResettleDate" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.ResettleDate" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-12">
+                                <label for="TenancyOrder__ResettleType">Тип распоряжения</label>
+                                <select data-actions-box="true" data-live-search="true" class="selectpicker form-control" title="Тип распоряжения" name="TenancyOrder.ResettleType"
+                                        data-val="true" data-val-required="Не указан тип распоряжения" id="TenancyOrder__ResettleType">
+                                    <option value="1">По свободным спискам (изменения)</option>
+                                    <option value="2">Перераспределение</option>
+                                    <option value="3">Основное распоряжение</option>
+                                </select>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.ResettleType" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="tenancyNotifiesListForm">
+    <div class="modal fade" id="tenancyNotifiesListModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Перечень уведомлений по счетчикам</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="TenancyNotifiesList__DateFrom">Период формирования с</label>
+                            <input type="date" data-actions-box="true" class="form-control" title="Период формирования с" name="TenancyNotifiesList.DateFrom"
+                                   data-val="true" data-val-required="Не указана дата начала периода" id="TenancyNotifiesList__DateFrom" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyNotifiesList.DateFrom" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="TenancyNotifiesList__DateTo">по</label>
+                            <input type="date" data-actions-box="true" class="form-control" title="Период формирования по" name="TenancyNotifiesList.DateTo"
+                                   data-val="true" data-val-required="Не указана дата окончания периода" id="TenancyNotifiesList__DateTo" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyNotifiesList.DateTo" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

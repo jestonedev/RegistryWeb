@@ -11,15 +11,17 @@
     <link rel="stylesheet" href="~/css/payment.accounts.css" runat="server" />
 }
 
+<div class="col info text-center" data-controller="PaymentAccounts"></div>
+
 <h2>@ViewData["Title"] @text</h2>
 
 <partial name="Filter" model="Model" />
 <partial name="DataTable" model="Model" />
-<partial name="ReportsModals">
+<partial name="ReportsModals" />
 
 <page-link page-model="Model.PageOptions" page-action="Index"></page-link>
 @section validation
-{
+    {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
 }
@@ -29,4 +31,5 @@
     <script src="~/js/address.filter.js" asp-append-version="true"></script>
     <script src="~/js/index.common.js" asp-append-version="true"></script>
     <script src="~/js/index.PaymentAccounts.js" asp-append-version="true"></script>
+    <script src="~/js/multimaster.js" asp-append-version="true"></script>
 }
