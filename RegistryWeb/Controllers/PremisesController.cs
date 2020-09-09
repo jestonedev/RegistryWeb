@@ -399,5 +399,26 @@ namespace RegistryWeb.Controllers
             return RedirectToAction("PremiseReports");
         }
 
+        [HttpPost]
+        public IActionResult GetAreaAvgCostView()
+        {
+            ViewBag.SecurityService = securityService;
+            return View("AreaAvgCost", dataService.GetAreaAvgCost());
+        }
+
+        [HttpPost]
+        public IActionResult UpdateAreaAvgCost(TotalAreaAvgCost avgCost)
+        {
+            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
+            {
+                return Json(-1);
+            }
+            if (ModelState.IsValid)
+            {
+                dataService.UpdateAreaAvgCost(avgCost);
+            }
+            return Json(1);
+        }
+
     }
 }

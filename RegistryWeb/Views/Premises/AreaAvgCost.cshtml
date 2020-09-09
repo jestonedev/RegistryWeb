@@ -1,0 +1,46 @@
+﻿@using RegistryWeb.Models.Entities
+@using RegistryWeb.SecurityServices
+@model TotalAreaAvgCost
+@{ 
+    Layout = null;
+    var securityService = (SecurityService)ViewBag.SecurityService;
+}
+
+<form id="areaAvgCostForm">
+    <div class="modal fade" id="areaAvgCostModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Цена 1 м<sup>2</sup> жилья</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label asp-for="Cost">Цена 1 м<sup>2</sup> жилья</label>
+                            @if (securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
+                            {
+                                <input type="text" class="form-control input-decimal" asp-for="Cost" title="Цена 1 кв. м. жилья">
+                            }
+                            else
+                            {
+                                <input type="text" class="form-control input-decimal" asp-for="Cost" disabled title="Цена 1 кв. м. жилья">
+                            }
+                            <span asp-validation-for="Cost" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @if(securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
+                    {
+                        <button type="button" class="btn btn-primary" id="areaAvgCostFormSubmit">Изменить</button>
+                    }
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -7,7 +7,7 @@ namespace RegistryWeb.Models.Entities
     public partial class DocumentIssuedBy
     {
         public int IdDocumentIssuedBy { get; set; }
-        [Required(ErrorMessage = "Введите название органа")]
+        [Required(ErrorMessage = "Укажите наименование органа, выдавшего документ")]
         public string DocumentIssuedByName { get; set; }
         public byte Deleted { get; set; }
     }

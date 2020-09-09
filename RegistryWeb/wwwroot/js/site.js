@@ -25,31 +25,26 @@
         });
 
         if ($.validator !== undefined) {
-            var form = $("form")
-                .removeData("validator")
-                .removeData("unobtrusiveValidation");
-            $.validator.unobtrusive.parse(form);
-            form.validate();
+            refreshValidationForm($("form"));
         }
     });
 }
 
-(function ($) {
-    $.fn.inputFilter = function (inputFilter) {
-        return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function () {
-            if (inputFilter(this.value)) {
-                this.oldValue = this.value;
-                this.oldSelectionStart = this.selectionStart;
-                this.oldSelectionEnd = this.selectionEnd;
-            } else if (this.hasOwnProperty("oldValue")) {
-                this.value = this.oldValue;
-                this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
-            } else {
-                this.value = "";
-            }
-        });
-    };
-}(jQuery));
+$.fn.inputFilter = function (inputFilter) {
+    return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function () {
+        if (inputFilter(this.value)) {
+            this.oldValue = this.value;
+            this.oldSelectionStart = this.selectionStart;
+            this.oldSelectionEnd = this.selectionEnd;
+        } else if (this.hasOwnProperty("oldValue")) {
+            this.value = this.oldValue;
+            this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+        } else {
+            this.value = "";
+        }
+    });
+};
+
 //Формат вызова:
 //$('1').on('click', 2, elementToogle);
 //  1 - элемент по которому щелкают (стрелочка)
@@ -170,6 +165,7 @@ function removeErrorFromValidator(validator, elem) {
 }
 
 $(function () {
+
     $('.input-filter-numbers').inputFilter(function (value) {
         return /^\d*$/.test(value);
     });
@@ -182,7 +178,7 @@ $(function () {
         return /^(\d+:?)*$/.test(value);
     });
 
-    $('.input-filter-decimal').inputFilter(function (value) {
+    $('.input-filter-decimal, .input-decimal').inputFilter(function (value) {
         return /^-?\d*[.,]?\d{0,2}$/.test(value);
     });
 
@@ -192,5 +188,44 @@ $(function () {
 
     $('.input-filter-house').inputFilter(function (value) {
         return /^[0-9\\/а-яА-Я]*$/.test(value);
+    });
+
+    $("#areaAvgCostModalBtn").on("click", function (e) {
+        if ($("#areaAvgCostForm").length > 0) {
+            $("#areaAvgCostForm").remove();
+        }
+        $.ajax({
+            async: false,
+            type: 'POST',
+            url: window.location.origin + '/Premises/GetAreaAvgCostView',
+            success: function (modal) {
+                $("body").append(modal);
+                $("#areaAvgCostForm [data-val-number]").attr("data-val-number", "Введите числовое значение");
+                refreshValidationForm($("#areaAvgCostForm"));
+
+                $("#areaAvgCostModal").modal("show");
+            }
+        });
+        e.preventDefault();
+    });
+
+    $("body").on("click", "#areaAvgCostFormSubmit", function (e) {
+        var form = $(this).closest("form");
+        var isValid = form.valid();
+        if (isValid) {
+            $.ajax({
+                async: false,
+                type: 'POST',
+                url: window.location.origin + '/Premises/UpdateAreaAvgCost',
+                data: { id: $("#areaAvgCostForm #Id").val(), cost: $("#areaAvgCostForm #Cost").val() },
+                success: function (result) {
+                    if (result === 1) {
+                        $("#areaAvgCostModal").modal("hide");
+                    } else {
+                        alert("У вас нет прав на изменение цены 1 кв. м. жилья");
+                    }
+                }
+            });
+        }
     });
 });

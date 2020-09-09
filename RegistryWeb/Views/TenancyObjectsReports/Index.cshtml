@@ -11,8 +11,6 @@
 @section Scripts
     {
     <script src="~/js/tenancyobjects.report.js" asp-append-version="true"></script>
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
 }
 
 <div>
@@ -48,7 +46,7 @@
 
 <form id="statisticForm">
     <div class="modal fade" id="statisticModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Критерии отчета статистики найма</h5>
@@ -104,7 +102,7 @@
                     <div class="form-group">
                         <label>Дата регистрации</label>
                         <div class="row">
-                            <div class="col-1">
+                            <div class="col-1 mt-2 text-right">
                                 <label for="Statistic__DateRegistrationFrom">C</label>
                             </div>
                             <div class="col-5">
@@ -112,7 +110,7 @@
                                        data-val="true" data-val-required="Не указано начало регистрации" id="Statistic__DateRegistrationFrom" />
                                 <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.DateRegistrationFrom" data-valmsg-replace="true"></span>
                             </div>
-                            <div class="col-1">
+                            <div class="col-1 mt-2 text-right">
                                 <label for="Statistic__DateRegistrationTo">По</label>
                             </div>
                             <div class="col-5">
@@ -125,7 +123,7 @@
                     <div class="form-group">
                         <label>Начало действия договора</label>
                         <div class="row">
-                            <div class="col-1">
+                            <div class="col-1 mt-2 text-right">
                                 <label for="Statistic__BeginDateFrom">C</label>
                             </div>
                             <div class="col-5">
@@ -133,7 +131,7 @@
                                        data-val="true" data-val-required="Не указано начало действия договора с" id="Statistic__BeginDateFrom" />
                                 <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.BeginDateFrom" data-valmsg-replace="true"></span>
                             </div>
-                            <div class="col-1">
+                            <div class="col-1 mt-2 text-right">
                                 <label for="Statistic__BeginDateTo">По</label>
                             </div>
                             <div class="col-5">
@@ -146,7 +144,7 @@
                     <div class="form-group">
                         <label>Окончание действия договора</label>
                         <div class="row">
-                            <div class="col-1">
+                            <div class="col-1 mt-2 text-right">
                                 <label for="Statistic__EndDateFrom">C</label>
                             </div>
                             <div class="col-5">
@@ -154,7 +152,7 @@
                                        data-val="true" data-val-required="Не указано окончание действия договора с" id="Statistic__EndDateFrom" />
                                 <span class="text-danger field-validation-valid" data-valmsg-for="Statistic.EndDateFrom" data-valmsg-replace="true"></span>
                             </div>
-                            <div class="col-1">
+                            <div class="col-1 mt-2 text-right">
                                 <label for="Statistic__EndDateTo">По</label>
                             </div>
                             <div class="col-5">
@@ -176,7 +174,7 @@
 
 <form id="tenancyOrderForm">
     <div class="modal fade" id="tenancyOrderModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Распоряжение</h5>
@@ -224,19 +222,19 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="col-4">
+                        <div class="form-group col-4">
                             <label for="TenancyOrder__OrderDateFrom">Распоряжение от</label>
                             <input type="date" data-actions-box="true" class="form-control" title="Распоряжение от" name="TenancyOrder.OrderDateFrom"
                                    id="TenancyOrder__OrderDateFrom" />
                         </div>
-                        <div class="col-4">
-                            <label for="TenancyOrder__RegistrationDateFrom">Регистрация <b>с</b></label>
-                            <input type="date" data-actions-box="true" class="form-control" title="Регистрация с" name="TenancyOrder.RegistrationDateFrom"
+                        <div class="form-group col-4">
+                            <label for="TenancyOrder__RegistrationDateFrom">Дата регистрации (с)</label>
+                            <input type="date" data-actions-box="true" class="form-control" title="Дата регистрации (с)" name="TenancyOrder.RegistrationDateFrom"
                                    id="TenancyOrder__RegistrationDateFrom" />
                         </div>
-                        <div class="col-4">
-                            <label for="TenancyOrder__RegistrationDateTo">Регистрация <b>по</b></label>
-                            <input type="date" data-actions-box="true" class="form-control" title="Регистрация по" name="TenancyOrder.RegistrationDateTo"
+                        <div class="form-group col-4">
+                            <label for="TenancyOrder__RegistrationDateTo">Дата регистрации (по)</label>
+                            <input type="date" data-actions-box="true" class="form-control" title="Дата регистрации (по)" name="TenancyOrder.RegistrationDateTo"
                                    id="TenancyOrder__RegistrationDateTo" />
                         </div>
                     </div>
@@ -367,16 +365,14 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-row">
-                        <div class="form-group col-12">
-                            <label for="TenancyNotifiesList__DateFrom">Период формирования с</label>
+                        <div class="form-group col-12 col-lg-6">
+                            <label for="TenancyNotifiesList__DateFrom">Период формирования (с)</label>
                             <input type="date" data-actions-box="true" class="form-control" title="Период формирования с" name="TenancyNotifiesList.DateFrom"
                                    data-val="true" data-val-required="Не указана дата начала периода" id="TenancyNotifiesList__DateFrom" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="TenancyNotifiesList.DateFrom" data-valmsg-replace="true"></span>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-12">
-                            <label for="TenancyNotifiesList__DateTo">по</label>
+                        <div class="form-group col-12 col-lg-6">
+                            <label for="TenancyNotifiesList__DateTo">Период формирования (по)</label>
                             <input type="date" data-actions-box="true" class="form-control" title="Период формирования по" name="TenancyNotifiesList.DateTo"
                                    data-val="true" data-val-required="Не указана дата окончания периода" id="TenancyNotifiesList__DateTo" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="TenancyNotifiesList.DateTo" data-valmsg-replace="true"></span>
