@@ -170,27 +170,27 @@ function removeErrorFromValidator(validator, elem) {
 }
 
 $(function () {
-    $('.input-filter-numbers').inputFilter(function (value) {
+    $('.input-filter-numbers, .input-numbers').inputFilter(function (value) {
         return /^\d*$/.test(value);
     });
 
-    $('.input-filter-snp').inputFilter(function (value) {
+    $('.input-filter-snp, .input-snp').inputFilter(function (value) {
         return /^([а-яА-Я]+[ ]?)*$/.test(value);
     });
 
-    $('.input-filter-cadastral-num').inputFilter(function (value) {
+    $('.input-filter-cadastral-num, .input-cadastral-num').inputFilter(function (value) {
         return /^(\d+:?)*$/.test(value);
     });
 
-    $('.input-filter-decimal').inputFilter(function (value) {
+    $('.input-filter-decimal, .input-decimal').inputFilter(function (value) {
         return /^-?\d*[.,]?\d{0,2}$/.test(value);
     });
 
-    $('.input-filter-premise-num').inputFilter(function (value) {
+    $('.input-filter-premise-num, .input-premise-num').inputFilter(function (value) {
         return /^[0-9\\/а-яА-Я,-]*$/.test(value);
     });
 
-    $('.input-filter-house').inputFilter(function (value) {
+    $('.input-filter-house, .input-house').inputFilter(function (value) {
         return /^[0-9\\/а-яА-Я]*$/.test(value);
     });
 });
