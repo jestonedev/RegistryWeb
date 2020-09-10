@@ -99,6 +99,11 @@ function addTenancyRentObject(e) {
             list.append(elem);
             elem = list.find(".list-group-item").last();
             elem.find("select").selectpicker("refresh");
+
+            elem.find(".input-decimal").inputFilter(function (value) {
+                return /^-?\d*[.,]?\d{0,2}$/.test(value);
+            });
+
             elem.find(".tenancy-rent-object-edit-btn").first().click();
             $([document.documentElement, document.body]).animate({
                 scrollTop: $(elem).offset().top
