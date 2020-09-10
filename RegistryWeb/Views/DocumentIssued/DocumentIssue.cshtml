@@ -16,11 +16,6 @@
     }
 }
 
-@section validation
-    {
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
-}
 @section scripts
     {
     <script src="~/js/documentIssue.common.js" asp-append-version="true"></script>
@@ -60,7 +55,7 @@
             <div class="validation" asp-validation-summary="ModelOnly"></div>
             <div class="form-group">
                 <input type="hidden" asp-for="DocumentIssue.IdDocumentIssuedBy" />
-                <label asp-for="DocumentIssue.DocumentIssuedByName" class="control-label">Название паспортного стола</label>
+                <label asp-for="DocumentIssue.DocumentIssuedByName" class="control-label">Наименование</label>
                 <input type="text" asp-for="DocumentIssue.DocumentIssuedByName" class="form-control" />
                 <span asp-validation-for="DocumentIssue.DocumentIssuedByName" class="text-danger"></span>
             </div>

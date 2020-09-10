@@ -9,12 +9,6 @@
     ViewData["Title"] = "Создание типа оснований собственности";
 }
 
-@section validation
-    {
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
-}
-
 @section scripts
     {
     <script src="~/js/ownershipReasonTypes.common.js" asp-append-version="true"></script>
@@ -52,7 +46,7 @@
         <div class="card-body" id="ownerreasontype">
             <div class="validation" asp-validation-summary="ModelOnly"></div>
             <div class="form-group">
-                <label asp-for="ownerReasonType.ReasonName" class="control-label">Название</label>
+                <label asp-for="ownerReasonType.ReasonName" class="control-label">Наименование</label>
                 <input type="text" asp-for="ownerReasonType.ReasonName" class="form-control" />
                 <span asp-validation-for="ownerReasonType.ReasonName" class="text-danger"></span>
             </div>

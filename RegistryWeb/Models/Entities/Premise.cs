@@ -37,10 +37,10 @@ namespace RegistryWeb.Models.Entities
         [Range(0, Double.MaxValue, ErrorMessage = "Этаж не может быть меньше нуля")]
         public short Floor { get; set; }
         [Required(ErrorMessage = "Укажите количество комнат", AllowEmptyStrings = false)]
-        [Range(-1, Double.MaxValue, ErrorMessage = "Количество комнат не может быть меньше нуля")]
+        [Range(0, Double.MaxValue, ErrorMessage = "Количество комнат не может быть меньше нуля")]
         public short NumRooms { get; set; }
         [Required(ErrorMessage = "Укажите количество койко-мест", AllowEmptyStrings = false)]
-        [Range(-1, Double.MaxValue, ErrorMessage = "Количество койко-мест не может быть меньше нуля")]
+        [Range(0, Double.MaxValue, ErrorMessage = "Количество койко-мест не может быть меньше нуля")]
         public short NumBeds { get; set; }
         [Required(ErrorMessage = "Укажите общую площадь", AllowEmptyStrings = false)]
         public double TotalArea { get; set; }

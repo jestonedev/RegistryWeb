@@ -12,7 +12,7 @@ namespace RegistryWeb.Models.Entities
         }
 
         public int IdReasonType { get; set; }
-        [Required(ErrorMessage = "Введите название типа оснований собственности")]
+        [Required(ErrorMessage = "Укажите наименование типа основания собственности")]
         public string ReasonName { get; set; }
         public byte Deleted { get; set; }
 

@@ -55,7 +55,7 @@ namespace RegistryWeb.Models.Entities
         [Range(0, Double.MaxValue, ErrorMessage = "Кадастровая стоимость должна быть больше нуля")]
         public decimal CadastralCost { get; set; }
         [Required(ErrorMessage = "Укажите балансовую стоимость")]
-        [Range(-1, Double.MaxValue, ErrorMessage = "Балансовая стоимость должна быть больше нуля")]
+        [Range(0, Double.MaxValue, ErrorMessage = "Балансовая стоимость должна быть больше нуля")]
         public decimal BalanceCost { get; set; }
         [Required(ErrorMessage = "Укажите год ввода в эксплуатацию")]
         public int StartupYear { get; set; }

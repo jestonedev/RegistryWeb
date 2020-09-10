@@ -376,6 +376,17 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        internal void UpdateAreaAvgCost(TotalAreaAvgCost cost)
+        {
+            registryContext.TotalAreaAvgCosts.Update(cost);
+            registryContext.SaveChanges();
+        }
+
+        internal TotalAreaAvgCost GetAreaAvgCost()
+        {
+            return registryContext.TotalAreaAvgCosts.FirstOrDefault();
+        }
+
         private IQueryable<Premise> RestrictionFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
         {
             if ((filterOptions.IdsRestrictionType != null && filterOptions.IdsRestrictionType.Any()) ||

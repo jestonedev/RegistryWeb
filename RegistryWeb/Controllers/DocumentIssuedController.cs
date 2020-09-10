@@ -36,7 +36,7 @@ namespace RegistryWeb.Controllers
         public IActionResult Create()
         {
             ViewBag.Action = "Create";
-            return View("DocumentIssue");
+            return View("DocumentIssue", dataService.GetDocumentIssuerView(new DocumentIssuedBy()));
         }
 
         [HttpPost]
