@@ -174,6 +174,10 @@ $(function () {
         return /^\d*$/.test(value);
     });
 
+    $('.input-filter-chars, .input-chars').inputFilter(function (value) {
+        return /^([а-яА-Я]+)*$/.test(value);
+    });
+
     $('.input-filter-snp, .input-snp').inputFilter(function (value) {
         return /^([а-яА-Я]+[ ]?)*$/.test(value);
     });

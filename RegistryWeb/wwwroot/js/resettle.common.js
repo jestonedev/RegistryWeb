@@ -274,6 +274,11 @@ function addResettle(e) {
             elem.find("#resettleDocumentsToggle").on('click', elem.find('#resettleDocumentsList'), elementToogleHide);
 
             elem.find("select").selectpicker("refresh");
+
+            elem.find(".input-decimal").inputFilter(function (value) {
+                return /^-?\d*[.,]?\d{0,2}$/.test(value);
+            });
+
             elem.find(".resettle-edit-btn").click();
             $([document.documentElement, document.body]).animate({
                 scrollTop: $(elem).offset().top

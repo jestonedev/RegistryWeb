@@ -30,15 +30,15 @@
     <div class="form-row">
         <div class="form-group col-md-4">
             <label>Фамилия</label>
-            <input type="text" class="form-control input-snp @(Model.ExcludeDate != null ? "text-danger" : "")" disabled asp-for="Surname" id="Surname_@id" name="Surname_@id" title="Фамилия">
+            <input type="text" class="form-control @(Model.ExcludeDate != null ? "text-danger" : "")" disabled asp-for="Surname" id="Surname_@id" name="Surname_@id" title="Фамилия">
         </div>
         <div class="form-group col-md-4">
             <label>Имя</label>
-            <input type="text" class="form-control input-snp @(Model.ExcludeDate != null ? "text-danger" : "")" disabled asp-for="Name" id="Name_@id" name="Name_@id" title="Имя">
+            <input type="text" class="form-control @(Model.ExcludeDate != null ? "text-danger" : "")" disabled asp-for="Name" id="Name_@id" name="Name_@id" title="Имя">
         </div>
         <div class="form-group col-md-4">
             <label>Отчество</label>
-            <input type="text" class="form-control input-snp @(Model.ExcludeDate != null ? "text-danger" : "")" disabled asp-for="Patronymic" id="Patronymic_@id" name="Patronymic_@id" title="Отчество">
+            <input type="text" class="form-control @(Model.ExcludeDate != null ? "text-danger" : "")" disabled asp-for="Patronymic" id="Patronymic_@id" name="Patronymic_@id" title="Отчество">
         </div>
         <div class="form-group col-md-4">
             <label>Дата рождения</label>
