@@ -55,7 +55,7 @@ namespace RegistryWeb.ViewOptions.Filter
 
         public bool IsEmpty()
         {
-            return IsAddressEmpty() && IsModalEmpty();
+            return IsAddressEmpty() && IsModalEmpty() && IdBuilding == null;
         }
     }
 }
