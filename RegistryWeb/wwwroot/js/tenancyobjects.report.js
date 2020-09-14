@@ -18,19 +18,6 @@
         e.preventDefault();
     });
 
-    var resetModalForm = function (jQElem) {
-        var form = jQElem.closest("form")[0];
-        form.reset();
-        var selectpickers = $(form).find(".selectpicker");
-        selectpickers.selectpicker("deselectAll");
-        selectpickers.selectpicker('refresh');
-        $(form).find("fieldset").hide();
-    }
-
-    $(".close, .cancel").on("click", function (e) {
-        resetModalForm($(this));
-    });
-
     $("#statisticModal .rr-report-submit").on("click", function (e) {
         e.preventDefault();
         var idReportType = +$("#statisticModal").data("idreporttype");
@@ -60,6 +47,11 @@
 
     $("#TenancyOrder__OrderTypes").on("change", function (e) {
         var valueSelected = this.value;
+        var selectpickers = $("#tenancyOrderModal fieldset .selectpicker");
+        selectpickers.val(null);
+        selectpickers.selectpicker("deselectAll");
+        selectpickers.selectpicker("refresh");
+        $("#tenancyOrderModal fieldset input").val(null);
         $("#tenancyOrderModal fieldset").hide();
         var showFieldsets = $("#tenancyOrderModal fieldset").filter(function (ind, el) {
             return $(el).data("selected-id") == valueSelected;
@@ -103,6 +95,7 @@
         downloadFile(url);
         $("#tenancyOrderModal").modal("hide");
         resetModalForm($(this));
+        $(form).find("fieldset").hide();
     });
 
     $("#tenancyNotifiesListModal .rr-report-submit").on("click", function (e) {
@@ -119,10 +112,5 @@
         downloadFile(url);
         $("#tenancyNotifiesListModal").modal("hide");
         resetModalForm($(this));
-    });
-
-    $(".modal").on("hide.bs.modal", function () {
-        $(this).find(".input-validation-error").removeClass("input-validation-error").addClass("valid");
-        $(this).find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid").text("");
     });
 });
