@@ -73,7 +73,7 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
                 return View("NotAccess");
-            ViewBag.Action = "Create";
+            ViewBag.Action = "Index";
             ViewBag.ReturnUrl = returnUrl;
             if (ModelState.IsValid)
             {                
