@@ -165,6 +165,7 @@ function removeErrorFromValidator(validator, elem) {
 }
 
 $(function () {
+
     $('.input-filter-numbers, .input-numbers').inputFilter(function (value) {
         return /^\d*$/.test(value);
     });

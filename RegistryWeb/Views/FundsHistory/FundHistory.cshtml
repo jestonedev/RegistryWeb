@@ -75,7 +75,7 @@
             <div class="card-header d-flex justify-content-between col-12">
                 <label class="form-check-label h2 @fundheadClass">@ViewData["Title"]</label>
                 @*<div class="col-4">*@
-                <a id="fundhistoryAdd" style="width: 38px;" class="form-control btn btn-success" title="Добавить фонд" asp-action="Create" asp-route-action="Create" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">&#10010;</a>
+                <a id="fundhistoryAdd" style="width: 38px;" class="form-control btn btn-success" title="Добавить фонд" asp-action="Create" asp-route-action="Create" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.addressType" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">&#10010;</a>
                 <div class="btn-group" role="group" aria-label="Панель доступа">
 
                     @if (ViewBag.ReturnUrl != null)
@@ -89,15 +89,15 @@
                     
                     @if (ViewBag.Action == "Create")
                     {
-                        <input type="submit" id="createBtn" value="Создать" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise"  asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"/>
+                        <input type="submit" id="createBtn" value="Создать" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.addressType"  asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"/>
                     }
                     @if (ViewBag.Action == "Edit")
                     {
-                        <input type="submit" value="Сохранить" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"/>
+                        <input type="submit" value="Сохранить" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.addressType" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"/>
                     }
                     @if (ViewBag.Action == "Delete")
                     {
-                        <input id="del" type="submit" value="Удалить" class="form-control btn btn-danger" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"/>
+                        <input id="del" type="submit" value="Удалить" class="form-control btn btn-danger" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.addressType" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"/>
                     }
 
                     <a href="#" id="fundbodyToggle" class="form-control btn btn-primary" title="Развернуть помещение" style="font-weight:bold;">∧</a>

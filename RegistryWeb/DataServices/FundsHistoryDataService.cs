@@ -109,7 +109,6 @@ namespace RegistryWeb.DataServices
 
         internal void Create(FundHistory fh, int IdObject, string typeObject)
         {
-            fh.IdFundType = fh.IdFundTypeNavigation.IdFundType;
             fh.IdFundTypeNavigation = null;
             rc.FundsHistory.Add(fh);
 
