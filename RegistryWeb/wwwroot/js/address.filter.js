@@ -17,9 +17,12 @@
             });
         },
         select: function (event, ui) {
-            $('input[name="FilterOptions.Address.Id"]').val(ui.item.id);
-            $('input[name="FilterOptions.Address.Text"]').val(ui.item.value);
+            var inputAddressType = $('input[name="FilterOptions.Address.AddressType"]');
+            var idAddressType = inputAddressType.val();
             filterClearModal();
+            inputAddressType.val(idAddressType);
+            $('input[name="FilterOptions.Address.Id"]').val(ui.item.id);
+            $('input[name="FilterOptions.Address.Text"]').val(ui.item.value);            
             $("form.filterForm").submit();
         },
         delay: 300,

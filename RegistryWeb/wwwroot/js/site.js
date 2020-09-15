@@ -164,12 +164,18 @@ function removeErrorFromValidator(validator, elem) {
     delete validator.errorMap[elem.attr("name")];
 }
 
-function resetModalForm(jQElem) {
-    var form = jQElem.closest("form")[0];
-    form.reset();
-    var inputs = $(form).find("input");
+function resetModalForm(jQElem, isForm = true) {
+    var form = null;
+    if (isForm) {
+        form = jQElem;
+    }
+    else {
+        form = jQElem.closest("form");
+    }
+    form[0].reset();
+    var inputs = form.find("input");
     inputs.val(null);
-    var selectpickers = $(form).find(".selectpicker");
+    var selectpickers = form.find(".selectpicker");
     selectpickers.val(null);
     selectpickers.selectpicker("deselectAll");
     selectpickers.selectpicker("refresh");

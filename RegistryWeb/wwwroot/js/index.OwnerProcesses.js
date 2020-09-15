@@ -3,11 +3,12 @@
     $("form.filterForm").submit();
 };
 var filterClearModal = function () {
-    resetModalForm($(this));
+    resetModalForm($("form.filterForm"));
 };
 var filterClear = function () {
-    resetModalForm($(this));
-    $("form.filterForm").submit();
+    var form = $("form.filterForm");
+    resetModalForm(form);
+    form.submit();
 };
 $(function () {
     $('#searchModalBtn').click(searchModal);
