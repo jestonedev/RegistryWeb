@@ -164,7 +164,22 @@ function removeErrorFromValidator(validator, elem) {
     delete validator.errorMap[elem.attr("name")];
 }
 
+function resetModalForm(jQElem) {
+    var form = jQElem.closest("form")[0];
+    form.reset();
+    var inputs = $(form).find("input");
+    inputs.val(null);
+    var selectpickers = $(form).find(".selectpicker");
+    selectpickers.val(null);
+    selectpickers.selectpicker("deselectAll");
+    selectpickers.selectpicker("refresh");
+}
+
 $(function () {
+    $(".modal").on("hide.bs.modal", function () {
+        $(this).find(".input-validation-error").removeClass("input-validation-error").addClass("valid");
+        $(this).find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid").text("");
+    });
 
     $('.input-filter-numbers, .input-numbers').inputFilter(function (value) {
         return /^\d*$/.test(value);
