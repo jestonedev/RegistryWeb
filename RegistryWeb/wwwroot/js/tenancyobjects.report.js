@@ -113,4 +113,9 @@
         $("#tenancyNotifiesListModal").modal("hide");
         resetModalForm($(this));
     });
+
+    $(".modal").on("hide.bs.modal", function () {
+        resetModalForm($(this));
+        $("#tenancyOrderForm fieldset").hide();
+    });
 });

@@ -217,7 +217,7 @@ namespace RegistryWeb.DataServices
         private IQueryable<OwnerProcess> IdProcessTypeFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
         {
             //Все
-            if (filterOptions.IdProcessType == 0)
+            if (filterOptions.IdProcessType == null || filterOptions.IdProcessType.Value == 0)
                 return query;
             // Действующие
             if (filterOptions.IdProcessType == 1)
