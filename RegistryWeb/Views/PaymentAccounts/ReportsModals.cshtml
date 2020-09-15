@@ -38,7 +38,7 @@
                         <div class="form-group col-12">
                             <label for="Account.Date">Дата запроса</label>
                             <input type="date" class="form-control" title="Дата запроса" name="Account.Date"
-                                   data-val="true" data-val-required="Укажите дату запроса" id="Account_Date" />
+                                   data-val="true" data-val-required="Укажите дату запроса" value="@(DateTime.Now.Date.ToString("yyyy-MM-dd"))" id="Account_Date" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="Account.Date" data-valmsg-replace="true"></span>
                         </div>
                     </div>
