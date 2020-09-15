@@ -302,6 +302,10 @@ function changeOwnershipRightFileAttachment() {
         let owrFileBtns = owrElem.find(".rr-ownership-right-file-buttons");
         owrElem.find(".rr-ownership-right-file-attach").hide();
         owrFileBtns.append(owrElem.find(".rr-ownership-right-file-remove").show());
+        var descriptionElem = owrElem.find("input[name^='OwnershipRightDescription']");
+        if (descriptionElem.val() === "") {
+            descriptionElem.val($(this)[0].files[0].name);
+        }
     }
 }
 

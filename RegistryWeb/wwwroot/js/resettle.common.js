@@ -272,6 +272,8 @@ function addResettle(e) {
             elem = list.find(".list-group-item").last();
 
             elem.find("#resettleDocumentsToggle").on('click', elem.find('#resettleDocumentsList'), elementToogleHide);
+            elem.find("#financeSourcesToggle").on('click', elem.find('#financeSourcesList'), elementToogleHide);
+            elem.find("#resettleAddressesToggle").on('click', elem.find('#resettleAddressesList'), elementToogleHide);
 
             elem.find("select").selectpicker("refresh");
 
@@ -545,6 +547,16 @@ function saveResettle(e) {
                 resettleElem.find("#resettleDocumentsToggle").click();
             }
         }
+        if (resettleElem.find("#financeSourcesList .field-validation-error").length > 0) {
+            if (!isExpandElemntArrow(resettleElem.find("#financeSourcesToggle"))) {
+                resettleElem.find("#financeSourcesToggle").click();
+            }
+        }
+        if (resettleElem.find("#resettleAddressesList .field-validation-error").length > 0) {
+            if (!isExpandElemntArrow(resettleElem.find("#resettleAddressesToggle"))) {
+                resettleElem.find("#resettleAddressesToggle").click();
+            }
+        }
         $([document.documentElement, document.body]).animate({
             scrollTop: resettleElem.find(".input-validation-error").first().offset().top - 35
         }, 1000);
@@ -565,6 +577,10 @@ function changeResettleDocumentFileAttachment() {
         let resettleDocumentFileBtns = resettleDocumentElem.find(".rr-resettle-document-file-buttons");
         resettleDocumentElem.find(".rr-resettle-document-file-attach").hide();
         resettleDocumentFileBtns.append(resettleDocumentElem.find(".rr-resettle-document-file-remove").show());
+        var descriptionElem = resettleDocumentElem.find("input[name^='ResettleDocumentDescription']");
+        if (descriptionElem.val() === "") {
+            descriptionElem.val($(this)[0].files[0].name);
+        }
     }
 }
 
@@ -653,7 +669,12 @@ $(function () {
     $('#resettlesToggle').on('click', $('#resettlesList'), elementToogleHide);
 
     $('#resettlesList .list-group-item').each(function (idx, elem) {
+    });
+
+    $('#resettlesList .list-group-item').each(function (idx, elem) {
         $(elem).find('#resettleDocumentsToggle').on('click', $(elem).find('#resettleDocumentsList'), elementToogleHide);
+        $(elem).find('#financeSourcesToggle').on('click', $(elem).find('#financeSourcesList'), elementToogleHide);
+        $(elem).find('#resettleAddressesToggle').on('click', $(elem).find('#resettleAddressesList'), elementToogleHide);
     });
 
 

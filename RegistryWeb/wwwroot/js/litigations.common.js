@@ -285,6 +285,10 @@ function changeLitigationFileAttachment() {
         let litigationFileBtns = litegationElem.find(".rr-litigation-file-buttons");
         litegationElem.find(".rr-litigation-file-attach").hide();
         litigationFileBtns.append(litegationElem.find(".rr-litigation-file-remove").show());
+        var descriptionElem = litegationElem.find("input[name^='LitigationDescription']");
+        if (descriptionElem.val() === "") {
+            descriptionElem.val($(this)[0].files[0].name);
+        }
     }
 }
 

@@ -41,8 +41,8 @@
         {
             <div class="text-lg-right col-lg-2 rr-resettle-edit-buttons d-none d-lg-block">
                 <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
-                    <a class="btn btn-danger resettle-cancel-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
                     <a class="btn btn-success resettle-save-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                    <a class="btn btn-danger resettle-cancel-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
                 </div>
                 <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
                     <a class="btn btn-primary resettle-edit-btn @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
@@ -76,9 +76,12 @@
     </div>
     <div class="card">
         <div class="card-header d-flex justify-content-between">
-            <h5 class="rr-resettle-card-header-sub-title">Адрес переселения</h5>
+            <h5 class="rr-resettle-card-header-sub-title" style="margin-top: .25em;">Адрес переселения</h5>
+            <div class="btn-group" role="group">
+                <a href="#" id="resettleAddressesToggle" class="form-control btn btn-primary" title="Развернуть адрес переселения" style="font-weight:bold;">∨</a>
+            </div>
         </div>
-        <div class="card-body">
+        <div class="card-body toggle-hide" id="resettleAddressesList">
             <h5>Плановый адрес</h5>
             <hr class="mt-0" />
             <div class="form-row">
@@ -158,9 +161,12 @@
 
     <div class="card">
         <div class="card-header d-flex justify-content-between">
-            <h5 class="rr-resettle-card-header-sub-title">Источники финансирования</h5>
+            <h5 class="rr-resettle-card-header-sub-title" style="margin-top: .25em;">Источники финансирования</h5>
+            <div class="btn-group" role="group">
+                <a href="#" id="financeSourcesToggle" class="form-control btn btn-primary" title="Развернуть источники финансирования" style="font-weight:bold;">∨</a>
+            </div>
         </div>
-        <div class="card-body">
+        <div class="card-body toggle-hide" id="financeSourcesList">
             <div class="form-row">
                 <div class="form-group col-lg-6 col-md-12">
                     <label class="rr-resettle-label">Фонд содействия реформированию ЖКХ</label>
@@ -227,8 +233,8 @@
     {
         <div class="text-center col-12 rr-resettle-edit-buttons-2 d-block d-lg-none">
             <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
-                <a class="btn btn-danger resettle-cancel-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
                 <a class="btn btn-success resettle-save-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                <a class="btn btn-danger resettle-cancel-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
             </div>
             <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
                 <a class="btn btn-primary resettle-edit-btn-2 @(ViewBag.Address.AddressType == Model.Address.AddressType && canEdit ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>

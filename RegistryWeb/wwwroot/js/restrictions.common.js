@@ -301,6 +301,10 @@ function changeRestrictionFileAttachment() {
         let restrictionFileBtns = restrictionElem.find(".rr-restriction-file-buttons");
         restrictionElem.find(".rr-restriction-file-attach").hide();
         restrictionFileBtns.append(restrictionElem.find(".rr-restriction-file-remove").show());
+        var descriptionElem = restrictionElem.find("input[name^='RestrictionDescription']");
+        if (descriptionElem.val() === "") {
+            descriptionElem.val($(this)[0].files[0].name);
+        }
     }
 }
 

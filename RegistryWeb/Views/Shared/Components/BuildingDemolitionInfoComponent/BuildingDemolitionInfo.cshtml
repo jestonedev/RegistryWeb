@@ -109,17 +109,13 @@
 
             @if (ViewBag.Action == "Edit" && ViewBag.CanEditDemolishingInfo)
             {
-                <div class="form-group row d-flex justify-content-center mb-0">
-                    <div class="col-auto">
-                        <a href="#" id="buildingDemolitionInfoEdit" class="form-control btn btn-success" title="Редактировать">Редактирвоать</a>
-                    </div>
-                    <div class="col-auto">
-                        <div class="btn-group" role="group">
-                            <a href="#" id="buildingDemolitionInfoSave" class="form-control btn btn-success" title="Сохранить">Сохранить</a>
-                            <a href="#" id="buildingDemolitionInfoCancel" class="form-control btn btn-primary" title="Отменить">Отменить</a>
-                        </div>
-                    </div>
+            <div class="form-group row d-flex justify-content-center mb-0">
+                <a class="btn btn-primary" id="buildingDemolitionInfoEdit" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                <div class="btn-group" role="group">
+                    <a class="btn btn-success" id="buildingDemolitionInfoSave" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                    <a class="btn btn-danger" id="buildingDemolitionInfoCancel" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
                 </div>
+            </div>
             }
         </div>
     </div>

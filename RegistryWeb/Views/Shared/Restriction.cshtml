@@ -11,6 +11,11 @@
     var restrictionTypeClass = "col-md-6 col-lg-4";
     if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
     {
+        if (ViewBag.AddressType == AddressTypes.Premise && ViewBag.AddressType != Model.AddressType)
+        {
+            restrictionTypeClass = "col-md-6";
+        }
+        else
         if (ViewBag.AddressType == AddressTypes.Building)
         {
             restrictionTypeClass = "col-md-9 col-lg-7";
@@ -94,12 +99,12 @@
                 <option></option>
             </select>
         </div>
-        @if (ViewBag.Action == "Edit")
+        @if (ViewBag.Action == "Edit" && ViewBag.AddressType == Model.AddressType)
         {
             <div class="text-lg-right text-center col-lg-2 rr-restriction-edit-buttons">
                 <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
-                    <a class="btn btn-danger restriction-cancel-btn @(ViewBag.AddressType == Model.AddressType && canEdit ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
                     <a class="btn btn-success restriction-save-btn @(ViewBag.AddressType == Model.AddressType && canEdit ? "" : "disabled")" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                    <a class="btn btn-danger restriction-cancel-btn @(ViewBag.AddressType == Model.AddressType && canEdit ? "" : "disabled")" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
                 </div>
                 <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
                     <a class="btn btn-primary restriction-edit-btn @(ViewBag.AddressType == Model.AddressType && canEdit ? "" : "disabled")" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
