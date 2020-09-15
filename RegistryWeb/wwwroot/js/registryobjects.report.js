@@ -54,7 +54,6 @@
         e.preventDefault();
     });
 
-
     $("#JFModal .rr-report-submit").on("click", function (e) {
         e.preventDefault();
         var isValid = $(this).closest("#JFForm").valid();
@@ -106,10 +105,5 @@
         }
 
         $("#reestrModal").modal("hide");
-    });
-
-    $(".modal").on("hide.bs.modal", function () {
-        $(this).find(".input-validation-error").removeClass("input-validation-error").addClass("valid");
-        $(this).find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid").text("");
     });
 });

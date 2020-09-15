@@ -8,10 +8,12 @@
 
 <h2>@ViewData["Title"] @text</h2>
 
-@Html.Partial("Filter", Model)
-@Html.Partial("DataTable", Model)
+<partial name="Filter" model="Model" />
+<partial name="DataTable" model="Model" />
 <page-link page-model="Model.PageOptions" page-action="Index"></page-link>
 
 @section Scripts {
+    <script src="~/js/address.filter.js" asp-append-version="true"></script>
+    <script src="~/js/index.common.js" asp-append-version="true"></script>
     <script src="~/js/index.OwnerProcesses.js" asp-append-version="true"></script>
 }
