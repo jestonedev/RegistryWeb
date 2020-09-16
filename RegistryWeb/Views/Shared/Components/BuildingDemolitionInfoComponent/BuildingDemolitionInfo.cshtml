@@ -12,7 +12,15 @@
         <div class="card-header d-flex justify-content-between">
             <h3>Информация о сносе</h3>
             <div>
-                <a href="#" id="buildingDemolitionInfoToggle" class="form-control btn btn-primary" title="Развернуть информацию о сносе" style="font-weight:bold;">∨</a>
+                <div class="btn-group">
+                    @if (ViewBag.Action == "Edit" && ViewBag.CanEditDemolishingInfo)
+                    {
+                        <a class="btn btn-primary" id="buildingDemolitionInfoEdit" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                        <a class="btn btn-success" id="buildingDemolitionInfoSave" style="display: none" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
+                        <a class="btn btn-danger" id="buildingDemolitionInfoCancel"  style="display: none" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
+                    }
+                    <a href="#" id="buildingDemolitionInfoToggle" class="form-control btn btn-primary" title="Развернуть информацию о сносе" style="font-weight:bold;">∨</a>
+                </div>
             </div>
         </div>
         <div class="card-body toggle-hide" id="buildingDemolitionInfoBlock">
@@ -106,17 +114,6 @@
                     }
                 </tbody>
             </table>
-
-            @if (ViewBag.Action == "Edit" && ViewBag.CanEditDemolishingInfo)
-            {
-            <div class="form-group row d-flex justify-content-center mb-0">
-                <a class="btn btn-primary" id="buildingDemolitionInfoEdit" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
-                <div class="btn-group" role="group">
-                    <a class="btn btn-success" id="buildingDemolitionInfoSave" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
-                    <a class="btn btn-danger" id="buildingDemolitionInfoCancel" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
-                </div>
-            </div>
-            }
         </div>
     </div>
 </form>

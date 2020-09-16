@@ -413,6 +413,13 @@ let buildingDemolitionInfoEditClick = function (event) {
     $('#buildingDemolitionInfoSave').show();
     $('#buildingDemolitionInfoCancel').show();
     $('#buildingDemolitionInfoEdit').hide();
+
+    var toggler = $("#buildingDemolitionInfoToggle");
+    if (!isExpandElemntArrow(toggler)) {
+        toggler.click();
+    }
+
+    $(this).closest(".btn-group").prepend($('#buildingDemolitionInfoCancel')).prepend($('#buildingDemolitionInfoSave'));
     editFieldsAndBtnsDisabled(false);
 };
 let buildingDemolitionInfoSaveClick = function (event) {
@@ -458,6 +465,7 @@ let buildingDemolitionInfoCancelClick = function (event) {
     $('#buildingDemolitionInfoCancel').hide();
     $("#buildingDemolitionInfoBlock").removeClass("list-group-item-warning");
     $('#buildingDemolitionInfoEdit').show();
+    $(this).closest(".btn-group").prepend($('#buildingDemolitionInfoEdit'));
     editFieldsAndBtnsDisabled(true);
 };
 let actFileLinkClick = function (elem, event) {
