@@ -121,6 +121,75 @@ namespace RegistryWeb.DataServices
                 query = OwnerTypeFilter(query, filterOptions);
                 query = IdProcessFilter(query, filterOptions);
                 query = IdProcessTypeFilter(query, filterOptions);
+                query = GetModalAddressFilter(query, filterOptions);
+            }
+            return query;
+        }
+
+        private IQueryable<OwnerProcess> GetModalAddressFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
+        {
+            if (filterOptions.IdStreet == null && filterOptions.House == null && filterOptions.PremisesNum == null)
+                return query;
+            IEnumerable<int> idsProcess = null;
+            var buildingsAssoc = ownerBuildingsAssoc.ToList();
+            var premisesAssoc = ownerPremisesAssoc.ToList();
+            var subPremisesAssoc = ownerSubPremisesAssoc.ToList();
+            if (!string.IsNullOrEmpty(filterOptions.IdStreet))
+            {
+                var ids = buildingsAssoc
+                    .Where(r => r.BuildingNavigation.IdStreet == filterOptions.IdStreet)
+                    .Select(r => r.IdProcess)
+                    .Union(premisesAssoc
+                        .Where(r => r.PremiseNavigation.IdBuildingNavigation.IdStreet == filterOptions.IdStreet)
+                        .Select(r => r.IdProcess))
+                    .Union(subPremisesAssoc
+                        .Where(r => r.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet == filterOptions.IdStreet)
+                        .Select(r => r.IdProcess));
+                idsProcess = ids;
+            }
+            if (!string.IsNullOrEmpty(filterOptions.House))
+            {
+                var ids = buildingsAssoc
+                    .Where(r => r.BuildingNavigation.House == filterOptions.House)
+                    .Select(r => r.IdProcess)
+                    .Union(premisesAssoc
+                        .Where(r => r.PremiseNavigation.IdBuildingNavigation.House == filterOptions.House)
+                        .Select(r => r.IdProcess))
+                    .Union(subPremisesAssoc
+                        .Where(r => r.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.House == filterOptions.House)
+                        .Select(r => r.IdProcess));
+                if (idsProcess == null)
+                {
+                    idsProcess = ids;
+                }
+                else
+                {
+                    idsProcess = idsProcess.Intersect(ids);
+                }
+            }
+            if (!string.IsNullOrEmpty(filterOptions.PremisesNum))
+            {
+                var ids = premisesAssoc
+                    .Where(r => r.PremiseNavigation.PremisesNum == filterOptions.PremisesNum)
+                    .Select(r => r.IdProcess)
+                    .Union(subPremisesAssoc
+                        .Where(r => r.SubPremiseNavigation.IdPremisesNavigation.PremisesNum == filterOptions.PremisesNum)
+                        .Select(r => r.IdProcess));
+                if (idsProcess == null)
+                {
+                    idsProcess = ids;
+                }
+                else
+                {
+                    idsProcess = idsProcess.Intersect(ids);
+                }
+            }
+            if (idsProcess != null)
+            {
+                query = (from row in query
+                         join id in idsProcess
+                         on row.IdProcess equals id
+                         select row).Distinct();
             }
             return query;
         }
@@ -259,7 +328,10 @@ namespace RegistryWeb.DataServices
             return ownerProcess;
         }
 
-        internal IQueryable<OwnerType> GetOwnerTypes()
+        internal IQueryable<KladrStreet> KladrStreets()
+            => registryContext.KladrStreets.AsNoTracking();
+
+        internal IQueryable<OwnerType> OwnerTypes()
             => registryContext.OwnerType.AsNoTracking();
 
         internal OwnerType GetOwnerType(int idOwnerType)
