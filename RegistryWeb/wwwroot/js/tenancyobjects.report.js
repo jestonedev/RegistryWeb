@@ -40,7 +40,7 @@
             "&EndDateFrom=" + endDateFrom + "&EndDateTo=" + endDateTo;
         downloadFile(url);
         $("#statisticModal").modal("hide");
-        resetModalForm($(this));
+        resetModalForm($("#statisticForm"));
     });
 
     $("#tenancyOrderModal fieldset").hide();
@@ -94,7 +94,7 @@
             "&ResettleDate=" + resettleDate + "&IdResettleType=" + idResettleType;
         downloadFile(url);
         $("#tenancyOrderModal").modal("hide");
-        resetModalForm($(this));
+        resetModalForm(form);
         $(form).find("fieldset").hide();
     });
 
@@ -111,11 +111,11 @@
         var url = "/TenancyObjectsReports/GetTenancyNotifiesList?dateFrom=" + dateFrom + "&dateTo=" + dateTo;
         downloadFile(url);
         $("#tenancyNotifiesListModal").modal("hide");
-        resetModalForm($(this));
+        resetModalForm($("#tenancyNotifiesListForm"));
     });
 
     $(".modal").on("hide.bs.modal", function () {
-        resetModalForm($(this));
+        resetModalForm($(this), false);
         $("#tenancyOrderForm fieldset").hide();
     });
 });
