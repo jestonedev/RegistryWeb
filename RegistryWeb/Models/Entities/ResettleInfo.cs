@@ -19,6 +19,7 @@ namespace RegistryWeb.Models.Entities
         public DateTime? ResettleDate { get; set; }
         public int? IdResettleKind { get; set; }
         public int? IdResettleKindFact { get; set; }
+        public int? IdResettleStage { get; set; }
         [Required]
         public decimal FinanceSource1 { get; set; }
         [Required]
@@ -31,6 +32,7 @@ namespace RegistryWeb.Models.Entities
 
         public virtual ResettleKind ResettleKindNavigation { get; set; }
         public virtual ResettleKind ResettleKindFactNavigation { get; set; }
+        public virtual ResettleStage ResettleStageNavigation { get; set; }
         public virtual IList<ResettlePremiseAssoc> ResettlePremisesAssoc { get; set; }
         public virtual IList<ResettleDocument> ResettleDocuments { get; set; }
         public virtual IList<ResettleInfoSubPremiseFrom> ResettleInfoSubPremisesFrom  { get; set; }

@@ -138,6 +138,7 @@
                 $(this).append(inputTemplate.replace('{0}', rin + "ResettleDate").replace('{1}', resettles[l].ResettleInfoNavigation.ResettleDate));
                 $(this).append(inputTemplate.replace('{0}', rin + "IdResettleKind").replace('{1}', resettles[l].ResettleInfoNavigation.IdResettleKind));
                 $(this).append(inputTemplate.replace('{0}', rin + "IdResettleKindFact").replace('{1}', resettles[l].ResettleInfoNavigation.IdResettleKindFact));
+                $(this).append(inputTemplate.replace('{0}', rin + "IdResettleStage").replace('{1}', resettles[l].ResettleInfoNavigation.IdResettleStage));
                 $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource1").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource1));
                 $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource2").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource2));
                 $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource3").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource3));

@@ -32,6 +32,7 @@ namespace RegistryWeb.ViewModel
             IdResettleInfo = ri.IdResettleInfo;
             IdResettleKind = ri.IdResettleKind;
             IdResettleKindFact = ri.IdResettleKindFact;
+            IdResettleStage = ri.IdResettleStage;
             ResettleDate = ri.ResettleDate;
             FinanceSource1 = ri.FinanceSource1;
             FinanceSource2 = ri.FinanceSource2;

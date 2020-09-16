@@ -36,6 +36,7 @@ namespace RegistryWeb.ViewComponents
             ViewBag.Address = address;
             ViewBag.Action = action;
             ViewBag.ResettleKinds = registryContext.ResettleKinds;
+            ViewBag.ResettleStages = registryContext.ResettleStages;
             ViewBag.ResettleDocumentTypes = registryContext.ResettleDocumentTypes;
             ViewBag.SubPremises = registryContext.SubPremises.Where(r => r.IdPremises == id).Select(r => new {
                 r.IdSubPremises,
@@ -61,7 +62,8 @@ namespace RegistryWeb.ViewComponents
                 .Include(ri => ri.ResettleInfoSubPremisesFrom)
                 .Include(ri => ri.ResettleDocuments)
                 .Include(ri => ri.ResettleKindNavigation)
-                .Include(ri => ri.ResettleKindFactNavigation);
+                .Include(ri => ri.ResettleKindFactNavigation)
+                .Include(ri => ri.ResettleStageNavigation);
             var resettleVMs = resettles.ToList().Select(ri => new ResettleInfoVM(ri, address_p, registryContext));
             return resettleVMs.OrderBy(r => r.ResettleDate);
         }

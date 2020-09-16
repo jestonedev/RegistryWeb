@@ -110,6 +110,7 @@ namespace RegistryWeb.Models
         // Переселение
         public virtual DbSet<ResettleInfo> ResettleInfos { get; set; }
         public virtual DbSet<ResettleKind> ResettleKinds { get; set; }
+        public virtual DbSet<ResettleStage> ResettleStages { get; set; }
         public virtual DbSet<ResettleInfoTo> ResettleInfoTo { get; set; }
         public virtual DbSet<ResettleInfoToFact> ResettleInfoToFact { get; set; }
         public virtual DbSet<ResettleInfoSubPremiseFrom> ResettleInfoSubPremisesFrom { get; set; }
@@ -267,6 +268,7 @@ namespace RegistryWeb.Models
 
             modelBuilder.ApplyConfiguration(new ResettleInfoConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleKindConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ResettleStageConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleInfoToConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleInfoToFactConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleInfoSubPremiseFromConfiguration(nameDatebase));

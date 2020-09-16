@@ -23,6 +23,7 @@ function getResettle(resettleElem) {
         ResettleDate: resettleElem.find("[name^='ResettleDate']").val(),
         IdResettleKind: resettleElem.find("[name^='IdResettleKindPlan']").val(),
         IdResettleKindFact: resettleElem.find("[name^='IdResettleKindFact']").val(),
+        IdResettleStage: resettleElem.find("[name^='IdResettleStage']").val(),
         ResettleInfoSubPremisesFrom: $(resettleElem.find("[name^='SubPremisesFrom']").val()).map(function (idx, val) {
             return {
                 IdSubPremises: val,
@@ -86,6 +87,7 @@ function resettleToFormData(resettle, address) {
     formData.append("ResettleInfo.ResettleDate", resettle.ResettleDate);
     formData.append("ResettleInfo.IdResettleKind", resettle.IdResettleKind);
     formData.append("ResettleInfo.IdResettleKindFact", resettle.IdResettleKindFact);
+    formData.append("ResettleInfo.IdResettleStage", resettle.IdResettleStage);
     for (var i = 0; i < resettle.ResettleInfoSubPremisesFrom.length; i++) {
         formData.append("ResettleInfo.ResettleInfoSubPremisesFrom["+i+"].IdSubPremise", resettle.ResettleInfoSubPremisesFrom[i].IdSubPremises);
         formData.append("ResettleInfo.ResettleInfoSubPremisesFrom[" + i +"].IdResettleInfo", resettle.ResettleInfoSubPremisesFrom[i].IdResettleInfo);
@@ -434,6 +436,10 @@ function refreshResettle(resettleElem, resettle) {
     resettleElem.find("[name^='ResettleDate']").val(resettle.resettleDate);
     resettleElem.find("[name^='IdResettleKindPlan']").val(resettle.idResettleKind).selectpicker('refresh');
     resettleElem.find("[name^='IdResettleKindFact']").val(resettle.idResettleKindFact).selectpicker('refresh');
+    resettleElem.find("[name^='IdResettleStage']").val(resettle.idResettleStage).selectpicker('refresh');
+    if (resettle.subPremisesFrom.length === 0) {
+        resettle.subPremisesFrom.push(0);
+    }
     resettleElem.find("[name^='SubPremisesFrom']").val(resettle.subPremisesFrom).selectpicker('refresh');
     resettleElem.find("[name^='FinanceSource1']").val(resettle.financeSource1.toFixed(2).replace('.', ','));
     resettleElem.find("[name^='FinanceSource2']").val(resettle.financeSource2.toFixed(2).replace('.', ','));

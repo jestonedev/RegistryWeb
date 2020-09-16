@@ -37,6 +37,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_resettle_kind_fact")
                 .HasColumnType("int(11)");
 
+            builder.Property(e => e.IdResettleStage)
+                .HasColumnName("id_resettle_stage")
+                .HasColumnType("int(11)");
+
             builder.Property(e => e.ResettleDate)
                 .HasColumnName("resettle_date")
                 .HasColumnType("date");
@@ -71,6 +75,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.HasOne(d => d.ResettleKindFactNavigation)
                 .WithMany(p => p.ResettleInfosFact)
                 .HasForeignKey(d => d.IdResettleKindFact)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(d => d.ResettleStageNavigation)
+                .WithMany(p => p.ResettleInfos)
+                .HasForeignKey(d => d.IdResettleStage)
                 .OnDelete(DeleteBehavior.Restrict);
 
             //Фильтры по умолчанию

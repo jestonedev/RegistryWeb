@@ -66,6 +66,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 resettleDate = resettle.ResettleDate == null ? null : resettle.ResettleDate.Value.ToString("yyyy-MM-dd"),
                 idResettleKind = resettle.IdResettleKind,
                 idResettleKindFact = resettle.IdResettleKindFact,
+                idResettleStage = resettle.IdResettleStage,
                 subPremisesFrom = resettle.ResettleInfoSubPremisesFrom.Select(r => r.IdSubPremise),
                 financeSource1 = resettle.FinanceSource1,
                 financeSource2 = resettle.FinanceSource2,
@@ -304,6 +305,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             ViewBag.Action = action;
             ViewBag.Address = address;
             ViewBag.ResettleKinds = registryContext.ResettleKinds;
+            ViewBag.ResettleStages = registryContext.ResettleStages;
             ViewBag.ResettleDocumentTypes = registryContext.ResettleDocumentTypes;
             ViewBag.SubPremises = registryContext.SubPremises.Where(r => r.IdPremises == id).Select(r => new {
                 r.IdSubPremises,
