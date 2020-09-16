@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.Models.Entities;
@@ -41,7 +42,8 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("PageOptions");
                 HttpContext.Session.Remove("FilterOptions");
             }
-            ViewBag.OwnerTypes = dataService.GetOwnerTypes();
+            ViewBag.KladrStreets = dataService.KladrStreets();
+            ViewBag.OwnerTypes = dataService.OwnerTypes();
             ViewBag.SecurityService = securityService;
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
