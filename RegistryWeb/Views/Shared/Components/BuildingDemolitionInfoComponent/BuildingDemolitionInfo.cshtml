@@ -63,12 +63,14 @@
                     {
                     <tr class="building-demolition-act-file" data-idbuildingdemolitionactfile="@item.Id">
                         <td class="align-middle">
-                            <input type="text" class="form-control field-building-demolition-act-file" value="@item.Number" title="@item.Number">
+                            <input type="text" class="form-control field-building-demolition-act-file" maxlength="50" value="@item.Number" title="@item.Number">
                         </td>
                         <td class="align-middle">
                             <input type="date" class="form-control field-building-demolition-act-file" value="@(item.Date.HasValue ? item.Date.Value.ToString("yyyy-MM-dd") : "")" title="@(item.Date.HasValue ? item.Date.Value.ToString("yyyy-MM-dd") : "")">
                         </td>
-                        <td class="align-middle"><input type="text" class="form-control field-building-demolition-act-file" value="@item.Name" title="@item.Name"></td>
+                        <td class="align-middle">
+                            <input type="text" class="form-control field-building-demolition-act-file" maxlength="50" value="@item.Name" title="@item.Name">
+                        </td>
                         <td class="align-middle">
                             <select class="form-control field-building-demolition-act-file" title="@item.ActTypeDocument.Name"
                                     asp-items="@{new SelectList(ViewBag.ActTypeDocuments, "Id", "Name", item.IdActTypeDocument)}"></select>

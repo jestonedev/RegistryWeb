@@ -326,12 +326,12 @@ let BuildingDemolitionInfo = class {
         <tr class="building-demolition-act-file" data-idbuildingdemolitionactfile="${buildingDemolitionActFile.id}">
             <td class="align-middle">
                 <input type="hidden" value="${buildingDemolitionActFile.id}" name="Id" />
-                <input type="text" class="form-control field-building-demolition-act-file" value="${buildingDemolitionActFile.number}" title="${buildingDemolitionActFile.number}">
+                <input type="text" class="form-control field-building-demolition-act-file" maxlength="50" value="${buildingDemolitionActFile.number}" title="${buildingDemolitionActFile.number}">
             </td>
             <td class="align-middle">
                 <input type="date" class="form-control field-building-demolition-act-file" value="${buildingDemolitionActFile.date}" title="${buildingDemolitionActFile.date}">
             </td>
-            <td class="align-middle"><input type="text" class="form-control field-building-demolition-act-file" value="${buildingDemolitionActFile.name}" title="${buildingDemolitionActFile.name}"></td>
+            <td class="align-middle"><input type="text" class="form-control field-building-demolition-act-file" maxlength="50" value="${buildingDemolitionActFile.name}" title="${buildingDemolitionActFile.name}"></td>
             <td class="align-middle">
         `
             + this.createActTypeDocumentSelect(buildingDemolitionActFile.idActTypeDocument) +
@@ -425,6 +425,7 @@ let buildingDemolitionInfoEditClick = function (event) {
 let buildingDemolitionInfoSaveClick = function (event) {
     event.preventDefault();
     if ($('#buildingDemolitionInfoForm').valid()) {
+        let self = this;
         let formData = _buildingDemolitionInfo.getFormData();
         let xhr = new XMLHttpRequest();
         xhr.open("POST", window.location.origin + '/BuildingDemolitionInfo/SaveBuildingDemolitionInfo');
@@ -442,6 +443,7 @@ let buildingDemolitionInfoSaveClick = function (event) {
             $('#buildingDemolitionInfoCancel').hide();
             $("#buildingDemolitionInfoBlock").removeClass("list-group-item-warning");
             $('#buildingDemolitionInfoEdit').show();
+            $(self).closest(".btn-group").prepend($('#buildingDemolitionInfoEdit'));
             editFieldsAndBtnsDisabled(true);
             $(".act-file-block").each(function (idx, elem) {
                 $(this).data("id", response[idx] === null || response[idx] === undefined ? "" : response[idx]);

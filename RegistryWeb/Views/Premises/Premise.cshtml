@@ -161,7 +161,7 @@
                 </div>
                 <div class="form-group col-lg-2 col-md-4 r-form-group-label">
                     <label class="rr-premises-label" asp-for="@Model.Premise.PremisesNum">Номер помещения</label>
-                    <input type="text" class="form-control input-premise-num" asp-for="@Model.Premise.PremisesNum" title="Номер помещения">
+                    <input type="text" class="form-control input-premise-num" asp-for="@Model.Premise.PremisesNum" maxlength="255" title="Номер помещения">
                     <span asp-validation-for="@Model.Premise.PremisesNum" class="text-danger"></span>
                 </div>
             </div>
@@ -214,7 +214,7 @@
                 </div>
                 <div class="form-group col-lg-3 col-md-6 r-form-group-label">
                     <label asp-for="@Model.Premise.Account">Лицевой счёт ФКР</label>
-                    <input type="text" class="form-control" asp-for="@Model.Premise.Account" title="Лицевой счёт ФКР">
+                    <input type="text" class="form-control" asp-for="@Model.Premise.Account" maxlength="255" title="Лицевой счёт ФКР">
                     <span asp-validation-for="@Model.Premise.Account" class="text-danger"></span>
                 </div>
             </div>

@@ -325,7 +325,7 @@
                                 <a href="#" data-for="ClaimDescription" class="form-control btn btn-primary claim-toggler" title="Развернуть дополнительные сведения" style="font-weight:bold;">∨</a>
                             </div>
                         </div>
-                        <textarea id="ClaimDescription" class="form-control toggle-hide" asp-for="Claim.Description" title="Дополнительные сведения"></textarea>
+                        <textarea id="ClaimDescription" class="form-control toggle-hide" maxlength="2048" asp-for="Claim.Description" title="Дополнительные сведения"></textarea>
                     </div>
                 </div>
             </div>
