@@ -17,7 +17,7 @@
         @if (securityService.HasPrivilege(Privileges.ClaimsWrite))
         {
             <div class="form-group col-2 col-md-1 col-lg-1">
-                <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="Claims" asp-action="Create">&#10010;</a>
+                <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="Claims" asp-action="Create" asp-route-idAccount="@Model.FilterOptions.IdAccount">&#10010;</a>
             </div>
         }
         @if (Model.FilterOptions.IsAddressEmpty())

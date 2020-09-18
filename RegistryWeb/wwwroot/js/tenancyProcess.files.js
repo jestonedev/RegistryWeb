@@ -219,7 +219,7 @@ function removeTenancyFile(e) {
 }
 
 $(function () {
-    $('.yes-no-panel').hide();
+    $('#TenancyProcessFiles .yes-no-panel').hide();
     $('#tenancyFileAdd').click(addTenancyFile);
     $('#TenancyProcessFiles').on('click', '.tenancy-file-edit-btn', editTenancyFile);
     $('#TenancyProcessFiles').on('click', '.tenancy-file-cancel-btn', cancelEditTenancyFile);

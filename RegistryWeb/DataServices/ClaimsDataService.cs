@@ -764,12 +764,16 @@ namespace RegistryWeb.DataServices
             return GetRentObjects(ids);
         }
 
-        private Dictionary<int, Payment> GetLastPaymentsInfo(IEnumerable<Claim> claims)
+        internal Dictionary<int, Payment> GetLastPaymentsInfo(IEnumerable<Claim> claims)
         {
             var ids = claims.Select(r => r.IdAccount).Distinct();
+            return GetLastPaymentsInfo(ids);
+        }
 
+        internal Dictionary<int, Payment> GetLastPaymentsInfo(IEnumerable<int> idsAccount)
+        {
             var maxDatePayments = from row in registryContext.Payments
-                                  where ids.Contains(row.IdAccount)
+                                  where idsAccount.Contains(row.IdAccount)
                                   group row.Date by row.IdAccount into gs
                                   select new
                                   {
@@ -790,11 +794,24 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
-        internal ClaimVM CreateClaimEmptyViewModel([CallerMemberName]string action = "")
+        internal ClaimVM CreateClaimEmptyViewModel(int? idAccount = null, [CallerMemberName]string action = "")
         {
+            var lastPaymentInfo = idAccount != null ?
+                    GetLastPaymentsInfo(new List<int> { idAccount.Value }).Select(v => v.Value).FirstOrDefault() : null;
+
             return new ClaimVM
             {
-                Claim = new Claim(),
+                Claim = new Claim {
+                    IdAccount = idAccount ?? 0,
+                    IdAccountNavigation = idAccount != null ? GetAccount(idAccount.Value) : null,
+                    AmountTenancy = lastPaymentInfo?.BalanceOutputTenancy,
+                    AmountPenalties = lastPaymentInfo?.BalanceOutputPenalties,
+                    AmountDgi = lastPaymentInfo?.BalanceOutputDgi,
+                    AmountPadun = lastPaymentInfo?.BalanceOutputPadun,
+                    AmountPkk = lastPaymentInfo?.BalanceOutputPkk
+                },
+                RentObjects = idAccount != null ? 
+                    GetRentObjects(new List<int> { idAccount.Value }).SelectMany( v => v.Value).ToList() : null,
                 CurrentExecutor = CurrentExecutor,
                 StateTypes = registryContext.ClaimStateTypes.ToList(),
                 Executors = registryContext.Executors.Where(r => action == "Create" || !r.IsInactive).ToList(),
@@ -806,7 +823,7 @@ namespace RegistryWeb.DataServices
 
         internal ClaimVM GetClaimViewModel(Claim claim, [CallerMemberName]string action = "")
         {
-            var claimVM = CreateClaimEmptyViewModel(action);
+            var claimVM = CreateClaimEmptyViewModel(null, action);
             claimVM.Claim = claim;
             claimVM.RentObjects = GetRentObjects(new List<Claim> { claim }).SelectMany(r => r.Value).ToList();
             claimVM.LastPaymentInfo = GetLastPaymentsInfo(new List<Claim> { claim }).Select(r => r.Value).FirstOrDefault();

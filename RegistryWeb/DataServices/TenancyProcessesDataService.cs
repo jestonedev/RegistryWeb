@@ -62,9 +62,72 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
-        internal TenancyProcessVM CreateTenancyProcessEmptyViewModel([CallerMemberName]string action = "")
+        internal TenancyProcessVM CreateTenancyProcessEmptyViewModel(int? idObject = null, 
+            AddressTypes addressType = AddressTypes.None,
+            [CallerMemberName]string action = "")
         {
             var userName = securityService.User.UserName.ToLowerInvariant();
+
+            var rentObjects = new List<TenancyRentObject>();
+
+            switch(addressType)
+            {
+                case AddressTypes.Building:
+                    var building = registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == idObject);
+                    rentObjects.Add(new TenancyRentObject
+                    {
+                        Address = new Address
+                        {
+                            AddressType = addressType,
+                            Id = (building?.IdBuilding ?? 0).ToString(),
+                            IdParents = new Dictionary<string, string> {
+                                { AddressTypes.Street.ToString(), building?.IdStreet }
+                            }
+                        },
+                        TotalArea = building?.TotalArea ?? 0,
+                        LivingArea = building?.LivingArea ?? 0
+                    });
+                    break;
+                case AddressTypes.Premise:
+                    var premise = registryContext.Premises.Include(b => b.IdBuildingNavigation)
+                        .FirstOrDefault(p => p.IdPremises == idObject);
+                    rentObjects.Add(new TenancyRentObject
+                    {
+                        Address = new Address
+                        {
+                            AddressType = addressType,
+                            Id = (premise?.IdPremises ?? 0).ToString(),
+                            IdParents = new Dictionary<string, string> {
+                                { AddressTypes.Street.ToString(), premise?.IdBuildingNavigation.IdStreet },
+                                { AddressTypes.Building.ToString(), premise?.IdBuilding.ToString() }
+                            }
+                        },
+                        TotalArea = premise?.TotalArea ?? 0,
+                        LivingArea = premise?.LivingArea ?? 0
+                    });
+                    break;
+                case AddressTypes.SubPremise:
+                    var subPremise = registryContext.SubPremises.Include(p => p.IdPremisesNavigation)
+                                .ThenInclude(b => b.IdBuildingNavigation)
+                                .FirstOrDefault(sp => sp.IdSubPremises == idObject);
+                    rentObjects.Add(new TenancyRentObject
+                    {
+                        Address = new Address
+                        {
+                            AddressType = addressType,
+                            Id = (subPremise?.IdSubPremises ?? 0).ToString(),
+                            IdParents = new Dictionary<string, string> {
+                                { AddressTypes.Street.ToString(), subPremise?.IdPremisesNavigation.IdBuildingNavigation.IdStreet },
+                                { AddressTypes.Building.ToString(), subPremise?.IdPremisesNavigation.IdBuilding.ToString() },
+                                { AddressTypes.Premise.ToString(), subPremise?.IdPremises.ToString() }
+                            }
+                        },
+                        TotalArea = subPremise?.TotalArea ?? 0,
+                        LivingArea = subPremise?.LivingArea ?? 0
+                    });
+                    break;
+            }
+
             return new TenancyProcessVM
             {
                 TenancyProcess = new TenancyProcess(),
@@ -78,13 +141,14 @@ namespace RegistryWeb.DataServices
                         e.ExecutorLogin.ToLowerInvariant() == userName),
                 DocumentTypes = registryContext.DocumentTypes.ToList(),
                 DocumentIssuedBy = registryContext.DocumentsIssuedBy.ToList(),
-                TenancyProlongRentReasons = registryContext.TenancyProlongRentReasons.ToList()
+                TenancyProlongRentReasons = registryContext.TenancyProlongRentReasons.ToList(),
+                RentObjects = rentObjects
             };
         }
 
         internal TenancyProcessVM GetTenancyProcessViewModel(TenancyProcess process, [CallerMemberName]string action = "")
         {
-            var tenancyProcessVM = CreateTenancyProcessEmptyViewModel(action);
+            var tenancyProcessVM = CreateTenancyProcessEmptyViewModel(null, AddressTypes.None, action);
             tenancyProcessVM.TenancyProcess = process;
             tenancyProcessVM.RentObjects = GetRentObjects(new List<TenancyProcess> { process }).SelectMany(r => r.Value).ToList();
             return tenancyProcessVM;

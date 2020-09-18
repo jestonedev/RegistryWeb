@@ -73,12 +73,12 @@ namespace RegistryWeb.Controllers
             return View("Claim", claimVM);
         }
 
-        public ActionResult Create()
+        public ActionResult Create(int? idAccount)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
                 return View("NotAccess");
             InitializeViewBag("Create", null, true);
-            return View("Claim", dataService.CreateClaimEmptyViewModel());
+            return View("Claim", dataService.CreateClaimEmptyViewModel(idAccount));
         }
 
         [HttpPost]
@@ -189,13 +189,19 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetRentAddress(int idAccount)
+        public JsonResult GetAccountInfo(int idAccount)
         {
             var account = dataService.GetAccount(idAccount);
             var rentObjects = dataService.GetRentObjects(new List<int> { idAccount });
+            var lastPaymentInfo = dataService.GetLastPaymentsInfo(new List<int> { idAccount }).Select(v => v.Value).FirstOrDefault();
             return Json(new {
                 BksAddress = account?.RawAddress,
-                RegistryAddress = rentObjects.ContainsKey(idAccount) ? rentObjects[idAccount].Select(r => r.Text).Aggregate((acc, v) => acc + ", " + v) : ""
+                RegistryAddress = rentObjects.ContainsKey(idAccount) ? rentObjects[idAccount].Select(r => r.Text).Aggregate((acc, v) => acc + ", " + v) : "",
+                AmountTenancy = lastPaymentInfo?.BalanceOutputTenancy,
+                AmountPenalties = lastPaymentInfo?.BalanceOutputPenalties,
+                AmountDgi = lastPaymentInfo?.BalanceOutputDgi,
+                AmountPadun = lastPaymentInfo?.BalanceOutputPadun,
+                AmountPkk = lastPaymentInfo?.BalanceOutputPkk
             });
         }
 

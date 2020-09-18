@@ -17,7 +17,11 @@
         @if (securityService.HasPrivilege(Privileges.TenancyWrite))
         {
             <div class="form-group col-2 col-md-1 col-lg-1">
-                <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="TenancyProcesses" asp-action="Create">&#10010;</a>
+                <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="TenancyProcesses" asp-action="Create"
+                    asp-route-idObject="@(Model.FilterOptions.IdBuilding ?? Model.FilterOptions.IdPremises ?? Model.FilterOptions.IdSubPremises)"
+                    asp-route-addressType="@(Model.FilterOptions.IdBuilding != null ? AddressTypes.Building :
+                                             Model.FilterOptions.IdPremises != null ? AddressTypes.Premise :
+                                             Model.FilterOptions.IdSubPremises != null ? AddressTypes.SubPremise : AddressTypes.None)">&#10010;</a>
             </div>
         }
         @if (Model.FilterOptions.IsAddressEmpty())

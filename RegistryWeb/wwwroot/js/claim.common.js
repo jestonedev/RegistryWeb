@@ -175,12 +175,17 @@ $(function () {
         if (account.idAccount !== "" && account.idAccount !== null) {
             $.ajax({
                 type: 'POST',
-                url: window.location.origin + '/Claims/GetRentAddress',
+                url: window.location.origin + '/Claims/GetAccountInfo',
                 dataType: 'json',
                 data: { idAccount: account.idAccount },
                 success: function (address) {
                     $("input[name='Claim.BksAddress']").val(address.bksAddress);
                     $("input[name='Claim.RegistryAddress']").val(address.registryAddress);
+                    $("input[id='Claim_AmountTenancy']").val(address.amountTenancy);
+                    $("input[id='Claim_AmountPenalties']").val(address.amountPenalties);
+                    $("input[id='Claim_AmountDgi']").val(address.amountDgi);
+                    $("input[id='Claim_AmountPadun']").val(address.amountPadun);
+                    $("input[id='Claim_AmountPkk']").val(address.amountPkk).focusout();
                 }
             });
         }
