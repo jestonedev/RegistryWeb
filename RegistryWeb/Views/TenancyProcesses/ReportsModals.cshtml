@@ -164,11 +164,13 @@
                             <span class="text-danger field-validation-valid" data-valmsg-for="TenancyReason.ReasonDate" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group col-12">
-                        <label for="TenancyReason.IdReasonType">Тип основания</label>
-                        <select class="selectpicker form-control" title="Тип основания" name="TenancyReason.IdReasonType"
-                                data-val="true" data-val-required="Выберите тип основания" id="TenancyReason_IdReasonType" asp-items="@reasonTypeList"></select>
-                        <span class="text-danger field-validation-valid" data-valmsg-for="TenancyReason.IdReasonType" data-valmsg-replace="true"></span>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="TenancyReason.IdReasonType">Тип основания</label>
+                            <select class="selectpicker form-control" title="Тип основания" name="TenancyReason.IdReasonType"
+                                    data-val="true" data-val-required="Выберите тип основания" id="TenancyReason_IdReasonType" asp-items="@reasonTypeList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyReason.IdReasonType" data-valmsg-replace="true"></span>
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-check col-12">

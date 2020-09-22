@@ -45,7 +45,7 @@ namespace RegistryWeb.Controllers
                     return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
                 }
                 var file = reportService.PreContract(idProcess, idPreamble, idCommittee);
-                return File(file, odtMime, string.Format(@"Предварительный договор № {0}", idProcess));
+                return File(file, odtMime, string.Format(@"Предварительный договор № {0}.odt", idProcess));
             }
             catch (Exception ex)
             {
@@ -68,7 +68,7 @@ namespace RegistryWeb.Controllers
                     return Error(string.Format("В найме {0} не указан наниматель", idProcess));
                 }
                 var file = reportService.DksrContract(idProcess);
-                return File(file, odtMime, string.Format(@"Договор (ДКСР) № {0}", idProcess));
+                return File(file, odtMime, string.Format(@"Договор (ДКСР) № {0}.odt", idProcess));
             }
             catch (Exception ex)
             {
@@ -95,7 +95,7 @@ namespace RegistryWeb.Controllers
                     return Error(string.Format("В найме {0} не указан наниматель", idProcess));
                 }
                 var file = reportService.Contract(idProcess, idRentType, contractType, openDate);
-                return File(file, odtMime, string.Format(@"Договор № {0}", idProcess));
+                return File(file, odtMime, string.Format(@"Договор № {0}.odt", idProcess));
             }
             catch (Exception ex)
             {
@@ -122,7 +122,7 @@ namespace RegistryWeb.Controllers
                     return Error(string.Format("В найме {0} не указан наниматель", idProcess));
                 }
                 var file = reportService.Act(idProcess, openDate, 2);
-                return File(file, odtMime, string.Format(@"Акт передачи в найм № {0}", idProcess));
+                return File(file, odtMime, string.Format(@"Акт передачи в найм № {0}.odt", idProcess));
             }
             catch (Exception ex)
             {
@@ -153,7 +153,7 @@ namespace RegistryWeb.Controllers
                     return Error(string.Format("В найме {0} отсутствует соглашение", idProcess));
                 }
                 var file = reportService.Act(idProcess, openDate, 1);
-                return File(file, odtMime, string.Format(@"Акт передачи в найм № {0}", idProcess));
+                return File(file, odtMime, string.Format(@"Акт передачи в найм № {0}.odt", idProcess));
             }
             catch (Exception ex)
             {
@@ -181,7 +181,7 @@ namespace RegistryWeb.Controllers
                     return Error(string.Format("В найме {0} не указан наниматель", idProcess));
                 }
                 var file = reportService.Agreement(idAgreement);
-                return File(file, odtMime, string.Format(@"Соглашение найма № {0}", idProcess));
+                return File(file, odtMime, string.Format(@"Соглашение найма № {0}.odt", idProcess));
             }
             catch (Exception ex)
             {
@@ -208,7 +208,7 @@ namespace RegistryWeb.Controllers
                     return Error(string.Format("В найме {0} не указан наниматель", idProcess));
                 }
                 var file = reportService.NotifySingleDocument(idProcess, reportType);
-                return File(file, odtMime, string.Format(@reportTitle+" (найм № {0})", idProcess));
+                return File(file, odtMime, string.Format(@reportTitle+" (найм № {0}).odt", idProcess));
             }
             catch (Exception ex)
             {
@@ -265,7 +265,7 @@ namespace RegistryWeb.Controllers
                         return Error(string.Format("В найме {0} отсутствуют участники", idProcess));
                     }
                     processingIds.Add(idProcess);
-                    fileName += string.Format(" (найм № {0})", idProcess);
+                    fileName += string.Format(" (найм № {0}).odt", idProcess);
                 }
                 var file = reportService.RequestToMvd(processingIds, requestType);
                 return File(file, odtMime, fileName);
@@ -284,7 +284,7 @@ namespace RegistryWeb.Controllers
             {
                 var ids = GetSessionIds();
                 var file = reportService.Notifies(ids, reportType);
-                return File(file, odtMime, string.Format(fileName));
+                return File(file, odtMime, string.Format("{0}.odt", fileName));
             }
             catch (Exception ex)
             {
@@ -320,8 +320,8 @@ namespace RegistryWeb.Controllers
                 var ids = GetSessionIds();
                 var file = reportService.TenancyWarning(ids, idPreparer, isMultipageDocument);
                 if (isMultipageDocument)
-                    return File(file, odtMime, @"Предупреждения");
-                return File(file, zipMime, @"Предупреждения"); 
+                    return File(file, odtMime, @"Предупреждения.odt");
+                return File(file, zipMime, @"Предупреждения.zip"); 
             }
             catch (Exception ex)
             {
@@ -383,7 +383,7 @@ namespace RegistryWeb.Controllers
             {
                 var ids = GetSessionIds();
                 var file = reportService.ExportReasonsForGisZkh(ids);
-                return File(file, zipMime, "Документ-оснвоания для ГИС \"ЖКХ\"");
+                return File(file, zipMime, "Документ-оснвоания для ГИС \"ЖКХ\".zip");
             }
             catch (Exception ex)
             {

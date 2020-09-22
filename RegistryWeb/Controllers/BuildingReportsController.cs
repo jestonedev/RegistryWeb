@@ -32,7 +32,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ExcerptBuilding(idBuilding, excerptNumber, excerptDateFrom, signer);
-                return File(file, odsMime, string.Format(@"Выписка на здание № {0}", idBuilding));
+                return File(file, odtMime, string.Format(@"Выписка на здание № {0}.odt", idBuilding));
             }
             catch (Exception ex)
             {

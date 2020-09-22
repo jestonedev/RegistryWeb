@@ -118,7 +118,7 @@
         e.preventDefault();
     });
 
-    $("#preContractModal, #openDateModal, #tenancyWarningModal").on("change", "select", function () {
+    $("#preContractModal, #openDateModal, #tenancyWarningModal, #tenancyReasonModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
 
@@ -233,6 +233,7 @@
         var form = $(this).closest("#tenancyReasonForm");
         var isValid = form.valid();
         if (!isValid) {
+            fixBootstrapSelectHighlight(form);
             return false;
         }
         var reasonNumber = $("#tenancyReasonModal").find("[name='TenancyReason.ReasonNumber']").val();

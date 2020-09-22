@@ -42,7 +42,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ExcerptPremise(idPremise, excerptNumber, excerptDateFrom, signer);
-                return File(file, odsMime, string.Format(@"Выписка на помещение № {0}", idPremise));
+                return File(file, odtMime, string.Format(@"Выписка на помещение № {0}.odt", idPremise));
             }
             catch (Exception ex)
             {
@@ -57,7 +57,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ExcerptSubPremise(idSubPremise, excerptNumber, excerptDateFrom, signer);
-                return File(file, odsMime, string.Format(@"Выписка на комнату № {0}", idSubPremise));
+                return File(file, odtMime, string.Format(@"Выписка на комнату № {0}.odt", idSubPremise));
             }
             catch (Exception ex)
             {
@@ -76,7 +76,7 @@ namespace RegistryWeb.Controllers
                     return Error(string.Format("В помещении № {0} отсутствуют муниципальные комнаты", idPremise));
                 }
                 var file = reportService.ExcerptMunSubPremises(idPremise, excerptNumber, excerptDateFrom, signer);
-                return File(file, odtMime, string.Format(@"Выписка на мун. комнаты помещения № {0}", idPremise));
+                return File(file, odtMime, string.Format(@"Выписка на мун. комнаты помещения № {0}.odt", idPremise));
             }
             catch (Exception ex)
             {
@@ -91,7 +91,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.PremiseNoticeToBks(idPremise, actionText, paymentType, signer);
-                return File(file, odtMime, string.Format(@"Извещение в БКС на помещение № {0}", idPremise));
+                return File(file, odtMime, string.Format(@"Извещение в БКС на помещение № {0}.odt", idPremise));
             }
             catch (Exception ex)
             {
@@ -106,7 +106,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.SubPremiseNoticeToBks(idSubPremise, actionText, paymentType, signer);
-                return File(file, odtMime, string.Format(@"Извещение в БКС на комнату № {0}", idSubPremise));
+                return File(file, odtMime, string.Format(@"Извещение в БКС на комнату № {0}.odt", idSubPremise));
             }
             catch (Exception ex)
             {
@@ -127,7 +127,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.PremisesArea(ids);
-                return File(file, odtMime, string.Format(@"Справка о площади помещений"));
+                return File(file, odtMime, string.Format(@"Справка о площади помещений.odt"));
             }
             catch (Exception ex)
             {
@@ -142,7 +142,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.PremisesArea(new List<int> { idPremise });
-                return File(file, odtMime, string.Format(@"Справка о площади помещения № {0}", idPremise));
+                return File(file, odtMime, string.Format(@"Справка о площади помещения № {0}.odt", idPremise));
             }
             catch (Exception ex)
             {
@@ -164,7 +164,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ExcerptPremises(ids, excerptNumber, excerptDateFrom, signer);
-                return File(file, odsMime, string.Format(@"Массовая выписка"));
+                return File(file, odtMime, string.Format(@"Массовая выписка.odt"));
             }
             catch (Exception ex)
             {
@@ -185,7 +185,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.MassActPremises(ids, actDate, isNotResides, commision, clerk);
-                return File(file, odsMime, string.Format(@"Акт о факте проживания"));
+                return File(file, odtMime, string.Format(@"Акт о факте проживания.odt"));
             }
             catch (Exception ex)
             {
@@ -206,7 +206,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ExportPremises(ids);
-                return File(file, odsMime, string.Format(@"Экспорт данных"));
+                return File(file, odsMime, string.Format(@"Экспорт данных.ods"));
             }
             catch (Exception ex)
             {
@@ -230,7 +230,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.TenancyHistoryPremises(ids);
-                return File(file, odsMime, string.Format(@"История найма помещений"));
+                return File(file, odsMime, string.Format(@"История найма помещений.ods"));
             }
             catch (Exception ex)
             {
