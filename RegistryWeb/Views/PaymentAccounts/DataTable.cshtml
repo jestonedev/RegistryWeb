@@ -68,9 +68,9 @@
             if (Model.ClaimsByAddresses.ContainsKey(item.IdAccount))
             {
                 lastClaimInfo = Model.ClaimsByAddresses[item.IdAccount].First();
-                if (Model.ClaimsByAddresses[item.IdAccount].Any(r => r.IdClaimCurrentState != 6 && !r.EndedForFilter))
+                if (Model.ClaimsByAddresses[item.IdAccount].Any(r => r.IdClaimCurrentState != 6))
                 {
-                    lastClaimInfo = Model.ClaimsByAddresses[item.IdAccount].FirstOrDefault(r => r.IdClaimCurrentState != 6 && !r.EndedForFilter);
+                    lastClaimInfo = Model.ClaimsByAddresses[item.IdAccount].FirstOrDefault(r => r.IdClaimCurrentState != 6);
                 }
             }
             <tr>
@@ -84,7 +84,7 @@
                 }
                 <td class="align-middle"><input type="checkbox" class="idCheckbox" data-id="@item.IdAccount" @Html.Raw(check) /></td>
                 @{ 
-                    var hasOpenedClaims = Model.ClaimsByAddresses.ContainsKey(item.IdAccount) && lastClaimInfo.IdClaimCurrentState != 6 && !lastClaimInfo.EndedForFilter;
+                    var hasOpenedClaims = Model.ClaimsByAddresses.ContainsKey(item.IdAccount) && lastClaimInfo.IdClaimCurrentState != 6;
                 }
                 <td style="@(hasOpenedClaims ? "background-color: #FEDCDC" : "")" title="@(hasOpenedClaims ? "По данному адресу имеются незавершенные претензионно-исковые работы" : "")">
                     @item.PaymentAccountNavigation.Account

@@ -16,6 +16,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public int? IdPremises { get; set; }
         public int? IdBuilding { get; set; }
         public int? IdPreset { get; set; } // Поисковые пресеты
+        public int? IdClaimsBehavior { get; set; } // Поведение при фильтрации с учетом исковых работ
         public DateTime? AtDate { get; set; }
         public int BalanceInputTotalOp { get; set; }
         public decimal? BalanceInputTotal { get; set;}
@@ -87,7 +88,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool IsModalEmpty()
         {
             return Account == null && Crn == null && Tenant == null && RawAddress == null &&
-                IdStreet == null && House == null && PremisesNum == null && IdPreset == null &&
+                IdStreet == null && House == null && PremisesNum == null && IdPreset == null && IdClaimsBehavior == null &&
                 BalanceInputTotal == null && BalanceInputTenancy == null && BalanceInputPenalties == null &&
                 BalanceInputDgiPadunPkk == null && ChargingTotal == null && ChargingTenancy == null && ChargingPenalties == null &&
                 ChargingDgiPadunPkk == null && RecalcTenancy == null && RecalcPenalties == null && RecalcDgiPadunPkk == null &&
