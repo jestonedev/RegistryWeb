@@ -89,12 +89,17 @@ namespace RegistryWeb.Controllers
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(process));
         }
         
-        public ActionResult Create(int? idObject, AddressTypes addressType = AddressTypes.None)
+        public ActionResult Create(int? idProcess, int? idObject, AddressTypes addressType = AddressTypes.None)
         {
             if (!securityService.HasPrivilege(Privileges.TenancyWrite))
                 return View("NotAccess");
             InitializeViewBag("Create", null, true);
-            return View("TenancyProcess", dataService.CreateTenancyProcessEmptyViewModel(idObject, addressType));
+            var vm = dataService.CreateTenancyProcessEmptyViewModel(idObject, addressType);
+            if (idProcess != null)
+            {
+                vm = dataService.ClearifyTenancyProcessVmForCopy(dataService.GetTenancyProcessViewModel(dataService.GetTenancyProcess(idProcess.Value)));
+            }
+            return View("TenancyProcess", vm);
         }
         
         [HttpPost]

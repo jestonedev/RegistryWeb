@@ -146,6 +146,38 @@ namespace RegistryWeb.DataServices
             };
         }
 
+        internal TenancyProcessVM ClearifyTenancyProcessVmForCopy(TenancyProcessVM tenancyProcessVM)
+        {
+            var tenancyProcess = tenancyProcessVM.TenancyProcess;
+            tenancyProcess.IdProcess = 0;
+            tenancyProcess.ProtocolDate = null;
+            tenancyProcess.ProtocolNum = null;
+            tenancyProcess.IdExecutor = registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
+                        e.ExecutorLogin.ToLowerInvariant() == securityService.User.UserName.ToLowerInvariant())?.IdExecutor;
+            foreach (var person in tenancyProcess.TenancyPersons)
+            {
+                person.IdProcess = 0;
+                person.IdPerson = 0;
+            }
+            foreach (var building in tenancyProcess.TenancyBuildingsAssoc)
+            {
+                building.IdProcess = 0;
+            }
+            foreach (var premise in tenancyProcess.TenancyPremisesAssoc)
+            {
+                premise.IdProcess = 0;
+            }
+            foreach (var subPremise in tenancyProcess.TenancySubPremisesAssoc)
+            {
+                subPremise.IdProcess = 0;
+            }
+            tenancyProcess.TenancyReasons = null;
+            tenancyProcess.TenancyAgreements = null;
+            tenancyProcess.TenancyFiles = null;
+            tenancyProcess.TenancyRentPeriods = null;
+            return tenancyProcessVM;
+        }
+
         internal TenancyProcessVM GetTenancyProcessViewModel(TenancyProcess process, [CallerMemberName]string action = "")
         {
             var tenancyProcessVM = CreateTenancyProcessEmptyViewModel(null, AddressTypes.None, action);

@@ -44,6 +44,11 @@
                             <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@Model.TenancyProcess.IdProcess">
                                 <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
                                    asp-controller="TenancyProcesses" asp-action="Edit" asp-route-idProcess="@Model.TenancyProcess.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+
+                                <a class="btn btn-outline-dark oi oi-layers" title="Копировать" aria-label="Копировать"
+                                   asp-controller="TenancyProcesses" asp-action="Create" asp-route-idProcess="@Model.TenancyProcess.IdProcess" asp-route-action="Create" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+
+
                                 <a class="btn btn-danger oi oi-x @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" title="Удалить" aria-label="Удалить"
                                    asp-controller="TenancyProcesses" asp-action="Delete" asp-route-idProcess="@Model.TenancyProcess.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                             </div>

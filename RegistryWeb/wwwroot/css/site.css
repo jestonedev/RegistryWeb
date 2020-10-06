@@ -127,3 +127,7 @@ h5.rr-resettle-card-header-sub-title {
 input.input-validation-error, button.input-validation-error, textarea.input-validation-error {
     border: 1px solid #dc3545;
 }
+
+.rr-index-tools-dropdown-menu.show {
+    display: flex;
+}
