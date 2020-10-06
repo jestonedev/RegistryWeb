@@ -190,7 +190,7 @@
                 <div class="col-md-6">
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" asp-for="Claim.EndedForFilter">
-                        <label class="form-check-label" asp-for="Claim.EndedForFilter" title="Считать исковую работу завершенной">Считать исковую работу завершенной</label>
+                        <label class="form-check-label" asp-for="Claim.EndedForFilter" title="Не учитывать при фильтрации">Не учитывать при фильтрации</label>
                     </div>
                 </div>
             </div>
@@ -325,7 +325,7 @@
                                 <a href="#" data-for="ClaimDescription" class="form-control btn btn-primary claim-toggler" title="Развернуть дополнительные сведения" style="font-weight:bold;">∨</a>
                             </div>
                         </div>
-                        <textarea id="ClaimDescription" class="form-control toggle-hide" asp-for="Claim.Description" title="Дополнительные сведения"></textarea>
+                        <textarea id="ClaimDescription" class="form-control toggle-hide" maxlength="2048" asp-for="Claim.Description" title="Дополнительные сведения"></textarea>
                     </div>
                 </div>
             </div>

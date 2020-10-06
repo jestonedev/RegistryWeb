@@ -345,4 +345,13 @@ $(function () {
     $('#TenancyProcessRentObjects').on('change', 'select[name^="IdPremises"]', getTenancyRentSubPremises);
     $('#TenancyProcessRentObjects').on('change', 'select[name^="IdSubPremises"]', updateSubPremisesArea);
     $('#TenancyProcessRentObjects select[name^="IdStreet"]').change();
+
+    let action = $('#TenancyProcessRentObjects').data('action');
+    if (action === "Create" && $('#TenancyProcessRentObjects .list-group-item').length > 0) {
+        let tenancyRentObjectToggle = $('#TenancyProcessRentObjectsForm .tenancy-process-toggler');
+        if (!isExpandElemntArrow(tenancyRentObjectToggle)) {
+            tenancyRentObjectToggle.click();
+        }
+        $('#TenancyProcessRentObjects .list-group-item .tenancy-rent-object-edit-btn').first().click();
+    }
 });

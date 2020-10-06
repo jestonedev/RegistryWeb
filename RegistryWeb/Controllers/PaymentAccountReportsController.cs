@@ -52,7 +52,7 @@ namespace RegistryWeb.Controllers
                 }
 
                 var file = reportService.RequestToBks(ids, idSigner, dateValue);
-                return File(file, odtMime, string.Format(@"Запрос в БКС{0}", idAccount == 0 ? "" : string.Format(" (лицевой счет № {0})", idAccount)));
+                return File(file, odtMime, string.Format(@"Запрос в БКС{0}.odt", idAccount == 0 ? "" : string.Format(" (лицевой счет № {0})", idAccount)));
             }
             catch (Exception ex)
             {
@@ -72,7 +72,8 @@ namespace RegistryWeb.Controllers
                     return Error(string.Format("Отсутствуют начисления по лицевому счету № {0}", idAccount));
                 }
                 var file = reportService.CalDept(payment, dateFrom, dateTo, fileFormat);
-               return File(file, fileFormat == 1 ? xlsxMime : odsMime, string.Format(@"Расчет суммы задолженности (лицевой счет № {0})", idAccount));
+               return File(file, fileFormat == 1 ? xlsxMime : odsMime, 
+                   string.Format(@"Расчет суммы задолженности (лицевой счет № {0}).{1}", idAccount, fileFormat == 1 ? "xlsx" : "ods"));
             }
             catch (Exception ex)
             {
@@ -93,7 +94,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ExportPayments(ids);
-                return File(file, odsMime, "Экспорт данных");
+                return File(file, odsMime, "Экспорт данных.ods");
             }
             catch (Exception ex)
             {

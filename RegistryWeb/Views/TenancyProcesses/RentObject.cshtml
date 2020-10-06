@@ -33,7 +33,7 @@
     <input type="hidden" value="@idBuilding" name="IdBuildingPrev_@id" />
     <input type="hidden" value="@idPremises" name="IdPremisesPrev_@id" />
     <input type="hidden" value="@idSubPremises" name="IdSubPremisesPrev_@id" />
-    <input type="hidden" value="@Model.Address.AddressType" name="AddressTypePrev_@id" />
+    <input type="hidden" value="@(ViewBag.Action == "Create" ? AddressTypes.None : Model.Address.AddressType)" name="AddressTypePrev_@id" />
     <input type="hidden" value="@Model.RentArea" name="RentAreaPrev_@id" />
     <div class="form-row">
         <div class="form-group col-12 col-lg-4">

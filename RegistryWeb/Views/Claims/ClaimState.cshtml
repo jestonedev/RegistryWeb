@@ -79,18 +79,18 @@
     <div class="form-row">
         <div class="form-group col-12 col-md-4">
             <label>Исполнитель</label>
-            <input type="text" disabled class="form-control" value="@claimState.Executor" id="Executor_@id" name="Executor_@id" title="Исполнитель">
+            <input type="text" disabled class="form-control" value="@claimState.Executor" maxlength="255" id="Executor_@id" name="Executor_@id" title="Исполнитель">
         </div>
         <div class="form-group col-12 col-md-8">
             <label>Примечание</label>
-            <input type="text" disabled class="form-control" value="@claimState.Description" id="Description_@id" name="Description_@id" title="Примечание">
+            <input type="text" disabled class="form-control" value="@claimState.Description" maxlength="2048" id="Description_@id" name="Description_@id" title="Примечание">
         </div>
     </div>
 
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 1 ? "" : "d-none")" data-id-state-type="1">
         <div class="form-group col-12">
             <label>Кто сделал запрос</label>
-            <input type="text" disabled class="form-control" value="@claimState.BksRequester" id="BksRequester_@id" name="BksRequester_@id" title="Кто сделал запрос">
+            <input type="text" disabled class="form-control" value="@claimState.BksRequester" id="BksRequester_@id" maxlength="255" name="BksRequester_@id" title="Кто сделал запрос">
         </div>
     </div>
 
@@ -101,7 +101,7 @@
         </div>
         <div class="form-group col-12 col-md-8">
             <label>Кто передал</label>
-            <input type="text" disabled class="form-control" value="@claimState.TransferToLegalDepartmentWho" id="TransferToLegalDepartmentWho_@id" name="TransferToLegalDepartmentWho_@id" title="Кто передал">
+            <input type="text" disabled class="form-control" value="@claimState.TransferToLegalDepartmentWho" id="TransferToLegalDepartmentWho_@id" maxlength="255" name="TransferToLegalDepartmentWho_@id" title="Кто передал">
         </div>
     </div>
 
@@ -112,7 +112,7 @@
         </div>
         <div class="form-group col-12 col-md-8">
             <label>Кто принял</label>
-            <input type="text" disabled class="form-control" value="@claimState.AcceptedByLegalDepartmentWho" id="AcceptedByLegalDepartmentWho_@id" name="AcceptedByLegalDepartmentWho_@id" title="Кто принял">
+            <input type="text" disabled class="form-control" value="@claimState.AcceptedByLegalDepartmentWho" id="AcceptedByLegalDepartmentWho_@id" maxlength="255" name="AcceptedByLegalDepartmentWho_@id" title="Кто принял">
         </div>
     </div>
 
@@ -127,7 +127,7 @@
         </div>
         <div class="form-group col-12 col-md-8">
             <label>Примечание</label>
-            <input type="text" disabled class="form-control" value="@claimState.ClaimDirectionDescription" id="ClaimDirectionDescription_@id" name="ClaimDirectionDescription_@id" title="Примечание">
+            <input type="text" disabled class="form-control" value="@claimState.ClaimDirectionDescription" id="ClaimDirectionDescription_@id" maxlength="255" name="ClaimDirectionDescription_@id" title="Примечание">
         </div>
     </div>
 
@@ -142,7 +142,7 @@
         </div>
         <div class="form-group col-12 col-md-8">
             <label>Номер с/п</label>
-            <input type="text" disabled class="form-control" value="@claimState.CourtOrderNum" id="CourtOrderNum_@id" name="CourtOrderNum_@id" title="Номер с/п">
+            <input type="text" disabled class="form-control" value="@claimState.CourtOrderNum" id="CourtOrderNum_@id" maxlength="255" name="CourtOrderNum_@id" title="Номер с/п">
         </div>
     </div>
 
@@ -163,7 +163,7 @@
         </div>
         <div class="form-group col-12 col-md-8">
             <label>Примечание</label>
-            <input type="text" disabled class="form-control" value="@claimState.ObtainingCourtOrderDescription" id="ObtainingCourtOrderDescription_@id" name="ObtainingCourtOrderDescription_@id" title="Примечание">
+            <input type="text" disabled class="form-control" value="@claimState.ObtainingCourtOrderDescription" maxlength="255" id="ObtainingCourtOrderDescription_@id" name="ObtainingCourtOrderDescription_@id" title="Примечание">
         </div>
     </div>
 
@@ -178,7 +178,7 @@
         </div>
         <div class="form-group col-12 col-md-8">
             <label>Примечание</label>
-            <input type="text" disabled class="form-control" value="@claimState.DirectionCourtOrderBailiffsDescription" id="DirectionCourtOrderBailiffsDescription_@id" name="DirectionCourtOrderBailiffsDescription_@id" title="Примечание">
+            <input type="text" disabled class="form-control" value="@claimState.DirectionCourtOrderBailiffsDescription" maxlength="255" id="DirectionCourtOrderBailiffsDescription_@id" name="DirectionCourtOrderBailiffsDescription_@id" title="Примечание">
         </div>
     </div>
 
@@ -193,7 +193,7 @@
         </div>
         <div class="form-group col-12 col-md-8">
             <label>Примечание</label>
-            <input type="text" disabled class="form-control" value="@claimState.EnforcementProceedingStartDescription" id="EnforcementProceedingStartDescription_@id" name="EnforcementProceedingStartDescription_@id" title="Примечание">
+            <input type="text" disabled class="form-control" value="@claimState.EnforcementProceedingStartDescription" maxlength="255" id="EnforcementProceedingStartDescription_@id" name="EnforcementProceedingStartDescription_@id" title="Примечание">
         </div>
     </div>
 
@@ -208,7 +208,7 @@
         </div>
         <div class="form-group col-12 col-md-8">
             <label>Примечание</label>
-            <input type="text" disabled class="form-control" value="@claimState.EnforcementProceedingEndDescription" id="EnforcementProceedingEndDescription_@id" name="EnforcementProceedingEndDescription_@id" title="Примечание">
+            <input type="text" disabled class="form-control" value="@claimState.EnforcementProceedingEndDescription" maxlength="255" id="EnforcementProceedingEndDescription_@id" name="EnforcementProceedingEndDescription_@id" title="Примечание">
         </div>
     </div>
 
@@ -223,7 +223,7 @@
         </div>
         <div class="form-group col-12 col-md-8">
             <label>Примечание</label>
-            <input type="text" disabled class="form-control" value="@claimState.EnforcementProceedingTerminateDescription" id="EnforcementProceedingTerminateDescription_@id" name="EnforcementProceedingTerminateDescription_@id" title="Примечание">
+            <input type="text" disabled class="form-control" value="@claimState.EnforcementProceedingTerminateDescription" maxlength="255" id="EnforcementProceedingTerminateDescription_@id" name="EnforcementProceedingTerminateDescription_@id" title="Примечание">
         </div>
     </div>
 
@@ -238,7 +238,7 @@
         </div>
         <div class="form-group col-12 col-md-8">
             <label>Примечание</label>
-            <input type="text" disabled class="form-control" value="@claimState.RepeatedDirectionCourtOrderBailiffsDescription" id="RepeatedDirectionCourtOrderBailiffsDescription_@id" name="RepeatedDirectionCourtOrderBailiffsDescription_@id" title="Примечание">
+            <input type="text" disabled class="form-control" value="@claimState.RepeatedDirectionCourtOrderBailiffsDescription" maxlength="255" id="RepeatedDirectionCourtOrderBailiffsDescription_@id" name="RepeatedDirectionCourtOrderBailiffsDescription_@id" title="Примечание">
         </div>
     </div>
 
@@ -253,7 +253,7 @@
         </div>
         <div class="form-group col-12 col-md-8">
             <label>Примечание</label>
-            <input type="text" disabled class="form-control" value="@claimState.RepeatedEnforcementProceedingStartDescription" id="RepeatedEnforcementProceedingStartDescription_@id" name="RepeatedEnforcementProceedingStartDescription_@id" title="Примечание">
+            <input type="text" disabled class="form-control" value="@claimState.RepeatedEnforcementProceedingStartDescription" maxlength="255" id="RepeatedEnforcementProceedingStartDescription_@id" name="RepeatedEnforcementProceedingStartDescription_@id" title="Примечание">
         </div>
     </div>
 
@@ -268,7 +268,7 @@
         </div>
         <div class="form-group col-12 col-md-8">
             <label>Примечание</label>
-            <input type="text" disabled class="form-control" value="@claimState.RepeatedEnforcementProceedingEndDescription" id="RepeatedEnforcementProceedingEndDescription_@id" name="RepeatedEnforcementProceedingEndDescription_@id" title="Примечание">
+            <input type="text" disabled class="form-control" value="@claimState.RepeatedEnforcementProceedingEndDescription" maxlength="255" id="RepeatedEnforcementProceedingEndDescription_@id" name="RepeatedEnforcementProceedingEndDescription_@id" title="Примечание">
         </div>
     </div>
 
@@ -279,11 +279,11 @@
         </div>
         <div class="form-group col-6 col-md-4">
             <label>Причина завершения</label>
-            <input type="text" disabled class="form-control" value="@claimState.CourtOrderCompleteReason" id="CourtOrderCompleteReason_@id" name="CourtOrderCompleteReason_@id" title="Причина завершения">
+            <input type="text" disabled class="form-control" value="@claimState.CourtOrderCompleteReason" maxlength="255" id="CourtOrderCompleteReason_@id" name="CourtOrderCompleteReason_@id" title="Причина завершения">
         </div>
         <div class="form-group col-6 col-md-4">
             <label>Примечание</label>
-            <input type="text" disabled class="form-control" value="@claimState.CourtOrderCompleteDescription" id="CourtOrderCompleteDescription_@id" name="CourtOrderCompleteDescription_@id" title="Примечание">
+            <input type="text" disabled class="form-control" value="@claimState.CourtOrderCompleteDescription" maxlength="255" id="CourtOrderCompleteDescription_@id" name="CourtOrderCompleteDescription_@id" title="Примечание">
         </div>
     </div>
 

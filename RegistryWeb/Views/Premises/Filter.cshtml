@@ -24,7 +24,7 @@
         @if (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))
         {
             <div class="form-group col-2 col-md-1 col-lg-1">
-                <a class="btn btn-success" title="Добавить" aria-label="Добавить помещение" asp-controller="Premises" asp-action="Create">&#10010;</a>
+                <a class="btn btn-success" title="Добавить" aria-label="Добавить помещение" asp-controller="Premises" asp-action="Create" asp-route-idBuilding="@Model.FilterOptions.IdBuilding">&#10010;</a>
             </div>
         }
         @if (Model.FilterOptions.IsAddressEmpty())

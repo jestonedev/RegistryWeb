@@ -208,7 +208,7 @@
                         <hr class="col-md-12 p-0" />
                         <h5 class="col-12 pb-2">Содержание соглашения</h5>
                         <div class="form-group col-md-12">
-                            <textarea rows="15" id="Agreement_AgreementContent" name="Agreement.AgreementContent" class="form-control" title="Содержание дополнительного соглашения"></textarea>
+                            <textarea rows="15" id="Agreement_AgreementContent" maxlength="65536" name="Agreement.AgreementContent" class="form-control" title="Содержание дополнительного соглашения"></textarea>
                         </div>
                         @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                         {

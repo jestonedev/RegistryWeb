@@ -38,6 +38,19 @@ namespace RegistryWeb.ViewOptions.Filter
         public int AmountDgiPadunPkkOp { get; set; }
         public decimal? AmountDgiPadunPkk { get; set; }
 
+        public ClaimsFilter()
+        {
+            AmountDgiPadunPkkOp = 2;
+            AmountPenaltiesOp = 2;
+            AmountTenancyOp = 2;
+            AmountTotalOp = 2;
+            BalanceOutputDgiPadunPkkOp = 2;
+            BalanceOutputPenaltiesOp = 2;
+            BalanceOutputTenancyOp = 2;
+            BalanceOutputTotalOp = 2;
+            ClaimStateDateOp = 2;
+        }
+
         public bool IsEmpty()
         {
             return IsAddressEmpty() && IsModalEmpty() && IdBuilding == null && IdPremises == null && IdSubPremises == null && IdAccount == null;

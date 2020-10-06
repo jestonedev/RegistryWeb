@@ -82,7 +82,7 @@ namespace RegistryWeb.Controllers
                     processingIds.Add(idClaim);
                 }
                 var file = reportService.TransferToLegal(processingIds, idSigner, dateValue);
-                return File(file, docxMime, string.Format(@"Передача в юр. отдел{0}", idClaim == 0 ? "" : string.Format(" (исковой работы № {0})", idClaim)));
+                return File(file, docxMime, string.Format(@"Передача в юр. отдел{0}.docx", idClaim == 0 ? "" : string.Format(" (исковой работы № {0})", idClaim)));
             }
             catch (Exception ex)
             {
@@ -128,7 +128,7 @@ namespace RegistryWeb.Controllers
                 }
                 var idAccounts = dataService.GetAccountIds(processingIds);
                 var file = reportService.RequestToBks(idAccounts, idSigner, dateValue);
-                return File(file, odtMime, string.Format(@"Запрос в БКС{0}", idClaim == 0 ? "" : string.Format(" (иск. работа № {0})", idClaim)));
+                return File(file, odtMime, string.Format(@"Запрос в БКС{0}.odt", idClaim == 0 ? "" : string.Format(" (иск. работа № {0})", idClaim)));
             }
             catch (Exception ex)
             {
@@ -143,7 +143,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.CourtOrderStatement(idClaim, idOrder);
-                return File(file, odtMime, string.Format(@"Заявление о выдаче судебного приказа (иск. работа № {0})", idClaim));
+                return File(file, odtMime, string.Format(@"Заявление о выдаче судебного приказа (иск. работа № {0}).odt", idClaim));
             }
             catch (Exception ex)
             {
@@ -164,7 +164,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ExportClaims(ids);
-                return File(file, odsMime, "Экспорт данных");
+                return File(file, odsMime, "Экспорт данных.ods");
             }
             catch (Exception ex)
             {
@@ -180,7 +180,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.SplitAccountsReport();
-                return File(file, odsMime, "Статистика по разделенным лицевым счетам");
+                return File(file, odsMime, "Статистика по разделенным лицевым счетам.ods");
             }
             catch (Exception ex)
             {
@@ -197,7 +197,7 @@ namespace RegistryWeb.Controllers
             {
                 var executor = dataService.GetExecutor(idExecutor);
                 var file = reportService.ClaimStatesReport(startDate, endDate, executor);
-                return File(file, odsMime, "Отчет по стадиям исковых работ");
+                return File(file, odsMime, "Отчет по стадиям исковых работ.ods");
             }
             catch (Exception ex)
             {
@@ -213,7 +213,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ClaimExecutorsReport(startDate, endDate, idStateType, isCurrentState);
-                return File(file, odsMime, "Отчет по исполнителям исковой работы");
+                return File(file, odsMime, "Отчет по исполнителям исковой работы.ods");
             }
             catch (Exception ex)
             {
@@ -229,7 +229,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ClaimCourtReport(startDate, endDate);
-                return File(file, odsMime, "Подготовленные судебные приказы");
+                return File(file, odsMime, "Подготовленные судебные приказы.ods");
             }
             catch (Exception ex)
             {
@@ -245,7 +245,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ClaimEmergencyTariffReport(startDate, endDate);
-                return File(file, xlsxMime, "Отчет по тарифам аварийных помещений");
+                return File(file, xlsxMime, "Отчет по тарифам аварийных помещений.xlsx");
             }
             catch (Exception ex)
             {

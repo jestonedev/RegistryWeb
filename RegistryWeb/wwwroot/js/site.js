@@ -192,7 +192,7 @@ $(function () {
     });
 
     $('.input-filter-chars, .input-chars').inputFilter(function (value) {
-        return /^([а-яА-Я]+)*$/.test(value);
+        return /^[а-яА-Я]*$/.test(value);
     });
 
     $('.input-filter-snp, .input-snp').inputFilter(function (value) {

@@ -251,6 +251,26 @@ namespace RegistryWeb.DataServices
             query = PaymentFilter(query, filterOptions);
             query = OutputBalanceFilter(query, filterOptions);
             query = PresetsFilter(query, filterOptions);
+            query = ClaimsBehaviorFilter(query, filterOptions);
+            return query;
+        }
+
+        private IQueryable<Payment> ClaimsBehaviorFilter(IQueryable<Payment> query, PaymentsFilter filterOptions)
+        {
+            if (filterOptions.IdClaimsBehavior != null)
+            {
+                var filterIdAccounts = registryContext.Claims.Where(r => r.EndedForFilter)
+                    .Select(r => r.IdAccount).Distinct().ToList();
+                switch(filterOptions.IdClaimsBehavior)
+                {
+                    case 1:
+                        query = query.Where(r => !filterIdAccounts.Contains(r.IdAccount));
+                        break;
+                    case 2:
+                        query = query.Where(r => filterIdAccounts.Contains(r.IdAccount));
+                        break;
+                }
+            }
             return query;
         }
 
@@ -747,7 +767,7 @@ namespace RegistryWeb.DataServices
                         {
                             foreach (var claimStateInfo in claimInfo.Value)
                             {
-                                if (claimStateInfo.IdClaimCurrentState != 6 && !claimStateInfo.EndedForFilter)
+                                if (claimStateInfo.IdClaimCurrentState != 6)
                                 {
                                     ids.Add(claimInfo.Key);
                                     break;

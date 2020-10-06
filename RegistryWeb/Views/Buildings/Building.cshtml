@@ -126,7 +126,7 @@
                 </div>
                 <div class="form-group col-12 col-md-3 col-lg-2">
                     <label asp-for="House">Номер дома</label>
-                    <input type="text" class="form-control input-house" asp-for="House" title="Номер дома">
+                    <input type="text" class="form-control input-house" asp-for="House" maxlength="20" title="Номер дома">
                     <span asp-validation-for="House" class="text-danger"></span>
                 </div>
                 <div class="form-group col-6 col-lg-2">
@@ -233,12 +233,12 @@
             <div class="form-row">
                 <div class="form-group col-6 col-lg-3">
                     <label asp-for="Series">Серия, тип постройки</label>
-                    <input type="text" class="form-control" asp-for="Series" title="Серия, тип постройки">
+                    <input type="text" class="form-control" asp-for="Series" maxlength="255" title="Серия, тип постройки">
                     <span asp-validation-for="Series" class="text-danger"></span>
                 </div>
                 <div class="form-group col-6 col-lg-3">
                     <label asp-for="CadastralNum">Кадастровый номер</label>
-                    <input type="text" class="form-control input-cadastral-num" asp-for="CadastralNum" title="Кадастровый номер">
+                    <input type="text" class="form-control input-cadastral-num" asp-for="CadastralNum" maxlength="20" title="Кадастровый номер">
                     <span asp-validation-for="CadastralNum" class="text-danger"></span>
                 </div>
                 <div class="form-group col-6 col-lg-3">
@@ -255,7 +255,7 @@
             <div class="form-row">
                 <div class="form-group col-12 col-lg-4">
                     <label class="rr-building-label input-cadastral-num" asp-for="LandCadastralNum">Кадастровый номер земельного участка</label>
-                    <input type="text" class="form-control input-cadastral-num" asp-for="LandCadastralNum" title="Кадастровый номер земельного участка, на котором расположено здание">
+                    <input type="text" class="form-control input-cadastral-num" asp-for="LandCadastralNum" maxlength="20" title="Кадастровый номер земельного участка, на котором расположено здание">
                     <span asp-validation-for="LandCadastralNum" class="text-danger"></span>
                 </div>
                 <div class="form-group col-6 col-lg-4">
@@ -283,7 +283,7 @@
                             <div class="input-group-prepend">
                                 <div class="input-group-text">№</div>
                             </div>
-                            <input type="text" class="form-control" asp-for="MemorialNumber" title="Номер документа">
+                            <input type="text" class="form-control" asp-for="MemorialNumber" maxlength="255" title="Номер документа">
                             <span asp-validation-for="MemorialNumber" class="text-danger"></span>
                         </div>
                     </div>
@@ -296,7 +296,7 @@
                             <div class="input-group-prepend">
                                 <div class="input-group-text">Орган</div>
                             </div>
-                            <input type="text" class="form-control" asp-for="MemorialNameOrg" title="Наименование органа, выдавшего документ">
+                            <input type="text" class="form-control" asp-for="MemorialNameOrg" maxlength="255" title="Наименование органа, выдавшего документ">
                             <span asp-validation-for="MemorialNameOrg" class="text-danger"></span>
                         </div>
                     </div>
@@ -352,19 +352,19 @@
 
             <div class="form-group">
                 <label asp-for="HousingCooperative">Управляющая компания / ТСЖ</label>
-                <input type="text" class="form-control" asp-for="HousingCooperative" title="Управляющая компания / ТСЖ">
+                <input type="text" class="form-control" asp-for="HousingCooperative" maxlength="255" title="Управляющая компания / ТСЖ">
                 <span asp-validation-for="HousingCooperative" class="text-danger"></span>
             </div>
 
             <div class="form-row">
                 <div class="form-group col-12 col-md-6">
                     <label asp-for="Description">Другие сведения</label>
-                    <textarea rows="5" class="form-control" asp-for="Description" title="Другие сведения"></textarea>
+                    <textarea rows="5" class="form-control" asp-for="Description" maxlength="4096" title="Другие сведения"></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
                 <div class="form-group col-12 col-md-6">
                     <label asp-for="BtiRooms">Приватиз. квартиры согласно БТИ</label>
-                    <textarea rows="5" class="form-control" asp-for="BtiRooms" title="Приватиз. квартиры согласно БТИ"></textarea>
+                    <textarea rows="5" class="form-control" asp-for="BtiRooms" maxlength="1512" title="Приватиз. квартиры согласно БТИ"></textarea>
                     <span asp-validation-for="BtiRooms" class="text-danger"></span>
                 </div>
             </div>

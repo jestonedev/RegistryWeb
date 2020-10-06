@@ -705,10 +705,12 @@ namespace RegistryWeb.DataServices
             registryContext.SaveChanges();            
         }
 
-        internal Premise CreatePremise()
+        internal Premise CreatePremise(int ?idBuilding)
         {
             var premise = new Premise {
-                RegDate = new DateTime(1999, 10, 29)
+                RegDate = new DateTime(1999, 10, 29),
+                IdBuilding = idBuilding ?? 0,
+                IdBuildingNavigation = idBuilding != null ? registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == idBuilding.Value)  : null
             };
             premise.FundsPremisesAssoc = new List<FundPremiseAssoc>() { new FundPremiseAssoc() };
             premise.OwnerPremisesAssoc = new List<OwnerPremiseAssoc>() { new OwnerPremiseAssoc() };

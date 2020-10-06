@@ -16,6 +16,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public int? IdPremises { get; set; }
         public int? IdBuilding { get; set; }
         public int? IdPreset { get; set; } // Поисковые пресеты
+        public int? IdClaimsBehavior { get; set; } // Поведение при фильтрации с учетом исковых работ
         public DateTime? AtDate { get; set; }
         public int BalanceInputTotalOp { get; set; }
         public decimal? BalanceInputTotal { get; set;}
@@ -55,6 +56,30 @@ namespace RegistryWeb.ViewOptions.Filter
         public decimal? BalanceOutputPenalties { get; set; }
         public int BalanceOutputDgiPadunPkkOp { get; set; }
         public decimal? BalanceOutputDgiPadunPkk { get; set; }
+
+        public PaymentsFilter()
+        {
+            BalanceInputDgiPadunPkkOp = 2;
+            BalanceInputPenaltiesOp = 2;
+            BalanceInputTenancyOp = 2;
+            BalanceInputTotalOp = 2;
+            BalanceOutputDgiPadunPkkOp = 2;
+            BalanceOutputPenaltiesOp = 2;
+            BalanceOutputTenancyOp = 2;
+            BalanceOutputTotalOp = 2;
+            ChargingDgiPadunPkkOp = 2;
+            ChargingPenaltiesOp = 2;
+            ChargingTenancyOp = 2;
+            ChargingTotalOp = 2;
+            PaymentDgiPadunPkkOp = 2;
+            PaymentPenaltiesOp = 2;
+            PaymentTenancyOp = 2;
+            RecalcDgiPadunPkkOp = 2;
+            RecalcPenaltiesOp = 2;
+            RecalcTenancyOp = 2;
+            TransferBalanceOp = 2;
+        }
+
         public bool IsEmpty()
         {
             return IsAddressEmpty() && IsModalEmpty() && IdBuilding == null && IdPremises == null && IdSubPremises == null;
@@ -63,7 +88,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool IsModalEmpty()
         {
             return Account == null && Crn == null && Tenant == null && RawAddress == null &&
-                IdStreet == null && House == null && PremisesNum == null && IdPreset == null &&
+                IdStreet == null && House == null && PremisesNum == null && IdPreset == null && IdClaimsBehavior == null &&
                 BalanceInputTotal == null && BalanceInputTenancy == null && BalanceInputPenalties == null &&
                 BalanceInputDgiPadunPkk == null && ChargingTotal == null && ChargingTenancy == null && ChargingPenalties == null &&
                 ChargingDgiPadunPkk == null && RecalcTenancy == null && RecalcPenalties == null && RecalcDgiPadunPkk == null &&

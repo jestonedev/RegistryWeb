@@ -102,7 +102,7 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-12">
+                        <div class="form-group col-12 col-md-6">
                             <label asp-for="FilterOptions.IdPreset">Особые критерии поиска</label>
                             <select class="selectpicker form-control" title="Особые критерии поиска" asp-for="FilterOptions.IdPreset">
                                 <option></option>
@@ -111,6 +111,14 @@
                                 <option value="3">Лицевые счета с незавершенными исковыми работами</option>
                                 <option value="4">Лицевые счета, в которых отсутствуют незавершенные исковые работы</option>
                                 <option value="5">В суд</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-12 col-md-6">
+                            <label asp-for="FilterOptions.IdPreset">Правило учета ИР при фильтрации</label>
+                            <select class="selectpicker form-control" title="Исключенные из фильтрации ИР" asp-for="FilterOptions.IdClaimsBehavior">
+                                <option selected>Все лицевые счета (игнорировать признак)</option>
+                                <option value="1">Лицевые счета, по которым отсутствуют ИР с признаком "Не учитывать при фильтрации"</option>
+                                <option value="2">Лицевые счета, по которым присутствуют ИР с признаком "Не учитывать при фильтрации"</option>
                             </select>
                         </div>
                     </div>
