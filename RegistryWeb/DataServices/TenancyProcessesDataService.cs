@@ -644,16 +644,16 @@ namespace RegistryWeb.DataServices
             }
             if (!string.IsNullOrEmpty(filterOptions.TenantSnp) || !string.IsNullOrEmpty(filterOptions.TenancyParticipantSnp))
             {
-                var tenantSnp = string.IsNullOrEmpty(filterOptions.TenantSnp) ? null : filterOptions.TenantSnp;
-                var tenancyParticipantSnp = string.IsNullOrEmpty(filterOptions.TenancyParticipantSnp) ? null : filterOptions.TenancyParticipantSnp;
+                var tenantSnp = string.IsNullOrEmpty(filterOptions.TenantSnp) ? null : filterOptions.TenantSnp.ToLowerInvariant();
+                var tenancyParticipantSnp = string.IsNullOrEmpty(filterOptions.TenancyParticipantSnp) ? null : filterOptions.TenancyParticipantSnp.ToLowerInvariant();
                 query = (from tRow in query
                          join tpRow in registryContext.TenancyPersons
                          on tRow.IdProcess equals tpRow.IdProcess
                          where tpRow.ExcludeDate == null &&
                              ((tenantSnp != null && tpRow.IdKinship == 1 &&
-                                 string.Concat(tpRow.Surname, " ", tpRow.Name, " ", tpRow.Patronymic).Contains(tenantSnp)) ||
+                                 string.Concat(tpRow.Surname, " ", tpRow.Name, " ", tpRow.Patronymic == null ? "": tpRow.Patronymic).ToLowerInvariant().Contains(tenantSnp)) ||
                              (tenancyParticipantSnp != null &&
-                                 string.Concat(tpRow.Surname, " ", tpRow.Name, " ", tpRow.Patronymic).Contains(tenancyParticipantSnp)))
+                                 string.Concat(tpRow.Surname, " ", tpRow.Name, " ", tpRow.Patronymic == null ? "" : tpRow.Patronymic).ToLowerInvariant().Contains(tenancyParticipantSnp)))
                          select tRow).Distinct();
             }
             if (filterOptions.IdPreset != null)
