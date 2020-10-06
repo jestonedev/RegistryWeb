@@ -1,0 +1,40 @@
+﻿@model RegistryWeb.ViewModel.OwnerProcessAddressVM;
+@{
+    string assocName = "";
+    string idName = "";
+    if (Model.AddressType == AddressTypes.Building)
+    {
+        assocName = "OwnerBuildingsAssoc";
+        idName = "IdBuilding";
+    }
+    else if (Model.AddressType == AddressTypes.Premise)
+    {
+        assocName = "OwnerPremisesAssoc";
+        idName = "IdPremise";
+    }
+    else if (Model.AddressType == AddressTypes.SubPremise)
+    {
+        assocName = "OwnerSubPremisesAssoc";
+        idName = "IdSubPremise";
+    }
+    var nameAttrIdProcess = assocName + "[" + Model.I + "].IdProcess";
+    var nameAttrIdAssoc = assocName + "[" + Model.I + "].IdAssoc";
+    var nameAttrId = assocName + "[" + Model.I + "]." + idName;
+}
+<li class="list-group-item col-12" data-i="@Model.I" data-addresstype="@Model.AddressType" >
+    <input type="hidden" value="@Model.IdProcess" name="@nameAttrIdProcess" />
+    <input type="hidden" value="@Model.IdAssoc" name="@nameAttrIdAssoc" />
+    <input type="hidden" value="@Model.Id" name="@nameAttrId" />
+    <div class="input-group">
+        <input type="text" class="form-control address" disabled title="@Model.Text" value="@Model.Text" />
+        <div class="input-group-append h-auto d-inline-block">
+            <a href="@Model.Href" class="btn btn-success oi oi-home"></a>
+        </div>
+        @if (Model.Action == ActionTypeEnum.Create || Model.Action == ActionTypeEnum.Edit)
+        {
+            <div class="input-group-append h-auto d-inline-block">
+                <a href="#" class="btn btn-danger oi oi-x addressDeleteBtn"></a>
+            </div>
+        }
+    </div>
+</li>

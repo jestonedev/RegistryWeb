@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
+using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
@@ -74,28 +75,47 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddressAdd(int id, string action)
+        public IActionResult AddressAdd(int idProcess, int id, int i, string text, AddressTypes addressType, ActionTypeEnum action)
         {
-            return ViewComponent("AddressComponent", new { addressAssoc = new OwnerBuildingAssoc(), id, action });
+            var addressVM = new OwnerProcessAddressVM();
+            addressVM.AddressType = addressType;
+            addressVM.Action = action;
+            addressVM.IdProcess = idProcess;
+            addressVM.IdAssoc = 0;
+            addressVM.Id = id;
+            addressVM.I = i;
+            addressVM.Text = text;
+            addressVM.Href = dataService.GetHrefToReestr(id, addressType);
+            return PartialView("OwnerProcessAddress", addressVM);
         }
 
         [HttpPost]
-        public IActionResult OwnerAdd(int idOwnerType, int id, string action)
+        public IActionResult OwnerAdd(int idOwnerType, int i, ActionTypeEnum action)
         {
-            var owner = new Owner() { IdOwnerType = idOwnerType };
-            owner.IdOwnerTypeNavigation = dataService.GetOwnerType(idOwnerType);
-            owner.OwnerReasons = new List<OwnerReason>() { new OwnerReason() };
+            var ownerVM = new OwnerVM();
+            ownerVM.Owner = new Owner() { IdOwnerType = idOwnerType };
+            ownerVM.Owner.IdOwnerTypeNavigation = dataService.GetOwnerType(idOwnerType);
             if (idOwnerType == 1)
-                owner.OwnerPerson = new OwnerPerson();
+                ownerVM.Owner.OwnerPerson = new OwnerPerson();
             if (idOwnerType == 2 || idOwnerType == 3)
-                owner.OwnerOrginfo = new OwnerOrginfo();
-            return ViewComponent("OwnerComponent", new { owner, id, action });
+                ownerVM.Owner.OwnerOrginfo = new OwnerOrginfo();
+            ownerVM.Owner.OwnerReasons = new List<OwnerReason>() { new OwnerReason() };
+            ownerVM.I = i;
+            ownerVM.Action = action;
+            ViewBag.OwnerReasonTypes = dataService.OwnerReasonTypes();
+            return PartialView("Owner", ownerVM);
         }
 
         [HttpPost]
-        public IActionResult OwnerReasonAdd(int iOwner, int iReason, string action)
+        public IActionResult OwnerReasonAdd(int iOwner, int iReason, ActionTypeEnum action)
         {
-            return ViewComponent("OwnerReasonComponent", new { ownerReason = new OwnerReason(), iOwner, iReason, action });
+            var ownerReasonVM = new OwnerReasonVM();
+            ownerReasonVM.OwnerReason = new OwnerReason();
+            ownerReasonVM.IOwner = iOwner;
+            ownerReasonVM.IReason = iReason;
+            ownerReasonVM.Action = action;
+            ViewBag.OwnerReasonTypes = dataService.OwnerReasonTypes();
+            return PartialView("OwnerReason", ownerReasonVM);
         }
 
         public IActionResult Details(int? idProcess)
@@ -164,10 +184,12 @@ namespace RegistryWeb.Controllers
 
         private IActionResult GetOwnerProcessView(OwnerProcess ownerProcess, [CallerMemberName]string action = "")
         {
-            ViewBag.Action = action;
+            var actionType = (ActionTypeEnum)Enum.Parse(typeof(ActionTypeEnum), action);
+            ViewBag.Action = actionType;
+            ViewBag.OwnerReasonTypes = dataService.OwnerReasonTypes();
             var ownerProcessVM = new OwnerProcessVM();
-            ownerProcessVM.OwnerProcess = ownerProcess;
-            if (action == "Details" || action == "Edit")
+            ownerProcessVM.OwnerProcess = ownerProcess;            
+            if (actionType == ActionTypeEnum.Details || actionType == ActionTypeEnum.Edit)
                 ownerProcessVM.Logs = dataService.GetProcessLog(ownerProcess.IdProcess);
             return View("OwnerProcessIndex", ownerProcessVM);
         }

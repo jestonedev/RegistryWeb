@@ -122,7 +122,7 @@ namespace RegistryWeb.Controllers
                     }
                 }
             }
-            return Json(new { idAddressType = (int)addressType, autocompletePairs });
+            return Json(new { addressType = addressType.ToString(), autocompletePairs });
         }
 
         [HttpPost]

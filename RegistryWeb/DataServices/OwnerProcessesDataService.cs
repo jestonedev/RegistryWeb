@@ -69,6 +69,26 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
+        public string GetHrefToReestr(int id, AddressTypes addressType)
+        {
+            if (addressType == AddressTypes.Building)
+            {
+                return "/Buildings/Details?idBuilding=" + id;
+            }
+            if (addressType == AddressTypes.Premise)
+            {
+                return "/Premises/Details?idPremises=" + id;
+            }
+            if (addressType == AddressTypes.SubPremise)
+            {
+                var idPremise = registryContext.SubPremises
+                    .Single(sp => sp.IdSubPremises == id)
+                    .IdPremises;
+                return "/Premises/Details?idPremises=" + idPremise;
+            }
+            return "#";
+        }
+
         private IQueryable<OwnerProcess> GetQuery()
         {
             return registryContext.OwnerProcesses.AsNoTracking();
@@ -317,9 +337,6 @@ namespace RegistryWeb.DataServices
         internal OwnerProcess CreateOwnerProcess()
         {
             var ownerProcess = new OwnerProcess();
-            ownerProcess.OwnerBuildingsAssoc = new List<OwnerBuildingAssoc>() { new OwnerBuildingAssoc() };
-            ownerProcess.OwnerPremisesAssoc = new List<OwnerPremiseAssoc>();
-            ownerProcess.OwnerSubPremisesAssoc = new List<OwnerSubPremiseAssoc>();
             var owner = new Owner() { IdOwnerType = 1 };
             owner.IdOwnerTypeNavigation = GetOwnerType(1);
             owner.OwnerPerson = new OwnerPerson();
@@ -334,15 +351,15 @@ namespace RegistryWeb.DataServices
         internal IQueryable<OwnerType> OwnerTypes()
             => registryContext.OwnerType.AsNoTracking();
 
+        internal IQueryable<OwnerReasonType> OwnerReasonTypes()
+            => registryContext.OwnerReasonTypes.AsNoTracking();
+
         internal OwnerType GetOwnerType(int idOwnerType)
             => registryContext.OwnerType.FirstOrDefault(ot => ot.IdOwnerType == idOwnerType);
 
         internal OwnerProcess GetOwnerProcess(int idProcess)
         {
             var ownerProcess = registryContext.OwnerProcesses
-                .Include(op => op.OwnerBuildingsAssoc)
-                .Include(op => op.OwnerPremisesAssoc)
-                .Include(op => op.OwnerSubPremisesAssoc)
                 .Include(op => op.Owners)
                     .ThenInclude(ow => ow.IdOwnerTypeNavigation)
                 .Include(op => op.Owners)
@@ -353,6 +370,35 @@ namespace RegistryWeb.DataServices
                     .ThenInclude(ow => ow.OwnerReasons)
                 .AsNoTracking()
                 .FirstOrDefault(op => op.IdProcess == idProcess);
+            ownerProcess.OwnerBuildingsAssoc =
+                registryContext.OwnerBuildingsAssoc
+                .Include(oba => oba.BuildingNavigation)
+                    .ThenInclude(b => b.IdStreetNavigation)
+                .Where(oba => oba.IdProcess == idProcess)
+                .AsNoTracking()
+                .ToList();
+            ownerProcess.OwnerPremisesAssoc =
+                registryContext.OwnerPremisesAssoc
+                .Include(opa => opa.PremiseNavigation)
+                    .ThenInclude(p => p.IdPremisesTypeNavigation)
+                .Include(opa => opa.PremiseNavigation)
+                    .ThenInclude(p => p.IdBuildingNavigation)
+                    .ThenInclude(b => b.IdStreetNavigation)
+                .Where(opa => opa.IdProcess == idProcess)
+                .AsNoTracking()
+                .ToList();
+            ownerProcess.OwnerSubPremisesAssoc =
+                registryContext.OwnerSubPremisesAssoc
+                .Include(ospa => ospa.SubPremiseNavigation)
+                    .ThenInclude(sp => sp.IdPremisesNavigation)
+                    .ThenInclude(p => p.IdPremisesTypeNavigation)
+                .Include(ospa => ospa.SubPremiseNavigation)
+                    .ThenInclude(sp => sp.IdPremisesNavigation)
+                    .ThenInclude(p => p.IdBuildingNavigation)
+                    .ThenInclude(b => b.IdStreetNavigation)
+                .Where(ospa => ospa.IdProcess == idProcess)
+                .AsNoTracking()
+                .ToList();
             return ownerProcess;
         }
 
@@ -421,6 +467,7 @@ namespace RegistryWeb.DataServices
                     {
                         if (newOwner.OwnerReasons.Select(or => or.IdReason).Contains(oldReason.IdReason) == false)
                         {
+                            registryContext.Entry(oldReason).Property(p => p.Deleted).IsModified = true;
                             oldReason.Deleted = 1;
                             newOwner.OwnerReasons.Add(oldReason);
                         }
@@ -431,6 +478,7 @@ namespace RegistryWeb.DataServices
             {
                 if (newOwnerProcess.OwnerBuildingsAssoc.Select(owba => owba.IdAssoc).Contains(oba.IdAssoc) == false)
                 {
+                    registryContext.Entry(oba).Property(p => p.Deleted).IsModified = true;
                     oba.Deleted = 1;
                     newOwnerProcess.OwnerBuildingsAssoc.Add(oba);
                 }
@@ -439,6 +487,7 @@ namespace RegistryWeb.DataServices
             {
                 if (newOwnerProcess.OwnerPremisesAssoc.Select(owpa => owpa.IdAssoc).Contains(opa.IdAssoc) == false)
                 {
+                    registryContext.Entry(opa).Property(p => p.Deleted).IsModified = true;
                     opa.Deleted = 1;
                     newOwnerProcess.OwnerPremisesAssoc.Add(opa);
                 }
@@ -447,6 +496,7 @@ namespace RegistryWeb.DataServices
             {
                 if (newOwnerProcess.OwnerSubPremisesAssoc.Select(owspa => owspa.IdAssoc).Contains(ospa.IdAssoc) == false)
                 {
+                    registryContext.Entry(ospa).Property(p => p.Deleted).IsModified = true;
                     ospa.Deleted = 1;
                     newOwnerProcess.OwnerSubPremisesAssoc.Add(ospa);
                 }
