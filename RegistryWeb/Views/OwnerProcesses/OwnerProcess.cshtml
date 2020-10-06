@@ -1,10 +1,12 @@
 ﻿@using RegistryWeb.Extensions;
+@using RegistryWeb.ViewModel;
 @model RegistryWeb.Models.Entities.OwnerProcess;
 @{
     var annulChecked = Model.AnnulDate == null ? "checked" : "";
     var controller = Context.Session.Get<string>("Controller");
+    var canEdit = ViewBag.Action == ActionTypeEnum.Create || ViewBag.Action == ActionTypeEnum.Edit;
 }
-<form asp-controller="OwnerProcesses" asp-action="@ViewBag.Action" id="r-ownerprocess-form" data-action="@ViewBag.Action" method="post">
+<form asp-controller="OwnerProcesses" asp-action="@ViewBag.Action" id="ownerProcessForm" data-action="@ViewBag.Action" method="post">
     <div class="card">
         <div class="card-header d-flex justify-content-between">
             <div class="form-check form-check-inline">
@@ -14,23 +16,23 @@
             </div>
             <div class="btn-group" role="group" aria-label="Панель доступа">
                 <a class="form-control btn btn-primary" asp-controller="@controller" asp-action="Index" asp-route-isBack="true">Назад</a>
-                @if (ViewBag.Action == "Create")
+                @if (ViewBag.Action == ActionTypeEnum.Create)
                 {
-                    <input type="submit" value="Создать" class="form-control btn btn-success" />
+                <a href="#" id="ownerProcessCreate" class="form-control btn btn-success">Создать</a>
                 }
-                @if (ViewBag.Action == "Edit")
+                @if (ViewBag.Action == ActionTypeEnum.Edit)
                 {
-                    <input type="submit" value="Сохранить" class="form-control btn btn-success" />
+                <a href="#" id="ownerProcessEdit" class="form-control btn btn-success">Сохранить</a>
                 }
-                @if (ViewBag.Action == "Delete")
+                @if (ViewBag.Action == ActionTypeEnum.Delete)
                 {
-                    <input type="submit" value="Удалить" class="form-control btn btn-danger" />
+                <a href="#" id="ownerProcessDelete" class="form-control btn btn-danger">Удалить</a>
                 }
                 <a href="#" id="ownerProcessToggle" class="form-control btn btn-primary" title="Развернуть процесс собственности" style="font-weight:bold;">∧</a>
             </div>
         </div>
         <div class="card-body" id="ownerProcess">
-            <input type="hidden" asp-for="IdProcess" />
+            <input type="hidden" value="@Model.IdProcess" name="IdProcess"/>
             <div class="validation text-danger" asp-validation-summary="All"></div>
             <div class="card" id="annulOwnerProcessCard">
                 <div class="card-header d-flex justify-content-between">
@@ -41,12 +43,13 @@
                 </div>
                 <div id="annulOwnerProcess" class="card-body row">
                     <div class="col-2">
-                        <input type="date" class="form-control" placeholder="Дата аннулирования" title="Дата аннулирования"
-                               asp-for="AnnulDate" />
+                        <input type="date" class="form-control ignore" placeholder="Дата аннулирования" title="Дата аннулирования"
+                               data-val="true"
+                               value="@Model.AnnulDate?.ToString("yyyy-MM-dd")" name="AnnulDate"/>
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" placeholder="Причина аннулирования" title="Причина аннулирования"
-                               asp-for="AnnulComment" />
+                        <input type="text" class="form-control ignore" placeholder="Причина аннулирования" title="Причина аннулирования"
+                               value="@Model.AnnulComment" name="AnnulComment"/>
                     </div>
                 </div>
             </div>
@@ -54,45 +57,76 @@
                 <div class="card-header d-flex justify-content-between">
                     <h3>Адреса</h3>
                     <div class="btn-group" role="group">
-                        @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
-                        {
-                            <a href="#" id="addressAdd" class="form-control btn btn-success" title="Добавить адрес">&#10010;</a>
-                        }
                         <a href="#" id="addressesToggle" class="form-control btn btn-primary" title="Развернуть коментарий" style="font-weight:bold;">∧</a>
                     </div>
                 </div>
-                <div id="addresses" class="card-body">
+                <ul id="addresses" class="list-group list-group-flush">
+                    @if (canEdit)
+                    {
+                        <li class="list-group-item col-12">
+                            <div class="input-group">
+                                <input type="text" id="addressSearch" name="AddressSearch" class="form-control" title="Адрес" placeholder="Адрес"/>
+                                <div class="input-group-append h-auto d-inline-block">
+                                    <a href="#" id="addressAddBtn" class="btn btn-success oi oi-plus disabled"></a>
+                                </div>
+                                <div class="input-group-append h-auto d-inline-block">
+                                    <a href="#" id="addressClearBtn" class="btn btn-danger oi oi-x disabled"></a>
+                                </div>
+                            </div>
+                        </li>
+                    }
                     @if (Model.OwnerBuildingsAssoc != null)
                     {
                         @for (var i = 0; i < Model.OwnerBuildingsAssoc.Count(); i++)
                         {
-                            @await Component.InvokeAsync("AddressComponent",
-                                     new { addressAssoc = Model.OwnerBuildingsAssoc[i], id = i, action = ViewBag.Action })
+                            <partial name="OwnerProcessAddress" model="@{new OwnerProcessAddressVM() {
+                            IdProcess = Model.OwnerBuildingsAssoc[i].IdProcess,
+                            IdAssoc = Model.OwnerBuildingsAssoc[i].IdAssoc,
+                            Id = Model.OwnerBuildingsAssoc[i].IdBuilding,
+                            I = i,
+                            Action = ViewBag.Action,
+                            AddressType = AddressTypes.Building,
+                            Text = Model.OwnerBuildingsAssoc[i].BuildingNavigation.GetAddress(),
+                            Href = "/Buildings/Details?idBuilding=" + Model.OwnerBuildingsAssoc[i].IdBuilding}}" />
                         }
                     }
                     @if (Model.OwnerPremisesAssoc != null)
                     {
                         @for (var i = 0; i < Model.OwnerPremisesAssoc.Count(); i++)
                         {
-                            @await Component.InvokeAsync("AddressComponent",
-                                     new { addressAssoc = Model.OwnerPremisesAssoc[i], id = i, action = ViewBag.Action })
+                            <partial name="OwnerProcessAddress" model="@{new OwnerProcessAddressVM() {
+                            IdProcess = Model.OwnerPremisesAssoc[i].IdProcess,
+                            IdAssoc = Model.OwnerPremisesAssoc[i].IdAssoc,
+                            Id = Model.OwnerPremisesAssoc[i].IdPremise,
+                            I = i,
+                            Action = ViewBag.Action,
+                            AddressType = AddressTypes.Premise,
+                            Text = Model.OwnerPremisesAssoc[i].PremiseNavigation.GetAddress(),
+                            Href = "/Premises/Details?idPremises=" + Model.OwnerPremisesAssoc[i].IdPremise}}" />
                         }
                     }
                     @if (Model.OwnerSubPremisesAssoc != null)
                     {
                         @for (var i = 0; i < Model.OwnerSubPremisesAssoc.Count(); i++)
                         {
-                            @await Component.InvokeAsync("AddressComponent",
-                                     new { addressAssoc = Model.OwnerSubPremisesAssoc[i], id = i, action = ViewBag.Action })
+                            <partial name="OwnerProcessAddress" model="@{new OwnerProcessAddressVM() {
+                            IdProcess = Model.OwnerSubPremisesAssoc[i].IdProcess,
+                            IdAssoc = Model.OwnerSubPremisesAssoc[i].IdAssoc,
+                            Id = Model.OwnerSubPremisesAssoc[i].IdSubPremise,
+                            I = i,
+                            Action = ViewBag.Action,
+                            AddressType = AddressTypes.SubPremise,
+                            Text = Model.OwnerSubPremisesAssoc[i].SubPremiseNavigation.GetAddress(),
+                            Href = "/Premises/Details?idPremises=" + Model.OwnerSubPremisesAssoc[i].SubPremiseNavigation.IdPremises}}" />
                         }
                     }
-                </div>
+                </ul>
             </div>
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <h3>Собственники</h3>
                     <div class="btn-group" role="group">
-                        @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                        @if (canEdit)
                         {
                             <a class="form-control">Добавить:</a>
                             <a href="#" class="form-control btn btn-success ownerAdd" title="Добавить физическое лицо" data-id-owner-type="1">ФЛ</a>
@@ -109,7 +143,7 @@
                             <th width="100px">Документы</th>
                             <th width="50px">Доля</th>
                             <th>Данные</th>
-                            @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                            @if (canEdit)
                             {
                                 <th></th>
                             }
@@ -120,14 +154,16 @@
                         {
                             @for (var i = 0; i < Model.Owners.Count(); i++)
                             {
-                                @await Component.InvokeAsync("OwnerComponent",
-                                    new { owner = Model.Owners[i], id = i, action = ViewBag.Action })
+                                <partial name="Owner" model="@{new OwnerVM() {
+                                Owner = Model.Owners[i],
+                                I = i,
+                                Action = ViewBag.Action}}" />
                             }
                         }
                     </tbody>
                 </table>
             </div>
-            <div class="card">
+            <div class=" card">
                 <div class="card-header d-flex justify-content-between">
                     <h3 for="Comment">Комментарий</h3>
                     <div class="btn-group" role="group">

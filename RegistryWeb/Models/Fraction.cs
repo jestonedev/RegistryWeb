@@ -69,7 +69,7 @@ namespace RegistryWeb.Models
         public static Fraction operator -(Fraction a, Fraction b) => 
             plusMinusOperation(a, b, (int x, int y) => x - y);
         public static Fraction operator -(Fraction a, int b) => a - new Fraction(b);
-        public static Fraction operator -(int a, Fraction b) => b - a;
+        public static Fraction operator -(int a, Fraction b) => new Fraction(a) - b;
 
         public static Fraction operator *(Fraction a, Fraction b) =>
             new Fraction(a.numerator * a.sign * b.numerator * b.sign, a.denominator * b.denominator);

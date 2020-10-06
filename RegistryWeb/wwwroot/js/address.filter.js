@@ -8,7 +8,8 @@
                 data: { text: request.term },
                 success: function (data) {
                     if (data !== "0" && data !== undefined) {
-                        $('input[name="FilterOptions.Address.AddressType"]').val(data.idAddressType);
+                        console.log(data.addressType);
+                        $('input[name="FilterOptions.Address.AddressType"]').val(data.addressType);
                         response($.map(data.autocompletePairs, function (pair) {
                             return { label: pair.item2, value: pair.item2, id: pair.item1 };
                         }));
@@ -18,9 +19,9 @@
         },
         select: function (event, ui) {
             var inputAddressType = $('input[name="FilterOptions.Address.AddressType"]');
-            var idAddressType = inputAddressType.val();
+            var addressType = inputAddressType.val();
             filterClearModal();
-            inputAddressType.val(idAddressType);
+            inputAddressType.val(addressType);
             $('input[name="FilterOptions.Address.Id"]').val(ui.item.id);
             $('input[name="FilterOptions.Address.Text"]').val(ui.item.value);            
             $("form.filterForm").submit();

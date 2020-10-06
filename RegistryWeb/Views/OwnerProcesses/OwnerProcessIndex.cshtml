@@ -1,6 +1,6 @@
 ﻿@model RegistryWeb.ViewModel.OwnerProcessVM;
 @{
-    if (ViewBag.Action == "Create")
+    if (ViewBag.Action == ActionTypeEnum.Create)
     {
         ViewData["Title"] = "Создание нового процесса собственности";
     }
@@ -9,19 +9,20 @@
         ViewData["Title"] = "Процесс собственности №" + Model.OwnerProcess.IdProcess;
     }
 }
-@Html.Partial("OwnerProcess", Model.OwnerProcess)
-@if (ViewBag.Action == "Details" || ViewBag.Action == "Edit")
+<partial name="OwnerProcess" model="Model.OwnerProcess" />
+@if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Edit)
 {
-    @*@Html.Partial("OwnerProcessLog", Model.Logs)*@
     @await Component.InvokeAsync("OwnerProcessLogComponent", Model.Logs)
 }
+@section Styles {
+    <link rel="stylesheet" href="~/css/owner.processes.css" asp-append-version="true" />
+}
 @section Scripts {
-    <script src="~/js/address.common.js" asp-append-version="true"></script>
-    <script src="~/js/owner.common.js" asp-append-version="true"></script>
+    <script src="~/js/ownerProcess.address.js" asp-append-version="true"></script>
+    <script src="~/js/ownerProcess.owner.js" asp-append-version="true"></script>
     <script src="~/js/ownerProcess.common.js" asp-append-version="true"></script>
-    <script src="~/lib/bootstrap4-toggle/js/bootstrap4-toggle.min.js"></script>
-    <link href="~/lib/bootstrap4-toggle/css/bootstrap4-toggle.min.css" rel="stylesheet">
-    @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+
+    @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
     {
         <script>
             $(function () {

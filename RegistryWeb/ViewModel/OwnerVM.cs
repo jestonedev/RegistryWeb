@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace RegistryWeb.ViewModel
 {
-    public class AddressVM
+    public class OwnerVM
     {
-        public IEnumerable<KladrStreet> KladrStreets { get; set; }
-        public IEnumerable<ProcessAddress> Addresses { get; set; }
+        public Owner Owner { get; set; }
+        public int I { get; set; }
+        public ActionTypeEnum Action { get; set; }
     }
 }
