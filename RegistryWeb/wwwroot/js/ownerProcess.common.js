@@ -39,14 +39,30 @@ var annulOwnerProcessCheckboxChange = function () {
     }
 }
 var logToggle = function (e) {
+    var logCard = $(this).parents('.card');
+    var logCardBody = logCard.find('.card-body');
+    var isHidden = logCardBody.length == 0;
+    if (isHidden) {
+        var idProcess = $('input[name="IdProcess"]').val();
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/OwnerProcesses/ProcessLogGet',
+            data: { idProcess },
+            success: function (processLog) {
+                logCard.find('.card-header').after(processLog);
+                $('.logValueToggle').click(logValueToggle);
+            }
+        });
+    }
+    else {
+        logCardBody.remove();
+    }
     arrowAnimation($(this));
-    $('#logTable').toggle();
     e.preventDefault();
 }
 var logValueToggle = function (e) {
     arrowAnimation($(this));
     var ind = $(this).data('ind');
-    console.log(ind);
     $('.logValue')
         .filter(function () { return $(this).data('ind') === ind; })
         .toggle();
@@ -138,7 +154,6 @@ $(function () {
     $('#annulOwnerProcessToggle').click(annulOwnerProcessToggle);
     $('#annulOwnerProcessCheckbox').change(annulOwnerProcessCheckboxChange);
     $('#logToggle').click(logToggle);
-    $('.logValueToggle').click(logValueToggle);
 
     $('#ownerProcessEdit, #ownerProcessCreate').click(function (e) {
         e.preventDefault();

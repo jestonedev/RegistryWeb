@@ -1,5 +1,5 @@
 ﻿var autocompleteFilterOptionsAddress = function () {
-    $('#FilterOptions_Address_Text').autocomplete({
+    $('input[name="FilterOptions.Address.Text"]').autocomplete({
         source: function (request, response) {
             $.ajax({
                 type: 'POST',
@@ -50,6 +50,6 @@ var addressFilterClear = function () {
 
 $(function () {
     autocompleteFilterOptionsAddress();
-    $('#FilterOptions_Address_Text').focusout(focusOutFilterOptionsAddress);
+    $('input[name="FilterOptions.Address.Text"]').focusout(focusOutFilterOptionsAddress);
     $('#addressFilterClearBtn').click(addressFilterClear);
 });

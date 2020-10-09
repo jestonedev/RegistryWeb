@@ -1,7 +1,35 @@
 ﻿@using RegistryWeb.Extensions;
 @using RegistryWeb.ViewModel;
 @model RegistryWeb.Models.Entities.OwnerProcess;
+@section Styles {
+    <link rel="stylesheet" href="~/css/owner.processes.css" asp-append-version="true" />
+}
+@section Scripts {
+    <script src="~/js/ownerProcess.address.js" asp-append-version="true"></script>
+    <script src="~/js/ownerProcess.owner.js" asp-append-version="true"></script>
+    <script src="~/js/ownerProcess.common.js" asp-append-version="true"></script>
+
+    @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
+    {
+        <script>
+            $(function () {
+                $('select option:not(:selected)').attr('disabled', true)
+                //$('select').attr('disabled', true);
+                $('input').attr('readonly', true);
+                $('textarea').attr('readonly', true);
+            })
+        </script>
+    }
+}
 @{
+    if (ViewBag.Action == ActionTypeEnum.Create)
+    {
+        ViewData["Title"] = "Создание нового процесса собственности";
+    }
+    else
+    {
+        ViewData["Title"] = "Процесс собственности №" + Model.IdProcess;
+    }
     var annulChecked = Model.AnnulDate == null ? "checked" : "";
     var controller = Context.Session.Get<string>("Controller");
     var canEdit = ViewBag.Action == ActionTypeEnum.Create || ViewBag.Action == ActionTypeEnum.Edit;
@@ -15,24 +43,31 @@
                 <sup class="badge badge-danger ml-2" id="annulBadge">Аннулирован</sup>
             </div>
             <div class="btn-group" role="group" aria-label="Панель доступа">
-                <a class="form-control btn btn-primary" asp-controller="@controller" asp-action="Index" asp-route-isBack="true">Назад</a>
+                @if (@ViewBag.ReturnUrl != null)
+                {
+                    <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+                }
+                else
+                {
+                    <a class="form-control btn btn-primary" asp-controller="OwnerProcesses" asp-action="Index">Назад</a>
+                }
                 @if (ViewBag.Action == ActionTypeEnum.Create)
                 {
-                <a href="#" id="ownerProcessCreate" class="form-control btn btn-success">Создать</a>
+                    <a href="#" id="ownerProcessCreate" class="form-control btn btn-success">Создать</a>
                 }
                 @if (ViewBag.Action == ActionTypeEnum.Edit)
                 {
-                <a href="#" id="ownerProcessEdit" class="form-control btn btn-success">Сохранить</a>
+                    <a href="#" id="ownerProcessEdit" class="form-control btn btn-success">Сохранить</a>
                 }
                 @if (ViewBag.Action == ActionTypeEnum.Delete)
                 {
-                <a href="#" id="ownerProcessDelete" class="form-control btn btn-danger">Удалить</a>
+                    <a href="#" id="ownerProcessDelete" class="form-control btn btn-danger">Удалить</a>
                 }
                 <a href="#" id="ownerProcessToggle" class="form-control btn btn-primary" title="Развернуть процесс собственности" style="font-weight:bold;">∧</a>
             </div>
         </div>
         <div class="card-body" id="ownerProcess">
-            <input type="hidden" value="@Model.IdProcess" name="IdProcess"/>
+            <input type="hidden" value="@Model.IdProcess" name="IdProcess" />
             <div class="validation text-danger" asp-validation-summary="All"></div>
             <div class="card" id="annulOwnerProcessCard">
                 <div class="card-header d-flex justify-content-between">
@@ -45,11 +80,11 @@
                     <div class="col-2">
                         <input type="date" class="form-control ignore" placeholder="Дата аннулирования" title="Дата аннулирования"
                                data-val="true"
-                               value="@Model.AnnulDate?.ToString("yyyy-MM-dd")" name="AnnulDate"/>
+                               value="@Model.AnnulDate?.ToString("yyyy-MM-dd")" name="AnnulDate" />
                     </div>
                     <div class="col">
                         <input type="text" class="form-control ignore" placeholder="Причина аннулирования" title="Причина аннулирования"
-                               value="@Model.AnnulComment" name="AnnulComment"/>
+                               value="@Model.AnnulComment" name="AnnulComment" />
                     </div>
                 </div>
             </div>
@@ -65,7 +100,7 @@
                     {
                         <li class="list-group-item col-12">
                             <div class="input-group">
-                                <input type="text" id="addressSearch" name="AddressSearch" class="form-control" title="Адрес" placeholder="Адрес"/>
+                                <input type="text" id="addressSearch" name="AddressSearch" class="form-control" title="Адрес" placeholder="Адрес" />
                                 <div class="input-group-append h-auto d-inline-block">
                                     <a href="#" id="addressAddBtn" class="btn btn-success oi oi-plus disabled"></a>
                                 </div>
@@ -174,4 +209,15 @@
             </div>
         </div>
     </div>
+    @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Edit)
+    {
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h3 for="Comment">Журнал изменений</h3>
+            <div class="btn-group" role="group">
+                <a href="#" id="logToggle" class="form-control btn btn-primary" title="Развернуть журнал изменений" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+    </div>
+    }
 </form>

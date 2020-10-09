@@ -3,13 +3,9 @@
 @using RegistryWeb.SecurityServices;
 @model RegistryWeb.ViewModel.OwnerProcessesVM;
 @{
-    Context.Session.Set("Controller", "OwnerProcesses");
-    Context.Session.Set("Action", "Index");
-    Context.Session.Set("OrderOptions", Model.OrderOptions);
-    Context.Session.Set("FilterOptions", Model.FilterOptions);
-    Context.Session.Set("PageOptions", Model.PageOptions);
     var securityService = (SecurityService)ViewData["SecurityService"];
     var canEdit = securityService.HasPrivilege(Privileges.OwnerWrite);
+    var returnUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
 }
 <table class="table table-hover">
     <thead>
@@ -37,39 +33,28 @@
             {
                 annulStyle = "style=\"background-color:lightpink;\" title=\"Аннулирован\"";
             }
-        <tr @Html.Raw(annulStyle)>
-            <td class="align-middle">@item.IdProcess</td>
-            <td class="align-middle">
-                @foreach (var addr in Model.Addresses[item.IdProcess])
-                {
-                    @await Component.InvokeAsync("OwnerProcessesAddressComponent", new { address = addr, idProcess = item.IdProcess })
-                }
-            </td>
-            @*<div class="btn-group" role="group" aria-label="Панель доступа">
-                <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                <div class="dropdown-menu dropdown-menu-right but text-center" aria-labelledby="toolsBtn_@item.IdBuilding">
-                    <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                       asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@item.IdBuilding" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                    <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
-                       asp-controller="Buildings" asp-action="Edit" asp-route-idBuilding="@item.IdBuilding" asp-route-action="Edit" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                    <a class="btn btn-danger oi oi-x @(canEditBaseInfo ? "" : "disabled")" title="Удалить" aria-label="Удалить"
-                       asp-controller="Buildings" asp-action="Delete" asp-route-idBuilding="@item.IdBuilding" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                </div>
-            </div>*@
-            <td class="align-middle">
-                <div class="btn-group" role="group" aria-label="Панель доступа">
-                    <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                    <div class="dropdown-menu dropdown-menu-right but text-center" aria-labelledby="toolsBtn_@item.IdProcess">
-                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                           asp-action="Details" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
-                        <a class="btn btn-outline-dark oi oi-pencil @(canEdit ? "" : "disabled")" title="Изменить" aria-label="Изменить"
-                           asp-action="Edit" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
-                        <a class="btn btn-danger oi oi-x @(canEdit ? "" : "disabled")" title="Удалить" aria-label="Удалить"
-                           asp-action="Delete" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
+            <tr @Html.Raw(annulStyle)>
+                <td class="align-middle">@item.IdProcess</td>
+                <td class="align-middle">
+                    @foreach (var addr in Model.Addresses[item.IdProcess])
+                    {
+                        @await Component.InvokeAsync("OwnerProcessesAddressComponent", new { address = addr, idProcess = item.IdProcess })
+                    }
+                </td>
+                <td class="align-middle">
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right but text-center" aria-labelledby="toolsBtn_@item.IdProcess">
+                            <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                               asp-action="Details" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess" asp-route-returnUrl="@returnUrl"></a>
+                            <a class="btn btn-outline-dark oi oi-pencil @(canEdit ? "" : "disabled")" title="Изменить" aria-label="Изменить"
+                               asp-action="Edit" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess" asp-route-returnUrl="@returnUrl"></a>
+                            <a class="btn btn-danger oi oi-x @(canEdit ? "" : "disabled")" title="Удалить" aria-label="Удалить"
+                               asp-action="Delete" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
+                        </div>
                     </div>
-                </div>
-            </td>
-        </tr>
+                </td>
+            </tr>
         }
     </tbody>
 </table>

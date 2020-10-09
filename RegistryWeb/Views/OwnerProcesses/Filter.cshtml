@@ -2,29 +2,33 @@
 @{ 
     var kladrStreetsList = new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.FilterOptions.IdStreet);
     var ownerTypesList = new SelectList(ViewBag.OwnerTypes, "IdOwnerType", "OwnerType1", Model.FilterOptions.IdOwnerType);
+    var returnUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
 }
 <form asp-action="Index" method="get" class="filterForm">
-    <input type="hidden" asp-for="OrderOptions.OrderDirection" />
-    <input type="hidden" asp-for="OrderOptions.OrderField" />
-    <input type="hidden" asp-for="PageOptions.CurrentPage" />
-    <input type="hidden" asp-for="PageOptions.SizePage" />
-    <input type="hidden" asp-for="FilterOptions.Address.AddressType" />
-    <input type="hidden" asp-for="FilterOptions.Address.Id" />
+    <input type="hidden" name="OrderOptions.OrderDirection" value="@Model.OrderOptions.OrderDirection" />
+    <input type="hidden" name="OrderOptions.OrderField" value="@Model.OrderOptions.OrderField" />
+    <input type="hidden" name="PageOptions.CurrentPage" value="@Model.PageOptions.CurrentPage" />
+    <input type="hidden" name="PageOptions.CurrentPage" value="@Model.PageOptions.CurrentPage" />
+    <input type="hidden" name="FilterOptions.Address.AddressType" value="@Model.FilterOptions.Address.AddressType" />
+    <input type="hidden" name="FilterOptions.Address.Id" value="@Model.FilterOptions.Address.Id" />
+    <input type="hidden" name="returnUrl" value="@returnUrl" />
     <div class="form-row">
         <div class="form-group col-2 col-md-1 col-lg-1">
-            <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="OwnerProcesses" asp-action="Create">&#10010;</a>
+            <a href="#" id="createOwnerProcessBtn"class="btn btn-success" title="Создать" aria-label="Создать">&#10010;</a>
         </div>
         @if (Model.FilterOptions.IsAddressEmpty())
         {
             <div class="form-group col-7 col-md-9 col-lg-9">
-                <input type="text" class="form-control" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                <input type="text" class="form-control" title="Адрес" placeholder="Адрес"
+                       name="FilterOptions.Address.Text" value="@Model.FilterOptions.Address.Text" />
             </div>
         }
         else
         {
             <div class="form-group col-7 col-md-9 col-lg-9">
                 <div class="input-group">
-                    <input type="text" class="form-control col" disabled asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                    <input type="text" class="form-control col" readonly title="Адрес" placeholder="Адрес"
+                           name="FilterOptions.Address.Text" value="@Model.FilterOptions.Address.Text" />
                     <div class="input-group-append h-auto d-inline-block">
                         <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
                     </div>

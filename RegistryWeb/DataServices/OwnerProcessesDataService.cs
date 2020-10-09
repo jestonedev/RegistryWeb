@@ -131,7 +131,7 @@ namespace RegistryWeb.DataServices
                 addresses.Add(ownerProcess.IdProcess, curOwnerProcessAddresses);
             }
             return addresses;
-        }
+        }        
 
         private IQueryable<OwnerProcess> GetQueryFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
         {
@@ -334,7 +334,7 @@ namespace RegistryWeb.DataServices
                 .Take(pageOptions.SizePage);
         }
 
-        internal OwnerProcess CreateOwnerProcess()
+        internal OwnerProcess CreateOwnerProcess(OwnerProcessesFilter filterOptions)
         {
             var ownerProcess = new OwnerProcess();
             var owner = new Owner() { IdOwnerType = 1 };
@@ -342,6 +342,57 @@ namespace RegistryWeb.DataServices
             owner.OwnerPerson = new OwnerPerson();
             owner.OwnerReasons = new List<OwnerReason>() { new OwnerReason() };
             ownerProcess.Owners = new List<Owner>() { owner };
+            if (!filterOptions.IsAddressEmpty())
+            {
+                int id = 0;
+                if (!int.TryParse(filterOptions.Address.Id, out id))
+                    return ownerProcess;
+                switch (filterOptions.Address.AddressType)
+                {
+                    case AddressTypes.Building:
+                        ownerProcess.OwnerBuildingsAssoc = new List<OwnerBuildingAssoc>()
+                        {
+                            new OwnerBuildingAssoc()
+                            {
+                                IdBuilding = id,
+                                BuildingNavigation = registryContext.Buildings
+                                    .Include(b => b.IdStreetNavigation)
+                                    .SingleOrDefault(b => b.IdBuilding == id)
+                            }
+                        };
+                        break;
+                    case AddressTypes.Premise:
+                        ownerProcess.OwnerPremisesAssoc = new List<OwnerPremiseAssoc>()
+                        {
+                            new OwnerPremiseAssoc()
+                            {
+                                IdPremise = id,
+                                PremiseNavigation = registryContext.Premises
+                                    .Include(p => p.IdBuildingNavigation)
+                                        .ThenInclude(b => b.IdStreetNavigation)
+                                    .Include(p => p.IdPremisesTypeNavigation)
+                                    .SingleOrDefault(b => b.IdPremises == id)
+                            }
+                        };
+                        break;
+                    case AddressTypes.SubPremise:
+                        ownerProcess.OwnerSubPremisesAssoc = new List<OwnerSubPremiseAssoc>()
+                        {
+                            new OwnerSubPremiseAssoc()
+                            {
+                                IdSubPremise = id,
+                                SubPremiseNavigation = registryContext.SubPremises
+                                    .Include(sp => sp.IdPremisesNavigation)
+                                        .ThenInclude(p => p.IdBuildingNavigation)
+                                            .ThenInclude(b => b.IdStreetNavigation)
+                                    .Include(sp => sp.IdPremisesNavigation)
+                                        .ThenInclude(p => p.IdPremisesTypeNavigation)
+                                    .SingleOrDefault(sp => sp.IdSubPremises == id)
+                            }
+                        };
+                        break;
+                }
+            }
             return ownerProcess;
         }
 
@@ -504,6 +555,37 @@ namespace RegistryWeb.DataServices
             //Добавление и радактирование
             registryContext.OwnerProcesses.Update(newOwnerProcess);
             registryContext.SaveChanges();
+        }
+
+        internal object GetAddressInfo(int id, AddressTypes addressType)
+        {
+            switch (addressType)
+            {
+                case AddressTypes.Building:
+                    var building = registryContext.Buildings.Single(b => b.IdBuilding == id);
+                    return new
+                    {
+                        building.NumRooms,
+                        building.TotalArea,
+                        building.LivingArea
+                    };
+                case AddressTypes.Premise:
+                    var premise = registryContext.Premises.Single(p => p.IdPremises == id);
+                    return new
+                    {
+                        premise.NumRooms,
+                        premise.TotalArea,
+                        premise.LivingArea
+                    };
+                default:
+                    var subPremise = registryContext.SubPremises.Single(sp => sp.IdSubPremises == id);
+                    return new
+                    {
+                        NumRooms = 1,
+                        subPremise.TotalArea,
+                        subPremise.LivingArea
+                    };
+            }
         }
 
         internal IList<LogOwnerProcess> GetProcessLog(int idProcess)

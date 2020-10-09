@@ -20,15 +20,19 @@
     var nameAttrIdProcess = assocName + "[" + Model.I + "].IdProcess";
     var nameAttrIdAssoc = assocName + "[" + Model.I + "].IdAssoc";
     var nameAttrId = assocName + "[" + Model.I + "]." + idName;
+    var href = Model.Href + $"&returnUrl={Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
 }
-<li class="list-group-item col-12" data-i="@Model.I" data-addresstype="@Model.AddressType" >
+<li class="list-group-item col-12" data-i="@Model.I" data-addresstype="@Model.AddressType">
     <input type="hidden" value="@Model.IdProcess" name="@nameAttrIdProcess" />
     <input type="hidden" value="@Model.IdAssoc" name="@nameAttrIdAssoc" />
     <input type="hidden" value="@Model.Id" name="@nameAttrId" />
     <div class="input-group">
         <input type="text" class="form-control address" disabled title="@Model.Text" value="@Model.Text" />
-        <div class="input-group-append h-auto d-inline-block">
-            <a href="@Model.Href" class="btn btn-success oi oi-home"></a>
+        <div class="input-group-append d-inline-block">
+            <a href="#" class="btn btn-secondary oi oi-info addressInfoToggleBtn"></a>
+        </div>
+        <div class="input-group-append d-inline-block">
+            <a href="@href" class="btn btn-success oi oi-home"></a>
         </div>
         @if (Model.Action == ActionTypeEnum.Create || Model.Action == ActionTypeEnum.Edit)
         {
@@ -36,5 +40,25 @@
                 <a href="#" class="btn btn-danger oi oi-x addressDeleteBtn"></a>
             </div>
         }
+    </div>
+    <div class="row mt-2 info" style="display: none;">
+        <div class="col-4 input-group" title="Комнатность" >
+            <div class="input-group-prepend">
+                <span class="input-group-text">Ком</span>
+            </div>
+            <input type="text" readonly class="form-control" />
+        </div>
+        <div class="col-4 input-group" title="Общая площадь">
+            <div class="input-group-prepend">
+                <span class="input-group-text">S<sub>общ</sub></span>
+            </div>
+            <input type="text" readonly class="form-control" />
+        </div>
+        <div class="col-4 input-group" title="Жилая площадь">
+            <div class="input-group-prepend">
+                <span class="input-group-text">S<sub>жил</sub></span>
+            </div>
+            <input type="text" readonly class="form-control" />
+        </div>
     </div>
 </li>

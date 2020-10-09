@@ -17,8 +17,8 @@
                        name="Owners[@i].OwnerReasons[@j].DenominatorShare" />
             </div>
             <div class="col-4">
-                <select value="@Model.OwnerReason.IdReasonType" class="form-control" title="Тип документа основания"
-                        name="Owners[@i].OwnerReasons[@j].IdReasonType" asp-items="@{new SelectList(ViewBag.OwnerReasonTypes, "IdReasonType", "ReasonName")}"></select>
+                <select value="@Model.OwnerReason.IdReasonType" class="form-control" title="Тип документа основания"                        
+                        name="Owners[@i].OwnerReasons[@j].IdReasonType" asp-items="@{new SelectList(ViewBag.OwnerReasonTypes, "IdReasonType", "ReasonName", Model.OwnerReason.IdReasonType)}"></select>
             </div>
             <div class="col">
                 <input type="text" value="@Model.OwnerReason.ReasonNumber" class="form-control reasonNum" placeholder="Номер документа" title="Номер документа"

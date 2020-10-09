@@ -14,6 +14,7 @@
     {
         ViewData["Title"] = "Здание №" + Model.IdBuilding;
     }
+    var address = Model.IdStreetNavigation.StreetName + ", д." + Model.House;
 }
 @section scripts
     {
@@ -66,7 +67,10 @@
                             @if (securityService.HasPrivilege(Privileges.OwnerRead))
                             {
                                 <a class="dropdown-item" title="Собственники помещения" aria-label="Собственники помещения"
-                                   asp-controller="OwnerProcesses" asp-action="Index" asp-route-filterOptions.IdBuilding="@Model.IdBuilding">Процессы собственности</a>
+                                   asp-controller="OwnerProcesses" asp-action="Index"
+                                   asp-route-filterOptions.Address.AddressType="Building"
+                                   asp-route-filterOptions.Address.Id="@Model.IdBuilding"
+                                   asp-route-filterOptions.Address.Text="@address">Процессы собственности</a>
                             }
                             @if (securityService.HasPrivilege(Privileges.ClaimsRead))
                             {

@@ -25,24 +25,12 @@ namespace RegistryWeb.Controllers
         {
         }
 
-        public IActionResult Index(OwnerProcessesVM viewModel, bool isBack = false)
+        public IActionResult Index(OwnerProcessesVM viewModel)
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
-            if (isBack)
-            {
-                viewModel.OrderOptions = HttpContext.Session.Get<OrderOptions>("OrderOptions");
-                viewModel.PageOptions = HttpContext.Session.Get<PageOptions>("PageOptions");
-                viewModel.FilterOptions = HttpContext.Session.Get<OwnerProcessesFilter>("FilterOptions");
-            }
-            else
-            {
-                HttpContext.Session.Remove("OrderOptions");
-                HttpContext.Session.Remove("PageOptions");
-                HttpContext.Session.Remove("FilterOptions");
-            }
             ViewBag.KladrStreets = dataService.KladrStreets();
             ViewBag.OwnerTypes = dataService.OwnerTypes();
             ViewBag.SecurityService = securityService;
@@ -52,11 +40,13 @@ namespace RegistryWeb.Controllers
                 viewModel.FilterOptions));
         }
 
-        public IActionResult Create()
+        [HttpGet]
+        public IActionResult Create(OwnerProcessesFilter filterOptions, string returnUrl)
         {
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
                 return View("NotAccess");
-            return GetOwnerProcessView(dataService.CreateOwnerProcess());
+            ViewBag.ReturnUrl = returnUrl;
+            return GetOwnerProcessView(dataService.CreateOwnerProcess(filterOptions), returnUrl);
         }
 
         [HttpPost]
@@ -69,9 +59,9 @@ namespace RegistryWeb.Controllers
             if (ModelState.IsValid)
             {
                 dataService.Create(ownerProcess);
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", new { ownerProcess.IdProcess });
             }
-            return GetOwnerProcessView(ownerProcess);
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -118,7 +108,22 @@ namespace RegistryWeb.Controllers
             return PartialView("OwnerReason", ownerReasonVM);
         }
 
-        public IActionResult Details(int? idProcess)
+        [HttpPost]
+        public JsonResult AddressInfoGet(int id, AddressTypes addressType)
+        {
+            var addressInfo = dataService.GetAddressInfo(id, addressType);
+            return Json(addressInfo);
+        }
+
+        [HttpPost]
+        public IActionResult ProcessLogGet(int idProcess)
+        {
+            var processLog = dataService.GetProcessLog(idProcess);
+            return PartialView("OwnerProcessLog", processLog);
+        }
+
+        [HttpGet]
+        public IActionResult Details(int? idProcess, string returnUrl)
         {
             if (idProcess == null)
                 return NotFound();
@@ -127,11 +132,12 @@ namespace RegistryWeb.Controllers
             var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
             if (ownerProcess == null)
                 return NotFound();
-            return GetOwnerProcessView(ownerProcess);
+            ViewBag.ReturnUrl = returnUrl;
+            return GetOwnerProcessView(ownerProcess, returnUrl);
         }
 
         [HttpGet]
-        public IActionResult Delete(int? idProcess)
+        public IActionResult Delete(int? idProcess, string returnUrl)
         {
             if (idProcess == null)
                 return NotFound();
@@ -140,7 +146,7 @@ namespace RegistryWeb.Controllers
             var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
             if (ownerProcess == null)
                 return NotFound();
-            return GetOwnerProcessView(ownerProcess);
+            return GetOwnerProcessView(ownerProcess, returnUrl);
         }
 
         [HttpPost]
@@ -155,7 +161,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int? idProcess)
+        public IActionResult Edit(int? idProcess, string returnUrl)
         {
             if (idProcess == null)
                 return NotFound();
@@ -164,7 +170,7 @@ namespace RegistryWeb.Controllers
             var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
             if (ownerProcess == null)
                 return NotFound();
-            return GetOwnerProcessView(ownerProcess);
+            return GetOwnerProcessView(ownerProcess, returnUrl);
         }
 
         [HttpPost]
@@ -177,21 +183,18 @@ namespace RegistryWeb.Controllers
             if (ModelState.IsValid)
             {
                 dataService.Edit(ownerProcess);
-                return RedirectToAction("Index");
+                return RedirectToAction("Edit", new { ownerProcess.IdProcess });
             }
-            return GetOwnerProcessView(ownerProcess);
+            return RedirectToAction("Index");
         }
 
-        private IActionResult GetOwnerProcessView(OwnerProcess ownerProcess, [CallerMemberName]string action = "")
+        private IActionResult GetOwnerProcessView(OwnerProcess ownerProcess, string returnUrl, [CallerMemberName]string action = "")
         {
             var actionType = (ActionTypeEnum)Enum.Parse(typeof(ActionTypeEnum), action);
             ViewBag.Action = actionType;
             ViewBag.OwnerReasonTypes = dataService.OwnerReasonTypes();
-            var ownerProcessVM = new OwnerProcessVM();
-            ownerProcessVM.OwnerProcess = ownerProcess;            
-            if (actionType == ActionTypeEnum.Details || actionType == ActionTypeEnum.Edit)
-                ownerProcessVM.Logs = dataService.GetProcessLog(ownerProcess.IdProcess);
-            return View("OwnerProcessIndex", ownerProcessVM);
+            ViewBag.ReturnUrl = returnUrl;        
+            return View("OwnerProcess", ownerProcess);
         }
     }
 }

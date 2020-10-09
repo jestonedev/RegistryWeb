@@ -55,7 +55,7 @@ function addressClear() {
         .val(null)
         .attr('readonly', false);
 }
-function addressAdd() {
+function addressAdd(e) {
     var addressSearch = $('#addressSearch');
     var addressType = addressSearch.data('addresstype');
     if (addressType != "Building" && addressType != "Premise" && addressType != "SubPremise") {
@@ -97,6 +97,7 @@ function addressAdd() {
         }
     });
     addressClear();
+    e.preventDefault();
 }
 function addressDelete(li) {
     var addressType = li.data('addresstype');
@@ -112,6 +113,26 @@ function addressDelete(li) {
         $('.addressDeleteBtn').addClass('disabled');
     }
 }
+function addressInfoToggle(li) {
+    var addressType = li.data('addresstype');
+    var id = li.find('input')[2].value;
+    var infoBlock = li.find('.info');
+    var isHidden = infoBlock.is(':hidden');
+    if (isHidden) {
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/OwnerProcesses/AddressInfoGet',
+            data: {id, addressType},
+            success: function (addressInfo) {
+                var inputs = infoBlock.find('input');
+                inputs[0].value = addressInfo.numRooms;
+                inputs[1].value = addressInfo.totalArea;
+                inputs[2].value = addressInfo.livingArea;
+            }
+        });
+    }
+    infoBlock.toggle(isHidden);
+}
 $(function () {
     autocompleteFilterOptionsAddress();
     if ($('.address').length == 1) {
@@ -120,7 +141,13 @@ $(function () {
     $('#addresses').click(function (event) {
         //Удаление адрессов
         if ($(event.target).hasClass('addressDeleteBtn')) {
+            event.preventDefault();
             addressDelete($(event.target).parents('li'))
+        }
+        //Блок информации про адрес
+        if ($(event.target).hasClass('addressInfoToggleBtn')) {
+            event.preventDefault();
+            addressInfoToggle($(event.target).parents('li'))
         }
     });
     $('#addressClearBtn').click(addressClear);

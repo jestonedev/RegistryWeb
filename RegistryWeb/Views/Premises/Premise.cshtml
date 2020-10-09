@@ -17,6 +17,8 @@
     {
         ViewData["Title"] = "Помещение №" + Model.Premise.IdPremises;
     }
+    var address = Model.Premise.IdBuildingNavigation?.IdStreetNavigation?.StreetLong + ", д." + Model.Premise.IdBuildingNavigation?.House +
+                    ", " + Model.Premise.IdPremisesTypeNavigation?.PremisesTypeShort + Model.Premise.PremisesNum;
 }
 
 @section styles
@@ -77,7 +79,10 @@
                                 @if (securityService.HasPrivilege(Privileges.OwnerRead))
                                 {
                                     <a class="dropdown-item" title="Собственники помещения" aria-label="Собственники помещения"
-                                       asp-controller="OwnerProcesses" asp-action="Index" asp-route-filterOptions.IdPremises="@Model.Premise.IdPremises">Процессы собственности</a>
+                                       asp-controller="OwnerProcesses" asp-action="Index"
+                                       asp-route-filterOptions.Address.AddressType="Premise"
+                                       asp-route-filterOptions.Address.Id="@Model.Premise.IdPremises"
+                                       asp-route-filterOptions.Address.Text="@address">Процессы собственности</a>
                                 }
                                 @if (securityService.HasPrivilege(Privileges.ClaimsRead))
                                 {

@@ -114,6 +114,8 @@
                     idCurrentOwhershipType == 2 ? "Присутствует реквизит \"Аварийное\"" :
                     idCurrentOwhershipType == 7 ? "Присутствует реквизит \"Аварийное после 01.01.2012\"" :
                     "";
+                var address = item.IdBuildingNavigation?.IdStreetNavigation?.StreetLong + ", д." + item.IdBuildingNavigation?.House +
+                    ", " + item.IdPremisesTypeNavigation?.PremisesTypeShort + item.PremisesNum;
             }
             <td style="background-color: @backgroundColor; font-weight: bold;" title="@title">
                 @item.IdPremises
@@ -124,10 +126,7 @@
                         <a class="btn btn-success oi oi-home" title="Здание" aria-label="Здание" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                     </div>
                     <div class="col-xl-9 col-lg-12 col-md-8">
-                        @item.IdBuildingNavigation?.IdStreetNavigation?.StreetLong,
-                        д. @item.IdBuildingNavigation?.House,
-                        @item.IdPremisesTypeNavigation?.PremisesTypeShort @item.PremisesNum
-
+                        @address
                         <div class="dopinfo">
                             Тип помещения: @item.IdPremisesTypeNavigation?.PremisesTypeName<br />
                             Кадастровый номер: @item.CadastralNum<br />
@@ -195,7 +194,10 @@
                             @if (securityService.HasPrivilege(Privileges.OwnerRead))
                             {
                                 <a class="dropdown-item" title="Собственники помещения" aria-label="Собственники помещения"
-                                   asp-controller="OwnerProcesses" asp-action="Index" asp-route-filterOptions.IdPremises="@item.IdPremises">Процессы собственности</a>
+                                   asp-controller="OwnerProcesses" asp-action="Index"
+                                   asp-route-filterOptions.Address.AddressType="Premise"
+                                   asp-route-filterOptions.Address.Id="@item.IdPremises"
+                                   asp-route-filterOptions.Address.Text="@address">Процессы собственности</a>
                             }
                             @if (securityService.HasPrivilege(Privileges.ClaimsRead))
                             {

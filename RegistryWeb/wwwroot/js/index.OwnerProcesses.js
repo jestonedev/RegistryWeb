@@ -10,10 +10,16 @@ var filterClear = function () {
     resetModalForm(form);
     form.submit();
 };
+var createOwnerProcess = function () {
+    var form = $("form.filterForm")[0];
+    form.action = '/OwnerProcesses/Create';
+    form.submit();
+};
 $(function () {
     $('#searchModalBtn').click(searchModal);
     $('#filterClearModalBtn').click(filterClearModal);
     $('#filterClearBtn').click(filterClear);
+    $('#createOwnerProcessBtn').click(createOwnerProcess);
     $("#filterModalShow").on("click", function (e) {
         e.preventDefault();
         var modal = $("#filterModal");
