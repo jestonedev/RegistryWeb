@@ -72,7 +72,7 @@
             <input type="text" class="form-control decimal" disabled value="@Model.Account" maxlength="255" name="Account" title="Лицевой счет ФКР">
         </div>
     </div>
-    @if (securityService.HasPrivilege(Privileges.TenancyRead) && (ViewBag.Action == "Details" || ViewBag.Action == "Delete") && Model.PaymentInfo != null)
+    @if (securityService.HasPrivilege(Privileges.TenancyRead) && (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete) && Model.PaymentInfo != null)
     {
         <div class="form-row">
             <div class="form-group col r-form-group-label">
@@ -120,7 +120,7 @@
                 <label class="rr-premises-label">Примечание</label>
                 <input type="text" class="form-control decimal" disabled value="@Model.Description" name="Description" title="Примечание">
             </div>
-            @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+            @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
             {
                 <div class="col-md-2 text-md-right text-center rr-sub-premise-nav-buttons">
                     <div class="btn-group" role="group" aria-label="Панель доступа">
@@ -163,7 +163,7 @@
                     </div>
                 </div>
             }
-            @if (ViewBag.Action == "Edit")
+            @if (ViewBag.Action == ActionTypeEnum.Edit)
             {
                 <div class="col-md-2 text-md-right text-center rr-sub-premise-edit-buttons">
                     <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
@@ -176,7 +176,7 @@
                     </div>
                 </div>
             }
-            @if (ViewBag.Action == "Create")
+            @if (ViewBag.Action == ActionTypeEnum.Create)
             {
                 <a class="subpremise-edit-btn" style="display: none"></a>
                 <div class="col-md-2 text-md-right text-center rr-sub-premise-edit-buttons">

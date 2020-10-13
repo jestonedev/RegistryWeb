@@ -163,11 +163,12 @@ $(function () {
     var canEditBaseInfo = JSON.parse($('#building').data("caneditbaseinfo").toLowerCase());
     memorialCardClick();
     if (action === "Details" || action === "Delete" || !canEditBaseInfo) {
-        $('#building select').prop('disabled', true);
-        $('#building input').prop('disabled', true);
-        $('#building textarea').prop('disabled', true);
-        $('#building input[type="hidden"]').prop('disabled', false);
-        $('#building input[type="submit"]').prop('disabled', false);
+        $('#building select option:not(:selected)').attr('disabled', true)
+        $('#building input[type="checkbox"]').click(function () {
+            return false;
+        });
+        $('#building input').attr('readonly', true);
+        $('#building textarea').attr('readonly', true);
     }
     $('#buildingToggle').on('click', $('#building'), elementToogleHide);
     $('#createBtn').click(createBuildingClick);

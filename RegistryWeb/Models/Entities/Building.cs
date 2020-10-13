@@ -64,16 +64,16 @@ namespace RegistryWeb.Models.Entities
         public bool Improvement { get; set; }
         [Required]
         public bool Elevator { get; set; }
-        public bool? RubbishChute { get; set; }
+        public bool RubbishChute { get; set; }
         public double? Wear { get; set; }
         public string Description { get; set; }
         //Не используется
         //public DateTime? StateDate { get; set; }
-        public bool? Plumbing { get; set; }
-        public bool? HotWaterSupply { get; set; }
-        public bool? Canalization { get; set; }
-        public bool? Electricity { get; set; }
-        public bool? RadioNetwork { get; set; }
+        public bool Plumbing { get; set; }
+        public bool HotWaterSupply { get; set; }
+        public bool Canalization { get; set; }
+        public bool Electricity { get; set; }
+        public bool RadioNetwork { get; set; }
         public int? IdHeatingType { get; set; }
         [Required(ErrorMessage = "Выберите постановление")]
         public int IdDecree { get; set; }

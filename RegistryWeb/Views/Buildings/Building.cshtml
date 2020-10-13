@@ -6,7 +6,7 @@
     var controller = Context.Session.Get<string>("Controller");
     var action = Context.Session.Get<string>("Action");
     var securityService = (SecurityService)ViewBag.SecurityService;
-    if (ViewBag.Action == "Create")
+    if (ViewBag.Action == ActionTypeEnum.Create)
     {
         ViewData["Title"] = "Создание нового здания";
     }
@@ -14,7 +14,6 @@
     {
         ViewData["Title"] = "Здание №" + Model.IdBuilding;
     }
-    var address = Model.IdStreetNavigation.StreetName + ", д." + Model.House;
 }
 @section scripts
     {
@@ -30,13 +29,13 @@
         <label class="form-check-label h2 col-sm-12 col-lg-6 col-xl-7 pl-0">@ViewData["Title"]</label>
 
         <div class="col-sm-12 col-lg-6 col-xl-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
-            @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+            @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
             {
                 <a class="btn btn-success" title="Помещения здания" aria-label="Помещения здания" asp-action="Index" asp-controller="Premises" asp-route-FilterOptions.IdBuilding="@Model.IdBuilding">
                     <span class="oi oi-home"></span>
                 </a>
                 <div class="btn-group" role="group" aria-label="Панель доступа">
-                    @if (ViewBag.Action == "Details" && ((ViewBag.CanEditBaseInfo ?? false) || (ViewBag.CanEditDemolishingInfo ?? false)))
+                    @if (ViewBag.Action == ActionTypeEnum.Details && ((ViewBag.CanEditBaseInfo ?? false) || (ViewBag.CanEditDemolishingInfo ?? false)))
                     {
                         <div class="btn-group" role="group" aria-label="Панель доступа">
                             <button class="btn btn-primary dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@Model.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -62,7 +61,11 @@
                             @if (securityService.HasPrivilege(Privileges.TenancyRead))
                             {
                                 <a class="dropdown-item" title="Найм помещения" aria-label="Найм помещения"
-                                   asp-controller="TenancyProcesses" asp-action="Index" asp-route-filterOptions.IdBuilding="@Model.IdBuilding">Процессы найма</a>
+                                   asp-controller="TenancyProcesses" asp-action="Index" 
+                                   asp-route-filterOptions.IdBuilding="@Model.IdBuilding"
+                                   asp-route-filterOptions.Address.AddressType="Building"
+                                   asp-route-filterOptions.Address.Id="@Model.IdBuilding"
+                                   asp-route-filterOptions.Address.Text="@ViewBag.Address">Процессы найма</a>
                             }
                             @if (securityService.HasPrivilege(Privileges.OwnerRead))
                             {
@@ -70,12 +73,16 @@
                                    asp-controller="OwnerProcesses" asp-action="Index"
                                    asp-route-filterOptions.Address.AddressType="Building"
                                    asp-route-filterOptions.Address.Id="@Model.IdBuilding"
-                                   asp-route-filterOptions.Address.Text="@address">Процессы собственности</a>
+                                   asp-route-filterOptions.Address.Text="@ViewBag.Address">Процессы собственности</a>
                             }
                             @if (securityService.HasPrivilege(Privileges.ClaimsRead))
                             {
                                 <a class="dropdown-item" title="Лицевые счета БКС" aria-label="Лицевые счета"
-                                   asp-controller="PaymentAccounts" asp-action="Index" asp-route-filterOptions.IdBuilding="@Model.IdBuilding">Лицевые счета БКС</a>
+                                   asp-controller="PaymentAccounts" asp-action="Index" 
+                                   asp-route-filterOptions.IdBuilding="@Model.IdBuilding"
+                                   asp-route-filterOptions.Address.AddressType="Building"
+                                   asp-route-filterOptions.Address.Id="@Model.IdBuilding"
+                                   asp-route-filterOptions.Address.Text="@ViewBag.Address">Лицевые счета БКС</a>
                             }
                         </div>
                     </div>
@@ -99,15 +106,15 @@
                 {
                     <a class="form-control btn btn-primary" asp-controller="Buildings" asp-action="Index" asp-route-isBack="true">Назад</a>
                 }
-                @if (ViewBag.Action == "Create")
+                @if (ViewBag.Action == ActionTypeEnum.Create)
                 {
                     <input type="submit" value="Создать" id="createBtn" class="form-control btn btn-success" />
                 }
-                @if (ViewBag.Action == "Edit")
+                @if (ViewBag.Action == ActionTypeEnum.Edit)
                 {
                     <input type="submit" value="Сохранить" id="editBtn" class="form-control btn btn-success  @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" />
                 }
-                @if (ViewBag.Action == "Delete")
+                @if (ViewBag.Action == ActionTypeEnum.Delete)
                 {
                     <input type="submit" value="Удалить" id="deleteBtn" class="form-control btn btn-danger" />
                 }
@@ -317,28 +324,28 @@
                     <label asp-for="Elevator" class="form-check-label">Наличие в доме лифта</label>
                 </div>
                 <div class="form-group form-check col-6 col-lg-4">
-                    <input type="checkbox" class="form-check-input" asp-for="RubbishChute.Value" title="Наличие в доме мусоропровода">
-                    <label asp-for="RubbishChute.Value" class="form-check-label">Наличие в доме мусоропровода</label>
+                    <input type="checkbox" class="form-check-input" asp-for="RubbishChute" title="Наличие в доме мусоропровода">
+                    <label asp-for="RubbishChute" class="form-check-label">Наличие в доме мусоропровода</label>
                 </div>
                 <div class="form-group form-check col-6 col-lg-4">
-                    <input type="checkbox" class="form-check-input" asp-for="Plumbing.Value" title="Водопровод">
-                    <label asp-for="Plumbing.Value" class="form-check-label">Водопровод</label>
+                    <input type="checkbox" class="form-check-input" asp-for="Plumbing" title="Водопровод">
+                    <label asp-for="Plumbing" class="form-check-label">Водопровод</label>
                 </div>
                 <div class="form-group form-check col-6 col-lg-4">
-                    <input type="checkbox" class="form-check-input" asp-for="HotWaterSupply.Value" title="Горячее водоснабжение">
-                    <label asp-for="HotWaterSupply.Value" class="form-check-label">Горячее водоснабжение</label>
+                    <input type="checkbox" class="form-check-input" asp-for="HotWaterSupply" title="Горячее водоснабжение">
+                    <label asp-for="HotWaterSupply" class="form-check-label">Горячее водоснабжение</label>
                 </div>
                 <div class="form-group form-check col-6 col-lg-4">
-                    <input type="checkbox" class="form-check-input" asp-for="Canalization.Value" title="Канализация">
-                    <label asp-for="Canalization.Value" class="form-check-label">Канализация</label>
+                    <input type="checkbox" class="form-check-input" asp-for="Canalization" title="Канализация">
+                    <label asp-for="Canalization" class="form-check-label">Канализация</label>
                 </div>
                 <div class="form-group form-check col-6 col-lg-4">
-                    <input type="checkbox" class="form-check-input" asp-for="Electricity.Value" title="Электроосвещение">
-                    <label asp-for="Electricity.Value" class="form-check-label">Электроосвещение</label>
+                    <input type="checkbox" class="form-check-input" asp-for="Electricity" title="Электроосвещение">
+                    <label asp-for="Electricity" class="form-check-label">Электроосвещение</label>
                 </div>
                 <div class="form-group form-check col-6 col-lg-4">
-                    <input type="checkbox" class="form-check-input" asp-for="RadioNetwork.Value" title="Радиотрансляционная сеть">
-                    <label asp-for="RadioNetwork.Value" class="form-check-label">Радиотрансляционная сеть</label>
+                    <input type="checkbox" class="form-check-input" asp-for="RadioNetwork" title="Радиотрансляционная сеть">
+                    <label asp-for="RadioNetwork" class="form-check-label">Радиотрансляционная сеть</label>
                 </div>
             </div>
             <div class="form-row">

@@ -145,7 +145,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         }
 
         [HttpPost]
-        public IActionResult AddAttachmentFile(AddressTypes addressType, string action)
+        public IActionResult AddAttachmentFile(AddressTypes addressType, ActionTypeEnum action)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles))
                 return Json(-2);

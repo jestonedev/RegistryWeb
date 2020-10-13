@@ -137,7 +137,11 @@
                                 @if (securityService.HasPrivilege(Privileges.TenancyRead))
                                 {
                                     <a class="dropdown-item" title="Найм помещения" aria-label="Найм помещения"
-                                       asp-controller="TenancyProcesses" asp-action="Index" asp-route-filterOptions.IdBuilding="@item.IdBuilding">Процессы найма</a>
+                                       asp-controller="TenancyProcesses" asp-action="Index" 
+                                       asp-route-filterOptions.IdBuilding="@item.IdBuilding"
+                                       asp-route-filterOptions.Address.AddressType="Building"
+                                       asp-route-filterOptions.Address.Id="@item.IdBuilding"
+                                       asp-route-filterOptions.Address.Text="@address">Процессы найма</a>
                                 }
                                 @if (securityService.HasPrivilege(Privileges.OwnerRead))
                                 {
@@ -150,7 +154,11 @@
                                 @if (securityService.HasPrivilege(Privileges.ClaimsRead))
                                 {
                                     <a class="dropdown-item" title="Лицевые счета БКС" aria-label="Лицевые счета"
-                                       asp-controller="PaymentAccounts" asp-action="Index" asp-route-filterOptions.IdBuilding="@item.IdBuilding">Лицевые счета БКС</a>
+                                       asp-controller="PaymentAccounts" asp-action="Index" 
+                                       asp-route-filterOptions.IdBuilding="@item.IdBuilding"
+                                       asp-route-filterOptions.Address.AddressType="Building"
+                                       asp-route-filterOptions.Address.Id="@item.IdBuilding"
+                                       asp-route-filterOptions.Address.Text="@address">Лицевые счета БКС</a>
                                 }
                             </div>
                         </div>

@@ -5,7 +5,7 @@
         <div class="card-header d-flex justify-content-between">
             <h3>Судебные разбирательства</h3>
             <div class="btn-group" role="group">
-                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {
                     <a href="#" id="litigationAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditLitigationInfo ?? true) ? "" : "disabled")" title="Добавить разбирательство">&#10010;</a>
                 }

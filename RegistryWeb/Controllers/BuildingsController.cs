@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
+using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
@@ -144,7 +145,7 @@ namespace RegistryWeb.Controllers
             canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
             if (!canEditBaseInfo)
                 return View("NotAccess");
-            return GetBuildingView(dataService.CreateBuilding());
+            return GetBuildingView(null);
         }
 
         [HttpPost]
@@ -170,7 +171,7 @@ namespace RegistryWeb.Controllers
                 dataService.Create(building, HttpContext.Request.Form.Files.Select(f => f).ToList());
                 return RedirectToAction("Details", new { building.IdBuilding });
             }
-            return GetBuildingView(building);
+            return Error("Здание не было создано!");
         }
 
         public IActionResult Details(int? idBuilding, string returnUrl)
@@ -214,7 +215,7 @@ namespace RegistryWeb.Controllers
             var b = dataService.GetBuilding(building.IdBuilding);
             if (b == null)
                 return NotFound();
-            canEditBaseInfo = CanEditBuildingBaseInfo(building);
+            canEditBaseInfo = CanEditBuildingBaseInfo(b);
             if (!canEditBaseInfo)
                 return View("NotAccess");
             dataService.Delete(b.IdBuilding);
@@ -254,7 +255,7 @@ namespace RegistryWeb.Controllers
                 dataService.Edit(building);
                 return RedirectToAction("Details", new { building.IdBuilding });
             }
-            return GetBuildingView(building);
+            return Error("Здание не было сохранено!");
         }
 
         private bool CanEditBuildingBaseInfo(Building building)
@@ -265,7 +266,8 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetBuildingView(Building building, [CallerMemberName]string action = "")
         {
-            ViewBag.Action = action;
+            var actionType = (ActionTypeEnum)Enum.Parse(typeof(ActionTypeEnum), action);
+            ViewBag.Action = actionType;
             ViewBag.SecurityService = securityService;
             ViewBag.CanEditBaseInfo = canEditBaseInfo;
             ViewBag.CanEditDemolishingInfo = canEditDemolishingInfo;
@@ -281,6 +283,11 @@ namespace RegistryWeb.Controllers
                 s.IdRecord,
                 Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
             }), "IdRecord", "Snp");
+            if (actionType == ActionTypeEnum.Create)
+            {
+                return View("Building", dataService.CreateBuilding());
+            }
+            ViewBag.Address = building.IdStreetNavigation.StreetName + ", д." + building.House;
             return View("Building", building);
         }
     }

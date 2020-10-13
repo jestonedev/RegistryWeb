@@ -3,7 +3,7 @@
 @{ 
     var canEdit = ((bool?)ViewBag.CanAttachAdditionalFiles) ?? true;
     var descriptionClass = "col-md-12 col-lg-10";
-    if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
     {
         descriptionClass = "col-md-12 col-lg-12";
     }
@@ -18,14 +18,14 @@
                 <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="AttachmentFileDescription" title="Наименование">
                 <input type="file" name="AttachmentFile" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
                 <input type="hidden" name="AttachmentFileRemove" value="false" />
-                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+                @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
                 {
                     <div class="input-group-append">
                         <a class="btn btn-success rr-attachment-file-download @(Model.FileOriginName == null ? "disabled" : "")"
                            href="/AttachmentFiles/DownloadFile/?idAttachment=@Model.IdAttachment" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
                     </div>
                 }
-                @if (ViewBag.Action == "Edit")
+                @if (ViewBag.Action == ActionTypeEnum.Edit)
                 {
                     <div class="input-group-append rr-attachment-file-buttons">
                         <a class="btn btn-danger rr-attachment-file-remove" style="display: none"
@@ -36,7 +36,7 @@
                            href="/AttachmentFiles/DownloadFile/?idAttachment=@Model.IdAttachment" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
                     </div>
                 }
-                @if (ViewBag.Action == "Create")
+                @if (ViewBag.Action == ActionTypeEnum.Create)
                 {
                     <div class="input-group-append rr-attachment-file-buttons">
                         <a class="btn btn-danger rr-attachment-file-remove" style="display: none"
@@ -47,7 +47,7 @@
                 }
             </div>
         </div>
-        @if (ViewBag.Action == "Edit")
+        @if (ViewBag.Action == ActionTypeEnum.Edit)
         {
             <div class="text-lg-right text-center col-lg-2 rr-attachment-file-edit-buttons">
                 <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
@@ -60,7 +60,7 @@
                 </div>
             </div>
         }
-        @if (ViewBag.Action == "Create")
+        @if (ViewBag.Action == ActionTypeEnum.Create)
         {
             <a class="attachment-file-edit-btn" style="display: none"></a>
             <div class="text-lg-right text-center col-lg-2 rr-attachment-file-edit-buttons">

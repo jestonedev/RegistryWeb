@@ -13,7 +13,7 @@
         <div class="card-header d-flex justify-content-between">
             <h3>Комнаты</h3>
             <div class="btn-group" role="group">
-                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {
                     <a href="#" id="subPremiseAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить комнату">&#10010;</a>
                 }

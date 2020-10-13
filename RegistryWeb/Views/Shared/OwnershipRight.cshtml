@@ -9,7 +9,7 @@
     var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
     var attachment = Model.Address.AddressType == AddressTypes.Premise ? "Помещение" : "Здание";
     var ownershipRightTypeClass = "col-md-9 col-lg-7";
-    if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+    if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
     {
         if (ViewBag.Address.AddressType == AddressTypes.Premise && ViewBag.Address.AddressType != Model.Address.AddressType)
         {
@@ -20,7 +20,7 @@
             ownershipRightTypeClass = "col-md-12 col-lg-10";
         }
     }
-    if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
     {
         if (ViewBag.Address.AddressType == AddressTypes.Premise)
         {
@@ -49,14 +49,14 @@
                 <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="OwnershipRightDescription" title="Наименование">
                 <input type="file" name="OwnershipRightFile" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
                 <input type="hidden" name="OwnershipRightFileRemove" value="false" />
-                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+                @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
                 {
                     <div class="input-group-append">
                         <a class="btn btn-success rr-ownership-right-file-download @(Model.FileOriginName == null ? "disabled" : "")"
                            href="/OwnershipRights/DownloadFile/?idOwnershipRight=@Model.IdOwnershipRight" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
                     </div>
                 }
-                @if (ViewBag.Action == "Edit")
+                @if (ViewBag.Action == ActionTypeEnum.Edit)
                 {
                     <div class="input-group-append rr-ownership-right-file-buttons">
                         <a class="btn btn-danger rr-ownership-right-file-remove" style="display: none"
@@ -67,7 +67,7 @@
                            href="/OwnershipRights/DownloadFile/?idOwnershipRight=@Model.IdOwnershipRight" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
                     </div>
                 }
-                @if (ViewBag.Action == "Create")
+                @if (ViewBag.Action == ActionTypeEnum.Create)
                 {
                     <div class="input-group-append rr-ownership-right-file-buttons">
                         <a class="btn btn-danger rr-ownership-right-file-remove" style="display: none"
@@ -101,7 +101,7 @@
                 <option></option>
             </select>
         </div>
-        @if (ViewBag.Action == "Edit" && ViewBag.Address.AddressType == Model.Address.AddressType)
+        @if (ViewBag.Action == ActionTypeEnum.Edit && ViewBag.Address.AddressType == Model.Address.AddressType)
         {
             <div class="text-lg-right text-center col-lg-2 rr-ownership-right-edit-buttons">
                 <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
@@ -114,7 +114,7 @@
                 </div>
             </div>
         }
-        @if (ViewBag.Action == "Create")
+        @if (ViewBag.Action == ActionTypeEnum.Create)
         {
             <a class="ownership-right-edit-btn" style="display: none"></a>
             <div class="text-lg-right text-center col-lg-2 rr-ownership-right-edit-buttons">

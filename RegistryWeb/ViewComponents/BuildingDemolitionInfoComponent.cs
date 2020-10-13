@@ -20,7 +20,7 @@ namespace RegistryWeb.ViewComponents
         }
 
         public IViewComponentResult Invoke(int id, DateTime? demolishedPlanDate, DateTime? demolishedFactDate, 
-            DateTime? dateOwnerEmergency, DateTime? demandForDemolishingDeliveryDate, string action)
+            DateTime? dateOwnerEmergency, DateTime? demandForDemolishingDeliveryDate, ActionTypeEnum action)
         {
             var model = new BuildingDemolitionInfoVM();
             model.BuildingDemolitionActFiles =

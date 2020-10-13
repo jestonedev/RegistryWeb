@@ -9,7 +9,7 @@
     ViewBag.addressType = "Premise";
 
     var securityService = (SecurityService)ViewBag.SecurityService;
-    if (ViewBag.Action == "Create")
+    if (ViewBag.Action == ActionTypeEnum.Create)
     {
         ViewData["Title"] = "Создание нового помещения";
     }
@@ -42,13 +42,13 @@
         <div class="card-header d-flex flex-column flex-lg-row">
             <label class="form-check-label h2 col-sm-12 col-lg-6 col-xl-7 pl-0">@ViewData["Title"]</label>
             <div class="col-sm-12 col-lg-6 col-xl-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
-                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+                @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
                 {
                     <a class="btn btn-success" title="Здание" aria-label="Здание" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@Model.Premise.IdBuilding" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
                         <span class="oi oi-home"></span>
                     </a>
                     <div class="btn-group" role="group" aria-label="Панель доступа">
-                        @if (ViewBag.Action == "Details" && ((ViewBag.CanEditBaseInfo ?? false) || (ViewBag.CanEditResettleInfo ?? false) || (ViewBag.CanEditLitigationInfo ?? false)))
+                        @if (ViewBag.Action == ActionTypeEnum.Details && ((ViewBag.CanEditBaseInfo ?? false) || (ViewBag.CanEditResettleInfo ?? false) || (ViewBag.CanEditLitigationInfo ?? false)))
                         {
                             <div class="btn-group" role="group" aria-label="Панель доступа">
                                 <button class="btn btn-primary dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@Model.Premise.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -74,7 +74,11 @@
                                 @if (securityService.HasPrivilege(Privileges.TenancyRead))
                                 {
                                     <a class="dropdown-item" title="Найм помещения" aria-label="Найм помещения"
-                                       asp-controller="TenancyProcesses" asp-action="Index" asp-route-filterOptions.IdPremises="@Model.Premise.IdPremises">Процессы найма</a>
+                                       asp-controller="TenancyProcesses" asp-action="Index"
+                                       asp-route-filterOptions.IdPremises="@Model.Premise.IdPremises"
+                                       asp-route-filterOptions.Address.AddressType="Premise"
+                                       asp-route-filterOptions.Address.Id="@Model.Premise.IdPremises"
+                                       asp-route-filterOptions.Address.Text="@address">Процессы найма</a>
                                 }
                                 @if (securityService.HasPrivilege(Privileges.OwnerRead))
                                 {
@@ -87,9 +91,17 @@
                                 @if (securityService.HasPrivilege(Privileges.ClaimsRead))
                                 {
                                     <a class="dropdown-item" title="Лицевые счета БКС" aria-label="Лицевые счета"
-                                       asp-controller="PaymentAccounts" asp-action="Index" asp-route-filterOptions.IdPremises="@Model.Premise.IdPremises">Лицевые счета БКС</a>
+                                       asp-controller="PaymentAccounts" asp-action="Index"
+                                       asp-route-filterOptions.IdPremises="@Model.Premise.IdPremises"
+                                       asp-route-filterOptions.Address.AddressType="Premise"
+                                       asp-route-filterOptions.Address.Id="@Model.Premise.IdPremises"
+                                       asp-route-filterOptions.Address.Text="@address">Лицевые счета БКС</a>
                                     <a class="dropdown-item" title="Исковые работы" aria-label="Исковые работы"
-                                       asp-controller="Claims" asp-action="Index" asp-route-filterOptions.IdPremises="@Model.Premise.IdPremises">Исковые работы</a>
+                                       asp-controller="Claims" asp-action="Index"
+                                       asp-route-filterOptions.IdPremises="@Model.Premise.IdPremises"
+                                       asp-route-filterOptions.Address.AddressType="Premise"
+                                       asp-route-filterOptions.Address.Id="@Model.Premise.IdPremises"
+                                       asp-route-filterOptions.Address.Text="@address">Исковые работы</a>
                                 }
                             </div>
                         </div>
@@ -116,15 +128,15 @@
                     {
                         <a class="form-control btn btn-primary" asp-controller="Premises" asp-action="Index" asp-route-isBack="true">Назад</a>
                     }
-                    @if (ViewBag.Action == "Create")
+                    @if (ViewBag.Action == ActionTypeEnum.Create)
                     {
                         <input type="submit" value="Создать" id="createBtn" class="form-control btn btn-success" />
                     }
-                    @if (ViewBag.Action == "Edit")
+                    @if (ViewBag.Action == ActionTypeEnum.Edit)
                     {
                         <input type="submit" value="Сохранить" id="editBtn" class="form-control btn btn-success  @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" />
                     }
-                    @if (ViewBag.Action == "Delete")
+                    @if (ViewBag.Action == ActionTypeEnum.Delete)
                     {
                         <input type="submit" value="Удалить" class="form-control btn btn-danger" />
                     }
@@ -197,7 +209,7 @@
                 </div>
             </div>
 
-            @if ((ViewBag.Action == "Details" || ViewBag.Action == "Delete") && securityService.HasPrivilege(Privileges.TenancyRead))
+            @if ((ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete) && securityService.HasPrivilege(Privileges.TenancyRead))
             {
                 <partial name="PaymentPartialView" model="@Model" />
             }
@@ -234,7 +246,7 @@
                     <span asp-validation-for="@Model.Premise.IdState" class="text-danger"></span>
                 </div>
                 <div class="form-group col-lg-3 col-md-6 r-form-group-label">
-                    @if ((ViewBag.Action == "Details" || ViewBag.Action == "Delete") && !ObjectStateHelper.IsMunicipal(Model.Premise.IdState))
+                    @if ((ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete) && !ObjectStateHelper.IsMunicipal(Model.Premise.IdState))
                     {
                         <label asp-for="@Model.IdFundType">Текущий фонд</label>
                         <select class="selectpicker form-control" data-live-search="true"
@@ -244,7 +256,7 @@
                         <span asp-validation-for="@Model.IdFundType" class="text-danger"></span>
                     }
                     else
-              if (ViewBag.Action == "Create" || ((ViewBag.Action == "Details" || ViewBag.Action == "Delete") && ObjectStateHelper.IsMunicipal(Model.Premise.IdState)))
+              if (ViewBag.Action == ActionTypeEnum.Create || ((ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete) && ObjectStateHelper.IsMunicipal(Model.Premise.IdState)))
                     {
                         <label asp-for="@Model.IdFundType">Текущий фонд</label>
                         <select class="selectpicker form-control" data-live-search="true" asp-for="@Model.IdFundType"
@@ -254,7 +266,7 @@
                         <span asp-validation-for="@Model.IdFundType" class="text-danger"></span>
                     }
                     else
-              if (ViewBag.Action == "Edit")
+              if (ViewBag.Action == ActionTypeEnum.Edit)
                     {
                         <label asp-for="@Model.IdFundType">Текущий фонд</label>
                         <select disabled class="selectpicker form-control" data-live-search="true" asp-for="@Model.IdFundType"

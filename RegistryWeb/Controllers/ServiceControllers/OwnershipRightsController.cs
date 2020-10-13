@@ -162,7 +162,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         }
 
         [HttpPost]
-        public IActionResult AddOwnershipRight(AddressTypes addressType, string action)
+        public IActionResult AddOwnershipRight(AddressTypes addressType, ActionTypeEnum action)
         {
 
             if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&

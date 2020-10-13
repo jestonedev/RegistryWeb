@@ -23,14 +23,14 @@ namespace RegistryWeb.ViewComponents
             this.securityService = securityService;
         }
 
-        public IViewComponentResult Invoke(int idPremise, string action, List<PaymentsInfo> paymentsInfo)
+        public IViewComponentResult Invoke(int idPremise, ActionTypeEnum action, List<PaymentsInfo> paymentsInfo)
         {
             IEnumerable<SubPremiseVM> model = GetSubPremises(idPremise, paymentsInfo);
             ViewBag.Action = action;
 
             var objectStates = registryContext.ObjectStates.ToList();
             ViewBag.ObjectStatesFullList = new SelectList(objectStates, "IdState", "StateFemale");
-            if (action == "Create" || action == "Edit")
+            if (action == ActionTypeEnum.Create || action == ActionTypeEnum.Edit)
             {
                 objectStates = objectStates.Where(r => (
                 securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.MunicipalIds().Contains(r.IdState) ||

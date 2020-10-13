@@ -147,7 +147,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         }
 
         [HttpPost]
-        public IActionResult AddLitigation(AddressTypes addressType, string action)
+        public IActionResult AddLitigation(AddressTypes addressType, ActionTypeEnum action)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo))
                 return Json(-2);

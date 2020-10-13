@@ -55,7 +55,6 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("FilterOptions");
             }
             ViewBag.SecurityService = securityService;
-            //ViewBag.PremiseService = dataService;
 
             var vm = dataService.GetViewModel(
                 viewModel.OrderOptions,
@@ -69,7 +68,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Details(int? idPremises, string returnUrl)
         {
-            ViewBag.Action = "Details";
+            ViewBag.Action = ActionTypeEnum.Details;
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.SecurityService = securityService;
             if (idPremises == null)
@@ -87,7 +86,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Create(int? idBuilding)
         {
-            ViewBag.Action = "Create";
+            ViewBag.Action = ActionTypeEnum.Create;
             ViewBag.SecurityService = securityService;
             if (!securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal))
                 return View("NotAccess");
@@ -142,7 +141,7 @@ namespace RegistryWeb.Controllers
                 dataService.Create(premise, HttpContext.Request.Form.Files.Select(f => f).ToList(), IdFundType);
                 return RedirectToAction("Details", new { premise.IdPremises });
             }
-            ViewBag.Action = "Create";
+            ViewBag.Action = ActionTypeEnum.Create;
             ViewBag.SecurityService = securityService;
             ViewBag.CanEditBaseInfo = true;
             ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
@@ -153,7 +152,7 @@ namespace RegistryWeb.Controllers
         [HttpGet]
         public IActionResult Edit(int? idPremises, string returnUrl)
         {
-            ViewBag.Action = "Edit";
+            ViewBag.Action = ActionTypeEnum.Edit;
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.SecurityService = securityService;
             if (idPremises == null)
@@ -190,7 +189,7 @@ namespace RegistryWeb.Controllers
                 dataService.Edit(premise);
                 return RedirectToAction("Details", new { premise.IdPremises });
             }
-            ViewBag.Action = "Edit";
+            ViewBag.Action = ActionTypeEnum.Edit;
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.SecurityService = securityService;
             return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: (bool)ViewBag.CanEditBaseInfo));
@@ -199,7 +198,7 @@ namespace RegistryWeb.Controllers
         [HttpGet]
         public IActionResult Delete(int? idPremises, string returnUrl)
         {
-            ViewBag.Action = "Delete";
+            ViewBag.Action = ActionTypeEnum.Delete;
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.SecurityService = securityService;
             if (idPremises == null)

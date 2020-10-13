@@ -116,7 +116,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         }
 
         [HttpPost]
-        public IActionResult AddSubPremise(string action)
+        public IActionResult AddSubPremise(ActionTypeEnum action)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
                 !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
@@ -129,7 +129,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             ViewBag.Action = action;
 
             var objectStates = registryContext.ObjectStates.ToList();
-            if (action == "Create" || action == "Edit")
+            if (action == ActionTypeEnum.Create || action == ActionTypeEnum.Edit)
             {
                 objectStates = objectStates.Where(r => (
                 securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.MunicipalIds().Contains(r.IdState) ||

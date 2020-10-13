@@ -8,7 +8,7 @@
 @{ 
     var canEdit = ((bool?)ViewBag.CanEditExtInfo) ?? false;
     var resettleDocumentTypeClass = "col-sm-10 col-md-11";
-    if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
     {
         resettleDocumentTypeClass = "col-md-12";
     }
@@ -31,14 +31,14 @@
                 <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="ResettleDocumentDescription" title="Наименование">
                 <input type="file" name="ResettleDocumentFile" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
                 <input type="hidden" name="ResettleDocumentFileRemove" value="false" />
-                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+                @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
                 {
                     <div class="input-group-append">
                         <a class="btn btn-success rr-resettle-document-file-download @(Model.FileOriginName == null ? "disabled" : "")"
                            href="/Resettles/DownloadFile/?idDocument=@Model.IdDocument" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
                     </div>
                 }
-                @if (ViewBag.Action == "Edit")
+                @if (ViewBag.Action == ActionTypeEnum.Edit)
                 {
                     <div class="input-group-append rr-resettle-document-file-buttons">
                         <a class="btn btn-danger rr-resettle-document-file-remove" style="display: none"
@@ -49,7 +49,7 @@
                            href="/Resettles/DownloadFile/?idDocument=@Model.IdDocument" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
                     </div>
                 }
-                @if (ViewBag.Action == "Create")
+                @if (ViewBag.Action == ActionTypeEnum.Create)
                 {
                     <div class="input-group-append rr-resettle-document-file-buttons">
                         <a class="btn btn-danger rr-resettle-document-file-remove" style="display: none"
@@ -67,7 +67,7 @@
                 <option></option>
             </select>   
         </div>
-        @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+        @if (ViewBag.Action == ActionTypeEnum.Create || ViewBag.Action == ActionTypeEnum.Edit)
         {
             <div class="text-sm-right text-center col-sm-2 col-md-1 rr-resettle-document-edit-buttons">
                 <div class="btn-group" role="group" aria-label="Панель подтверждения">

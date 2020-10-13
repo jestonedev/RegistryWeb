@@ -18,7 +18,7 @@ namespace RegistryWeb.ViewComponents
             this.registryContext = registryContext;
         }
 
-        public IViewComponentResult Invoke(Address address, string action)
+        public IViewComponentResult Invoke(Address address, ActionTypeEnum action)
         {
             IEnumerable<OwnershipRightVM> model = null;
             var id = 0;

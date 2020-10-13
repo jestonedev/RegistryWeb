@@ -189,7 +189,11 @@
                             @if (securityService.HasPrivilege(Privileges.TenancyRead))
                             {
                                 <a class="dropdown-item" title="Найм помещения" aria-label="Найм помещения"
-                                   asp-controller="TenancyProcesses" asp-action="Index" asp-route-filterOptions.IdPremises="@item.IdPremises">Процессы найма</a>
+                                   asp-controller="TenancyProcesses" asp-action="Index" 
+                                   asp-route-filterOptions.IdPremises="@item.IdPremises"
+                                   asp-route-filterOptions.Address.AddressType="Premise"
+                                   asp-route-filterOptions.Address.Id="@item.IdPremises"
+                                   asp-route-filterOptions.Address.Text="@address">Процессы найма</a>
                             }
                             @if (securityService.HasPrivilege(Privileges.OwnerRead))
                             {
@@ -202,9 +206,17 @@
                             @if (securityService.HasPrivilege(Privileges.ClaimsRead))
                             {
                                 <a class="dropdown-item" title="Лицевые счета БКС" aria-label="Лицевые счета"
-                                   asp-controller="PaymentAccounts" asp-action="Index" asp-route-filterOptions.IdPremises="@item.IdPremises">Лицевые счета БКС</a>
+                                   asp-controller="PaymentAccounts" asp-action="Index" 
+                                   asp-route-filterOptions.IdPremises="@item.IdPremises"
+                                   asp-route-filterOptions.Address.AddressType="Premise"
+                                   asp-route-filterOptions.Address.Id="@item.IdPremises"
+                                   asp-route-filterOptions.Address.Text="@address">Лицевые счета БКС</a>
                                 <a class="dropdown-item" title="Исковые работы" aria-label="Исковые работы"
-                                   asp-controller="Claims" asp-action="Index" asp-route-filterOptions.IdPremises="@item.IdPremises">Исковые работы</a>
+                                   asp-controller="Claims" asp-action="Index" 
+                                   asp-route-filterOptions.IdPremises="@item.IdPremises"
+                                   asp-route-filterOptions.Address.AddressType="Premise"
+                                   asp-route-filterOptions.Address.Id="@item.IdPremises"
+                                   asp-route-filterOptions.Address.Text="@address">Исковые работы</a>
                             }
                         </div>
                     </div>

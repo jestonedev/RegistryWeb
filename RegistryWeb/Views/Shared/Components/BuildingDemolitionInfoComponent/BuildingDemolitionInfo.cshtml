@@ -13,7 +13,7 @@
             <h3>Информация о сносе</h3>
             <div>
                 <div class="btn-group">
-                    @if (ViewBag.Action == "Edit" && ViewBag.CanEditDemolishingInfo)
+                    @if (ViewBag.Action == ActionTypeEnum.Edit && ViewBag.CanEditDemolishingInfo)
                     {
                         <a class="btn btn-primary" id="buildingDemolitionInfoEdit" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
                         <a class="btn btn-success" id="buildingDemolitionInfoSave" style="display: none" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
@@ -50,7 +50,7 @@
                         <th class="align-middle">Наименование</th>
                         <th class="align-middle">Тип документа</th>
                         <th class="align-middle">Файл</th>
-                        @if ((ViewBag.Action == "Edit" || ViewBag.Action == "Create") && ViewBag.CanEditDemolishingInfo)
+                        @if ((ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create) && ViewBag.CanEditDemolishingInfo)
                         {
                             <th class="align-middle" width="110">
                                 <a href="#" id="buildingDemolitionActFileAdd" class="form-control btn btn-success w-auto" title="Добавить документ">&#10010;</a>
@@ -88,7 +88,7 @@
                                 }
                             }
                             <div class="act-file-block" data-id="@idFile">
-                                @if ((ViewBag.Action == "Edit" || ViewBag.Action == "Create"))
+                                @if ((ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create))
                                 { 
                                     <input type="file" id="@id" class="act-file-upload" />
                                     <label for="@id" class="btn btn-success act-file-add">
@@ -97,14 +97,14 @@
                                 }
                                     <div class="act-file" title="@originalName">
                                         <a href="#" class="btn-link act-file-link">@originalName</a>
-                                        @if ((ViewBag.Action == "Edit" || ViewBag.Action == "Create"))
+                                        @if ((ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create))
                                         {
                                             <a href="#" class="badge btn btn-danger">&times;</a>
                                         }
                                     </div>
                             </div>
                         </td>
-                        @if ((ViewBag.Action == "Edit" || ViewBag.Action == "Create") && ViewBag.CanEditDemolishingInfo)
+                        @if ((ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create) && ViewBag.CanEditDemolishingInfo)
                         {
                             <td class="align-middle">
                                 <a href="#" class="btn btn-danger act-file-record-remove" title="Удалить" aria-label="Удалить">

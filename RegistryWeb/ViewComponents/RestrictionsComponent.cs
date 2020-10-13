@@ -18,7 +18,7 @@ namespace RegistryWeb.ViewComponents
             this.registryContext = registryContext;
         }
 
-        public IViewComponentResult Invoke(int id, AddressTypes type, string action)
+        public IViewComponentResult Invoke(int id, AddressTypes type, ActionTypeEnum action)
         {
             ViewBag.Id = id;
             IEnumerable<RestrictionVM> model = null;

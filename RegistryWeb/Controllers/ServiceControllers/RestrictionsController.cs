@@ -162,7 +162,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         }
 
         [HttpPost]
-        public IActionResult AddRestriction(AddressTypes addressType, string action)
+        public IActionResult AddRestriction(AddressTypes addressType, ActionTypeEnum action)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) &&
                 !securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))

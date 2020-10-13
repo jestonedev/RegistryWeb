@@ -289,7 +289,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         }
 
         [HttpPost]
-        public IActionResult AddResettle(Address address, string action)
+        public IActionResult AddResettle(Address address, ActionTypeEnum action)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo))
                 return Json(-2);
@@ -318,7 +318,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         }
 
         [HttpPost]
-        public IActionResult AddResettleDocument(Address address, string action)
+        public IActionResult AddResettleDocument(Address address, ActionTypeEnum action)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo))
                 return Json(-2);

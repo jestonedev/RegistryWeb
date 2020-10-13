@@ -8,7 +8,7 @@
 @{
     var canEdit = ((bool?)ViewBag.CanEditResettleInfo) ?? true;
     var ownershipRightTypeClass = "col-md-6 col-lg-4";
-    if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
     {
         ownershipRightTypeClass = "col-md-6";
     }
@@ -44,7 +44,7 @@
             </select>
         </div>
 
-        @if (ViewBag.Action == "Edit")
+        @if (ViewBag.Action == ActionTypeEnum.Edit)
         {
             <div class="text-lg-right col-lg-2 rr-resettle-edit-buttons d-none d-lg-block">
                 <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
@@ -57,7 +57,7 @@
                 </div>
             </div>
         }
-        @if (ViewBag.Action == "Create")
+        @if (ViewBag.Action == ActionTypeEnum.Create)
         {
             <a class="resettle-edit-btn" style="display: none"></a>
             <div class="text-lg-right col-lg-2 rr-resettle-edit-buttons d-none d-lg-block">
@@ -219,7 +219,7 @@
         <div class="card-header d-flex justify-content-between">
             <h5 class="rr-resettle-card-header-sub-title" style="margin-top: .25em;">Документы</h5>
             <div class="btn-group" role="group">
-                @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+                @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {
                     <a href="#" id="resettleDocumentAdd" class="form-control btn btn-success disabled" title="Добавить документ по переселению">&#10010;</a>
                 }
@@ -236,7 +236,7 @@
         </ul>
     </div>
 
-    @if (ViewBag.Action == "Edit")
+    @if (ViewBag.Action == ActionTypeEnum.Edit)
     {
         <div class="text-center col-12 rr-resettle-edit-buttons-2 d-block d-lg-none">
             <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
@@ -249,7 +249,7 @@
             </div>
         </div>
     }
-    @if (ViewBag.Action == "Create")
+    @if (ViewBag.Action == ActionTypeEnum.Create)
     {
         <div class="text-center col-12 rr-resettle-edit-buttons-2 d-block d-lg-none">
             <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
