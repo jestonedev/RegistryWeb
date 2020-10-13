@@ -83,6 +83,9 @@
                 </ul>
             </div>
             <div class="ml-auto align-middle">
+                @await Component.InvokeAsync("DatabaseNameComponent")
+            </div>
+            <div class="ml-auto align-middle">
                 <a asp-controller="PersonalSetting" asp-action="Details" class="btn btn-link">@User.Identity.Name</a>
             </div>
         </div>
