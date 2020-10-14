@@ -71,6 +71,7 @@ function refreshClaimPerson(claimPersonElem, claimPerson) {
     claimPersonElem.find("[name^='DateOfBirth']").val(claimPerson.dateOfBirth);
     claimPersonElem.find("[name^='PlaceOfBirth']").val(claimPerson.placeOfBirth);
     claimPersonElem.find("[name^='WorkPlace']").val(claimPerson.workPlace);
+    claimPersonElem.find("[name^='Passport']").val(claimPerson.passport);
     claimPersonElem.find("[name^='IsClaimer']").prop("checked", claimPerson.isClaimer);
 }
 
@@ -119,6 +120,7 @@ function getClaimPerson(claimPersonElem) {
         DateOfBirth: claimPersonElem.find("[name^='DateOfBirth']").val(),
         PlaceOfBirth: claimPersonElem.find("[name^='PlaceOfBirth']").val(),
         WorkPlace: claimPersonElem.find("[name^='WorkPlace']").val(),
+        Passport: claimPersonElem.find("[name^='Passport']").val(),
         IsClaimer: claimPersonElem.find("[name^='IsClaimer']").is(":checked")
     };
 }
@@ -140,6 +142,7 @@ function claimPersonToFormData(claimPerson) {
     formData.append("ClaimPerson.DateOfBirth", claimPerson.DateOfBirth);
     formData.append("ClaimPerson.PlaceOfBirth", claimPerson.PlaceOfBirth);
     formData.append("ClaimPerson.WorkPlace", claimPerson.WorkPlace);
+    formData.append("ClaimPerson.Passport", claimPerson.Passport);
     formData.append("ClaimPerson.IsClaimer", claimPerson.IsClaimer);
     return formData;
 }
