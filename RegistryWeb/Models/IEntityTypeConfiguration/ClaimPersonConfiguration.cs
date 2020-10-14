@@ -51,6 +51,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(1024)
                 .IsUnicode(false);
 
+            builder.Property(e => e.Passport)
+                .HasColumnName("passport")
+                .HasMaxLength(1024)
+                .IsUnicode(false);
+
             builder.Property(e => e.WorkPlace)
                 .HasColumnName("work_place")
                 .HasMaxLength(1024)

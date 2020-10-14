@@ -15,6 +15,7 @@ namespace RegistryWeb.Models.Entities
         public DateTime? DateOfBirth { get; set; }
         public string PlaceOfBirth { get; set; }
         public string WorkPlace { get; set; }
+        public string Passport { get; set; }
         public bool IsClaimer { get; set; }
         public byte Deleted { get; set; }
         public virtual Claim IdClaimNavigation { get; set; }
