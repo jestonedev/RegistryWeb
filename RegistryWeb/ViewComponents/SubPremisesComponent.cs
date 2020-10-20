@@ -23,7 +23,7 @@ namespace RegistryWeb.ViewComponents
             this.securityService = securityService;
         }
 
-        public IViewComponentResult Invoke(int idPremise, ActionTypeEnum action, List<PaymentsInfo> paymentsInfo)
+        public IViewComponentResult Invoke(int idPremise, ActionTypeEnum action, string address, List<PaymentsInfo> paymentsInfo)
         {
             IEnumerable<SubPremiseVM> model = GetSubPremises(idPremise, paymentsInfo);
             ViewBag.Action = action;
@@ -41,6 +41,7 @@ namespace RegistryWeb.ViewComponents
             ViewBag.FundTypesList = new SelectList(registryContext.FundTypes, "IdFundType", "FundTypeName");
             ViewBag.SecurityService = securityService;
             ViewBag.IdPremises = idPremise;
+            ViewBag.PremiseAddress = address;
             return View("SubPremises", model);
         }
 

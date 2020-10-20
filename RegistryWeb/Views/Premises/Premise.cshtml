@@ -17,8 +17,9 @@
     {
         ViewData["Title"] = "Помещение №" + Model.Premise.IdPremises;
     }
-    var address = Model.Premise.IdBuildingNavigation?.IdStreetNavigation?.StreetLong + ", д." + Model.Premise.IdBuildingNavigation?.House +
-                    ", " + Model.Premise.IdPremisesTypeNavigation?.PremisesTypeShort + Model.Premise.PremisesNum;
+    var premiseAddress = Model.Premise.IdBuildingNavigation?.IdStreetNavigation?.StreetLong + ", д." +
+        Model.Premise.IdBuildingNavigation?.House + ", " +
+        Model.Premise.IdPremisesTypeNavigation?.PremisesTypeShort + Model.Premise.PremisesNum;
 }
 
 @section styles
@@ -78,7 +79,7 @@
                                        asp-route-filterOptions.IdPremises="@Model.Premise.IdPremises"
                                        asp-route-filterOptions.Address.AddressType="Premise"
                                        asp-route-filterOptions.Address.Id="@Model.Premise.IdPremises"
-                                       asp-route-filterOptions.Address.Text="@address">Процессы найма</a>
+                                       asp-route-filterOptions.Address.Text="@premiseAddress">Процессы найма</a>
                                 }
                                 @if (securityService.HasPrivilege(Privileges.OwnerRead))
                                 {
@@ -86,7 +87,7 @@
                                        asp-controller="OwnerProcesses" asp-action="Index"
                                        asp-route-filterOptions.Address.AddressType="Premise"
                                        asp-route-filterOptions.Address.Id="@Model.Premise.IdPremises"
-                                       asp-route-filterOptions.Address.Text="@address">Процессы собственности</a>
+                                       asp-route-filterOptions.Address.Text="@premiseAddress">Процессы собственности</a>
                                 }
                                 @if (securityService.HasPrivilege(Privileges.ClaimsRead))
                                 {
@@ -95,13 +96,13 @@
                                        asp-route-filterOptions.IdPremises="@Model.Premise.IdPremises"
                                        asp-route-filterOptions.Address.AddressType="Premise"
                                        asp-route-filterOptions.Address.Id="@Model.Premise.IdPremises"
-                                       asp-route-filterOptions.Address.Text="@address">Лицевые счета БКС</a>
+                                       asp-route-filterOptions.Address.Text="@premiseAddress">Лицевые счета БКС</a>
                                     <a class="dropdown-item" title="Исковые работы" aria-label="Исковые работы"
                                        asp-controller="Claims" asp-action="Index"
                                        asp-route-filterOptions.IdPremises="@Model.Premise.IdPremises"
                                        asp-route-filterOptions.Address.AddressType="Premise"
                                        asp-route-filterOptions.Address.Id="@Model.Premise.IdPremises"
-                                       asp-route-filterOptions.Address.Text="@address">Исковые работы</a>
+                                       asp-route-filterOptions.Address.Text="@premiseAddress">Исковые работы</a>
                                 }
                             </div>
                         </div>
@@ -256,7 +257,7 @@
                         <span asp-validation-for="@Model.IdFundType" class="text-danger"></span>
                     }
                     else
-              if (ViewBag.Action == ActionTypeEnum.Create || ((ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete) && ObjectStateHelper.IsMunicipal(Model.Premise.IdState)))
+             if (ViewBag.Action == ActionTypeEnum.Create || ((ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete) && ObjectStateHelper.IsMunicipal(Model.Premise.IdState)))
                     {
                         <label asp-for="@Model.IdFundType">Текущий фонд</label>
                         <select class="selectpicker form-control" data-live-search="true" asp-for="@Model.IdFundType"
@@ -266,7 +267,7 @@
                         <span asp-validation-for="@Model.IdFundType" class="text-danger"></span>
                     }
                     else
-              if (ViewBag.Action == ActionTypeEnum.Edit)
+             if (ViewBag.Action == ActionTypeEnum.Edit)
                     {
                         <label asp-for="@Model.IdFundType">Текущий фонд</label>
                         <select disabled class="selectpicker form-control" data-live-search="true" asp-for="@Model.IdFundType"
@@ -323,7 +324,7 @@
     </div>
 </form>
 
-@await Component.InvokeAsync("SubPremisesComponent", new { idPremise = Model.Premise.IdPremises, action = ViewBag.Action, paymentsInfo = Model.PaymentsInfo ?? new List<PaymentsInfo>() })
+@await Component.InvokeAsync("SubPremisesComponent", new { idPremise = Model.Premise.IdPremises, action = ViewBag.Action, address = premiseAddress, paymentsInfo = Model.PaymentsInfo ?? new List<PaymentsInfo>() })
 @await Component.InvokeAsync("RestrictionsComponent", new { id = Model.Premise.IdPremises, type = AddressTypes.Premise, action = ViewBag.Action })
 @await Component.InvokeAsync("OwnershipRightsComponent", new { address = new Address() { Id = Model.Premise.IdPremises.ToString(), AddressType = AddressTypes.Premise }, action = ViewBag.Action })
 @await Component.InvokeAsync("ResettleInfoComponent", new { address = new Address() { Id = Model.Premise.IdPremises.ToString(), AddressType = AddressTypes.Premise }, action = ViewBag.Action })

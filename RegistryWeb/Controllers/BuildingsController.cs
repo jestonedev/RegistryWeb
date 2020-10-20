@@ -287,7 +287,7 @@ namespace RegistryWeb.Controllers
             {
                 return View("Building", dataService.CreateBuilding());
             }
-            ViewBag.Address = building.IdStreetNavigation.StreetName + ", д." + building.House;
+            ViewBag.Address = building.IdStreetNavigation?.StreetName + ", д." + building.House;
             return View("Building", building);
         }
     }
