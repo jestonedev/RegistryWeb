@@ -710,6 +710,8 @@ namespace RegistryWeb.DataServices
             var premise = new Premise {
                 RegDate = new DateTime(1999, 10, 29),
                 IdBuilding = idBuilding ?? 0,
+                IdPremisesDoorKeys = 1,
+                IdPremisesComment = 1,
                 IdBuildingNavigation = idBuilding != null ? registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == idBuilding.Value)  : null
             };
             premise.FundsPremisesAssoc = new List<FundPremiseAssoc>() { new FundPremiseAssoc() };

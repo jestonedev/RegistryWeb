@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using RegistryWeb.DataHelpers;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.Models;
@@ -288,6 +289,8 @@ namespace RegistryWeb.Controllers
                 return View("Building", dataService.CreateBuilding());
             }
             ViewBag.Address = building.IdStreetNavigation?.StreetName + ", д." + building.House;
+            ViewBag.MunicipalPremisesArea = dataService.GetPremisesAreaByStates(building.IdBuilding, ObjectStateHelper.MunicipalIds());
+            ViewBag.NonMunicipalPremisesArea = dataService.GetPremisesAreaByStates(building.IdBuilding, ObjectStateHelper.MunicipalIds(), false);
             return View("Building", building);
         }
     }
