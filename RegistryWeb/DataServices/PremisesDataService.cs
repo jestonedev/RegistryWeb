@@ -360,13 +360,13 @@ namespace RegistryWeb.DataServices
 
                     ownershipRightsPremisesList = ownershipRightsPremisesList.Union(premisesInBuildingsOwnershipRights).ToList(); //
 
-                    var buildingIds = from bRow in buildings
+                    var buildingIds = (from bRow in buildings
                                       where ownershipRightsBuildingsList.Contains(bRow.IdBuilding)
-                                      select bRow.IdBuilding;
+                                      select bRow.IdBuilding).ToList();
 
-                    var premisesIds = from pRow in premises
+                    var premisesIds = (from pRow in premises
                                       where ownershipRightsPremisesList.Contains(pRow.IdPremises)
-                                      select pRow.IdPremises;
+                                      select pRow.IdPremises).ToList();
 
                     query = (from row in query
                              where buildingIds.Contains(row.IdBuilding) || premisesIds.Contains(row.IdPremises)

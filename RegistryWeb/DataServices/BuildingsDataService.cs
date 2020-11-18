@@ -192,9 +192,9 @@ namespace RegistryWeb.DataServices
 
                         var ownershipRightsBuildingsList = generalOwnershipRightsBuildings.Union(specialOwnershipRightsBuildings).ToList();
 
-                        var buildingIds = from bRow in buildings
+                        var buildingIds = (from bRow in buildings
                                           where ownershipRightsBuildingsList.Contains(bRow.IdBuilding)
-                                          select bRow.IdBuilding;
+                                          select bRow.IdBuilding).ToList();
 
                         query = (from row in query
                                  where buildingIds.Contains(row.IdBuilding)
