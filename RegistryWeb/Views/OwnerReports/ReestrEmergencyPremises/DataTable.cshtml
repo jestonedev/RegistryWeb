@@ -34,6 +34,11 @@
                         <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
                            asp-action="Details" asp-controller="OwnerProcesses" asp-route-idProcess="@item.Id"></a>
                     }
+                    @if (@item.Type == ProcessOwnershipTypeEnum.Municipal)
+                    {
+                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                           asp-action="Details" asp-controller="TenancyProcesses" asp-route-idProcess="@item.Id"></a>
+                    }
                 </td>
             </tr>
         }
