@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using RegistryWeb.DataHelpers;
 using System.Runtime.CompilerServices;
 using System.IO;
@@ -1008,7 +1009,6 @@ namespace RegistryWeb.DataServices
                                      IdAccountFiltered = filteredRow.IdAccount,
                                      IdAccountActual = allRow.IdAccount
                                  }).ToList();
-
             return result;
         }
 
@@ -1025,6 +1025,58 @@ namespace RegistryWeb.DataServices
             viewModel.RentObjects = GetRentObjects(lastPayment);
             viewModel.ClaimsByAddresses = GetClaimsByAddresses(lastPayment);
             return viewModel;
+        }
+
+        public PaymentsAccountTableVM GetPaymentHistoryTable(AclUser user, int idAccount)
+        {
+            var viewModel = new PaymentsAccountTableVM();
+            viewModel.LastPayment = GetQuery().Single(r => r.IdAccount == idAccount);
+            viewModel.Payments = (from row in registryContext.Payments.Include(r => r.PaymentAccountNavigation)
+                                  where row.IdAccount == idAccount
+                                  orderby row.Date descending
+                                  select row).ToList();
+            var lastPaymentList = new List<Payment>();
+            lastPaymentList.Add(viewModel.LastPayment);
+            viewModel.RentObjects = GetRentObjects(lastPaymentList);
+
+            var json = registryContext.PersonalSettings
+                .SingleOrDefault(ps => ps.IdUser == user.IdUser)
+                ?.PaymentAccauntTableJson;
+            if (json != null)
+            {
+                viewModel.PaymentAccountTableJson =
+                    JsonSerializer.Deserialize<PaymentAccountTableJson>(json);
+            }
+            return viewModel;
+        }
+
+        public bool SavePaymentAccountTableJson(AclUser user, PaymentAccountTableJson vm)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(vm);
+                var personalSetting = registryContext.PersonalSettings
+                    .SingleOrDefault(ps => ps.IdUser == user.IdUser);
+                if (personalSetting == null)
+                {
+                    var newPersonalSetting = new PersonalSetting()
+                    {
+                        IdUser = user.IdUser,
+                        PaymentAccauntTableJson = json
+                    };
+                    registryContext.PersonalSettings.Add(newPersonalSetting);
+                }
+                else
+                {
+                    personalSetting.PaymentAccauntTableJson = json;
+                }
+                registryContext.SaveChanges();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
         }
 
         private Dictionary<int, List<ClaimInfo>> GetClaimsByAddresses(IEnumerable<Payment> payments)

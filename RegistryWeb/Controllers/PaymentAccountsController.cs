@@ -61,6 +61,8 @@ namespace RegistryWeb.Controllers
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
                 return View("NotAccess");
+            if (idAccount == 0)
+                return NotFound();
             ViewBag.SecurityService = securityService;
             ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
             ViewBag.IdAccount = idAccount;
@@ -69,6 +71,30 @@ namespace RegistryWeb.Controllers
             if (!paymentsVM.Payments.Any())
                 return Error("Ошибка формирования списка платежей по лицевому счету");
             return View(paymentsVM);
+        }
+
+        public IActionResult PaymentAccountsTable(int idAccount, string returnUrl)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+            if (idAccount == 0)
+                return NotFound();
+            ViewBag.IdAccount = idAccount;
+            ViewBag.ReturnUrl = returnUrl;
+            var vm = dataService.GetPaymentHistoryTable(securityService.User, idAccount);
+            if (!vm.Payments.Any())
+                return Error("Ошибка формирования списка платежей по лицевому счету");
+            return View("PaymentAccountsTable", vm);
+        }
+
+        [HttpPost]
+        public JsonResult SavePaymentAccountTableJson(PaymentAccountTableJson vm)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return Json(false);
+            var result =
+                dataService.SavePaymentAccountTableJson(securityService.User, vm);
+            return Json(result);
         }
 
         public IActionResult AccountsReports(PageOptions pageOptions)
