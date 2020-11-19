@@ -192,9 +192,9 @@ namespace RegistryWeb.DataServices
 
                         var ownershipRightsBuildingsList = generalOwnershipRightsBuildings.Union(specialOwnershipRightsBuildings).ToList();
 
-                        var buildingIds = from bRow in buildings
+                        var buildingIds = (from bRow in buildings
                                           where ownershipRightsBuildingsList.Contains(bRow.IdBuilding)
-                                          select bRow.IdBuilding;
+                                          select bRow.IdBuilding).ToList();
 
                         query = (from row in query
                                  where buildingIds.Contains(row.IdBuilding)
@@ -417,6 +417,13 @@ namespace RegistryWeb.DataServices
             return objectStates;
         }
 
+        public double GetPremisesAreaByStates(int idBuilding, List<int> states, bool contains = true)
+        {
+            return (from row in registryContext.Premises
+                    where row.IdBuilding == idBuilding && ((contains && states.Contains(row.IdState)) || (!contains && !states.Contains(row.IdState)))
+                    select row.TotalArea).Sum();
+        }
+
         public IEnumerable<StructureType> StructureTypes
         {
             get => registryContext.StructureTypes.AsNoTracking();
@@ -459,7 +466,9 @@ namespace RegistryWeb.DataServices
 
         internal Building CreateBuilding()
         {
-            var building = new Building();
+            var building = new Building {
+                IdDecree = 1
+            };
             return building;
         }
 

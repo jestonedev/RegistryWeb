@@ -8,7 +8,7 @@
 				data: { text: request.term },
 				success: function (data) {
 					if (data != 0 && data != undefined) {
-						$('input[name="FilterOptions.Address.AddressType"]').val(data.idAddressType);
+                        $('input[name="FilterOptions.Address.AddressType"]').val(data.addressType);
 						response($.map(data.autocompletePairs, function (pair) {
 							return { label: pair.item2, value: pair.item2, id: pair.item1 };
 						}))
