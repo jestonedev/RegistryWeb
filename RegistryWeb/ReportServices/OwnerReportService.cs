@@ -61,5 +61,29 @@ namespace RegistryWeb.ReportServices
                 sw.Write(ids.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y));
             return fileName;
         }
+
+        public byte[] AzfAreaAnalize()
+        {
+            var reportFile = GenerateReport(new Dictionary<string, object>(), "registry_web\\owners\\azf_area_analize");
+            return DownloadFile(reportFile);
+        }
+
+        public byte[] AzfRoomsAnalize()
+        {
+            var reportFile = GenerateReport(new Dictionary<string, object>(), "registry_web\\owners\\azf_rooms_analize");
+            return DownloadFile(reportFile);
+        }
+
+        public byte[] AzfRegionsAnalize()
+        {
+            var reportFile = GenerateReport(new Dictionary<string, object>(), "registry_web\\owners\\azf_regions_analize");
+            return DownloadFile(reportFile);
+        }
+
+        public byte[] AzfWithoutPrivAnalize()
+        {
+            var reportFile = GenerateReport(new Dictionary<string, object>(), "registry_web\\owners\\azf_without_priv_analize");
+            return DownloadFile(reportFile);
+        }
     }
 }

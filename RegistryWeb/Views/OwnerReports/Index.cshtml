@@ -12,7 +12,8 @@
     <br />
     
     <div class="row">
-        <div class="col-12 col-md-6 col-lg-6 mb-3">
+
+        <div class="col-12 col-md-6 col-lg-4 mb-3">
             <a asp-controller="OwnerReports" asp-action="Forma1">
                 <div class="media cardreport align-items-center p-2">
                     <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
@@ -20,11 +21,43 @@
                 </div>
             </a>
         </div>
-        <div class="col-12 col-md-6 col-lg-6 mb-3">
+        <div class="col-12 col-md-6 col-lg-4 mb-3">
             <a asp-controller="OwnerReports" asp-action="Forma2And3">
                 <div class="media cardreport align-items-center p-2">
                     <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
                     <div class="media-body pl-2 pr-2" style="color:black;">Отчет по форме №2 и №3</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3">
+            <a asp-controller="OwnerReports" asp-action="GetAzfAreaAnalize">
+                <div class="media cardreport align-items-center p-2">
+                    <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                    <div class="media-body pl-2 pr-2" style="color:black;">Анализ АЖФ на текущую дату (краткий) по площади</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3">
+            <a asp-controller="OwnerReports" asp-action="GetAzfRoomsAnalize">
+                <div class="media cardreport align-items-center p-2">
+                    <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                    <div class="media-body pl-2 pr-2" style="color:black;">Анализ АЖФ на текущую дату (краткий) по количеству комнат</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3">
+            <a asp-controller="OwnerReports" asp-action="GetAzfWithoutPrivAnalize">
+                <div class="media cardreport align-items-center p-2">
+                    <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                    <div class="media-body pl-2 pr-2" style="color:black;">Анализ АЖФ на текущую дату по МКД без частных ЖП</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3">
+            <a asp-controller="OwnerReports" asp-action="GetAzfRegionsAnalize">
+                <div class="media cardreport align-items-center p-2">
+                    <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                    <div class="media-body pl-2 pr-2" style="color:black;">Анализ АЖФ на текущую дату (краткий) по жилым районам</div>
                 </div>
             </a>
         </div>

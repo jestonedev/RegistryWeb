@@ -169,5 +169,69 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
+
+        public IActionResult GetAzfAreaAnalize()
+        {
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.AzfAreaAnalize();
+                return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    @"Анализ АЖФ на текущую дату (краткий) по площади.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetAzfRoomsAnalize()
+        {
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.AzfRoomsAnalize();
+                return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    @"Анализ АЖФ на текущую дату (краткий) по количеству комнат.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetAzfRegionsAnalize()
+        {
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.AzfRegionsAnalize();
+                return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    @"Анализ АЖФ на текущую дату (краткий) по жилым районам.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetAzfWithoutPrivAnalize()
+        {
+            if (!securityService.HasPrivilege(Privileges.OwnerRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.AzfWithoutPrivAnalize();
+                return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    @"Анализ АЖФ на текущую дату по МКД без частных ЖП.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
     }
 }
