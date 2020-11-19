@@ -1,20 +1,48 @@
-﻿@model RegistryWeb.ViewModel.PaymentsVM;
+﻿@model RegistryWeb.ViewModel.PaymentsAccountTableVM;
 @{
-    ViewData["Title"] = "PaymentAccountsTable";
-    var account = Model.Payments.FirstOrDefault(p => p.IdAccount == ViewBag.IdAccount)?.PaymentAccountNavigation;
-    var paymentAccount = account?.Account;
-    var title = "История ЛС №" + paymentAccount;
+    ViewData["Title"] = "История ЛС №" + Model.LastPayment.PaymentAccountNavigation.Account;
+    string isChecked(bool value) => value ? "checked" : "";
 }
 <link rel="stylesheet" type="text/css" href="~/lib/datatables/datatables.min.css" />
 @*<link rel="stylesheet" type="text/css" href="~/lib/datatables/DataTables-1.10.22/css/dataTables.bootstrap4.min.css" />*@
 <script type="text/javascript" src="~/lib/datatables/datatables.min.js"></script>
 @*<script type="text/javascript" src="~/lib/datatables/DataTables-1.10.22/js/dataTables.bootstrap4.min.js"></script>*@
+<style>
+    .table td {
+        padding: .25rem;
+        font-size: .75rem;
+    }
+</style>
+<script type="text/javascript" src="~/js/paymentAccountsTable.js" asp-append-version="true" ></script>
 
-<script type="text/javascript" src="~/js/paymentAccountsTable.js"></script>
 <div class="d-inline-flex justify-content-start">
-    <h2 class="m-auto">@title</h2>
+    <h2 class="m-auto">@ViewData["Title"]</h2>
     <a href="#" id="configModalShow" title="Настройки" class="oi oi-cog" style="margin:auto 0 auto 10px"></a>
 </div>
+<div class="row">
+    <div class="form-group col-4">
+        <label>Наниматель</label>
+        <input class="form-control" disabled type="text" value="@Model.LastPayment.Tenant" />
+    </div>
+    <div class="form-group col-2">
+        <label>Общая площадь</label>
+        <input class="form-control" disabled type="text" value="@Model.LastPayment.TotalArea" />
+    </div>
+    <div class="form-group col-6">
+        <label>Адрес БКС</label>
+        <input class="form-control" disabled type="text" value="@Model.LastPayment.PaymentAccountNavigation.RawAddress" />
+    </div>
+</div>
+@if (Model.RentObjects.ContainsKey(ViewBag.IdAccount))
+{
+    <ul class="list-group">
+        <label>Адресс ЖФ</label>
+        @foreach (Address address in Model.RentObjects[ViewBag.IdAccount])
+        {
+            <li class="list-group-item">@address.Text</li>
+        }
+    </ul>
+}
 <table id="ttt" class="table table-bordered">
     <thead>
         <tr>
@@ -26,9 +54,9 @@
             <th>Сальдо вх.</th>
             <th>Сальдо вх. найм</th>
             <th>Пени вх.</th>
-            <th>Сальда вх. ДГИ</th>
-            <th>Сальда вх. Падун</th>
-            <th>Сальда вх. ПКК</th>
+            <th>Сальдо вх. ДГИ</th>
+            <th>Сальдо вх. Падун</th>
+            <th>Сальдо вх. ПКК</th>
             <th>Начисление итого</th>
             <th>Начисление найм</th>
             <th>Начисление пени</th>
@@ -111,183 +139,183 @@
                     <fieldset class="r-scheduler-border">
                         <legend class="r-scheduler-border">Основная информация</legend>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_Tenant" data-column="1"
-                                   class="form-check-input" title="Наниматель" checked />
+                            <input type="checkbox" id="Column_Tenant" class="form-check-input"
+                                   title="Наниматель" @isChecked(Model.PaymentAccountTableJson.HasTenant) />
                             <label for="Column_Tenant" class="form-check-label">Наниматель</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_TotalArea" data-column="2"
-                                   class="form-check-input" title="Общая площадь" checked />
+                            <input type="checkbox" id="Column_TotalArea" class="form-check-input"
+                                   title="Общая площадь" @isChecked(Model.PaymentAccountTableJson.HasTotalArea) />
                             <label for="Column_TotalArea" class="form-check-label">Общая площадь</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_LivingArea" data-column="3"
-                                   class="form-check-input" title="Жилая площадь" checked />
+                            <input type="checkbox" id="Column_LivingArea" class="form-check-input"
+                                   title="Жилая площадь" @isChecked(Model.PaymentAccountTableJson.HasLivingArea)  />
                             <label for="Column_LivingArea" class="form-check-label">Жилая площадь</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_Prescribed" data-column="4"
-                                   class="form-check-input" title="Прописано" checked />
+                            <input type="checkbox" id="Column_Prescribed" class="form-check-input"
+                                   title="Прописано" @isChecked(Model.PaymentAccountTableJson.HasPrescribed) />
                             <label for="Column_Prescribed" class="form-check-label">Прописано</label>
                         </div>
                     </fieldset>
                     <fieldset class="r-scheduler-border">
                         <legend class="r-scheduler-border">Входящее сальдо</legend>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_BalanceInput" data-column="5"
-                                   class="form-check-input" title="Сальдо вх." checked />
+                            <input type="checkbox" id="Column_BalanceInput" class="form-check-input"
+                                   title="Сальдо вх." @isChecked(Model.PaymentAccountTableJson.HasBalanceInput) />
                             <label for="Column_BalanceInput" class="form-check-label">Сальдо вх.</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_BalanceTenancy" data-column="6"
-                                   class="form-check-input" title="Сальдо вх. найм" checked />
+                            <input type="checkbox" id="Column_BalanceTenancy" class="form-check-input"
+                                   title="Сальдо вх. найм" @isChecked(Model.PaymentAccountTableJson.HasBalanceTenancy) />
                             <label for="Column_BalanceTenancy" class="form-check-label">Сальдо вх. найм</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_BalanceInputPenalties" data-column="7"
-                                   class="form-check-input" title="Пени вх." checked />
+                            <input type="checkbox" id="Column_BalanceInputPenalties" class="form-check-input"
+                                   title="Пени вх." @isChecked(Model.PaymentAccountTableJson.HasBalanceInputPenalties) />
                             <label for="Column_BalanceInputPenalties" class="form-check-label">Пени вх.</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_BalanceDgi" data-column="8"
-                                   class="form-check-input" title="Сальда вх. ДГИ" checked />
+                            <input type="checkbox" id="Column_BalanceDgi" class="form-check-input"
+                                   title="Сальда вх. ДГИ" @isChecked(Model.PaymentAccountTableJson.HasBalanceDgi) />
                             <label for="Column_BalanceDgi" class="form-check-label">Сальдо вх. ДГИ</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_BalancePadun" data-column="9"
-                                   class="form-check-input" title="Сальда вх. Падун" checked />
+                            <input type="checkbox" id="Column_BalancePadun" class="form-check-input"
+                                   title="Сальда вх. Падун" @isChecked(Model.PaymentAccountTableJson.HasBalancePadun) />
                             <label for="Column_BalancePadun" class="form-check-label">Сальдо вх. Падун</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_BalancePkk" data-column="10"
-                                   class="form-check-input" title="Сальда вх. ПКК" checked />
+                            <input type="checkbox" id="Column_BalancePkk" class="form-check-input"
+                                   title="Сальда вх. ПКК" @isChecked(Model.PaymentAccountTableJson.HasBalancePkk) />
                             <label for="Column_BalancePkk" class="form-check-label">Сальдо вх. ПКК</label>
                         </div>
                     </fieldset>
                     <fieldset class="r-scheduler-border">
                         <legend class="r-scheduler-border">Начисления</legend>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_ChargingTotal" data-column="11"
-                                   class="form-check-input" title="Начисление итого" checked />
+                            <input type="checkbox" id="Column_ChargingTotal" class="form-check-input"
+                                   title="Начисление итого" @isChecked(Model.PaymentAccountTableJson.HasChargingTotal) />
                             <label for="Column_ChargingTotal" class="form-check-label">Начисление итого</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_ChargingTenancy" data-column="12"
-                                   class="form-check-input" title="Начисление найм" checked />
+                            <input type="checkbox" id="Column_ChargingTenancy" class="form-check-input"
+                                   title="Начисление найм" @isChecked(Model.PaymentAccountTableJson.HasChargingTenancy) />
                             <label for="Column_ChargingTenancy" class="form-check-label">Начисление найм</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_ChargingPenalties" data-column="13"
-                                   class="form-check-input" title="Начисление пени" checked />
+                            <input type="checkbox" id="Column_ChargingPenalties" class="form-check-input"
+                                   title="Начисление пени" @isChecked(Model.PaymentAccountTableJson.HasChargingPenalties) />
                             <label for="Column_ChargingPenalties" class="form-check-label">Начисление пени</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_ChargingDgi" data-column="14"
-                                   class="form-check-input" title="Начисление ДГИ" checked />
+                            <input type="checkbox" id="Column_ChargingDgi" class="form-check-input"
+                                   title="Начисление ДГИ" @isChecked(Model.PaymentAccountTableJson.HasChargingDgi) />
                             <label for="Column_ChargingDgi" class="form-check-label">Начисление ДГИ</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_ChargingPadun" data-column="15"
-                                   class="form-check-input" title="Начисление Падун" checked />
+                            <input type="checkbox" id="Column_ChargingPadun" class="form-check-input"
+                                   title="Начисление Падун" @isChecked(Model.PaymentAccountTableJson.HasChargingPadun) />
                             <label for="Column_ChargingPadun" class="form-check-label">Начисление Падун</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_ChargingPkk" data-column="16"
-                                   class="form-check-input" title="Начисление ПКК" checked />
+                            <input type="checkbox" id="Column_ChargingPkk" class="form-check-input"
+                                   title="Начисление ПКК" @isChecked(Model.PaymentAccountTableJson.HasChargingPkk) />
                             <label for="Column_ChargingPkk" class="form-check-label">Начисление ПКК</label>
                         </div>
                     </fieldset>
                     <fieldset class="r-scheduler-border">
                         <legend class="r-scheduler-border">Разовый перерасчет и перенос сальдо</legend>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_TransferBalance" data-column="17"
-                                   class="form-check-input" title="Перенос сальдо" checked />
+                            <input type="checkbox" id="Column_TransferBalance" class="form-check-input"
+                                   title="Перенос сальдо" @isChecked(Model.PaymentAccountTableJson.HasTransferBalance) />
                             <label for="Column_TransferBalance" class="form-check-label">Перенос сальдо</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_RecalcTenancy" data-column="18"
-                                   class="form-check-input" title="Перерасчет найм" checked />
+                            <input type="checkbox" id="Column_RecalcTenancy" class="form-check-input"
+                                   title="Перерасчет найм" @isChecked(Model.PaymentAccountTableJson.HasRecalcTenancy) />
                             <label for="Column_RecalcTenancy" class="form-check-label">Перерасчет найм</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_RecalcPenalties" data-column="19"
-                                   class="form-check-input" title="Перерасчет пени" checked />
+                            <input type="checkbox" id="Column_RecalcPenalties" class="form-check-input"
+                                   title="Перерасчет пени" @isChecked(Model.PaymentAccountTableJson.HasRecalcPenalties) />
                             <label for="Column_RecalcPenalties" class="form-check-label">Перерасчет пени</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_RecalcDgi" data-column="20"
-                                   class="form-check-input" title="Перерасчет ДГИ" checked />
+                            <input type="checkbox" id="Column_RecalcDgi" class="form-check-input"
+                                   title="Перерасчет ДГИ" @isChecked(Model.PaymentAccountTableJson.HasRecalcDgi) />
                             <label for="Column_RecalcDgi" class="form-check-label">Перерасчет ДГИ</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_RecalcPadun" data-column="21"
-                                   class="form-check-input" title="Перерасчет Падун" checked />
+                            <input type="checkbox" id="Column_RecalcPadun" class="form-check-input"
+                                   title="Перерасчет Падун" @isChecked(Model.PaymentAccountTableJson.HasRecalcPadun) />
                             <label for="Column_RecalcPadun" class="form-check-label">Перерасчет Падун</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_RecalcPkk" data-column="22"
-                                   class="form-check-input" title="Перерасчет ПКК" checked />
+                            <input type="checkbox" id="Column_RecalcPkk" class="form-check-input"
+                                   title="Перерасчет ПКК" @isChecked(Model.PaymentAccountTableJson.HasRecalcPkk) />
                             <label for="Column_RecalcPkk" class="form-check-label">Перерасчет ПКК</label>
                         </div>
                     </fieldset>
                     <fieldset class="r-scheduler-border">
                         <legend class="r-scheduler-border">Оплата</legend>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_PaymentTenancy" data-column="23"
-                                   class="form-check-input" title="Оплата найм" checked />
+                            <input type="checkbox" id="Column_PaymentTenancy" class="form-check-input"
+                                   title="Оплата найм" @isChecked(Model.PaymentAccountTableJson.HasPaymentTenancy) />
                             <label for="Column_PaymentTenancy" class="form-check-label">Оплата найм</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_PaymentPenalties" data-column="24"
-                                   class="form-check-input" title="Оплата пени" checked />
+                            <input type="checkbox" id="Column_PaymentPenalties" class="form-check-input"
+                                   title="Оплата пени" @isChecked(Model.PaymentAccountTableJson.HasPaymentPenalties) />
                             <label for="Column_PaymentPenalties" class="form-check-label">Оплата пени</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_PaymentDgi" data-column="25"
-                                   class="form-check-input" title="Оплата ДГИ" checked />
+                            <input type="checkbox" id="Column_PaymentDgi" class="form-check-input"
+                                   title="Оплата ДГИ" @isChecked(Model.PaymentAccountTableJson.HasPaymentDgi) />
                             <label for="Column_PaymentDgi" class="form-check-label">Оплата ДГИ</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_PaymentPadun" data-column="26"
-                                   class="form-check-input" title="Оплата Падун" checked />
+                            <input type="checkbox" id="Column_PaymentPadun" class="form-check-input"
+                                   title="Оплата Падун" @isChecked(Model.PaymentAccountTableJson.HasPaymentPadun) />
                             <label for="Column_PaymentPadun" class="form-check-label">Оплата Падун</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_PaymentPkk" data-column="27"
-                                   class="form-check-input" title="Оплата ПКК" checked />
+                            <input type="checkbox" id="Column_PaymentPkk" class="form-check-input"
+                                   title="Оплата ПКК" @isChecked(Model.PaymentAccountTableJson.HasPaymentPkk) />
                             <label for="Column_PaymentPkk" class="form-check-label">Оплата ПКК</label>
                         </div>
                     </fieldset>
                     <fieldset class="r-scheduler-border">
                         <legend class="r-scheduler-border">Исходящее сальдо</legend>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_BalanceOutputTotal" data-column="28"
-                                   class="form-check-input" title="Сальдо исх." checked />
+                            <input type="checkbox" id="Column_BalanceOutputTotal" class="form-check-input"
+                                   title="Сальдо исх." @isChecked(Model.PaymentAccountTableJson.HasBalanceOutputTotal) />
                             <label for="Column_BalanceOutputTotal" class="form-check-label">Сальдо исх.</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_BalanceOutputTenancy" data-column="29"
-                                   class="form-check-input" title="Сальдо исх. найм" checked />
+                            <input type="checkbox" id="Column_BalanceOutputTenancy" class="form-check-input"
+                                   title="Сальдо исх. найм" @isChecked(Model.PaymentAccountTableJson.HasBalanceOutputTenancy) />
                             <label for="Column_BalanceOutputTenancy" class="form-check-label">Сальдо исх. найм</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_BalanceOutputPenalties" data-column="30"
-                                   class="form-check-input" title="Пени исх." checked />
+                            <input type="checkbox" id="Column_BalanceOutputPenalties" class="form-check-input"
+                                   title="Пени исх." @isChecked(Model.PaymentAccountTableJson.HasBalanceOutputPenalties) />
                             <label for="Column_BalanceOutputPenalties" class="form-check-label">Пени исх.</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_BalanceOutputDgi" data-column="31"
-                                   class="form-check-input" title="Сальдо исх. ДГИ" checked />
+                            <input type="checkbox" id="Column_BalanceOutputDgi" class="form-check-input"
+                                   title="Сальдо исх. ДГИ" @isChecked(Model.PaymentAccountTableJson.HasBalanceOutputDgi) />
                             <label for="Column_BalanceOutputDgi" class="form-check-label">Сальдо исх. ДГИ</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_BalanceOutputPadun" data-column="32"
-                                   class="form-check-input" title="Сальдо исх. Падун" checked />
+                            <input type="checkbox" id="Column_BalanceOutputPadun" class="form-check-input"
+                                   title="Сальдо исх. Падун" @isChecked(Model.PaymentAccountTableJson.HasBalanceOutputPadun) />
                             <label for="Column_BalanceOutputPadun" class="form-check-label">Сальдо исх. Падун</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="checkbox" id="Column_BalanceOutputPkk" data-column="33"
-                                   class="form-check-input" title="Сальдо исх. ПКК" checked />
+                            <input type="checkbox" id="Column_BalanceOutputPkk" class="form-check-input"
+                                   title="Сальдо исх. ПКК" @isChecked(Model.PaymentAccountTableJson.HasBalanceOutputPkk) />
                             <label for="Column_BalanceOutputPkk" class="form-check-label">Сальдо исх. ПКК</label>
                         </div>
                     </fieldset>

@@ -18,6 +18,7 @@ namespace RegistryWeb.Models.Entities
         public string UserName { get; set; }
         public string UserDescription { get; set; }
 
+        public virtual PersonalSetting PersonalSetting { get; set; }
         public virtual IList<AclUserPrivilege> AclUserPrivileges { get; set; }
         public virtual IList<AclUserRole> AclUserRoles { get; set; }
         public virtual IList<LogOwnerProcess> LogOwnerProcesses { get; set; }

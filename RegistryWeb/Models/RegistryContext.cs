@@ -149,6 +149,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<AclUser> AclUsers { get; set; }
         public virtual DbSet<AclUserPrivilege> AclUserPrivileges { get; set; }
         public virtual DbSet<AclUserRole> AclUserRoles { get; set; }
+        public virtual DbSet<PersonalSetting> PersonalSettings { get; set; }
 
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
@@ -187,6 +188,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new AclUserConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new AclUserPrivilegeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new AclUserRoleConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PersonalSettingsConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new ActTypeDocumentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ActFileConfiguration(nameDatebase));
