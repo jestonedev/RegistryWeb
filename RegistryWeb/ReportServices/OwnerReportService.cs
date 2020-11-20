@@ -39,7 +39,7 @@ namespace RegistryWeb.ReportServices
 
         public byte[] Forma3(List<int> ids)
         {
-            var fileNameReport = GenerateMultiReport(ids, "registry_web\\forma3");
+            var fileNameReport = GenerateMultiReport(ids, "registry_web\\owners\\forma3");
             return DownloadFile(fileNameReport);
         }
 

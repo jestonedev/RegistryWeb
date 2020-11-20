@@ -89,10 +89,29 @@
             </div>
         </div>
         <div class="card-body toggle-hide" id="resettleAddressesList">
-            <h5>Плановый адрес</h5>
+            <h5>
+                Плановый адрес
+                @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
+                {
+                    if (Model.IdPremise != null)
+                    {
+                        <a class="btn pl-0 pr-0" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@Model.IdPremise">
+                            <span class="oi oi-eye"></span>
+                        </a>
+                    }
+                    else
+                    if (Model.IdBuilding != null)
+                    {
+                        <a class="btn pl-0 pr-0" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@Model.IdBuilding">
+                            <span class="oi oi-eye"></span>
+                        </a>
+                    }
+                }
+            </h5>
+            
             <hr class="mt-0" />
             <div class="form-row">
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-4">
                     <label>Улица</label>
                     <input type="hidden" value="@Model.IdStreet" name="ResettleToIdStreetPrev">
                     <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Улица"
@@ -104,16 +123,38 @@
                     <label>Дом</label>
                     <input type="hidden" value="@Model.IdBuilding" name="ResettleToIdBuildingPrev">
                     <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Дом"
-                            asp-items="@{new SelectList(Model.Buildings, "IdBuilding", "House",Model.IdBuilding)}" name="ResettleToIdBuilding">
+                            name="ResettleToIdBuilding">
                         <option></option>
+                        @foreach (var building in Model.Buildings)
+                        {
+                            if (Model.IdBuilding == building.IdBuilding)
+                            {
+                                <option value="@building.IdBuilding" data-total-area="@building.TotalArea" selected>@building.House</option>
+                            }
+                            else
+                            {
+                                <option value="@building.IdBuilding" data-total-area="@building.TotalArea">@building.House</option>
+                            }
+                        }
                     </select>
                 </div>
                 <div class="form-group col-md-2">
                     <label>Помещение</label>
                     <input type="hidden" value="@Model.IdPremise" name="ResettleToIdPremisePrev">
                     <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Помещение"
-                            asp-items="@{new SelectList(Model.Premises, "IdPremises", "PremisesNum",Model.IdPremise)}" name="ResettleToIdPremise">
+                            name="ResettleToIdPremise">
                         <option></option>
+                        @foreach (var premise in Model.Premises)
+                        {
+                            if (Model.IdPremise == premise.IdPremises)
+                            {
+                                <option value="@premise.IdPremises" data-total-area="@premise.TotalArea" selected>@premise.PremisesNum</option>
+                            }
+                            else
+                            {
+                                <option value="@premise.IdPremises" data-total-area="@premise.TotalArea">@premise.PremisesNum</option>
+                            }
+                        }
                     </select>
                 </div>
                 <div class="form-group col-md-2">
@@ -123,13 +164,47 @@
                         <input type="hidden" value="@idSubPremise" name="ResettleToSubPremisesPrev">
                     }
                     <select disabled multiple class="form-control field-resettle selectpicker" title="Комнаты"
-                            asp-items="@{new SelectList(Model.SubPremises, "IdSubPremises", "SubPremisesNum")}" asp-for="@Model.IdSubPremises" name="ResettleToSubPremises"></select>
+                            asp-for="@Model.IdSubPremises" name="ResettleToSubPremises">
+                        @foreach (var subPremise in Model.SubPremises)
+                        {
+                            if (Model.IdSubPremises.Contains(subPremise.IdSubPremises))
+                            {
+                                <option value="@subPremise.IdSubPremises" data-total-area="@subPremise.TotalArea" selected>@subPremise.SubPremisesNum</option>
+                            }
+                            else
+                            {
+                                <option value="@subPremise.IdSubPremises" data-total-area="@subPremise.TotalArea">@subPremise.SubPremisesNum</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label class="rr-resettle-label">Общая площадь</label>
+                    <input disabled class="form-control" name="ResettleToTotalArea" asp-for="TotalArea" />
                 </div>
             </div>
-            <h5>Фактический адрес</h5>
+            <h5>
+                Фактический адрес
+                @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
+                {
+                    if (Model.IdPremiseFact != null)
+                    {
+                        <a class="btn pl-0 pr-0" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@Model.IdPremiseFact">
+                            <span class="oi oi-eye"></span>
+                        </a>
+                    }
+                    else
+                    if (Model.IdBuildingFact != null)
+                    {
+                        <a class="btn pl-0 pr-0" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@Model.IdBuildingFact">
+                            <span class="oi oi-eye"></span>
+                        </a>
+                    }
+                }
+            </h5>
             <hr class="mt-0" />
             <div class="form-row">
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-4">
                     <label>Улица</label>
                     <input type="hidden" value="@Model.IdStreetFact" name="ResettleToIdStreetFactPrev">
                     <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Улица"
@@ -140,17 +215,37 @@
                 <div class="form-group col-md-2">
                     <label>Дом</label>
                     <input type="hidden" value="@Model.IdBuildingFact" name="ResettleToIdBuildingFactPrev">
-                    <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Дом"
-                            asp-items="@{new SelectList(Model.BuildingsFact, "IdBuilding", "House",Model.IdBuildingFact)}" name="ResettleToIdBuildingFact">
+                    <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Дом" name="ResettleToIdBuildingFact">
                         <option></option>
+                        @foreach (var building in Model.BuildingsFact)
+                        {
+                            if (Model.IdBuildingFact == building.IdBuilding)
+                            {
+                                <option value="@building.IdBuilding" data-total-area="@building.TotalArea" selected>@building.House</option>
+                            }
+                            else
+                            {
+                                <option value="@building.IdBuilding" data-total-area="@building.TotalArea">@building.House</option>
+                            }
+                        }
                     </select>
                 </div>
                 <div class="form-group col-md-2">
                     <label>Помещение</label>
                     <input type="hidden" value="@Model.IdPremiseFact" name="ResettleToIdPremiseFactPrev">
-                    <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Помещение"
-                            asp-items="@{new SelectList(Model.PremisesFact, "IdPremises", "PremisesNum",Model.IdPremiseFact)}" name="ResettleToIdPremiseFact">
+                    <select disabled class="form-control field-resettle selectpicker" data-live-search="true" title="Помещение" name="ResettleToIdPremiseFact">
                         <option></option>
+                        @foreach (var premise in Model.PremisesFact)
+                        {
+                            if (Model.IdPremiseFact == premise.IdPremises)
+                            {
+                                <option value="@premise.IdPremises" data-total-area="@premise.TotalArea" selected>@premise.PremisesNum</option>
+                            }
+                            else
+                            {
+                                <option value="@premise.IdPremises" data-total-area="@premise.TotalArea">@premise.PremisesNum</option>
+                            }
+                        }
                     </select>
                 </div>
                 <div class="form-group col-md-2">
@@ -160,7 +255,25 @@
                         <input type="hidden" value="@idSubPremise" name="ResettleToSubPremisesFactPrev">
                     }
                     <select disabled multiple class="form-control field-resettle selectpicker" title="Комнаты"
-                            asp-items="@{new SelectList(Model.SubPremisesFact, "IdSubPremises", "SubPremisesNum")}" asp-for="@Model.IdSubPremisesFact" name="ResettleToSubPremisesFact"></select>
+                        asp-for="@Model.IdSubPremisesFact" name="ResettleToSubPremisesFact">
+
+                        @foreach (var subPremise in Model.SubPremisesFact)
+                        {
+                            if (Model.IdSubPremisesFact.Contains(subPremise.IdSubPremises))
+                            {
+                                <option value="@subPremise.IdSubPremises" data-total-area="@subPremise.TotalArea" selected>@subPremise.SubPremisesNum</option>
+                            }
+                            else
+                            {
+                                <option value="@subPremise.IdSubPremises" data-total-area="@subPremise.TotalArea">@subPremise.SubPremisesNum</option>
+                            }
+                        }
+
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label class="rr-resettle-label">Общая площадь</label>
+                    <input disabled class="form-control" name="ResettleToTotalAreaFact" asp-for="TotalAreaFact" />
                 </div>
             </div>
         </div>
