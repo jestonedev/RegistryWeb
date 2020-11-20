@@ -4,16 +4,10 @@
     string isChecked(bool value) => value ? "checked" : "";
 }
 <link rel="stylesheet" type="text/css" href="~/lib/datatables/datatables.min.css" />
-@*<link rel="stylesheet" type="text/css" href="~/lib/datatables/DataTables-1.10.22/css/dataTables.bootstrap4.min.css" />*@
+<link rel="stylesheet" type="text/css" href="~/css/paymentAccountsTable.css" asp-append-version="true"/>
+
 <script type="text/javascript" src="~/lib/datatables/datatables.min.js"></script>
-@*<script type="text/javascript" src="~/lib/datatables/DataTables-1.10.22/js/dataTables.bootstrap4.min.js"></script>*@
-<style>
-    .table td {
-        padding: .25rem;
-        font-size: .75rem;
-    }
-</style>
-<script type="text/javascript" src="~/js/paymentAccountsTable.js" asp-append-version="true" ></script>
+<script type="text/javascript" src="~/js/paymentAccountsTable.js" asp-append-version="true"></script>
 
 <div class="d-inline-flex justify-content-start">
     <h2 class="m-auto">@ViewData["Title"]</h2>
@@ -35,13 +29,49 @@
 </div>
 @if (Model.RentObjects.ContainsKey(ViewBag.IdAccount))
 {
-    <ul class="list-group">
-        <label>Адресс ЖФ</label>
-        @foreach (Address address in Model.RentObjects[ViewBag.IdAccount])
-        {
-            <li class="list-group-item">@address.Text</li>
-        }
-    </ul>
+    <label>Адресс ЖФ</label>
+    @foreach (Address address in Model.RentObjects[ViewBag.IdAccount])
+    {
+        var idPremise = Int32.Parse(address.AddressType == AddressTypes.SubPremise ? address.IdParents["Premise"] : address.Id);
+        <div class="card">
+            <div class="h5 card-header d-flex justify-content-between">
+                <div>@address.Text <span>(статус)</span></div>
+                <div class="btn-group">
+                    <a class="btn btn-success oi oi-home" style="top: 0;" title="Помещение"
+                       asp-controller="Premises" asp-action="Details"
+                       asp-route-idPremises="@idPremise"
+                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                    <a class="btn btn-success" title="Процессы найма"
+                       asp-controller="TenancyProcesses" asp-action="Index"
+                       asp-route-filterOptions.Address.AddressType="@address.AddressType"
+                       asp-route-filterOptions.Address.Id="@address.Id"
+                       asp-route-filterOptions.Address.Text="@address.Text">ПН</a>
+                    <a href="#" class="btn btn-secondary oi oi-info" style="top: 0;" id="infoBtn" title="Информация"></a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="form-group col">
+                        <label>Дополнительные сведения</label>
+                        <textarea class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col">
+                        <label>Документы права собственности</label>
+                        @await Component.InvokeAsync("RestrictionsComponent", new { id = idPremise, type = AddressTypes.Premise, isTable = true })
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col">
+                        <label>Процессы найма</label>
+                        @await Component.InvokeAsync("TenancyProcessesComponent", new { address = address })
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    }
 }
 <table id="ttt" class="table table-bordered">
     <thead>
@@ -150,7 +180,7 @@
                         </div>
                         <div class="form-check form-check-inline">
                             <input type="checkbox" id="Column_LivingArea" class="form-check-input"
-                                   title="Жилая площадь" @isChecked(Model.PaymentAccountTableJson.HasLivingArea)  />
+                                   title="Жилая площадь" @isChecked(Model.PaymentAccountTableJson.HasLivingArea) />
                             <label for="Column_LivingArea" class="form-check-label">Жилая площадь</label>
                         </div>
                         <div class="form-check form-check-inline">

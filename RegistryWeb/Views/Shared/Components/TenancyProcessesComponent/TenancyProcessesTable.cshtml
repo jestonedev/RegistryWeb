@@ -1,0 +1,29 @@
+﻿@model IEnumerable<RegistryWeb.Models.Entities.TenancyProcess>;
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Номер</th>
+            <th>№ договора</th>
+            <th>Дата регистрации договора</th>
+            <th>Дата окончания договора</th>
+            <th>Тип найма</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tp in Model)
+        {
+            <tr>
+                <td>
+                    <a title="Процесс найма № @tp.IdProcess"
+                       asp-controller="TenancyProcesses" asp-action="Details"
+                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
+                       asp-route-idProcess="@tp.IdProcess">@tp.IdProcess</a>
+                </td>
+                <td>@tp.RegistrationNum</td>
+                <td>@(tp.RegistrationDate.HasValue ? tp.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")</td>
+                <td>@(tp.EndDate.HasValue ? tp.EndDate.Value.ToString("dd.MM.yyyy") : "")</td>
+                <td>@tp.IdRentTypeNavigation.RentTypeName</td>
+            </tr>
+        }
+    </tbody>
+</table>

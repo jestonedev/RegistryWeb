@@ -18,7 +18,7 @@ namespace RegistryWeb.ViewComponents
             this.registryContext = registryContext;
         }
 
-        public IViewComponentResult Invoke(int id, AddressTypes type, ActionTypeEnum action)
+        public IViewComponentResult Invoke(int id, AddressTypes type, ActionTypeEnum action = ActionTypeEnum.Details, bool isTable = false)
         {
             ViewBag.Id = id;
             IEnumerable<RestrictionVM> model = null;
@@ -33,7 +33,8 @@ namespace RegistryWeb.ViewComponents
             ViewBag.AddressType = type;
             ViewBag.Action = action;
             ViewBag.RestrictionTypes = registryContext.RestrictionTypes;
-
+            if (isTable)
+                return View("RestrictionsTable", model);
             return View("Restrictions", model);
         }
 

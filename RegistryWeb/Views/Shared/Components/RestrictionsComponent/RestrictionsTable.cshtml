@@ -1,0 +1,26 @@
+﻿@model IEnumerable<RegistryWeb.ViewModel.RestrictionVM>;
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Номер</th>
+            <th>Дата документа</th>
+            <th>Наименование</th>
+            <th>Дата г/р в УЮ</th>
+            <th>Тип права собственности</th>
+            <th>Принадлежность</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var restVM in Model)
+        {
+        <tr>
+            <td>@restVM.Number</td>
+            <td>@(restVM.Date.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : restVM.Date.ToString("dd.MM.yyyy"))</td>
+            <td>@restVM.Description</td>
+            <td>@(restVM.DateStateReg.HasValue ? restVM.DateStateReg.Value.ToString("dd.MM.yyyy") : "")</td>
+            <td>@restVM.RestrictionTypeNavigation.RestrictionTypeName</td>
+            <td>@(restVM.AddressType == AddressTypes.Premise ? "Помещение" : "Здание")</td>
+        </tr>
+        }
+    </tbody>
+</table>

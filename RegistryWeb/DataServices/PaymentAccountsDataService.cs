@@ -1033,7 +1033,7 @@ namespace RegistryWeb.DataServices
             viewModel.LastPayment = GetQuery().Single(r => r.IdAccount == idAccount);
             viewModel.Payments = (from row in registryContext.Payments.Include(r => r.PaymentAccountNavigation)
                                   where row.IdAccount == idAccount
-                                  orderby row.Date descending
+                                  orderby row.Date
                                   select row).ToList();
             var lastPaymentList = new List<Payment>();
             lastPaymentList.Add(viewModel.LastPayment);

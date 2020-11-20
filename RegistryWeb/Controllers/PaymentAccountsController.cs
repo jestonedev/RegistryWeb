@@ -97,6 +97,14 @@ namespace RegistryWeb.Controllers
             return Json(result);
         }
 
+        [HttpPost]
+        public JsonResult GetTenancies(int? idPremise)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead) || (idPremise == null) || (idPremise == 0))
+                return Json(false);
+            return Json(true);
+        }
+
         public IActionResult AccountsReports(PageOptions pageOptions)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))

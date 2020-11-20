@@ -53,7 +53,6 @@ $(document).ready(function () {
         fixedHeader: true,
         fixedColumns: true,
         scrollX: true,
-        scrollY: "55vh",
         scrollCollapse: true,
         paging: false,
         ordering: false,
@@ -87,5 +86,33 @@ $(document).ready(function () {
             }
         });
         $("#configModal").modal("hide");
+    });
+    $("tenanciesBtn").on("click", function (e) {
+        e.preventDefault();
+        $.ajax({
+            async: false,
+            type: 'POST',
+            url: window.location.origin + '/PaymentAccounts/',
+            data: setting,
+            success: function (isSuccess) {
+                if (!isSuccess) {
+                    alert("Ошибка сохранения настроек! Обратитесь в ЦИТ!");
+                }
+            }
+        });
+    });
+    $("restrictionsBtn").on("click", function (e) {
+        e.preventDefault();
+        $.ajax({
+            async: false,
+            type: 'POST',
+            url: window.location.origin + '/PaymentAccounts/',
+            data: setting,
+            success: function (isSuccess) {
+                if (!isSuccess) {
+                    alert("Ошибка сохранения настроек! Обратитесь в ЦИТ!");
+                }
+            }
+        });
     });
 });
