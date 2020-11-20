@@ -289,8 +289,13 @@ namespace RegistryWeb.Controllers
                 return View("Building", dataService.CreateBuilding());
             }
             ViewBag.Address = building.IdStreetNavigation?.StreetName + ", д." + building.House;
-            ViewBag.MunicipalPremisesArea = dataService.GetPremisesAreaByStates(building.IdBuilding, ObjectStateHelper.MunicipalIds());
-            ViewBag.NonMunicipalPremisesArea = dataService.GetPremisesAreaByStates(building.IdBuilding, ObjectStateHelper.MunicipalIds(), false);
+            ViewBag.PremisesAreaInfo = new PremisesAreaInfo
+            {
+                MunicipalLivingArea = dataService.GetPremisesLivingAreaByStates(building.IdBuilding, ObjectStateHelper.MunicipalIds()),
+                MunicipalTotalArea = dataService.GetPremisesTotalAreaByStates(building.IdBuilding, ObjectStateHelper.MunicipalIds()),
+                PrivLivingArea = dataService.GetPremisesLivingAreaByStates(building.IdBuilding, ObjectStateHelper.MunicipalIds(), false),
+                PrivTotalArea = dataService.GetPremisesLivingAreaByStates(building.IdBuilding, ObjectStateHelper.MunicipalIds(), false)
+            };
             return View("Building", building);
         }
     }

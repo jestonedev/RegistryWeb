@@ -417,11 +417,18 @@ namespace RegistryWeb.DataServices
             return objectStates;
         }
 
-        public double GetPremisesAreaByStates(int idBuilding, List<int> states, bool contains = true)
+        public double GetPremisesTotalAreaByStates(int idBuilding, List<int> states, bool contains = true)
         {
             return (from row in registryContext.Premises
                     where row.IdBuilding == idBuilding && ((contains && states.Contains(row.IdState)) || (!contains && !states.Contains(row.IdState)))
                     select row.TotalArea).Sum();
+        }
+
+        public double GetPremisesLivingAreaByStates(int idBuilding, List<int> states, bool contains = true)
+        {
+            return (from row in registryContext.Premises
+                    where row.IdBuilding == idBuilding && ((contains && states.Contains(row.IdState)) || (!contains && !states.Contains(row.IdState)))
+                    select row.LivingArea).Sum();
         }
 
         public IEnumerable<StructureType> StructureTypes
