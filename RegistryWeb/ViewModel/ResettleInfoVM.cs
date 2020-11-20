@@ -11,6 +11,7 @@ namespace RegistryWeb.ViewModel
         public string IdStreet { get; set; }
         public int? IdBuilding { get; set; }
         public int? IdPremise { get; set; }
+        public double TotalArea { get; set; }
         public List<int> IdSubPremises { get; set; }
         public List<Building> Buildings { get; set; }
         public List<Premise> Premises { get; set; }
@@ -20,6 +21,7 @@ namespace RegistryWeb.ViewModel
         public string IdStreetFact { get; set; }
         public int? IdBuildingFact { get; set; }
         public int? IdPremiseFact { get; set; }
+        public double TotalAreaFact { get; set; }
         public List<int> IdSubPremisesFact { get; set; }
         public List<Building> BuildingsFact { get; set; }
         public List<Premise> PremisesFact { get; set; }
@@ -47,7 +49,7 @@ namespace RegistryWeb.ViewModel
             ResettleInfoToFact = ri.ResettleInfoToFact;
             Address = address;
 
-            // Gkfyjdsq flhtc gthtctktybz
+            // Плановый адрес переселения
             var resettleTo = ri.ResettleInfoTo.FirstOrDefault();
             IdSubPremises = new List<int>();
             if (resettleTo != null)
@@ -56,15 +58,20 @@ namespace RegistryWeb.ViewModel
                 {
                     case "Building":
                         IdBuilding = resettleTo.IdObject;
-                        IdStreet = registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == IdBuilding)?.IdStreet;
+                        var building = registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == IdBuilding);
+                        TotalArea = building?.TotalArea ?? 0;
+                        IdStreet = building?.IdStreet;
                         break;
                     case "Premise":
                         IdPremise = resettleTo.IdObject;
-                        IdBuilding = registryContext.Premises.FirstOrDefault(p => p.IdPremises == IdPremise)?.IdBuilding;
+                        var premise = registryContext.Premises.FirstOrDefault(p => p.IdPremises == IdPremise);
+                        TotalArea = premise?.TotalArea ?? 0;
+                        IdBuilding = premise?.IdBuilding;
                         IdStreet = registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == IdBuilding)?.IdStreet;
                         break;
                     case "SubPremise":
                         IdSubPremises = ri.ResettleInfoTo.Where(r => r.ObjectType == "SubPremise").Select(r => r.IdObject).ToList();
+                        TotalArea = registryContext.SubPremises.Where(sp => IdSubPremises.Contains(sp.IdSubPremises)).Select(sp => sp.TotalArea).Sum();
                         IdPremise = registryContext.SubPremises.FirstOrDefault(sp => IdSubPremises.Contains(sp.IdSubPremises))?.IdPremises;
                         IdBuilding = registryContext.Premises.FirstOrDefault(p => p.IdPremises == IdPremise)?.IdBuilding;
                         IdStreet = registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == IdBuilding)?.IdStreet;
@@ -84,15 +91,20 @@ namespace RegistryWeb.ViewModel
                 {
                     case "Building":
                         IdBuildingFact = resettleToFact.IdObject;
-                        IdStreetFact = registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == IdBuildingFact)?.IdStreet;
+                        var building = registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == IdBuildingFact);
+                        TotalAreaFact = building?.TotalArea ?? 0;
+                        IdStreetFact = building?.IdStreet;
                         break;
                     case "Premise":
                         IdPremiseFact = resettleToFact.IdObject;
-                        IdBuildingFact = registryContext.Premises.FirstOrDefault(p => p.IdPremises == IdPremiseFact)?.IdBuilding;
+                        var premise = registryContext.Premises.FirstOrDefault(p => p.IdPremises == IdPremiseFact);
+                        TotalAreaFact = premise?.TotalArea ?? 0;
+                        IdBuildingFact = premise?.IdBuilding;
                         IdStreetFact = registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == IdBuildingFact)?.IdStreet;
                         break;
                     case "SubPremise":
                         IdSubPremisesFact = ri.ResettleInfoToFact.Where(r => r.ObjectType == "SubPremise").Select(r => r.IdObject).ToList();
+                        TotalAreaFact = registryContext.SubPremises.Where(sp => IdSubPremisesFact.Contains(sp.IdSubPremises)).Select(sp => sp.TotalArea).Sum();
                         IdPremiseFact = registryContext.SubPremises.FirstOrDefault(sp => IdSubPremisesFact.Contains(sp.IdSubPremises))?.IdPremises;
                         IdBuildingFact = registryContext.Premises.FirstOrDefault(p => p.IdPremises == IdPremiseFact)?.IdBuilding;
                         IdStreetFact = registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == IdBuildingFact)?.IdStreet;

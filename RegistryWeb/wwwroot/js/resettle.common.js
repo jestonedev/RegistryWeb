@@ -326,7 +326,9 @@ let resettleDocumentTemplateForCancelation = undefined;
 
 function editResettle(e) {
     let resettle = $(this).closest(".list-group-item");
-    let fields = resettle.find('input, select, textarea');
+    let fields = resettle.find('input, select, textarea').filter(function (idx, elem) {
+        return !($(elem).prop("name") === "ResettleToTotalAreaFact" || $(elem).prop("name") === "ResettleToTotalArea");
+    });
     let yesNoPanel = resettle.find('.yes-no-panel');
     let editDelPanel = resettle.find('.edit-del-panel');
     fields.filter(function (idx, val) { return !$(val).prop("name").startsWith("FinanceSourceTotal"); }).prop('disabled', false);
@@ -513,9 +515,26 @@ function saveResettle(e) {
                     resettleElem.find('input[name="ResettleToIdBuildingPrev"]').val(resettleElem.find('select[name="ResettleToIdBuilding"]').val());
                     resettleElem.find('input[name="ResettleToIdPremisePrev"]').val(resettleElem.find('select[name="ResettleToIdPremise"]').val());
                     resettleElem.find('input[name="ResettleToSubPremisesPrev"]').remove();
+
                     var resettleToSubPremisesIds = resettleElem.find('select[name="ResettleToSubPremises"]').val();
                     for (let i = 0; i < resettleToSubPremisesIds.length; i++) {
                         resettleElem.append("<input type='hidden' name='ResettleToSubPremisesPrev' value='" + resettleToSubPremisesIds[i]+"'>");
+                    }
+
+                    resettleElem.find(".rr-open-resettle-to-plan").remove();
+                    var url = "";
+                    var resettleToPremiseElem = resettleElem.find('select[name="ResettleToIdPremise"]');
+                    var resettleToBuildingElem = resettleElem.find('select[name="ResettleToIdBuilding"]');
+                    if (resettleToPremiseElem.val() !== null && resettleToPremiseElem.val() !== "") {
+                        url = "/Premises/Details?idPremises=" + resettleToPremiseElem.val();
+                    } else
+                        if (resettleToBuildingElem.val() !== null && resettleToBuildingElem.val() !== "") {
+                            url = "/Buildings/Details?idBuilding=" + resettleToBuildingElem.val();
+                        }
+                    if (url !== "") {
+                        resettleElem.find(".resettle-to-plan-header").append(
+                            '<a class="btn pl-0 pr-0 rr-open-resettle-to-plan" href="' + url + '">' +
+                            '<span class="oi oi-eye"></span></a>');
                     }
 
                     resettleElem.find('input[name="ResettleToIdStreetFactPrev"]').val(resettleElem.find('select[name="ResettleToIdStreetFact"]').val());
@@ -525,6 +544,22 @@ function saveResettle(e) {
                     resettleToSubPremisesIds = resettleElem.find('select[name="ResettleToSubPremisesFact"]').val();
                     for (let i = 0; i < resettleToSubPremisesIds.length; i++) {
                         resettleElem.append("<input type='hidden' name='ResettleToSubPremisesFactPrev' value='" + resettleToSubPremisesIds[i] + "'>");
+                    }
+
+                    resettleElem.find(".rr-open-resettle-to-fact").remove();
+                    url = "";
+                    resettleToPremiseElem = resettleElem.find('select[name="ResettleToIdPremiseFact"]');
+                    resettleToBuildingElem = resettleElem.find('select[name="ResettleToIdBuildingFact"]');
+                    if (resettleToPremiseElem.val() !== null && resettleToPremiseElem.val() !== "") {
+                        url = "/Premises/Details?idPremises=" + resettleToPremiseElem.val();
+                    } else
+                        if (resettleToBuildingElem.val() !== null && resettleToBuildingElem.val() !== "") {
+                            url = "/Buildings/Details?idBuilding=" + resettleToBuildingElem.val();
+                        }
+                    if (url !== "") {
+                        resettleElem.find(".resettle-to-fact-header").append(
+                            '<a class="btn pl-0 pr-0 rr-open-resettle-to-fact" href="' + url + '">' +
+                            '<span class="oi oi-eye"></span></a>');
                     }
 
                     var resettleDocumentElems = resettleElem.find("#resettleDocumentsList .list-group-item");
@@ -604,14 +639,14 @@ function getResettleHouses() {
     var idStreet = $(this).val();
     var postfix = $(this).prop("name") === "ResettleToIdStreetFact" ? "Fact" : "";
     var resettleElem = $(this).closest(".list-group-item");
-    var buildingToSelect = resettleElem.find('select[name="ResettleToIdBuilding' + postfix+'"]');
+    var buildingToSelect = resettleElem.find('select[name="ResettleToIdBuilding' + postfix + '"]');
     var buildingPrevId = resettleElem.find('input[name="ResettleToIdBuilding' + postfix+'Prev"]').val();
     buildingToSelect.empty();
     buildingToSelect.append("<option></option>");
     buildingToSelect.selectpicker('refresh');
     $.getJSON('/Resettles/GetHouses', { idStreet: idStreet }, function (buildings) {
         $(buildings).each(function (idx, building) {
-            var option = '<option value="' + building.idBuilding + '">' + building.house + '</option>';
+            var option = '<option value="' + building.idBuilding + '" data-total-area="'+building.totalArea+'">' + building.house + '</option>';
             buildingToSelect.append(option);
         });
         buildingToSelect.val(buildingPrevId);
@@ -624,14 +659,20 @@ function getResettlePremises() {
     var idBuilding = $(this).val();
     var postfix = $(this).prop("name") === "ResettleToIdBuildingFact" ? "Fact" : "";
     var resettleElem = $(this).closest(".list-group-item");
-    var premiseToSelect = resettleElem.find('select[name="ResettleToIdPremise' + postfix +'"]');
+    var premiseToSelect = resettleElem.find('select[name="ResettleToIdPremise' + postfix + '"]');
+    var totalAreaElem = resettleElem.find('input[name="ResettleToTotalArea' + postfix + '"]');
+    var totalAreaBuilding = $(this).find("option[value='" + idBuilding + "']").data("totalArea");
+    if (idBuilding !== "" && idBuilding !== null)
+        totalAreaElem.val((totalAreaBuilding + "").replace(".", ","));
+    else
+        totalAreaElem.val(0);
     var premisePrevId = resettleElem.find('input[name="ResettleToIdPremise' + postfix +'Prev"]').val();
     premiseToSelect.empty();
     premiseToSelect.append("<option></option>");
     premiseToSelect.selectpicker('refresh');
     $.getJSON('/Resettles/GetPremises', { idBuilding: idBuilding }, function (premises) {
         $(premises).each(function (idx, premise) {
-            var option = '<option value="' + premise.idPremises + '">' + premise.premisesNum + '</option>';
+            var option = '<option value="' + premise.idPremises + '" data-total-area="' + premise.totalArea +'">' + premise.premisesNum + '</option>';
             premiseToSelect.append(option);
         });
         premiseToSelect.val(premisePrevId);
@@ -644,18 +685,52 @@ function getResettleSubPremises() {
     var idPremise = $(this).val();
     var postfix = $(this).prop("name") === "ResettleToIdPremiseFact" ? "Fact" : "";
     var resettleElem = $(this).closest(".list-group-item");
-    var subPremiseToSelect = resettleElem.find('select[name="ResettleToSubPremises' + postfix +'"]');
+    var subPremiseToSelect = resettleElem.find('select[name="ResettleToSubPremises' + postfix + '"]');
+    var totalAreaElem = resettleElem.find('input[name="ResettleToTotalArea' + postfix + '"]');
+
+    if (idPremise !== "" && idPremise !== null) {
+        var totalAreaPremise = $(this).find("option[value='" + idPremise + "']").data("totalArea") + "";
+        totalAreaElem.val(totalAreaPremise.replace(".", ","));
+    } else {
+        var buildingToSelect = resettleElem.find('select[name="ResettleToIdBuilding' + postfix + '"]');
+        var totalAreaBuilding = buildingToSelect.find("option[value='" + buildingToSelect.val() + "']").data("totalArea");
+        if (totalAreaBuilding !== undefined)
+            totalAreaElem.val((totalAreaBuilding + "").replace(".", ","));
+    }
+
     var subPremisePrevIds = resettleElem.find('input[name="ResettleToSubPremises' + postfix +'Prev"]').map(function (idx, elem) { return $(elem).val() }).toArray();
     subPremiseToSelect.empty();
     subPremiseToSelect.selectpicker('refresh');
     $.getJSON('/Resettles/GetSubPremises', { idPremise: idPremise }, function (subPremises) {
         $(subPremises).each(function (idx, subPremise) {
-            var option = '<option value="' + subPremise.idSubPremises + '">' + subPremise.subPremisesNum + '</option>';
+            var option = '<option value="' + subPremise.idSubPremises + '" data-total-area="' + subPremise.totalArea +'">' + subPremise.subPremisesNum + '</option>';
             subPremiseToSelect.append(option);
         });
         subPremiseToSelect.val(subPremisePrevIds);
         subPremiseToSelect.selectpicker('refresh');
+        subPremiseToSelect.change();
     });
+}
+
+function changeSubPremises() {
+    var idSubPremises = $(this).val();
+    var postfix = $(this).prop("name") === "ResettleToSubPremisesFact" ? "Fact" : "";
+    var resettleElem = $(this).closest(".list-group-item");
+    var totalAreaElem = resettleElem.find('input[name="ResettleToTotalArea' + postfix + '"]');
+    var totalAreaSubPremise = 0;
+    if (idSubPremises.length > 0) {
+        for (var i = 0; i < idSubPremises.length; i++) {
+            var idSubPremise = idSubPremises[i];
+            var totalAreaStr = $(this).find("option[value='" + idSubPremise + "']").data("totalArea") + "";
+            totalAreaSubPremise += parseFloat(totalAreaStr.replace(",", "."));
+        }
+        totalAreaElem.val((totalAreaSubPremise + "").replace(".", ","));
+    } else {
+        var premiseSelect = resettleElem.find('select[name="ResettleToIdPremise' + postfix + '"]');
+        var totalAreaPremise = premiseSelect.find("option[value='" + premiseSelect.val() + "']").data("totalArea");
+        if (totalAreaPremise !== undefined)
+            totalAreaElem.val((totalAreaPremise + "").replace(".", ","));
+    }
 }
 
 function removeResettleDocument(e) {
@@ -691,6 +766,7 @@ $(function () {
     $('#resettlesList').on('change', 'select[name="ResettleToIdStreet"], select[name="ResettleToIdStreetFact"]', getResettleHouses);
     $('#resettlesList').on('change', 'select[name="ResettleToIdBuilding"], select[name="ResettleToIdBuildingFact"]', getResettlePremises);
     $('#resettlesList').on('change', 'select[name="ResettleToIdPremise"], select[name="ResettleToIdPremiseFact"]', getResettleSubPremises);
+    $('#resettlesList').on('change', 'select[name="ResettleToSubPremises"], select[name="ResettleToSubPremisesFact"]', changeSubPremises);
     $('#resettlesList').on('click', '#resettleDocumentAdd', addResettleDocument);
     $('#resettlesList').on('click', '.resettle-document-cancel-btn', removeResettleDocument);
     $('#resettlesList').on('click', '.rr-resettle-document-file-attach', attachResettleDocumentFile);

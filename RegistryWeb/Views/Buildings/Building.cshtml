@@ -196,8 +196,8 @@
                         <div class="input-group">
                             <input type="text" class="form-control decimal input-decimal" asp-for="TotalArea" title="Общая площадь">
                             <div class="input-group-append">
-                                <span class="input-group-text" id="basic-addon2" title="Площадь муниципальных жилых помещений">МЖП: @ViewBag.PremisesAreaInfo.MunicipalTotalArea</span>
-                                <span class="input-group-text" id="basic-addon2" title="Площадь немуниципальных жилых помещений">НМЖП: @ViewBag.PremisesAreaInfo.PrivTotalArea</span>
+                                <span class="input-group-text @(Model.TotalArea == ViewBag.PremisesAreaInfo.MunicipalTotalArea + ViewBag.PremisesAreaInfo.PrivTotalArea ? "" : "bg-danger text-white")" id="basic-addon2" title="Площадь муниципальных жилых помещений">МЖП: @ViewBag.PremisesAreaInfo.MunicipalTotalArea</span>
+                                <span class="input-group-text @(Model.TotalArea == ViewBag.PremisesAreaInfo.MunicipalTotalArea + ViewBag.PremisesAreaInfo.PrivTotalArea ? "" : "bg-danger text-white")" id="basic-addon2" title="Площадь немуниципальных жилых помещений">НМЖП: @ViewBag.PremisesAreaInfo.PrivTotalArea</span>
                             </div>
                         </div>
                         <span asp-validation-for="TotalArea" class="text-danger"></span>
@@ -208,8 +208,8 @@
                         <div class="input-group">
                             <input type="text" class="form-control decimal input-decimal" asp-for="LivingArea" title="Жилая площадь">
                             <div class="input-group-append">
-                                <span class="input-group-text" id="basic-addon2" title="Площадь муниципальных жилых помещений">МЖП: @ViewBag.PremisesAreaInfo.MunicipalLivingArea</span>
-                                <span class="input-group-text" id="basic-addon2" title="Площадь немуниципальных жилых помещений">НМЖП: @ViewBag.PremisesAreaInfo.PrivLivingArea</span>
+                                <span class="input-group-text @(Model.LivingArea == ViewBag.PremisesAreaInfo.MunicipalLivingArea + ViewBag.PremisesAreaInfo.PrivLivingArea ? "" : "bg-danger text-white")" id="basic-addon2" title="Площадь муниципальных жилых помещений">МЖП: @ViewBag.PremisesAreaInfo.MunicipalLivingArea</span>
+                                <span class="input-group-text @(Model.LivingArea == ViewBag.PremisesAreaInfo.MunicipalLivingArea + ViewBag.PremisesAreaInfo.PrivLivingArea ? "" : "bg-danger text-white")" id="basic-addon2" title="Площадь немуниципальных жилых помещений">НМЖП: @ViewBag.PremisesAreaInfo.PrivLivingArea</span>
                             </div>
                         </div>
                         <span asp-validation-for="LivingArea" class="text-danger"></span>
