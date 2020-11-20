@@ -89,23 +89,20 @@
             </div>
         </div>
         <div class="card-body toggle-hide" id="resettleAddressesList">
-            <h5>
+            <h5 class="resettle-to-plan-header">
                 Плановый адрес
-                @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
+                @if (Model.IdPremise != null)
                 {
-                    if (Model.IdPremise != null)
-                    {
-                        <a class="btn pl-0 pr-0" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@Model.IdPremise">
-                            <span class="oi oi-eye"></span>
-                        </a>
-                    }
-                    else
-                    if (Model.IdBuilding != null)
-                    {
-                        <a class="btn pl-0 pr-0" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@Model.IdBuilding">
-                            <span class="oi oi-eye"></span>
-                        </a>
-                    }
+                    <a class="btn pl-0 pr-0 rr-open-resettle-to-plan" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@Model.IdPremise">
+                        <span class="oi oi-eye"></span>
+                    </a>
+                }
+                else
+                if (Model.IdBuilding != null)
+                {
+                    <a class="btn pl-0 pr-0 rr-open-resettle-to-plan" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@Model.IdBuilding">
+                        <span class="oi oi-eye"></span>
+                    </a>
                 }
             </h5>
             
@@ -183,23 +180,20 @@
                     <input disabled class="form-control" name="ResettleToTotalArea" asp-for="TotalArea" />
                 </div>
             </div>
-            <h5>
+            <h5 class="resettle-to-fact-header">
                 Фактический адрес
-                @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
+                @if (Model.IdPremiseFact != null)
                 {
-                    if (Model.IdPremiseFact != null)
-                    {
-                        <a class="btn pl-0 pr-0" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@Model.IdPremiseFact">
-                            <span class="oi oi-eye"></span>
-                        </a>
-                    }
-                    else
-                    if (Model.IdBuildingFact != null)
-                    {
-                        <a class="btn pl-0 pr-0" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@Model.IdBuildingFact">
-                            <span class="oi oi-eye"></span>
-                        </a>
-                    }
+                    <a class="btn pl-0 pr-0 rr-open-resettle-to-fact" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@Model.IdPremiseFact">
+                        <span class="oi oi-eye"></span>
+                    </a>
+                }
+                else
+                if (Model.IdBuildingFact != null)
+                {
+                    <a class="btn pl-0 pr-0 rr-open-resettle-to-fact" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@Model.IdBuildingFact">
+                        <span class="oi oi-eye"></span>
+                    </a>
                 }
             </h5>
             <hr class="mt-0" />

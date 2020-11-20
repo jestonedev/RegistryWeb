@@ -515,9 +515,26 @@ function saveResettle(e) {
                     resettleElem.find('input[name="ResettleToIdBuildingPrev"]').val(resettleElem.find('select[name="ResettleToIdBuilding"]').val());
                     resettleElem.find('input[name="ResettleToIdPremisePrev"]').val(resettleElem.find('select[name="ResettleToIdPremise"]').val());
                     resettleElem.find('input[name="ResettleToSubPremisesPrev"]').remove();
+
                     var resettleToSubPremisesIds = resettleElem.find('select[name="ResettleToSubPremises"]').val();
                     for (let i = 0; i < resettleToSubPremisesIds.length; i++) {
                         resettleElem.append("<input type='hidden' name='ResettleToSubPremisesPrev' value='" + resettleToSubPremisesIds[i]+"'>");
+                    }
+
+                    resettleElem.find(".rr-open-resettle-to-plan").remove();
+                    var url = "";
+                    var resettleToPremiseElem = resettleElem.find('select[name="ResettleToIdPremise"]');
+                    var resettleToBuildingElem = resettleElem.find('select[name="ResettleToIdBuilding"]');
+                    if (resettleToPremiseElem.val() !== null && resettleToPremiseElem.val() !== "") {
+                        url = "/Premises/Details?idPremises=" + resettleToPremiseElem.val();
+                    } else
+                        if (resettleToBuildingElem.val() !== null && resettleToBuildingElem.val() !== "") {
+                            url = "/Buildings/Details?idBuilding=" + resettleToBuildingElem.val();
+                        }
+                    if (url !== "") {
+                        resettleElem.find(".resettle-to-plan-header").append(
+                            '<a class="btn pl-0 pr-0 rr-open-resettle-to-plan" href="' + url + '">' +
+                            '<span class="oi oi-eye"></span></a>');
                     }
 
                     resettleElem.find('input[name="ResettleToIdStreetFactPrev"]').val(resettleElem.find('select[name="ResettleToIdStreetFact"]').val());
@@ -527,6 +544,22 @@ function saveResettle(e) {
                     resettleToSubPremisesIds = resettleElem.find('select[name="ResettleToSubPremisesFact"]').val();
                     for (let i = 0; i < resettleToSubPremisesIds.length; i++) {
                         resettleElem.append("<input type='hidden' name='ResettleToSubPremisesFactPrev' value='" + resettleToSubPremisesIds[i] + "'>");
+                    }
+
+                    resettleElem.find(".rr-open-resettle-to-fact").remove();
+                    url = "";
+                    resettleToPremiseElem = resettleElem.find('select[name="ResettleToIdPremiseFact"]');
+                    resettleToBuildingElem = resettleElem.find('select[name="ResettleToIdBuildingFact"]');
+                    if (resettleToPremiseElem.val() !== null && resettleToPremiseElem.val() !== "") {
+                        url = "/Premises/Details?idPremises=" + resettleToPremiseElem.val();
+                    } else
+                        if (resettleToBuildingElem.val() !== null && resettleToBuildingElem.val() !== "") {
+                            url = "/Buildings/Details?idBuilding=" + resettleToBuildingElem.val();
+                        }
+                    if (url !== "") {
+                        resettleElem.find(".resettle-to-fact-header").append(
+                            '<a class="btn pl-0 pr-0 rr-open-resettle-to-fact" href="' + url + '">' +
+                            '<span class="oi oi-eye"></span></a>');
                     }
 
                     var resettleDocumentElems = resettleElem.find("#resettleDocumentsList .list-group-item");
