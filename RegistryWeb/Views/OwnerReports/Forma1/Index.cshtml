@@ -5,8 +5,30 @@
 }
 
 <h2>@ViewData["Title"]</h2>
-@*<a class="btn btn-block btn-success">Форма 1</a>
-<button class="btn btn-block btn-success">Форма 2</button>*@
+
+<form asp-action="Forma1" method="get" class="filterForm">
+    <input type="hidden" asp-for="FilterOptions.Address.AddressType" />
+    <input type="hidden" asp-for="FilterOptions.Address.Id" />
+    <div class="row">
+        @if (Model.FilterOptions.IsAddressEmpty())
+        {
+            <div class="form-group col-12">
+                <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" data-is-buildings="true" title="Адрес" placeholder="Адрес" />
+            </div>
+        }
+        else
+        {
+            <div class="form-group col-12">
+                <div class="input-group">
+                    <input type="text" class="form-control col" disabled asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                    <div class="input-group-append h-auto d-inline-block">
+                        <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</form>
 <table class="table table-bordered">
     <tbody>
         @foreach (var item in Model.Buildings)
@@ -18,9 +40,13 @@
                 </td>
                 <td>
                     <a class="btn btn-success oi oi-document" title="Отчет по форме 1"
-                        asp-action="GetForma1" asp-controller="OwnerReports" asp-route-idBuilding="@item.IdBuilding"></a>
+                       asp-action="GetForma1" asp-controller="OwnerReports" asp-route-idBuilding="@item.IdBuilding"></a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script src="~/js/address.filter.js" asp-append-version="true"></script>
+}

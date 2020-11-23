@@ -3,11 +3,36 @@
     ViewData["Title"] = "Отчет по форме 2 и 3";
     var text = "(Зданий всего: " + Model.GroupPremises.Count() + " | Помещений всего: " + Model.GroupPremises.Sum(gp => gp.Count()) + ")";
 }
-@section scripts
-    {
+@section Scripts
+{
+    <script src="~/js/address.filter.js" asp-append-version="true"></script>
     <script src="~/js/forma1and2and3.js" asp-append-version="true"></script>
 }
 <h2 class="ml-2">@ViewData["Title"] @text</h2>
+
+<form asp-action="Forma2And3" method="get" class="filterForm">
+    <input type="hidden" asp-for="FilterOptions.Address.AddressType" />
+    <input type="hidden" asp-for="FilterOptions.Address.Id" />
+    <div class="row">
+        @if (Model.FilterOptions.IsAddressEmpty())
+        {
+            <div class="form-group col-12">
+                <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" data-is-buildings="true" title="Адрес" placeholder="Адрес" />
+            </div>
+        }
+        else
+        {
+            <div class="form-group col-12">
+                <div class="input-group">
+                    <input type="text" class="form-control col" disabled asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                    <div class="input-group-append h-auto d-inline-block">
+                        <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</form>
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -33,7 +58,7 @@
             @foreach (var premise in groupPremise)
             {
                 <tr class="trPremise" data-idbuilding="@groupPremise.Key" data-idpremise="@premise.IdPremises">
-                    <td  width="70px">
+                    <td width="70px">
                         @if (Model.PremisesIdOwnerProcesses.Keys.Contains(premise.IdPremises))
                         {
                             <a class="btn btn-success oi oi-aperture" title="Процесс собственности @Model.PremisesIdOwnerProcesses[premise.IdPremises]"

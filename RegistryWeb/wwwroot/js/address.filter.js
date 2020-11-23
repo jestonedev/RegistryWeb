@@ -1,11 +1,12 @@
 ﻿var autocompleteFilterOptionsAddress = function () {
     $('input[name="FilterOptions.Address.Text"]').autocomplete({
         source: function (request, response) {
+            var isBuildings = $(this.element).data("isBuildings");
             $.ajax({
                 type: 'POST',
                 url: window.location.origin + '/Address/AutocompleteFilterOptionsAddress',
                 dataType: 'json',
-                data: { text: request.term },
+                data: { text: request.term, isBuildings: isBuildings },
                 success: function (data) {
                     if (data !== "0" && data !== undefined) {
                         console.log(data.addressType);
@@ -20,7 +21,8 @@
         select: function (event, ui) {
             var inputAddressType = $('input[name="FilterOptions.Address.AddressType"]');
             var addressType = inputAddressType.val();
-            filterClearModal();
+            if (window.filterClearModal !== undefined)
+                filterClearModal();
             inputAddressType.val(addressType);
             $('input[name="FilterOptions.Address.Id"]').val(ui.item.id);
             $('input[name="FilterOptions.Address.Text"]').val(ui.item.value);            

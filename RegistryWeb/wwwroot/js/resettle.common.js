@@ -327,7 +327,8 @@ let resettleDocumentTemplateForCancelation = undefined;
 function editResettle(e) {
     let resettle = $(this).closest(".list-group-item");
     let fields = resettle.find('input, select, textarea').filter(function (idx, elem) {
-        return !($(elem).prop("name") === "ResettleToTotalAreaFact" || $(elem).prop("name") === "ResettleToTotalArea");
+        return !($(elem).prop("name") === "ResettleToTotalAreaFact" || $(elem).prop("name") === "ResettleToTotalArea" ||
+            $(elem).prop("name") === "ResettleToLivingAreaFact" || $(elem).prop("name") === "ResettleToLivingArea");
     });
     let yesNoPanel = resettle.find('.yes-no-panel');
     let editDelPanel = resettle.find('.edit-del-panel');
@@ -531,6 +532,7 @@ function saveResettle(e) {
                         if (resettleToBuildingElem.val() !== null && resettleToBuildingElem.val() !== "") {
                             url = "/Buildings/Details?idBuilding=" + resettleToBuildingElem.val();
                         }
+                    url += "&returnUrl=" + encodeURIComponent(location.href);
                     if (url !== "") {
                         resettleElem.find(".resettle-to-plan-header").append(
                             '<a class="btn pl-0 pr-0 rr-open-resettle-to-plan" href="' + url + '">' +
@@ -556,6 +558,7 @@ function saveResettle(e) {
                         if (resettleToBuildingElem.val() !== null && resettleToBuildingElem.val() !== "") {
                             url = "/Buildings/Details?idBuilding=" + resettleToBuildingElem.val();
                         }
+                    url += "&returnUrl=" + encodeURIComponent(location.href);
                     if (url !== "") {
                         resettleElem.find(".resettle-to-fact-header").append(
                             '<a class="btn pl-0 pr-0 rr-open-resettle-to-fact" href="' + url + '">' +
@@ -646,7 +649,7 @@ function getResettleHouses() {
     buildingToSelect.selectpicker('refresh');
     $.getJSON('/Resettles/GetHouses', { idStreet: idStreet }, function (buildings) {
         $(buildings).each(function (idx, building) {
-            var option = '<option value="' + building.idBuilding + '" data-total-area="'+building.totalArea+'">' + building.house + '</option>';
+            var option = '<option value="' + building.idBuilding + '" data-total-area="' + building.totalArea + '" data-living-area="' + building.livingArea +'">' + building.house + '</option>';
             buildingToSelect.append(option);
         });
         buildingToSelect.val(buildingPrevId);
@@ -660,19 +663,26 @@ function getResettlePremises() {
     var postfix = $(this).prop("name") === "ResettleToIdBuildingFact" ? "Fact" : "";
     var resettleElem = $(this).closest(".list-group-item");
     var premiseToSelect = resettleElem.find('select[name="ResettleToIdPremise' + postfix + '"]');
+    var buildingOption = $(this).find("option[value='" + idBuilding + "']");
     var totalAreaElem = resettleElem.find('input[name="ResettleToTotalArea' + postfix + '"]');
-    var totalAreaBuilding = $(this).find("option[value='" + idBuilding + "']").data("totalArea");
-    if (idBuilding !== "" && idBuilding !== null)
+    var totalAreaBuilding = buildingOption.data("totalArea");
+    var livingAreaElem = resettleElem.find('input[name="ResettleToLivingArea' + postfix + '"]');
+    var livingAreaBuilding = buildingOption.data("livingArea");
+    if (idBuilding !== "" && idBuilding !== null) {
         totalAreaElem.val((totalAreaBuilding + "").replace(".", ","));
-    else
+        livingAreaElem.val((livingAreaBuilding + "").replace(".", ","));
+    }
+    else {
         totalAreaElem.val(0);
+        livingAreaElem.val(0);
+    }
     var premisePrevId = resettleElem.find('input[name="ResettleToIdPremise' + postfix +'Prev"]').val();
     premiseToSelect.empty();
     premiseToSelect.append("<option></option>");
     premiseToSelect.selectpicker('refresh');
     $.getJSON('/Resettles/GetPremises', { idBuilding: idBuilding }, function (premises) {
         $(premises).each(function (idx, premise) {
-            var option = '<option value="' + premise.idPremises + '" data-total-area="' + premise.totalArea +'">' + premise.premisesNum + '</option>';
+            var option = '<option value="' + premise.idPremises + '" data-total-area="' + premise.totalArea + '" data-living-area="' + premise.livingArea +'">' + premise.premisesNum + '</option>';
             premiseToSelect.append(option);
         });
         premiseToSelect.val(premisePrevId);
@@ -687,15 +697,23 @@ function getResettleSubPremises() {
     var resettleElem = $(this).closest(".list-group-item");
     var subPremiseToSelect = resettleElem.find('select[name="ResettleToSubPremises' + postfix + '"]');
     var totalAreaElem = resettleElem.find('input[name="ResettleToTotalArea' + postfix + '"]');
+    var livingAreaElem = resettleElem.find('input[name="ResettleToLivingArea' + postfix + '"]');
 
     if (idPremise !== "" && idPremise !== null) {
-        var totalAreaPremise = $(this).find("option[value='" + idPremise + "']").data("totalArea") + "";
+        var premiseOption = $(this).find("option[value='" + idPremise + "']");
+        var totalAreaPremise = premiseOption.data("totalArea") + "";
         totalAreaElem.val(totalAreaPremise.replace(".", ","));
+        var livingAreaPremise = premiseOption.data("livingArea") + "";
+        livingAreaElem.val(livingAreaPremise.replace(".", ","));
     } else {
         var buildingToSelect = resettleElem.find('select[name="ResettleToIdBuilding' + postfix + '"]');
-        var totalAreaBuilding = buildingToSelect.find("option[value='" + buildingToSelect.val() + "']").data("totalArea");
+        var buldingOption = buildingToSelect.find("option[value='" + buildingToSelect.val() + "']");
+        var totalAreaBuilding = buldingOption.data("totalArea");
         if (totalAreaBuilding !== undefined)
             totalAreaElem.val((totalAreaBuilding + "").replace(".", ","));
+        var livingAreaBuilding = buldingOption.data("livingArea");
+        if (livingAreaBuilding !== undefined)
+            livingAreaElem.val((livingAreaBuilding + "").replace(".", ","));
     }
 
     var subPremisePrevIds = resettleElem.find('input[name="ResettleToSubPremises' + postfix +'Prev"]').map(function (idx, elem) { return $(elem).val() }).toArray();
@@ -703,7 +721,7 @@ function getResettleSubPremises() {
     subPremiseToSelect.selectpicker('refresh');
     $.getJSON('/Resettles/GetSubPremises', { idPremise: idPremise }, function (subPremises) {
         $(subPremises).each(function (idx, subPremise) {
-            var option = '<option value="' + subPremise.idSubPremises + '" data-total-area="' + subPremise.totalArea +'">' + subPremise.subPremisesNum + '</option>';
+            var option = '<option value="' + subPremise.idSubPremises + '" data-total-area="' + subPremise.totalArea + '" data-living-area="' + subPremise.livingArea +'">' + subPremise.subPremisesNum + '</option>';
             subPremiseToSelect.append(option);
         });
         subPremiseToSelect.val(subPremisePrevIds);
@@ -717,19 +735,29 @@ function changeSubPremises() {
     var postfix = $(this).prop("name") === "ResettleToSubPremisesFact" ? "Fact" : "";
     var resettleElem = $(this).closest(".list-group-item");
     var totalAreaElem = resettleElem.find('input[name="ResettleToTotalArea' + postfix + '"]');
+    var livingAreaElem = resettleElem.find('input[name="ResettleToLivingArea' + postfix + '"]');
     var totalAreaSubPremise = 0;
+    var livingAreaSubPremise = 0;
     if (idSubPremises.length > 0) {
         for (var i = 0; i < idSubPremises.length; i++) {
             var idSubPremise = idSubPremises[i];
-            var totalAreaStr = $(this).find("option[value='" + idSubPremise + "']").data("totalArea") + "";
+            var subPremiseOption = $(this).find("option[value='" + idSubPremise + "']")
+            var totalAreaStr = subPremiseOption.data("totalArea") + "";
             totalAreaSubPremise += parseFloat(totalAreaStr.replace(",", "."));
+            var livingAreaStr = subPremiseOption.data("livingArea") + "";
+            livingAreaSubPremise += parseFloat(livingAreaStr.replace(",", "."));
         }
         totalAreaElem.val((totalAreaSubPremise + "").replace(".", ","));
+        livingAreaElem.val((livingAreaSubPremise + "").replace(".", ","));
     } else {
         var premiseSelect = resettleElem.find('select[name="ResettleToIdPremise' + postfix + '"]');
-        var totalAreaPremise = premiseSelect.find("option[value='" + premiseSelect.val() + "']").data("totalArea");
+        var premiseOption = premiseSelect.find("option[value='" + premiseSelect.val() + "']");
+        var totalAreaPremise = premiseOption.data("totalArea");
         if (totalAreaPremise !== undefined)
             totalAreaElem.val((totalAreaPremise + "").replace(".", ","));
+        var livingAreaPremise = premiseOption.data("livingArea");
+        if (livingAreaPremise !== undefined)
+            livingAreaElem.val((livingAreaPremise + "").replace(".", ","));
     }
 }
 
