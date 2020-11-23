@@ -187,10 +187,13 @@ namespace RegistryWeb.Controllers
             if (ModelState.IsValid)
             {
                 dataService.Edit(premise);
-                return RedirectToAction("Details", new { premise.IdPremises });
+                string returnUrlPrepared = null;
+                if (returnUrl?.Split("&returnUrl=", 2).Length == 2)
+                    returnUrlPrepared = System.Net.WebUtility.UrlDecode(returnUrl.Split("&returnUrl=")[1]);
+                return RedirectToAction("Details", new { premise.IdPremises, returnUrl = returnUrlPrepared });
             }
-            ViewBag.Action = ActionTypeEnum.Edit;
             ViewBag.ReturnUrl = returnUrl;
+            ViewBag.Action = ActionTypeEnum.Edit;
             ViewBag.SecurityService = securityService;
             return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: (bool)ViewBag.CanEditBaseInfo));
         }
