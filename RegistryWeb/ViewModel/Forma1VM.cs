@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RegistryWeb.ViewModel
 {
-    public class Forma1VM
+    public class Forma1VM : ListVM<BuildingsFilter>
     {
         public IQueryable<Building> Buildings { get; set; }
     }

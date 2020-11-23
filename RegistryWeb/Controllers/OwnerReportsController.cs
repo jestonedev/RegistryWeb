@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ReportServices;
 using RegistryWeb.DataServices;
+using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers
 {
@@ -35,11 +36,11 @@ namespace RegistryWeb.Controllers
             return RedirectToAction("Index", "ReestrEmergencyPremises");
         }
 
-        public IActionResult Forma1()
+        public IActionResult Forma1(Forma1VM forma1VM)
         {
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
-            return View("~/Views/OwnerReports/Forma1/Index.cshtml", dataService.GetForma1VM());
+            return View("~/Views/OwnerReports/Forma1/Index.cshtml", dataService.GetForma1VM(forma1VM.FilterOptions));
         }
 
         public IActionResult GetForma1(int? idBuilding)
@@ -61,11 +62,11 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult Forma2And3()
+        public IActionResult Forma2And3(Forma2VM forma2VM)
         {
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
-            return View("~/Views/OwnerReports/Forma2And3/Index.cshtml", dataService.GetForma2VM());
+            return View("~/Views/OwnerReports/Forma2And3/Index.cshtml", dataService.GetForma2VM(forma2VM.FilterOptions));
         }
 
         public IActionResult GetForma2(int? idPremise)

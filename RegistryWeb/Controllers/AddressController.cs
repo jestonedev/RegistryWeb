@@ -32,7 +32,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public JsonResult AutocompleteFilterOptionsAddress(string text, bool isBuldings = false)
+        public JsonResult AutocompleteFilterOptionsAddress(string text, bool isBuildings = false)
         {
             var match = Regex.Match(text, @"^(.*?)[,]*[ ]*(д\.?)?[ ]*(\d+[а-яА-Я]?([\\\/]\d+[а-яА-Я]?)?)?[ ]*[ ]*([,-]?|кв\.?)?[ ]*(\d+[а-яА-Я]?)?[ ]*$");
             var addressWordsList = new List<string>();
@@ -77,7 +77,7 @@ namespace RegistryWeb.Controllers
                             b.IdBuilding.ToString(),
                             string.Concat(b.IdStreetNavigation.StreetName, ", д.", b.House)));
                 }
-                else if (!isBuldings)
+                else if (!isBuildings)
                 {
                     var premiseNum = addressWords[2].ToLowerInvariant();
                     if (addressWords.Length == 3)
