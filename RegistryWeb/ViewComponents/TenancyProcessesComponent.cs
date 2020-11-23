@@ -18,7 +18,7 @@ namespace RegistryWeb.ViewComponents
             this.registryContext = registryContext;
         }
 
-        public IViewComponentResult Invoke(Address address)
+        public IViewComponentResult Invoke(Address address, string returnUrl)
         {
             IEnumerable<TenancyProcess> model = null;
             int id = 0;
@@ -44,6 +44,7 @@ namespace RegistryWeb.ViewComponents
                 }
             }
             ViewBag.RentTypes = registryContext.RentTypes;
+            ViewBag.ReturnUrl = returnUrl;
             return View("TenancyProcessesTable", model);
         }
     }

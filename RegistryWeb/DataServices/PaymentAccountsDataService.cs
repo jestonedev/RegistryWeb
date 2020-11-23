@@ -1164,6 +1164,15 @@ namespace RegistryWeb.DataServices
             return GetQuery().Where(p => ids.Contains(p.IdAccount)).Include(p => p.PaymentAccountNavigation).AsNoTracking();
         }
 
+        public Premise GetPremiseJson(int idPremise)
+        {
+            var premise = registryContext.Premises
+                .Include(p => p.IdStateNavigation)
+                .AsNoTracking()
+                .SingleOrDefault(p => p.IdPremises == idPremise);
+            return premise;
+        }
+
         public List<SelectableSigner> Signers => registryContext.SelectableSigners.ToList();
 
         public Executor CurrentExecutor

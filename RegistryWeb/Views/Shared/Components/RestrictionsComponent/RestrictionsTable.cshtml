@@ -1,4 +1,6 @@
 ﻿@model IEnumerable<RegistryWeb.ViewModel.RestrictionVM>;
+@if (Model.Count() > 0)
+{
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -13,14 +15,19 @@
     <tbody>
         @foreach (var restVM in Model)
         {
-        <tr>
-            <td>@restVM.Number</td>
-            <td>@(restVM.Date.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : restVM.Date.ToString("dd.MM.yyyy"))</td>
-            <td>@restVM.Description</td>
-            <td>@(restVM.DateStateReg.HasValue ? restVM.DateStateReg.Value.ToString("dd.MM.yyyy") : "")</td>
-            <td>@restVM.RestrictionTypeNavigation.RestrictionTypeName</td>
-            <td>@(restVM.AddressType == AddressTypes.Premise ? "Помещение" : "Здание")</td>
-        </tr>
+            <tr>
+                <td>@restVM.Number</td>
+                <td>@(restVM.Date.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : restVM.Date.ToString("dd.MM.yyyy"))</td>
+                <td>@restVM.Description</td>
+                <td>@(restVM.DateStateReg.HasValue ? restVM.DateStateReg.Value.ToString("dd.MM.yyyy") : "")</td>
+                <td>@restVM.RestrictionTypeNavigation.RestrictionTypeName</td>
+                <td>@(restVM.AddressType == AddressTypes.Premise ? "Помещение" : "Здание")</td>
+            </tr>
         }
     </tbody>
 </table>
+}
+else
+{
+    <i>Отсутствуют</i>
+}

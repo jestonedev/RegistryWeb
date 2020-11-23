@@ -59,6 +59,7 @@ $(document).ready(function () {
         info: false,
         searching: false
     });
+    $('.card-body').hide();
     $("#configModalShow").on("click", function (e) {
         e.preventDefault();
         $("#configModal").modal("show");
@@ -87,32 +88,55 @@ $(document).ready(function () {
         });
         $("#configModal").modal("hide");
     });
-    $("tenanciesBtn").on("click", function (e) {
+    $(".registryInfoBtn").on("click", function (e) {
         e.preventDefault();
-        $.ajax({
-            async: false,
-            type: 'POST',
-            url: window.location.origin + '/PaymentAccounts/',
-            data: setting,
-            success: function (isSuccess) {
-                if (!isSuccess) {
-                    alert("Ошибка сохранения настроек! Обратитесь в ЦИТ!");
+        var card = $(this).parents('.card')
+        var cardBody = card.find('.card-body');
+        var address = card.find('.address');
+        var type = address.data('type');
+        var id = address.data('id');
+        var idPremise = address.data('idpremise');
+        var returnUrl = address.data('returnurl');
+        var isHidden = cardBody.is(':hidden');
+        if (isHidden) {
+            $.ajax({
+                async: false,
+                type: 'GET',
+                url: window.location.origin + '/PaymentAccounts/GetPrimisesInfo?idPremise=' + idPremise,
+                dataType: 'json',
+                success: function (isSuccess) {
+                    if (isSuccess) {
+                        card.find('.objectState').text('(' + isSuccess.IdStateNavigation.StateNeutral + ')');
+                        if (isSuccess.Description != null) {
+                            cardBody.find('textarea').text(isSuccess.Description);
+                        }
+                    }
                 }
-            }
-        });
-    });
-    $("restrictionsBtn").on("click", function (e) {
-        e.preventDefault();
-        $.ajax({
-            async: false,
-            type: 'POST',
-            url: window.location.origin + '/PaymentAccounts/',
-            data: setting,
-            success: function (isSuccess) {
-                if (!isSuccess) {
-                    alert("Ошибка сохранения настроек! Обратитесь в ЦИТ!");
+            });
+            $.ajax({
+                async: false,
+                type: 'GET',
+                url: window.location.origin + '/PaymentAccounts/GetRestrictionsInfo?idPremise=' + idPremise,
+                success: function (isSuccess) {
+                    console.log(isSuccess);
+                    if (isSuccess) {
+                        cardBody.find('.col div')[0].innerHTML = isSuccess;
+                    }
                 }
-            }
-        });
+            });
+            $.ajax({
+                async: false,
+                type: 'POST',
+                url: window.location.origin + '/PaymentAccounts/GetTenanciesInfo',
+                data: { id, type, returnUrl },
+                success: function (isSuccess) {
+                    console.log(isSuccess);
+                    if (isSuccess) {
+                        cardBody.find('.col div')[1].innerHTML = isSuccess;
+                    }
+                }
+            });
+        }
+        cardBody.toggle(isHidden);
     });
 });

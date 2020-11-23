@@ -1,4 +1,6 @@
 ﻿@model IEnumerable<RegistryWeb.Models.Entities.TenancyProcess>;
+@if (Model.Count() > 0)
+{
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -16,7 +18,7 @@
                 <td>
                     <a title="Процесс найма № @tp.IdProcess"
                        asp-controller="TenancyProcesses" asp-action="Details"
-                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
+                       asp-route-returnUrl="@ViewBag.ReturnUrl"
                        asp-route-idProcess="@tp.IdProcess">@tp.IdProcess</a>
                 </td>
                 <td>@tp.RegistrationNum</td>
@@ -27,3 +29,8 @@
         }
     </tbody>
 </table>
+}
+else
+{
+    <i>Отсутствуют</i>
+}

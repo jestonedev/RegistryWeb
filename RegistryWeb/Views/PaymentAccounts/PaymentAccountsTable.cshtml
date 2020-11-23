@@ -33,20 +33,24 @@
     @foreach (Address address in Model.RentObjects[ViewBag.IdAccount])
     {
         var idPremise = Int32.Parse(address.AddressType == AddressTypes.SubPremise ? address.IdParents["Premise"] : address.Id);
+        var returnUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
         <div class="card">
             <div class="h5 card-header d-flex justify-content-between">
-                <div>@address.Text <span>(статус)</span></div>
+                <div class="address" data-idpremise="@idPremise" data-id="@address.Id"
+                     data-type="@address.AddressType" data-returnurl="@returnUrl">
+                    @address.Text <span class="objectState"></span>
+                </div>
                 <div class="btn-group">
-                    <a class="btn btn-success oi oi-home" style="top: 0;" title="Помещение"
+                    <a class="btn btn-success oi oi-home" title="Помещение"
                        asp-controller="Premises" asp-action="Details"
                        asp-route-idPremises="@idPremise"
-                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                       asp-route-returnUrl="@returnUrl"></a>
                     <a class="btn btn-success" title="Процессы найма"
                        asp-controller="TenancyProcesses" asp-action="Index"
                        asp-route-filterOptions.Address.AddressType="@address.AddressType"
                        asp-route-filterOptions.Address.Id="@address.Id"
                        asp-route-filterOptions.Address.Text="@address.Text">ПН</a>
-                    <a href="#" class="btn btn-secondary oi oi-info" style="top: 0;" id="infoBtn" title="Информация"></a>
+                    <a href="#" class="btn btn-secondary oi oi-info registryInfoBtn" title="Информация"></a>
                 </div>
             </div>
             <div class="card-body">
@@ -59,13 +63,13 @@
                 <div class="row">
                     <div class="form-group col">
                         <label>Документы права собственности</label>
-                        @await Component.InvokeAsync("RestrictionsComponent", new { id = idPremise, type = AddressTypes.Premise, isTable = true })
+                        <div></div>                       
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col">
                         <label>Процессы найма</label>
-                        @await Component.InvokeAsync("TenancyProcessesComponent", new { address = address })
+                        <div></div>
                     </div>
                 </div>
                 

@@ -97,12 +97,32 @@ namespace RegistryWeb.Controllers
             return Json(result);
         }
 
-        [HttpPost]
-        public JsonResult GetTenancies(int? idPremise)
+        [HttpGet]
+        public JsonResult GetPrimisesInfo(int? idPremise)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead) || (idPremise == null) || (idPremise == 0))
                 return Json(false);
-            return Json(true);
+            var premise = dataService.GetPremiseJson(idPremise.Value);
+            if (premise == null)
+                return Json(false);
+            return Json(premise, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+        }
+
+        [HttpGet]
+        public IActionResult GetRestrictionsInfo(int idPremise)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return Content("");
+            return ViewComponent("RestrictionsComponent", new { id = idPremise, type = AddressTypes.Premise, isTable = true });
+        }
+
+        [HttpPost]
+        public IActionResult GetTenanciesInfo(int id, AddressTypes type, string returnUrl)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return Content("");
+            var address = new Address() { Id = id.ToString(), AddressType = type };
+            return ViewComponent("TenancyProcessesComponent", new { address, returnUrl });
         }
 
         public IActionResult AccountsReports(PageOptions pageOptions)
