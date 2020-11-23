@@ -39,6 +39,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-toggleable-lg navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container">
+
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Главная</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -91,6 +92,11 @@
         </div>
     </nav>
     <div class="container">
+        <div class="alert alert-danger text-center">
+            Программный комплекс «Жилищный фонд города Братска», расположенный по адресу <a href="http://registry-test/">http://registry-test/</a>, настроен на тестовую базу данных.
+            Любые изменения, совершенные на данном веб-ресурсе, не будут отражены на действующей базе данных ПК «Жилищный фонд».
+            По окончании опытной эксплуатации тестовая база данных будет удалена.
+        </div>
         @RenderBody()
     </div>
 </body>

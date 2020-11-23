@@ -93,14 +93,16 @@
                 Плановый адрес
                 @if (Model.IdPremise != null)
                 {
-                    <a class="btn pl-0 pr-0 rr-open-resettle-to-plan" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@Model.IdPremise">
+                    <a class="btn pl-0 pr-0 rr-open-resettle-to-plan" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@Model.IdPremise"
+                         asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
                         <span class="oi oi-eye"></span>
                     </a>
                 }
                 else
                 if (Model.IdBuilding != null)
                 {
-                    <a class="btn pl-0 pr-0 rr-open-resettle-to-plan" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@Model.IdBuilding">
+                    <a class="btn pl-0 pr-0 rr-open-resettle-to-plan" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@Model.IdBuilding"
+                         asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
                         <span class="oi oi-eye"></span>
                     </a>
                 }
@@ -126,11 +128,13 @@
                         {
                             if (Model.IdBuilding == building.IdBuilding)
                             {
-                                <option value="@building.IdBuilding" data-total-area="@building.TotalArea" selected>@building.House</option>
+                                <option value="@building.IdBuilding" data-total-area="@building.TotalArea" data-living-area="@building.LivingArea"
+                                     selected>@building.House</option>
                             }
                             else
                             {
-                                <option value="@building.IdBuilding" data-total-area="@building.TotalArea">@building.House</option>
+                                <option value="@building.IdBuilding" data-total-area="@building.TotalArea" data-living-area="@building.LivingArea">
+                                    @building.House</option>
                             }
                         }
                     </select>
@@ -145,11 +149,13 @@
                         {
                             if (Model.IdPremise == premise.IdPremises)
                             {
-                                <option value="@premise.IdPremises" data-total-area="@premise.TotalArea" selected>@premise.PremisesNum</option>
+                                <option value="@premise.IdPremises" data-total-area="@premise.TotalArea" data-living-area="@premise.LivingArea"
+                                    selected>@premise.PremisesNum</option>
                             }
                             else
                             {
-                                <option value="@premise.IdPremises" data-total-area="@premise.TotalArea">@premise.PremisesNum</option>
+                                <option value="@premise.IdPremises" data-total-area="@premise.TotalArea" data-living-area="@premise.LivingArea">
+                                    @premise.PremisesNum</option>
                             }
                         }
                     </select>
@@ -166,32 +172,39 @@
                         {
                             if (Model.IdSubPremises.Contains(subPremise.IdSubPremises))
                             {
-                                <option value="@subPremise.IdSubPremises" data-total-area="@subPremise.TotalArea" selected>@subPremise.SubPremisesNum</option>
+                                <option value="@subPremise.IdSubPremises" data-total-area="@subPremise.TotalArea" data-living-area="@subPremise.LivingArea" 
+                                    selected>@subPremise.SubPremisesNum</option>
                             }
                             else
                             {
-                                <option value="@subPremise.IdSubPremises" data-total-area="@subPremise.TotalArea">@subPremise.SubPremisesNum</option>
+                                <option value="@subPremise.IdSubPremises" data-total-area="@subPremise.TotalArea" data-living-area="@subPremise.LivingArea">
+                                    @subPremise.SubPremisesNum</option>
                             }
                         }
                     </select>
                 </div>
                 <div class="form-group col-md-2">
-                    <label class="rr-resettle-label">Общая площадь</label>
-                    <input disabled class="form-control" name="ResettleToTotalArea" asp-for="TotalArea" />
+                    <label class="rr-resettle-label" title="Площадь (общ.|жил.)">Площадь (общ.|жил.)</label>
+                    <div class="input-group">
+                        <input disabled class="form-control" name="ResettleToTotalArea" title="Общая площадь" asp-for="TotalArea" />
+                        <input disabled class="form-control" name="ResettleToLivingArea" title="Жилая площадь" asp-for="LivingArea" />
+                    </div>
                 </div>
             </div>
             <h5 class="resettle-to-fact-header">
                 Фактический адрес
                 @if (Model.IdPremiseFact != null)
                 {
-                    <a class="btn pl-0 pr-0 rr-open-resettle-to-fact" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@Model.IdPremiseFact">
+                    <a class="btn pl-0 pr-0 rr-open-resettle-to-fact" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@Model.IdPremiseFact"
+                         asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
                         <span class="oi oi-eye"></span>
                     </a>
                 }
                 else
                 if (Model.IdBuildingFact != null)
                 {
-                    <a class="btn pl-0 pr-0 rr-open-resettle-to-fact" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@Model.IdBuildingFact">
+                    <a class="btn pl-0 pr-0 rr-open-resettle-to-fact" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@Model.IdBuildingFact"
+                         asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
                         <span class="oi oi-eye"></span>
                     </a>
                 }
@@ -215,11 +228,13 @@
                         {
                             if (Model.IdBuildingFact == building.IdBuilding)
                             {
-                                <option value="@building.IdBuilding" data-total-area="@building.TotalArea" selected>@building.House</option>
+                                <option value="@building.IdBuilding" data-total-area="@building.TotalArea" data-living-area="@building.LivingArea" 
+                                    selected>@building.House</option>
                             }
                             else
                             {
-                                <option value="@building.IdBuilding" data-total-area="@building.TotalArea">@building.House</option>
+                                <option value="@building.IdBuilding" data-total-area="@building.TotalArea" data-living-area="@building.LivingArea">
+                                    @building.House</option>
                             }
                         }
                     </select>
@@ -233,11 +248,13 @@
                         {
                             if (Model.IdPremiseFact == premise.IdPremises)
                             {
-                                <option value="@premise.IdPremises" data-total-area="@premise.TotalArea" selected>@premise.PremisesNum</option>
+                                <option value="@premise.IdPremises" data-total-area="@premise.TotalArea" data-living-area="@premise.LivingArea" 
+                                    selected>@premise.PremisesNum</option>
                             }
                             else
                             {
-                                <option value="@premise.IdPremises" data-total-area="@premise.TotalArea">@premise.PremisesNum</option>
+                                <option value="@premise.IdPremises" data-total-area="@premise.TotalArea" data-living-area="@premise.LivingArea">
+                                    @premise.PremisesNum</option>
                             }
                         }
                     </select>
@@ -255,19 +272,24 @@
                         {
                             if (Model.IdSubPremisesFact.Contains(subPremise.IdSubPremises))
                             {
-                                <option value="@subPremise.IdSubPremises" data-total-area="@subPremise.TotalArea" selected>@subPremise.SubPremisesNum</option>
+                                <option value="@subPremise.IdSubPremises" data-total-area="@subPremise.TotalArea" data-living-area="@subPremise.LivingArea" 
+                                    selected>@subPremise.SubPremisesNum</option>
                             }
                             else
                             {
-                                <option value="@subPremise.IdSubPremises" data-total-area="@subPremise.TotalArea">@subPremise.SubPremisesNum</option>
+                                <option value="@subPremise.IdSubPremises" data-total-area="@subPremise.TotalArea" data-living-area="@subPremise.LivingArea" >
+                                    @subPremise.SubPremisesNum</option>
                             }
                         }
 
                     </select>
                 </div>
                 <div class="form-group col-md-2">
-                    <label class="rr-resettle-label">Общая площадь</label>
-                    <input disabled class="form-control" name="ResettleToTotalAreaFact" asp-for="TotalAreaFact" />
+                    <label class="rr-resettle-label" title="Площадь (общ.|жил.)">Площадь (общ.|жил.)</label>
+                    <div class="input-group">
+                        <input disabled class="form-control" name="ResettleToTotalAreaFact" title="Общая площадь" asp-for="TotalAreaFact" />
+                        <input disabled class="form-control" name="ResettleToLivingAreaFact" title="Жилая площадь" asp-for="LivingAreaFact" />
+                    </div>
                 </div>
             </div>
         </div>
