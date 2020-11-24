@@ -41,16 +41,20 @@
                     @address.Text <span class="objectState"></span>
                 </div>
                 <div class="btn-group">
-                    <a class="btn btn-success oi oi-home" title="Помещение" target="_blank"
+                    <a class="btn btn-success" title="Помещение" target="_blank"
                        asp-controller="Premises" asp-action="Details"
                        asp-route-idPremises="@idPremise"
-                       asp-route-returnUrl="@returnUrl"></a>
+                       asp-route-returnUrl="@returnUrl">
+                        <span class="oi oi-home"></span>
+                    </a>
                     <a class="btn btn-success" title="Процессы найма" target="_blank"
                        asp-controller="TenancyProcesses" asp-action="Index"
                        asp-route-filterOptions.Address.AddressType="@address.AddressType"
                        asp-route-filterOptions.Address.Id="@address.Id"
                        asp-route-filterOptions.Address.Text="@address.Text">ПН</a>
-                    <a href="#" class="btn btn-secondary oi oi-info registryInfoBtn" title="Информация"></a>
+                    <a href="#" class="btn btn-secondary registryInfoBtn" title="Информация">
+                        <span class="oi oi-info"></span>
+                    </a>
                 </div>
             </div>
             <div class="card-body">
