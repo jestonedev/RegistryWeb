@@ -5,6 +5,8 @@ namespace RegistryWeb.ViewOptions.Filter
 {
     public class PaymentsFilter : FilterAddressOptions
     {
+        public string FrontSideAccount { get; set; }
+
         public string Crn { get; set; }
         public string Account { get; set; }
         public string Tenant { get; set; }
@@ -82,7 +84,7 @@ namespace RegistryWeb.ViewOptions.Filter
 
         public bool IsEmpty()
         {
-            return IsAddressEmpty() && IsModalEmpty() && IdBuilding == null && IdPremises == null && IdSubPremises == null;
+            return IsAddressEmpty() && IsModalEmpty() && IdBuilding == null && IdPremises == null && IdSubPremises == null && FrontSideAccount == null;
         }
 
         public bool IsModalEmpty()

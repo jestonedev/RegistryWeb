@@ -103,4 +103,16 @@ $(function () {
             toggler.click();
         }
     }
+
+    $("#FilterOptions_FrontSideAccount").keyup(function (event) {
+        if (event.keyCode == 13) {
+            event.preventDefault();
+            filterClear();
+        }
+    });
+    $("#accountFilterClearBtn").click(function (event) {
+        event.preventDefault();
+        $("#FilterOptions_FrontSideAccount").val("");
+        $("form.filterForm").submit();
+    });
 });

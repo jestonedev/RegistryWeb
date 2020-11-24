@@ -118,7 +118,6 @@ $(document).ready(function () {
                 type: 'GET',
                 url: window.location.origin + '/PaymentAccounts/GetRestrictionsInfo?idPremise=' + idPremise,
                 success: function (isSuccess) {
-                    console.log(isSuccess);
                     if (isSuccess) {
                         cardBody.find('.col div')[0].innerHTML = isSuccess;
                     }
@@ -130,7 +129,6 @@ $(document).ready(function () {
                 url: window.location.origin + '/PaymentAccounts/GetTenanciesInfo',
                 data: { id, type, returnUrl },
                 success: function (isSuccess) {
-                    console.log(isSuccess);
                     if (isSuccess) {
                         cardBody.find('.col div')[1].innerHTML = isSuccess;
                     }

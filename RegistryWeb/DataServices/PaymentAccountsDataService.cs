@@ -230,6 +230,10 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<Payment> PaymentAccountFilter(IQueryable<Payment> query, PaymentsFilter filterOptions)
         {
+            if (!string.IsNullOrEmpty(filterOptions.FrontSideAccount))
+            {
+                query = query.Where(p => p.PaymentAccountNavigation.Account.Contains(filterOptions.FrontSideAccount));
+            }
             if (!string.IsNullOrEmpty(filterOptions.Crn))
             {
                 query = query.Where(p => p.PaymentAccountNavigation.Crn.Contains(filterOptions.Crn));

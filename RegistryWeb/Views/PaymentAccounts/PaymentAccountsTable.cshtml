@@ -41,11 +41,11 @@
                     @address.Text <span class="objectState"></span>
                 </div>
                 <div class="btn-group">
-                    <a class="btn btn-success oi oi-home" title="Помещение"
+                    <a class="btn btn-success oi oi-home" title="Помещение" target="_blank"
                        asp-controller="Premises" asp-action="Details"
                        asp-route-idPremises="@idPremise"
                        asp-route-returnUrl="@returnUrl"></a>
-                    <a class="btn btn-success" title="Процессы найма"
+                    <a class="btn btn-success" title="Процессы найма" target="_blank"
                        asp-controller="TenancyProcesses" asp-action="Index"
                        asp-route-filterOptions.Address.AddressType="@address.AddressType"
                        asp-route-filterOptions.Address.Id="@address.Id"
