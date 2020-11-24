@@ -14,7 +14,6 @@
         <script>
             $(function () {
                 $('select option:not(:selected)').attr('disabled', true)
-                //$('select').attr('disabled', true);
                 $('input').attr('readonly', true);
                 $('textarea').attr('readonly', true);
             })
@@ -154,6 +153,26 @@
                             Text = Model.OwnerSubPremisesAssoc[i].SubPremiseNavigation.GetAddress(),
                             Href = "/Premises/Details?idPremises=" + Model.OwnerSubPremisesAssoc[i].SubPremiseNavigation.IdPremises}}" />
                         }
+                    }
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h3>Документы собственности</h3>
+                    <div class="btn-group" role="group">
+                        @*@if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
+                        {
+                            <a href="#" id="restrictionAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить реквизит права собственности">&#10010;</a>
+                        }*@
+                        <a href="#" id="restrictionsToggle" class="form-control btn btn-primary" title="Развернуть список документов" style="font-weight:bold;">
+                            <span class="oi oi-chevron-bottom"></span>
+                        </a>
+                    </div>
+                </div>
+                <ul id="ownerReasonFiles" class="list-group list-group-flush">
+                    @foreach (var item in Model.OwnerFiles)
+                    {
+                        <partial name="OwnerReasonFile" model="item" />
                     }
                 </ul>
             </div>

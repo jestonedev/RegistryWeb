@@ -13,6 +13,7 @@ namespace RegistryWeb.Models.Entities
             OwnerPremisesAssoc = new List<OwnerPremiseAssoc>();
             OwnerSubPremisesAssoc = new List<OwnerSubPremiseAssoc>();
             Owners = new List<Owner>();
+            OwnerFiles = new List<OwnerFile>();
         }
 
         public int IdProcess { get; set; }
@@ -26,6 +27,7 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<OwnerPremiseAssoc> OwnerPremisesAssoc { get; set; }
         public virtual IList<OwnerSubPremiseAssoc> OwnerSubPremisesAssoc { get; set; }
         public virtual IList<Owner> Owners { get; set; }
+        public virtual IList<OwnerFile> OwnerFiles { get; set; }
 
         public bool Equals(OwnerProcess op)
         {

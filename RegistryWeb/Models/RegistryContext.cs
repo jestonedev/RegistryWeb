@@ -77,6 +77,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<OwnershipRight> OwnershipRights { get; set; }
         public virtual DbSet<ObjectAttachmentFile> ObjectAttachmentFiles { get; set; }
         public virtual DbSet<BuildingAttachmentFileAssoc> BuildingAttachmentFilesAssoc { get; set; }
+        public virtual DbSet<OwnerFile> OwnerFiles { get; set; }
 
         //Собственники
         public virtual DbSet<Owner> Owners { get; set; }
@@ -251,7 +252,8 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new OwnerReasonConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerReasonTypeConfiguration(nameDatebase));
-      
+            modelBuilder.ApplyConfiguration(new OwnerFileConfiguration(nameDatebase));
+
             modelBuilder.ApplyConfiguration(new TenancyPersonConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KinshipConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyProcessConfiguration(nameDatebase));
