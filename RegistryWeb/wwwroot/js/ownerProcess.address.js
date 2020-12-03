@@ -99,21 +99,21 @@ function addressAdd(e) {
     addressClear();
     e.preventDefault();
 }
-function addressDelete(li) {
+function addressDelete() {
+    var li = $(this).parents('li');
     var addressType = li.data('addresstype');
     li.remove();
-    var i = 0;
-    $('#addresses li').each(function (index) {
+    $('#addresses li').each(function (i) {
         if ($(this).data('addresstype') == addressType) {
             recalculationAddresses($(this), i)
-            i++;
         }
     });
     if ($('.address').length == 1) {
         $('.addressDeleteBtn').addClass('disabled');
     }
 }
-function addressInfoToggle(li) {
+function addressInfoToggle() {
+    var li = $(this).parents('li');
     var addressType = li.data('addresstype');
     var id = li.find('input')[2].value;
     var infoBlock = li.find('.info');
@@ -138,18 +138,8 @@ $(function () {
     if ($('.address').length == 1) {
         $('.addressDeleteBtn').addClass('disabled');
     }
-    $('#addresses').click(function (event) {
-        //Удаление адрессов
-        if ($(event.target).hasClass('addressDeleteBtn')) {
-            event.preventDefault();
-            addressDelete($(event.target).parents('li'))
-        }
-        //Блок информации про адрес
-        if ($(event.target).hasClass('addressInfoToggleBtn')) {
-            event.preventDefault();
-            addressInfoToggle($(event.target).parents('li'))
-        }
-    });
+    $('#addresses').on('click', '.addressDeleteBtn', addressDelete);
+    $('#addresses').on('click', '.addressInfoToggleBtn', addressInfoToggle);
     $('#addressClearBtn').click(addressClear);
     $('#addressAddBtn').click(addressAdd);
 });

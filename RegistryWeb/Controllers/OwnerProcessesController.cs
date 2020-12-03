@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Configuration;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.Models;
@@ -20,6 +23,7 @@ namespace RegistryWeb.Controllers
     [Authorize]
     public class OwnerProcessesController : ListController<OwnerProcessesDataService, OwnerProcessesFilter>
     {
+        
         public OwnerProcessesController(OwnerProcessesDataService dataService, SecurityService securityService)
             : base(dataService, securityService)
         {
@@ -174,15 +178,16 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(OwnerProcess ownerProcess)
+        public IActionResult Edit(OwnerProcess ownerProcess, IFormFileCollection attachmentFiles, bool[] removeFiles)
         {
+            var r = Request;
             if (ownerProcess == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
                 return View("NotAccess");
             if (ModelState.IsValid)
-            {
-                dataService.Edit(ownerProcess);
+            {                
+                dataService.Edit(ownerProcess, attachmentFiles, removeFiles);
                 return RedirectToAction("Edit", new { ownerProcess.IdProcess });
             }
             return RedirectToAction("Index");
@@ -195,6 +200,30 @@ namespace RegistryWeb.Controllers
             ViewBag.OwnerReasonTypes = dataService.OwnerReasonTypes();
             ViewBag.ReturnUrl = returnUrl;        
             return View("OwnerProcess", ownerProcess);
+        }
+
+        public IActionResult DownloadFile(int id)
+        {
+            var ownerFile = dataService.GetOwnerFile(id);           
+            if (ownerFile == null) return Json(new { Error = -1 });
+            var filePath = Path.Combine(dataService.AttachmentsPath, ownerFile.FileOriginName);
+            if (!System.IO.File.Exists(filePath))
+            {
+                return Json(new { Error = -2 });
+            }
+            return File(System.IO.File.ReadAllBytes(filePath), ownerFile.FileMimeType, ownerFile.FileDisplayName);
+        }
+
+        public IActionResult OwnerFileAdd(int i, ActionTypeEnum action)
+        {
+            var ownerFileVM = new OwnerFileVM()
+            {
+                OwnerFile = new OwnerFile(),
+                Action = action,
+                I = i
+            };
+            ViewBag.OwnerReasonTypes = dataService.OwnerReasonTypes();
+            return PartialView("OwnerFile", ownerFileVM);
         }
     }
 }

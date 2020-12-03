@@ -6,6 +6,7 @@
 }
 @section Scripts {
     <script src="~/js/ownerProcess.address.js" asp-append-version="true"></script>
+    <script src="~/js/ownerProcess.files.js" asp-append-version="true"></script>
     <script src="~/js/ownerProcess.owner.js" asp-append-version="true"></script>
     <script src="~/js/ownerProcess.common.js" asp-append-version="true"></script>
 
@@ -33,7 +34,7 @@
     var controller = Context.Session.Get<string>("Controller");
     var canEdit = ViewBag.Action == ActionTypeEnum.Create || ViewBag.Action == ActionTypeEnum.Edit;
 }
-<form asp-controller="OwnerProcesses" asp-action="@ViewBag.Action" id="ownerProcessForm" data-action="@ViewBag.Action" method="post">
+<form enctype="multipart/form-data" asp-controller="OwnerProcesses" asp-action="@ViewBag.Action" id="ownerProcessForm" data-action="@ViewBag.Action" method="post">
     <div class="card">
         <div class="card-header d-flex justify-content-between">
             <div class="form-check form-check-inline">
@@ -62,7 +63,9 @@
                 {
                     <a href="#" id="ownerProcessDelete" class="form-control btn btn-danger">Удалить</a>
                 }
-                <a href="#" id="ownerProcessToggle" class="form-control btn btn-primary" title="Развернуть процесс собственности" style="font-weight:bold;">∧</a>
+                <a href="#" id="ownerProcessToggle" class="form-control btn btn-primary" title="Развернуть процесс собственности">
+                    <span class="oi oi-chevron-top"></span>
+                </a>
             </div>
         </div>
         <div class="card-body" id="ownerProcess">
@@ -72,7 +75,9 @@
                 <div class="card-header d-flex justify-content-between">
                     <h3>Завершение процесса</h3>
                     <div>
-                        <a href="#" id="annulOwnerProcessToggle" class="form-control btn btn-primary" title="Развернуть панель аннулирования" style="font-weight:bold;">∧</a>
+                        <a href="#" id="annulOwnerProcessToggle" class="form-control btn btn-primary" title="Развернуть панель аннулирования">
+                            <span class="oi oi-chevron-top"></span>
+                        </a>
                     </div>
                 </div>
                 <div id="annulOwnerProcess" class="card-body row">
@@ -91,7 +96,9 @@
                 <div class="card-header d-flex justify-content-between">
                     <h3>Адреса</h3>
                     <div class="btn-group" role="group">
-                        <a href="#" id="addressesToggle" class="form-control btn btn-primary" title="Развернуть коментарий" style="font-weight:bold;">∧</a>
+                        <a href="#" id="addressesToggle" class="form-control btn btn-primary" title="Развернуть коментарий">
+                            <span class="oi oi-chevron-top"></span>
+                        </a>
                     </div>
                 </div>
                 <ul id="addresses" class="list-group list-group-flush">
@@ -101,10 +108,14 @@
                             <div class="input-group">
                                 <input type="text" id="addressSearch" name="AddressSearch" class="form-control" title="Адрес" placeholder="Адрес" />
                                 <div class="input-group-append h-auto d-inline-block">
-                                    <a href="#" id="addressAddBtn" class="btn btn-success oi oi-plus disabled"></a>
+                                    <a href="#" id="addressAddBtn" class="btn btn-success disabled">
+                                        <span class="oi oi-plus"></span>
+                                    </a>
                                 </div>
                                 <div class="input-group-append h-auto d-inline-block">
-                                    <a href="#" id="addressClearBtn" class="btn btn-danger oi oi-x disabled"></a>
+                                    <a href="#" id="addressClearBtn" class="btn btn-danger disabled">
+                                        <span class="oi oi-x"></span>
+                                    </a>
                                 </div>
                             </div>
                         </li>
@@ -160,19 +171,27 @@
                 <div class="card-header d-flex justify-content-between">
                     <h3>Документы собственности</h3>
                     <div class="btn-group" role="group">
-                        @*@if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
+                        @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                         {
-                            <a href="#" id="restrictionAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanEditBaseInfo ?? true) ? "" : "disabled")" title="Добавить реквизит права собственности">&#10010;</a>
-                        }*@
-                        <a href="#" id="restrictionsToggle" class="form-control btn btn-primary" title="Развернуть список документов" style="font-weight:bold;">
-                            <span class="oi oi-chevron-bottom"></span>
+                        <a href="#" id="ownerFileAdd" class="form-control btn btn-success" title="Добавить реквизит права собственности">
+                            <span class="oi oi-plus"></span>
+                        </a>
+                        }
+                        <a href="#" id="ownerFilesToggle" class="form-control btn btn-primary" title="Развернуть список документов">
+                            <span class="oi oi-chevron-top"></span>
                         </a>
                     </div>
                 </div>
-                <ul id="ownerReasonFiles" class="list-group list-group-flush">
-                    @foreach (var item in Model.OwnerFiles)
+                <ul id="ownerFiles" class="list-group list-group-flush">
+                    @if (Model.OwnerFiles != null)
                     {
-                        <partial name="OwnerReasonFile" model="item" />
+                        @for (var i = 0; i < Model.OwnerFiles.Count(); i++)
+                        {
+                            <partial name="OwnerFile" model="@{new OwnerFileVM() {
+                            OwnerFile = Model.OwnerFiles[i],
+                            I = i,
+                            Action = ViewBag.Action}}" />
+                        }
                     }
                 </ul>
             </div>
@@ -187,7 +206,9 @@
                             <a href="#" class="form-control btn btn-success ownerAdd" title="Добавить юридическое лицо" data-id-owner-type="2">ЮЛ</a>
                             <a href="#" class="form-control btn btn-success ownerAdd" title="Добавить индивидуального предпринимателя" data-id-owner-type="3">ИП</a>
                         }
-                        <a href="#" id="ownersToggle" class="form-control btn btn-primary" title="Развернуть список собственников" style="font-weight:bold;">∧</a>
+                        <a href="#" id="ownersToggle" class="form-control btn btn-primary" title="Развернуть список собственников">
+                            <span class="oi oi-chevron-top"></span>
+                        </a>
                     </div>
                 </div>
                 <table class="table table-bordered" id="ownersTable" style="margin-bottom:0px;">
@@ -211,7 +232,7 @@
                                 <partial name="Owner" model="@{new OwnerVM() {
                                 Owner = Model.Owners[i],
                                 I = i,
-                                Action = ViewBag.Action}}" />
+                                Action = ViewBag.Action }}" />
                             }
                         }
                     </tbody>
@@ -221,7 +242,9 @@
                 <div class="card-header d-flex justify-content-between">
                     <h3 for="Comment">Комментарий</h3>
                     <div class="btn-group" role="group">
-                        <a href="#" id="commentToggle" class="form-control btn btn-primary" title="Развернуть коментарий" style="font-weight:bold;">∧</a>
+                        <a href="#" id="commentToggle" class="form-control btn btn-primary" title="Развернуть коментарий">
+                            <span class="oi oi-chevron-top"></span>
+                        </a>
                     </div>
                 </div>
                 <textarea rows="3" asp-for="Comment" class="form-control card-body"></textarea>
@@ -230,13 +253,15 @@
     </div>
     @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Edit)
     {
-    <div class="card">
-        <div class="card-header d-flex justify-content-between">
-            <h3 for="Comment">Журнал изменений</h3>
-            <div class="btn-group" role="group">
-                <a href="#" id="logToggle" class="form-control btn btn-primary" title="Развернуть журнал изменений" style="font-weight:bold;">∨</a>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <h3 for="Comment">Журнал изменений</h3>
+                <div class="btn-group" role="group">
+                    <a href="#" id="logToggle" class="form-control btn btn-primary" title="Развернуть журнал изменений">
+                        <span class="oi oi-chevron-top"></span>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
     }
 </form>

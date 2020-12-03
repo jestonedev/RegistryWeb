@@ -29,15 +29,21 @@
     <div class="input-group">
         <input type="text" class="form-control address" disabled title="@Model.Text" value="@Model.Text" />
         <div class="input-group-append d-inline-block">
-            <a href="#" class="btn btn-secondary oi oi-info addressInfoToggleBtn"></a>
+            <a href="#" class="btn btn-secondary addressInfoToggleBtn">
+                <span class="oi oi-info"></span>
+            </a>
         </div>
         <div class="input-group-append d-inline-block">
-            <a href="@href" class="btn btn-success oi oi-home"></a>
+            <a href="@href" class="btn btn-success">
+                <span class="oi oi-home"></span>
+            </a>
         </div>
         @if (Model.Action == ActionTypeEnum.Create || Model.Action == ActionTypeEnum.Edit)
         {
             <div class="input-group-append h-auto d-inline-block">
-                <a href="#" class="btn btn-danger oi oi-x addressDeleteBtn"></a>
+                <a href="#" class="btn btn-danger addressDeleteBtn">
+                    <span class="oi oi-x"></span>
+                </a>
             </div>
         }
     </div>

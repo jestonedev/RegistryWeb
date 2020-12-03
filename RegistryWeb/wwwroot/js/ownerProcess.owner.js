@@ -1,4 +1,5 @@
-﻿function reasonDelete(reason) {
+﻿function reasonDelete(e) {
+    var reason = $(this).closest('.reasonBlock');
     var iOwner = +reason.attr('data-i-owner');
     var reasons = $('.reasonBlock[data-i-owner="' + iOwner + '"]');
     if (reasons.length == 1)
@@ -11,8 +12,10 @@
     if (newReasons.length == 1) {
         newReasons.find('.reasonDelete').addClass('disabled');
     }
+    e.preventDefault();
 }
-function ownerDelete(owner) {
+function ownerDelete(e) {
+    var owner = $(this).closest('.ownerBlock');
     if ($('.ownerBlock').length == 1)
         return;
     var iOwner = +owner.attr('data-i-owner');//Преобразование iOwner к числу
@@ -39,6 +42,7 @@ function ownerDelete(owner) {
     if ($('.ownerBlock').length == 1) {
         $('.ownerDelete').addClass('disabled');
     }
+    e.preventDefault();
 }
 function recalculationOwners(owner, i) {
     var inputs = owner.find('input');
@@ -68,19 +72,16 @@ function recalculationReasons(reason, i, j) {
     inputs[5].name = 'Owners[' + i + '].OwnerReasons[' + j + '].ReasonDate';
     reason.find('select')[0].name = 'Owners[' + i + '].OwnerReasons[' + j + '].IdReasonType';
 }
-function reasonsToggle(owner) {
+function reasonsToggle(e) {
+    var owner = $(this).closest('.ownerBlock')
     var iOwner = +owner.attr('data-i-owner');
-    var reasonsToggleBtn = owner.find('.reasonsToggle');
-    if (reasonsToggleBtn.html() === '∧') {
-        reasonsToggleBtn.html('∨');
-    }
-    else {
-        reasonsToggleBtn.html('∧');
-    }
+    $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
     $('.reasonBlock[data-i-owner="' + iOwner + '"]').toggle();
+    e.preventDefault();
 }
 
-function reasonAdd(owner) {
+function reasonAdd(e) {
+    var owner = $(this).closest('.ownerBlock');
     var iOwner = +owner.attr('data-i-owner');
     var reasons = $('.reasonBlock[data-i-owner="' + iOwner + '"]');
     var iReason = reasons.length;
@@ -97,12 +98,13 @@ function reasonAdd(owner) {
                 $(reasons[iReason - 1]).after(data);
             }
             var newReasons = $('.reasonBlock[data-i-owner="' + iOwner + '"]');
-            if (owner.find('.reasonsToggle').html() === '∨') {
+            if (owner.find('.oi-chevron-top').length == 0) {
                 newReasons.last().hide();
             }
             newReasons.find('.reasonDelete').removeClass('disabled');
         }
     });
+    e.preventDefault();
 }
 $(function () {
     if ($('.ownerBlock').length == 1) {
@@ -134,23 +136,8 @@ $(function () {
             }
         });        
     });
-    $('#owners').click(function (event) {
-        if ($(event.target).hasClass('ownerDelete')) {
-            event.preventDefault();
-            var owner = $(event.target).parents('.ownerBlock')
-            ownerDelete(owner);
-        } else if ($(event.target).hasClass('reasonDelete')) {
-            event.preventDefault();
-            var reason = $(event.target).parents('.reasonBlock');
-            reasonDelete(reason);
-        } else if ($(event.target).hasClass('reasonsToggle')) {
-            event.preventDefault();
-            var owner = $(event.target).parents('.ownerBlock')
-            reasonsToggle(owner);
-        } else if ($(event.target).hasClass('reasonAdd')) {
-            event.preventDefault();
-            var owner = $(event.target).parents('.ownerBlock')
-            reasonAdd(owner);
-        }
-    });
+    $('#owners').on('click', '.ownerDelete', ownerDelete);
+    $('#owners').on('click', '.reasonsToggle', reasonsToggle);
+    $('#owners').on('click', '.reasonAdd', reasonAdd);
+    $('#owners').on('click', '.reasonDelete', reasonDelete);
 });

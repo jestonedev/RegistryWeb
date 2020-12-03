@@ -13,10 +13,14 @@
     </td>
     <td class="align-middle text-center">
         <div class="btn-group" role="group">
-            <a href="#" class="form-control btn btn-primary reasonsToggle" title="Развернуть список документов-оснований" style="font-weight:bold;">∧</a>
+            <a href="#" class="form-control btn btn-primary reasonsToggle" title="Развернуть список документов-оснований">
+                <span class="oi oi-chevron-top"></span>
+            </a>
             @if (Model.Action == ActionTypeEnum.Create || Model.Action == ActionTypeEnum.Edit)
             {
-                <a href="#" class="form-control btn btn-success reasonAdd" title="Добавить документ-основание">&#10010;</a>
+                <a href="#" class="form-control btn btn-success reasonAdd" title="Добавить документ-основание">
+                    <span class="oi oi-plus"></span>
+                </a>
             }
         </div>
     </td>
@@ -61,7 +65,9 @@
     @if (Model.Action == ActionTypeEnum.Create || Model.Action == ActionTypeEnum.Edit)
     {
         <td class="align-middle">
-            <a href="#" class="btn btn-danger oi oi-x ownerDelete" title="Удалить" aria-label="Удалить"></a>
+            <a href="#" class="btn btn-danger ownerDelete" title="Удалить" aria-label="Удалить">
+                <span class="oi oi-x"></span>
+            </a>
         </td>
     }
 </tr>

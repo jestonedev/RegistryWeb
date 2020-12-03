@@ -1,26 +1,62 @@
-﻿var ownersToggle = function (e) {
-    arrowAnimation($(this));
+﻿var ownerProcessToggle = function (e) {
+    $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
+    $('#ownerProcess').toggle();
+    e.preventDefault();
+}
+var annulOwnerProcessToggle = function (e) {
+    $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
+    $('#annulOwnerProcess').toggle();
+    e.preventDefault();
+}
+var addressesToggle = function (e) {
+    $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
+    $('#addresses').toggle();
+    e.preventDefault();
+}
+function ownerFilesToggle(e) {
+    $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
+    $('#ownerFiles').toggle();
+    e.preventDefault();
+}
+var ownersToggle = function (e) {
+    $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
     $('#ownersTable').toggle();
     e.preventDefault();
 }
 var commentToggle = function (e) {
-    arrowAnimation($(this));
+    $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
     $('#Comment').toggle();
     e.preventDefault();
 }
-var addressesToggle = function (e) {
-    arrowAnimation($(this));
-    $('#addresses').toggle();
+var logToggle = function (e) {
+    var logCard = $(this).parents('.card');
+    var logCardBody = logCard.find('.card-body');
+    var isHidden = logCardBody.length == 0;
+    if (isHidden) {
+        var idProcess = $('input[name="IdProcess"]').val();
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/OwnerProcesses/ProcessLogGet',
+            data: { idProcess },
+            success: function (processLog) {
+                logCard.find('.card-header').after(processLog);
+                $('.logValueToggle').on('click', logValueToggle);
+            }
+        });
+    }
+    else {
+        logCardBody.remove();
+    }
+    $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
     e.preventDefault();
 }
-var ownerProcessToggle = function (e) {
-    arrowAnimation($(this));
-    $('#ownerProcess').toggle();
+var logValueToggle = function (e) {
+    $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
+    var ind = $(this).data('ind');
+    $('.logValue')
+        .filter(function () { return $(this).data('ind') === ind; })
+        .toggle();
     e.preventDefault();
-}
-var annulOwnerProcessToggle = function () {
-    arrowAnimation($(this));
-    $('#annulOwnerProcess').toggle();
 }
 var annulOwnerProcessCheckboxChange = function () {
     $('#annulOwnerProcessCard').toggle();
@@ -38,36 +74,7 @@ var annulOwnerProcessCheckboxChange = function () {
         annulComment.removeClass('ignore');
     }
 }
-var logToggle = function (e) {
-    var logCard = $(this).parents('.card');
-    var logCardBody = logCard.find('.card-body');
-    var isHidden = logCardBody.length == 0;
-    if (isHidden) {
-        var idProcess = $('input[name="IdProcess"]').val();
-        $.ajax({
-            type: 'POST',
-            url: window.location.origin + '/OwnerProcesses/ProcessLogGet',
-            data: { idProcess },
-            success: function (processLog) {
-                logCard.find('.card-header').after(processLog);
-                $('.logValueToggle').click(logValueToggle);
-            }
-        });
-    }
-    else {
-        logCardBody.remove();
-    }
-    arrowAnimation($(this));
-    e.preventDefault();
-}
-var logValueToggle = function (e) {
-    arrowAnimation($(this));
-    var ind = $(this).data('ind');
-    $('.logValue')
-        .filter(function () { return $(this).data('ind') === ind; })
-        .toggle();
-    e.preventDefault();
-}
+
 $.validator.addMethod('addressRequired', function (value, element) {
     return $('.address').length != 0;
 });
@@ -147,13 +154,15 @@ $(function () {
     }    
     $('.logValue').hide();
     $('#logTable').hide();
-    $('#ownersToggle').click(ownersToggle);
-    $('#commentToggle').click(commentToggle);
-    $('#addressesToggle').click(addressesToggle);
-    $('#ownerProcessToggle').click(ownerProcessToggle);
-    $('#annulOwnerProcessToggle').click(annulOwnerProcessToggle);
+    $('#ownerProcessToggle').on('click', ownerProcessToggle);
+    $('#annulOwnerProcessToggle').on('click', annulOwnerProcessToggle);
+    $('#addressesToggle').on('click',addressesToggle);
+    $('#ownerFilesToggle').on('click', ownerFilesToggle);
+    $('#ownersToggle').on('click', ownersToggle);
+    $('#commentToggle').on('click', commentToggle);
+    $('#logToggle').on('click', logToggle);
+    
     $('#annulOwnerProcessCheckbox').change(annulOwnerProcessCheckboxChange);
-    $('#logToggle').click(logToggle);
 
     $('#ownerProcessEdit, #ownerProcessCreate').click(function (e) {
         e.preventDefault();
@@ -167,6 +176,5 @@ $(function () {
     $('#ownerProcessDelete').click(function (e) {
         e.preventDefault();
         $('#ownerProcessForm').submit();
-    });
-    
+    });    
 });

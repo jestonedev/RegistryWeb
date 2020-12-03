@@ -7,6 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace RegistryWeb.DataServices
 {
@@ -15,9 +18,12 @@ namespace RegistryWeb.DataServices
         private readonly IQueryable<OwnerBuildingAssoc> ownerBuildingsAssoc;
         private readonly IQueryable<OwnerPremiseAssoc> ownerPremisesAssoc;
         private readonly IQueryable<OwnerSubPremiseAssoc> ownerSubPremisesAssoc;
+        public string AttachmentsPath { get; private set; }
 
-        public OwnerProcessesDataService(RegistryContext registryContext) : base(registryContext)
+        public OwnerProcessesDataService(RegistryContext registryContext, IConfiguration config) : base(registryContext)
         {
+            AttachmentsPath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"OwnerProcesses");
+
             ownerBuildingsAssoc = registryContext.OwnerBuildingsAssoc
                 .Include(oba => oba.BuildingNavigation)
                     .ThenInclude(b => b.IdStreetNavigation)
@@ -405,6 +411,9 @@ namespace RegistryWeb.DataServices
         internal IQueryable<OwnerReasonType> OwnerReasonTypes()
             => registryContext.OwnerReasonTypes.AsNoTracking();
 
+        internal OwnerFile GetOwnerFile(int id)
+            => registryContext.OwnerFiles.AsNoTracking().FirstOrDefault(of => of.Id == id);
+
         internal OwnerType GetOwnerType(int idOwnerType)
             => registryContext.OwnerType.FirstOrDefault(ot => ot.IdOwnerType == idOwnerType);
 
@@ -419,6 +428,7 @@ namespace RegistryWeb.DataServices
                     .ThenInclude(ow => ow.OwnerOrginfo)
                 .Include(op => op.Owners)
                     .ThenInclude(ow => ow.OwnerReasons)
+                .Include(op => op.OwnerFiles)
                 .AsNoTracking()
                 .FirstOrDefault(op => op.IdProcess == idProcess);
             ownerProcess.OwnerBuildingsAssoc =
@@ -492,10 +502,60 @@ namespace RegistryWeb.DataServices
             registryContext.SaveChanges();
         }
 
-        internal void Edit(OwnerProcess newOwnerProcess)
+        internal void Edit(OwnerProcess newOwnerProcess, IFormFileCollection attachmentFiles, bool[] removeFiles)
         {
-            //Удаление
             var oldOwnerProcess = GetOwnerProcess(newOwnerProcess.IdProcess);
+            //Добавление файлов
+            var ind = 0;
+            for (var i = 0; i < newOwnerProcess.OwnerFiles.Count(); i++)
+            {
+                var newOwnerFile = newOwnerProcess.OwnerFiles[i];
+                var oldOnwerFile = oldOwnerProcess.OwnerFiles.FirstOrDefault(of => of.Id == newOwnerFile.Id);
+                var isAddedfile = newOwnerFile.FileDisplayName != null
+                    && (oldOnwerFile?.FileOriginName == null || removeFiles[i])
+                    && attachmentFiles.Count() > 0;
+                //удаляем старый файл, если он был прикреплен
+                if (removeFiles[i])
+                {
+                    if (!string.IsNullOrEmpty(oldOnwerFile?.FileOriginName))
+                    {
+                        var filePath = Path.Combine(AttachmentsPath, oldOnwerFile?.FileOriginName);
+                        if (File.Exists(filePath))
+                        {
+                            File.Delete(filePath);
+                        }
+                    }
+                }
+                //если новый файл прикрепили в документ
+                if (isAddedfile)
+                {
+                    newOwnerFile.FileOriginName = Guid.NewGuid().ToString() + new FileInfo(attachmentFiles[ind].FileName).Extension;
+                    newOwnerFile.FileMimeType = attachmentFiles[ind].ContentType;
+                    var fileStream = new FileStream(Path.Combine(AttachmentsPath, newOwnerFile.FileOriginName), FileMode.CreateNew);
+                    attachmentFiles[ind].OpenReadStream().CopyTo(fileStream);
+                    fileStream.Close();
+                    ind++;
+                }
+                //если новый файл не прикрепляли
+                else
+                {
+                    //если старый файл был удален, то null, иначе заносим старое значение
+                    newOwnerFile.FileOriginName = removeFiles[i] ? null : oldOnwerFile?.FileOriginName;
+                    newOwnerFile.FileMimeType = removeFiles[i] ? null : oldOnwerFile?.FileMimeType;
+                }
+            }
+            //Удаление документов
+            //При удалении документа файл не удаляется, а хранится в базе
+            for (var i = 0; i < oldOwnerProcess.OwnerFiles.Count(); i++)
+            {
+                var oldOwnerFile = oldOwnerProcess.OwnerFiles[i];
+                if (newOwnerProcess.OwnerFiles.Select(of => of.Id).Contains(oldOwnerFile.Id) == false)
+                {
+                    registryContext.Entry(oldOwnerFile).Property(p => p.Deleted).IsModified = true;
+                    oldOwnerFile.Deleted = 1;
+                    newOwnerProcess.OwnerFiles.Add(oldOwnerFile);
+                }
+            }
             foreach (var oldOwner in oldOwnerProcess.Owners)
             {
                 if (newOwnerProcess.Owners.Select(owp => owp.IdOwner).Contains(oldOwner.IdOwner) == false)

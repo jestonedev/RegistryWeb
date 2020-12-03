@@ -77,7 +77,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasConstraintName("FK_owner_files_id_reason_type");
 
             //Фильтры по умолчанию
-            builder.HasQueryFilter(e => !e.Deleted);
+            builder.HasQueryFilter(e => e.Deleted == 0);
         }
     }
 }

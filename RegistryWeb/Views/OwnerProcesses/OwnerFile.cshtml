@@ -1,0 +1,74 @@
+﻿@model RegistryWeb.ViewModel.OwnerFileVM;
+@{
+    var i = Model.I;
+}
+<li class="list-group-item">
+    <input type="hidden" value="@Model.OwnerFile.Id" name="OwnerFiles[@i].Id" />
+    <input type="hidden" value="@Model.OwnerFile.IdProcess" name="OwnerFiles[@i].IdProcess" />
+    <div class="form-row align-items-end">
+        <div class="form-group col-3">
+            <label>Тип документа</label>
+            <select value="@Model.OwnerFile.IdReasonType" class="form-control" title="Тип документа основания"
+                    name="OwnerFiles[@i].IdReasonType" asp-items="@{new SelectList(ViewBag.OwnerReasonTypes, "IdReasonType", "ReasonName", Model.OwnerFile.IdReasonType)}"></select>
+        </div>
+        <div class="form-group col-3">
+            <label>Номер документа</label>
+            <input type="text" class="form-control" value="@Model.OwnerFile.ReasonNumber" name="OwnerFiles[@i].ReasonNumber"
+                   maxlength="255" title="Номер документа" placeholder="Номер документа">
+        </div>
+        <div class="form-group col-2">
+            <label>Дата документа</label>
+            <input type="date" class="form-control" value="@(Model.OwnerFile.ReasonDate.ToString("yyyy-MM-dd"))"
+                   name="OwnerFiles[@i].ReasonDate" title="Дата документа">
+        </div>
+        <div class="form-group col-3">
+            <label>Образ документа</label>
+            <div class="input-group">
+                <input type="text" maxlength="255" readonly class="form-control" value="@Model.OwnerFile.FileDisplayName"
+                       name="OwnerFiles[@i].FileDisplayName" title="Наименование">
+                <input type="file" name="attachmentFiles" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
+                <input type="hidden" name="removeFiles" value="false" data-isempty="@(Model.OwnerFile.FileDisplayName == null ? true : false)" />
+                <div class="input-group-append">
+                    @if (Model.Action == ActionTypeEnum.Details || Model.Action == ActionTypeEnum.Delete)
+                    {
+                        <a class="form-control btn btn-success rr-owner-file-download @(Model.OwnerFile.FileOriginName == null ? "disabled" : "")"
+                           href="/OwnerProcesses/DownloadFile/?id=@Model.OwnerFile.Id" title="Скачать образ документа" aria-label="Скачать образ документа">
+                            <span class="oi oi-data-transfer-download"></span>
+                        </a>
+                    }
+                    @if (Model.Action == ActionTypeEnum.Edit)
+                    {
+                        <a href="#" class="form-control btn btn-danger rr-owner-file-remove"
+                           title="Удалить образ документа" aria-label="Удалить образ документа">
+                            <span class="oi oi-trash"></span>
+                        </a>
+                        <a href="#" class="form-control btn btn-success rr-owner-file-attach"
+                           title="Прикрепить образ документа" aria-label="Прикрепить образ документа">
+                            <span class="oi oi-paperclip"></span>
+                        </a>
+                        <a class="form-control btn btn-success rr-owner-file-download"
+                           href="/OwnerProcesses/DownloadFile/?id=@Model.OwnerFile.Id" title="Скачать образ документа" aria-label="Скачать образ документа">
+                            <span class="oi oi-data-transfer-download"></span>
+                        </a>
+                    }
+                    @if (Model.Action == ActionTypeEnum.Create)
+                    {
+                        <a href="#" class="form-control btn btn-danger rr-owner-file-remove" style="display: none"
+                           title="Удалить образ документа" aria-label="Удалить образ документа">
+                            <span class="oi oi-x"></span>
+                        </a>
+                        <a href="#" class="form-control btn btn-success rr-owner-file-attach" style="display: none"
+                           title="Прикрепить образ документа" aria-label="Прикрепить образ документа">
+                            <span class="oi oi-paperclip"></span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-1">
+            <a href="#" class="form-control btn btn-danger rr-document-delete" title="Удалить" aria-label="Удалить">
+                <span class="oi oi-x"></span>
+            </a>
+        </div>
+    </div>
+</li>
