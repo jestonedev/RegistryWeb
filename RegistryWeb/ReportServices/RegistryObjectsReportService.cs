@@ -35,27 +35,27 @@ namespace RegistryWeb.ReportServices
                 case "0":
                     fileNameReport = GenerateReport(arguments, "registry\\registry\\ownerships_report");
                     //fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\ownerships_report");
-                    NameReport = "Аварийное и снесеное жилье";
+                    NameReport = "Аварийное и снесеное жилье.ods";
                     break;
                 case "1":
                     fileNameReport = GenerateReport(arguments, "registry\\registry\\commercial_fund");
                     //fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\commercial_fund");
-                    NameReport = "Коммерческий жилой фонд";
+                    NameReport = "Коммерческий жилой фонд.ods";
                     break;
                 case "2":
                     fileNameReport = GenerateReport(arguments, "registry\\registry\\special_fund");
                     //fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\special_fund");
-                    NameReport = "Специализированный жилой фонд";
+                    NameReport = "Специализированный жилой фонд.ods";
                     break;
                 case "3":
                     fileNameReport = GenerateReport(arguments, "registry\\registry\\social_fund");
                     //fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\social_fund");
-                    NameReport = "Социальный жилой фонд";
+                    NameReport = "Социальный жилой фонд.ods";
                     break;
                 case "4":
                     fileNameReport = GenerateReport(arguments, "registry\\registry\\municipal_premises_current_fund");
                     //fileNameReport = GenerateReport(arguments, @"D:\Projects\Всячина проектов\RegistryWeb\Отчёты\municipal_premises_current_fund");
-                    NameReport = "Текущий фонд муниципальных жилых помещений";
+                    NameReport = "Текущий фонд муниципальных жилых помещений.ods";
                     break;
             }
 
