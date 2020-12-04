@@ -9,18 +9,20 @@ namespace RegistryWeb.Models.Entities
         public Owner()
         {
             OwnerReasons = new List<OwnerReason>();
+            OwnerFilesAssoc = new List<OwnerFileAssoc>();
         }
 
         public int IdOwner { get; set; }
         public int IdProcess { get; set; }
         public int IdOwnerType { get; set; }
         public byte Deleted { get; set; }
-
+                
         public virtual OwnerType IdOwnerTypeNavigation { get; set; }
         public virtual OwnerProcess IdOwnerProcessNavigation { get; set; }
         public virtual OwnerOrginfo OwnerOrginfo { get; set; }
         public virtual OwnerPerson OwnerPerson { get; set; }
         public virtual IList<OwnerReason> OwnerReasons { get; set; }
+        public virtual IList<OwnerFileAssoc> OwnerFilesAssoc { get; set; }
 
         public bool Equals(Owner o)
         {
