@@ -1,29 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Configuration;
 using RegistryWeb.DataServices;
-using RegistryWeb.Extensions;
 using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
-using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
-using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
     public class OwnerProcessesController : ListController<OwnerProcessesDataService, OwnerProcessesFilter>
-    {
-        
+    {        
         public OwnerProcessesController(OwnerProcessesDataService dataService, SecurityService securityService)
             : base(dataService, securityService)
         {

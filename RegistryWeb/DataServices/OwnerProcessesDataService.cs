@@ -428,9 +428,19 @@ namespace RegistryWeb.DataServices
                     .ThenInclude(ow => ow.OwnerOrginfo)
                 .Include(op => op.Owners)
                     .ThenInclude(ow => ow.OwnerReasons)
+                .Include(op => op.Owners)
+                    .ThenInclude(ow => ow.OwnerFilesAssoc)
                 .Include(op => op.OwnerFiles)
+                    .ThenInclude(of => of.OwnerReasonType)
                 .AsNoTracking()
                 .FirstOrDefault(op => op.IdProcess == idProcess);
+            foreach (var owner in ownerProcess.Owners)
+            {
+                foreach (var assoc in owner.OwnerFilesAssoc)
+                {
+                    assoc.OwnerFile = ownerProcess.OwnerFiles.FirstOrDefault(of => of.Id == assoc.IdFile);
+                }
+            }
             ownerProcess.OwnerBuildingsAssoc =
                 registryContext.OwnerBuildingsAssoc
                 .Include(oba => oba.BuildingNavigation)
@@ -444,7 +454,7 @@ namespace RegistryWeb.DataServices
                     .ThenInclude(p => p.IdPremisesTypeNavigation)
                 .Include(opa => opa.PremiseNavigation)
                     .ThenInclude(p => p.IdBuildingNavigation)
-                    .ThenInclude(b => b.IdStreetNavigation)
+                        .ThenInclude(b => b.IdStreetNavigation)
                 .Where(opa => opa.IdProcess == idProcess)
                 .AsNoTracking()
                 .ToList();
@@ -452,11 +462,11 @@ namespace RegistryWeb.DataServices
                 registryContext.OwnerSubPremisesAssoc
                 .Include(ospa => ospa.SubPremiseNavigation)
                     .ThenInclude(sp => sp.IdPremisesNavigation)
-                    .ThenInclude(p => p.IdPremisesTypeNavigation)
+                        .ThenInclude(p => p.IdPremisesTypeNavigation)
                 .Include(ospa => ospa.SubPremiseNavigation)
                     .ThenInclude(sp => sp.IdPremisesNavigation)
-                    .ThenInclude(p => p.IdBuildingNavigation)
-                    .ThenInclude(b => b.IdStreetNavigation)
+                        .ThenInclude(p => p.IdBuildingNavigation)
+                            .ThenInclude(b => b.IdStreetNavigation)
                 .Where(ospa => ospa.IdProcess == idProcess)
                 .AsNoTracking()
                 .ToList();

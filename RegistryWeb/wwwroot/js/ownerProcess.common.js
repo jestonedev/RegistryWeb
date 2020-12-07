@@ -1,14 +1,14 @@
-﻿var ownerProcessToggle = function (e) {
+﻿function ownerProcessToggle(e) {
     $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
     $('#ownerProcess').toggle();
     e.preventDefault();
 }
-var annulOwnerProcessToggle = function (e) {
+function annulOwnerProcessToggle(e) {
     $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
     $('#annulOwnerProcess').toggle();
     e.preventDefault();
 }
-var addressesToggle = function (e) {
+function addressesToggle(e) {
     $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
     $('#addresses').toggle();
     e.preventDefault();
@@ -18,17 +18,23 @@ function ownerFilesToggle(e) {
     $('#ownerFiles').toggle();
     e.preventDefault();
 }
-var ownersToggle = function (e) {
+function ownersToggle(e) {
     $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
-    $('#ownersTable').toggle();
+    $('#owners').toggle();
     e.preventDefault();
 }
-var commentToggle = function (e) {
+function ownerReasonsToggle(e) {
+    $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-document');
+    var idOwner = $(this).closest('li').find('input')[0].value;
+    $('.ownerReason[data-idowner="' + idOwner + '"]').toggle();
+    e.preventDefault();
+}
+function commentToggle(e) {
     $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
     $('#Comment').toggle();
     e.preventDefault();
 }
-var logToggle = function (e) {
+function logToggle(e) {
     var logCard = $(this).parents('.card');
     var logCardBody = logCard.find('.card-body');
     var isHidden = logCardBody.length == 0;
@@ -50,7 +56,7 @@ var logToggle = function (e) {
     $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
     e.preventDefault();
 }
-var logValueToggle = function (e) {
+function logValueToggle(e) {
     $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
     var ind = $(this).data('ind');
     $('.logValue')
@@ -159,6 +165,7 @@ $(function () {
     $('#addressesToggle').on('click',addressesToggle);
     $('#ownerFilesToggle').on('click', ownerFilesToggle);
     $('#ownersToggle').on('click', ownersToggle);
+    $('.ownerReasonsToggle').on('click', ownerReasonsToggle);
     $('#commentToggle').on('click', commentToggle);
     $('#logToggle').on('click', logToggle);
     

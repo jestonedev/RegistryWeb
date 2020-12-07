@@ -1,0 +1,39 @@
+﻿@model RegistryWeb.ViewModel.OwnerFileAssocVM;
+@{
+    var i = Model.I;
+    var idOwner = Model.OwnerFileAssoc.IdOwner;
+    var fraction = Model.OwnerFileAssoc.NumeratorShare + "/" + Model.OwnerFileAssoc.DenominatorShare;
+}
+<li class="list-group-item ownerReason" data-idowner="@idOwner">
+    <input type="hidden" value="@Model.OwnerFileAssoc.Id" name="Owners[@idOwner].OwnerFilesAssoc[@i].Id" />
+    <input type="hidden" value="@Model.OwnerFileAssoc.IdOwner" name="Owners[@idOwner].OwnerFilesAssoc[@i].IdOwner" />
+    <input type="hidden" value="@Model.OwnerFileAssoc.NumeratorShare" name="Owners[@idOwner].OwnerFilesAssoc[@i].NumeratorShare" />
+    <input type="hidden" value="@Model.OwnerFileAssoc.DenominatorShare" name="Owners[@idOwner].OwnerFilesAssoc[@i].DenominatorShare" />
+    <div class="form-row align-items-end">
+        <div class="form-group col-2">
+            <label>Доля</label>
+            <input type="text" value="@fraction" class="form-control fraction" title="Числитель">
+        </div>
+        <div class="form-group col-9">
+            <label>Документ</label>
+            <select class="form-control" title="Документ">
+                @foreach (var file in Model.OwnerFiles)
+                {
+                    var selected = file.Id == Model.OwnerFileAssoc.IdFile ? "selected" : "";
+                    <!option value="file.Id" @selected>
+                        @string.Format("№" + file.ReasonNumber + " от " + file.ReasonDate.ToShortDateString() +
+                                       " (" +file.OwnerReasonType.ReasonName + ")")
+                    </!option>
+                }
+            </select>
+        </div>
+        <div class="form-group btn-group col-1" role="group">
+            @if (Model.Action == ActionTypeEnum.Edit || Model.Action == ActionTypeEnum.Create)
+            {
+                <a href="#" class="form-control btn btn-danger documentDelete" title="Удалить" aria-label="Удалить">
+                    <span class="oi oi-x"></span>
+                </a>
+            }
+        </div>
+    </div>
+</li>

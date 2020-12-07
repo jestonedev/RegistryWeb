@@ -1,84 +1,79 @@
-﻿@using RegistryWeb.Models;
-@using RegistryWeb.ViewModel;
+﻿@using RegistryWeb.ViewModel;
 @model OwnerVM;
 @{
     var i = Model.I;
+    var fraction = Model.Owner.OwnerFilesAssoc
+        .Select(r => new Fraction(r.NumeratorShare, r.DenominatorShare))
+        .Aggregate((x, y) => x + y)
+        .Reduce()
+        .ToString();
 }
-<tr class="ownerBlock" data-i-owner="@i">
+<li class="list-group-item owner">
     <input type="hidden" value="@Model.Owner.IdOwner" name="Owners[@i].IdOwner" />
     <input type="hidden" value="@Model.Owner.IdProcess" name="Owners[@i].IdProcess" />
     <input type="hidden" value="@Model.Owner.IdOwnerType" name="Owners[@i].IdOwnerType" />
-    <td class="align-middle text-center" title="Тип собственника">
-        @Html.DisplayFor(modelItem => Model.Owner.IdOwnerTypeNavigation.OwnerType1)
-    </td>
-    <td class="align-middle text-center">
-        <div class="btn-group" role="group">
-            <a href="#" class="form-control btn btn-primary reasonsToggle" title="Развернуть список документов-оснований">
-                <span class="oi oi-chevron-top"></span>
-            </a>
-            @if (Model.Action == ActionTypeEnum.Create || Model.Action == ActionTypeEnum.Edit)
-            {
-                <a href="#" class="form-control btn btn-success reasonAdd" title="Добавить документ-основание">
-                    <span class="oi oi-plus"></span>
-                </a>
-            }
+    <input type="hidden" value="@Model.Owner.IdOwnerType" name="Owners[@i].IdOwnerType" />
+    <div class="form-row align-items-end">
+        <div class="form-group col-1">
+            <label>Тип</label>
+            <input type="text" class="form-control" readonly value="@Model.Owner.IdOwnerTypeNavigation.OwnerType1" />
         </div>
-    </td>
-    <td class="align-middle text-center">
-        @if (Model.Action != ActionTypeEnum.Create && Model.Owner.OwnerReasons.Count() > 0)
+        <div class="form-group col-1">
+            <label>Доля</label>
+            <input type="text" class="form-control" readonly value="@fraction" />
+        </div>
+        @if (Model.Owner.IdOwnerType == 1 && Model.Owner.OwnerPerson != null)
         {
-            @(Model.Owner.OwnerReasons
-                                .Select(r => new Fraction(r.NumeratorShare, r.DenominatorShare))
-                                .Aggregate((x, y) => x + y)
-                                .Reduce()
-                                .ToString())
-        }
-    </td>
-    <td class="align-middle">
-        <div class="row">
-            @if (Model.Owner.IdOwnerType == 1 && Model.Owner.OwnerPerson != null)
-            {
-                <input type="hidden" value="@Model.Owner.OwnerPerson.IdOwner" name="Owners[@i].OwnerPerson.IdOwner" />
-                <div class="col">
-                    <input type="text" class="form-control input-chars ownerSurname" placeholder="Фамилия" title="Фамилия"
-                           value="@Model.Owner.OwnerPerson.Surname" name="Owners[@i].OwnerPerson.Surname" />
-                </div>
-                <div class="col">
-                    <input type="text" class="form-control input-chars ownerName" placeholder="Имя" title="Имя"
-                           value="@Model.Owner.OwnerPerson.Name" name="Owners[@i].OwnerPerson.Name" />
-                </div>
-                <div class="col">
-                    <input type="text" class="form-control input-chars" placeholder="Отчество" title="Отчество"
-                           value="@Model.Owner.OwnerPerson.Patronymic" name="Owners[@i].OwnerPerson.Patronymic" />
-                </div>
-            }
-            @if ((Model.Owner.IdOwnerType == 2 || Model.Owner.IdOwnerType == 3) && Model.Owner.OwnerOrginfo != null)
-            {
-                <input type="hidden" value="@Model.Owner.OwnerOrginfo.IdOwner" name="Owners[@i].OwnerOrginfo.IdOwner" />
-                <div class="col">
-                    <input type="text" class="form-control ownerOrgName" placeholder="Наименование"
-                           value="@Model.Owner.OwnerOrginfo.OrgName" name="Owners[@i].OwnerOrginfo.OrgName" />
-                </div>
-            }
+        <input type="hidden" value="@Model.Owner.OwnerPerson.IdOwner" name="Owners[@i].OwnerPerson.IdOwner" />
+        <div class="form-group col-3">
+            <label>Фамилия</label>
+            <input type="text" class="form-control input-chars" placeholder="Фамилия" title="Фамилия"
+                   value="@Model.Owner.OwnerPerson.Surname" name="Owners[@i].OwnerPerson.Surname" />
         </div>
-    </td>
-    @if (Model.Action == ActionTypeEnum.Create || Model.Action == ActionTypeEnum.Edit)
-    {
-        <td class="align-middle">
-            <a href="#" class="btn btn-danger ownerDelete" title="Удалить" aria-label="Удалить">
+        <div class="form-group col-2">
+            <label>Имя</label>
+            <input type="text" class="form-control input-chars" placeholder="Имя" title="Имя"
+                   value="@Model.Owner.OwnerPerson.Name" name="Owners[@i].OwnerPerson.Name" />
+        </div>
+        <div class="form-group col-3">
+            <label>Отчество</label>
+            <input type="text" class="form-control input-chars" placeholder="Отчество" title="Отчество"
+                   value="@Model.Owner.OwnerPerson.Patronymic" name="Owners[@i].OwnerPerson.Patronymic" />
+        </div>
+        }
+        @if (Model.Owner.IdOwnerType == 2 && Model.Owner.OwnerOrginfo != null)
+        {
+        <input type="hidden" value="@Model.Owner.OwnerOrginfo.IdOwner" name="Owners[@i].OwnerOrginfo.IdOwner" />
+        <div class="form-group col-8">
+            <label>Наименование</label>
+            <input type="text" class="form-control" placeholder="Наименование"
+                   value="@Model.Owner.OwnerOrginfo.OrgName" name="Owners[@i].OwnerOrginfo.OrgName" />
+        </div>
+        }
+        <div class="form-group btn-group col-2" role="group">
+            @if (Model.Action == ActionTypeEnum.Edit || Model.Action == ActionTypeEnum.Create)
+            {
+            <a href="#" class="form-control btn btn-success ownerReasonAdd" title="Добавить реквизит права собственности">
+                <span class="oi oi-plus"></span>
+            </a>
+            <a href="#" class="form-control btn btn-danger ownerDelete" title="Удалить" aria-label="Удалить">
                 <span class="oi oi-x"></span>
             </a>
-        </td>
-    }
-</tr>
-@if (Model.Owner.OwnerReasons != null)
+            }
+            <a href="#" class="form-control btn btn-primary ownerReasonsToggle" title="Развернуть список документов">
+                <span class="oi oi-chevron-top"></span>
+            </a>
+        </div>
+    </div>
+</li>
+@if (Model.Owner.OwnerFilesAssoc != null)
 {
-    @for (var j = 0; j < Model.Owner.OwnerReasons.Count(); j++)
-    {
-        <partial name="OwnerReason" model="@{new OwnerReasonVM() {
-        OwnerReason = Model.Owner.OwnerReasons[j],
-        IOwner = i,
-        IReason = j,
-        Action = Model.Action}}" />
-    }
+@for (var j = 0; j < Model.Owner.OwnerFilesAssoc.Count(); j++)
+{
+<partial name="OwnerFileAssoc" model="@{new OwnerFileAssocVM() {
+    OwnerFileAssoc = Model.Owner.OwnerFilesAssoc[j],
+    OwnerFiles = Model.OwnerFiles,
+    I = j,
+    Action = ViewBag.Action }} " />
+}
 }

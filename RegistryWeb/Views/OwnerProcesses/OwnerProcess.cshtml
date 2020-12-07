@@ -173,9 +173,9 @@
                     <div class="btn-group" role="group">
                         @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                         {
-                        <a href="#" id="ownerFileAdd" class="form-control btn btn-success" title="Добавить реквизит права собственности">
-                            <span class="oi oi-plus"></span>
-                        </a>
+                            <a href="#" id="ownerFileAdd" class="form-control btn btn-success" title="Добавить реквизит права собственности">
+                                <span class="oi oi-plus"></span>
+                            </a>
                         }
                         <a href="#" id="ownerFilesToggle" class="form-control btn btn-primary" title="Развернуть список документов">
                             <span class="oi oi-chevron-top"></span>
@@ -196,6 +196,36 @@
                 </ul>
             </div>
             <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h3>Собственники</h3>
+                    <div class="btn-group" role="group">
+                        @if (canEdit)
+                        {
+                            <a class="form-control">Добавить:</a>
+                            <a href="#" class="form-control btn btn-success ownerAdd" title="Добавить физическое лицо" data-id-owner-type="1">ФЛ</a>
+                            <a href="#" class="form-control btn btn-success ownerAdd" title="Добавить юридическое лицо" data-id-owner-type="2">ЮЛ</a>
+                            <a href="#" class="form-control btn btn-success ownerAdd" title="Добавить индивидуального предпринимателя" data-id-owner-type="3">ИП</a>
+                        }
+                        <a href="#" id="ownersToggle" class="form-control btn btn-primary" title="Развернуть список собственников">
+                            <span class="oi oi-chevron-top"></span>
+                        </a>
+                    </div>
+                </div>
+                <ul id="owners" class="list-group list-group-flush">
+                    @if (Model.Owners != null)
+                    {
+                        @for (var i = 0; i < Model.Owners.Count(); i++)
+                        {
+                            <partial name="Owner" model="@{new OwnerVM() {
+                            Owner = Model.Owners[i],
+                            OwnerFiles = Model.OwnerFiles,
+                            I = i,
+                            Action = ViewBag.Action}}" />
+                        }
+                    }
+                </ul>
+            </div>
+            @*<div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <h3>Собственники</h3>
                     <div class="btn-group" role="group">
@@ -237,7 +267,7 @@
                         }
                     </tbody>
                 </table>
-            </div>
+            </div>*@
             <div class=" card">
                 <div class="card-header d-flex justify-content-between">
                     <h3 for="Comment">Комментарий</h3>

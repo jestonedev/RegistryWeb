@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace RegistryWeb.ViewModel
 {
-    public class OwnerVM
+    public class OwnerFileAssocVM
     {
-        public Owner Owner { get; set; }
+        public OwnerFileAssoc OwnerFileAssoc { get; set; }
         public IList<OwnerFile> OwnerFiles { get; set; }
         public int I { get; set; }
         public ActionTypeEnum Action { get; set; }
