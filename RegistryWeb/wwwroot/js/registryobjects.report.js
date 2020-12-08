@@ -1,5 +1,13 @@
 ﻿$(document).ready(function () {
 
+    $("body").on('click', ".resettle_2019_2025", function (e) {
+        var url = "/RegistryObjectsReports/GetResettle_2019_2025";
+        if (url !== undefined) {
+            downloadFile(url);
+        }
+        e.preventDefault();
+    });
+
     $("body").on('click', ".type1", function (e) {
         var modal = $("#JFModal");
         switch ($(this).data("id-modal")) {

@@ -61,7 +61,13 @@ namespace RegistryWeb.ReportServices
 
             return DownloadFile(fileNameReport);
         }
-        
+
+        public byte[] GetResettle_2019_2025()
+        {
+            var fileNameReport = GenerateReport(new Dictionary<string, object>(), "registry_web\\premises\\reestr.2019-2025");
+            return DownloadFile(fileNameReport);
+        }
+
         public byte[] GetStatisticBuildingReport(string TypeReport)
         {
             var arguments = new Dictionary<string, object>
