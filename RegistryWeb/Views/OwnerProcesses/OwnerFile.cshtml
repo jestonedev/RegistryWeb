@@ -1,6 +1,7 @@
 ﻿@model RegistryWeb.ViewModel.OwnerFileVM;
 @{
     var i = Model.I;
+    var canEdit = Model.Action == ActionTypeEnum.Create || Model.Action == ActionTypeEnum.Edit;
 }
 <li class="list-group-item">
     <input type="hidden" value="@Model.OwnerFile.Id" name="OwnerFiles[@i].Id" />
@@ -11,7 +12,10 @@
             <select value="@Model.OwnerFile.IdReasonType" class="form-control" title="Тип документа основания"
                     name="OwnerFiles[@i].IdReasonType" asp-items="@{new SelectList(ViewBag.OwnerReasonTypes, "IdReasonType", "ReasonName", Model.OwnerFile.IdReasonType)}"></select>
         </div>
-        <div class="form-group col-3">
+        @{ 
+            var colReasonNumber = canEdit ? "col-3" : "col-4";
+        }
+        <div class="form-group @colReasonNumber">
             <label>Номер документа</label>
             <input type="text" class="form-control" value="@Model.OwnerFile.ReasonNumber" name="OwnerFiles[@i].ReasonNumber"
                    maxlength="255" title="Номер документа" placeholder="Номер документа">
@@ -53,11 +57,11 @@
                     }
                     @if (Model.Action == ActionTypeEnum.Create)
                     {
-                        <a href="#" class="form-control btn btn-danger rr-owner-file-remove" style="display: none"
+                        <a href="#" class="form-control btn btn-danger rr-owner-file-remove"
                            title="Удалить образ документа" aria-label="Удалить образ документа">
                             <span class="oi oi-x"></span>
                         </a>
-                        <a href="#" class="form-control btn btn-success rr-owner-file-attach" style="display: none"
+                        <a href="#" class="form-control btn btn-success rr-owner-file-attach"
                            title="Прикрепить образ документа" aria-label="Прикрепить образ документа">
                             <span class="oi oi-paperclip"></span>
                         </a>
@@ -65,10 +69,13 @@
                 </div>
             </div>
         </div>
-        <div class="form-group col-1">
-            <a href="#" class="form-control btn btn-danger rr-document-delete" title="Удалить" aria-label="Удалить">
-                <span class="oi oi-x"></span>
-            </a>
-        </div>
+        @if (canEdit)
+        {
+            <div class="form-group col-1">
+                <a href="#" class="form-control btn btn-danger rr-owner-file-document-delete" title="Удалить" aria-label="Удалить">
+                    <span class="oi oi-x"></span>
+                </a>
+            </div>
+        }
     </div>
 </li>

@@ -25,8 +25,8 @@ function ownersToggle(e) {
 }
 function ownerReasonsToggle(e) {
     $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-document');
-    var idOwner = $(this).closest('li').find('input')[0].value;
-    $('.ownerReason[data-idowner="' + idOwner + '"]').toggle();
+    var i = $(this).closest('li').data('i');
+    $('.rr-owner-reason[data-i="' + i + '"]').toggle();
     e.preventDefault();
 }
 function commentToggle(e) {
@@ -165,7 +165,7 @@ $(function () {
     $('#addressesToggle').on('click',addressesToggle);
     $('#ownerFilesToggle').on('click', ownerFilesToggle);
     $('#ownersToggle').on('click', ownersToggle);
-    $('.ownerReasonsToggle').on('click', ownerReasonsToggle);
+    $('.rr-owner-reasons-toggle').on('click', ownerReasonsToggle);
     $('#commentToggle').on('click', commentToggle);
     $('#logToggle').on('click', logToggle);
     

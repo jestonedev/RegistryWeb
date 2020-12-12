@@ -1,39 +1,35 @@
 ﻿@model RegistryWeb.ViewModel.OwnerFileAssocVM;
 @{
     var i = Model.I;
-    var idOwner = Model.OwnerFileAssoc.IdOwner;
+    var j = Model.J;
     var fraction = Model.OwnerFileAssoc.NumeratorShare + "/" + Model.OwnerFileAssoc.DenominatorShare;
+    var canEdit = Model.Action == ActionTypeEnum.Edit || Model.Action == ActionTypeEnum.Create;
 }
-<li class="list-group-item ownerReason" data-idowner="@idOwner">
-    <input type="hidden" value="@Model.OwnerFileAssoc.Id" name="Owners[@idOwner].OwnerFilesAssoc[@i].Id" />
-    <input type="hidden" value="@Model.OwnerFileAssoc.IdOwner" name="Owners[@idOwner].OwnerFilesAssoc[@i].IdOwner" />
-    <input type="hidden" value="@Model.OwnerFileAssoc.NumeratorShare" name="Owners[@idOwner].OwnerFilesAssoc[@i].NumeratorShare" />
-    <input type="hidden" value="@Model.OwnerFileAssoc.DenominatorShare" name="Owners[@idOwner].OwnerFilesAssoc[@i].DenominatorShare" />
+<li class="list-group-item rr-owner-reason" data-i="@i">
+    <input type="hidden" value="@Model.OwnerFileAssoc.Id" name="Owners[@i].OwnerFilesAssoc[@j].Id" />
+    <input type="hidden" value="@Model.OwnerFileAssoc.IdOwner" name="Owners[@i].OwnerFilesAssoc[@j].IdOwner" />
+    <input type="hidden" value="@Model.OwnerFileAssoc.IdFile" name="Owners[@i].OwnerFilesAssoc[@j].IdFile" />
+    <input type="hidden" value="@Model.OwnerFileAssoc.NumeratorShare" name="Owners[@i].OwnerFilesAssoc[@j].NumeratorShare" />
+    <input type="hidden" value="@Model.OwnerFileAssoc.DenominatorShare" name="Owners[@i].OwnerFilesAssoc[@j].DenominatorShare" />
     <div class="form-row align-items-end">
         <div class="form-group col-2">
             <label>Доля</label>
-            <input type="text" value="@fraction" class="form-control fraction" title="Числитель">
+            <input type="text" value="@fraction" class="form-control rr-fraction" title="Доля (числитель/знаменатель)">
         </div>
-        <div class="form-group col-9">
+        @{
+            var colDocument = canEdit ? "col-9" : "col-10";
+        }
+        <div class="form-group @colDocument">
             <label>Документ</label>
-            <select class="form-control" title="Документ">
-                @foreach (var file in Model.OwnerFiles)
-                {
-                    var selected = file.Id == Model.OwnerFileAssoc.IdFile ? "selected" : "";
-                    <!option value="file.Id" @selected>
-                        @string.Format("№" + file.ReasonNumber + " от " + file.ReasonDate.ToShortDateString() +
-                                       " (" +file.OwnerReasonType.ReasonName + ")")
-                    </!option>
-                }
-            </select>
+            <select class="form-control" title="Документ"></select>
         </div>
+        @if (canEdit)
+        {
         <div class="form-group btn-group col-1" role="group">
-            @if (Model.Action == ActionTypeEnum.Edit || Model.Action == ActionTypeEnum.Create)
-            {
-                <a href="#" class="form-control btn btn-danger documentDelete" title="Удалить" aria-label="Удалить">
-                    <span class="oi oi-x"></span>
-                </a>
-            }
+            <a href="#" class="form-control btn btn-danger rr-owner-reason-delete" title="Удалить" aria-label="Удалить">
+                <span class="oi oi-x"></span>
+            </a>
         </div>
+        }
     </div>
 </li>

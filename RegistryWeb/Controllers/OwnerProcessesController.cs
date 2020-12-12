@@ -47,7 +47,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(OwnerProcess ownerProcess)
+        public IActionResult Create(OwnerProcess ownerProcess, IFormFileCollection attachmentFiles)
         {
             if (ownerProcess == null)
                 return NotFound();
@@ -55,7 +55,7 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             if (ModelState.IsValid)
             {
-                dataService.Create(ownerProcess);
+                dataService.Create(ownerProcess, attachmentFiles);
                 return RedirectToAction("Details", new { ownerProcess.IdProcess });
             }
             return RedirectToAction("Index");
@@ -86,23 +86,22 @@ namespace RegistryWeb.Controllers
                 ownerVM.Owner.OwnerPerson = new OwnerPerson();
             if (idOwnerType == 2 || idOwnerType == 3)
                 ownerVM.Owner.OwnerOrginfo = new OwnerOrginfo();
-            ownerVM.Owner.OwnerReasons = new List<OwnerReason>() { new OwnerReason() };
             ownerVM.I = i;
             ownerVM.Action = action;
-            ViewBag.OwnerReasonTypes = dataService.OwnerReasonTypes();
             return PartialView("Owner", ownerVM);
         }
 
         [HttpPost]
-        public IActionResult OwnerReasonAdd(int iOwner, int iReason, ActionTypeEnum action)
+        public IActionResult OwnerReasonAdd(int i, int j, ActionTypeEnum action)
         {
-            var ownerReasonVM = new OwnerReasonVM();
-            ownerReasonVM.OwnerReason = new OwnerReason();
-            ownerReasonVM.IOwner = iOwner;
-            ownerReasonVM.IReason = iReason;
-            ownerReasonVM.Action = action;
-            ViewBag.OwnerReasonTypes = dataService.OwnerReasonTypes();
-            return PartialView("OwnerReason", ownerReasonVM);
+            var ownerFileAssocVM = new OwnerFileAssocVM();
+            ownerFileAssocVM.OwnerFileAssoc = new OwnerFileAssoc();
+            ownerFileAssocVM.OwnerFileAssoc.NumeratorShare = 1;
+            ownerFileAssocVM.OwnerFileAssoc.DenominatorShare = 1;
+            ownerFileAssocVM.I = i;
+            ownerFileAssocVM.J = j;
+            ownerFileAssocVM.Action = action;
+            return PartialView("OwnerFileAssoc", ownerFileAssocVM);
         }
 
         [HttpPost]
