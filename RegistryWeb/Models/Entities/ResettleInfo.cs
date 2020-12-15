@@ -28,6 +28,8 @@ namespace RegistryWeb.Models.Entities
         public decimal FinanceSource3 { get; set; }
         [Required]
         public decimal FinanceSource4 { get; set; }
+
+        public string Description { get; set; }
         public byte Deleted { get; set; }
 
         public virtual ResettleKind ResettleKindNavigation { get; set; }

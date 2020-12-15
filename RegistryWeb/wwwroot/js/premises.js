@@ -143,6 +143,7 @@
                 $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource2").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource2));
                 $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource3").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource3));
                 $(this).append(inputTemplate.replace('{0}', rin + "FinanceSource4").replace('{1}', resettles[l].ResettleInfoNavigation.FinanceSource4));
+                $(this).append(inputTemplate.replace('{0}', rin + "Description").replace('{1}', resettles[l].ResettleInfoNavigation.Description));
                 if (resettles[l].ResettleInfoNavigation.ResettleInfoTo !== null) {
                     for (let s = 0; s < resettles[l].ResettleInfoNavigation.ResettleInfoTo.length; s++) {
                         let rit = rin + "ResettleInfoTo[" + s + "].";

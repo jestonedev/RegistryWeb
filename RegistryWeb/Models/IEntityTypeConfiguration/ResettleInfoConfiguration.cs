@@ -61,6 +61,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("finance_source_4")
                 .HasColumnType("decimal(18,2)");
 
+            builder.Property(e => e.Description)
+                .HasColumnName("description")
+                .HasMaxLength(2048);
+
             builder.Property(e => e.Deleted)
                 .HasColumnName("deleted")
                 .HasColumnType("tinyint(1)")

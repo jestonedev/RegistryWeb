@@ -42,6 +42,7 @@ namespace RegistryWeb.ViewModel
             FinanceSource2 = ri.FinanceSource2;
             FinanceSource3 = ri.FinanceSource3;
             FinanceSource4 = ri.FinanceSource4;
+            Description = ri.Description;
             Deleted = ri.Deleted;
             ResettleKindNavigation = ri.ResettleKindNavigation;
             ResettleInfoSubPremisesFrom = ri.ResettleInfoSubPremisesFrom;
