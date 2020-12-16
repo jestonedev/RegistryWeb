@@ -71,64 +71,54 @@ var annulOwnerProcessCheckboxChange = function () {
     var annulComment = $('input[name="AnnulComment"]');
     if ($('#annulOwnerProcessCheckbox').is(':checked')) {
         annulDate.val("");
-        annulDate.addClass('ignore');
+        annulDate.addClass('rr-valid-ignore');
         annulComment.val("");
-        annulComment.addClass('ignore');
+        annulComment.addClass('rr-valid-ignore');
     }
     else {
-        annulDate.removeClass('ignore');
-        annulComment.removeClass('ignore');
+        annulDate.removeClass('rr-valid-ignore');
+        annulComment.removeClass('rr-valid-ignore');
     }
 }
 
 $.validator.addMethod('addressRequired', function (value, element) {
-    return $('.address').length != 0;
-});
+    return $('.rr-address').length != 0;
+}, 'Блок «Адрес» является обязательным для заполнения');
 $.validator.addMethod('ownerSurnameRequired', $.validator.methods.required,
     'Поле «Фамилия» является обязательным для заполнения');
 $.validator.addMethod('ownerNameRequired', $.validator.methods.required,
     'Поле «Имя» является обязательным для заполнения');
 $.validator.addMethod('ownerOrgNameRequired', $.validator.methods.required,
     'Поле «Наименование» является обязательным для заполнения');
-$.validator.addMethod('reasonNumeratorShareRequired', $.validator.methods.required,
-    'Поле «Числитель» является обязательным для заполнения');
-$.validator.addMethod('reasonNumeratorShareRange', $.validator.methods.range,
-    'Поле «Числитель» должно лежать между 1 и 1024');
-$.validator.addMethod('reasonDenominatorShareRequired', $.validator.methods.required,
-    'Поле «Знаменатель» является обязательным для заполнения');
-$.validator.addMethod('reasonDenominatorShareRange', $.validator.methods.range,
-    'Поле «Знаменатель» должно лежать между 1 и 1024');
-$.validator.addMethod('reasonNumRequired', $.validator.methods.required,
+$.validator.addMethod('fractionSum', function (value, element) {
+    return isValidFraction();
+}, 'Сумма значений полей «Доля» должно быть равно 1');
+$.validator.addMethod('fileNumRequired', $.validator.methods.required,
     'Поле «Номер» является обязательным для заполнения');
-$.validator.addMethod('reasonDateRequired', $.validator.methods.required,
+$.validator.addMethod('fileDateRequired', $.validator.methods.required,
     'Поле «Дата» является обязательным для заполнения');
-$.validator.addClassRules('ownerSurname', {
+$.validator.addClassRules('rr-owner-surname', {
     ownerSurnameRequired: true
 });
-$.validator.addClassRules('ownerName', {
+$.validator.addClassRules('rr-owner-name', {
     ownerNameRequired: true
 });
-$.validator.addClassRules('ownerOrgName', {
+$.validator.addClassRules('rr-owner-org-name', {
     ownerOrgNameRequired: true
 });
-$.validator.addClassRules('reasonNumeratorShare', {
-    reasonNumeratorShareRequired: true,
-    reasonNumeratorShareRange: [1, 1024]
+$.validator.addClassRules('rr-fraction', {
+    fractionSum: true
 });
-$.validator.addClassRules('reasonDenominatorShare', {
-    reasonDenominatorShareRequired: true,
-    reasonDenominatorShareRange: [1, 1024]
+$.validator.addClassRules('rr-file-num', {
+    fileNumRequired: true
 });
-$.validator.addClassRules('reasonNum', {
-    reasonNumRequired: true
-});
-$.validator.addClassRules('reasonDate', {
-    reasonDateRequired: true
+$.validator.addClassRules('rr-file-date', {
+    fileDateRequired: true
 });
 $(function () {
     var form = $('#ownerProcessForm');
     var validator = form.validate();
-    validator.settings.ignore = '.ignore';
+    validator.settings.ignore = '.rr-valid-ignore';
     validator.settings.ignoreTitle = true;
     validator.settings.rules = {
         AnnulDate: {
@@ -147,14 +137,11 @@ $(function () {
         },
         AnnulComment: {
             required: 'Поле «Причина аннулирования» является обязательным для заполнения при аннулировании процесса'
-        },
-        AddressSearch: {
-            addressRequired: 'Блок «Адрес» является обязательным для заполнения'
         }
     };    
     if ($('input[name="AnnulDate"]').val() === "") {
-        $('input[name="AnnulDate"]').addClass('ignore');
-        $('input[name="AnnulComment"]').addClass('ignore');
+        $('input[name="AnnulDate"]').addClass('rr-valid-ignore');
+        $('input[name="AnnulComment"]').addClass('rr-valid-ignore');
         $('#annulOwnerProcessCard').hide();
         $('#annulBadge').hide();
     }    

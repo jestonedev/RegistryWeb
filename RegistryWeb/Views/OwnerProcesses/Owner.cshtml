@@ -19,12 +19,12 @@
         <input type="hidden" value="@Model.Owner.OwnerPerson.IdOwner" name="Owners[@i].OwnerPerson.IdOwner" />
         <div class="form-group col-3">
             <label>Фамилия</label>
-            <input type="text" class="form-control input-chars" placeholder="Фамилия" title="Фамилия"
+            <input type="text" class="form-control input-chars rr-owner-surname" placeholder="Фамилия" title="Фамилия"
                    value="@Model.Owner.OwnerPerson.Surname" name="Owners[@i].OwnerPerson.Surname" />
         </div>
         <div class="form-group @colName">
             <label>Имя</label>
-            <input type="text" class="form-control input-chars" placeholder="Имя" title="Имя"
+            <input type="text" class="form-control input-chars rr-owner-name" placeholder="Имя" title="Имя"
                    value="@Model.Owner.OwnerPerson.Name" name="Owners[@i].OwnerPerson.Name" />
         </div>
         <div class="form-group col-3">
@@ -39,7 +39,7 @@
         <input type="hidden" value="@Model.Owner.OwnerOrginfo.IdOwner" name="Owners[@i].OwnerOrginfo.IdOwner" />
         <div class="form-group @colOrgName">
             <label>Наименование</label>
-            <input type="text" class="form-control" placeholder="Наименование"
+            <input type="text" class="form-control rr-owner-org-name" placeholder="Наименование"
                    value="@Model.Owner.OwnerOrginfo.OrgName" name="Owners[@i].OwnerOrginfo.OrgName" />
         </div>
         }

@@ -7,14 +7,14 @@
         inputs[1].name = 'Owners[' + i + '].IdProcess';
         inputs[2].name = 'Owners[' + i + '].IdOwnerType';
         if (inputs[2].value == 1) {
-            inputs[5].name = 'Owners[' + i + '].OwnerPerson.IdOwner';
-            inputs[6].name = 'Owners[' + i + '].OwnerPerson.Surname';
-            inputs[7].name = 'Owners[' + i + '].OwnerPerson.Name';
-            inputs[8].name = 'Owners[' + i + '].OwnerPerson.Patronymic';
+            inputs[4].name = 'Owners[' + i + '].OwnerPerson.IdOwner';
+            inputs[5].name = 'Owners[' + i + '].OwnerPerson.Surname';
+            inputs[6].name = 'Owners[' + i + '].OwnerPerson.Name';
+            inputs[7].name = 'Owners[' + i + '].OwnerPerson.Patronymic';
         }
         else {
-            inputs[5].name = 'Owners[' + i + '].OwnerOrginfo.IdOwner';
-            inputs[6].name = 'Owners[' + i + '].OwnerOrginfo.OrgName';
+            inputs[4].name = 'Owners[' + i + '].OwnerOrginfo.IdOwner';
+            inputs[5].name = 'Owners[' + i + '].OwnerOrginfo.OrgName';
         }
         ownerReasonRename(oldI, i);
     });
@@ -36,6 +36,7 @@ function ownerDelete(e) {
     owner.remove();
     $('.rr-owner-reason[data-i="' + i + '"]').remove();
     ownerRename();
+    isValidFraction();
     e.preventDefault();
 }
 function ownerReasonDelete(e) {
@@ -43,6 +44,7 @@ function ownerReasonDelete(e) {
     var i = ownerReason.data('i');
     ownerReason.remove();
     ownerReasonRename(i, i);
+    isValidFraction();
     e.preventDefault();
 }
 function ownerAdd(e) {
@@ -90,6 +92,7 @@ function ownerReasonAdd(e) {
                 });
             });
             reason.find('input[name$="IdFile"]').val(reason.find('option:selected').val());
+            isValidFraction();
         }
     });
     e.preventDefault();
@@ -118,6 +121,23 @@ function fractionDocumentChange(e) {
     reason.find('input[name$="NumeratorShare"]').val(fractionArray[0]);
     reason.find('input[name$="DenominatorShare"]').val(fractionArray[1]);
     e.preventDefault();
+}
+function isValidFraction() {
+    var result = 0.0;
+    $('.rr-fraction').each(function () {
+        var li = $(this).closest('li');
+        var numeratorShare = li.find('input[name$="NumeratorShare"]').val();
+        var denominatorShare = li.find('input[name$="DenominatorShare"]').val();
+        result += numeratorShare / denominatorShare;
+    });
+    var isValid = result.toFixed(2) == '1.00';
+    if (isValid) {
+        $('.rr-fraction').removeClass('input-validation-error');
+    }
+    else {
+        $('.rr-fraction').addClass('input-validation-error');
+    }
+    return isValid;
 }
 $(function () {
     $('.rr-fraction').inputFilter(function (value) {
