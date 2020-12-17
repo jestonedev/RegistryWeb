@@ -34,6 +34,7 @@ function getResettle(resettleElem) {
         FinanceSource2: resettleElem.find("[name^='FinanceSource2']").val(),
         FinanceSource3: resettleElem.find("[name^='FinanceSource3']").val(),
         FinanceSource4: resettleElem.find("[name^='FinanceSource4']").val(),
+        Description: resettleElem.find("[name^='Description']").val(),
         ResettleInfoTo: GetRessetleInfoTo(resettleElem, ""),
         ResettleInfoToFact: GetRessetleInfoTo(resettleElem, "Fact"),
         ResettleDocuments: resettleElem.find("#resettleDocumentsList .list-group-item").map(function (idx, elem) {
@@ -96,6 +97,7 @@ function resettleToFormData(resettle, address) {
     formData.append("ResettleInfo.FinanceSource2", resettle.FinanceSource2);
     formData.append("ResettleInfo.FinanceSource3", resettle.FinanceSource3);
     formData.append("ResettleInfo.FinanceSource4", resettle.FinanceSource4);
+    formData.append("ResettleInfo.Description", resettle.Description);
     formData.append("Address.AddressType", address.addressType);
     formData.append("Address.Id", address.id);
     if (resettle.ResettleInfoTo !== null) {
@@ -448,7 +450,7 @@ function refreshResettle(resettleElem, resettle) {
     resettleElem.find("[name^='FinanceSource2']").val(resettle.financeSource2.toFixed(2).replace('.', ','));
     resettleElem.find("[name^='FinanceSource3']").val(resettle.financeSource3.toFixed(2).replace('.', ','));
     resettleElem.find("[name^='FinanceSource4']").val(resettle.financeSource4.toFixed(2).replace('.', ','));
-    resettleElem.find("[name^='FinanceSource4']").val(resettle.financeSource4.toFixed(2).replace('.', ','));
+    resettleElem.find("[name^='Description']").val(resettle.description);
     resettleElem.find('select[name="ResettleToIdStreet"]').val(resettleElem.find('input[name="ResettleToIdStreetPrev"]').val()).change().selectpicker('refresh');
     resettleElem.find('select[name="ResettleToIdStreetFact"]').val(resettleElem.find('input[name="ResettleToIdStreetFactPrev"]').val()).change().selectpicker('refresh');
     var documentListElem = resettleElem.find("#resettleDocumentsList");

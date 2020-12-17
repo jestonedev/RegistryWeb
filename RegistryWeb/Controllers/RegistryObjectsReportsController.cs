@@ -18,6 +18,7 @@ namespace RegistryWeb.Controllers
         private readonly SecurityService securityService;
         private const string odtMime = "application/vnd.oasis.opendocument.text";
         private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
+        private const string xlsxMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
         public RegistryObjectsReportsController(RegistryObjectsReportService reportService, RegistryObjectsDataService dataService, SecurityService securityService)
         {
@@ -34,6 +35,21 @@ namespace RegistryWeb.Controllers
             var viewModel = dataService.GetViewModel();
             
             return View("Index", viewModel);
+        }
+
+        public IActionResult GetResettle_2019_2025()
+        {
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.GetResettle_2019_2025();
+                return File(file, xlsxMime, "Реестр ЖП, подлежащих переселению из АЖФ до 1 января 2017 года, подлежащих переселению в 2019-2025 года.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
         }
 
         public IActionResult GetEmergencyJP(string JFType, string regions)

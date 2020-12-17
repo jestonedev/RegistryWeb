@@ -72,6 +72,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 financeSource2 = resettle.FinanceSource2,
                 financeSource3 = resettle.FinanceSource3,
                 financeSource4 = resettle.FinanceSource4,
+                description = resettle.Description,
                 documents = resettle.ResettleDocuments.Select(r => new {
                     r.IdDocument,
                     r.Number,
