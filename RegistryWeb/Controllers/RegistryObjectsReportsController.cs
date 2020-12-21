@@ -44,7 +44,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.GetResettle_2019_2025();
-                return File(file, xlsxMime, "Реестр ЖП, подлежащих переселению из АЖФ до 1 января 2017 года, подлежащих переселению в 2019-2025 года.xlsx");
+                return File(file, odsMime, "Реестр ЖП, подлежащих переселению из АЖФ до 1 января 2017 года, подлежащих переселению в 2019-2025 года.ods");
             }
             catch (Exception ex)
             {
