@@ -44,19 +44,19 @@
         </div>
         }
         @{
-            var colPanel = canEdit ? "col-2" : "col-1";
+            var colPanel = canEdit ? "btn-group col-2" : "col-1 text-right";
         }
-        <div class="form-group btn-group @colPanel" role="group">
+        <div class="form-group @colPanel" role="group">
             @if (canEdit)
             {
-            <a href="#" class="form-control btn btn-success rr-owner-reason-add" title="Добавить реквизит права собственности">
+            <a href="#" class="btn btn-success rr-owner-reason-add" title="Добавить реквизит права собственности">
                 <span class="oi oi-plus"></span>
             </a>
-            <a href="#" class="form-control btn btn-danger rr-owner-delete" title="Удалить" aria-label="Удалить">
+            <a href="#" class="btn btn-danger rr-owner-delete" title="Удалить" aria-label="Удалить">
                 <span class="oi oi-x"></span>
             </a>
             }
-            <a href="#" class="form-control btn btn-primary rr-owner-reasons-toggle" title="Развернуть список документов">
+            <a href="#" class="btn btn-primary rr-owner-reasons-toggle" title="Развернуть список документов">
                 <span class="oi oi-chevron-top"></span>
             </a>
         </div>

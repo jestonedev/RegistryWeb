@@ -42,12 +42,11 @@ namespace RegistryWeb.Controllers
         {
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
                 return View("NotAccess");
-            ViewBag.ReturnUrl = returnUrl;
             return GetOwnerProcessView(dataService.CreateOwnerProcess(filterOptions), returnUrl);
         }
 
         [HttpPost]
-        public IActionResult Create(OwnerProcess ownerProcess, IFormFileCollection attachmentFiles)
+        public IActionResult Create(OwnerProcess ownerProcess, string returnUrl, IFormFileCollection attachmentFiles)
         {
             if (ownerProcess == null)
                 return NotFound();
@@ -56,9 +55,9 @@ namespace RegistryWeb.Controllers
             if (ModelState.IsValid)
             {
                 dataService.Create(ownerProcess, attachmentFiles);
-                return RedirectToAction("Details", new { ownerProcess.IdProcess });
+                return RedirectToAction("Details", new { ownerProcess.IdProcess, returnUrl });
             }
-            return RedirectToAction("Index");
+            return Redirect(returnUrl);
         }
 
         [HttpPost]
@@ -128,7 +127,6 @@ namespace RegistryWeb.Controllers
             var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
             if (ownerProcess == null)
                 return NotFound();
-            ViewBag.ReturnUrl = returnUrl;
             return GetOwnerProcessView(ownerProcess, returnUrl);
         }
 
@@ -146,14 +144,14 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(OwnerProcess ownerProcess)
+        public IActionResult Delete(OwnerProcess ownerProcess, string returnUrl)
         {
             if (ownerProcess == null)
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerWrite))
                 return View("NotAccess");
             dataService.Delete(ownerProcess.IdProcess);
-            return RedirectToAction("Index");            
+            return Redirect(returnUrl);            
         }
 
         [HttpGet]
@@ -170,7 +168,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(OwnerProcess ownerProcess, IFormFileCollection attachmentFiles, bool[] removeFiles)
+        public IActionResult Edit(OwnerProcess ownerProcess, string returnUrl, IFormFileCollection attachmentFiles, bool[] removeFiles)
         {
             var r = Request;
             if (ownerProcess == null)
@@ -180,9 +178,9 @@ namespace RegistryWeb.Controllers
             if (ModelState.IsValid)
             {                
                 dataService.Edit(ownerProcess, attachmentFiles, removeFiles);
-                return RedirectToAction("Edit", new { ownerProcess.IdProcess });
+                return RedirectToAction("Edit", new { ownerProcess.IdProcess, returnUrl });
             }
-            return RedirectToAction("Index");
+            return Redirect(returnUrl);
         }
 
         private IActionResult GetOwnerProcessView(OwnerProcess ownerProcess, string returnUrl, [CallerMemberName]string action = "")

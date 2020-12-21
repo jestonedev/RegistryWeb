@@ -50,7 +50,7 @@
                             <a class="btn btn-outline-dark oi oi-pencil @(canEdit ? "" : "disabled")" title="Изменить" aria-label="Изменить"
                                asp-action="Edit" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess" asp-route-returnUrl="@returnUrl"></a>
                             <a class="btn btn-danger oi oi-x @(canEdit ? "" : "disabled")" title="Удалить" aria-label="Удалить"
-                               asp-action="Delete" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess"></a>
+                               asp-action="Delete" asp-controller="OwnerProcesses" asp-route-idProcess="@item.IdProcess" asp-route-returnUrl="@returnUrl"></a>
                         </div>
                     </div>
                 </td>
