@@ -8,7 +8,7 @@
 <li class="list-group-item rr-owner-reason" data-i="@i">
     <input type="hidden" value="@Model.OwnerFileAssoc.Id" name="Owners[@i].OwnerFilesAssoc[@j].Id" />
     <input type="hidden" value="@Model.OwnerFileAssoc.IdOwner" name="Owners[@i].OwnerFilesAssoc[@j].IdOwner" />
-    <input type="hidden" value="@Model.OwnerFileAssoc.IdFile" name="Owners[@i].OwnerFilesAssoc[@j].IdFile" />
+    <input type="hidden" class="rr-owner-reason-document" value="@Model.OwnerFileAssoc.IdFile" name="Owners[@i].OwnerFilesAssoc[@j].IdFile" />
     <input type="hidden" value="@Model.OwnerFileAssoc.NumeratorShare" name="Owners[@i].OwnerFilesAssoc[@j].NumeratorShare" />
     <input type="hidden" value="@Model.OwnerFileAssoc.DenominatorShare" name="Owners[@i].OwnerFilesAssoc[@j].DenominatorShare" />
     <div class="form-row align-items-end">
@@ -21,15 +21,15 @@
         }
         <div class="form-group @colDocument">
             <label>Документ</label>
-            <select class="form-control" title="Документ"></select>
+            <select class="form-control selectpicker" data-live-search="true" title="Документ"></select>
         </div>
         @if (canEdit)
         {
-        <div class="form-group col-1 text-right" role="group">
-            <a href="#" class="btn btn-danger rr-owner-reason-delete" title="Удалить" aria-label="Удалить">
-                <span class="oi oi-x"></span>
-            </a>
-        </div>
+            <div class="form-group col-1 text-right" role="group">
+                <a href="#" class="btn btn-danger rr-owner-reason-delete" title="Удалить" aria-label="Удалить">
+                    <span class="oi oi-x"></span>
+                </a>
+            </div>
         }
     </div>
 </li>

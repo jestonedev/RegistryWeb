@@ -81,6 +81,16 @@ var annulOwnerProcessCheckboxChange = function () {
     }
 }
 
+$.validator.addMethod('documentRequired', function (value, element) {
+    var btn = $(element).closest('li').find('button');
+    if (value == '') {
+        btn.addClass('input-validation-error');
+    }
+    else {
+        btn.removeClass('input-validation-error');
+    }
+    return value != '';
+}, 'Блок «Документ» у собственника не выбран');
 $.validator.addMethod('addressRequired', function (value, element) {
     return $('.rr-address').length != 0;
 }, 'Блок «Адрес» является обязательным для заполнения');
@@ -105,6 +115,9 @@ $.validator.addClassRules('rr-owner-name', {
 });
 $.validator.addClassRules('rr-owner-org-name', {
     ownerOrgNameRequired: true
+});
+$.validator.addClassRules('rr-owner-reason-document', {
+    documentRequired: true
 });
 $.validator.addClassRules('rr-fraction', {
     fractionSum: true

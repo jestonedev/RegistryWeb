@@ -84,13 +84,14 @@ function ownerReasonAdd(e) {
             reason.find('input[name$="IdOwner"]').val(owner.find('input[name$="IdOwner"]').val());
             $('#ownerFiles .list-group-item').each(function () {
                 var idFile = $(this).find('input[name$="Id"]').val();
-                var doc = getDocumentString($(this));                
+                var doc = getDocumentString($(this));
                 reason.find('select').append('<option value="' + idFile + '">' + doc + '</option>');
                 reason.find('.rr-fraction').inputFilter(function (value) {
                     return /^$/.test(value) || /^[1-9]?\d{0,2}\/$/.test(value) || /^\/[1-9]?\d{0,2}$/.test(value) ||
                         /^\/$/.test(value) || /^[1-9]?\d{0,2}$/.test(value) || /^[1-9]\d{0,2}\/[1-9]\d{0,2}$/.test(value);
                 });
             });
+            reason.find('select').selectpicker("render");
             reason.find('input[name$="IdFile"]').val(reason.find('option:selected').val());
             isValidFraction();
         }

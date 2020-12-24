@@ -17,10 +17,10 @@ function ownerFileDocumentDelete(e) {
     var ownerFileElem = $(this).closest('.list-group-item');
     var idFile = ownerFileElem.find('input')[0].value;
     $('#owners option[value="' + idFile + '"]').remove();
+    $('#owners select').selectpicker("refresh");
     $('#owners input[name$="IdFile"]').each(function () {
         if (this.value == idFile) {
-            var ownerReason = $(this).closest('li');
-            this.value = ownerReason.find('select').val();
+            this.value = '';
         }
     });
     ownerFileElem.remove();
@@ -52,7 +52,8 @@ function ownerFileAdd(e) {
             newOwnerFileElem.find('input[name$="IdProcess"]').val($('#ownerProcess input[name="IdProcess"]').val());
             newOwnerFileElem.find('input[name$="Id"]').val(idNewOwnerFile);
             var doc = getDocumentString(newOwnerFileElem);
-            $('#owners select').append('<option value="' + idNewOwnerFile + '">' + doc + '</option>');
+            $('#owners select').append('<option value="' + idNewOwnerFile + '">' + doc + '</option>')
+                .selectpicker("refresh");
             idNewOwnerFile--;
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -91,7 +92,8 @@ function ownerReasonAddOption(ownerFileElem) {
     $('#owners select').each(function () {
         var ownerFileAssocIdFile = $(this).closest('li').find('input[name$="IdFile"]').val();
         var selected = idFile == ownerFileAssocIdFile ? ' selected' : '';
-        $(this).append('<option value="' + idFile + '"' + selected + '>' + doc + '</option>');
+        $(this).append('<option value="' + idFile + '"' + selected + '>' + doc + '</option>')
+            .selectpicker("refresh");
     });
 }
 function documentChange(e) {
@@ -99,6 +101,7 @@ function documentChange(e) {
     var idFile = ownerFileElem.find('input[name$="Id"]').val();
     var doc = getDocumentString(ownerFileElem);
     $('#owners option[value="' + idFile + '"]').text(doc);
+    $('#owners select').selectpicker("refresh");
     e.preventDefault();
 }
 $(function () {
