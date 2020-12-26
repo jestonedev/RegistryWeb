@@ -49,7 +49,7 @@
                         <span class="oi oi-home"></span>
                     </a>
                     <div class="btn-group" role="group" aria-label="Панель доступа">
-                        @if (ViewBag.Action == ActionTypeEnum.Details && ((ViewBag.CanEditBaseInfo ?? false) || (ViewBag.CanEditResettleInfo ?? false) || (ViewBag.CanEditLitigationInfo ?? false)))
+                        @if (ViewBag.Action == ActionTypeEnum.Details && (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || (ViewBag.CanEditResettleInfo ?? false) || (ViewBag.CanEditLitigationInfo ?? false)))
                         {
                             <div class="btn-group" role="group" aria-label="Панель доступа">
                                 <button class="btn btn-primary dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@Model.Premise.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -58,7 +58,7 @@
                                 <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@Model.Premise.IdPremises">
                                     <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
                                        asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@Model.Premise.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                    <a class="btn btn-danger oi oi-x @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" title="Удалить" aria-label="Удалить"
+                                    <a class="btn btn-danger oi oi-x @(ViewBag.CanDeleteBaseInfo ?? false ? "" : "disabled")" title="Удалить" aria-label="Удалить"
                                        asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@Model.Premise.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                                 </div>
                             </div>

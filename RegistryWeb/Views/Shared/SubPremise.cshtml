@@ -1,14 +1,10 @@
 ﻿@model RegistryWeb.ViewModel.SubPremiseVM;
-@using RegistryWeb.Extensions;
-@using RegistryWeb.ViewOptions;
-@using RegistryWeb.Models.Entities;
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.DataHelpers;
 
 @{
     var securityService = (SecurityService)ViewBag.SecurityService;
-    var canEditBasePremiseInfo = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
-    var canEdit = canEditBasePremiseInfo && (Model.IdSubPremises == 0 || 
+    var canEdit = (Model.IdSubPremises == 0 || 
             (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(Model.IdState)) ||
             (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(Model.IdState)));
 }
