@@ -26,6 +26,7 @@ namespace RegistryWeb.ReportServices
             var arguments = new Dictionary<string, object>
             {
                 { "ids", idPremise },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 { "excerpt_type", 1 },
                 { "excerpt_number", excerptNumber },
                 { "excerpt_date_from", excerptDateFrom.ToString("dd.MM.yyyy") },
@@ -40,6 +41,7 @@ namespace RegistryWeb.ReportServices
             var arguments = new Dictionary<string, object>
             {
                 { "ids", idPremise },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 { "excerpt_type", 2 },
                 { "excerpt_number", excerptNumber },
                 { "excerpt_date_from", excerptDateFrom.ToString("dd.MM.yyyy") },
@@ -54,6 +56,7 @@ namespace RegistryWeb.ReportServices
             var arguments = new Dictionary<string, object>
             {
                 { "ids", idPremise },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 { "excerpt_type", 3 },
                 { "excerpt_number", excerptNumber },
                 { "excerpt_date_from", excerptDateFrom.ToString("dd.MM.yyyy") },
@@ -69,7 +72,7 @@ namespace RegistryWeb.ReportServices
             {
                 { "id", idPremise },
                 { "notice_type", 1 },
-                { "executor", securityService.User.UserName },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 { "text", actionText },
                 { "payment_type", paymentType },
                 { "signer", signer }
@@ -84,7 +87,7 @@ namespace RegistryWeb.ReportServices
             {
                 { "id", idSubPremise },
                 { "notice_type", 2 },
-                { "executor", securityService.User.UserName },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 { "text", actionText },
                 { "payment_type", paymentType },
                 { "signer", signer }
@@ -123,7 +126,7 @@ namespace RegistryWeb.ReportServices
                 { "excerpt_type", 4 },
                 { "excerpt_date_from", excerptDateFrom.ToString("dd.MM.yyyy") },
                 { "excerpt_number", excerptNumber },
-                { "executor", securityService.User.UserName },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 { "signer", signer }
             };
             var fileNameReport = GenerateReport(arguments, "registry\\registry\\premises_mx");
@@ -136,7 +139,7 @@ namespace RegistryWeb.ReportServices
             {
                 { "filter", PremisesIdsToString(idPremises) },
                 { "acttype", 1 },
-                { "executor", securityService.User.UserName },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 { "date_act", actDate },
                 { "is_not_resides", isNotResides },
                 { "ids_commission", commision },
@@ -187,7 +190,7 @@ namespace RegistryWeb.ReportServices
             {
                 { "filterTmpFile", fileName },
                 { "type", "2"},
-                { "executor", securityService.User.UserName },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 {
                     "columnHeaders", "["+columnHeaders+",{\"columnHeader\":\"Номер и дата включения в фонд\"},{\"columnHeader\":\"Дополнительные сведения\"}"+
                     ",{\"columnHeader\":\"Основание на включение в АФ здания\"},{\"columnHeader\":\"Основание на включение в АФ помещения\"}"+
@@ -213,7 +216,7 @@ namespace RegistryWeb.ReportServices
             var arguments = new Dictionary<string, object>
             {
                 { "filterTmpFile", fileName },
-                { "executor", securityService.User.UserName }
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") }
             };
             var fileNameReport = GenerateReport(arguments, "registry\\registry\\tenancy_history");
             return DownloadFile(fileNameReport);

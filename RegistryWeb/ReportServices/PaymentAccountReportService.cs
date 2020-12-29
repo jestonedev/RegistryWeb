@@ -95,7 +95,7 @@ namespace RegistryWeb.ReportServices
             {
                 { "filterTmpFile", fileName },
                 { "type", "5"},
-                { "executor", securityService.User.UserName },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 { "columnHeaders", columnHeaders },
                 { "columnPatterns", columnPatterns },
                 { "orderColumn", "id_account" }

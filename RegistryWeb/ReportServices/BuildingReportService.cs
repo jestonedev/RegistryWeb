@@ -22,6 +22,7 @@ namespace RegistryWeb.ReportServices
             var arguments = new Dictionary<string, object>
             {
                 { "ids", idBuilding },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 { "excerpt_number", excerptNumber },
                 { "excerpt_date_from", excerptDateFrom.ToString("dd.MM.yyyy") },
                 { "signer", signer }
