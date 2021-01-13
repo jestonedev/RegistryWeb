@@ -36,6 +36,7 @@
 var addressClear = function () {
     $('input[name="FilterOptions.Address.AddressType"]').val("");
     $('input[name="FilterOptions.Address.Id"]').val("");
+    $('input[name="FilterOptions.Address.Text"]').val("");
 };
 
 var focusOutFilterOptionsAddress = function () {

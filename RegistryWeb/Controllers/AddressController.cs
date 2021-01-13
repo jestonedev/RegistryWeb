@@ -34,7 +34,7 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public JsonResult AutocompleteFilterOptionsAddress(string text, bool isBuildings = false)
         {
-            var match = Regex.Match(text, @"^(.*?)[,]*[ ]*(д\.?)?[ ]*(\d+[а-яА-Я]?([\\\/]\d+[а-яА-Я]?)?)?[ ]*[ ]*([,-]?|кв\.?)?[ ]*(\d+[а-яА-Я]?)?[ ]*$");
+            var match = Regex.Match(text, @"^(.*?)[,]*[ ]*(д\.?)?[ ]*(\d+[а-яА-Я]?([\\\/]\d+[а-яА-Я]?)?)?[ ,-]*(кв\.?)?[ ]*(\d+[а-яА-Я]?)?[ ]*$");
             var addressWordsList = new List<string>();
             if (!string.IsNullOrEmpty(match.Groups[1].Value))
             {
