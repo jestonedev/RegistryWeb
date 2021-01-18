@@ -258,7 +258,10 @@ namespace RegistryWeb.DataServices
         {
             if (filterOptions.IdsComment != null && filterOptions.IdsComment.Any())
             {
-                query = query.Where(p => filterOptions.IdsComment.Contains(p.IdPremisesComment));
+                if (filterOptions.IdsCommentContains == null || filterOptions.IdsCommentContains.Value)
+                    query = query.Where(p => filterOptions.IdsComment.Contains(p.IdPremisesComment));
+                else
+                    query = query.Where(p => !filterOptions.IdsComment.Contains(p.IdPremisesComment));
             }
             return query;
         }
@@ -267,7 +270,10 @@ namespace RegistryWeb.DataServices
         {
             if (filterOptions.IdsDoorKeys != null && filterOptions.IdsDoorKeys.Any())
             {
-                query = query.Where(p => filterOptions.IdsDoorKeys.Contains(p.IdPremisesDoorKeys));
+                if (filterOptions.IdsDoorKeysContains == null || filterOptions.IdsDoorKeysContains.Value)
+                    query = query.Where(p => filterOptions.IdsDoorKeys.Contains(p.IdPremisesDoorKeys));
+                else
+                    query = query.Where(p => !filterOptions.IdsDoorKeys.Contains(p.IdPremisesDoorKeys));
             }
             return query;
         }
@@ -367,10 +373,18 @@ namespace RegistryWeb.DataServices
                     var premisesIds = (from pRow in premises
                                       where ownershipRightsPremisesList.Contains(pRow.IdPremises)
                                       select pRow.IdPremises).ToList();
-
-                    query = (from row in query
-                             where buildingIds.Contains(row.IdBuilding) || premisesIds.Contains(row.IdPremises)
-                             select row).Distinct();
+                    
+                    if (filterOptions.IdsOwnershipRightTypeContains == null || filterOptions.IdsOwnershipRightTypeContains.Value)
+                    {
+                        query = (from row in query
+                                 where buildingIds.Contains(row.IdBuilding) || premisesIds.Contains(row.IdPremises)
+                                 select row).Distinct();
+                    } else
+                    {
+                        query = (from row in query
+                                 where !buildingIds.Contains(row.IdBuilding) && !premisesIds.Contains(row.IdPremises)
+                                 select row).Distinct();
+                    }
                 }
             }
             return query;

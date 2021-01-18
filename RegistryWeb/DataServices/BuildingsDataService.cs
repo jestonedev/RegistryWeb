@@ -196,9 +196,18 @@ namespace RegistryWeb.DataServices
                                           where ownershipRightsBuildingsList.Contains(bRow.IdBuilding)
                                           select bRow.IdBuilding).ToList();
 
-                        query = (from row in query
-                                 where buildingIds.Contains(row.IdBuilding)
-                                 select row).Distinct();
+                        if (filterOptions.IdsOwnershipRightTypeContains == null || filterOptions.IdsOwnershipRightTypeContains.Value)
+                        {
+                            query = (from row in query
+                                     where buildingIds.Contains(row.IdBuilding)
+                                     select row).Distinct();
+                        }
+                        else
+                        {
+                            query = (from row in query
+                                     where !buildingIds.Contains(row.IdBuilding)
+                                     select row).Distinct();
+                        }
                     }
                 }
             }

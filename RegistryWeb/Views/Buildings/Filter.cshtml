@@ -137,9 +137,29 @@
                             <input type="date" class="form-control" asp-for="FilterOptions.DateOwnershipRight" title="Дата ограничения">
                         </div>
                         <div class="form-group col-md-12 col-lg-6">
-                            <label asp-for="FilterOptions.IdsOwnershipRightType">Тип ограничения <b>содержит</b></label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип ограничения содержит" asp-for="FilterOptions.IdsOwnershipRightType" asp-items="@{
+                            <label asp-for="FilterOptions.IdsOwnershipRightType">Тип ограничения</label>
+                            <div class="row">
+                                <div class="col-4 pr-1">
+                                    <select class="selectpicker form-control" asp-for="FilterOptions.IdsOwnershipRightTypeContains" title="Содержит/не содержит">
+                                        @if (Model.FilterOptions.IdsOwnershipRightTypeContains == null || Model.FilterOptions.IdsOwnershipRightTypeContains.Value)
+                                        {
+                                            <option value="True" selected>Содержит</option>
+                                            <option value="False">Не содержит</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="True">Содержит</option>
+                                            <option value="False" selected>Не содержит</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-8 pl-1">
+                                    <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип ограничения" asp-for="FilterOptions.IdsOwnershipRightType" asp-items="@{
                                 new SelectList(ViewBag.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName", Model.FilterOptions.IdsOwnershipRightType)}"></select>
+                                </div>
+                            </div>
+
+                            
                         </div>
                     </div>
                 </div>

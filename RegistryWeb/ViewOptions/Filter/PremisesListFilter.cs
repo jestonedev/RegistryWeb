@@ -23,9 +23,12 @@ namespace RegistryWeb.ViewOptions.Filter
         public DateTime? StDateOwnershipRight { get; set; }
         public DateTime? EndDateOwnershipRight { get; set; }
         public List<int> IdsOwnershipRightType { get; set; }
+        public bool? IdsOwnershipRightTypeContains { get; set; }
         public List<int> IdsObjectState { get; set; }
         public List<int> IdsComment { get; set; }
+        public bool? IdsCommentContains { get; set; }
         public List<int> IdsDoorKeys { get; set; }
+        public bool? IdsDoorKeysContains { get; set; }
 
         public bool IsRestrictionEmpty()
         {
