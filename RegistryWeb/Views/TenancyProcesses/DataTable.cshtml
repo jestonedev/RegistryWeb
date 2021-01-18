@@ -123,7 +123,7 @@
                 {
                     @foreach (var rentObject in Model.RentObjects[item.IdProcess])
                     {
-                        @await Component.InvokeAsync("TenancyProcessesAddressComponent", new { address = rentObject.Address, idProcess = item.IdProcess })
+                        @await Component.InvokeAsync("TenancyProcessesAddressComponent", new { rentObject = rentObject, idProcess = item.IdProcess })
                     }
                 }
             </td>

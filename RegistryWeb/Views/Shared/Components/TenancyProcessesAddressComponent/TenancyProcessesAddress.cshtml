@@ -1,6 +1,8 @@
 ﻿@model List<Address>;
 @{
     var address = (Address)ViewData["Address"];
+    var totalArea = (double)ViewData["TotalArea"];
+    var livingArea = (double)ViewData["LivingArea"];
 }
 <div class="row">
     <div class="dropdown col-auto">
@@ -19,5 +21,12 @@
             }
         </div>
     </div>
-    <div class="col-lg-9 col-md-8">@address.Text</div>
+    <div class="col-lg-9 col-md-8">
+        @address.Text
+        <div class="dopinfo">
+            Общая площадь: @totalArea<span> м<sup>2</sup></span>
+            <br>
+            Жилая площадь: @livingArea<span> м<sup>2</sup></span>
+        </div>
+    </div>
 </div>

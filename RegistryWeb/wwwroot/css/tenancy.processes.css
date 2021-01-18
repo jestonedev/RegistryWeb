@@ -14,6 +14,11 @@
     color: #0056b3;
 }
 
+.dopinfo {
+    color: #888;
+    font-size: 75%;
+}
+
 .rr-tenancy-filter-label, .rr-tenancy-label {
     white-space: nowrap;
     overflow: hidden;
