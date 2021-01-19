@@ -36,8 +36,8 @@
         <tr style="align-content: center;">
             <th class="r-table-header-cell">
             </th>
-            <th class="r-table-header-cell" style="width:155px;">
-                № по рeестру
+            <th class="r-table-header-cell" style="width:70px;">
+                №
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "IdPremises")
                 {
                     <a href="#" class="oi oi-sort-descending sort p-sorted" data-order-field="IdPremises" data-order-direction="0"></a>
@@ -61,28 +61,19 @@
                 }
             </th>
             <th class="r-table-header-cell p-table-low-width-hide-cell">
-                Текущее состояние
+                Доп. характеристики
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "ObjectState")
                 {
-                    <a href="#" class="oi oi-sort-descending sort p-sorted" data-order-field="ObjectState" data-order-direction="0"></a>
+                    <a href="#" class="oi oi-sort-descending sort p-sorted" title="Сортировка по текущему состоянию" data-order-field="ObjectState" data-order-direction="0"></a>
                 }
                 else
                 {
                     <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "ObjectState" ? "p-sorted" : "")"
-                       data-order-field="ObjectState" data-order-direction="@(Model.OrderOptions.OrderField == "ObjectState" ? "1" : "0")"></a>
+                       data-order-field="ObjectState" title="Сортировка по текущему состоянию" data-order-direction="@(Model.OrderOptions.OrderField == "ObjectState" ? "1" : "0")"></a>
                 }
             </th>
             <th class="p-table-low-width-hide-cell">
-                Текущий фонд
-                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "CurrentFund")
-                {
-                    <a href="#" class="oi oi-sort-descending sort p-sorted" data-order-field="CurrentFund" data-order-direction="0"></a>
-                }
-                else
-                {
-                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "CurrentFund" ? "p-sorted" : "")"
-                       data-order-field="CurrentFund" data-order-direction="@(Model.OrderOptions.OrderField == "CurrentFund" ? "1" : "0")"></a>
-                }
+                Плата за найм
             </th>
             <th></th>
         </tr>
@@ -128,27 +119,38 @@
                     <div class="col-xl-9 col-lg-12 col-md-8">
                         @address
                         <div class="dopinfo">
-                            Тип помещения: @item.IdPremisesTypeNavigation?.PremisesTypeName<br />
-                            Кадастровый номер: @item.CadastralNum<br />
-                            Общая площадь: @item.TotalArea<span> м<sup>2</sup></span>
-                            @if (securityService.HasPrivilege(Privileges.TenancyRead))
-                            {
-                                var paymentInfo =
-                                        Model.PaymentsInfo.FirstOrDefault(pi => pi.IdObject == item.IdPremises && pi.AddresType == AddressTypes.Premise);
-
-                                @if (paymentInfo != null)
-                                {
-                                    <br /><span>Плата за найм (до 28.08.2019):</span> @paymentInfo.Payment <span>руб.</span>
-                                    <br /><span>Плата за найм (после 28.08.2019):</span> @paymentInfo.PaymentAfter28082019 <span>руб.</span>
-                                }
-                            }
+                            Общая площадь: @item.TotalArea<span> м<sup>2</sup></span>, этаж: @item.Floor
                         </div>
                     </div>
                 </div>
             </td>
 
-            <td class="p-table-low-width-hide-cell">@item.IdStateNavigation?.StateNeutral</td>
-            <td class="p-table-low-width-hide-cell">@(ObjectStateHelper.IsMunicipal(item.IdState) ? @GetTypeFund(item) : "")</td>
+            <td class="p-table-low-width-hide-cell">
+                <div class="dopinfo-alt">
+                    Кадастровый номер: @item.CadastralNum<br />
+                    Состояние: @item.IdStateNavigation?.StateNeutral<br />
+                    Тип помещения: @item.IdPremisesTypeNavigation?.PremisesTypeName<br />
+                    @if(ObjectStateHelper.IsMunicipal(item.IdState))
+                    {
+                        <span>Фонд:</span> @GetTypeFund(item)
+                    }
+                </div>
+            </td>
+            <td class="p-table-low-width-hide-cell" style="min-width: 170px">
+                <div class="dopinfo-alt">
+                    @if (securityService.HasPrivilege(Privileges.TenancyRead))
+                    {
+                        var paymentInfo =
+                                Model.PaymentsInfo.FirstOrDefault(pi => pi.IdObject == item.IdPremises && pi.AddresType == AddressTypes.Premise);
+
+                        @if (paymentInfo != null)
+                        {
+                            <span>До 28.08.2019: </span>@paymentInfo.Payment <span>руб.</span><br />
+                            <span>С 28.08.2019:</span> @paymentInfo.PaymentAfter28082019 <span>руб.</span>
+                        }
+                    }
+                </div>
+            </td>
             <td>
                 <div class="btn-group" role="group" aria-label="Панель доступа">
                     @{
