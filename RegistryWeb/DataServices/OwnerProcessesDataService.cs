@@ -227,8 +227,11 @@ namespace RegistryWeb.DataServices
         {
             if (filterOptions.IsAddressEmpty())
                 return query;
-
             var addresses = addressesDataService.GetAddressesByText(filterOptions.Address.Text).Select(r => r.Id);
+            if (filterOptions.Address.Id != null)
+            {
+                addresses = new List<string> { filterOptions.Address.Id };
+            }
 
             if (filterOptions.Address.AddressType == AddressTypes.Street)
             {
