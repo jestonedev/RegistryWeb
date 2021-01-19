@@ -18,7 +18,6 @@ namespace RegistryWeb.ViewOptions
         public bool IsAddressEmpty()
         {
             return Address == null || Address.AddressType == AddressTypes.None ||
-                string.IsNullOrWhiteSpace(Address.Id) ||
                 string.IsNullOrWhiteSpace(Address.Text);
         }
     }

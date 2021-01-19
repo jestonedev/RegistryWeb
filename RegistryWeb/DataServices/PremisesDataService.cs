@@ -23,12 +23,15 @@ namespace RegistryWeb.DataServices
     public class PremisesDataService : ListDataService<PremisesVM<Premise>, PremisesListFilter>
     {
         private BuildingsDataService buildingsDataService;
+        private readonly AddressesDataService addressesDataService;
         private readonly IConfiguration config;
         private SecurityService securityService;
-        public PremisesDataService(RegistryContext rc, SecurityService securityService, BuildingsDataService buildingsDataService, IConfiguration config) : base(rc)
+        public PremisesDataService(RegistryContext rc, SecurityService securityService, 
+            BuildingsDataService buildingsDataService, AddressesDataService addressesDataService, IConfiguration config) : base(rc)
         {
             this.securityService = securityService;
             this.buildingsDataService = buildingsDataService;
+            this.addressesDataService = addressesDataService;
             this.config = config;
         }
 
@@ -130,26 +133,28 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IsAddressEmpty())
                 return query;
 
-            if (filterOptions.Address.AddressType == AddressTypes.Street)            
-                return query.Where(q => q.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id));
+            var addresses = addressesDataService.GetAddressesByText(filterOptions.Address.Text).Select(r => r.Id);
 
-            int id = 0;
-            if (!int.TryParse(filterOptions.Address.Id, out id))
+            if (filterOptions.Address.AddressType == AddressTypes.Street)            
+                return query.Where(q => addresses.Contains(q.IdBuildingNavigation.IdStreet));
+
+            var addressesInt = addresses.Where(a => int.TryParse(a, out int aInt)).Select(a => int.Parse(a));
+            
+            if (!addressesInt.Any())
                 return query;
 
             if (filterOptions.Address.AddressType == AddressTypes.Building)            
-                return query.Where(q => q.IdBuilding == id);
+                return query.Where(q => addressesInt.Contains(q.IdBuilding));
             
             if (filterOptions.Address.AddressType == AddressTypes.Premise)            
-                return query.Where(q => q.IdPremises == id);
+                return query.Where(q => addressesInt.Contains(q.IdPremises));
             
             if (filterOptions.Address.AddressType == AddressTypes.SubPremise)
             {
                 return from q in query
-
                        join sp in registryContext.SubPremises
                        on q.IdPremises equals sp.IdPremises
-                       where sp.IdSubPremises == id
+                       where addressesInt.Contains(sp.IdSubPremises)
                        select q;
             }
             return query;

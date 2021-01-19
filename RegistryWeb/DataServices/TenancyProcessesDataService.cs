@@ -20,9 +20,10 @@ namespace RegistryWeb.DataServices
         private readonly IQueryable<TenancyPremiseAssoc> tenancyPremisesAssoc;
         private readonly IQueryable<TenancySubPremiseAssoc> tenancySubPremisesAssoc;
         private readonly SecurityServices.SecurityService securityService;
+        private readonly AddressesDataService addressesDataService;
         private readonly IConfiguration config;
 
-        public TenancyProcessesDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService, IConfiguration config) : base(registryContext)
+        public TenancyProcessesDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService, AddressesDataService addressesDataService, IConfiguration config) : base(registryContext)
         {
             tenancyBuildingsAssoc = registryContext.TenancyBuildingsAssoc
                     .Include(oba => oba.BuildingNavigation)
@@ -48,6 +49,7 @@ namespace RegistryWeb.DataServices
                 .Include(oba => oba.ProcessNavigation)
                 .AsNoTracking();
             this.securityService = securityService;
+            this.addressesDataService = addressesDataService;
             this.config = config;
         }
 
@@ -564,16 +566,19 @@ namespace RegistryWeb.DataServices
         {
             if (filterOptions.IsAddressEmpty())
                 return query;
+
+            var addresses = addressesDataService.GetAddressesByText(filterOptions.Address.Text).Select(r => r.Id);
+
             if (filterOptions.Address.AddressType == AddressTypes.Street)
             {
                 var idBuildingProcesses = tenancyBuildingsAssoc
-                    .Where(oba => oba.BuildingNavigation.IdStreet.Equals(filterOptions.Address.Id))
+                    .Where(oba => addresses.Contains(oba.BuildingNavigation.IdStreet))
                     .Select(oba => oba.IdProcess);
                 var idPremiseProcesses = tenancyPremisesAssoc
-                    .Where(opa => opa.PremiseNavigation.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id))
+                    .Where(opa => addresses.Contains(opa.PremiseNavigation.IdBuildingNavigation.IdStreet))
                     .Select(opa => opa.IdProcess);
                 var idSubPremiseProcesses = tenancySubPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id))
+                    .Where(ospa => addresses.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet))
                     .Select(ospa => ospa.IdProcess);
                 var idProcesses = idBuildingProcesses.Union(idPremiseProcesses).Union(idSubPremiseProcesses);
                 return
@@ -581,19 +586,21 @@ namespace RegistryWeb.DataServices
                     join idProcess in idProcesses on q.IdProcess equals idProcess
                     select q;
             }
-            int id = 0;
-            if (!int.TryParse(filterOptions.Address.Id, out id))
+
+            var addressesInt = addresses.Where(a => int.TryParse(a, out int aInt)).Select(a => int.Parse(a));
+            if (!addressesInt.Any())
                 return query;
+
             if (filterOptions.Address.AddressType == AddressTypes.Building)
             {
                 var idBuildingProcesses = tenancyBuildingsAssoc
-                    .Where(oba => oba.IdBuilding == id)
+                    .Where(oba => addressesInt.Contains(oba.IdBuilding))
                     .Select(oba => oba.IdProcess);
                 var idPremiseProcesses = tenancyPremisesAssoc
-                    .Where(opa => opa.PremiseNavigation.IdBuilding == id)
+                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdBuilding))
                     .Select(opa => opa.IdProcess);
                 var idSubPremiseProcesses = tenancySubPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuilding == id)
+                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuilding))
                     .Select(ospa => ospa.IdProcess);
                 var idProcesses = idBuildingProcesses.Union(idPremiseProcesses).Union(idSubPremiseProcesses);
                 return
@@ -604,10 +611,10 @@ namespace RegistryWeb.DataServices
             if (filterOptions.Address.AddressType == AddressTypes.Premise)
             {
                 var idPremiseProcesses = tenancyPremisesAssoc
-                    .Where(opa => opa.PremiseNavigation.IdPremises == id)
+                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdPremises))
                     .Select(opa => opa.IdProcess);
                 var idSubPremiseProcesses = tenancySubPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdPremises == id)
+                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdPremises))
                     .Select(ospa => ospa.IdProcess);
                 var idProcesses = idPremiseProcesses.Union(idSubPremiseProcesses);
                 return
@@ -618,7 +625,7 @@ namespace RegistryWeb.DataServices
             if (filterOptions.Address.AddressType == AddressTypes.SubPremise)
             {
                 var idProcesses = tenancySubPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdSubPremises == id)
+                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdSubPremises))
                     .Select(ospa => ospa.IdProcess);
                 return
                     from q in query

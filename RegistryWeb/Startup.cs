@@ -98,6 +98,7 @@ namespace RegistryWeb
             services.AddTransient<ClaimReportsDataService>();
             services.AddTransient<PaymentAccountReportsDataService>();
             services.AddTransient<ReestrEmergencyPremisesDataService>();
+            services.AddTransient<AddressesDataService>();
             services.AddHttpContextAccessor();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<TokenApiStorage>();

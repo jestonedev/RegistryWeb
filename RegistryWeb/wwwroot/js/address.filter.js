@@ -1,31 +1,36 @@
 ﻿var autocompleteFilterOptionsAddress = function () {
     $('input[name="FilterOptions.Address.Text"]').autocomplete({
         source: function (request, response) {
-            var isBuildings = $(this.element).data("isBuildings");
+            var self = $(this.element);
+            var isBuildings = self.data("isBuildings");
             $.ajax({
                 type: 'POST',
-                url: window.location.origin + '/Address/AutocompleteFilterOptionsAddress',
+                url: window.location.origin + '/Address/AutocompleteFilterOptionsAddress' + (self.hasClass("rr-alt-address-search") ? "Alt" : ""),
                 dataType: 'json',
                 data: { text: request.term, isBuildings: isBuildings },
                 success: function (data) {
                     if (data !== "0" && data !== undefined) {
-                        console.log(data.addressType);
-                        $('input[name="FilterOptions.Address.AddressType"]').val(data.addressType);
-                        response($.map(data.autocompletePairs, function (pair) {
-                            return { label: pair.item2, value: pair.item2, id: pair.item1 };
-                        }));
+                        if (self.hasClass("rr-alt-address-search")) {
+                            response($.map(data.addresses, function (addr) {
+                                return { label: addr, value: addr, type: data.addressType };
+                            }));
+                        } else {
+                            response($.map(data.autocompletePairs, function (pair) {
+                                return { label: pair.item2, value: pair.item2, id: pair.item1, type: data.addressType };
+                            }));
+                        }
                     }
                 }
             });
         },
         select: function (event, ui) {
             var inputAddressType = $('input[name="FilterOptions.Address.AddressType"]');
-            var addressType = inputAddressType.val();
-            if (window.filterClearModal !== undefined)
+            var inputAddressText = $('input[name="FilterOptions.Address.Text"]');
                 filterClearModal();
-            inputAddressType.val(addressType);
-            $('input[name="FilterOptions.Address.Id"]').val(ui.item.id);
-            $('input[name="FilterOptions.Address.Text"]').val(ui.item.value);            
+            inputAddressType.val(ui.item.type);
+            if (!inputAddressText.hasClass("rr-alt-address-search"))
+                $('input[name="FilterOptions.Address.Id"]').val(ui.item.id);
+            inputAddressText.val(ui.item.value);            
             $("form.filterForm").submit();
         },
         delay: 300,
@@ -40,7 +45,8 @@ var addressClear = function () {
 };
 
 var focusOutFilterOptionsAddress = function () {
-    if ($('input[name="FilterOptions.Address.Id"]').val() === "") {
+    var addressTypeElem = $('input[name="FilterOptions.Address.AddressType"]');
+    if (addressTypeElem.val() === "" || addressTypeElem.val() === "None" ) {
         addressClear();
         $('input[name="FilterOptions.Address.Text"]').val("");
     }

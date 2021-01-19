@@ -19,7 +19,7 @@
         @if (Model.FilterOptions.IsAddressEmpty())
         {
             <div class="form-group col-7 col-md-9 col-lg-9">
-                <input type="text" class="form-control" title="Адрес" placeholder="Адрес"
+                <input type="text" class="form-control rr-alt-address-search" title="Адрес" placeholder="Адрес"
                        name="FilterOptions.Address.Text" value="@Model.FilterOptions.Address.Text" />
             </div>
         }
@@ -27,7 +27,7 @@
         {
             <div class="form-group col-7 col-md-9 col-lg-9">
                 <div class="input-group">
-                    <input type="text" class="form-control col" title="Адрес" placeholder="Адрес"
+                    <input type="text" class="form-control col rr-alt-address-search" title="Адрес" placeholder="Адрес"
                            name="FilterOptions.Address.Text" value="@Model.FilterOptions.Address.Text" />
                     <div class="input-group-append h-auto d-inline-block">
                         <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>

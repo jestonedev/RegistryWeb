@@ -21,14 +21,14 @@
         @if (Model.FilterOptions.IsAddressEmpty())
         {
             <div class="form-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-7 col-md-8 col-lg-9" : "col-9 col-md-9 col-lg-10")">
-                <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" data-is-buildings="true" title="Адрес" placeholder="Адрес" />
+                <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" data-is-buildings="true" title="Адрес" placeholder="Адрес" />
             </div>
         }
         else
         {
             <div class="form-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-7 col-md-8 col-lg-9" : "col-9 col-md-9 col-lg-10")">
                 <div class="input-group">
-                    <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                    <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
                     <div class="input-group-append h-auto d-inline-block">
                         <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
                     </div>

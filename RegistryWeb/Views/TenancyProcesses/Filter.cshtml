@@ -27,14 +27,14 @@
         @if (Model.FilterOptions.IsAddressEmpty())
         {
             <div class="form-group @(securityService.HasPrivilege(Privileges.TenancyWrite) ? "col-10 col-md-4 col-lg-6" : "col-12 col-md-5 col-lg-7")">
-                <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
             </div>
         }
         else
         {
             <div class="form-group @(securityService.HasPrivilege(Privileges.TenancyWrite) ? "col-10 col-md-4 col-lg-6" : "col-12 col-md-5 col-lg-7")">
                 <div class="input-group">
-                    <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                    <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
                     <div class="input-group-append h-auto d-inline-block">
                         <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
                     </div>
