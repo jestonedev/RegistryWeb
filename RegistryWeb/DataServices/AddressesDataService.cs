@@ -21,7 +21,7 @@ namespace RegistryWeb.DataServices
         public List<Address> GetAddressesByText(string text, bool isBuildings = false)
         {
             if (string.IsNullOrEmpty(text)) return new List<Address>();
-            var match = Regex.Match(text, @"^(.*?)[,]*[ ]*(д\.?)?[ ]*(\d+[а-яА-Я]?([\\\/]\d+[а-яА-Я]?)?)?[ ,-]*(кв\.?|ком\.?|пом\.?|кв\.?ком.?)?[ ]*(\d+[а-яА-Я]?)?[ ]*$");
+            var match = Regex.Match(text, @"^(.*?)[,]*[ ]*(д\.?)?[ ]*(\d+[а-яА-Я]?([\\\/]\d+[а-яА-Я]?)?)?[ ,-]*(кв\.?|ком\.?|пом\.?|кв\.?[ ]?ком\.?|ком\.?[ ]?кв\.?)?[ ]*(\d+[а-яА-Я]?)?[ ]*$");
             var addressWordsList = new List<string>();
             if (!string.IsNullOrEmpty(match.Groups[1].Value))
             {
