@@ -38,7 +38,8 @@ namespace RegistryWeb.DataServices
         public override PremisesVM<Premise> InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, PremisesListFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
-            viewModel.KladrStreetsList = new SelectList(KladrStreets, "IdStreet", "StreetName");
+            viewModel.KladrStreetsList = new SelectList(GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
+            viewModel.KladrRegionsList = new SelectList(KladrRegions, "id_region", "region");
             viewModel.PremisesTypesList = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesType");
             viewModel.HeatingTypesList = new SelectList(HeatingTypes, "IdHeatingType", "IdHeatingType1");
             viewModel.StructureTypesList = new SelectList(StructureTypes, "IdStructureType", "StructureTypeName");
@@ -112,6 +113,7 @@ namespace RegistryWeb.DataServices
 
                 query = IdPremisesFilter(query, filterOptions);
                 query = IdBuildingFilter(query, filterOptions);
+                query = RegionFilter(query, filterOptions);
                 query = StreetFilter(query, filterOptions);
                 query = HouseFilter(query, filterOptions);
                 query = PremiseNumFilter(query, filterOptions);
@@ -174,6 +176,15 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IdBuilding.HasValue)
             {
                 query = query.Where(b => b.IdBuilding == filterOptions.IdBuilding.Value);
+            }
+            return query;
+        }
+
+        private IQueryable<Premise> RegionFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
+            if (string.IsNullOrEmpty(filterOptions.IdStreet) && !string.IsNullOrEmpty(filterOptions.IdRegion))
+            {
+                query = query.Where(b => b.IdBuildingNavigation.IdStreet.Contains(filterOptions.IdRegion));
             }
             return query;
         }
@@ -988,6 +999,18 @@ namespace RegistryWeb.DataServices
         public IEnumerable<StructureType> StructureTypes
         {
             get => registryContext.StructureTypes.AsNoTracking();
+        }
+
+        public IEnumerable<KladrRegion> KladrRegions
+        {
+            get => registryContext.KladrRegions.AsNoTracking();
+        }
+
+        public IEnumerable<KladrStreet> GetKladrStreets(string idRegion)
+        {
+            if (idRegion == null)
+                return KladrStreets;
+            return registryContext.KladrStreets.Where(s => s.IdStreet.Contains(idRegion)).AsNoTracking();
         }
 
         public IEnumerable<KladrStreet> KladrStreets

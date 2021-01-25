@@ -103,7 +103,13 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-lg-6 col-md-12">
+                        <div class="form-group col-lg-2 col-md-4">
+                            <label asp-for="FilterOptions.IdRegion">Район</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Район" asp-for="FilterOptions.IdRegion" asp-items="@Model.KladrRegionsList">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-4 col-md-8">
                             <label asp-for="FilterOptions.IdStreet">Улица</label>
                             <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@Model.KladrStreetsList">
                                 <option selected></option>

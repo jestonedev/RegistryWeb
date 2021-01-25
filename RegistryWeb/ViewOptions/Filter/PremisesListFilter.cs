@@ -9,6 +9,7 @@ namespace RegistryWeb.ViewOptions.Filter
     {
         public int? IdPremise { get; set; }
         public int? IdBuilding { get; set; }
+        public string IdRegion { get; set; }
         public string IdStreet { get; set; }
         public string House { get; set; }
         public string PremisesNum { get; set; }
@@ -47,7 +48,7 @@ namespace RegistryWeb.ViewOptions.Filter
             return
                 IsOwnershipRightEmpty() && IsRestrictionEmpty() &&
                 (IdPremise == null || IdPremise == 0) &&
-                IdStreet == null && House == null && PremisesNum == null &&
+                IdRegion == null && IdStreet == null && House == null && PremisesNum == null &&
                 (IdFundType == null || IdFundType.Count == 0) &&
                 (Floors == null) && CadastralNum == null &&
                 (IdsObjectState == null || IdsObjectState.Count == 0) &&

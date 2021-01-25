@@ -264,6 +264,12 @@ namespace RegistryWeb.Controllers
                     (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(premise.IdState) && !premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)));
         }
 
+        public JsonResult GetKladrStreets(string idRegion)
+        {
+            IEnumerable<KladrStreet> streets = dataService.GetKladrStreets(idRegion);
+            return Json(streets);
+        }
+
         public JsonResult GetHouse(string streetId)
         {
             IEnumerable<Building> buildings = dataService.GetHouses(streetId);

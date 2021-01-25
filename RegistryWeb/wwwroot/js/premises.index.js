@@ -43,9 +43,26 @@ var filterClear = function () {
 
 $(document).ready(function () {
     $('#searchModalBtn').click(searchModal);
+    $('#filterModal #FilterOptions_IdRegion').on('change', function (e) {
+        var idRegion = $(this).selectpicker('val');
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/Premises/GetKladrStreets',
+            dataType: 'json',
+            data: { idRegion },
+            success: function (data) {
+                var select = $('#filterModal #FilterOptions_IdStreet');
+                select.find('option[value]').remove();
+                $.each(data, function (i, d) {
+                    select.append('<option value="' + d.idStreet + '">' + d.streetName + '</option>');
+                });
+                select.selectpicker('refresh');
+            }
+        });
+        e.preventDefault();
+    });
     $('#filterClearModalBtn').click(filterClearModal);
     $('#filterClearBtn').click(filterClear);
-
     $("#filterModalShow").on("click", function (e) {
         e.preventDefault();
         var modal = $("#filterModal");
