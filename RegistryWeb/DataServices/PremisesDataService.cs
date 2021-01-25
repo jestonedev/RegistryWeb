@@ -265,7 +265,15 @@ namespace RegistryWeb.DataServices
         {
             if (filterOptions.IdsObjectState != null && filterOptions.IdsObjectState.Any())
             {
-                query = query.Where(p => filterOptions.IdsObjectState.Contains(p.IdState));
+                var ids = registryContext.SubPremises
+                    .Where(sp => filterOptions.IdsObjectState.Contains(sp.IdState))
+                    .Select(sp => sp.IdPremises)
+                    .Distinct()
+                    .ToList();
+                query = query.Where(p =>
+                    filterOptions.IdsObjectState.Contains(p.IdState) ||
+                    ids.Contains(p.IdPremises)
+                );
             }
             return query;
         }
