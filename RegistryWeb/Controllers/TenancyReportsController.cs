@@ -189,6 +189,34 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult GetAgreementReady(int idAgreement)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+            try
+            {
+                var idProcess = dataService.GetProcessIdForAgreement(idAgreement);
+                if (!dataService.HasRegistrationDateAndNum(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан номер и/или дата договора найма", idProcess));
+                }
+                if (!dataService.HasRentObjects(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
+                }
+                if (!dataService.HasTenant(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
+                }
+                var file = reportService.AgreementReady(idProcess);
+                return File(file, odtMime, string.Format(@"Уведомление о готовности соглашения найма № {0}.odt", idProcess));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
         public IActionResult GetNotifySingleDocument(int idProcess, int reportType, string reportTitle)
         {
             if (!securityService.HasPrivilege(Privileges.TenancyRead))

@@ -101,6 +101,13 @@
         e.preventDefault();
     });
 
+    $("body").on('click', ".rr-report-agreement-ready", function (e) {
+        var idAgreement = $(this).data("id-agreement");
+        url = "/TenancyReports/GetAgreementReady?idAgreement=" + idAgreement;
+        downloadFile(url);
+        e.preventDefault();
+    });
+
     $("body").on('click', ".rr-report-excerpt", function (e) {
         var idProcess = $(this).data("id-process");
         var reportType = $(this).data("report-type");

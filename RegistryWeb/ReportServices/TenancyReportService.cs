@@ -95,6 +95,17 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
+        public byte[] AgreementReady(int idProcess)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                {"id_process", idProcess},
+                {"report_type", "2"}
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\notify_single_document");
+            return DownloadFile(fileNameReport);
+        }
+
         public byte[] NotifySingleDocument(int idProcess, int reportType)
         {
             var arguments = new Dictionary<string, object>

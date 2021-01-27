@@ -35,9 +35,19 @@
                     <a class="btn btn-primary tenancy-agreement-open-btn" href="#" title="Открыть дополнительное соглашения" aria-label="Открыть дополнительное соглашения">
                         <span class="oi oi-eye"></span>
                     </a>
-                    <a class="btn btn-success rr-report-agreement" href="#" title="Распечатать соглашение" aria-label="Распечатать соглашение" data-id-agreement="@Model.IdAgreement">
-                        <span class="oi oi-document"></span>
-                    </a>
+
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        <button class="btn btn-success dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@Model.IdAgreement" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-document"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="toolsBtn_@Model.IdAgreement">
+                            <a class="dropdown-item rr-report-agreement" href="#" title="Соглашение" aria-label="Соглашение" data-id-agreement="@Model.IdAgreement">Соглашение
+                            </a>
+                            <a class="dropdown-item rr-report-agreement-ready" href="#" title="Уведомление о готовности соглашения" aria-label="Уведомление о готовности соглашения" data-id-agreement="@Model.IdAgreement">
+                                Уведомление о готовности соглашения
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         }
