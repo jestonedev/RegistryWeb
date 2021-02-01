@@ -60,7 +60,7 @@ namespace RegistryWeb.Controllers
             ViewBag.idObject = IdObject;
             ViewBag.addressType = typeObject;
             ViewBag.ReturnUrl = returnUrl;
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
                 return View("NotAccess");
 
             return View("FundHistory", dataService.GetFundHistoryView(dataService.CreateFundHistory(), IdObject, typeObject));
@@ -71,7 +71,7 @@ namespace RegistryWeb.Controllers
         {
             if (fh.FundHistory == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
                 return View("NotAccess");
             ViewBag.Action = "Index";
             ViewBag.ReturnUrl = returnUrl;
@@ -90,7 +90,7 @@ namespace RegistryWeb.Controllers
             ViewBag.ReturnUrl = returnUrl;
             if (idFund == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
                 return View("NotAccess");
 
             var fh = dataService.GetFund(idFund.Value);
@@ -105,7 +105,7 @@ namespace RegistryWeb.Controllers
         {
             if (fh.FundHistory == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
                 return View("NotAccess");
             if (ModelState.IsValid)
             {
@@ -125,7 +125,7 @@ namespace RegistryWeb.Controllers
             ViewBag.ReturnUrl = returnUrl;
             if (idFund == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
                 return View("NotAccess");
             var fh = dataService.GetFund(idFund.Value);
             if (fh == null)
@@ -141,7 +141,7 @@ namespace RegistryWeb.Controllers
             ViewBag.ReturnUrl = returnUrl;
             if (fh.FundHistory == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
                 return View("NotAccess");
             if (ModelState.IsValid)
             {
