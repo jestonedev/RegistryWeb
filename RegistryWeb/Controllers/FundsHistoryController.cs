@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
+using RegistryWeb.DataHelpers;
 using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
@@ -16,14 +17,16 @@ namespace RegistryWeb.Controllers
     public class FundsHistoryController : RegistryBaseController
     {
         private readonly FundsHistoryDataService dataService;
+        private readonly BuildingsDataService buildingService;
         private readonly SecurityService securityService;
         private readonly RegistryContext rc;
 
-        public FundsHistoryController(RegistryContext rc, FundsHistoryDataService dataService, SecurityService securityService)
+        public FundsHistoryController(RegistryContext rc, FundsHistoryDataService dataService, SecurityService securityService, BuildingsDataService buildingService)
         {
             this.rc = rc;
             this.dataService = dataService;
             this.securityService = securityService;
+            this.buildingService = buildingService;
         }
 
         public IActionResult Index(int idObject, string typeObject, string returnUrl, bool isBack = false)
@@ -63,6 +66,9 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
                 return View("NotAccess");
 
+            if (!CanEditFundHistory(IdObject, typeObject))
+                return View("NotAccess");
+
             return View("FundHistory", dataService.GetFundHistoryView(dataService.CreateFundHistory(), IdObject, typeObject));
         }
 
@@ -73,6 +79,10 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
                 return View("NotAccess");
+
+            if (!CanEditFundHistory(IdObject, typeObject))
+                return View("NotAccess");
+
             ViewBag.Action = "Index";
             ViewBag.ReturnUrl = returnUrl;
             if (ModelState.IsValid)
@@ -93,6 +103,9 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
                 return View("NotAccess");
 
+            if (!CanEditFundHistory(IdObject, typeObject))
+                return View("NotAccess");
+
             var fh = dataService.GetFund(idFund.Value);
             if (fh == null)
                 return NotFound();
@@ -107,6 +120,10 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
                 return View("NotAccess");
+
+            if (!CanEditFundHistory(IdObject, typeObject))
+                return View("NotAccess");
+
             if (ModelState.IsValid)
             {
                 dataService.Edit(fh.FundHistory);
@@ -127,6 +144,10 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
                 return View("NotAccess");
+
+            if (!CanEditFundHistory(IdObject, typeObject))
+                return View("NotAccess");
+
             var fh = dataService.GetFund(idFund.Value);
             if (fh == null)
                 return NotFound();
@@ -143,6 +164,10 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
                 return View("NotAccess");
+
+            if (!CanEditFundHistory(IdObject, typeObject))
+                return View("NotAccess");
+
             if (ModelState.IsValid)
             {
                 dataService.Delete(fh.FundHistory.IdFund);
@@ -151,5 +176,36 @@ namespace RegistryWeb.Controllers
             }
             return View("FundHistory", dataService.GetFundHistoryView(fh.FundHistory, 0, ""));
         }/**/
+
+        public bool CanEditFundHistory(int IdObject, string typeObject)
+        {
+            if (typeObject == "Building")
+            {
+                var building = rc.Buildings
+                    .FirstOrDefault(op => op.IdBuilding == IdObject);
+                if ((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !buildingService.IsMunicipal(building)) ||
+                    (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && buildingService.IsMunicipal(building)))
+                    return true;
+            }
+            else if (typeObject == "Premise")
+            {
+                var premise = rc.Premises
+                    .FirstOrDefault(op => op.IdPremises == IdObject);
+                if ((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(premise.IdState)) ||
+                    (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(premise.IdState)))
+                    return true;
+            }
+            else if (typeObject == "SubPremise")
+            {
+                var subPremise = rc.SubPremises
+                    .FirstOrDefault(op => op.IdSubPremises == IdObject);
+                if ((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(subPremise.IdState)) ||
+                    (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(subPremise.IdState)))
+                    return true;
+            }
+            else return false;
+
+            return false;
+        }
     }
 }
