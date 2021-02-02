@@ -94,7 +94,7 @@
             <td>
                 <div class="dopinfo-alt">
                     <div class="rent-type-info">
-                        Найм: @item.IdRentTypeNavigation?.RentTypeName
+                        Найм: <span class="text-success"><b>@item.IdRentTypeNavigation?.RentTypeName</b></span>
                     </div>
                     <div class="tenant-info">
                         Наниматель:
@@ -102,7 +102,7 @@
                             var tenant = item.TenancyPersons.FirstOrDefault(tp => tp.ExcludeDate == null && tp.IdKinship == 1 && tp.Deleted == 0);
                             if (tenant != null)
                             {
-                                <span>@(tenant.Surname + " " + tenant.Name + (string.IsNullOrEmpty(tenant.Patronymic) ? "" : " " + tenant.Patronymic))</span>
+                                <span class="text-primary"><b>@(tenant.Surname + " " + tenant.Name + (string.IsNullOrEmpty(tenant.Patronymic) ? "" : " " + tenant.Patronymic))</b></span>
                             }
                             else
                             {

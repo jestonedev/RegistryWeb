@@ -35,7 +35,7 @@
         },
         delay: 300,
         minLength: 3
-    });
+    }).focus();
 };
 
 var addressClear = function () {
