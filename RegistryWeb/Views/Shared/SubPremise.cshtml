@@ -13,20 +13,20 @@
     <input type="hidden" value="@Model.IdPremises" name="IdPremise" />
     <input type="hidden" value="@Model.IdSubPremises" name="IdSubPremise" />
     <div class="form-row">
-        <div class="form-group col-md-4 col-lg-2 r-form-group-label">
-            <label>Номер комнаты</label>
+        <div class="form-group col-md-4 col-lg-2 r-form-group-label mb-2">
+            <label class="mb-1">Номер комнаты</label>
             <input type="text" maxlength="20" class="form-control" disabled value="@Model.SubPremisesNum" name="SubPremisesNum" title="Номер комнаты">
         </div>
-        <div class="form-group col-md-4 col-lg-2 r-form-group-label">
-            <label>Общая площадь</label>
+        <div class="form-group col-md-4 col-lg-2 r-form-group-label mb-2">
+            <label class="mb-1">Общая площадь</label>
             <input type="text" class="form-control decimal input-decimal" disabled value="@Model.TotalArea" name="TotalArea" title="Общая площадь">
         </div>
-        <div class="form-group col-md-4 col-lg-2 r-form-group-label">
-            <label>Жилая площадь</label>
+        <div class="form-group col-md-4 col-lg-2 r-form-group-label mb-2">
+            <label class="mb-1">Жилая площадь</label>
             <input type="text" class="form-control decimal input-decimal" disabled value="@Model.LivingArea" name="LivingArea" title="Жилая площадь">
         </div>
-        <div class="form-group -md-6 col-lg-3 r-form-group-label">
-            <label>Текущее состояние</label>
+        <div class="form-group -md-6 col-lg-3 r-form-group-label mb-2">
+            <label class="mb-1">Текущее состояние</label>
             @if (canEdit)
             {
                 <select class="selectpicker form-control" disabled data-live-search="true" asp-for="@Model.IdState" name="IdState" title="Текущее состояние"
@@ -42,8 +42,8 @@
                 </select>
             }
         </div>
-        <div class="form-group -md-6 col-lg-3 r-form-group-label">
-            <label>Текущий фонд</label>
+        <div class="form-group -md-6 col-lg-3 r-form-group-label mb-2">
+            <label class="mb-1">Текущий фонд</label>
             <select class="selectpicker form-control" disabled data-live-search="true" asp-for="@Model.IdFundType" name="IdFundType" title="Текущий фонд"
                     asp-items="@ViewBag.FundTypesList">
                 <option></option>
@@ -51,69 +51,69 @@
         </div>
     </div>
     <div class="form-row">
-        <div class="form-group col-md-3 r-form-group-label">
-            <label class="rr-premises-label">Кадастровый номер</label>
+        <div class="form-group col-md-3 r-form-group-label mb-2">
+            <label class="rr-premises-label mb-1">Кадастровый номер</label>
             <input type="text" maxlength="20" class="form-control input-cadastral-num" disabled value="@Model.CadastralNum" name="CadastralNum" title="Кадастровый номер">
         </div>
-        <div class="form-group col-md-3 r-form-group-label">
-            <label class="rr-premises-label">Кадастровая стоимость</label>
+        <div class="form-group col-md-3 r-form-group-label mb-2">
+            <label class="rr-premises-label mb-1">Кадастровая стоимость</label>
             <input type="text" class="form-control decimal input-decimal" disabled value="@Model.CadastralCost" name="CadastralCost" title="Кадастровая стоимость">
         </div>
-        <div class="form-group col-md-3 r-form-group-label">
-            <label class="rr-premises-label">Балансовая стоимость</label>
+        <div class="form-group col-md-3 r-form-group-label mb-2">
+            <label class="rr-premises-label mb-1">Балансовая стоимость</label>
             <input type="text" class="form-control decimal input-decimal" disabled value="@Model.BalanceCost" name="BalanceCost" title="Балансовая стоимость">
         </div>
-        <div class="form-group col-md-3 r-form-group-label">
-            <label class="rr-premises-label">Лицевой счет ФКР</label>
+        <div class="form-group col-md-3 r-form-group-label mb-2">
+            <label class="rr-premises-label mb-1">Лицевой счет ФКР</label>
             <input type="text" class="form-control decimal" disabled value="@Model.Account" maxlength="255" name="Account" title="Лицевой счет ФКР">
         </div>
     </div>
     @if (securityService.HasPrivilege(Privileges.TenancyRead) && (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete) && Model.PaymentInfo != null)
     {
         <div class="form-row">
-            <div class="form-group col r-form-group-label">
-                <label for="Payment">Размер платы до 28.08.2019</label>
+            <div class="form-group col r-form-group-label mb-2">
+                <label class="mb-1" for="Payment">Размер платы до 28.08.2019</label>
                 <input id="Payment" name="Payment" value="@(Model.PaymentInfo.Payment)"
                        type="text" class="form-control input-decimal" title="Размер платы до 28.08.2019">
             </div>
-            <div class="form-group col r-form-group-label">
-                <label for="PaymentAfter">Размер платы после 28.08.2019</label>
+            <div class="form-group col r-form-group-label mb-2">
+                <label class="mb-1" for="PaymentAfter">Размер платы после 28.08.2019</label>
                 <input id="PaymentAfter" name="PaymentAfter" value="@(Model.PaymentInfo.PaymentAfter28082019)"
                        type="text" class="form-control input-decimal" title="Размер платы после 28.08.2019">
             </div>
         </div>
 
         <div class="form-row">
-            <div class="form-group col r-form-group-label">
-                <label class="rr-premises-label" for="Hb">Нб</label>
+            <div class="form-group col r-form-group-label mb-2">
+                <label class="rr-premises-label mb-1" for="Hb">Нб</label>
                 <input id="Hb" name="Nb" value="@(Model.PaymentInfo.Nb)"
                        type="text" class="form-control input-decimal" title="Нб">
             </div>
-            <div class="form-group col r-form-group-label">
-                <label class="rr-premises-label" for="Kc">Кс</label>
+            <div class="form-group col r-form-group-label mb-2">
+                <label class="rr-premises-label mb-1" for="Kc">Кс</label>
                 <input id="Kc" name="Nb" value="@(Model.PaymentInfo.KC)"
                        type="text" class="form-control input-decimal" title="Кс">
             </div>
-            <div class="form-group col r-form-group-label">
-                <label class="rr-premises-label" for="K1">К1</label>
+            <div class="form-group col r-form-group-label mb-2">
+                <label class="rr-premises-label mb-1" for="K1">К1</label>
                 <input id="K1" name="Nb" value="@(Model.PaymentInfo.K1)"
                        type="text" class="form-control input-decimal" title="К1">
             </div>
-            <div class="form-group col r-form-group-label">
-                <label class="rr-premises-label" for="K2">К2</label>
+            <div class="form-group col r-form-group-label mb-2">
+                <label class="rr-premises-label mb-1" for="K2">К2</label>
                 <input id="K2" name="Nb" value="@(Model.PaymentInfo.K2)"
                        type="text" class="form-control input-decimal" title="К2">
             </div>
-            <div class="form-group col r-form-group-label">
-                <label class="rr-premises-label" for="K3">К3</label>
+            <div class="form-group col r-form-group-label mb-2">
+                <label class="rr-premises-label mb-1" for="K3">К3</label>
                 <input id="K3" name="Nb" value="@(Model.PaymentInfo.K3)"
                        type="text" class="form-control input-decimal" title="К3">
             </div>
         </div>
     }
         <div class="form-row">
-            <div class="form-group col-md-10 r-form-group-label">
-                <label class="rr-premises-label">Примечание</label>
+            <div class="form-group col-md-10 r-form-group-label mb-2">
+                <label class="rr-premises-label mb-1">Примечание</label>
                 <input type="text" class="form-control decimal" disabled value="@Model.Description" name="Description" title="Примечание">
             </div>
             @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)

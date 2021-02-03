@@ -146,7 +146,7 @@
                 </div>
             </div>
         </div>
-        <div class="card-body" id="premise">
+        <div class="card-body pt-3 pb-3 pl-3 pr-3" id="premise">
             @if (TempData.ContainsKey("Error"))
             {
                 <div class="col alert alert-danger">
@@ -155,56 +155,53 @@
             }
             <div class="validation" asp-validation-summary="ModelOnly"></div>
             <div class="form-row">
-                <div class="form-group col-lg-4 col-md-8 r-form-group-label">
-                    <label for="IdStreet">Улица</label>
+                <div class="form-group col-lg-5 col-md-8 r-form-group-label mb-2">
+                    <label class="mb-1" for="IdStreet">Улица</label>
                     <select class="selectpicker form-control" data-live-search="true" id="IdStreet" name="IdStreet" title="Улица"
                             asp-items="@Model.KladrStreetsList">
                         <option></option>
                     </select>
                 </div>
-                <div class="form-group col-lg-2 col-md-4 r-form-group-label">
+                <div class="form-group col-lg-2 col-md-4 r-form-group-label mb-2">
 
-                    <label asp-for="@Model.Premise.IdBuilding">Номер дома</label>
+                    <label class="mb-1" asp-for="@Model.Premise.IdBuilding">Номер дома</label>
                     <select asp-for="@Model.Premise.IdBuilding" asp-items="@Model.HousesList"
                             class="selectpicker form-control" data-live-search="true" title="Номер дома">
                         <option></option>
                     </select>
                     <span asp-validation-for="@Model.Premise.IdBuilding" class="text-danger"></span>
                 </div>
-                <div class="form-group col-lg-4 col-md-8 r-form-group-label">
-                    <label asp-for="@Model.Premise.IdPremisesType">Тип помещения</label>
+                <div class="form-group col-lg-3 col-md-8 r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.IdPremisesType">Тип помещения</label>
                     <select class="selectpicker form-control" asp-for="@Model.Premise.IdPremisesType" title="Тип помещения"
                             asp-items="@Model.PremisesTypesList"></select>
                     <span asp-validation-for="@Model.Premise.IdPremisesType" class="text-danger"></span>
                 </div>
-                <div class="form-group col-lg-2 col-md-4 r-form-group-label">
-                    <label class="rr-premises-label" asp-for="@Model.Premise.PremisesNum">Номер помещения</label>
+                <div class="form-group col-lg-2 col-md-4 r-form-group-label mb-2">
+                    <label class="rr-premises-label mb-1" asp-for="@Model.Premise.PremisesNum">Номер помещения</label>
                     <input type="text" class="form-control input-premise-num" asp-for="@Model.Premise.PremisesNum" maxlength="255" title="Номер помещения">
                     <span asp-validation-for="@Model.Premise.PremisesNum" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="form-row">
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Premise.Floor">Этаж</label>
+                <div class="form-group col-lg-3 col-md-6 r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.Floor">Этаж</label>
                     <input type="number" class="form-control input-numbers" asp-for="@Model.Premise.Floor" title="Этаж">
                     <span asp-validation-for="@Model.Premise.Floor" class="text-danger"></span>
                 </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Premise.NumRooms">Кол-во комнат</label>
+                <div class="form-group col-lg-3 col-md-6 r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.NumRooms">Кол-во комнат</label>
                     <input type="number" min="1" max="100" class="form-control input-numbers" asp-for="@Model.Premise.NumRooms" title="Кол-во комнат">
                     <span asp-validation-for="@Model.Premise.NumRooms" class="text-danger"></span>
                 </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Premise.NumBeds">Кол-во койко-мест</label>
+                <div class="form-group  col-lg-3 col-md-6 r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.NumBeds">Кол-во койко-мест</label>
                     <input type="number" class="form-control input-numbers" asp-for="@Model.Premise.NumBeds" title="Кол-во койко-мест">
                     <span asp-validation-for="@Model.Premise.NumBeds" class="text-danger"></span>
                 </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Premise.RegDate">Дата включения в РМИ</label>
+                <div class="form-group  col-lg-3 col-md-6 r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.RegDate">Дата включения в РМИ</label>
                     <input type="date" asp-for="Premise.RegDate" value="@(Model.Premise.RegDate.ToString("yyyy-MM-dd"))" class="form-control" />
                     <span asp-validation-for="@Model.Premise.RegDate" class="text-danger"></span>
                 </div>
@@ -216,40 +213,40 @@
             }
 
             <div class="form-row">
-                <div class="form-group col-lg-3 col-md-6 r-form-group-label">
-                    <label asp-for="@Model.Premise.CadastralNum">Кадастровый номер</label>
+                <div class="form-group col-lg-3 col-md-6 r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.CadastralNum">Кадастровый номер</label>
                     <input type="text" class="form-control input-cadastral-num" asp-for="@Model.Premise.CadastralNum" maxlength="20" title="Кадастровый номер">
                 </div>
-                <div class="form-group col-lg-3 col-md-6 r-form-group-label">
-                    <label asp-for="@Model.Premise.CadastralCost">Кадастровая стоимость</label>
+                <div class="form-group col-lg-3 col-md-6 r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.CadastralCost">Кадастровая стоимость</label>
                     <input type="text" class="form-control decimal input-decimal" asp-for="@Model.Premise.CadastralCost" title="Кадастровая стоимость">
                     <span asp-validation-for="@Model.Premise.CadastralCost" class="text-danger"></span>
                 </div>
-                <div class="form-group col-lg-3 col-md-6 r-form-group-label">
-                    <label asp-for="@Model.Premise.BalanceCost">Балансовая стоимость</label>
+                <div class="form-group col-lg-3 col-md-6 r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.BalanceCost">Балансовая стоимость</label>
                     <input type="text" class="form-control decimal input-decimal" asp-for="@Model.Premise.BalanceCost" title="Балансовая стоимость">
                     <span asp-validation-for="@Model.Premise.BalanceCost" class="text-danger"></span>
                 </div>
-                <div class="form-group col-lg-3 col-md-6 r-form-group-label">
-                    <label asp-for="@Model.Premise.Account">Лицевой счёт ФКР</label>
+                <div class="form-group col-lg-3 col-md-6 r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.Account">Лицевой счёт ФКР</label>
                     <input type="text" class="form-control" asp-for="@Model.Premise.Account" maxlength="255" title="Лицевой счёт ФКР">
                     <span asp-validation-for="@Model.Premise.Account" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="form-row">
-                <div class="form-group col-lg-3 col-md-6 r-form-group-label">
-                    <label asp-for="@Model.Premise.IdState">Текущее состояние</label>
+                <div class="form-group col-lg-3 col-md-6 r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.IdState">Текущее состояние</label>
                     <select class="selectpicker form-control" data-live-search="true" asp-for="@Model.Premise.IdState" title="Текущее состояние"
                             asp-items="@Model.ObjectStatesList">
                         <option></option>
                     </select>
                     <span asp-validation-for="@Model.Premise.IdState" class="text-danger"></span>
                 </div>
-                <div class="form-group col-lg-3 col-md-6 r-form-group-label">
+                <div class="form-group col-lg-3 col-md-6 r-form-group-label mb-2">
                     @if ((ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete) && !ObjectStateHelper.IsMunicipal(Model.Premise.IdState))
                     {
-                        <label asp-for="@Model.IdFundType">Текущий фонд</label>
+                        <label class="mb-1" asp-for="@Model.IdFundType">Текущий фонд</label>
                         <select class="selectpicker form-control" data-live-search="true"
                                 asp-items="@Model.FundTypesList" title="Текущее фонд">
                             <option></option>
@@ -259,7 +256,7 @@
                     else
              if (ViewBag.Action == ActionTypeEnum.Create || ((ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete) && ObjectStateHelper.IsMunicipal(Model.Premise.IdState)))
                     {
-                        <label asp-for="@Model.IdFundType">Текущий фонд</label>
+                        <label class="mb-1" asp-for="@Model.IdFundType">Текущий фонд</label>
                         <select class="selectpicker form-control" data-live-search="true" asp-for="@Model.IdFundType"
                                 asp-items="@Model.FundTypesList" title="Текущее фонд">
                             <option></option>
@@ -269,7 +266,7 @@
                     else
              if (ViewBag.Action == ActionTypeEnum.Edit)
                     {
-                        <label asp-for="@Model.IdFundType">Текущий фонд</label>
+                        <label class="mb-1" asp-for="@Model.IdFundType">Текущий фонд</label>
                         <select disabled class="selectpicker form-control" data-live-search="true" asp-for="@Model.IdFundType"
                                 asp-items="@Model.FundTypesList" title="Текущее фонд">
                             <option></option>
@@ -278,16 +275,16 @@
                     }
                 </div>
 
-                <div class="form-group col-lg-3 col-md-6 r-form-group-label">
-                    <label asp-for="@Model.Premise.IdPremisesComment">Примечание</label>
+                <div class="form-group col-lg-3 col-md-6 r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.IdPremisesComment">Примечание</label>
                     <select class="selectpicker form-control" data-live-search="true" asp-for="@Model.Premise.IdPremisesComment" title="Примечание"
                             asp-items="@Model.CommentList">
                         <option></option>
                     </select>
                     <span asp-validation-for="@Model.Premise.IdPremisesComment" class="text-danger"></span>
                 </div>
-                <div class="form-group col-lg-3 col-md-6 r-form-group-label">
-                    <label asp-for="@Model.Premise.IdPremisesComment">Ключи</label>
+                <div class="form-group col-lg-3 col-md-6 r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.IdPremisesComment">Ключи</label>
                     <select class="selectpicker form-control" data-live-search="true" asp-for="@Model.Premise.IdPremisesDoorKeys" title="Ключи"
                             asp-items="@Model.LocationKeysList">
                         <option></option>
@@ -297,25 +294,25 @@
             </div>
 
             <div class="form-row">
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Premise.TotalArea">Общая площадь</label>
+                <div class="form-group col r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.TotalArea">Общая площадь</label>
                     <input type="text" class="form-control decimal input-decimal" asp-for="@Model.Premise.TotalArea" title="Общая площадь">
                     <span asp-validation-for="@Model.Premise.TotalArea" class="text-danger"></span>
                 </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Premise.LivingArea">Жилая площадь</label>
+                <div class="form-group col r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.LivingArea">Жилая площадь</label>
                     <input type="text" class="form-control decimal input-decimal" asp-for="@Model.Premise.LivingArea" title="Жилая площадь">
                     <span asp-validation-for="@Model.Premise.LivingArea" class="text-danger"></span>
                 </div>
-                <div class="form-group col r-form-group-label">
-                    <label asp-for="@Model.Premise.Height">Высота помещения</label>
+                <div class="form-group col r-form-group-label mb-2">
+                    <label class="mb-1" asp-for="@Model.Premise.Height">Высота помещения</label>
                     <input type="text" class="form-control decimal input-decimal" asp-for="@Model.Premise.Height" title="Высота помещения">
                     <span asp-validation-for="@Model.Premise.Height" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="form-row">
-                <div class="form-group col">
+                <div class="form-group col mb-0">
                     <label asp-for="@Model.Premise.Description">Дополнительные сведения</label>
                     <textarea asp-for="@Model.Premise.Description" class="form-control" rows="3" cols="10"></textarea>
                 </div>

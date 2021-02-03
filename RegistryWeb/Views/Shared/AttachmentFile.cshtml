@@ -12,8 +12,8 @@
 <li class="list-group-item">
     <input type="hidden" value="@Model.IdAttachment" name="IdAttachment" />
     <div class="form-row">
-        <div class="form-group @descriptionClass">
-            <label>Наименование и образ документа</label>
+        <div class="form-group mb-2 @descriptionClass">
+            <label class="mb-1">Наименование и образ документа</label>
             <div class="input-group">
                 <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="AttachmentFileDescription" title="Наименование">
                 <input type="file" name="AttachmentFile" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
