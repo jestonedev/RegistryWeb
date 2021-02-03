@@ -157,7 +157,7 @@
             <div class="form-row">
                 <div class="form-group col-lg-5 col-md-8 r-form-group-label mb-2">
                     <label class="mb-1" for="IdStreet">Улица</label>
-                    <select class="selectpicker form-control" data-live-search="true" id="IdStreet" name="IdStreet" title="Улица"
+                    <select class="selectpicker form-control" data-style="btn-info" data-live-search="true" id="IdStreet" name="IdStreet" title="Улица"
                             asp-items="@Model.KladrStreetsList">
                         <option></option>
                     </select>
@@ -166,7 +166,7 @@
 
                     <label class="mb-1" asp-for="@Model.Premise.IdBuilding">Номер дома</label>
                     <select asp-for="@Model.Premise.IdBuilding" asp-items="@Model.HousesList"
-                            class="selectpicker form-control" data-live-search="true" title="Номер дома">
+                            class="selectpicker form-control" data-style="btn-info" data-live-search="true" title="Номер дома">
                         <option></option>
                     </select>
                     <span asp-validation-for="@Model.Premise.IdBuilding" class="text-danger"></span>
@@ -179,7 +179,7 @@
                 </div>
                 <div class="form-group col-lg-2 col-md-4 r-form-group-label mb-2">
                     <label class="rr-premises-label mb-1" asp-for="@Model.Premise.PremisesNum">Номер помещения</label>
-                    <input type="text" class="form-control input-premise-num" asp-for="@Model.Premise.PremisesNum" maxlength="255" title="Номер помещения">
+                    <input type="text" class="form-control input-premise-num btn-info" asp-for="@Model.Premise.PremisesNum" maxlength="255" title="Номер помещения">
                     <span asp-validation-for="@Model.Premise.PremisesNum" class="text-danger"></span>
                 </div>
             </div>
