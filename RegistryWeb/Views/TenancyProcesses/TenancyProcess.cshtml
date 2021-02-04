@@ -112,7 +112,7 @@
             </div>
         </div>
     </div>
-    <div class="card-body" id="TenancyProcess">
+    <div class="card-body pt-3 pb-3 pl-3 pr-3" id="TenancyProcess">
         <form asp-controller="TenancyProcesses" asp-action="@ViewBag.Action" id="TenancyProcessForm" data-action="@ViewBag.Action" method="post" enctype="multipart/form-data">
             <input type="hidden" asp-for="TenancyProcess.IdProcess" />
             <input type="hidden" value="@ViewBag.ReturnUrl" name="ReturnUrl" />
@@ -121,16 +121,16 @@
                 <input type="hidden" name="RentTypeGenetive" value="@rentType.IdRentType" data-genetive="@rentType.RentTypeGenetive" />
             }
             <div class="row">
-                <div class="form-group col-md-6">
-                    <label asp-for="TenancyProcess.IdRentType">Тип найма жилья</label>
+                <div class="form-group col-md-6 mb-2">
+                    <label class="mb-1" asp-for="TenancyProcess.IdRentType">Тип найма жилья</label>
                     <select class="selectpicker form-control" asp-for="TenancyProcess.IdRentType" asp-items="@(new SelectList(Model.RentTypes, "IdRentType", "RentTypeName"))"
                             title="Тип найма жилья" data-val="true" data-val-required="Выберите тип найма жилья">
                         <option></option>
                     </select>
                     <span asp-validation-for="TenancyProcess.IdRentType" class="text-danger"></span>
                 </div>
-                <div class="form-group col-md-6">
-                    <label asp-for="TenancyProcess.IdExecutor">Исполнитель/составитель</label>
+                <div class="form-group col-md-6 mb-2">
+                    <label class="mb-1" asp-for="TenancyProcess.IdExecutor">Исполнитель/составитель</label>
                     <select class="selectpicker form-control" asp-for="TenancyProcess.IdExecutor" title="Исполнитель/составитель"
                             data-val="true" data-val-required="Выберите исполнителя/составителя">
                         <option></option>
@@ -152,17 +152,17 @@
             <div class="row">
                 @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
                 {
-                    <div class="form-group col-md-3">
-                        <label class="rr-tenancy-label">Размер платы (до 28.08.19)</label>
+                    <div class="form-group col-md-3 mb-2">
+                        <label class="rr-tenancy-label mb-1">Размер платы (до 28.08.19)</label>
                         <input class="form-control" type="text" value="@Model.RentObjects.Select(ro => ro.Payment).Sum()" />
                     </div>
-                    <div class="form-group col-md-3">
-                        <label class="rr-tenancy-label">Размер платы (после 28.08.19)</label>
+                    <div class="form-group col-md-3 mb-2">
+                        <label class="rr-tenancy-label mb-1">Размер платы (после 28.08.19)</label>
                         <input class="form-control" type="text" value="@Model.RentObjects.Select(ro => ro.PaymentAfter28082019).Sum()" />
                     </div>
                 }
-                <div class="form-group @(ViewBag.Action == "Details" || ViewBag.Action == "Delete" ? "col-md-6" : "col-md-12" )">
-                    <label asp-for="TenancyProcess.IdRentTypeCategory">Категория права</label>
+                <div class="form-group mb-2 @(ViewBag.Action == "Details" || ViewBag.Action == "Delete" ? "col-md-6" : "col-md-12" )">
+                    <label class="mb-1" asp-for="TenancyProcess.IdRentTypeCategory">Категория права</label>
                     <select class="selectpicker form-control" asp-for="TenancyProcess.IdRentTypeCategory" title="Категория права"
                             data-val="true" data-val-required="Выберите категорию права">
                         <option></option>
@@ -175,24 +175,24 @@
                 </div>
             </div>
             <div class="row">
-                <div class="form-group col-md-6">
-                    <label asp-for="TenancyProcess.BeginDate">Дата начала найма жилья</label>
+                <div class="form-group col-md-6 mb-2">
+                    <label class="mb-1" asp-for="TenancyProcess.BeginDate">Дата начала найма жилья</label>
                     <input type="date" class="form-control" asp-for="TenancyProcess.BeginDate"
                            value="@(Model.TenancyProcess.BeginDate.HasValue ? Model.TenancyProcess.BeginDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата начала найма жилья">
                 </div>
                 @if (ViewBag.Action != "Edit")
                 {
-                    <div class="form-group col-md-6">
-                        <label asp-for="TenancyProcess.EndDate">Дата окончания найма жилья</label>
+                    <div class="form-group col-md-6 mb-2">
+                        <label class="mb-1" asp-for="TenancyProcess.EndDate">Дата окончания найма жилья</label>
                         <input type="date" class="form-control" asp-for="TenancyProcess.EndDate"
                                value="@(Model.TenancyProcess.EndDate.HasValue ? Model.TenancyProcess.EndDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата окончания найма жилья">
                     </div>
                 }
                 else
                 {
-                    <div class="form-group col-md-6">
-                        <label asp-for="TenancyProcess.IdRentTypeCategory">Дата окончания найма жилья</label>
-                        <div class="input-group mb-3">
+                    <div class="form-group col-md-6 mb-2">
+                        <label class="mb-1" asp-for="TenancyProcess.IdRentTypeCategory">Дата окончания найма жилья</label>
+                        <div class="input-group">
                             <input type="date" class="form-control" asp-for="TenancyProcess.EndDate"
                                    value="@(Model.TenancyProcess.EndDate.HasValue ? Model.TenancyProcess.EndDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата окончания найма жилья">
                             <div class="input-group-append">
@@ -203,28 +203,28 @@
                         </div>
                     </div>
                 }
-                <div class="form-check offset-md-6 col-md-6 rr-until-dismissal-checkbox">
+                <div class="form-check offset-md-6 col-md-6 rr-until-dismissal-checkbox mb-2">
                     <input type="checkbox" class="form-check-input" asp-for="TenancyProcess.UntilDismissal">
                     <label class="form-check-label" asp-for="TenancyProcess.UntilDismissal" title="На период трудовых отношений / пролонгирован">На период ТО / пролонгирован</label>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-6 rr-tenancy-card">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3>Сдача в поднаем</h3>
+                    <div class="card mb-2">
+                        <div class="card-header d-flex justify-content-between pt-2 pb-2">
+                            <h4 class="mt-1">Сдача в поднаем</h4>
                             <div>
                                 <a href="#" data-for="TenancyProcessSubTenancy" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель разрешения на сдачу в поднаем" style="font-weight:bold;">∨</a>
                             </div>
                         </div>
-                        <div id="TenancyProcessSubTenancy" class="card-body toggle-hide">
-                            <div class="form-group">
-                                <label asp-for="TenancyProcess.SubTenancyNum">Номер реквизита разрешения</label>
+                        <div id="TenancyProcessSubTenancy" class="card-body toggle-hide pt-3 pb-3 pl-3 pr-3">
+                            <div class="form-group mb-2">
+                                <label class="mb-1" asp-for="TenancyProcess.SubTenancyNum">Номер реквизита разрешения</label>
                                 <input type="text" maxlength="255" class="form-control" asp-for="TenancyProcess.SubTenancyNum" title="Номер реквизита разрешения">
                                 <span asp-validation-for="TenancyProcess.SubTenancyNum" class="text-danger"></span>
                             </div>
-                            <div class="form-group">
-                                <label asp-for="TenancyProcess.SubTenancyDate">Дата выдачи разрешения</label>
+                            <div class="form-group mb-0">
+                                <label class="mb-1" asp-for="TenancyProcess.SubTenancyDate">Дата выдачи разрешения</label>
                                 <input type="date" class="form-control" asp-for="TenancyProcess.SubTenancyDate"
                                        value="@(Model.TenancyProcess.SubTenancyDate.HasValue ? Model.TenancyProcess.SubTenancyDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата выдачи разрешения">
                                 <span asp-validation-for="TenancyProcess.SubTenancyDate" class="text-danger"></span>
@@ -233,38 +233,34 @@
                     </div>
                 </div>
 
-
-
                 <div class="col-md-6 rr-tenancy-card">
                     <partial name="RentPeriods" model="Model.TenancyProcess.TenancyRentPeriods" />
                 </div>
-
-
             </div>
             <div class="row">
                 <div class="col-12 rr-tenancy-card">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3>Договор найма</h3>
+                    <div class="card mb-2">
+                        <div class="card-header d-flex justify-content-between pt-2 pb-2">
+                            <h4 class="mt-1">Договор найма</h4>
                             <div>
-                                <a href="#" data-for="TenancyProcessContract" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель договора найма" style="font-weight:bold;">∨</a>
+                                <a href="#" data-for="TenancyProcessContract" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель договора найма" style="font-weight:bold;">∧</a>
                             </div>
                         </div>
-                        <div id="TenancyProcessContract" class="card-body toggle-hide">
+                        <div id="TenancyProcessContract" class="card-body pt-3 pb-3 pl-3 pr-3">
                             <div class="row">
-                                <div class="form-group col-md-4">
-                                    <label asp-for="TenancyProcess.RegistrationNum">Номер договора найма</label>
+                                <div class="form-group col-md-4 mb-md-0 mb-2">
+                                    <label class="mb-1" asp-for="TenancyProcess.RegistrationNum">Номер договора найма</label>
                                     <input type="text" class="form-control" maxlength="255" asp-for="TenancyProcess.RegistrationNum" title="Номер договора найма">
                                     <span asp-validation-for="TenancyProcess.RegistrationNum" class="text-danger"></span>
                                 </div>
-                                <div class="form-group col-md-4">
-                                    <label class="rr-tenancy-label" asp-for="TenancyProcess.RegistrationDate">Дата регистрации договора</label>
+                                <div class="form-group col-md-4 mb-md-0 mb-2">
+                                    <label class="rr-tenancy-label mb-1" asp-for="TenancyProcess.RegistrationDate">Дата регистрации договора</label>
                                     <input type="date" class="form-control" asp-for="TenancyProcess.RegistrationDate"
                                            value="@(Model.TenancyProcess.RegistrationDate.HasValue ? Model.TenancyProcess.RegistrationDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата регистрации договора">
                                     <span asp-validation-for="TenancyProcess.RegistrationDate" class="text-danger"></span>
                                 </div>
-                                <div class="form-group col-md-4">
-                                    <label asp-for="TenancyProcess.IssueDate">Дата выдачи договора</label>
+                                <div class="form-group col-md-4 mb-0">
+                                    <label class="mb-1" asp-for="TenancyProcess.IssueDate">Дата выдачи договора</label>
                                     <input type="date" class="form-control" asp-for="TenancyProcess.IssueDate"
                                            value="@(Model.TenancyProcess.IssueDate.HasValue ? Model.TenancyProcess.IssueDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата выдачи договора">
                                 </div>
@@ -276,14 +272,14 @@
 
             <div class="row">
                 <div class="col-12 rr-tenancy-card">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3 for="TenancyProcess.Description">Дополнительные сведения</h3>
+                    <div class="card mb-2">
+                        <div class="card-header d-flex justify-content-between pt-2 pb-2">
+                            <h4 class="mt-1" for="TenancyProcess.Description">Дополнительные сведения</h4>
                             <div class="btn-group" role="group">
-                                <a href="#" data-for="TenancyProcessDescription" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть дополнительные сведения" style="font-weight:bold;">∨</a>
+                                <a href="#" data-for="TenancyProcessDescription" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть дополнительные сведения" style="font-weight:bold;">∧</a>
                             </div>
                         </div>
-                        <textarea id="TenancyProcessDescription" maxlength="2048" class="form-control toggle-hide" asp-for="TenancyProcess.Description" title="Дополнительные сведения"></textarea>
+                        <textarea id="TenancyProcessDescription" maxlength="2048" class="form-control" asp-for="TenancyProcess.Description" title="Дополнительные сведения"></textarea>
                     </div>
                 </div>
             </div>
