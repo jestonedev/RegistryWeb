@@ -112,13 +112,13 @@
         </div>
     }
         <div class="form-row">
-            <div class="form-group col-md-10 r-form-group-label mb-2">
+            <div class="form-group col-md-9 col-lg-10 r-form-group-label mb-2">
                 <label class="rr-premises-label mb-1">Примечание</label>
                 <input type="text" class="form-control decimal" disabled value="@Model.Description" name="Description" title="Примечание">
             </div>
             @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
             {
-                <div class="col-md-2 text-md-right text-center rr-sub-premise-nav-buttons">
+                <div class="col-md-3 col-lg-2 text-md-right text-center rr-sub-premise-nav-buttons">
                     <div class="btn-group" role="group" aria-label="Панель доступа">
                         <div class="btn-group" role="group" aria-label="Панель доступа">
                             <button class="btn btn-dark dropdown-toggle" type="button" title="Связанные объекты" aria-label="Связанные объекты" id="objectsBtn_sub_@Model.IdSubPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -179,7 +179,7 @@
             }
             @if (ViewBag.Action == ActionTypeEnum.Edit)
             {
-                <div class="col-md-2 text-md-right text-center rr-sub-premise-edit-buttons">
+                <div class="col-md-3 col-lg-2 text-md-right text-center rr-sub-premise-edit-buttons">
                     <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
                         <a class="btn btn-success subpremise-save-btn @(canEdit ? "" : "disabled")" title="Да" aria-label="Да" href="#"><span class="oi oi-check"></span></a>
                         <a class="btn btn-danger subpremise-cancel-btn @(canEdit ? "" : "disabled")" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
@@ -193,7 +193,7 @@
             @if (ViewBag.Action == ActionTypeEnum.Create)
             {
                 <a class="subpremise-edit-btn" style="display: none"></a>
-                <div class="col-md-2 text-md-right text-center rr-sub-premise-edit-buttons">
+                <div class="col-md-3 col-lg-2 text-md-right text-center rr-sub-premise-edit-buttons">
                     <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
                         <a class="btn btn-danger subpremise-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
                     </div>
