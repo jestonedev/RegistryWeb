@@ -163,12 +163,12 @@ $(function () {
     var canEditBaseInfo = JSON.parse($('#building').data("caneditbaseinfo").toLowerCase());
     memorialCardClick();
     if (action === "Details" || action === "Delete" || !canEditBaseInfo) {
-        $('#building select option:not(:selected)').attr('disabled', true)
+        $('select').selectpicker("refresh").prop('disabled', true);
         $('#building input[type="checkbox"]').click(function () {
             return false;
         });
-        $('#building input').attr('readonly', true);
-        $('#building textarea').attr('readonly', true);
+        $('#building input').attr('disabled', true);
+        $('#building textarea').attr('disabled', true);
     }
     $('#buildingToggle').on('click', $('#building'), elementToogleHide);
     $('#createBtn').click(createBuildingClick);

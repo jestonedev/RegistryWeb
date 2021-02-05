@@ -48,6 +48,7 @@
     text-overflow: ellipsis;
     max-width: 100%;
     margin-bottom: 0.24rem;
+    vertical-align: bottom;
 }
 
 .rr-until-dismissal-checkbox {
@@ -55,7 +56,7 @@
 }
 
 .rr-tenancy-card {
-    margin-top: 10pt;
+    margin-top: 0;
 }
 
 .rr-tenancy-card table.card-body {

@@ -35,16 +35,16 @@
 <li class="list-group-item">
     <input type="hidden" value="@Model.IdOwnershipRight" name="IdOwnershipRight" />
     <div class="form-row">
-        <div class="form-group col-sm-6 col-md-3">
-            <label>Номер документа</label>
+        <div class="form-group col-sm-6 col-md-3 mb-2">
+            <label class="mb-1">Номер документа</label>
             <input type="text" maxlength="20" class="form-control" disabled value="@Model.Number" name="OwnershipRightNum" title="Номер документа">
         </div>
-        <div class="form-group col-sm-6 col-md-3">
-            <label>Дата документа</label>
+        <div class="form-group col-sm-6 col-md-3 mb-2">
+            <label class="mb-1">Дата документа</label>
             <input type="date" class="form-control" disabled value="@(Model.Date.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : Model.Date.ToString("yyyy-MM-dd"))" name="OwnershipRightDate" title="Дата документа">
         </div>
-        <div class="form-group col-md-6">
-            <label>Наименование и образ документа</label>
+        <div class="form-group col-md-6 mb-2">
+            <label class="mb-1">Наименование и образ документа</label>
             <div class="input-group">
                 <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="OwnershipRightDescription" title="Наименование">
                 <input type="file" name="OwnershipRightFile" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
@@ -88,14 +88,14 @@
         </div>
         @if (ViewBag.Address.AddressType == AddressTypes.Premise)
         {
-            <div class="form-group col-md-3">
-                <label>Принадлежность</label>
+            <div class="form-group col-md-3 mb-2">
+                <label class="mb-1">Принадлежность</label>
 
                 <input type="text" maxlength="255" class="form-control" disabled value="@attachment" name="OwnershipRightAttachment" title="Принадлежность">
             </div>
         }
-        <div class="form-group @ownershipRightTypeClass">
-            <label>Тип документа</label>
+        <div class="form-group mb-2 @ownershipRightTypeClass">
+            <label class="mb-1">Тип документа</label>
             <select disabled class="form-control field-ownership-right selectpicker" title="Тип документа"
                     asp-items="@{new SelectList(ViewBag.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName",Model.IdOwnershipRightType)}" name="IdOwnershipRightType">
                 <option></option>

@@ -10,22 +10,22 @@
     var id = Guid.NewGuid();
 }
 
-<li class="list-group-item">
+<li class="list-group-item pl-3 pr-3 pb-3 pt-3">
     <input type="hidden" value="@Model.IdReason" name="IdReason_@id" />
     <div class="form-row">
-        <div class="form-group col-md-3">
-            <label>Номер основания</label>
+        <div class="form-group col-md-3 mb-md-0 mb-2">
+            <label class="mb-1">Номер основания</label>
             <input type="text" class="form-control" maxlength="50" disabled asp-for="ReasonNumber" id="ReasonNumber_@id" name="ReasonNumber_@id" title="Номер основания найма">
         </div>
-        <div class="form-group col-md-3">
-            <label>Дата основания</label>
+        <div class="form-group col-md-3 mb-md-0 mb-2">
+            <label class="mb-1">Дата основания</label>
             <input type="date" class="form-control" disabled asp-for="ReasonDate"
                    value="@(Model.ReasonDate.HasValue ? Model.ReasonDate.Value.ToString("yyyy-MM-dd") : "")" 
                    data-val="true" data-val-required="Укажите дату основания" id="ReasonDate_@id" name="ReasonDate_@id" title="Дата основания найма">
             <span class="text-danger field-validation-valid" data-valmsg-for="ReasonDate_@id" data-valmsg-replace="true"></span>
         </div>
-        <div class="form-group @widthClass">
-            <label>Тип основания</label>
+        <div class="form-group mb-0 @widthClass">
+            <label class="mb-1">Тип основания</label>
             <select class="selectpicker form-control" data-live-search="true" disabled asp-for="IdReasonType" asp-items="@(new SelectList(ViewBag.TenancyReasonTypes, "IdReasonType", "ReasonName"))"
                     id="IdReasonType_@id" name="IdReasonType_@id" title="Тип основания">
                 <option></option>

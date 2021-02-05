@@ -1,16 +1,15 @@
 ﻿@model IEnumerable<RegistryWeb.ViewModel.AttachmentFileVM>;
 <form id="attachmentFilesForm" autocomplete="off" >
     <script src="~/js/attachment-files.common.js" asp-append-version="true"></script>
-    <div class="card">
-        <div class="card-header d-flex justify-content-between">
-            <h3>
-                Прочие документы
-                @if (Model.Count() >= 1)
+    <div class="card mb-2">
+        <div class="card-header d-flex justify-content-between pt-2 pb-2">
+            <h4 class="mt-1">Прочие документы
+         @if (Model.Count() >= 1)
                 {
                     <span class="badge badge-secondary">@Model.Count()</span>
                 }
-            </h3>
-            <div class="btn-group" role="group">
+</h4> 
+<div class="btn-group" role="group">
                 @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {
                     <a href="#" id="attachmentFileAdd" class="form-control btn btn-success @(((bool?)ViewBag.CanAttachAdditionalFiles ?? true) ? "" : "disabled")" title="Добавить документ">&#10010;</a>

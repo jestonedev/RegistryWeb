@@ -1,15 +1,15 @@
 ﻿@model IEnumerable<RegistryWeb.ViewModel.OwnershipRightVM>;
 <form id="ownershipRightsForm">
     <script src="~/js/ownershipRights.common.js" asp-append-version="true"></script>
-    <div class="card">
-        <div class="card-header d-flex justify-content-between">
-            <h3>
+    <div class="card mb-2">
+        <div class="card-header d-flex justify-content-between pt-2 pb-2">
+            <h4 class="mt-1">
                 Ограничения
                 @if (Model.Count() >= 1)
                 {
                     <span class="badge badge-secondary">@Model.Count()</span>
                 }
-            </h3>
+            </h4>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {
