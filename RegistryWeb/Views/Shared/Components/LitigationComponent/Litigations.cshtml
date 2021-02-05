@@ -3,7 +3,13 @@
     <script src="~/js/litigations.common.js" asp-append-version="true"></script>
     <div class="card">
         <div class="card-header d-flex justify-content-between">
-            <h3>Судебные разбирательства</h3>
+            <h3>
+                Судебные разбирательства
+                @if (Model.Count() >= 1)
+                {
+                    <span class="badge badge-secondary">@Model.Count()</span>
+                }
+            </h3>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {

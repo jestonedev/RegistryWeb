@@ -11,7 +11,13 @@
     <div class="card">
         <script src="~/js/subPremises.common.js" asp-append-version="true"></script>
         <div class="card-header d-flex justify-content-between">
-            <h3>Комнаты</h3>
+            <h3>
+                Комнаты
+                @if (Model.Count() >= 1)
+                {
+                    <span class="badge badge-secondary">@Model.Count()</span>
+                }
+            </h3>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {

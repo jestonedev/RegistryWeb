@@ -3,7 +3,13 @@
     <script src="~/js/resettle.common.js" asp-append-version="true"></script>
     <div class="card">
         <div class="card-header d-flex justify-content-between">
-            <h3>Переселение</h3>
+            <h3>
+                Переселение
+                @if (Model.Count() >= 1)
+                {
+                    <span class="badge badge-secondary">@Model.Count()</span>
+                }
+            </h3>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {
