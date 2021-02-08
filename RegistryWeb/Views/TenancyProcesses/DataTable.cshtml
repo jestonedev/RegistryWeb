@@ -116,10 +116,22 @@
                             Договор найма: № @item.RegistrationNum @(item.RegistrationDate.HasValue ? "от " + @item.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")
                         </div>
                     }
-                    @if (!string.IsNullOrEmpty(item.ResidenceWarrantNum))
+                    @if (item.TenancyReasons != null && item.TenancyReasons.Any())
                     {
+                        var reason = item.TenancyReasons.OrderByDescending(r => r.IdReason).FirstOrDefault();
+                        var reasonName = Model.ReasonTypes.FirstOrDefault(r => r.IdReasonType == reason.IdReasonType)?.ReasonName;
+                        if (!string.IsNullOrEmpty(reasonName))
+                        {
+                            if (reasonName.Length > 0)
+                            {
+                                reasonName = reasonName.Substring(0, 1).ToUpperInvariant() + reasonName.Substring(1);
+                            } else
+                            {
+                                reasonName = reasonName.ToUpper();
+                            }
+                        }
                         <div>
-                            Ордер (пр. док. осн.): № @item.ResidenceWarrantNum @(item.ResidenceWarrantDate.HasValue ? "от " + @item.ResidenceWarrantDate.Value.ToString("dd.MM.yyyy") : "")
+                            @reasonName: № @reason.ReasonNumber @(reason.ReasonDate.HasValue ? "от " + @reason.ReasonDate.Value.ToString("dd.MM.yyyy") : "")
                         </div>
                     }
                 </div>
