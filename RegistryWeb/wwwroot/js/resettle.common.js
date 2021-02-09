@@ -248,6 +248,12 @@ function deleteResettle(e) {
             success: function (ind) {
                 if (ind === 1) {
                     resettleElem.remove();
+
+                    if ($("#resettlesList").find('.list-group-item').length > 0)
+                        $(".resettlesbadge").text(String(parseInt($(".resettlesbadge").text()) - 1))
+                    else {
+                        $(".resettlesbadge").css("display", "none");
+                    }
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -577,6 +583,13 @@ function saveResettle(e) {
                     showResettleDownloadFileBtns(resettleElem, resettle);
                 }
                 showEditDelPanelResettle(resettleElem);
+
+                if ($("#resettlesList").find('.list-group-item').length-1 > 0)
+                    $(".resettlesbadge").text(String(parseInt($(".resettlesbadge").text()) + 1))
+                else {
+                    $(".resettlesbadge").css("display", "inline-block");
+                    $(".resettlesbadge").text(1);
+                }
             }
         });
     } else {
@@ -802,4 +815,7 @@ $(function () {
     $('#resettlesList').on('click', '.rr-resettle-document-file-attach', attachResettleDocumentFile);
     $('#resettlesList').on('click', '.rr-resettle-document-file-remove', removeResettleDocumentFile);
     $('#resettlesList').on('change', "input[name^='ResettleDocumentFile']", changeResettleDocumentFileAttachment);
+
+    if ($("#resettlesList").find('.list-group-item').length == 0)
+        $(".resettlesbadge").css("display", "none");
 });

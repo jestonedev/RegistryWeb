@@ -5,10 +5,13 @@
         <div class="card-header d-flex justify-content-between pt-2 pb-2">
             <h4 class="mt-1">
                 Судебные разбирательства
-                @if (Model.Count() >= 1)
-                {
-                    <span class="badge badge-secondary">@Model.Count()</span>
-                }
+                <span class="badge badge-secondary litigationsbadge ml-1">
+                    @if (Model.Count() >= 1)
+                    {
+                        @Model.Count()
+
+                    }
+                </span>
             </h4>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
