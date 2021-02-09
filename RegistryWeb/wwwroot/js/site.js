@@ -192,11 +192,11 @@ $(function () {
     });
 
     $('.input-filter-chars, .input-chars').inputFilter(function (value) {
-        return /^[а-яА-Я]*$/.test(value);
+        return /^[а-яА-ЯёЁ]*$/.test(value);
     });
 
     $('.input-filter-snp, .input-snp').inputFilter(function (value) {
-        return /^([а-яА-Я]+[ ]?)*$/.test(value);
+        return /^([а-яА-ЯёЁ]+[ ]?)*$/.test(value);
     });
 
     $('.input-filter-cadastral-num, .input-cadastral-num').inputFilter(function (value) {
