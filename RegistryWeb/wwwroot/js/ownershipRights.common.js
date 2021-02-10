@@ -129,11 +129,10 @@ function deleteOwnershipRight(e) {
                 if (ind === 1) {
                     owrElem.remove();
 
-                    if ($("#ownershipRightsList").find('.list-group-item').length > 0)
-                        $(".ownershipRightsbadge").text(String(parseInt($(".ownershipRightsbadge").text()) - 1))
-                    else {
+                    if ($("#ownershipRightsList").find('.list-group-item').length - 1 > 0)
+                        $(".ownershipRightsbadge").text($("#ownershipRightsList").find('.list-group-item').length - 1);
+                    else
                         $(".ownershipRightsbadge").css("display", "none");
-                    }
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -276,12 +275,10 @@ function saveOwnershipRight(e) {
                     owrElem.find(".rr-ownership-right-file-download").prop("href", "/OwnershipRights/DownloadFile/?idOwnershipRight=" + owr.idOwnershipRight);
                     showOwnershipRightDownloadFileBtn(owrElem, owr.fileOriginName !== null);
 
-                    if ($("#ownershipRightsList").find('.list-group-item').length-1 > 0)
-                        $(".ownershipRightsbadge").text(String(parseInt($(".ownershipRightsbadge").text()) + 1))
-                    else {
-                            $(".ownershipRightsbadge").css("display","inline-block");
-                            $(".ownershipRightsbadge").text(1);
-                        }
+                    if ($("#ownershipRightsList").find('.list-group-item').length - 1 > 0) {
+                        $(".ownershipRightsbadge").text($("#ownershipRightsList").find('.list-group-item').length + 1);
+                        $(".ownershipRightsbadge").css("display", "inline-block");
+                    }
                 }
                 showEditDelPanelOwnershipRight(owrElem);
             }

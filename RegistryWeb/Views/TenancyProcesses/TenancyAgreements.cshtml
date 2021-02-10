@@ -6,7 +6,15 @@
 <form id="TenancyProcessAgreementsForm">
     <div class="card rr-tenancy-card mb-2">
         <div class="card-header d-flex justify-content-between pt-2 pb-2">
-            <h4 class="mt-1">Дополнительные соглашения</h4>
+            <h4 class="mt-1">
+                Дополнительные соглашения
+                <span class="badge badge-secondary TenancyProcessAgreementsbadge ml-1">
+                    @if (Model.Count() >= 1)
+                    {
+                        @Model.Count()
+                    }
+                </span>
+            </h4>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {

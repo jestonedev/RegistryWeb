@@ -451,6 +451,12 @@ $(function () {
                         if (tenancyAgreementReturn.idAgreement > 0) {
                             form.find("[name='Agreement.IdAgreement']").val(tenancyAgreementReturn.idAgreement);
                             updateInsertTenancyAgreementElem();
+
+                            if ($("#TenancyProcessAgreements").find('.list-group-item').length - 1 > 0) {
+                                $(".TenancyProcessAgreementsbadge").text($("#TenancyProcessAgreements").find('.list-group-item').length + 1);
+                                $(".TenancyProcessAgreementsbadge").css("display", "inline-block");
+                            }
+
                         } else {
                             alert('Произошла ошибка при сохранении');
                         }
@@ -500,6 +506,12 @@ $(function () {
                             if ($("#TenancyProcessAgreements .list-group-item").length === 1) {
                                 $("#TenancyProcessAgreements .rr-list-group-item-empty").show();
                             }
+
+                            if ($("#TenancyProcessAgreements").find('.list-group-item').length - 1 > 0)
+                                $(".TenancyProcessAgreementsbadge").text($("#TenancyProcessAgreements").find('.list-group-item').length - 1);
+                            else
+                                $(".TenancyProcessAgreementsbadge").css("display", "none");
+
                         }
                         else {
                             alert("Ошибка удаления!");
@@ -1354,4 +1366,7 @@ $(function () {
 
     $('#TenancyProcessAgreementsForm').on('click', '.tenancy-agreement-delete-btn', deleteTenancyAgreement);
     $("#TenancyProcessAgreementsForm").on("click", "#tenancyAgreementAdd", addTenancyAgreement);
+
+    if ($("#TenancyProcessAgreements").find('.list-group-item').length-1 == 0)
+        $(".TenancyProcessAgreementsbadge").css("display", "none");
 });

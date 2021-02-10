@@ -59,12 +59,10 @@ function deleteAttachmentFile(e) {
                 if (ind === 1) {
                     attachmentFileElem.remove();
                     
-                    if ($("#attachmentFilesList").find('.list-group-item').length > 0)
-                        $(".attachmentFilebadge").text(String(parseInt($(".attachmentFilebadge").text()) - 1))
-                    else {
+                    if ($("#attachmentFilesList").find('.list-group-item').length - 1 > 0)
+                        $(".attachmentFilebadge").text($("#attachmentFilesList").find('.list-group-item').length - 1);
+                    else
                         $(".attachmentFilebadge").css("display", "none");
-                    }
-
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -186,15 +184,13 @@ function saveAttachmentFile(e) {
         processData: false,
         contentType: false,
         success: function (attachmentFile) {
-            if (attachmentFile.idAttachment > 0) {
-            
-            if ($("#attachmentFilesList").find('.list-group-item').length-1 > 0)
-                $(".attachmentFilebadge").text(String(parseInt($(".attachmentFilebadge").text()) + 1))
-            else
-            {
-                $(".attachmentFilebadge").css("display", "inline-block");
-                $(".attachmentFilebadge").text(1);
-            }
+            if (attachmentFile.idAttachment > 0) {            
+
+                if ($("#attachmentFilesList").find('.list-group-item').length - 1 > 0) {
+                    $(".attachmentFilebadge").text($("#attachmentFilesList").find('.list-group-item').length + 1);
+                    $(".attachmentFilebadge").css("display", "inline-block");
+                }
+
                 attachmentFileElem.find("input[name^='IdAttachment']").val(attachmentFile.idAttachment);
                 attachmentFileElem.find(".rr-attachment-file-download")
                     .prop("href", "/AttachmentFiles/DownloadFile/?idAttachment=" + attachmentFile.idAttachment);

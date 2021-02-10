@@ -78,11 +78,10 @@ function saveSubPremise(e) {
                 }
                 showEditDelPanelSubPremise(subPremiseElem);
 
-                if ($("#subPremisesList").find('.list-group-item').length-1 > 0)
-                    $(".subPremisesbadge").text(String(parseInt($(".subPremisesbadge").text()) + 1))
-                else {
+                if ($("#subPremisesList").find('.list-group-item').length - 1 > 0)
+                {
+                    $(".subPremisesbadge").text($("#subPremisesList").find('.list-group-item').length + 1);
                     $(".subPremisesbadge").css("display", "inline-block");
-                    $(".subPremisesbadge").text(1);
                 }
             }
         });
@@ -140,12 +139,11 @@ function deleteSubPremise(e) {
             success: function (ind) {
                 if (ind === 1) {
                     subPremiseElem.remove();
-                    
-                    if ($("#subPremisesList").find('.list-group-item').length > 0)
-                        $(".subPremisesbadge").text(String(parseInt($(".subPremisesbadge").text()) - 1))
-                    else {
+
+                    if ($("#subPremisesList").find('.list-group-item').length - 1 > 0)
+                        $(".subPremisesbadge").text($("#subPremisesList").find('.list-group-item').length - 1);
+                    else
                         $(".subPremisesbadge").css("display", "none");
-                    }
                 }
                 else {
                     alert("Ошибка удаления!");

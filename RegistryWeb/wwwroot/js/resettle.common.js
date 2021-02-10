@@ -249,11 +249,10 @@ function deleteResettle(e) {
                 if (ind === 1) {
                     resettleElem.remove();
 
-                    if ($("#resettlesList").find('.list-group-item').length > 0)
-                        $(".resettlesbadge").text(String(parseInt($(".resettlesbadge").text()) - 1))
-                    else {
+                    if ($("#resettlesList").find('.list-group-item').length - 1 > 0)
+                        $(".resettlesbadge").text($("#resettlesList").find('.list-group-item').length - 1);
+                    else
                         $(".resettlesbadge").css("display", "none");
-                    }
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -584,11 +583,9 @@ function saveResettle(e) {
                 }
                 showEditDelPanelResettle(resettleElem);
 
-                if ($("#resettlesList").find('.list-group-item').length-1 > 0)
-                    $(".resettlesbadge").text(String(parseInt($(".resettlesbadge").text()) + 1))
-                else {
+                if ($("#resettlesList").find('.list-group-item').length - 1 > 0) {
+                    $(".resettlesbadge").text($("#resettlesList").find('.list-group-item').length + 1);
                     $(".resettlesbadge").css("display", "inline-block");
-                    $(".resettlesbadge").text(1);
                 }
             }
         });

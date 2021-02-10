@@ -113,11 +113,11 @@ function deleteLitigation(e) {
                 if (ind === 1) {
                     litegationElem.remove();
 
-                    if ($("#litigationsList").find('.list-group-item').length > 0)
-                        $(".litigationsbadge").text(String(parseInt($(".litigationsbadge").text()) - 1))
-                    else {
+                    if ($("#litigationsList").find('.list-group-item').length - 1 > 0)
+                        $(".litigationsbadge").text($("#litigationsList").find('.list-group-item').length - 1);
+                    else
                         $(".litigationsbadge").css("display", "none");
-                    }
+
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -261,11 +261,9 @@ function saveLitigation(e) {
                 }
                 showEditDelPanelLitigation(litegationElem);
 
-                if ($("#litigationsList").find('.list-group-item').length-1 > 0)
-                    $(".litigationsbadge").text(String(parseInt($(".litigationsbadge").text()) + 1))
-                else {
+                if ($("#litigationsList").find('.list-group-item').length - 1 > 0) {
+                    $(".litigationsbadge").text($("#litigationsList").find('.list-group-item').length + 1);
                     $(".litigationsbadge").css("display", "inline-block");
-                    $(".litigationsbadge").text(1);
                 }
             }
         });

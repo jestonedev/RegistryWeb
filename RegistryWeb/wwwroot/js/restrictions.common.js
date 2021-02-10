@@ -128,11 +128,10 @@ function deleteRestriction(e) {
                 if (ind === 1) {
                     restrictionElem.remove();
 
-                    if ($("#restrictionsList").find('.list-group-item').length > 0)
-                        $(".restrictionbadge").text(String(parseInt($(".restrictionbadge").text()) - 1))
-                    else {
+                    if ($("#restrictionsList").find('.list-group-item').length - 1 > 0)
+                        $(".restrictionbadge").text($("#restrictionsList").find('.list-group-item').length - 1);
+                    else
                         $(".restrictionbadge").css("display", "none");
-                    }
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -275,11 +274,9 @@ function saveRestriction(e) {
                         .prop("href", "/Restrictions/DownloadFile/?idRestriction=" + restriction.idRestriction);
                     showRestrictionDownloadFileBtn(restrictionElem, restriction.fileOriginName !== null);
 
-                    if ($("#restrictionsList").find('.list-group-item').length-1 > 0)
-                        $(".restrictionbadge").text(String(parseInt($(".restrictionbadge").text()) + 1))
-                    else {
+                    if ($("#restrictionsList").find('.list-group-item').length - 1 > 0) {
+                        $(".restrictionbadge").text($("#restrictionsList").find('.list-group-item').length + 1);
                         $(".restrictionbadge").css("display", "inline-block");
-                        $(".restrictionbadge").text(1);
                     }
                 }
                 showEditDelPanelRestriction(restrictionElem);

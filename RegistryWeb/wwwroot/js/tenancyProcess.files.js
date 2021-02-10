@@ -52,6 +52,11 @@ function deleteTenancyFile(e) {
                     if ($("#TenancyProcessFiles .list-group-item").length === 1) {
                         $("#TenancyProcessFiles .rr-list-group-item-empty").show();
                     }
+
+                    if ($("#TenancyProcessFiles").find('.list-group-item').length - 1 > 0)
+                        $(".TenancyProcessFilesbadge").text($("#TenancyProcessFiles").find('.list-group-item').length - 1);
+                    else
+                        $(".TenancyProcessFilesbadge").css("display", "none");
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -183,6 +188,12 @@ function saveTenancyFile(e) {
                 showTenancyFileDownloadFileBtn(attachmentFileElem, attachmentFile.fileName !== "" && attachmentFile.fileName !== null);
             }
             showEditDelPanelTenancyFile(attachmentFileElem);
+
+            if ($("#TenancyProcessFiles").find('.list-group-item').length - 1 > 0)
+            {
+                $(".TenancyProcessFilesbadge").text($("#TenancyProcessFiles").find('.list-group-item').length + 1);
+                $(".TenancyProcessFilesbadge").css("display", "inline-block");
+            }
         }
     });
     e.preventDefault();
@@ -228,4 +239,8 @@ $(function () {
     $('#TenancyProcessFiles').on('click', '.rr-tenancy-file-attach', attachTenancyFile);
     $('#TenancyProcessFiles').on('click', '.rr-tenancy-file-remove', removeTenancyFile);
     $('#TenancyProcessFiles').on('change', "input[name^='TenancyFile_']", changeTenancyFileAttachment);
+
+    if ($("#TenancyProcessFiles").find('.list-group-item').length-1 == 0)
+        $(".TenancyProcessFilesbadge").css("display", "none");
+
 });

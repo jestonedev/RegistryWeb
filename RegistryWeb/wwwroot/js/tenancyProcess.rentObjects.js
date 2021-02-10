@@ -148,6 +148,11 @@ function deleteTenancyRentObject(e) {
                     if ($("#TenancyProcessRentObjects .list-group-item").length === 1) {
                         $("#TenancyProcessRentObjects .rr-list-group-item-empty").show();
                     }
+
+                    if ($("#TenancyProcessRentObjects").find('.list-group-item').length - 1 > 0)
+                        $(".TenancyProcessRentObjectsbadge").text($("#TenancyProcessRentObjects").find('.list-group-item').length - 1);
+                    else
+                        $(".TenancyProcessRentObjectsbadge").css("display", "none");
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -313,6 +318,13 @@ function saveTenancyRentObject(e) {
                     tenancyRentObjectElem.find("input[name^='IdSubPremisesPrev']").val(tenancyRentObjectElem.find("select[id^='IdSubPremises']").val());
                     tenancyRentObjectElem.find("input[name^='RentAreaPrev']").val(rentAreaElem.val());
                     showEditDelPanelTenancyRentObject(tenancyRentObjectElem);
+
+                    if ($("#TenancyProcessRentObjects").find('.list-group-item').length - 1 > 0)
+                    {
+                        $(".TenancyProcessRentObjectsbadge").text($("#TenancyProcessRentObjects").find('.list-group-item').length + 1);
+                        $(".TenancyProcessRentObjectsbadge").css("display", "inline-block");
+                    }
+
                 } else {
                     alert("Во время сохранения произошла ошибка");
                 }
@@ -345,6 +357,9 @@ $(function () {
     $('#TenancyProcessRentObjects').on('change', 'select[name^="IdPremises"]', getTenancyRentSubPremises);
     $('#TenancyProcessRentObjects').on('change', 'select[name^="IdSubPremises"]', updateSubPremisesArea);
     $('#TenancyProcessRentObjects select[name^="IdStreet"]').change();
+
+    if ($("#TenancyProcessRentObjects").find('.list-group-item').length == 0)
+        $(".TenancyProcessRentObjectsbadge").css("display", "none");
 
     let action = $('#TenancyProcessRentObjects').data('action');
     if (action === "Create" && $('#TenancyProcessRentObjects .list-group-item').length > 0) {
