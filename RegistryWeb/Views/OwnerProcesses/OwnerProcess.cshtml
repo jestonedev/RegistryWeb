@@ -34,264 +34,221 @@
     var controller = Context.Session.Get<string>("Controller");
     var canEdit = ViewBag.Action == ActionTypeEnum.Create || ViewBag.Action == ActionTypeEnum.Edit;
 }
-        <form enctype="multipart/form-data" asp-controller="OwnerProcesses" asp-action="@ViewBag.Action" id="ownerProcessForm" data-action="@ViewBag.Action" method="post">
-            <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
-            <div class="card">
+<form enctype="multipart/form-data" asp-controller="OwnerProcesses" asp-action="@ViewBag.Action" id="ownerProcessForm" data-action="@ViewBag.Action" method="post">
+    <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <div class="form-check form-check-inline">
+                <input id="annulOwnerProcessCheckbox" class="form-check-input" type="checkbox" @annulChecked data-toggle="toggle" data-on=" " data-off=" " data-onstyle="success" data-offstyle="danger">
+                <label class="form-check-label h2 ml-2">@ViewData["Title"]</label>
+                <sup class="badge badge-danger ml-2" id="annulBadge">Аннулирован</sup>
+            </div>
+            <div class="btn-group" role="group" aria-label="Панель доступа">
+                @if (@ViewBag.ReturnUrl != null)
+                {
+                    <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+                }
+                else
+                {
+                    <a class="form-control btn btn-primary" asp-controller="OwnerProcesses" asp-action="Index">Назад</a>
+                }
+                @if (ViewBag.Action == ActionTypeEnum.Create)
+                {
+                    <a href="#" id="ownerProcessCreate" class="form-control btn btn-success">Создать</a>
+                }
+                @if (ViewBag.Action == ActionTypeEnum.Edit)
+                {
+                    <a href="#" id="ownerProcessEdit" class="form-control btn btn-success">Сохранить</a>
+                }
+                @if (ViewBag.Action == ActionTypeEnum.Delete)
+                {
+                    <a href="#" id="ownerProcessDelete" class="form-control btn btn-danger">Удалить</a>
+                }
+                <a href="#" id="ownerProcessToggle" class="form-control btn btn-primary" title="Развернуть процесс собственности">
+                    <span class="oi oi-chevron-top"></span>
+                </a>
+            </div>
+        </div>
+        <div class="card-body" id="ownerProcess">
+            <input type="hidden" value="@Model.IdProcess" name="IdProcess" />
+            <div class="validation text-danger" asp-validation-summary="All"></div>
+            <div class="card" id="annulOwnerProcessCard">
                 <div class="card-header d-flex justify-content-between">
-                    <div class="form-check form-check-inline">
-                        <input id="annulOwnerProcessCheckbox" class="form-check-input" type="checkbox" @annulChecked data-toggle="toggle" data-on=" " data-off=" " data-onstyle="success" data-offstyle="danger">
-                        <label class="form-check-label h2 ml-2">@ViewData["Title"]</label>
-                        <sup class="badge badge-danger ml-2" id="annulBadge">Аннулирован</sup>
-                    </div>
-                    <div class="btn-group" role="group" aria-label="Панель доступа">
-                        @if (@ViewBag.ReturnUrl != null)
-                        {
-                            <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
-                        }
-                        else
-                        {
-                            <a class="form-control btn btn-primary" asp-controller="OwnerProcesses" asp-action="Index">Назад</a>
-                        }
-                        @if (ViewBag.Action == ActionTypeEnum.Create)
-                        {
-                            <a href="#" id="ownerProcessCreate" class="form-control btn btn-success">Создать</a>
-                        }
-                        @if (ViewBag.Action == ActionTypeEnum.Edit)
-                        {
-                            <a href="#" id="ownerProcessEdit" class="form-control btn btn-success">Сохранить</a>
-                        }
-                        @if (ViewBag.Action == ActionTypeEnum.Delete)
-                        {
-                            <a href="#" id="ownerProcessDelete" class="form-control btn btn-danger">Удалить</a>
-                        }
-                        <a href="#" id="ownerProcessToggle" class="form-control btn btn-primary" title="Развернуть процесс собственности">
+                    <h3>Завершение процесса</h3>
+                    <div>
+                        <a href="#" id="annulOwnerProcessToggle" class="form-control btn btn-primary" title="Развернуть панель аннулирования">
                             <span class="oi oi-chevron-top"></span>
                         </a>
                     </div>
                 </div>
-                <div class="card-body" id="ownerProcess">
-                    <input type="hidden" value="@Model.IdProcess" name="IdProcess" />
-                    <div class="validation text-danger" asp-validation-summary="All"></div>
-                    <div class="card" id="annulOwnerProcessCard">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3>Завершение процесса</h3>
-                            <div>
-                                <a href="#" id="annulOwnerProcessToggle" class="form-control btn btn-primary" title="Развернуть панель аннулирования">
-                                    <span class="oi oi-chevron-top"></span>
-                                </a>
-                            </div>
-                        </div>
-                        <div id="annulOwnerProcess" class="card-body row">
-                            <div class="col-2">
-                                <input type="date" class="form-control rr-valid-ignore" placeholder="Дата аннулирования" title="Дата аннулирования"
-                                       data-val="true"
-                                       value="@Model.AnnulDate?.ToString("yyyy-MM-dd")" name="AnnulDate" />
-                            </div>
-                            <div class="col">
-                                <input type="text" class="form-control rr-valid-ignore" placeholder="Причина аннулирования" title="Причина аннулирования"
-                                       value="@Model.AnnulComment" name="AnnulComment" />
-                            </div>
-                        </div>
+                <div id="annulOwnerProcess" class="card-body row">
+                    <div class="col-2">
+                        <input type="date" class="form-control rr-valid-ignore" placeholder="Дата аннулирования" title="Дата аннулирования"
+                               data-val="true"
+                               value="@Model.AnnulDate?.ToString("yyyy-MM-dd")" name="AnnulDate" />
                     </div>
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3>Адреса</h3>
-                            <div class="btn-group" role="group">
-                                <a href="#" id="addressesToggle" class="form-control btn btn-primary" title="Развернуть коментарий">
-                                    <span class="oi oi-chevron-top"></span>
-                                </a>
-                            </div>
-                        </div>
-                        <ul id="addresses" class="list-group list-group-flush">
-                            @if (canEdit)
-                            {
-                                <li class="list-group-item col-12">
-                                    <div class="input-group">
-                                        <input type="text" id="addressSearch" name="AddressSearch" class="form-control" title="Адрес" placeholder="Адрес" />
-                                        <div class="input-group-append h-auto d-inline-block">
-                                            <a href="#" id="addressAddBtn" class="btn btn-success disabled">
-                                                <span class="oi oi-plus"></span>
-                                            </a>
-                                        </div>
-                                        <div class="input-group-append h-auto d-inline-block">
-                                            <a href="#" id="addressClearBtn" class="btn btn-danger disabled">
-                                                <span class="oi oi-x"></span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </li>
-                            }
-                            @if (Model.OwnerBuildingsAssoc != null)
-                            {
-                                @for (var i = 0; i < Model.OwnerBuildingsAssoc.Count(); i++)
-                                {
-                                    <partial name="OwnerProcessAddress" model="@{new OwnerProcessAddressVM() {
-                            IdProcess = Model.OwnerBuildingsAssoc[i].IdProcess,
-                            IdAssoc = Model.OwnerBuildingsAssoc[i].IdAssoc,
-                            Id = Model.OwnerBuildingsAssoc[i].IdBuilding,
-                            I = i,
-                            Action = ViewBag.Action,
-                            AddressType = AddressTypes.Building,
-                            Text = Model.OwnerBuildingsAssoc[i].BuildingNavigation.GetAddress(),
-                            Href = "/Buildings/Details?idBuilding=" + Model.OwnerBuildingsAssoc[i].IdBuilding}}" />
-                                }
-                            }
-                            @if (Model.OwnerPremisesAssoc != null)
-                            {
-                                @for (var i = 0; i < Model.OwnerPremisesAssoc.Count(); i++)
-                                {
-                                    <partial name="OwnerProcessAddress" model="@{new OwnerProcessAddressVM() {
-                            IdProcess = Model.OwnerPremisesAssoc[i].IdProcess,
-                            IdAssoc = Model.OwnerPremisesAssoc[i].IdAssoc,
-                            Id = Model.OwnerPremisesAssoc[i].IdPremise,
-                            I = i,
-                            Action = ViewBag.Action,
-                            AddressType = AddressTypes.Premise,
-                            Text = Model.OwnerPremisesAssoc[i].PremiseNavigation.GetAddress(),
-                            Href = "/Premises/Details?idPremises=" + Model.OwnerPremisesAssoc[i].IdPremise}}" />
-                                }
-                            }
-                            @if (Model.OwnerSubPremisesAssoc != null)
-                            {
-                                @for (var i = 0; i < Model.OwnerSubPremisesAssoc.Count(); i++)
-                                {
-                                    <partial name="OwnerProcessAddress" model="@{new OwnerProcessAddressVM() {
-                            IdProcess = Model.OwnerSubPremisesAssoc[i].IdProcess,
-                            IdAssoc = Model.OwnerSubPremisesAssoc[i].IdAssoc,
-                            Id = Model.OwnerSubPremisesAssoc[i].IdSubPremise,
-                            I = i,
-                            Action = ViewBag.Action,
-                            AddressType = AddressTypes.SubPremise,
-                            Text = Model.OwnerSubPremisesAssoc[i].SubPremiseNavigation.GetAddress(),
-                            Href = "/Premises/Details?idPremises=" + Model.OwnerSubPremisesAssoc[i].SubPremiseNavigation.IdPremises}}" />
-                                }
-                            }
-                        </ul>
-                    </div>
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3>Документы собственности</h3>
-                            <div class="btn-group" role="group">
-                                @if (canEdit)
-                                {
-                                    <a href="#" id="ownerFileAdd" class="form-control btn btn-success" title="Добавить реквизит права собственности">
-                                        <span class="oi oi-plus"></span>
-                                    </a>
-                                }
-                                <a href="#" id="ownerFilesToggle" class="form-control btn btn-primary" title="Развернуть список документов">
-                                    <span class="oi oi-chevron-top"></span>
-                                </a>
-                            </div>
-                        </div>
-                        <ul id="ownerFiles" class="list-group list-group-flush">
-                            @if (Model.OwnerFiles != null)
-                            {
-                                @for (var i = 0; i < Model.OwnerFiles.Count(); i++)
-                                {
-                                    <partial name="OwnerFile" model="@{new OwnerFileVM() {
-                            OwnerFile = Model.OwnerFiles[i],
-                            I = i,
-                            Action = ViewBag.Action}}" />
-                                }
-                            }
-                        </ul>
-                    </div>
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3>Собственники</h3>
-                            <div class="btn-group" role="group">
-                                @if (canEdit)
-                                {
-                                    <a class="form-control">Добавить:</a>
-                                    <a href="#" class="form-control btn btn-success rr-owner-add" title="Добавить физическое лицо" data-idownertype="1">ФЛ</a>
-                                    <a href="#" class="form-control btn btn-success rr-owner-add" title="Добавить юридическое лицо" data-idownertype="2">ЮЛ</a>
-                                    <a href="#" class="form-control btn btn-success rr-owner-add" title="Добавить индивидуального предпринимателя" data-idownertype="3">ИП</a>
-                                }
-                                <a href="#" id="ownersToggle" class="form-control btn btn-primary" title="Развернуть список собственников">
-                                    <span class="oi oi-chevron-top"></span>
-                                </a>
-                            </div>
-                        </div>
-                        <ul id="owners" class="list-group list-group-flush">
-                            @if (Model.Owners != null)
-                            {
-                                @for (var i = 0; i < Model.Owners.Count(); i++)
-                                {
-                                    <partial name="Owner" model="@{new OwnerVM() {
-                            Owner = Model.Owners[i],
-                            I = i,
-                            Action = ViewBag.Action}}" />
-                                }
-                            }
-                        </ul>
-                    </div>
-                    @*<div class="card">
-                    <div class="card-header d-flex justify-content-between">
-                        <h3>Собственники</h3>
-                        <div class="btn-group" role="group">
-                            @if (canEdit)
-                            {
-                                <a class="form-control">Добавить:</a>
-                                <a href="#" class="form-control btn btn-success ownerAdd" title="Добавить физическое лицо" data-id-owner-type="1">ФЛ</a>
-                                <a href="#" class="form-control btn btn-success ownerAdd" title="Добавить юридическое лицо" data-id-owner-type="2">ЮЛ</a>
-                                <a href="#" class="form-control btn btn-success ownerAdd" title="Добавить индивидуального предпринимателя" data-id-owner-type="3">ИП</a>
-                            }
-                            <a href="#" id="ownersToggle" class="form-control btn btn-primary" title="Развернуть список собственников">
-                                <span class="oi oi-chevron-top"></span>
-                            </a>
-                        </div>
-                    </div>
-                    <table class="table table-bordered" id="ownersTable" style="margin-bottom:0px;">
-                        <thead>
-                            <tr>
-                                <th width="100px">Тип</th>
-                                <th width="100px">Документы</th>
-                                <th width="50px">Доля</th>
-                                <th>Данные</th>
-                                @if (canEdit)
-                                {
-                                    <th></th>
-                                }
-                            </tr>
-                        </thead>
-                        <tbody id="owners">
-                            @if (Model.Owners != null)
-                            {
-                                @for (var i = 0; i < Model.Owners.Count(); i++)
-                                {
-                                    <partial name="Owner" model="@{new OwnerVM() {
-                                    Owner = Model.Owners[i],
-                                    I = i,
-                                    Action = ViewBag.Action }}" />
-                                }
-                            }
-                        </tbody>
-                    </table>
-                </div>*@
-                    <div class=" card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3 for="Comment">Комментарий</h3>
-                            <div class="btn-group" role="group">
-                                <a href="#" id="commentToggle" class="form-control btn btn-primary" title="Развернуть коментарий">
-                                    <span class="oi oi-chevron-top"></span>
-                                </a>
-                            </div>
-                        </div>
-                        <textarea rows="3" asp-for="Comment" class="form-control card-body"></textarea>
+                    <div class="col">
+                        <input type="text" class="form-control rr-valid-ignore" placeholder="Причина аннулирования" title="Причина аннулирования"
+                               value="@Model.AnnulComment" name="AnnulComment" />
                     </div>
                 </div>
             </div>
-            @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Edit)
-            {
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between">
-                        <h3 for="Comment">Журнал изменений</h3>
-                        <div class="btn-group" role="group">
-                            <a href="#" id="logToggle" class="form-control btn btn-primary" title="Развернуть журнал изменений">
-                                <span class="oi oi-chevron-top"></span>
-                            </a>
-                        </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h3>Адреса</h3>
+                    <div class="btn-group" role="group">
+                        <a href="#" id="addressesToggle" class="form-control btn btn-primary" title="Развернуть коментарий">
+                            <span class="oi oi-chevron-top"></span>
+                        </a>
                     </div>
                 </div>
-            }
-        </form>
+                <ul id="addresses" class="list-group list-group-flush">
+                    @if (canEdit)
+                    {
+                        <li class="list-group-item col-12">
+                            <div class="input-group">
+                                <input type="text" id="addressSearch" name="AddressSearch" class="form-control" title="Адрес" placeholder="Адрес" />
+                                <div class="input-group-append h-auto d-inline-block">
+                                    <a href="#" id="addressAddBtn" class="btn btn-success disabled">
+                                        <span class="oi oi-plus"></span>
+                                    </a>
+                                </div>
+                                <div class="input-group-append h-auto d-inline-block">
+                                    <a href="#" id="addressClearBtn" class="btn btn-danger disabled">
+                                        <span class="oi oi-x"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                    @if (Model.OwnerBuildingsAssoc != null)
+                    {
+                        @for (var i = 0; i < Model.OwnerBuildingsAssoc.Count(); i++)
+                        {
+                            <partial name="OwnerProcessAddress" model="@{new OwnerProcessAddressVM() {
+                    IdProcess = Model.OwnerBuildingsAssoc[i].IdProcess,
+                    IdAssoc = Model.OwnerBuildingsAssoc[i].IdAssoc,
+                    Id = Model.OwnerBuildingsAssoc[i].IdBuilding,
+                    I = i,
+                    Action = ViewBag.Action,
+                    AddressType = AddressTypes.Building,
+                    Text = Model.OwnerBuildingsAssoc[i].BuildingNavigation.GetAddress(),
+                    Href = "/Buildings/Details?idBuilding=" + Model.OwnerBuildingsAssoc[i].IdBuilding}}" />
+                        }
+                    }
+                    @if (Model.OwnerPremisesAssoc != null)
+                    {
+                        @for (var i = 0; i < Model.OwnerPremisesAssoc.Count(); i++)
+                        {
+                            <partial name="OwnerProcessAddress" model="@{new OwnerProcessAddressVM() {
+                    IdProcess = Model.OwnerPremisesAssoc[i].IdProcess,
+                    IdAssoc = Model.OwnerPremisesAssoc[i].IdAssoc,
+                    Id = Model.OwnerPremisesAssoc[i].IdPremise,
+                    I = i,
+                    Action = ViewBag.Action,
+                    AddressType = AddressTypes.Premise,
+                    Text = Model.OwnerPremisesAssoc[i].PremiseNavigation.GetAddress(),
+                    Href = "/Premises/Details?idPremises=" + Model.OwnerPremisesAssoc[i].IdPremise}}" />
+                        }
+                    }
+                    @if (Model.OwnerSubPremisesAssoc != null)
+                    {
+                        @for (var i = 0; i < Model.OwnerSubPremisesAssoc.Count(); i++)
+                        {
+                            <partial name="OwnerProcessAddress" model="@{new OwnerProcessAddressVM() {
+                    IdProcess = Model.OwnerSubPremisesAssoc[i].IdProcess,
+                    IdAssoc = Model.OwnerSubPremisesAssoc[i].IdAssoc,
+                    Id = Model.OwnerSubPremisesAssoc[i].IdSubPremise,
+                    I = i,
+                    Action = ViewBag.Action,
+                    AddressType = AddressTypes.SubPremise,
+                    Text = Model.OwnerSubPremisesAssoc[i].SubPremiseNavigation.GetAddress(),
+                    Href = "/Premises/Details?idPremises=" + Model.OwnerSubPremisesAssoc[i].SubPremiseNavigation.IdPremises}}" />
+                        }
+                    }
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h3>Собственники</h3>
+                    <div class="btn-group" role="group">
+                        @if (canEdit)
+                        {
+                            <a class="form-control">Добавить:</a>
+                            <a href="#" class="form-control btn btn-success rr-owner-add" title="Добавить физическое лицо" data-idownertype="1">ФЛ</a>
+                            <a href="#" class="form-control btn btn-success rr-owner-add" title="Добавить юридическое лицо" data-idownertype="2">ЮЛ</a>
+                            <a href="#" class="form-control btn btn-success rr-owner-add" title="Добавить индивидуального предпринимателя" data-idownertype="3">ИП</a>
+                        }
+                        <a href="#" id="ownersToggle" class="form-control btn btn-primary" title="Развернуть список собственников">
+                            <span class="oi oi-chevron-top"></span>
+                        </a>
+                    </div>
+                </div>
+                <ul id="owners" class="list-group list-group-flush">
+                    @if (Model.Owners != null)
+                    {
+                        @for (var i = 0; i < Model.Owners.Count(); i++)
+                        {
+                            <partial name="Owner" model="@{new OwnerVM() {
+                    Owner = Model.Owners[i],
+                    I = i,
+                    Action = ViewBag.Action}}" />
+                        }
+                    }
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h3 for="Comment">Комментарий</h3>
+                    <div class="btn-group" role="group">
+                        <a href="#" id="commentToggle" class="form-control btn btn-primary" title="Развернуть коментарий">
+                            <span class="oi oi-chevron-top"></span>
+                        </a>
+                    </div>
+                </div>
+                <textarea rows="3" asp-for="Comment" class="form-control card-body"></textarea>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h3>Документы собственности</h3>
+                    <div class="btn-group" role="group">
+                        @if (canEdit)
+                        {
+                            <a href="#" id="ownerFileAdd" class="form-control btn btn-success" title="Добавить реквизит права собственности">
+                                <span class="oi oi-plus"></span>
+                            </a>
+                        }
+                        <a href="#" id="ownerFilesToggle" class="form-control btn btn-primary" title="Развернуть список документов">
+                            <span class="oi oi-chevron-top"></span>
+                        </a>
+                    </div>
+                </div>
+                <ul id="ownerFiles" class="list-group list-group-flush">
+                    @if (Model.OwnerFiles != null)
+                    {
+                        @for (var i = 0; i < Model.OwnerFiles.Count(); i++)
+                        {
+                            <partial name="OwnerFile" model="@{new OwnerFileVM() {
+                    OwnerFile = Model.OwnerFiles[i],
+                    I = i,
+                    Action = ViewBag.Action}}" />
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Edit)
+    {
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <h3 for="Comment">Журнал изменений</h3>
+                <div class="btn-group" role="group">
+                    <a href="#" id="logToggle" class="form-control btn btn-primary" title="Развернуть журнал изменений">
+                        <span class="oi oi-chevron-top"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</form>

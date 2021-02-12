@@ -1,0 +1,44 @@
+﻿@model RegistryWeb.ViewModel.OwnerReasonVM;
+@{
+    var i = Model.I;
+    var j = Model.J;
+    var fraction = Model.OwnerReason.NumeratorShare + "/" + Model.OwnerReason.DenominatorShare;
+    var canEdit = Model.Action == ActionTypeEnum.Edit || Model.Action == ActionTypeEnum.Create;
+}
+<li class="list-group-item rr-owner-reason" data-i="@i" style="border-right: 5px solid #0069d9">
+    <input type="hidden" value="@Model.OwnerReason.IdReason" name="Owners[@i].OwnerReasons[@j].IdReason" />
+    <input type="hidden" value="@Model.OwnerReason.IdOwner" name="Owners[@i].OwnerReasons[@j].IdOwner" />
+    <input type="hidden" value="@Model.OwnerReason.NumeratorShare" name="Owners[@i].OwnerReasons[@j].NumeratorShare" />
+    <input type="hidden" value="@Model.OwnerReason.DenominatorShare" name="Owners[@i].OwnerReasons[@j].DenominatorShare" />
+    <div class="form-row align-items-end">
+        <div class="form-group col-lg-1 col-3">
+            <label>Доля</label>
+            <input type="text" value="@fraction" class="form-control rr-fraction" title="Доля (числитель/знаменатель)">
+        </div>
+        <div class="form-group col-lg-4 col-9">
+            <label>Тип документа</label>
+            <select class="form-control selectpicker" name="Owners[@i].OwnerReasons[@j].IdReasonType"
+                    asp-items="@{new SelectList(ViewBag.OwnerReasonTypes, "IdReasonType", "ReasonName", Model.OwnerReason.IdReasonType);}"></select>
+        </div>
+        @{
+            var numberCol = canEdit ? "col-lg-4 col-5" : "col-lg-5 col-6";
+            var dateCol = canEdit ? "col-lg-2 col-5" : "col-lg-2 col-6";
+        }
+        <div class="form-group @numberCol">
+            <label>Номер</label>
+            <input type="text" value="@Model.OwnerReason.ReasonNumber" class="form-control rr-reason-num" title="Номер" name="Owners[@i].OwnerReasons[@j].ReasonNumber">
+        </div>
+        <div class="form-group @dateCol">
+            <label>Дата</label>
+            <input type="date" value="@Model.OwnerReason.ReasonDate.ToString("yyyy-MM-dd")" class="form-control rr-reason-date" title="Дата" name="Owners[@i].OwnerReasons[@j].ReasonDate">
+        </div>
+        @if (canEdit)
+        {
+            <div class="form-group col-lg-1 col-2 text-right" role="group">
+                <a href="#" class="btn btn-danger rr-owner-reason-delete" title="Удалить" aria-label="Удалить">
+                    <span class="oi oi-x"></span>
+                </a>
+            </div>
+        }
+    </div>
+</li>

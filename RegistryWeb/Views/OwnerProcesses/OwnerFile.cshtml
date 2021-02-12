@@ -7,33 +7,33 @@
     <input type="hidden" value="@Model.OwnerFile.Id" name="OwnerFiles[@i].Id" />
     <input type="hidden" value="@Model.OwnerFile.IdProcess" name="OwnerFiles[@i].IdProcess" />
     <div class="form-row align-items-end">
-        <div class="form-group col-3">
+        <div class="form-group col-lg-3 col-6">
             <label>Тип документа</label>
-            <select value="@Model.OwnerFile.IdReasonType" class="form-control" title="Тип документа основания"
+            <select value="@Model.OwnerFile.IdReasonType" class="form-control selectpicker"
                     name="OwnerFiles[@i].IdReasonType" asp-items="@{new SelectList(ViewBag.OwnerReasonTypes, "IdReasonType", "ReasonName", Model.OwnerFile.IdReasonType)}"></select>
         </div>
-        @{ 
-            var colReasonNumber = canEdit ? "col-3" : "col-4";
-        }
-        <div class="form-group @colReasonNumber">
-            <label>Номер документа</label>
-            <input type="text" class="form-control rr-file-num" value="@Model.OwnerFile.ReasonNumber" name="OwnerFiles[@i].ReasonNumber"
-                   maxlength="255" title="Номер документа" placeholder="Номер документа">
-        </div>
-        <div class="form-group col-2">
+        <div class="form-group col-lg-2 col-3">
             <label>Дата документа</label>
-            <input type="date" class="form-control rr-file-date" value="@(Model.OwnerFile.ReasonDate.ToString("yyyy-MM-dd"))"
-                   name="OwnerFiles[@i].ReasonDate" title="Дата документа">
+            <input type="date" class="form-control" value="@Model.OwnerFile.DateDocument.ToString("yyyy-MM-dd")"
+                   name="OwnerFiles[@i].DateDocument" title="Дата документа">
         </div>
-        <div class="form-group col-3">
+        <div class="form-group col-lg-2 col-3">
+            <label>Дата загрузки</label>
+            <input type="date" class="form-control" value="@(Model.OwnerFile.DateDownload.ToString("yyyy-MM-dd"))"
+                   name="OwnerFiles[@i].DateDownload" title="Дата загрузки" readonly>
+        </div>
+        @{
+            var inputFileCol = canEdit ? "col-lg-4 col-10" : "col-lg-5 col-10";
+        }
+        <div class="form-group @inputFileCol">
             <label>Образ документа</label>
             <div class="input-group">
-                <input type="text" maxlength="255" readonly class="form-control" value="@Model.OwnerFile.FileDisplayName"
+                <input type="text" maxlength="255" readonly class="form-control rr-file" value="@Model.OwnerFile.FileDisplayName"
                        name="OwnerFiles[@i].FileDisplayName" title="Наименование">
                 <input type="file" name="attachmentFiles" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
                 <input type="hidden" name="removeFiles" value="false" data-isempty="@(Model.OwnerFile.FileDisplayName == null ? true : false)" />
                 <div class="input-group-append">
-                    @if (Model.Action == ActionTypeEnum.Details || Model.Action == ActionTypeEnum.Delete)
+                    @if (!canEdit)
                     {
                         <a class="btn btn-success rr-owner-file-download @(Model.OwnerFile.FileOriginName == null ? "disabled" : "")"
                            href="/OwnerProcesses/DownloadFile/?id=@Model.OwnerFile.Id" title="Скачать образ документа" aria-label="Скачать образ документа">
@@ -71,7 +71,7 @@
         </div>
         @if (canEdit)
         {
-            <div class="form-group col-1 text-right">
+            <div class="form-group col-lg-1 col-2 text-right">
                 <a href="#" class="btn btn-danger rr-owner-file-document-delete" title="Удалить" aria-label="Удалить">
                     <span class="oi oi-x"></span>
                 </a>

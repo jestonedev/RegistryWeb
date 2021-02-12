@@ -93,14 +93,33 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public IActionResult OwnerReasonAdd(int i, int j, ActionTypeEnum action)
         {
-            var ownerFileAssocVM = new OwnerFileAssocVM();
-            ownerFileAssocVM.OwnerFileAssoc = new OwnerFileAssoc();
-            ownerFileAssocVM.OwnerFileAssoc.NumeratorShare = 1;
-            ownerFileAssocVM.OwnerFileAssoc.DenominatorShare = 1;
-            ownerFileAssocVM.I = i;
-            ownerFileAssocVM.J = j;
-            ownerFileAssocVM.Action = action;
-            return PartialView("OwnerFileAssoc", ownerFileAssocVM);
+            var ownerReasonVM = new OwnerReasonVM();
+            ownerReasonVM.OwnerReason = new OwnerReason();
+            ownerReasonVM.OwnerReason.NumeratorShare = 1;
+            ownerReasonVM.OwnerReason.DenominatorShare = 1;
+            ownerReasonVM.OwnerReason.IdReasonType = 9; //Государственная регистрация права (ЕГРП)
+            ownerReasonVM.OwnerReason.ReasonDate = DateTime.Now;
+            ownerReasonVM.I = i;
+            ownerReasonVM.J = j;
+            ownerReasonVM.Action = action;
+            ViewBag.OwnerReasonTypes = dataService.OwnerReasonTypes();
+            return PartialView("OwnerReason", ownerReasonVM);
+        }
+
+        public IActionResult OwnerFileAdd(int i, ActionTypeEnum action)
+        {
+            var ownerFileVM = new OwnerFileVM()
+            {
+                OwnerFile = new OwnerFile()
+                {
+                    DateDocument = DateTime.Now,
+                    IdReasonType = 9 //Государственная регистрация права (ЕГРП)
+                },
+                Action = action,
+                I = i
+            };
+            ViewBag.OwnerReasonTypes = dataService.OwnerReasonTypes();
+            return PartialView("OwnerFile", ownerFileVM);
         }
 
         [HttpPost]
@@ -202,18 +221,6 @@ namespace RegistryWeb.Controllers
                 return Json(new { Error = -2 });
             }
             return File(System.IO.File.ReadAllBytes(filePath), ownerFile.FileMimeType, ownerFile.FileDisplayName);
-        }
-
-        public IActionResult OwnerFileAdd(int i, ActionTypeEnum action)
-        {
-            var ownerFileVM = new OwnerFileVM()
-            {
-                OwnerFile = new OwnerFile(),
-                Action = action,
-                I = i
-            };
-            ViewBag.OwnerReasonTypes = dataService.OwnerReasonTypes();
-            return PartialView("OwnerFile", ownerFileVM);
         }
     }
 }

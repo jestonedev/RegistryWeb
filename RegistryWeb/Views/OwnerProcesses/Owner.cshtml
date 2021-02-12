@@ -9,15 +9,15 @@
     <input type="hidden" value="@Model.Owner.IdProcess" name="Owners[@i].IdProcess" />
     <input type="hidden" value="@Model.Owner.IdOwnerType" name="Owners[@i].IdOwnerType" />
     <div class="form-row align-items-end">
-        <div class="form-group col-2">
+        <div class="form-group col-lg-2 col-4">
             <label>Тип</label>
             <input type="text" class="form-control" readonly value="@Model.Owner.IdOwnerTypeNavigation.OwnerType1" />
         </div>
         @if (Model.Owner.IdOwnerType == 1 && Model.Owner.OwnerPerson != null)
         {
-            var colName = canEdit ? "col-2" : "col-3";
+            var colName = canEdit ? "col-lg-2 col-4" : "col-lg-3 col-4";
         <input type="hidden" value="@Model.Owner.OwnerPerson.IdOwner" name="Owners[@i].OwnerPerson.IdOwner" />
-        <div class="form-group col-3">
+        <div class="form-group col-lg-3 col-8">
             <label>Фамилия</label>
             <input type="text" class="form-control input-chars rr-owner-surname" placeholder="Фамилия" title="Фамилия"
                    value="@Model.Owner.OwnerPerson.Surname" name="Owners[@i].OwnerPerson.Surname" />
@@ -27,7 +27,7 @@
             <input type="text" class="form-control input-chars rr-owner-name" placeholder="Имя" title="Имя"
                    value="@Model.Owner.OwnerPerson.Name" name="Owners[@i].OwnerPerson.Name" />
         </div>
-        <div class="form-group col-3">
+        <div class="form-group col-lg-3 col-4">
             <label>Отчество</label>
             <input type="text" class="form-control input-chars" placeholder="Отчество" title="Отчество"
                    value="@Model.Owner.OwnerPerson.Patronymic" name="Owners[@i].OwnerPerson.Patronymic" />
@@ -35,7 +35,7 @@
         }
         @if (Model.Owner.IdOwnerType != 1 && Model.Owner.OwnerOrginfo != null)
         {
-            var colOrgName = canEdit ? "col-8" : "col-9";
+            var colOrgName = canEdit ? "col-lg-8 col-4" : "col-lg-9 col-4";
         <input type="hidden" value="@Model.Owner.OwnerOrginfo.IdOwner" name="Owners[@i].OwnerOrginfo.IdOwner" />
         <div class="form-group @colOrgName">
             <label>Наименование</label>
@@ -44,7 +44,7 @@
         </div>
         }
         @{
-            var colPanel = canEdit ? "btn-group col-2" : "col-1 text-right";
+            var colPanel = canEdit ? "btn-group col-lg-2 col-4" : "col-lg-1 col-4 text-right";
         }
         <div class="form-group @colPanel" role="group">
             @if (canEdit)
@@ -62,10 +62,10 @@
         </div>
     </div>
 </li>
-@for (var j = 0; j < Model.Owner.OwnerFilesAssoc.Count(); j++)
+@for (var j = 0; j < Model.Owner.OwnerReasons.Count(); j++)
 {
-<partial name="OwnerFileAssoc" model="@{new OwnerFileAssocVM() {
-    OwnerFileAssoc = Model.Owner.OwnerFilesAssoc[j],
+<partial name="OwnerReason" model="@{new OwnerReasonVM() {
+    OwnerReason = Model.Owner.OwnerReasons[j],
     I = i,
     J = j,
     Action = ViewBag.Action }} " />
