@@ -37,7 +37,7 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = "Index";
             ViewBag.ReturnUrl = returnUrl;
             var viewModel = dataService.GetListViewModel(idObject, typeObject);
-            ViewBag.addressType = typeObject;
+            ViewBag.typeObject = typeObject;
             ViewBag.idObject = idObject;
 
             if(typeObject=="SubPremise")
@@ -61,7 +61,7 @@ namespace RegistryWeb.Controllers
         {
             ViewBag.Action = "Create";
             ViewBag.idObject = IdObject;
-            ViewBag.addressType = typeObject;
+            ViewBag.typeObject = typeObject;
             ViewBag.ReturnUrl = returnUrl;
             if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
                 return View("NotAccess");
@@ -126,7 +126,7 @@ namespace RegistryWeb.Controllers
 
             if (ModelState.IsValid)
             {
-                dataService.Edit(fh.FundHistory);
+                dataService.Edit(fh.FundHistory, IdObject, typeObject);
                 return View("Index", dataService.GetListViewModel(IdObject, typeObject));
                 //return RedirectToAction("Index");
             }
