@@ -181,6 +181,19 @@ function resetModalForm(jQElem, isForm = true) {
     selectpickers.selectpicker("refresh");
 }
 
+//Функция вычисления количества элементов для компонентов
+function countBadge(idNameComponentForm) {
+    var count = $(idNameComponentForm).find('.list-group-item').length;
+    if (count > 0) {
+        $(idNameComponentForm).find(".rr-count-badge").text(count);
+        $(idNameComponentForm).find(".rr-count-badge").css("display", "inline-block");
+    }
+    else {
+        $(idNameComponentForm).find(".rr-count-badge").text('');
+        $(idNameComponentForm).find(".rr-count-badge").css("display", "none");
+    }
+}
+
 $(function () {
     $(".modal").on("hide.bs.modal", function () {
         $(this).find(".input-validation-error").removeClass("input-validation-error").addClass("valid");
