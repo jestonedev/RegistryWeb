@@ -98,6 +98,11 @@ function saveTenancyReason(e) {
                     tenancyReasonElem.find("input[name^='IdReason']").val(tenancyReason.idReason);
                 }
                 showEditDelPanelTenancyReason(tenancyReasonElem);
+
+                if ($("#TenancyProcessReasons").find('.list-group-item').length - 1 > 0) {
+                    $(".tenancyReasonsbadge").text($("#TenancyProcessReasons").find('.list-group-item').length + 1);
+                    $(".tenancyReasonsbadge").css("display", "inline-block");
+                }
             }
         });
     } else {
@@ -159,6 +164,11 @@ function deleteTenancyReason(e) {
                     if ($("#TenancyProcessReasons .list-group-item").length === 1) {
                         $("#TenancyProcessReasons .rr-list-group-item-empty").show();
                     }
+
+                    if ($("#TenancyProcessReasons").find('.list-group-item').length - 1 > 0)
+                        $(".tenancyReasonsbadge").text($("#TenancyProcessReasons").find('.list-group-item').length - 1);
+                    else
+                        $(".tenancyReasonsbadge").css("display", "none");
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -183,4 +193,7 @@ $(function () {
     $('#TenancyProcessReasonsForm').on('click', '.tenancy-reason-cancel-btn', cancelEditTenancyReason);
     $('#TenancyProcessReasonsForm').on('click', '.tenancy-reason-save-btn', saveTenancyReason);
     $('#TenancyProcessReasonsForm').on('click', '.tenancy-reason-delete-btn', deleteTenancyReason);
+
+    if ($("#TenancyProcessReasons").find('.list-group-item').length-1 == 0)
+        $(".tenancyReasonsbadge").css("display", "none");
 });

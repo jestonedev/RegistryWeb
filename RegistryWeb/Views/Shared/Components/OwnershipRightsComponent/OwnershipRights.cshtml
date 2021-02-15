@@ -3,7 +3,15 @@
     <script src="~/js/ownershipRights.common.js" asp-append-version="true"></script>
     <div class="card mb-2">
         <div class="card-header d-flex justify-content-between pt-2 pb-2">
-            <h4 class="mt-1">Ограничения</h4>
+            <h4 class="mt-1">
+                Ограничения
+                <span class="badge badge-secondary ownershipRightsbadge ml-1">
+                    @if (Model.Count() >= 1)
+                    {
+                        @Model.Count()
+                    }
+                </span>
+            </h4>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {

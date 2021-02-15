@@ -3,7 +3,16 @@
     <script src="~/js/resettle.common.js" asp-append-version="true"></script>
     <div class="card mb-2">
         <div class="card-header d-flex justify-content-between pt-2 pb-2">
-            <h4 class="mt-1">Переселение</h4>
+            <h4 class="mt-1">
+                Переселение
+                <span class="badge badge-secondary resettlesbadge ml-1">
+                    @if (Model.Count() >= 1)
+                    {
+                        @Model.Count()
+
+                    }
+                </span>
+            </h4>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {
@@ -12,7 +21,7 @@
                 <a href="#" id="resettlesToggle" class="form-control btn btn-primary" title="Развернуть информацию о переселении" style="font-weight:bold;">∨</a>
             </div>
         </div>
-        <ul class="list-group list-group-flush toggle-hide" id="resettlesList"data-addresstype="@ViewBag.Address.AddressType" data-id="@ViewBag.Address.Id" data-action="@ViewBag.Action">
+        <ul class="list-group list-group-flush toggle-hide" id="resettlesList" data-addresstype="@ViewBag.Address.AddressType" data-id="@ViewBag.Address.Id" data-action="@ViewBag.Action">
             @foreach (var item in Model)
             {
                 <partial name="ResettleInfo" model="item" />

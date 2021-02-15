@@ -128,6 +128,11 @@ function deleteOwnershipRight(e) {
             success: function (ind) {
                 if (ind === 1) {
                     owrElem.remove();
+
+                    if ($("#ownershipRightsList").find('.list-group-item').length - 1 > 0)
+                        $(".ownershipRightsbadge").text($("#ownershipRightsList").find('.list-group-item').length - 1);
+                    else
+                        $(".ownershipRightsbadge").css("display", "none");
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -269,6 +274,11 @@ function saveOwnershipRight(e) {
                     owrElem.find("input[name^='IdOwnershipRight']").val(owr.idOwnershipRight);
                     owrElem.find(".rr-ownership-right-file-download").prop("href", "/OwnershipRights/DownloadFile/?idOwnershipRight=" + owr.idOwnershipRight);
                     showOwnershipRightDownloadFileBtn(owrElem, owr.fileOriginName !== null);
+
+                    if ($("#ownershipRightsList").find('.list-group-item').length - 1 > 0) {
+                        $(".ownershipRightsbadge").text($("#ownershipRightsList").find('.list-group-item').length + 1);
+                        $(".ownershipRightsbadge").css("display", "inline-block");
+                    }
                 }
                 showEditDelPanelOwnershipRight(owrElem);
             }
@@ -331,4 +341,7 @@ $(function () {
     $('#ownershipRightsList').on('click', '.rr-ownership-right-file-attach', attachOwnershipRightFile);
     $('#ownershipRightsList').on('click', '.rr-ownership-right-file-remove', removeOwnershipRightFile);
     $('#ownershipRightsList').on('change', "input[name^='OwnershipRightFile']", changeOwnershipRightFileAttachment);
+
+    if ($("#ownershipRightsList").find('.list-group-item').length == 0)
+        $(".ownershipRightsbadge").css("display", "none");
 });

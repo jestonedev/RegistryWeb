@@ -143,8 +143,36 @@ namespace RegistryWeb.DataServices
             rc.SaveChanges();
         }
 
-        internal void Edit(FundHistory fh)
+        internal void Edit(FundHistory fh, int IdObject, string typeObject)
         {
+            if (typeObject == "Premise")
+            {
+                var foa = new FundPremiseAssoc
+                {
+                    IdFund = fh.IdFund,
+                    IdPremises = IdObject
+                };
+                fh.FundsPremisesAssoc.Add(foa);
+            }
+            else if (typeObject == "Building")
+            {
+                var foa = new FundBuildingAssoc
+                {
+                    IdFund = fh.IdFund,
+                    IdBuilding = IdObject
+                };
+                fh.FundsBuildingsAssoc.Add(foa);
+            }
+            else if (typeObject == "SubPremise")
+            {
+                var foa = new FundSubPremiseAssoc
+                {
+                    IdFund = fh.IdFund,
+                    IdSubPremises = IdObject
+                };
+                fh.FundsSubPremisesAssoc.Add(foa);
+            }
+
             var oldFH = GetFund(fh.IdFund);
 
             foreach (var fpa in oldFH.FundsPremisesAssoc)

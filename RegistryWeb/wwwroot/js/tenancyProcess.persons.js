@@ -218,6 +218,13 @@ $(function () {
                     if (tenancyPersonReturn.idPerson > 0) {
                         form.find("[name='Person.IdPerson']").val(tenancyPersonReturn.idPerson);
                         updateInsertTenancyPersonElem();
+
+                        if ($("#TenancyProcessPersons").find('.list-group-item').length - 1 > 0)
+                        {
+                            $(".TenancyProcessPersonsbadge").text($("#TenancyProcessPersons").find('.list-group-item').length + 1);
+                            $(".TenancyProcessPersonsbadge").css("display", "inline-block");
+                        }
+
                     } else {
                         alert('Произошла ошибка при сохранении');
                     }
@@ -233,9 +240,6 @@ $(function () {
                     $("button[data-id='" + id + "']").addClass("input-validation-error");
                 }
             });
-            $([document.documentElement, document.body]).animate({
-                scrollTop: form.find(".input-validation-error").first().offset().top - 35
-            }, 1000);
         }
     });
 
@@ -261,6 +265,11 @@ $(function () {
                             if ($("#TenancyProcessPersons .list-group-item").length === 1) {
                                 $("#TenancyProcessPersons .rr-list-group-item-empty").show();
                             }
+
+                            if ($("#TenancyProcessPersons").find('.list-group-item').length-1 > 0)
+                                $(".TenancyProcessPersonsbadge").text($("#TenancyProcessPersons").find('.list-group-item').length - 1);
+                            else 
+                                $(".TenancyProcessPersonsbadge").css("display", "none");
                         }
                         else {
                             alert("Ошибка удаления!");
@@ -330,4 +339,7 @@ $(function () {
 
     $('#TenancyProcessPersonsForm').on('click', '.tenancy-person-delete-btn', deleteTenancyPerson);
     $("#TenancyProcessPersonsForm").on("click", "#tenancyPersonAdd", addTenancyPerson);
+
+    if ($("#TenancyProcessPersons").find('.list-group-item').length-1 == 0)
+        $(".TenancyProcessPersonsbadge").css("display", "none");
 });

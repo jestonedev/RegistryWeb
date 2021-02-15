@@ -14,7 +14,11 @@
 
             var buildingElem = $("select[name$='Premise.IdBuilding']");
             var idBuilding = $("input[name='IdBuildingPrev']").val();
-            buildingElem.html(options).selectpicker('refresh').val(idBuilding).selectpicker('render');
+
+            var disabled = (buildingElem.prop("disabled"));
+            buildingElem.removeAttr("disabled");
+            buildingElem.html(options).selectpicker('refresh').val(idBuilding).selectpicker('refresh');
+            buildingElem.prop("disabled", disabled);
         });
     });
 

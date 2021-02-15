@@ -6,7 +6,15 @@
 
 <div class="card rr-rent-periods-card mb-2">
     <div class="card-header d-flex justify-content-between pt-2 pb-2">
-        <h4 class="mt-1">Предыдущие периоды найма</h4>
+        <h4 class="mt-1">
+            Предыдущие периоды найма
+            <span class="badge badge-secondary TenancyProcessRentPeriodsbadge ml-1">
+                @if (Model.Count() >= 1)
+                {
+                    @Model.Count()
+                }
+            </span>
+        </h4>
         <div class="btn-group" role="group">
             @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
             {
@@ -17,7 +25,7 @@
     </div>
     <ul class="list-group list-group-flush toggle-hide" id="TenancyProcessRentPeriods" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
         <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
-            <i>Предыдущие периоды найма отсутстувуют</i>
+            <i>Предыдущие периоды найма отсутствуют</i>
         </li>
         @if (Model != null && Model.Any())
         {
