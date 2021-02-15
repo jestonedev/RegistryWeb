@@ -128,7 +128,7 @@
 
             <td class="p-table-low-width-hide-cell">
                 <div class="dopinfo-alt">
-                    Состояние: @item.IdStateNavigation?.StateNeutral<br />
+                    Состояние: <span class="text-success"><b>@item.IdStateNavigation?.StateNeutral</b></span><br />
                     Тип помещения: @item.IdPremisesTypeNavigation?.PremisesTypeName<br />
                     @if(ObjectStateHelper.IsMunicipal(item.IdState))
                     {

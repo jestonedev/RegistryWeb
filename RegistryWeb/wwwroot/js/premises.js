@@ -18,6 +18,15 @@
         });
     });
 
+    $("#Premise_IdPremisesComment").on("change", function () {
+        var id = $(this).val();
+        if (id === "1") {
+            $("[data-id='Premise_IdPremisesComment']").removeClass("btn-danger").addClass("btn-light");
+        } else {
+            $("[data-id='Premise_IdPremisesComment']").addClass("btn-danger").removeClass("btn-light");
+        }
+    });
+
     $("form#r-premises-form").on("submit", function (e) {
         if ($("form#r-premises-form input[type='submit']").hasClass("disabled")) {
             e.preventDefault();

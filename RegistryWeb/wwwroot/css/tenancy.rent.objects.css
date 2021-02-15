@@ -1,10 +1,10 @@
 ﻿.rr-tenancy-rent-objects-edit-buttons, .rr-tenancy-rent-objects-view-buttons {
-    margin-top: 0;
+    margin-top: 15px;
 }
 
 @media(min-width: 992px) {
     .rr-tenancy-rent-objects-edit-buttons, .rr-tenancy-rent-objects-view-buttons {
-        margin-top: 32px;
+        margin-top: 28px;
     }
 }
 
@@ -14,4 +14,5 @@
     text-overflow: ellipsis;
     max-width: 100%;
     margin-bottom: 0.24rem;
+    vertical-align: bottom;
 }

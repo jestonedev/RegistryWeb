@@ -30,3 +30,7 @@
 .b-table th {
     white-space: nowrap;
 }
+
+.b-table > tbody td {
+    padding: 0.4rem 0.75rem;
+}
