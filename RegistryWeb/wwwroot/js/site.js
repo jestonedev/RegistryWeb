@@ -182,8 +182,8 @@ function resetModalForm(jQElem, isForm = true) {
 }
 
 //Функция вычисления количества элементов для компонентов
-function countBadge(idNameComponentForm) {
-    var count = $(idNameComponentForm).find('.list-group-item').length;
+function countBadges(idNameComponentForm, flag) {
+    var count = flag ? $(idNameComponentForm).find('.list-group-item').length-1 : $(idNameComponentForm).find('.list-group-item').length;
     if (count > 0) {
         $(idNameComponentForm).find(".rr-count-badge").text(count);
         $(idNameComponentForm).find(".rr-count-badge").css("display", "inline-block");

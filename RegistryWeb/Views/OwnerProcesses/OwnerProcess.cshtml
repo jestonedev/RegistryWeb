@@ -93,11 +93,21 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card" id="ownerAddressesBlock">
                 <div class="card-header d-flex justify-content-between">
-                    <h3>Адреса</h3>
+                    <h3>
+                        Адреса
+                        @{
+                            var countassoc = Model.OwnerPremisesAssoc.Count() + Model.OwnerBuildingsAssoc.Count() + Model.OwnerSubPremisesAssoc.Count();
+                            var countAddress = countassoc > 0 ? countassoc.ToString() : "";
+                            var visibleAddress = countassoc > 0 ? "" : "style='display: none;'";
+                        }
+                        <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visibleAddress)>
+                            @countAddress
+                        </span>
+                    </h3>
                     <div class="btn-group" role="group">
-                        <a href="#" id="addressesToggle" class="form-control btn btn-primary" title="Развернуть коментарий">
+                        <a href="#" id="addressesToggle" class="form-control btn btn-primary" title="Развернуть адреса">
                             <span class="oi oi-chevron-top"></span>
                         </a>
                     </div>
@@ -168,9 +178,18 @@
                     }
                 </ul>
             </div>
-            <div class="card">
+            <div class="card" id="ownerOwnersBlock">
                 <div class="card-header d-flex justify-content-between">
-                    <h3>Собственники</h3>
+                    <h3>
+                        Собственники
+                        @{
+                            var countOwner = Model.Owners.Count() > 0 ? Model.Owners.Count().ToString() : "";
+                            var visibleOwner = Model.Owners.Count() > 0 ? "" : "style='display: none;'";
+                        }
+                        <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visibleOwner)>
+                            @countOwner
+                        </span>
+                    </h3>
                     <div class="btn-group" role="group">
                         @if (canEdit)
                         {
@@ -208,9 +227,18 @@
                 </div>
                 <textarea rows="3" asp-for="Comment" class="form-control card-body"></textarea>
             </div>
-            <div class="card">
+            <div class="card" id="ownerFilesBlock">
                 <div class="card-header d-flex justify-content-between">
-                    <h3>Документы собственности</h3>
+                    <h3>
+                        Документы собственности
+                        @{
+                            var count = Model.OwnerFiles.Count() > 0 ? Model.OwnerFiles.Count().ToString() : "";
+                            var visible = Model.OwnerFiles.Count() > 0 ? "" : "style='display: none;'";
+                        }
+                        <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visible)>
+                            @count
+                        </span>
+                    </h3>
                     <div class="btn-group" role="group">
                         @if (canEdit)
                         {
@@ -245,7 +273,7 @@
                 <h3 for="Comment">Журнал изменений</h3>
                 <div class="btn-group" role="group">
                     <a href="#" id="logToggle" class="form-control btn btn-primary" title="Развернуть журнал изменений">
-                        <span class="oi oi-chevron-top"></span>
+                        <span class="oi oi-chevron-bottom"></span>
                     </a>
                 </div>
             </div>

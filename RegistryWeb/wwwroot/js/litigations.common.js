@@ -113,10 +113,8 @@ function deleteLitigation(e) {
                 if (ind === 1) {
                     litegationElem.remove();
 
-                    if ($("#litigationsList").find('.list-group-item').length - 1 > 0)
-                        $(".litigationsbadge").text($("#litigationsList").find('.list-group-item').length - 1);
-                    else
-                        $(".litigationsbadge").css("display", "none");
+                    var flag = $("#litigationsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                    countBadges('#litigationsForm', flag);
 
                 }
                 else {
@@ -261,10 +259,8 @@ function saveLitigation(e) {
                 }
                 showEditDelPanelLitigation(litegationElem);
 
-                if ($("#litigationsList").find('.list-group-item').length - 1 > 0) {
-                    $(".litigationsbadge").text($("#litigationsList").find('.list-group-item').length + 1);
-                    $(".litigationsbadge").css("display", "inline-block");
-                }
+                var flag = $("#litigationsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                countBadges('#litigationsForm', flag);
             }
         });
     } else {
@@ -325,7 +321,4 @@ $(function () {
     $('#litigationsList').on('click', '.rr-litigation-file-attach', attachLitigationFile);
     $('#litigationsList').on('click', '.rr-litigation-file-remove', removeLitigationFile);
     $('#litigationsList').on('change', "input[name^='LitigationFile']", changeLitigationFileAttachment);
-
-    if ($("#litigationsList").find('.list-group-item').length == 0)
-        $(".litigationsbadge").css("display", "none");
 });

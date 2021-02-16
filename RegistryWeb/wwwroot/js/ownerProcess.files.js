@@ -20,6 +20,10 @@ function ownerFileAttach(e) {
 function ownerFileDocumentDelete(e) {
     var ownerFileElem = $(this).closest('.list-group-item');
     ownerFileElem.remove();
+
+    var flag = $("#ownerFilesBlock").find("rr-list-group-item-empty").length != 0 ? true : false;
+    countBadges('#ownerFilesBlock', flag);
+
     $('#ownerFiles li').each(function (i) {
         var inputs = $(this).find('input');
         inputs[0].name = 'OwnerFiles[' + i + '].Id';
@@ -46,6 +50,9 @@ function ownerFileAdd(e) {
             ownerFilePanelInit(newOwnerFileElem);
             newOwnerFileElem.find('input[name$="IdProcess"]').val($('#ownerProcess input[name="IdProcess"]').val());
             newOwnerFileElem.find('select').selectpicker("render");
+
+            var flag = $("#ownerFilesBlock").find("rr-list-group-item-empty").length != 0 ? true : false;
+            countBadges('#ownerFilesBlock', flag);
         },
         error: function (jqXHR, textStatus, errorThrown) {
             console.log(jqXHR);

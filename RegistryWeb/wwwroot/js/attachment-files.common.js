@@ -58,11 +58,9 @@ function deleteAttachmentFile(e) {
             success: function (ind) {
                 if (ind === 1) {
                     attachmentFileElem.remove();
-                    
-                    if ($("#attachmentFilesList").find('.list-group-item').length - 1 > 0)
-                        $(".attachmentFilebadge").text($("#attachmentFilesList").find('.list-group-item').length - 1);
-                    else
-                        $(".attachmentFilebadge").css("display", "none");
+
+                    var flag = $("#attachmentFilesForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                    countBadges('#attachmentFilesForm', flag);
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -185,11 +183,9 @@ function saveAttachmentFile(e) {
         contentType: false,
         success: function (attachmentFile) {
             if (attachmentFile.idAttachment > 0) {            
-
-                if ($("#attachmentFilesList").find('.list-group-item').length - 1 > 0) {
-                    $(".attachmentFilebadge").text($("#attachmentFilesList").find('.list-group-item').length + 1);
-                    $(".attachmentFilebadge").css("display", "inline-block");
-                }
+                
+                var flag = $("#attachmentFilesForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                countBadges('#attachmentFilesForm', flag);
 
                 attachmentFileElem.find("input[name^='IdAttachment']").val(attachmentFile.idAttachment);
                 attachmentFileElem.find(".rr-attachment-file-download")
@@ -242,9 +238,5 @@ $(function () {
     $('#attachmentFilesList').on('click', '.attachment-file-delete-btn', deleteAttachmentFile);
     $('#attachmentFilesList').on('click', '.rr-attachment-file-attach', attachAttachmentFile);
     $('#attachmentFilesList').on('click', '.rr-attachment-file-remove', removeAttachmentFile);
-    $('#attachmentFilesList').on('change', "input[name='AttachmentFile']", changeAttachmentFileAttachment);
-
-    if ($("#attachmentFilesList").find('.list-group-item').length == 0)
-        $(".attachmentFilebadge").css("display", "none");
-    
+    $('#attachmentFilesList').on('change', "input[name='AttachmentFile']", changeAttachmentFileAttachment);    
 });

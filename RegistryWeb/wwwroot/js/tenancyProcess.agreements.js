@@ -452,10 +452,8 @@ $(function () {
                             form.find("[name='Agreement.IdAgreement']").val(tenancyAgreementReturn.idAgreement);
                             updateInsertTenancyAgreementElem();
 
-                            if ($("#TenancyProcessAgreements").find('.list-group-item').length - 1 > 0) {
-                                $(".TenancyProcessAgreementsbadge").text($("#TenancyProcessAgreements").find('.list-group-item').length + 1);
-                                $(".TenancyProcessAgreementsbadge").css("display", "inline-block");
-                            }
+                            var flag = $("#TenancyProcessAgreementsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                            countBadges('#TenancyProcessAgreementsForm', flag);
 
                         } else {
                             alert('Произошла ошибка при сохранении');
@@ -507,10 +505,8 @@ $(function () {
                                 $("#TenancyProcessAgreements .rr-list-group-item-empty").show();
                             }
 
-                            if ($("#TenancyProcessAgreements").find('.list-group-item').length - 1 > 0)
-                                $(".TenancyProcessAgreementsbadge").text($("#TenancyProcessAgreements").find('.list-group-item').length - 1);
-                            else
-                                $(".TenancyProcessAgreementsbadge").css("display", "none");
+                            var flag = $("#TenancyProcessAgreementsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                            countBadges('#TenancyProcessAgreementsForm', flag);
 
                         }
                         else {
@@ -1366,7 +1362,4 @@ $(function () {
 
     $('#TenancyProcessAgreementsForm').on('click', '.tenancy-agreement-delete-btn', deleteTenancyAgreement);
     $("#TenancyProcessAgreementsForm").on("click", "#tenancyAgreementAdd", addTenancyAgreement);
-
-    if ($("#TenancyProcessAgreements").find('.list-group-item').length-1 == 0)
-        $(".TenancyProcessAgreementsbadge").css("display", "none");
 });

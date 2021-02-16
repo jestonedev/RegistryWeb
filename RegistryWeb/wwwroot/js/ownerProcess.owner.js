@@ -36,6 +36,9 @@ function ownerDelete(e) {
     var i = owner.data('i');
     owner.remove();
     $('.rr-owner-reason[data-i="' + i + '"]').remove();
+
+    countOwnerBadges('#ownerOwnersBlock', false);
+
     ownerRename();
     isValidFraction();
     e.preventDefault();
@@ -60,6 +63,8 @@ function ownerAdd(e) {
             $('#owners').append(data);
             var li = $('.rr-owner').last();
             li.find('input[name$="IdProcess"]').val($('#ownerProcess input[name="IdProcess"]').val());
+
+            countOwnerBadges('#ownerOwnersBlock');
         }
     });
     e.preventDefault();
@@ -135,6 +140,20 @@ function isValidFraction() {
     }
     return isValid;
 }
+
+//Функция вычисления количества элементов для компонентов
+function countOwnerBadges(idNameComponentForm) {
+    var count = $(idNameComponentForm).find('.rr-owner').length;
+    if (count > 0) {
+        $(idNameComponentForm).find(".rr-count-badge").text(count);
+        $(idNameComponentForm).find(".rr-count-badge").css("display", "inline-block");
+    }
+    else {
+        $(idNameComponentForm).find(".rr-count-badge").text('');
+        $(idNameComponentForm).find(".rr-count-badge").css("display", "none");
+    }
+}
+
 $(function () {
     $('.rr-fraction').inputFilter(function (value) {
         return /^$/.test(value) || /^[1-9]?\d{0,2}\/$/.test(value) || /^\/[1-9]?\d{0,2}$/.test(value) ||

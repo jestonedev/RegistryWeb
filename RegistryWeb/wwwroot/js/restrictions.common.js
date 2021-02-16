@@ -126,7 +126,9 @@ function deleteRestriction(e) {
             success: function (ind) {
                 if (ind === 1) {
                     restrictionElem.remove();
-                    countBadge('#restrictionsForm');
+
+                    var flag = $("#restrictionsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                    countBadges('#restrictionsForm', flag);
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -268,7 +270,9 @@ function saveRestriction(e) {
                     restrictionElem.find(".rr-restriction-file-download")
                         .prop("href", "/Restrictions/DownloadFile/?idRestriction=" + restriction.idRestriction);
                     showRestrictionDownloadFileBtn(restrictionElem, restriction.fileOriginName !== null);
-                    countBadge('#restrictionsForm');
+
+                    var flag = $("#restrictionsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                    countBadges('#restrictionsForm', flag);
                 }
                 showEditDelPanelRestriction(restrictionElem);
             }

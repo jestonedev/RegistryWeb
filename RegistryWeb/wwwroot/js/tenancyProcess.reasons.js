@@ -99,10 +99,8 @@ function saveTenancyReason(e) {
                 }
                 showEditDelPanelTenancyReason(tenancyReasonElem);
 
-                if ($("#TenancyProcessReasons").find('.list-group-item').length - 1 > 0) {
-                    $(".tenancyReasonsbadge").text($("#TenancyProcessReasons").find('.list-group-item').length + 1);
-                    $(".tenancyReasonsbadge").css("display", "inline-block");
-                }
+                var flag = $("#TenancyProcessReasonsForm").find("rr-list-group-item-empty") != null ? true : false;
+                countBadges('#TenancyProcessReasonsForm', flag);
             }
         });
     } else {
@@ -165,10 +163,8 @@ function deleteTenancyReason(e) {
                         $("#TenancyProcessReasons .rr-list-group-item-empty").show();
                     }
 
-                    if ($("#TenancyProcessReasons").find('.list-group-item').length - 1 > 0)
-                        $(".tenancyReasonsbadge").text($("#TenancyProcessReasons").find('.list-group-item').length - 1);
-                    else
-                        $(".tenancyReasonsbadge").css("display", "none");
+                    var flag = $("#TenancyProcessReasonsForm").find("rr-list-group-item-empty") != null ? true : false;
+                    countBadges('#TenancyProcessReasonsForm', flag);
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -193,7 +189,4 @@ $(function () {
     $('#TenancyProcessReasonsForm').on('click', '.tenancy-reason-cancel-btn', cancelEditTenancyReason);
     $('#TenancyProcessReasonsForm').on('click', '.tenancy-reason-save-btn', saveTenancyReason);
     $('#TenancyProcessReasonsForm').on('click', '.tenancy-reason-delete-btn', deleteTenancyReason);
-
-    if ($("#TenancyProcessReasons").find('.list-group-item').length-1 == 0)
-        $(".tenancyReasonsbadge").css("display", "none");
 });

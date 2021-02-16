@@ -219,11 +219,8 @@ $(function () {
                         form.find("[name='Person.IdPerson']").val(tenancyPersonReturn.idPerson);
                         updateInsertTenancyPersonElem();
 
-                        if ($("#TenancyProcessPersons").find('.list-group-item').length - 1 > 0)
-                        {
-                            $(".TenancyProcessPersonsbadge").text($("#TenancyProcessPersons").find('.list-group-item').length + 1);
-                            $(".TenancyProcessPersonsbadge").css("display", "inline-block");
-                        }
+                        var flag = $("#TenancyProcessPersonsForm").find("rr-list-group-item-empty") != null ? true : false;
+                        countBadges('#TenancyProcessPersonsForm', flag);
 
                     } else {
                         alert('Произошла ошибка при сохранении');
@@ -266,10 +263,8 @@ $(function () {
                                 $("#TenancyProcessPersons .rr-list-group-item-empty").show();
                             }
 
-                            if ($("#TenancyProcessPersons").find('.list-group-item').length-1 > 0)
-                                $(".TenancyProcessPersonsbadge").text($("#TenancyProcessPersons").find('.list-group-item').length - 1);
-                            else 
-                                $(".TenancyProcessPersonsbadge").css("display", "none");
+                            var flag = $("#TenancyProcessPersonsForm").find("rr-list-group-item-empty") != null ? true : false;
+                            countBadges('#TenancyProcessPersonsForm', flag);
                         }
                         else {
                             alert("Ошибка удаления!");
@@ -339,7 +334,4 @@ $(function () {
 
     $('#TenancyProcessPersonsForm').on('click', '.tenancy-person-delete-btn', deleteTenancyPerson);
     $("#TenancyProcessPersonsForm").on("click", "#tenancyPersonAdd", addTenancyPerson);
-
-    if ($("#TenancyProcessPersons").find('.list-group-item').length-1 == 0)
-        $(".TenancyProcessPersonsbadge").css("display", "none");
 });

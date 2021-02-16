@@ -99,10 +99,8 @@ function saveRentPeriod(e) {
                 }
                 showEditDelPanelRentPeriod(rentPeriodElem);
 
-                if ($("#TenancyProcessRentPeriods").find('.list-group-item').length - 1 > 0) {
-                    $(".TenancyProcessRentPeriodsbadge").text($("#TenancyProcessRentPeriods").find('.list-group-item').length + 1);
-                    $(".TenancyProcessRentPeriodsbadge").css("display", "inline-block");
-                }
+                var flag = $("#TenancyProcessRentPeriodsBlock").find("rr-list-group-item-empty") != null ? true : false;
+                countBadges('#TenancyProcessRentPeriodsBlock', flag);
             }
         });
     } else {
@@ -158,10 +156,8 @@ function deleteRentPeriod(e) {
                         $("#TenancyProcessRentPeriods .rr-list-group-item-empty").show();
                     }
 
-                    if ($("#TenancyProcessRentPeriods").find('.list-group-item').length - 1 > 0)
-                        $(".TenancyProcessRentPeriodsbadge").text($("#TenancyProcessRentPeriods").find('.list-group-item').length - 1);
-                    else
-                        $(".TenancyProcessRentPeriodsbadge").css("display", "none");
+                    var flag = $("#TenancyProcessRentPeriodsBlock").find("rr-list-group-item-empty")!=null ? true : false;
+                    countBadges('#TenancyProcessRentPeriodsBlock', flag);
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -211,7 +207,4 @@ $(function () {
     $('.rr-rent-periods-card').on('click', '.rent-period-save-btn', saveRentPeriod);
     $('.rr-rent-periods-card').on('click', '.rent-period-delete-btn', deleteRentPeriod);
     $('.rr-rent-periods-card').on('change', '[id^="UntilDismissal"]', changeUntilDismissal);
-
-    if ($("#TenancyProcessRentPeriods").find('.list-group-item').length - 1 == 0)
-        $(".TenancyProcessRentPeriodsbadge").css("display", "none");
 });
