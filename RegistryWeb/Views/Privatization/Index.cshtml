@@ -1,0 +1,18 @@
+﻿@model RegistryWeb.ViewModel.PrivatizationListVM;
+@{
+    ViewData["Title"] = "Приватизация";
+    var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
+        "(" + Model.PageOptions.TotalRows + ")" :
+        "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
+}
+
+<h2>@ViewData["Title"] @text</h2>
+
+<partial name="Filter" model="Model"/>
+<partial name="DataTable" model="Model" />
+<page-link page-model="Model.PageOptions" page-action="Index"></page-link>
+
+@section Scripts {
+}
+@section styles{
+}
