@@ -12,6 +12,7 @@ using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
+using NameCaseLib;
 
 namespace RegistryWeb.Controllers.ServiceControllers
 {
@@ -69,6 +70,20 @@ namespace RegistryWeb.Controllers.ServiceControllers
             registryContext.TenancyAgreements.Update(agreement);
             registryContext.SaveChanges();
             return Json(new { agreement.IdAgreement });
+        }
+
+        [HttpGet]
+        public IActionResult GetSnpPartsCase(string surname, string name, string patronymic, Padeg padeg)
+        {
+            return GetSnpCase((surname + " " + name + " " + patronymic).Trim(), padeg);
+        }
+
+        [HttpGet]
+        public IActionResult GetSnpCase(string snp, Padeg padeg)
+        {
+            var ncl = new Ru();
+            var snpAccusative = ncl.Q(snp, padeg);
+            return Json(new { snpAccusative });
         }
     }
 }
