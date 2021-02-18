@@ -454,7 +454,7 @@ $(function () {
                             form.find("[name='Agreement.IdAgreement']").val(tenancyAgreementReturn.idAgreement);
                             updateInsertTenancyAgreementElem();
 
-                            var flag = $("#TenancyProcessAgreementsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                            var flag = $("#TenancyProcessAgreementsForm").find("rr-list-group-item-empty") != null ? true : false;
                             countBadges('#TenancyProcessAgreementsForm', flag);
 
                         } else {
@@ -509,7 +509,7 @@ $(function () {
                                 $("#TenancyProcessAgreements .rr-list-group-item-empty").show();
                             }
 
-                            var flag = $("#TenancyProcessAgreementsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                            var flag = $("#TenancyProcessAgreementsForm").find("rr-list-group-item-empty") != null != 0 ? true : false;
                             countBadges('#TenancyProcessAgreementsForm', flag);
 
                         }
