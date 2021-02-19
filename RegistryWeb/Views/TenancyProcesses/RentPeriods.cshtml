@@ -9,8 +9,8 @@
         <h4 class="mt-1">
             Предыдущие периоды найма
             @{
-                var count = Model.Count() > 0 ? Model.Count().ToString() : "";
-                var visible = Model.Count() > 0 ? "" : "style='display: none;'";
+                var count = Model != null && Model.Any() ? Model.Count().ToString() : "";
+                var visible = Model != null && Model.Any() ? "" : "style='display: none;'";
             }
             <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visible)>
                 @count
