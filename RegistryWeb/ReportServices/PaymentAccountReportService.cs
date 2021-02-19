@@ -65,7 +65,8 @@ namespace RegistryWeb.ReportServices
             columnHeaders = "[{\"columnHeader\":\"Состояние на дату\"},{\"columnHeader\":\"Дата последнего начисления\"},"+
                 "{\"columnHeader\":\"СРН\"},{\"columnHeader\":\"Адрес по БКС\"},{\"columnHeader\":\"Адрес в реестре ЖФ\"},"+
                 "{\"columnHeader\":\"Лицевой счет\"},{\"columnHeader\":\"Наниматель\"},"+
-                "{\"columnHeader\":\"Общая площадь\"},{\"columnHeader\":\"Жилая площадь\"},{\"columnHeader\":\"Прописано\"},"+
+                "{\"columnHeader\":\"Текущее состояние посл. иск. работы\"},{\"columnHeader\":\"Период посл. иск. работы с\"},{\"columnHeader\":\"Период посл. иск. работы по\"}," +
+                "{\"columnHeader\":\"Общая площадь\"},{\"columnHeader\":\"Жилая площадь\"},{\"columnHeader\":\"Прописано\"}," +
                 "{\"columnHeader\":\"Сальдо вх.\"},{\"columnHeader\":\"Сальдо вх. найм\"},{\"columnHeader\":\"Пени (вх.)\"},"+
                 "{\"columnHeader\":\"Сальдо вх. ДГИ\"},{\"columnHeader\":\"Сальдо вх. Падун\"},{\"columnHeader\":\"Сальдо вх. ПКК\"},"+
                 "{\"columnHeader\":\"Начисление итого\"},{\"columnHeader\":\"Начисление найм\"},{\"columnHeader\":\"Начисление пени\"},"+
@@ -85,7 +86,8 @@ namespace RegistryWeb.ReportServices
                 "{\"columnPattern\":\"$column23$\"},{\"columnPattern\":\"$column24$\"},{\"columnPattern\":\"$column25$\"},{\"columnPattern\":\"$column26$\"},"+
                 "{\"columnPattern\":\"$column27$\"},{\"columnPattern\":\"$column28$\"},{\"columnPattern\":\"$column29$\"},{\"columnPattern\":\"$column30$\"},"+
                 "{\"columnPattern\":\"$column31$\"},{\"columnPattern\":\"$column32$\"},{\"columnPattern\":\"$column33$\"},{\"columnPattern\":\"$column34$\"},"+
-                "{\"columnPattern\":\"$column35$\"},{\"columnPattern\":\"$column36$\"},{\"columnPattern\":\"$column37$\"},{\"columnPattern\":\"$column38$\"}]";
+                "{\"columnPattern\":\"$column35$\"},{\"columnPattern\":\"$column36$\"},{\"columnPattern\":\"$column37$\"},{\"columnPattern\":\"$column38$\"},"+
+                "{\"columnPattern\":\"$column39$\"},{\"columnPattern\":\"$column40$\"},{\"columnPattern\":\"$column41$\"}]";
 
             var fileName = Path.GetTempFileName();
             using (var sw = new StreamWriter(fileName))
