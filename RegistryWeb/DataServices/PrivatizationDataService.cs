@@ -1,7 +1,12 @@
-﻿using RegistryWeb.Models;
+﻿using System;
+using RegistryWeb.Models;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using RegistryWeb.Models.Entities;
+using System.Collections.Generic;
 
 namespace RegistryWeb.DataServices
 {
@@ -15,6 +20,35 @@ namespace RegistryWeb.DataServices
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
             return viewModel;
+        }
+
+        internal PrivatizationListVM GetViewModel(OrderOptions orderOptions, PageOptions pageOptions, PrivatizationFilter filterOptions)
+        {
+            var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
+            var privContract = GetQuery();
+            viewModel.PageOptions.TotalRows = privContract.Count();
+            var query = privContract;
+            //var query = GetQueryFilter(privContract, viewModel.FilterOptions);
+            //query = GetQueryOrder(query, viewModel.OrderOptions);
+            var count = query.Count();
+            viewModel.PageOptions.Rows = count;
+            viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+            if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
+                viewModel.PageOptions.CurrentPage = 1;
+            viewModel.PrivContracts = GetQueryPage(query, viewModel.PageOptions).ToList();
+            return viewModel;
+        }
+
+        private IQueryable<PrivContract> GetQuery()
+        {
+            return registryContext.PrivContracts.AsNoTracking();
+        }
+
+        private IQueryable<PrivContract> GetQueryPage(IQueryable<PrivContract> query, PageOptions pageOptions)
+        {
+            return query
+                .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
+                .Take(pageOptions.SizePage);
         }
     }
 }

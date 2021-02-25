@@ -6,5 +6,46 @@
     var canEdit = true;
 }
 <table class="table table-hover b-table">
-    
+    <thead>
+        <tr>
+            <th class="align-middle" style="width:70px;">
+                №
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "IdBuilding")
+                {
+                    <a href="#" class="oi oi-sort-descending sort b-sorted" data-order-field="IdBuilding" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "IdBuilding" ? "b-sorted" : "")"
+                       data-order-field="IdBuilding" data-order-direction="@(Model.OrderOptions.OrderField == "IdBuilding" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="align-middle">
+                Адрес
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Address")
+                {
+                    <a href="#" class="oi oi-sort-descending sort b-sorted" data-order-field="Address" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Address" ? "b-sorted" : "")"
+                       data-order-field="Address" data-order-direction="@(Model.OrderOptions.OrderField == "Address" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="align-middle"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var contract in Model.PrivContracts)
+        {
+        <tr>
+            <td>@contract.RegNumber</td>
+            <td>Адрес</td>
+            <td>
+                <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                   asp-controller="Privatization" asp-action="Details" asp-route-idContract="@contract.IdContract" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+            </td>
+        </tr>
+        }
+    </tbody>
 </table>

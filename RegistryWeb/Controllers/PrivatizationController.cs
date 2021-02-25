@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.SecurityServices;
+using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
 
 namespace RegistryWeb.Controllers
@@ -18,9 +19,12 @@ namespace RegistryWeb.Controllers
         {
         }
 
-        public IActionResult Index()
+        public IActionResult Index(PrivatizationListVM viewModel)
         {
-            return View();
+            return View(dataService.GetViewModel(
+                viewModel.OrderOptions,
+                viewModel.PageOptions,
+                viewModel.FilterOptions));
         }
     }
 }

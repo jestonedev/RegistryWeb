@@ -152,6 +152,11 @@ namespace RegistryWeb.Models
         public virtual DbSet<AclUserRole> AclUserRoles { get; set; }
         public virtual DbSet<PersonalSetting> PersonalSettings { get; set; }
 
+        //Приватизация
+        public virtual DbSet<PrivAgreement> PrivAgreements { get; set; }
+        public virtual DbSet<PrivContract> PrivContracts { get; set; }
+        public virtual DbSet<PrivContractor> PrivContractors { get; set; }
+
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
         public virtual DbSet<TenancyActiveProcess> TenancyActiveProcesses { get; set; }
@@ -294,6 +299,10 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new JudgeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new JudgeBuildingAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LawyerConfiguration(nameDatebase));
+
+            modelBuilder.ApplyConfiguration(new PrivAgreementConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PrivContractConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PrivContractorConfiguration(nameDatebase));
         }
     }
 }
