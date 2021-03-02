@@ -112,6 +112,10 @@ function deleteLitigation(e) {
             success: function (ind) {
                 if (ind === 1) {
                     litegationElem.remove();
+
+                    var flag = $("#litigationsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                    countBadges('#litigationsForm', flag);
+
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -254,6 +258,9 @@ function saveLitigation(e) {
                     showLitigationDownloadFileBtn(litegationElem, litegation.fileOriginName !== null);
                 }
                 showEditDelPanelLitigation(litegationElem);
+
+                var flag = $("#litigationsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                countBadges('#litigationsForm', flag);
             }
         });
     } else {

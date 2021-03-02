@@ -22,6 +22,9 @@
                 .attr('readonly', true)
                 .data('id', ui.item.id)
                 .data('addresstype', ui.item.addressType);
+
+            var flag = $("#ownerAddressesBlock").find("rr-list-group-item-empty").length != 0 ? true : false;
+            countBadges('#ownerAddressesBlock', flag);
         },
         delay: 300,
         minLength: 3
@@ -103,6 +106,10 @@ function addressDelete() {
     var li = $(this).parents('li');
     var addressType = li.data('addresstype');
     li.remove();
+
+    var flag = $("#ownerAddressesBlock").find("rr-list-group-item-empty").length-1 != 0 ? true : false;
+    countBadges('#ownerAddressesBlock', flag);
+
     $('#addresses li').each(function (i) {
         if ($(this).data('addresstype') == addressType) {
             recalculationAddresses($(this), i)
@@ -133,6 +140,7 @@ function addressInfoToggle() {
     }
     infoBlock.toggle(isHidden);
 }
+
 $(function () {
     autocompleteFilterOptionsAddress();
     if ($('.address').length == 1) {

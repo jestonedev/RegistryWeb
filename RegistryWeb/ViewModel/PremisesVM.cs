@@ -30,6 +30,7 @@ namespace RegistryWeb.ViewModel
         public PremiseWithFunType PremiseWFT { get; set; }
         public List<Premise> PremiseWithFundType { get; set; }
         public int? IdFundType { get; set; }
+        public SelectList KladrRegionsList { get; set; }
         public SelectList KladrStreetsList { get; set; }
         public SelectList RentList { get; set; }
         public SelectList HeatingTypesList { get; set; }

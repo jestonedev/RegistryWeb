@@ -128,6 +128,9 @@ function deleteOwnershipRight(e) {
             success: function (ind) {
                 if (ind === 1) {
                     owrElem.remove();
+
+                    var flag = $("#ownershipRightsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                    countBadges('#ownershipRightsForm', flag);
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -269,6 +272,9 @@ function saveOwnershipRight(e) {
                     owrElem.find("input[name^='IdOwnershipRight']").val(owr.idOwnershipRight);
                     owrElem.find(".rr-ownership-right-file-download").prop("href", "/OwnershipRights/DownloadFile/?idOwnershipRight=" + owr.idOwnershipRight);
                     showOwnershipRightDownloadFileBtn(owrElem, owr.fileOriginName !== null);
+
+                    var flag = $("#ownershipRightsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                    countBadges('#ownershipRightsForm', flag);
                 }
                 showEditDelPanelOwnershipRight(owrElem);
             }

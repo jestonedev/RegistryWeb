@@ -148,6 +148,9 @@ function deleteTenancyRentObject(e) {
                     if ($("#TenancyProcessRentObjects .list-group-item").length === 1) {
                         $("#TenancyProcessRentObjects .rr-list-group-item-empty").show();
                     }
+
+                    var flag = $("#TenancyProcessRentObjectsForm").find("rr-list-group-item-empty") != null ? true : false;
+                    countBadges('#TenancyProcessRentObjectsForm', flag);
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -313,6 +316,10 @@ function saveTenancyRentObject(e) {
                     tenancyRentObjectElem.find("input[name^='IdSubPremisesPrev']").val(tenancyRentObjectElem.find("select[id^='IdSubPremises']").val());
                     tenancyRentObjectElem.find("input[name^='RentAreaPrev']").val(rentAreaElem.val());
                     showEditDelPanelTenancyRentObject(tenancyRentObjectElem);
+
+                    var flag = $("#TenancyProcessRentObjectsForm").find("rr-list-group-item-empty") != null ? true : false;
+                    countBadges('#TenancyProcessRentObjectsForm', flag);
+
                 } else {
                     alert("Во время сохранения произошла ошибка");
                 }

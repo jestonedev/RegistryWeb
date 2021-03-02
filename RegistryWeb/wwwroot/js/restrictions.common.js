@@ -113,7 +113,6 @@ let initializeVilidationRestricitons = function () {
         initializeVilidationRestriction($(this));
     });
 };
-
 function deleteRestriction(e) {
     let isOk = confirm("Вы уверены что хотите удалить документ права собственности?");
     if (isOk) {
@@ -127,6 +126,9 @@ function deleteRestriction(e) {
             success: function (ind) {
                 if (ind === 1) {
                     restrictionElem.remove();
+
+                    var flag = $("#restrictionsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                    countBadges('#restrictionsForm', flag);
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -268,6 +270,9 @@ function saveRestriction(e) {
                     restrictionElem.find(".rr-restriction-file-download")
                         .prop("href", "/Restrictions/DownloadFile/?idRestriction=" + restriction.idRestriction);
                     showRestrictionDownloadFileBtn(restrictionElem, restriction.fileOriginName !== null);
+
+                    var flag = $("#restrictionsForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                    countBadges('#restrictionsForm', flag);
                 }
                 showEditDelPanelRestriction(restrictionElem);
             }

@@ -22,12 +22,13 @@
 function ownerReasonRename(oldI, i) {
     $('.rr-owner-reason[data-i="' + oldI + '"]').each(function (j) {
         $(this).attr('data-i', i);
-        var inputs = $(this).find('input');
-        inputs[0].name = 'Owners[' + i + '].OwnerFilesAssoc[' + j + '].Id';
-        inputs[1].name = 'Owners[' + i + '].OwnerFilesAssoc[' + j + '].IdOwner';
-        inputs[2].name = 'Owners[' + i + '].OwnerFilesAssoc[' + j + '].IdFile';
-        inputs[3].name = 'Owners[' + i + '].OwnerFilesAssoc[' + j + '].NumeratorShare';
-        inputs[4].name = 'Owners[' + i + '].OwnerFilesAssoc[' + j + '].DenominatorShare';
+        $(this).find('[name$=IdReason]').attr('name','Owners[' + i + '].OwnerReasons[' + j + '].IdReason');
+        $(this).find('[name$=IdOwner]').attr('name','Owners[' + i + '].OwnerReasons[' + j + '].IdOwner');
+        $(this).find('[name$=NumeratorShare]').attr('name','Owners[' + i + '].OwnerReasons[' + j + '].NumeratorShare');
+        $(this).find('[name$=DenominatorShare]').attr('name','Owners[' + i + '].OwnerReasons[' + j + '].DenominatorShare');
+        $(this).find('select').attr('name', 'Owners[' + i + '].OwnerReasons[' + j + '].IdReasonType');
+        $(this).find('[name$=ReasonNumber]').attr('name','Owners[' + i + '].OwnerReasons[' + j + '].ReasonNumber');
+        $(this).find('[name$=ReasonDate]').attr('name','Owners[' + i + '].OwnerReasons[' + j + '].ReasonDate');
     });
 }
 function ownerDelete(e) {
@@ -35,6 +36,9 @@ function ownerDelete(e) {
     var i = owner.data('i');
     owner.remove();
     $('.rr-owner-reason[data-i="' + i + '"]').remove();
+
+    countOwnerBadges('#ownerOwnersBlock', false);
+
     ownerRename();
     isValidFraction();
     e.preventDefault();
@@ -59,6 +63,8 @@ function ownerAdd(e) {
             $('#owners').append(data);
             var li = $('.rr-owner').last();
             li.find('input[name$="IdProcess"]').val($('#ownerProcess input[name="IdProcess"]').val());
+
+            countOwnerBadges('#ownerOwnersBlock');
         }
     });
     e.preventDefault();
@@ -81,25 +87,20 @@ function ownerReasonAdd(e) {
                 ownerReasons.last().after(data);
             }
             var reason = $('.rr-owner-reason[data-i="' + i + '"]').last();
+            if (owner.find('.rr-owner-reasons-toggle span').hasClass('oi-document')) {
+                reason.hide();
+            }
             reason.find('input[name$="IdOwner"]').val(owner.find('input[name$="IdOwner"]').val());
             $('#ownerFiles .list-group-item').each(function () {
-                var idFile = $(this).find('input[name$="Id"]').val();
-                var doc = getDocumentString($(this));                
-                reason.find('select').append('<option value="' + idFile + '">' + doc + '</option>');
                 reason.find('.rr-fraction').inputFilter(function (value) {
                     return /^$/.test(value) || /^[1-9]?\d{0,2}\/$/.test(value) || /^\/[1-9]?\d{0,2}$/.test(value) ||
                         /^\/$/.test(value) || /^[1-9]?\d{0,2}$/.test(value) || /^[1-9]\d{0,2}\/[1-9]\d{0,2}$/.test(value);
                 });
             });
-            reason.find('input[name$="IdFile"]').val(reason.find('option:selected').val());
+            reason.find('select').selectpicker("render");
             isValidFraction();
         }
     });
-    e.preventDefault();
-}
-function selectDocumentChange(e) {
-    var reason = $(this).closest('li');
-    reason.find('input[name$="IdFile"]').val(reason.find('option:selected').val());
     e.preventDefault();
 }
 function fractionDocumentChange(e) {
@@ -139,6 +140,20 @@ function isValidFraction() {
     }
     return isValid;
 }
+
+//Функция вычисления количества элементов для компонентов
+function countOwnerBadges(idNameComponentForm) {
+    var count = $(idNameComponentForm).find('.rr-owner').length;
+    if (count > 0) {
+        $(idNameComponentForm).find(".rr-count-badge").text(count);
+        $(idNameComponentForm).find(".rr-count-badge").css("display", "inline-block");
+    }
+    else {
+        $(idNameComponentForm).find(".rr-count-badge").text('');
+        $(idNameComponentForm).find(".rr-count-badge").css("display", "none");
+    }
+}
+
 $(function () {
     $('.rr-fraction').inputFilter(function (value) {
         return /^$/.test(value) || /^[1-9]?\d{0,2}\/$/.test(value) || /^\/[1-9]?\d{0,2}$/.test(value) ||
@@ -148,6 +163,5 @@ $(function () {
     $('#owners').on('click', '.rr-owner-delete', ownerDelete);
     $('#owners').on('click', '.rr-owner-reason-add', ownerReasonAdd);
     $('#owners').on('click', '.rr-owner-reason-delete', ownerReasonDelete);
-    $('#owners').on('change', 'select', selectDocumentChange);
     $('#owners').on('change', '.rr-fraction', fractionDocumentChange);
 });

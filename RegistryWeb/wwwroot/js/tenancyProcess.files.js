@@ -52,6 +52,9 @@ function deleteTenancyFile(e) {
                     if ($("#TenancyProcessFiles .list-group-item").length === 1) {
                         $("#TenancyProcessFiles .rr-list-group-item-empty").show();
                     }
+
+                    var flag = $("#TenancyFilesForm").find("rr-list-group-item-empty") != null ? true : false;
+                    countBadges('#TenancyFilesForm', flag);
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -183,6 +186,9 @@ function saveTenancyFile(e) {
                 showTenancyFileDownloadFileBtn(attachmentFileElem, attachmentFile.fileName !== "" && attachmentFile.fileName !== null);
             }
             showEditDelPanelTenancyFile(attachmentFileElem);
+
+            var flag = $("#TenancyFilesForm").find("rr-list-group-item-empty") != null ? true : false;
+            countBadges('#TenancyFilesForm', flag);
         }
     });
     e.preventDefault();

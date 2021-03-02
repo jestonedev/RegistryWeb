@@ -98,6 +98,9 @@ function saveTenancyReason(e) {
                     tenancyReasonElem.find("input[name^='IdReason']").val(tenancyReason.idReason);
                 }
                 showEditDelPanelTenancyReason(tenancyReasonElem);
+
+                var flag = $("#TenancyProcessReasonsForm").find("rr-list-group-item-empty") != null ? true : false;
+                countBadges('#TenancyProcessReasonsForm', flag);
             }
         });
     } else {
@@ -159,6 +162,9 @@ function deleteTenancyReason(e) {
                     if ($("#TenancyProcessReasons .list-group-item").length === 1) {
                         $("#TenancyProcessReasons .rr-list-group-item-empty").show();
                     }
+
+                    var flag = $("#TenancyProcessReasonsForm").find("rr-list-group-item-empty") != null ? true : false;
+                    countBadges('#TenancyProcessReasonsForm', flag);
                 }
                 else {
                     alert("Ошибка удаления!");

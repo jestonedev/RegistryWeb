@@ -248,6 +248,9 @@ function deleteResettle(e) {
             success: function (ind) {
                 if (ind === 1) {
                     resettleElem.remove();
+
+                    var flag = $("#resettlesForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                    countResettleBadges('#resettlesForm', flag);
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -577,6 +580,9 @@ function saveResettle(e) {
                     showResettleDownloadFileBtns(resettleElem, resettle);
                 }
                 showEditDelPanelResettle(resettleElem);
+
+                var flag = $("#resettlesForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                countResettleBadges('#resettlesForm', flag);
             }
         });
     } else {
@@ -771,6 +777,20 @@ function removeResettleDocument(e) {
 function toggleDocuments(e) {
     $("#resettleDocumentsList").toggle();
     e.preventDefault();
+}
+
+//Функция вычисления количества элементов для компонентов
+function countResettleBadges(idNameComponentForm, flag) {
+    var dif = $(idNameComponentForm).find('.list-group-item').length - $("#resettleDocumentsList").find('.list-group-item').length;
+    var count = flag ? dif - 1 : dif;
+    if (count > 0) {
+        $(idNameComponentForm).find(".rr-count-badge").text(count);
+        $(idNameComponentForm).find(".rr-count-badge").css("display", "inline-block");
+    }
+    else {
+        $(idNameComponentForm).find(".rr-count-badge").text('');
+        $(idNameComponentForm).find(".rr-count-badge").css("display", "none");
+    }
 }
 
 $(function () {

@@ -4,9 +4,18 @@
 <link rel="stylesheet" href="~/css/tenancy.rent.periods.css"/>
 <script src="~/js/tenancyProcess.rentPeriods.js"></script>
 
-<div class="card rr-rent-periods-card">
-    <div class="card-header d-flex justify-content-between">
-        <h3>Предыдущие периоды найма</h3>
+<div class="card rr-rent-periods-card mb-2" id="TenancyProcessRentPeriodsBlock">
+    <div class="card-header d-flex justify-content-between pt-2 pb-2">
+        <h4 class="mt-1">
+            Предыдущие периоды найма
+            @{
+                var count = Model != null && Model.Any() ? Model.Count().ToString() : "";
+                var visible = Model != null && Model.Any() ? "" : "style='display: none;'";
+            }
+            <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visible)>
+                @count
+            </span>
+        </h4>
         <div class="btn-group" role="group">
             @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
             {
@@ -17,7 +26,7 @@
     </div>
     <ul class="list-group list-group-flush toggle-hide" id="TenancyProcessRentPeriods" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
         <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
-            <i>Предыдущие периоды найма отсутстувуют</i>
+            <i>Предыдущие периоды найма отсутствуют</i>
         </li>
         @if (Model != null && Model.Any())
         {

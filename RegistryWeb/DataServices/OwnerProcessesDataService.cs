@@ -18,9 +18,11 @@ namespace RegistryWeb.DataServices
         private readonly IQueryable<OwnerBuildingAssoc> ownerBuildingsAssoc;
         private readonly IQueryable<OwnerPremiseAssoc> ownerPremisesAssoc;
         private readonly IQueryable<OwnerSubPremiseAssoc> ownerSubPremisesAssoc;
+        private readonly AddressesDataService addressesDataService;
+
         public string AttachmentsPath { get; private set; }
 
-        public OwnerProcessesDataService(RegistryContext registryContext, IConfiguration config) : base(registryContext)
+        public OwnerProcessesDataService(RegistryContext registryContext, AddressesDataService addressesDataService, IConfiguration config) : base(registryContext)
         {
             AttachmentsPath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"OwnerProcesses");
 
@@ -47,6 +49,7 @@ namespace RegistryWeb.DataServices
                         .ThenInclude(p => p.IdPremisesTypeNavigation)
                 .Include(oba => oba.IdProcessNavigation)
                 .AsNoTracking();
+            this.addressesDataService = addressesDataService;
         }
 
         public override OwnerProcessesVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, OwnerProcessesFilter filterOptions)
@@ -224,16 +227,22 @@ namespace RegistryWeb.DataServices
         {
             if (filterOptions.IsAddressEmpty())
                 return query;
+            var addresses = addressesDataService.GetAddressesByText(filterOptions.Address.Text).Select(r => r.Id);
+            if (filterOptions.Address.Id != null)
+            {
+                addresses = new List<string> { filterOptions.Address.Id };
+            }
+
             if (filterOptions.Address.AddressType == AddressTypes.Street)
             {
                 var idBuildingProcesses = ownerBuildingsAssoc
-                    .Where(oba => oba.BuildingNavigation.IdStreet.Equals(filterOptions.Address.Id))
+                    .Where(oba => addresses.Contains(oba.BuildingNavigation.IdStreet))
                     .Select(oba => oba.IdProcess);
                 var idPremiseProcesses = ownerPremisesAssoc
-                    .Where(opa => opa.PremiseNavigation.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id))
+                    .Where(opa => addresses.Contains(opa.PremiseNavigation.IdBuildingNavigation.IdStreet))
                     .Select(opa => opa.IdProcess);
                 var idSubPremiseProcesses = ownerSubPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id))
+                    .Where(ospa => addresses.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet))
                     .Select(ospa => ospa.IdProcess);
                 var idProcesses = idBuildingProcesses.Union(idPremiseProcesses).Union(idSubPremiseProcesses);
                 //query.Join(idProcesses, q => q.IdProcess, idProc => idProc, (q, idProc) => q);
@@ -242,19 +251,20 @@ namespace RegistryWeb.DataServices
                     join idProcess in idProcesses on q.IdProcess equals idProcess
                     select q;
             }
-            int id = 0;
-            if (!int.TryParse(filterOptions.Address.Id, out id))
+            var addressesInt = addresses.Where(a => int.TryParse(a, out int aInt)).Select(a => int.Parse(a));
+            if (!addressesInt.Any())
                 return query;
+
             if (filterOptions.Address.AddressType == AddressTypes.Building)
             {
                 var idBuildingProcesses = ownerBuildingsAssoc
-                    .Where(oba => oba.IdBuilding == id)
+                    .Where(oba => addressesInt.Contains(oba.IdBuilding))
                     .Select(oba => oba.IdProcess);
                 var idPremiseProcesses = ownerPremisesAssoc
-                    .Where(opa => opa.PremiseNavigation.IdBuilding == id)
+                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdBuilding))
                     .Select(opa => opa.IdProcess);
                 var idSubPremiseProcesses = ownerSubPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuilding == id)
+                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuilding))
                     .Select(ospa => ospa.IdProcess);
                 var idProcesses = idBuildingProcesses.Union(idPremiseProcesses).Union(idSubPremiseProcesses);
                 return
@@ -265,10 +275,10 @@ namespace RegistryWeb.DataServices
             if (filterOptions.Address.AddressType == AddressTypes.Premise)
             {
                 var idPremiseProcesses = ownerPremisesAssoc
-                    .Where(opa => opa.PremiseNavigation.IdPremises == id)
+                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdPremises))
                     .Select(opa => opa.IdProcess);
                 var idSubPremiseProcesses = ownerSubPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdPremises == id)
+                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdPremises))
                     .Select(ospa => ospa.IdProcess);
                 var idProcesses = idPremiseProcesses.Union(idSubPremiseProcesses);
                 return
@@ -279,7 +289,7 @@ namespace RegistryWeb.DataServices
             if (filterOptions.Address.AddressType == AddressTypes.SubPremise)
             {
                 var idProcesses = ownerSubPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdSubPremises == id)
+                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdSubPremises))
                     .Select(ospa => ospa.IdProcess);
                 return
                     from q in query
@@ -426,9 +436,9 @@ namespace RegistryWeb.DataServices
                 .Include(op => op.Owners)
                     .ThenInclude(ow => ow.OwnerOrginfo)
                 .Include(op => op.Owners)
-                    .ThenInclude(ow => ow.OwnerFilesAssoc)
+                    .ThenInclude(ow => ow.OwnerReasons)
                 .Include(op => op.OwnerFiles)
-                    .ThenInclude(of => of.OwnerReasonType)
+                //    .ThenInclude(of => of.OwnerReasonType)
                 .AsNoTracking()
                 .FirstOrDefault(op => op.IdProcess == idProcess);
             ownerProcess.OwnerBuildingsAssoc =
@@ -465,24 +475,9 @@ namespace RegistryWeb.DataServices
 
         internal void Create(OwnerProcess ownerProcess, IFormFileCollection attachmentFiles)
         {
-            var tempOwnerProcess = new OwnerProcess()
-            {
-                AnnulDate = ownerProcess.AnnulDate,
-                AnnulComment = ownerProcess.AnnulComment,
-                Comment = ownerProcess.Comment,
-                OwnerBuildingsAssoc = ownerProcess.OwnerBuildingsAssoc,
-                OwnerPremisesAssoc = ownerProcess.OwnerPremisesAssoc,
-                OwnerSubPremisesAssoc = ownerProcess.OwnerSubPremisesAssoc,
-            };
-            registryContext.OwnerProcesses.Add(tempOwnerProcess);
-            registryContext.SaveChanges();
-            ownerProcess.IdProcess = tempOwnerProcess.IdProcess;
             var ind = 0;
             foreach (var ownerFile in ownerProcess.OwnerFiles)
             {
-                var tempId = ownerFile.Id;
-                ownerFile.Id = 0;
-                ownerFile.IdProcess = ownerProcess.IdProcess;
                 //если новый файл прикрепили в документ
                 if (ownerFile.FileDisplayName != null)
                 {
@@ -493,19 +488,8 @@ namespace RegistryWeb.DataServices
                     fileStream.Close();
                     ind++;
                 }
-                registryContext.OwnerFiles.Add(ownerFile);
-                registryContext.SaveChanges();
-                foreach (var owner in ownerProcess.Owners)
-                {
-                    var assocs = owner.OwnerFilesAssoc.Where(ofa => ofa.IdFile == tempId);
-                    foreach (var assoc in assocs)
-                    {
-                        assoc.IdFile = ownerFile.Id;
-                    }
-                }
             }
-            tempOwnerProcess.Owners = ownerProcess.Owners;
-            registryContext.OwnerProcesses.Update(tempOwnerProcess);
+            registryContext.OwnerProcesses.Add(ownerProcess);
             registryContext.SaveChanges();
         }
 
@@ -516,7 +500,7 @@ namespace RegistryWeb.DataServices
                 .Include(op => op.OwnerPremisesAssoc)
                 .Include(op => op.OwnerSubPremisesAssoc)
                 .Include(op => op.Owners)
-                    .ThenInclude(ow => ow.OwnerFilesAssoc)
+                    .ThenInclude(ow => ow.OwnerReasons)
                 .Include(op => op.OwnerFiles)
                 .FirstOrDefault(op => op.IdProcess == idProcess);
             ownerProcess.Deleted = 1;
@@ -539,9 +523,9 @@ namespace RegistryWeb.DataServices
             foreach (var owner in ownerProcess.Owners)
             {
                 owner.Deleted = 1;
-                foreach (var ofa in owner.OwnerFilesAssoc)
+                foreach (var or in owner.OwnerReasons)
                 {
-                    ofa.Deleted = 1;
+                    or.Deleted = 1;
                 }
             }
             registryContext.SaveChanges();
@@ -556,27 +540,9 @@ namespace RegistryWeb.DataServices
             {
                 var newOwnerFile = newOwnerProcess.OwnerFiles[i];
                 var oldOnwerFile = oldOwnerProcess.OwnerFiles.FirstOrDefault(of => of.Id == newOwnerFile.Id);
-                var isAddedfile = newOwnerFile.FileDisplayName != null
+                var isAddedFile = newOwnerFile.FileDisplayName != null
                     && (oldOnwerFile?.FileOriginName == null || removeFiles[i])
                     && attachmentFiles.Count() > 0;
-
-                //Обработка новых файлов с отрицательным Id
-                if (newOwnerFile.Id < 0)
-                {
-                    var tempId = newOwnerFile.Id;
-                    newOwnerFile.Id = 0;
-                    registryContext.OwnerFiles.Add(newOwnerFile);
-                    registryContext.SaveChanges();
-                    foreach (var newOwner in newOwnerProcess.Owners)
-                    {
-                        var assocs = newOwner.OwnerFilesAssoc.Where(ofa => ofa.IdFile == tempId);
-                        foreach (var assoc in assocs)
-                        {
-                            assoc.IdFile = newOwnerFile.Id;
-                        }
-                    }
-                }
-
                 //удаляем старый файл, если он был прикреплен
                 if (removeFiles[i])
                 {
@@ -590,7 +556,7 @@ namespace RegistryWeb.DataServices
                     }
                 }
                 //если новый файл прикрепили в документ
-                if (isAddedfile)
+                if (isAddedFile)
                 {
                     newOwnerFile.FileOriginName = Guid.NewGuid().ToString() + new FileInfo(attachmentFiles[ind].FileName).Extension;
                     newOwnerFile.FileMimeType = attachmentFiles[ind].ContentType;
@@ -626,10 +592,10 @@ namespace RegistryWeb.DataServices
                     registryContext.Entry(oldOwner).Property(p => p.Deleted).IsModified = true;
                     oldOwner.Deleted = 1;
                     //случай, когда удаляется собственник. Все его документы должны удалиться автоматом
-                    foreach (var oldOwnerFileAssoc in oldOwner.OwnerFilesAssoc)
+                    foreach (var oldOwnerReason in oldOwner.OwnerReasons)
                     {
-                        registryContext.Entry(oldOwnerFileAssoc).Property(p => p.Deleted).IsModified = true;
-                        oldOwnerFileAssoc.Deleted = 1;
+                        registryContext.Entry(oldOwnerReason).Property(p => p.Deleted).IsModified = true;
+                        oldOwnerReason.Deleted = 1;
                     }
                     newOwnerProcess.Owners.Add(oldOwner);
                 }
@@ -637,13 +603,13 @@ namespace RegistryWeb.DataServices
                 {
                     //случай, когда удаляется документ.
                     var newOwner = newOwnerProcess.Owners.FirstOrDefault(ow => ow.IdOwner == oldOwner.IdOwner);
-                    foreach (var oldOwnerFileAssoc in oldOwner.OwnerFilesAssoc)
+                    foreach (var oldOwnerReason in oldOwner.OwnerReasons)
                     {
-                        if (newOwner.OwnerFilesAssoc.Select(ofa => ofa.Id).Contains(oldOwnerFileAssoc.Id) == false)
+                        if (newOwner.OwnerReasons.Select(or => or.IdReason).Contains(oldOwnerReason.IdReason) == false)
                         {
-                            registryContext.Entry(oldOwnerFileAssoc).Property(p => p.Deleted).IsModified = true;
-                            oldOwnerFileAssoc.Deleted = 1;
-                            newOwner.OwnerFilesAssoc.Add(oldOwnerFileAssoc);
+                            registryContext.Entry(oldOwnerReason).Property(p => p.Deleted).IsModified = true;
+                            oldOwnerReason.Deleted = 1;
+                            newOwner.OwnerReasons.Add(oldOwnerReason);
                         }
                     }
                 }

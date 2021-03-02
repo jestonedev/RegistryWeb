@@ -98,6 +98,9 @@ function saveRentPeriod(e) {
                     rentPeriodElem.find("input[name^='IdRentPeriod']").val(rentPeriod.idRentPeriod);
                 }
                 showEditDelPanelRentPeriod(rentPeriodElem);
+
+                var flag = $("#TenancyProcessRentPeriodsBlock").find("rr-list-group-item-empty") != null ? true : false;
+                countBadges('#TenancyProcessRentPeriodsBlock', flag);
             }
         });
     } else {
@@ -152,6 +155,9 @@ function deleteRentPeriod(e) {
                     if ($("#TenancyProcessRentPeriods .list-group-item").length === 1) {
                         $("#TenancyProcessRentPeriods .rr-list-group-item-empty").show();
                     }
+
+                    var flag = $("#TenancyProcessRentPeriodsBlock").find("rr-list-group-item-empty")!=null ? true : false;
+                    countBadges('#TenancyProcessRentPeriodsBlock', flag);
                 }
                 else {
                     alert("Ошибка удаления!");

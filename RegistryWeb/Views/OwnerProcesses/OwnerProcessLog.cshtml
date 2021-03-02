@@ -25,7 +25,7 @@
             case "org_name":
                 return "Имя: " + logValue.Value;
             case "patronymic":
-                return "Отчетсво: " + logValue.Value;
+                return "Отчество: " + logValue.Value;
             case "id_owner":
                 return "Договор по Собственнику №" + logValue.Value;
             case "numerator_share":
@@ -66,7 +66,7 @@
                     @if (log.IdLogType != 5 && log.IdLogType != 6)
                     {
                         <a href="#" class="form-control btn btn-primary logValueToggle" data-ind="@i">
-                            <span class="oi oi-chevron-top"></span>
+                            <span class="oi oi-chevron-bottom"></span>
                         </a>
                     }
                 </td>

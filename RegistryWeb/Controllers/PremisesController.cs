@@ -79,6 +79,8 @@ namespace RegistryWeb.Controllers
             if (premise == null)
                 return NotFound();
             ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(premise);
+            ViewBag.CanDeleteBaseInfo = CanDeleteBaseInfo(premise);
+            ViewBag.CanEditAnySubPremises = CanEditAnySubPremises(premise);
             ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
             ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
             return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: false));
@@ -102,7 +104,7 @@ namespace RegistryWeb.Controllers
             if (premise == null)
                 return NotFound();
 
-            if (!CanEditPremiseBaseInfo(premise))
+            if (!CanEditPremiseBaseInfo(premise) || (premise.SubPremises.Count > 0 && !CanEditAnySubPremises(premise)))
                 return View("NotAccess");
             if (!securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo))
             {
@@ -163,6 +165,8 @@ namespace RegistryWeb.Controllers
                 return NotFound();
 
             ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(premise);
+            ViewBag.CanDeleteBaseInfo = CanDeleteBaseInfo(premise);
+            ViewBag.CanEditAnySubPremises = CanEditAnySubPremises(premise);
             ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
             ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
 
@@ -178,6 +182,8 @@ namespace RegistryWeb.Controllers
                 return NotFound();
 
             ViewBag.CanEditBaseInfo = CanEditPremiseBaseInfo(premise);
+            ViewBag.CanDeleteBaseInfo = CanDeleteBaseInfo(premise);
+            ViewBag.CanEditAnySubPremises = CanEditAnySubPremises(premise);
             ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
             ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
 
@@ -211,7 +217,7 @@ namespace RegistryWeb.Controllers
             if (premise == null)
                 return NotFound();
 
-            if (!CanEditPremiseBaseInfo(premise))
+            if (!CanEditPremiseBaseInfo(premise) || (premise.SubPremises.Count > 0 && !CanEditAnySubPremises(premise)))
                 return View("NotAccess");
 
             ViewBag.CanEditBaseInfo = false;
@@ -229,7 +235,7 @@ namespace RegistryWeb.Controllers
 
             var premiseDb = dataService.GetPremise(premise.IdPremises);
 
-            if (!CanEditPremiseBaseInfo(premiseDb))
+            if (!CanEditPremiseBaseInfo(premiseDb) || (premiseDb.SubPremises.Count > 0 && !CanEditAnySubPremises(premiseDb)))
                 return View("NotAccess");
 
             ViewBag.ReturnUrl = returnUrl;
@@ -239,9 +245,29 @@ namespace RegistryWeb.Controllers
 
         private bool CanEditPremiseBaseInfo(Premise premise)
         {
-            return ((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(premise.IdState) &&
-                (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) || premise.SubPremises == null || !premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)))) ||
-               (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(premise.IdState)));
+            return (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(premise.IdState)) ||
+                   (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(premise.IdState));
+        }
+
+        private bool CanEditAnySubPremises(Premise premise)
+        {
+            return (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && 
+                        premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState))) ||
+                   (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) &&
+                        premise.SubPremises.Any(sp => !ObjectStateHelper.IsMunicipal(sp.IdState)));
+        }
+
+        private bool CanDeleteBaseInfo(Premise premise)
+        {
+            return  (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal)) ||
+                    (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(premise.IdState) && !premise.SubPremises.Any(sp => !ObjectStateHelper.IsMunicipal(sp.IdState))) ||
+                    (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(premise.IdState) && !premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)));
+        }
+
+        public JsonResult GetKladrStreets(string idRegion)
+        {
+            IEnumerable<KladrStreet> streets = dataService.GetKladrStreets(idRegion);
+            return Json(streets);
         }
 
         public JsonResult GetHouse(string streetId)

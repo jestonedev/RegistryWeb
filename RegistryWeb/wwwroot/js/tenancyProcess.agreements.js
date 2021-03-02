@@ -109,6 +109,7 @@ $(function () {
 
     $("#agreementModal").on("show.bs.modal", function () {
         $(this).find("select").selectpicker("refresh");
+        $("#saveAgreementModalBtn").prop("disabled", "");
     });
 
     $("#agreementModal").on("hide.bs.modal", function () {
@@ -429,6 +430,7 @@ $(function () {
 
     $("#agreementModal").on("click", "#saveAgreementModalBtn", function (e) {
         e.preventDefault();
+        $("#saveAgreementModalBtn").prop("disabled", "disabled");
         let action = $('#TenancyProcessAgreements').data('action');
         var form = $("#TenancyProcessAgreementsModalForm");
         form.find("#Agreement_Type").val("").selectpicker("refresh").change();
@@ -451,6 +453,10 @@ $(function () {
                         if (tenancyAgreementReturn.idAgreement > 0) {
                             form.find("[name='Agreement.IdAgreement']").val(tenancyAgreementReturn.idAgreement);
                             updateInsertTenancyAgreementElem();
+
+                            var flag = $("#TenancyProcessAgreementsForm").find("rr-list-group-item-empty") != null ? true : false;
+                            countBadges('#TenancyProcessAgreementsForm', flag);
+
                         } else {
                             alert('Произошла ошибка при сохранении');
                         }
@@ -458,12 +464,14 @@ $(function () {
                 });
             }, function (error) {
                 alert(error);
+                $("#saveAgreementModalBtn").prop("disabled", "");
             });
         } else {
             refreshSelectpickerValidationBorders(form);
             $([document.documentElement, document.body]).animate({
                 scrollTop: form.find(".input-validation-error").first().offset().top - 35
             }, 1000);
+            $("#saveAgreementModalBtn").prop("disabled", "");
         }
     });
 
@@ -500,6 +508,10 @@ $(function () {
                             if ($("#TenancyProcessAgreements .list-group-item").length === 1) {
                                 $("#TenancyProcessAgreements .rr-list-group-item-empty").show();
                             }
+
+                            var flag = $("#TenancyProcessAgreementsForm").find("rr-list-group-item-empty") != null != 0 ? true : false;
+                            countBadges('#TenancyProcessAgreementsForm', flag);
+
                         }
                         else {
                             alert("Ошибка удаления!");
@@ -905,6 +917,16 @@ $(function () {
                 header += " от " + personInfo.RegistrationDate;
             }
             let tenant = personInfo.Surname + " " + personInfo.Name + (personInfo.Patronymic !== "" ? " " + personInfo.Patronymic : "");
+            $.ajax({
+                type: "GET",
+                url: "/TenancyAgreements/GetSnpPartsCase?surname=" + personInfo.Surname + "&name=" + personInfo.Name + "&patronymic=" + personInfo.Patronymic +
+                    "&padeg=VINITELN",
+                async: false,
+                success: function (data) {
+                    tenant = data.snpAccusative;
+                }
+            });
+
             if (personInfo.BirthDate !== "") {
                 tenant += " - " + personInfo.BirthDate + " г.р.";
             }
@@ -1186,9 +1208,18 @@ $(function () {
         var contentLines = [];
 
         var agreementDefaultText = getDefaultAgreementText();
-        var oldTenant = "";
+        var oldTenant = changeTenantInfo.CurrentTenant;
         if (changeTenantInfo.CurrentTenant !== "") {
-            oldTenant = " «" + changeTenantInfo.CurrentTenant + "»";
+            $.ajax({
+                type: "GET",
+                url: "/TenancyAgreements/GetSnpCase?snp=" + changeTenantInfo.CurrentTenant +"&padeg=RODITLN",
+                async: false,
+                success: function (data) {
+                    oldTenant = data.snpAccusative;
+                }
+            });
+
+            oldTenant = " «" + oldTenant + "»";
         }
         agreementDefaultText = agreementDefaultText.replace("договорились:",
             "в связи c ________________________________________ нанимателя" + oldTenant + ", договорились:");
@@ -1198,6 +1229,17 @@ $(function () {
 
         var tenant = changeTenantInfo.NewTenantSurname + " " + changeTenantInfo.NewTenantName +
             (changeTenantInfo.NewTenantPatronymic !== "" ? " " + changeTenantInfo.NewTenantPatronymic : "");
+
+        $.ajax({
+            type: "GET",
+            url: "/TenancyAgreements/GetSnpPartsCase?surname=" + changeTenantInfo.NewTenantSurname + "&name=" + changeTenantInfo.NewTenantName +
+                "&patronymic=" + changeTenantInfo.NewTenantPatronymic + "&padeg=VINITELN",
+            async: false,
+            success: function (data) {
+                tenant = data.snpAccusative;
+            }
+        });
+
         if (changeTenantInfo.NewTenantBirthDate !== "") {
             tenant += ", " + changeTenantInfo.NewTenantBirthDate + " г.р.";
         }

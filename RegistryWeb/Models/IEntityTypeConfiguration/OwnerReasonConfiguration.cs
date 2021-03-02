@@ -61,7 +61,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
             builder.HasOne(d => d.IdOwnerNavigation)
                 .WithMany(p => p.OwnerReasons)
-                .HasForeignKey(d => d.IdOwner);
+                .HasForeignKey(d => d.IdOwner)
+                .HasConstraintName("FK_owner_reasons_owners_id_owner");
 
             builder.HasOne(d => d.IdReasonTypeNavigation)
                 .WithMany(p => p.OwnerReasons)

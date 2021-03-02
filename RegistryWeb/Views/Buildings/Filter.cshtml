@@ -21,14 +21,14 @@
         @if (Model.FilterOptions.IsAddressEmpty())
         {
             <div class="form-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-7 col-md-8 col-lg-9" : "col-9 col-md-9 col-lg-10")">
-                <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" data-is-buildings="true" title="Адрес" placeholder="Адрес" />
+                <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" data-is-buildings="true" title="Адрес" placeholder="Адрес" />
             </div>
         }
         else
         {
             <div class="form-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-7 col-md-8 col-lg-9" : "col-9 col-md-9 col-lg-10")">
                 <div class="input-group">
-                    <input type="text" class="form-control col" disabled asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                    <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
                     <div class="input-group-append h-auto d-inline-block">
                         <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
                     </div>
@@ -137,9 +137,29 @@
                             <input type="date" class="form-control" asp-for="FilterOptions.DateOwnershipRight" title="Дата ограничения">
                         </div>
                         <div class="form-group col-md-12 col-lg-6">
-                            <label asp-for="FilterOptions.IdsOwnershipRightType">Тип ограничения <b>содержит</b></label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип ограничения содержит" asp-for="FilterOptions.IdsOwnershipRightType" asp-items="@{
+                            <label asp-for="FilterOptions.IdsOwnershipRightType">Тип ограничения</label>
+                            <div class="row">
+                                <div class="col-4 pr-1">
+                                    <select class="selectpicker form-control" asp-for="FilterOptions.IdsOwnershipRightTypeContains" title="Содержит/не содержит">
+                                        @if (Model.FilterOptions.IdsOwnershipRightTypeContains == null || Model.FilterOptions.IdsOwnershipRightTypeContains.Value)
+                                        {
+                                            <option value="True" selected>Содержит</option>
+                                            <option value="False">Не содержит</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="True">Содержит</option>
+                                            <option value="False" selected>Не содержит</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-8 pl-1">
+                                    <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип ограничения" asp-for="FilterOptions.IdsOwnershipRightType" asp-items="@{
                                 new SelectList(ViewBag.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName", Model.FilterOptions.IdsOwnershipRightType)}"></select>
+                                </div>
+                            </div>
+
+                            
                         </div>
                     </div>
                 </div>

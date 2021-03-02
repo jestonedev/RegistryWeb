@@ -58,6 +58,9 @@ function deleteAttachmentFile(e) {
             success: function (ind) {
                 if (ind === 1) {
                     attachmentFileElem.remove();
+
+                    var flag = $("#attachmentFilesForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                    countBadges('#attachmentFilesForm', flag);
                 }
                 else {
                     alert("Ошибка удаления!");
@@ -179,7 +182,11 @@ function saveAttachmentFile(e) {
         processData: false,
         contentType: false,
         success: function (attachmentFile) {
-            if (attachmentFile.idAttachment > 0) {
+            if (attachmentFile.idAttachment > 0) {            
+                
+                var flag = $("#attachmentFilesForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                countBadges('#attachmentFilesForm', flag);
+
                 attachmentFileElem.find("input[name^='IdAttachment']").val(attachmentFile.idAttachment);
                 attachmentFileElem.find(".rr-attachment-file-download")
                     .prop("href", "/AttachmentFiles/DownloadFile/?idAttachment=" + attachmentFile.idAttachment);
@@ -231,5 +238,5 @@ $(function () {
     $('#attachmentFilesList').on('click', '.attachment-file-delete-btn', deleteAttachmentFile);
     $('#attachmentFilesList').on('click', '.rr-attachment-file-attach', attachAttachmentFile);
     $('#attachmentFilesList').on('click', '.rr-attachment-file-remove', removeAttachmentFile);
-    $('#attachmentFilesList').on('change', "input[name='AttachmentFile']", changeAttachmentFileAttachment);
+    $('#attachmentFilesList').on('change', "input[name='AttachmentFile']", changeAttachmentFileAttachment);    
 });

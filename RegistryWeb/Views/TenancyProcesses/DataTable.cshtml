@@ -22,8 +22,8 @@
         <tr style="align-content: center;">
             <th class="r-table-header-cell">
             </th>
-            <th class="r-table-header-cell" style="width:155px;">
-                № по рeестру
+            <th class="r-table-header-cell" style="width:70px;">
+                №
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "IdProcess")
                 {
                     <a href="#" class="oi oi-sort-descending sort tp-sorted" data-order-field="IdProcess" data-order-direction="0"></a>
@@ -32,18 +32,6 @@
                 {
                     <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "IdProcess" ? "tp-sorted" : "")"
                        data-order-field="IdProcess" data-order-direction="@(Model.OrderOptions.OrderField == "IdProcess" ? "1" : "0")"></a>
-                }
-            </th>
-            <th class="r-table-header-cell">
-                Информация о найме
-                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "RegistrationNum")
-                {
-                    <a href="#" class="oi oi-sort-descending sort tp-sorted" data-order-field="RegistrationNum" data-order-direction="0"></a>
-                }
-                else
-                {
-                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "RegistrationNum" ? "tp-sorted" : "")"
-                       data-order-field="RegistrationNum" data-order-direction="@(Model.OrderOptions.OrderField == "RegistrationNum" ? "1" : "0")"></a>
                 }
             </th>
             <th class="r-table-header-cell">
@@ -57,6 +45,22 @@
                     <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Address" ? "tp-sorted" : "")"
                        data-order-field="Address" data-order-direction="@(Model.OrderOptions.OrderField == "Address" ? "1" : "0")"></a>
                 }
+            </th>
+            <th class="r-table-header-cell">
+                Информация о найме
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "RegistrationNum")
+                {
+                    <a href="#" class="oi oi-sort-descending sort tp-sorted" title="Сортировка по регистрационному номеру"  data-order-field="RegistrationNum" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "RegistrationNum" ? "tp-sorted" : "")"
+                       title="Сортировка по регистрационному номеру"
+                       data-order-field="RegistrationNum" data-order-direction="@(Model.OrderOptions.OrderField == "RegistrationNum" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="tp-table-low-width-hide-cell">
+                Плата за найм
             </th>
             <th></th>
         </tr>
@@ -79,53 +83,67 @@
                 @item.IdProcess
             </td>
             <td>
-                <div class="rent-type-info">
-                    <b>Найм:</b> @item.IdRentTypeNavigation?.RentTypeName
-                </div>
-                <div class="tenant-info">
-                    <b>Наниматель:</b>
-                    @{
-                        var tenant = item.TenancyPersons.FirstOrDefault(tp => tp.ExcludeDate == null && tp.IdKinship == 1 && tp.Deleted == 0);
-                        if (tenant != null)
-                        {
-                            <span>@(tenant.Surname + " " + tenant.Name + (string.IsNullOrEmpty(tenant.Patronymic) ? "" : " " + tenant.Patronymic))</span>
-                        }
-                        else
-                        {
-                            <span><i>Отсутствует</i></span>
-                        }
-                    }
-                </div>
-                @if (!string.IsNullOrEmpty(item.RegistrationNum))
-                {
-                    <div>
-                        <b>Договор найма:</b> № @item.RegistrationNum @(item.RegistrationDate.HasValue ? "от " + @item.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")
-                    </div>
-                }
-                @if (!string.IsNullOrEmpty(item.ResidenceWarrantNum))
-                {
-                    <div>
-                        <b>Ордер (пр. док. осн.):</b> № @item.ResidenceWarrantNum @(item.ResidenceWarrantDate.HasValue ? "от " + @item.ResidenceWarrantDate.Value.ToString("dd.MM.yyyy") : "")
-                    </div>
-                }
-                @if (Model.RentObjects.ContainsKey(item.IdProcess))
-                {
-                    <div>
-                        <b>Размер платы (до 28.08.19):</b> @(Model.RentObjects[item.IdProcess].Sum(r => r.Payment).ToString("#0.00")) руб.
-                    </div>
-                    <div>
-                        <b>Размер платы (после 28.08.19):</b> @(Model.RentObjects[item.IdProcess].Sum(r => r.PaymentAfter28082019).ToString("#0.00")) руб.
-                    </div>
-                }
-            </td>
-            <td>
                 @if (Model.RentObjects.ContainsKey(item.IdProcess))
                 {
                     @foreach (var rentObject in Model.RentObjects[item.IdProcess])
                     {
-                        @await Component.InvokeAsync("TenancyProcessesAddressComponent", new { address = rentObject.Address, idProcess = item.IdProcess })
+                        @await Component.InvokeAsync("TenancyProcessesAddressComponent", new { rentObject = rentObject, idProcess = item.IdProcess })
                     }
                 }
+            </td>
+            <td>
+                <div class="dopinfo-alt">
+                    <div class="rent-type-info">
+                        Найм: <span class="text-success"><b>@item.IdRentTypeNavigation?.RentTypeName</b></span>
+                    </div>
+                    <div class="tenant-info">
+                        Наниматель:
+                        @{
+                            var tenant = item.TenancyPersons.FirstOrDefault(tp => tp.ExcludeDate == null && tp.IdKinship == 1 && tp.Deleted == 0);
+                            if (tenant != null)
+                            {
+                                <span class="text-primary"><b>@(tenant.Surname + " " + tenant.Name + (string.IsNullOrEmpty(tenant.Patronymic) ? "" : " " + tenant.Patronymic))</b></span>
+                            }
+                            else
+                            {
+                                <span><i>Отсутствует</i></span>
+                            }
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(item.RegistrationNum))
+                    {
+                        <div>
+                            Договор найма: № @item.RegistrationNum @(item.RegistrationDate.HasValue ? "от " + @item.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")
+                        </div>
+                    }
+                    @if (item.TenancyReasons != null && item.TenancyReasons.Any())
+                    {
+                        var reason = item.TenancyReasons.OrderByDescending(r => r.IdReason).FirstOrDefault();
+                        var reasonName = Model.ReasonTypes.FirstOrDefault(r => r.IdReasonType == reason.IdReasonType)?.ReasonName;
+                        if (!string.IsNullOrEmpty(reasonName))
+                        {
+                            if (reasonName.Length > 0)
+                            {
+                                reasonName = reasonName.Substring(0, 1).ToUpperInvariant() + reasonName.Substring(1);
+                            } else
+                            {
+                                reasonName = reasonName.ToUpper();
+                            }
+                        }
+                        <div>
+                            @reasonName: № @reason.ReasonNumber @(reason.ReasonDate.HasValue ? "от " + @reason.ReasonDate.Value.ToString("dd.MM.yyyy") : "")
+                        </div>
+                    }
+                </div>
+            </td>
+            <td style="min-width: 170px" class="tp-table-low-width-hide-cell">
+                <div class="dopinfo-alt">
+                    @if (Model.RentObjects.ContainsKey(item.IdProcess))
+                    {
+                        <span>До 28.08.2019: </span>@(Model.RentObjects[item.IdProcess].Sum(r => r.Payment).ToString("#0.00")) <span>руб.</span><br />
+                        <span>С 28.08.2019:</span> @(Model.RentObjects[item.IdProcess].Sum(r => r.PaymentAfter28082019).ToString("#0.00")) <span>руб.</span>
+                    }
+                </div>
             </td>
             <td>
                 <div class="btn-group" role="group" aria-label="Панель доступа">

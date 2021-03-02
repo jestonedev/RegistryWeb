@@ -28,7 +28,7 @@
     }
 }
 
-<li class="list-group-item">
+<li class="list-group-item pl-3 pr-3 pb-3 pt-3">
     <input type="hidden" value="@idStreet" name="IdStreetPrev_@id" />
     <input type="hidden" value="@idBuilding" name="IdBuildingPrev_@id" />
     <input type="hidden" value="@idPremises" name="IdPremisesPrev_@id" />
@@ -36,8 +36,8 @@
     <input type="hidden" value="@(ViewBag.Action == "Create" ? AddressTypes.None : Model.Address.AddressType)" name="AddressTypePrev_@id" />
     <input type="hidden" value="@Model.RentArea" name="RentAreaPrev_@id" />
     <div class="form-row">
-        <div class="form-group col-12 col-lg-4">
-            <label>Улица</label>
+        <div class="form-group col-12 col-lg-4 mb-2">
+            <label class="mb-1">Улица</label>
             <select class="selectpicker form-control" data-live-search="true" disabled
                     id="IdStreet_@id" name="IdStreet_@id" title="Улица" data-val="true" data-val-required="Выберите улицу">
                 <option></option>
@@ -55,23 +55,23 @@
             </select>
             <span class="text-danger field-validation-valid" data-valmsg-for="IdStreet_@id" data-valmsg-replace="true"></span>
         </div>
-        <div class="form-group col-4 col-lg-2">
-            <label>Дом</label>
+        <div class="form-group col-4 col-lg-2 mb-2">
+            <label class="mb-1">Дом</label>
             <select class="selectpicker form-control" data-live-search="true" disabled
                     id="IdBuilding_@id" name="IdBuilding_@id" title="Дом" data-val="true" data-val-required="Выберите дом">
                 <option></option>
             </select>
             <span class="text-danger field-validation-valid" data-valmsg-for="IdBuilding_@id" data-valmsg-replace="true"></span>
         </div>
-        <div class="form-group col-4 col-lg-2">
-            <label>Помещение</label>
+        <div class="form-group col-4 col-lg-2 mb-2">
+            <label class="mb-1">Помещение</label>
             <select class="selectpicker form-control" data-live-search="true" disabled
                     id="IdPremises_@id" name="IdPremises_@id" title="Помещение">
                 <option></option>
             </select>
         </div>
-        <div class="form-group col-4 col-lg-2">
-            <label>Комната</label>
+        <div class="form-group col-4 col-lg-2 mb-2">
+            <label class="mb-1">Комната</label>
             <select class="selectpicker form-control" data-live-search="true" disabled
                     id="IdSubPremises_@id" name="IdSubPremises_@id" title="Комната">
                 <option></option>
@@ -106,35 +106,39 @@
             <div class="text-md-right text-center col-md-3 col-lg-2 rr-tenancy-rent-objects-view-buttons d-none d-lg-block">
                 @if (Model.Address.AddressType == AddressTypes.Building)
                 {
-                    <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
+                    <a class="btn btn-primary" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
                        asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@Model.Address.Id" asp-route-action="Details"
-                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
+                        <span class="oi oi-eye"></span>
+                    </a>
                 }
                 @if (Model.Address.AddressType == AddressTypes.Premise)
                 {
-                    <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
+                    <a class="btn btn-primary" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
                        asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.Address.Id" asp-route-action="Details"
-                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
+                        <span class="oi oi-eye"></span></a>
                 }
                 @if (Model.Address.AddressType == AddressTypes.SubPremise)
                 {
-                    <a class="btn btn-primary oi oi-eye" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
+                    <a class="btn btn-primary" title="Перейти на карточку объекта найма" aria-label="Перейти на карточку объекта найма"
                        asp-controller="Premises" asp-action="Details" asp-route-idPremises="@Model.Address.IdParents[AddressTypes.Premise.ToString()]" asp-route-action="Details"
-                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
+                        <span class="oi oi-eye"></span></a>
                 }
             </div>
         }
     </div>
     <div class="form-row">
-        <div class="form-group col-4">
+        <div class="form-group col-4 mb-0">
             <label class="rr-tenancy-rent-object-label">Общая площадь</label>
             <input type="text" disabled class="form-control input-decimal" asp-for="TotalArea" id="TotalArea_@id" name="TotalArea_@id" title="Общая площадь">
         </div>
-        <div class="form-group col-4">
+        <div class="form-group col-4 mb-0">
             <label class="rr-tenancy-rent-object-label">Жилая площадь</label>
             <input type="text" disabled class="form-control input-decimal" asp-for="LivingArea" id="LivingArea_@id" name="LivingArea_@id" title="Жилая площадь">
         </div>
-        <div class="form-group col-4">
+        <div class="form-group col-4 mb-0">
             <label class="rr-tenancy-rent-object-label">Площадь койко-места</label>
             <input type="text" disabled class="form-control input-decimal" asp-for="RentArea" data-val="true" data-val-number="Введите числовое значение"
                     id="RentArea_@id" name="RentArea_@id" title="Площадь койко-места">

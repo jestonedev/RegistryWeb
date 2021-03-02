@@ -23,19 +23,23 @@ namespace RegistryWeb.DataServices
     public class PremisesDataService : ListDataService<PremisesVM<Premise>, PremisesListFilter>
     {
         private BuildingsDataService buildingsDataService;
+        private readonly AddressesDataService addressesDataService;
         private readonly IConfiguration config;
         private SecurityService securityService;
-        public PremisesDataService(RegistryContext rc, SecurityService securityService, BuildingsDataService buildingsDataService, IConfiguration config) : base(rc)
+        public PremisesDataService(RegistryContext rc, SecurityService securityService, 
+            BuildingsDataService buildingsDataService, AddressesDataService addressesDataService, IConfiguration config) : base(rc)
         {
             this.securityService = securityService;
             this.buildingsDataService = buildingsDataService;
+            this.addressesDataService = addressesDataService;
             this.config = config;
         }
 
         public override PremisesVM<Premise> InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, PremisesListFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
-            viewModel.KladrStreetsList = new SelectList(KladrStreets, "IdStreet", "StreetName");
+            viewModel.KladrStreetsList = new SelectList(GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
+            viewModel.KladrRegionsList = new SelectList(KladrRegions, "id_region", "region");
             viewModel.PremisesTypesList = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesType");
             viewModel.HeatingTypesList = new SelectList(HeatingTypes, "IdHeatingType", "IdHeatingType1");
             viewModel.StructureTypesList = new SelectList(StructureTypes, "IdStructureType", "StructureTypeName");
@@ -109,6 +113,7 @@ namespace RegistryWeb.DataServices
 
                 query = IdPremisesFilter(query, filterOptions);
                 query = IdBuildingFilter(query, filterOptions);
+                query = RegionFilter(query, filterOptions);
                 query = StreetFilter(query, filterOptions);
                 query = HouseFilter(query, filterOptions);
                 query = PremiseNumFilter(query, filterOptions);
@@ -130,26 +135,28 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IsAddressEmpty())
                 return query;
 
-            if (filterOptions.Address.AddressType == AddressTypes.Street)            
-                return query.Where(q => q.IdBuildingNavigation.IdStreet.Equals(filterOptions.Address.Id));
+            var addresses = addressesDataService.GetAddressesByText(filterOptions.Address.Text).Select(r => r.Id);
 
-            int id = 0;
-            if (!int.TryParse(filterOptions.Address.Id, out id))
+            if (filterOptions.Address.AddressType == AddressTypes.Street)            
+                return query.Where(q => addresses.Contains(q.IdBuildingNavigation.IdStreet));
+
+            var addressesInt = addresses.Where(a => int.TryParse(a, out int aInt)).Select(a => int.Parse(a));
+            
+            if (!addressesInt.Any())
                 return query;
 
             if (filterOptions.Address.AddressType == AddressTypes.Building)            
-                return query.Where(q => q.IdBuilding == id);
+                return query.Where(q => addressesInt.Contains(q.IdBuilding));
             
             if (filterOptions.Address.AddressType == AddressTypes.Premise)            
-                return query.Where(q => q.IdPremises == id);
+                return query.Where(q => addressesInt.Contains(q.IdPremises));
             
             if (filterOptions.Address.AddressType == AddressTypes.SubPremise)
             {
                 return from q in query
-
                        join sp in registryContext.SubPremises
                        on q.IdPremises equals sp.IdPremises
-                       where sp.IdSubPremises == id
+                       where addressesInt.Contains(sp.IdSubPremises)
                        select q;
             }
             return query;
@@ -169,6 +176,15 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IdBuilding.HasValue)
             {
                 query = query.Where(b => b.IdBuilding == filterOptions.IdBuilding.Value);
+            }
+            return query;
+        }
+
+        private IQueryable<Premise> RegionFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
+            if (string.IsNullOrEmpty(filterOptions.IdStreet) && !string.IsNullOrEmpty(filterOptions.IdRegion))
+            {
+                query = query.Where(b => b.IdBuildingNavigation.IdStreet.Contains(filterOptions.IdRegion));
             }
             return query;
         }
@@ -249,7 +265,15 @@ namespace RegistryWeb.DataServices
         {
             if (filterOptions.IdsObjectState != null && filterOptions.IdsObjectState.Any())
             {
-                query = query.Where(p => filterOptions.IdsObjectState.Contains(p.IdState));
+                var ids = registryContext.SubPremises
+                    .Where(sp => filterOptions.IdsObjectState.Contains(sp.IdState))
+                    .Select(sp => sp.IdPremises)
+                    .Distinct()
+                    .ToList();
+                query = query.Where(p =>
+                    filterOptions.IdsObjectState.Contains(p.IdState) ||
+                    ids.Contains(p.IdPremises)
+                );
             }
             return query;
         }
@@ -258,7 +282,10 @@ namespace RegistryWeb.DataServices
         {
             if (filterOptions.IdsComment != null && filterOptions.IdsComment.Any())
             {
-                query = query.Where(p => filterOptions.IdsComment.Contains(p.IdPremisesComment));
+                if (filterOptions.IdsCommentContains == null || filterOptions.IdsCommentContains.Value)
+                    query = query.Where(p => filterOptions.IdsComment.Contains(p.IdPremisesComment));
+                else
+                    query = query.Where(p => !filterOptions.IdsComment.Contains(p.IdPremisesComment));
             }
             return query;
         }
@@ -267,7 +294,10 @@ namespace RegistryWeb.DataServices
         {
             if (filterOptions.IdsDoorKeys != null && filterOptions.IdsDoorKeys.Any())
             {
-                query = query.Where(p => filterOptions.IdsDoorKeys.Contains(p.IdPremisesDoorKeys));
+                if (filterOptions.IdsDoorKeysContains == null || filterOptions.IdsDoorKeysContains.Value)
+                    query = query.Where(p => filterOptions.IdsDoorKeys.Contains(p.IdPremisesDoorKeys));
+                else
+                    query = query.Where(p => !filterOptions.IdsDoorKeys.Contains(p.IdPremisesDoorKeys));
             }
             return query;
         }
@@ -367,10 +397,18 @@ namespace RegistryWeb.DataServices
                     var premisesIds = (from pRow in premises
                                       where ownershipRightsPremisesList.Contains(pRow.IdPremises)
                                       select pRow.IdPremises).ToList();
-
-                    query = (from row in query
-                             where buildingIds.Contains(row.IdBuilding) || premisesIds.Contains(row.IdPremises)
-                             select row).Distinct();
+                    
+                    if (filterOptions.IdsOwnershipRightTypeContains == null || filterOptions.IdsOwnershipRightTypeContains.Value)
+                    {
+                        query = (from row in query
+                                 where buildingIds.Contains(row.IdBuilding) || premisesIds.Contains(row.IdPremises)
+                                 select row).Distinct();
+                    } else
+                    {
+                        query = (from row in query
+                                 where !buildingIds.Contains(row.IdBuilding) && !premisesIds.Contains(row.IdPremises)
+                                 select row).Distinct();
+                    }
                 }
             }
             return query;
@@ -969,6 +1007,18 @@ namespace RegistryWeb.DataServices
         public IEnumerable<StructureType> StructureTypes
         {
             get => registryContext.StructureTypes.AsNoTracking();
+        }
+
+        public IEnumerable<KladrRegion> KladrRegions
+        {
+            get => registryContext.KladrRegions.AsNoTracking();
+        }
+
+        public IEnumerable<KladrStreet> GetKladrStreets(string idRegion)
+        {
+            if (idRegion == null)
+                return KladrStreets;
+            return registryContext.KladrStreets.Where(s => s.IdStreet.Contains(idRegion)).AsNoTracking();
         }
 
         public IEnumerable<KladrStreet> KladrStreets

@@ -14,12 +14,41 @@
     color: #0056b3;
 }
 
+.tp-table > tbody td {
+    padding: 0.4rem 0.75rem;
+}
+
+.tp-table th {
+    white-space: nowrap;
+}
+
+.dopinfo {
+    color: #888;
+    font-size: 75%;
+}
+
+.dopinfo-alt {
+    color: #212529;
+    font-size: 75%;
+}
+
+.tp-table-low-width-hide-cell {
+    display: none;
+}
+
+@media(min-width: 992px) {
+    .tp-table-low-width-hide-cell {
+        display: table-cell;
+    }
+}
+
 .rr-tenancy-filter-label, .rr-tenancy-label {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
     margin-bottom: 0.24rem;
+    vertical-align: bottom;
 }
 
 .rr-until-dismissal-checkbox {
@@ -27,7 +56,7 @@
 }
 
 .rr-tenancy-card {
-    margin-top: 10pt;
+    margin-top: 0;
 }
 
 .rr-tenancy-card table.card-body {

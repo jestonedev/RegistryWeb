@@ -1,9 +1,18 @@
 ﻿@model IEnumerable<RegistryWeb.ViewModel.ResettleInfoVM>;
 <form id="resettlesForm">
     <script src="~/js/resettle.common.js" asp-append-version="true"></script>
-    <div class="card">
-        <div class="card-header d-flex justify-content-between">
-            <h3>Переселение</h3>
+    <div class="card mb-2">
+        <div class="card-header d-flex justify-content-between pt-2 pb-2">
+            <h4 class="mt-1">
+                Переселение
+                @{
+                    var count = Model != null && Model.Any() ? Model.Count().ToString() : "";
+                    var visible = Model != null && Model.Any() ? "" : "style='display: none;'";
+                }
+                <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visible)>
+                    @count
+                </span>
+            </h4>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {
@@ -12,7 +21,7 @@
                 <a href="#" id="resettlesToggle" class="form-control btn btn-primary" title="Развернуть информацию о переселении" style="font-weight:bold;">∨</a>
             </div>
         </div>
-        <ul class="list-group list-group-flush toggle-hide" id="resettlesList"data-addresstype="@ViewBag.Address.AddressType" data-id="@ViewBag.Address.Id" data-action="@ViewBag.Action">
+        <ul class="list-group list-group-flush toggle-hide" id="resettlesList" data-addresstype="@ViewBag.Address.AddressType" data-id="@ViewBag.Address.Id" data-action="@ViewBag.Action">
             @foreach (var item in Model)
             {
                 <partial name="ResettleInfo" model="item" />

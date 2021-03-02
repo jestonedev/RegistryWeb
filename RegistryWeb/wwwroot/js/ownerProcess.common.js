@@ -93,10 +93,12 @@ $.validator.addMethod('ownerOrgNameRequired', $.validator.methods.required,
 $.validator.addMethod('fractionSum', function (value, element) {
     return isValidFraction();
 }, 'Сумма значений полей «Доля» должно быть равно 1');
-$.validator.addMethod('fileNumRequired', $.validator.methods.required,
+$.validator.addMethod('reasonNumRequired', $.validator.methods.required,
     'Поле «Номер» является обязательным для заполнения');
-$.validator.addMethod('fileDateRequired', $.validator.methods.required,
+$.validator.addMethod('reasonDateRequired', $.validator.methods.required,
     'Поле «Дата» является обязательным для заполнения');
+$.validator.addMethod('fileRequired', $.validator.methods.required,
+    'Поле «Файл» является обязательным для заполнения');
 $.validator.addClassRules('rr-owner-surname', {
     ownerSurnameRequired: true
 });
@@ -109,11 +111,14 @@ $.validator.addClassRules('rr-owner-org-name', {
 $.validator.addClassRules('rr-fraction', {
     fractionSum: true
 });
-$.validator.addClassRules('rr-file-num', {
-    fileNumRequired: true
+$.validator.addClassRules('rr-reason-num', {
+    reasonNumRequired: true
 });
-$.validator.addClassRules('rr-file-date', {
-    fileDateRequired: true
+$.validator.addClassRules('rr-reason-date', {
+    reasonDateRequired: true
+});
+$.validator.addClassRules('rr-file', {
+    fileRequired: true
 });
 $(function () {
     var form = $('#ownerProcessForm');
@@ -152,7 +157,7 @@ $(function () {
     $('#addressesToggle').on('click',addressesToggle);
     $('#ownerFilesToggle').on('click', ownerFilesToggle);
     $('#ownersToggle').on('click', ownersToggle);
-    $('.rr-owner-reasons-toggle').on('click', ownerReasonsToggle);
+    $('#owners').on('click', '.rr-owner-reasons-toggle', ownerReasonsToggle);
     $('#commentToggle').on('click', commentToggle);
     $('#logToggle').on('click', logToggle);
     

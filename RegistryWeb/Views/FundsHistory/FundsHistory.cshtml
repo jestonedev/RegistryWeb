@@ -26,9 +26,9 @@
                     <td id="@(i)fund">@item.IdFundTypeNavigation.FundTypeName</td>
                     <td>
                         <a class="btn btn-outline-dark oi oi-pencil" id="edit" title="Изменить" aria-label="Изменить"
-                           asp-action="Edit" asp-route-idFund="@item.IdFund" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                           asp-action="Edit" asp-route-idFund="@item.IdFund" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.typeObject" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                         <a class="btn btn-danger oi oi-x" id="delete" title="Удалить" aria-label="Удалить"
-                           asp-action="Delete" asp-route-idFund="@item.IdFund" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="Premise" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                           asp-action="Delete" asp-route-idFund="@item.IdFund" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.typeObject" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                     </td>
                 </tr>
             }

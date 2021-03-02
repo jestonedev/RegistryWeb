@@ -37,13 +37,12 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_reason_type")
                 .HasColumnType("int(11)");
 
-            builder.Property(e => e.ReasonNumber)
-                .HasColumnName("reason_number")
-                .HasMaxLength(255)
-                .IsUnicode(false);
+            builder.Property(e => e.DateDownload)
+                .HasColumnName("date_download")
+                .HasColumnType("date");
 
-            builder.Property(e => e.ReasonDate)
-                .HasColumnName("reason_date")
+            builder.Property(e => e.DateDocument)
+                .HasColumnName("date_document")
                 .HasColumnType("date");
 
             builder.Property(e => e.FileOriginName)

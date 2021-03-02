@@ -17,10 +17,12 @@ namespace RegistryWeb.DataServices
 {
     public class BuildingsDataService : ListDataService<BuildingsVM, BuildingsFilter>
     {
+        private readonly AddressesDataService addressesDataService;
         ReportService reportService;
 
-        public BuildingsDataService(RegistryContext registryContext, ReportService reportService) : base(registryContext)
+        public BuildingsDataService(RegistryContext registryContext, AddressesDataService addressesDataService, ReportService reportService) : base(registryContext)
         {
+            this.addressesDataService = addressesDataService;
             this.reportService = reportService;
         }
 
@@ -196,9 +198,18 @@ namespace RegistryWeb.DataServices
                                           where ownershipRightsBuildingsList.Contains(bRow.IdBuilding)
                                           select bRow.IdBuilding).ToList();
 
-                        query = (from row in query
-                                 where buildingIds.Contains(row.IdBuilding)
-                                 select row).Distinct();
+                        if (filterOptions.IdsOwnershipRightTypeContains == null || filterOptions.IdsOwnershipRightTypeContains.Value)
+                        {
+                            query = (from row in query
+                                     where buildingIds.Contains(row.IdBuilding)
+                                     select row).Distinct();
+                        }
+                        else
+                        {
+                            query = (from row in query
+                                     where !buildingIds.Contains(row.IdBuilding)
+                                     select row).Distinct();
+                        }
                     }
                 }
             }
@@ -234,16 +245,20 @@ namespace RegistryWeb.DataServices
         {
             if (filterOptions.IsAddressEmpty())
                 return query;
+
+            var addresses = addressesDataService.GetAddressesByText(filterOptions.Address.Text).Select(r => r.Id);
+
             if (filterOptions.Address.AddressType == AddressTypes.Street)
             {
-                return query.Where(q => q.IdStreet.Equals(filterOptions.Address.Id));
+                return query.Where(q => addresses.Contains(q.IdStreet));
             }
-            int id = 0;
-            if (!int.TryParse(filterOptions.Address.Id, out id))
-                return query;
+
             if (filterOptions.Address.AddressType == AddressTypes.Building)
             {
-                return query.Where(q => q.IdBuilding == id);
+                var addressesInt = addresses.Where(a => int.TryParse(a, out int aInt)).Select(a => int.Parse(a));
+                if (!addressesInt.Any())
+                    return query;
+                return query.Where(q => addressesInt.Contains(q.IdBuilding));
             }
             return query;
         }

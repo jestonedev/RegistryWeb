@@ -30,14 +30,14 @@
         @if (Model.FilterOptions.IsAddressEmpty())
         {
             <div class="form-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-10 col-md-4 col-lg-6" : "col-12 col-md-5 col-lg-7")">
-                <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
             </div>
         }
         else
         {
             <div class="form-group @((securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal)) ? "col-10 col-md-4 col-lg-6" : "col-12 col-md-5 col-lg-7")">
                 <div class="input-group">
-                    <input type="text" class="form-control col" disabled asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                    <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
                     <div class="input-group-append h-auto d-inline-block">
                         <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
                     </div>
@@ -85,53 +85,94 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-row">
-                        <div class="form-group col-lg-4 col-md-4">
+                        <div class="form-group col-lg-3 col-md-6">
                             <label asp-for="FilterOptions.IdPremise">Реестровый номер</label>
                             <input type="text" class="form-control input-filter-numbers" asp-for="FilterOptions.IdPremise" title="Реестровый номер помещения">
                         </div>
-                        <div class="form-group col-lg-4 col-md-8">
+                        <div class="form-group col-lg-3 col-md-6">
                             <label asp-for="FilterOptions.IdFundType">Тип жилого фонда</label>
                             <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип жилого фонда" asp-for="FilterOptions.IdFundType" asp-items="@Model.FundTypesList"></select>
                         </div>
-                        <div class="form-group col-lg-4 col-md-12">
+                        <div class="form-group col-lg-3 col-md-6">
                             <label asp-for="FilterOptions.IdsObjectState">Текущее состояние</label>
                             <select multiple class="selectpicker form-control" data-actions-box="true" title="Текущее состояние" asp-for="FilterOptions.IdsObjectState" asp-items="@Model.ObjectStatesList"></select>
                         </div>
+                        <div class="form-group col-lg-3 col-md-6">
+                            <label asp-for="FilterOptions.CadastralNum">Кадастровый номер</label>
+                            <input type="text" class="form-control input-filter-cadastral-num" asp-for="FilterOptions.CadastralNum" title="Кадастровый номер">
+                        </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-lg-6 col-md-12">
+                        <div class="form-group col-lg-2 col-md-4">
+                            <label asp-for="FilterOptions.IdRegion">Район</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Район" asp-for="FilterOptions.IdRegion" asp-items="@Model.KladrRegionsList">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-4 col-md-8">
                             <label asp-for="FilterOptions.IdStreet">Улица</label>
                             <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@Model.KladrStreetsList">
                                 <option selected></option>
                             </select>
                         </div>
-                        <div class="form-group col-lg-3 col-md-6">
+                        <div class="form-group col-lg-2 col-md-4">
                             <label asp-for="FilterOptions.House">Номер дома</label>
                             <input type="text" class="form-control input-filter-house" asp-for="FilterOptions.House" title="Номер дома">
                         </div>
-                        <div class="form-group col-lg-3 col-md-6">
-                            <label asp-for="FilterOptions.PremisesNum">Номер помещения</label>
+                        <div class="form-group col-lg-2 col-md-4">
+                            <label asp-for="FilterOptions.PremisesNum" class="rr-premises-label">Номер помещения</label>
                             <input type="text" class="form-control input-filter-premise-num" asp-for="FilterOptions.PremisesNum" title="Номер помещения">
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-lg-2 col-md-3">
+                        <div class="form-group col-lg-2 col-md-4">
                             <label asp-for="FilterOptions.Floors">Этаж</label>
                             <input type="text" class="form-control input-filter-numbers" asp-for="FilterOptions.Floors" title="Этаж">
                         </div>
-                        <div class="form-group col-lg-4 col-md-9">
-                            <label asp-for="FilterOptions.CadastralNum">Кадастровый номер</label>
-                            <input type="text" class="form-control input-filter-cadastral-num" asp-for="FilterOptions.CadastralNum" title="Кадастровый номер">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-lg-6 col-md-12">
+                            <label asp-for="FilterOptions.IdsComment">Примечание</label>
+                            <div class="row">
+                                <div class="col-4 pr-1">
+                                    <select class="selectpicker form-control" asp-for="FilterOptions.IdsCommentContains" title="Содержит/не содержит">
+                                        @if (Model.FilterOptions.IdsCommentContains == null || Model.FilterOptions.IdsCommentContains.Value)
+                                        {
+                                            <option value="True" selected>Содержит</option>
+                                            <option value="False">Не содержит</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="True">Содержит</option>
+                                            <option value="False" selected>Не содержит</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-8 pl-1">
+                                    <select multiple class="selectpicker form-control" data-actions-box="true" title="Примечание" asp-for="FilterOptions.IdsComment" asp-items="@Model.CommentList"></select>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="form-group col-lg-3 col-md-6">
-                            <label asp-for="FilterOptions.IdsComment">Примечание <b>содержит</b></label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Примечание содержит" asp-for="FilterOptions.IdsComment" asp-items="@Model.CommentList"></select>
-                        </div>
-
-                        <div class="form-group col-lg-3 col-md-6">
-                            <label asp-for="FilterOptions.IdsDoorKeys">Ключи <b>содержит</b></label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Ключи содержит" asp-for="FilterOptions.IdsDoorKeys" asp-items="@Model.LocationKeysList"></select>
+                        <div class="form-group col-lg-6 col-md-12">
+                            <label asp-for="FilterOptions.IdsDoorKeys">Ключи</label>
+                            <div class="row">
+                                <div class="col-4 pr-1">
+                                    <select class="selectpicker form-control" asp-for="FilterOptions.IdsDoorKeysContains" title="Содержит/не содержит">
+                                        @if (Model.FilterOptions.IdsDoorKeysContains == null || Model.FilterOptions.IdsDoorKeysContains.Value)
+                                        {
+                                            <option value="True" selected>Содержит</option>
+                                            <option value="False">Не содержит</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="True">Содержит</option>
+                                            <option value="False" selected>Не содержит</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-8 pl-1">
+                                    <select multiple class="selectpicker form-control" data-actions-box="true" title="Ключи" asp-for="FilterOptions.IdsDoorKeys" asp-items="@Model.LocationKeysList"></select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-row">
@@ -159,8 +200,26 @@
                             <input type="date" class="form-control" asp-for="FilterOptions.DateOwnershipRight" value="@(Model.FilterOptions.DateOwnershipRight==null ? "" : Model.FilterOptions.DateOwnershipRight?.ToString("yyyy-MM-dd"))" title="Дата ограничения">
                         </div>
                         <div class="form-group col-lg-6 col-md-12">
-                            <label asp-for="FilterOptions.IdsOwnershipRightType">Тип ограничения <b>содержит</b></label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип ограничения содержит" asp-for="FilterOptions.IdsOwnershipRightType" asp-items="@Model.OwnershipRightTypesList"></select>
+                            <label asp-for="FilterOptions.IdsOwnershipRightType">Тип ограничения</label>
+                            <div class="row">
+                                <div class="col-4 pr-1">
+                                    <select class="selectpicker form-control" asp-for="FilterOptions.IdsOwnershipRightTypeContains" title="Содержит/не содержит">
+                                        @if (Model.FilterOptions.IdsOwnershipRightTypeContains == null || Model.FilterOptions.IdsOwnershipRightTypeContains.Value)
+                                        {
+                                            <option value="True" selected>Содержит</option>
+                                            <option value="False">Не содержит</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="True">Содержит</option>
+                                            <option value="False" selected>Не содержит</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-8 pl-1">
+                                    <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип ограничения" asp-for="FilterOptions.IdsOwnershipRightType" asp-items="@Model.OwnershipRightTypesList"></select>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

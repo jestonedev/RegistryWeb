@@ -4,9 +4,18 @@
 <link rel="stylesheet" href="~/css/tenancy.files.css" />
 <script src="~/js/tenancyProcess.files.js"></script>
 <form id="TenancyFilesForm">
-    <div class="card rr-tenancy-card">
-        <div class="card-header d-flex justify-content-between">
-            <h3>Прикрепленные образы документов</h3>
+    <div class="card rr-tenancy-card mb-2">
+        <div class="card-header d-flex justify-content-between pt-2 pb-2">
+            <h4 class="mt-1">
+                Прикрепленные образы документов
+                @{
+                    var count = Model != null && Model.Any() ? Model.Count().ToString() : "";
+                    var visible = Model != null && Model.Any() ? "" : "style='display: none;'";
+                }
+                <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visible)>
+                    @count
+                </span>
+            </h4>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
                 {

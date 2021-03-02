@@ -24,7 +24,7 @@
         {
             <div class="form-group col-12 col-md-3 col-lg-3">
                 <div class="input-group">
-                    <input type="text" class="form-control input-filter-numbers" disabled title="Лицевой счет" asp-for="FilterOptions.FrontSideAccount" placeholder="Лицевой счет" />
+                    <input type="text" class="form-control input-filter-numbers" title="Лицевой счет" asp-for="FilterOptions.FrontSideAccount" placeholder="Лицевой счет" />
                     <div class="input-group-append h-auto d-inline-block">
                         <button class="btn btn-outline-secondary" type="button" id="accountFilterClearBtn">&#10006;</button>
                     </div>
@@ -36,14 +36,14 @@
             var col_md = Model.FilterOptions.IsModalEmpty() ? "col-md-5" : "col-md-4";
             var col_xl = Model.FilterOptions.IsModalEmpty() ? "col-xl-5" : "col-xl-4";
             <div class="form-group col-12 @col_md col-lg-4 @col_xl">
-                <input type="text" class="form-control col" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
             </div>
         }
         else
         {
             <div class="form-group col-12 col-md-5 col-lg-4 col-xl-5">
                 <div class="input-group">
-                    <input type="text" class="form-control col" disabled asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                    <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
                     <div class="input-group-append h-auto d-inline-block">
                         <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
                     </div>

@@ -15,41 +15,43 @@ namespace RegistryWeb.ViewComponents
             this.registryContext = registryContext;
         }
 
-        public IViewComponentResult Invoke(Address address, int idProcess)
+        public IViewComponentResult Invoke(TenancyRentObject rentObject, int idProcess)
         {
             ViewData["IdProcess"] = idProcess;
-            ViewData["Address"] = address;
-            var id = int.Parse(address.Id);
+            ViewData["Address"] = rentObject.Address;
+            ViewData["TotalArea"] = rentObject.TotalArea;
+            ViewData["LivingArea"] = rentObject.LivingArea;
+            var id = int.Parse(rentObject.Address.Id);
             var model = new List<Address>();
-            if (address.AddressType == AddressTypes.Building)
+            if (rentObject.Address.AddressType == AddressTypes.Building)
             {
-                model.Add(address);
+                model.Add(rentObject.Address);
             }
-            if (address.AddressType == AddressTypes.Premise)
+            if (rentObject.Address.AddressType == AddressTypes.Premise)
             {
                 var addr = new Address
                 {
                     AddressType = AddressTypes.Building,
-                    Id = address.IdParents[AddressTypes.Building.ToString()]
+                    Id = rentObject.Address.IdParents[AddressTypes.Building.ToString()]
                 };
                 model.Add(addr);
-                model.Add(address);
+                model.Add(rentObject.Address);
             }
-            if (address.AddressType == AddressTypes.SubPremise)
+            if (rentObject.Address.AddressType == AddressTypes.SubPremise)
             {
                 var addr_b = new Address
                 {
                     AddressType = AddressTypes.Building,
-                    Id = address.IdParents[AddressTypes.Building.ToString()]
+                    Id = rentObject.Address.IdParents[AddressTypes.Building.ToString()]
                 };
                 var addr_p = new Address
                 {
                     AddressType = AddressTypes.Premise,
-                    Id = address.IdParents[AddressTypes.Premise.ToString()]
+                    Id = rentObject.Address.IdParents[AddressTypes.Premise.ToString()]
                 };
                 model.Add(addr_b);
                 model.Add(addr_p);
-                model.Add(address);
+                model.Add(rentObject.Address);
             }
             return View("TenancyProcessesAddress", model);
         }

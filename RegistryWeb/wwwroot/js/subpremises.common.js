@@ -77,6 +77,9 @@ function saveSubPremise(e) {
                     subPremiseElem.find("input[name^='IdSubPremise']").val(idSubPremise);
                 }
                 showEditDelPanelSubPremise(subPremiseElem);
+
+                var flag = $("#subpremisesForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                countBadges('#subpremisesForm', flag);
             }
         });
     } else {
@@ -133,6 +136,9 @@ function deleteSubPremise(e) {
             success: function (ind) {
                 if (ind === 1) {
                     subPremiseElem.remove();
+
+                    var flag = $("#subpremisesForm").find("rr-list-group-item-empty").length != 0 ? true : false;
+                    countBadges('#subpremisesForm', flag);
                 }
                 else {
                     alert("Ошибка удаления!");

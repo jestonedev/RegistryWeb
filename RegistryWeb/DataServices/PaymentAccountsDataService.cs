@@ -18,11 +18,13 @@ namespace RegistryWeb.DataServices
     public class PaymentAccountsDataService : ListDataService<PaymentsVM, PaymentsFilter>
     {
         private readonly SecurityServices.SecurityService securityService;
+        private readonly AddressesDataService addressesDataService;
         private readonly IConfiguration config;
 
-        public PaymentAccountsDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService, IConfiguration config) : base(registryContext)
+        public PaymentAccountsDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService, AddressesDataService addressesDataService, IConfiguration config) : base(registryContext)
         {
             this.securityService = securityService;
+            this.addressesDataService = addressesDataService;
             this.config = config;
         }
 
@@ -102,6 +104,8 @@ namespace RegistryWeb.DataServices
                 filterOptions.IdSubPremises == null)
                 return query;
 
+            var addresses = addressesDataService.GetAddressesByText(filterOptions.Address.Text).Select(r => r.Id);
+
             var premisesAssoc = registryContext.PaymentAccountPremisesAssoc
                 .Include(p => p.PremiseNavigation)
                 .ThenInclude(b => b.IdBuildingNavigation);
@@ -116,55 +120,56 @@ namespace RegistryWeb.DataServices
 
             if (filterOptions.Address.AddressType == AddressTypes.Street || !string.IsNullOrEmpty(filterOptions.IdStreet))
             {
-                var street = filterOptions.Address.AddressType == AddressTypes.Street ? filterOptions.Address.Id : filterOptions.IdStreet;
+                var streets = filterOptions.Address.AddressType == AddressTypes.Street ? addresses : new List<string> { filterOptions.IdStreet };
                 var idPremiseAccounts = premisesAssoc
-                    .Where(opa => opa.PremiseNavigation.IdBuildingNavigation.IdStreet.Equals(street))
+                    .Where(opa => streets.Contains(opa.PremiseNavigation.IdBuildingNavigation.IdStreet))
                     .Select(opa => opa.IdAccount);
                 var idSubPremiseAccounts = subPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet.Equals(street))
+                    .Where(ospa => streets.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet))
                     .Select(ospa => ospa.IdAccount);
                 idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
                 filtered = true;
             }
-            var id = 0;
-            if ((filterOptions.Address.AddressType == AddressTypes.Building && int.TryParse(filterOptions.Address.Id, out id)) || filterOptions.IdBuilding != null)
+            var addressesInt = addresses.Where(a => int.TryParse(a, out int aInt)).Select(a => int.Parse(a));
+
+            if ((filterOptions.Address.AddressType == AddressTypes.Building && addressesInt.Any()) || filterOptions.IdBuilding != null)
             {
                 if (filterOptions.IdBuilding != null)
                 {
-                    id = filterOptions.IdBuilding.Value;
+                    addressesInt = new List<int> { filterOptions.IdBuilding.Value };
                 }
                 var idPremiseAccounts = premisesAssoc
-                    .Where(opa => opa.PremiseNavigation.IdBuilding == id)
+                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdBuilding))
                     .Select(opa => opa.IdAccount);
                 var idSubPremiseAccounts = subPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuilding == id)
+                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuilding))
                     .Select(ospa => ospa.IdAccount);
                 idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
                 filtered = true;
             }
-            if ((filterOptions.Address.AddressType == AddressTypes.Premise && int.TryParse(filterOptions.Address.Id, out id)) || filterOptions.IdPremises != null)
+            if ((filterOptions.Address.AddressType == AddressTypes.Premise && addressesInt.Any()) || filterOptions.IdPremises != null)
             {
                 if (filterOptions.IdPremises != null)
                 {
-                    id = filterOptions.IdPremises.Value;
+                    addressesInt = new List<int> { filterOptions.IdPremises.Value };
                 }
                 var idPremiseAccounts = premisesAssoc
-                    .Where(opa => opa.PremiseNavigation.IdPremises == id)
+                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdPremises))
                     .Select(opa => opa.IdAccount);
                 var idSubPremiseAccounts = subPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdPremises == id)
+                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdPremises))
                     .Select(ospa => ospa.IdAccount);
                 idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
                 filtered = true;
             }
-            if ((filterOptions.Address.AddressType == AddressTypes.SubPremise && int.TryParse(filterOptions.Address.Id, out id)) || filterOptions.IdSubPremises != null)
+            if ((filterOptions.Address.AddressType == AddressTypes.SubPremise && addressesInt.Any()) || filterOptions.IdSubPremises != null)
             {
                 if (filterOptions.IdSubPremises != null)
                 {
-                    id = filterOptions.IdSubPremises.Value;
+                    addressesInt = new List<int> { filterOptions.IdSubPremises.Value };
                 }
                 idAccounts = subPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdSubPremises == id)
+                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdSubPremises))
                     .Select(ospa => ospa.IdAccount);
                 filtered = true;
             }

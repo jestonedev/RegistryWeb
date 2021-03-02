@@ -218,6 +218,10 @@ $(function () {
                     if (tenancyPersonReturn.idPerson > 0) {
                         form.find("[name='Person.IdPerson']").val(tenancyPersonReturn.idPerson);
                         updateInsertTenancyPersonElem();
+
+                        var flag = $("#TenancyProcessPersonsForm").find("rr-list-group-item-empty") != null ? true : false;
+                        countBadges('#TenancyProcessPersonsForm', flag);
+
                     } else {
                         alert('Произошла ошибка при сохранении');
                     }
@@ -233,9 +237,6 @@ $(function () {
                     $("button[data-id='" + id + "']").addClass("input-validation-error");
                 }
             });
-            $([document.documentElement, document.body]).animate({
-                scrollTop: form.find(".input-validation-error").first().offset().top - 35
-            }, 1000);
         }
     });
 
@@ -261,6 +262,9 @@ $(function () {
                             if ($("#TenancyProcessPersons .list-group-item").length === 1) {
                                 $("#TenancyProcessPersons .rr-list-group-item-empty").show();
                             }
+
+                            var flag = $("#TenancyProcessPersonsForm").find("rr-list-group-item-empty") != null ? true : false;
+                            countBadges('#TenancyProcessPersonsForm', flag);
                         }
                         else {
                             alert("Ошибка удаления!");

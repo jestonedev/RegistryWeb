@@ -1,9 +1,18 @@
 ﻿@model IEnumerable<RegistryWeb.ViewModel.RestrictionVM>;
 <form id="restrictionsForm">
     <script src="~/js/restrictions.common.js" asp-append-version="true"></script>
-    <div class="card">
-        <div class="card-header d-flex justify-content-between">
-            <h3>Документы права собственности</h3>
+    <div class="card mb-2">
+        <div class="card-header d-flex justify-content-between pt-2 pb-2">
+            <h4 class="mt-1">
+                Документы права собственности
+                @{
+                    var count = Model != null && Model.Any() ? Model.Count().ToString() : "";
+                    var visible = Model != null && Model.Any() ? "" : "style='display: none;'";
+                }
+                <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visible)>
+                    @count
+                </span>
+            </h4>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {
