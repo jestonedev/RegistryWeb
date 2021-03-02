@@ -100,13 +100,31 @@
                         <div class="form-group col-md-6 col-lg-3">
                             <label asp-for="FilterOptions.RegistrationDate">Дата регистрации</label>
                             <div class="input-group date">
+                                <div class="input-group-prepend rr-registration-date-dropdown">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Model.FilterOptions.RegistrationDateSign</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">=</a>
+                                        <a class="dropdown-item" href="#">≥</a>
+                                        <a class="dropdown-item" href="#">≤</a>
+                                    </div>
+                                </div>
                                 <input type="date" class="form-control" asp-for="FilterOptions.RegistrationDate" title="Дата регистрации договора">
+                                <input type="hidden" asp-for="FilterOptions.RegistrationDateSign" />
                             </div>
                         </div>
                         <div class="form-group col-md-6 col-lg-3">
                             <label asp-for="FilterOptions.IssuedDate">Дата выдачи</label>
                             <div class="input-group date">
+                                <div class="input-group-prepend rr-issued-date-dropdown">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Model.FilterOptions.IssuedDateSign</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">=</a>
+                                        <a class="dropdown-item" href="#">≥</a>
+                                        <a class="dropdown-item" href="#">≤</a>
+                                    </div>
+                                </div>
                                 <input type="date" class="form-control" asp-for="FilterOptions.IssuedDate" title="Дата выдачи договора">
+                                <input type="hidden" asp-for="FilterOptions.IssuedDateSign" />
                             </div>
                         </div>
                     </div>
@@ -118,13 +136,31 @@
                         <div class="form-group col-md-6 col-lg-3">
                             <label asp-for="FilterOptions.BeginDate">Дата начала действия</label>
                             <div class="input-group date">
+                                <div class="input-group-prepend rr-begin-date-dropdown">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Model.FilterOptions.BeginDateSign</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">=</a>
+                                        <a class="dropdown-item" href="#">≥</a>
+                                        <a class="dropdown-item" href="#">≤</a>
+                                    </div>
+                                </div>
                                 <input type="date" class="form-control" asp-for="FilterOptions.BeginDate" title="Дата начала действия договора">
+                                <input type="hidden" asp-for="FilterOptions.BeginDateSign" />
                             </div>
                         </div>
                         <div class="form-group col-md-6 col-lg-3">
                             <label asp-for="FilterOptions.EndDate">Дата окончания</label>
                             <div class="input-group date">
+                                <div class="input-group-prepend rr-end-date-dropdown">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Model.FilterOptions.EndDateSign</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">=</a>
+                                        <a class="dropdown-item" href="#">≥</a>
+                                        <a class="dropdown-item" href="#">≤</a>
+                                    </div>
+                                </div>
                                 <input type="date" class="form-control" asp-for="FilterOptions.EndDate" title="Дата окончания действия договора">
+                                <input type="hidden" asp-for="FilterOptions.EndDateSign" />
                             </div>
                         </div>
                     </div>
