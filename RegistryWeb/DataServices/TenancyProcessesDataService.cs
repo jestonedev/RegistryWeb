@@ -651,19 +651,39 @@ namespace RegistryWeb.DataServices
             }
             if (filterOptions.RegistrationDate.HasValue)
             {
-                query = query.Where(p => p.RegistrationDate == filterOptions.RegistrationDate);
+                if (filterOptions.RegistrationDateSign == "=")
+                    query = query.Where(p => p.RegistrationDate == filterOptions.RegistrationDate);
+                if(filterOptions.RegistrationDateSign == "≥")
+                    query = query.Where(p => p.RegistrationDate >= filterOptions.RegistrationDate);
+                if(filterOptions.RegistrationDateSign == "≤")
+                    query = query.Where(p => p.RegistrationDate <= filterOptions.RegistrationDate);
             }
             if (filterOptions.IssuedDate.HasValue)
             {
-                query = query.Where(p => p.IssueDate == filterOptions.IssuedDate);
+                if (filterOptions.IssuedDateSign == "=")
+                    query = query.Where(p => p.IssueDate == filterOptions.IssuedDate);
+                if (filterOptions.IssuedDateSign == "≥")
+                    query = query.Where(p => p.IssueDate >= filterOptions.IssuedDate);
+                if (filterOptions.IssuedDateSign == "≤")
+                    query = query.Where(p => p.IssueDate <= filterOptions.IssuedDate);
             }
             if (filterOptions.BeginDate.HasValue)
             {
-                query = query.Where(p => p.BeginDate == filterOptions.BeginDate);
+                if (filterOptions.BeginDateSign == "=")
+                    query = query.Where(p => p.BeginDate == filterOptions.BeginDate);
+                if (filterOptions.BeginDateSign == "≥")
+                    query = query.Where(p => p.BeginDate >= filterOptions.BeginDate);
+                if (filterOptions.BeginDateSign == "≤")
+                    query = query.Where(p => p.BeginDate <= filterOptions.BeginDate);
             }
             if (filterOptions.EndDate.HasValue)
             {
-                query = query.Where(p => p.EndDate == filterOptions.EndDate);
+                if (filterOptions.EndDateSign == "=")
+                    query = query.Where(p => p.EndDate == filterOptions.EndDate);
+                if (filterOptions.EndDateSign == "≥")
+                    query = query.Where(p => p.EndDate >= filterOptions.EndDate);
+                if (filterOptions.EndDateSign == "≤")
+                    query = query.Where(p => p.EndDate <= filterOptions.EndDate);
             }
             if (filterOptions.IdsRentType != null && filterOptions.IdsRentType.Any())
             {

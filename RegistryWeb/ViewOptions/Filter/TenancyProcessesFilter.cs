@@ -9,9 +9,13 @@ namespace RegistryWeb.ViewOptions.Filter
         public string RegistrationNum { get; set; }
         public bool RegistrationNumIsEmpty { get; set; }
         public DateTime? RegistrationDate { get; set; }
+        public string RegistrationDateSign { get; set; } = "=";
         public DateTime? IssuedDate { get; set; }
+        public string IssuedDateSign { get; set; } = "=";
         public DateTime? BeginDate { get; set; }
+        public string BeginDateSign { get; set; } = "=";
         public DateTime? EndDate { get; set; }
+        public string EndDateSign { get; set; } = "=";
         public string ReasonDocNum { get; set; }
         public DateTime? ReasonDocDate { get; set; }
         public List<int> IdsReasonType { get; set; }
