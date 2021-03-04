@@ -50,5 +50,13 @@ namespace RegistryWeb.DataServices
                 .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
                 .Take(pageOptions.SizePage);
         }
+
+        internal PrivContract GetPrivContract(int idContract)
+        {
+            var privContract = registryContext.PrivContracts
+                .Include(pc => pc.ExecutorNavigation)
+                .SingleOrDefault(pc => pc.IdContract == idContract);
+            return privContract;
+        }
     }
 }

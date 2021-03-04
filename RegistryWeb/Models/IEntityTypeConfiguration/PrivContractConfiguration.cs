@@ -36,6 +36,12 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasDefaultValueSql("0")
                 .IsRequired();
 
+            builder.Property(e => e.IsRefuse)
+                .HasColumnName("is_refuse")
+                .HasColumnType("tinyint")
+                .HasDefaultValueSql("0")
+                .IsRequired();
+
             builder.Property(e => e.IsRasprivatization)
                 .HasColumnName("is_rasprivatization")
                 .HasColumnType("tinyint")
@@ -47,6 +53,14 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnType("tinyint")
                 .HasDefaultValueSql("0")
                 .IsRequired();
+
+            builder.Property(e => e.IdExecutor)
+                .HasColumnName("id_executor")
+                .HasColumnType("int(11)");
+
+            builder.HasOne(e => e.ExecutorNavigation)
+                .WithMany(p => p.PrivContracts)
+                .HasForeignKey(e => e.IdExecutor);
         }  
     }
 }

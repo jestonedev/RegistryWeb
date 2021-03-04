@@ -1,20 +1,20 @@
-﻿using RegistryWeb.ViewModel;
-@model RegistryWeb.Models.Entities.PrivContract;
+﻿@model RegistryWeb.Models.Entities.PrivContract;
+@{
+    ViewData["Title"] = "Договор приватизации №" + Model.RegNumber;
+}
 @section Styles {
     @*<link rel="stylesheet" href="~/css/owner.processes.css" asp-append-version="true" />*@
 }
 @section Scripts {
     @*<script src="~/js/ownerProcess.address.js" asp-append-version="true"></script>
-    <script src="~/js/ownerProcess.files.js" asp-append-version="true"></script>
-    <script src="~/js/ownerProcess.owner.js" asp-append-version="true"></script>
-    <script sr*@c="~/js/ownerProcess.common.js" asp-append-version="true"></script>
+        <script src="~/js/ownerProcess.files.js" asp-append-version="true"></script>
+        <script src="~/js/ownerProcess.owner.js" asp-append-version="true"></script>
+        <script src="~/js/ownerProcess.common.js" asp-append-version="true"></script>*@
 }
-<h1>Privatization</h1>
-<form enctype="multipart/form-data" asp-controller="Privatization" asp-action="@ViewBag.Action" id="privatizationForm" data-action="@ViewBag.Action" method="post">
-    <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
-    <div class="card">
-        <div class="card-header d-flex justify-content-between">
-            <label class="form-check-label h2">@ViewData["Title"]</label>
+<div class="card">
+    <div class="card-header d-flex flex-column flex-lg-row">
+        <label class="form-check-label h2 col-sm-12 col-lg-6 col-xl-7 pl-0">@ViewData["Title"]</label>
+        <div class="col-sm-12 col-lg-6 col-xl-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
             <div class="btn-group" role="group" aria-label="Панель доступа">
                 @if (@ViewBag.ReturnUrl != null)
                 {
@@ -41,46 +41,40 @@
                 </a>
             </div>
         </div>
-        <div class="card-body" id="ownerProcess">
+    </div>
+    <div class="card-body" id="privatization">
+        <form enctype="multipart/form-data" asp-controller="Privatization" asp-action="@ViewBag.Action" id="privatizationForm" data-action="@ViewBag.Action" method="post">
+            <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
             <input type="hidden" value="@Model.IdContract" name="IdProcess" />
             <div class="validation text-danger" asp-validation-summary="All"></div>
             <div class="form-group">
-                <label>RegNumber</label>
-                <input type="text" value="@Model.RegNumber" />
+                <label asp-for="RegNumber">RegNumber</label>
+                <input type="text" asp-for="RegNumber" class="form-control" />
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" asp-for="IsRefusenik" class="form-check-input" />
+                <label asp-for="IsRefusenik" class="form-check-label">IsRefusenik</label>
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" asp-for="IsRefuse" class="form-check-input" />
+                <label asp-for="IsRefuse" class="form-check-label">IsRefuse</label>
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" asp-for="IsRasprivatization" class="form-check-input" />
+                <label asp-for="IsRasprivatization" class="form-check-label">IsRasprivatization</label>
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" asp-for="IsRelocation" class="form-check-input" />
+                <label asp-for="IsRelocation" class="form-check-label">IsRelocation</label>
             </div>
             <div class="form-group">
-                <label>RegNumber</label>
-                <input type="text" value="@Model.IsRefusenik" />
+                <label asp-for="IdExecutor">IdExecutor</label>
+                <input type="text" asp-for="IdExecutor" class="form-control" />
             </div>
             <div class="form-group">
-                <label>IsRasprivatization</label>
-                <input type="text" value="@Model.IsRasprivatization" />
+                <label>ExecutorName</label>
+                <input type="text" value="@Model.ExecutorNavigation?.ExecutorName" class="form-control" />
             </div>
-            <div class="form-group">
-                <label>IsRelocation</label>
-                <input type="text" value="@Model.IsRelocation" />
-            </div>
-            @*<div class="card" id="annulOwnerProcessCard">
-            <div class="card-header d-flex justify-content-between">
-                <h3>Завершение процесса</h3>
-                <div>
-                    <a href="#" id="annulOwnerProcessToggle" class="form-control btn btn-primary" title="Развернуть панель аннулирования">
-                        <span class="oi oi-chevron-top"></span>
-                    </a>
-                </div>
-            </div>
-            <div id="annulOwnerProcess" class="card-body row">
-                <div class="col-2">
-                    <input type="date" class="form-control rr-valid-ignore" placeholder="Дата аннулирования" title="Дата аннулирования"
-                           data-val="true"
-                           value="@Model.AnnulDate?.ToString("yyyy-MM-dd")" name="AnnulDate" />
-                </div>
-                <div class="col">
-                    <input type="text" class="form-control rr-valid-ignore" placeholder="Причина аннулирования" title="Причина аннулирования"
-                           value="@Model.AnnulComment" name="AnnulComment" />
-                </div>
-            </div>
-        </div>*@
-        </div>
+        </form>
     </div>
-</form>
+</div>

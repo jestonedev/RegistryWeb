@@ -63,21 +63,18 @@ namespace RegistryWeb.Controllers
         //    return Error("Здание не было создано!");
         //}
 
-        //public IActionResult Details(int? idContract, string returnUrl)
-        //{
-        //    ViewBag.ReturnUrl = returnUrl;
-        //    if (idBuilding == null)
-        //        return NotFound();
-        //    if (!securityService.HasPrivilege(Privileges.RegistryRead))
-        //        return View("NotAccess");
-        //    var building = dataService.GetBuilding(idBuilding.Value);
-        //    if (building == null)
-        //        return NotFound();
-        //    canEditBaseInfo = CanEditBuildingBaseInfo(building);
-        //    canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
-        //    canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
-        //    return GetBuildingView(building);
-        //}
+        public IActionResult Details(int? idContract, string returnUrl)
+        {
+            ViewBag.ReturnUrl = returnUrl;
+            if (!idContract.HasValue)
+                return NotFound();
+            //if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            //    return View("NotAccess");
+            var privContract = dataService.GetPrivContract(idContract.Value);
+            if (privContract == null)
+                return NotFound();
+            return View("Privatization", privContract);
+        }
 
         //[HttpGet]
         //public IActionResult Delete(int? idBuilding, string returnUrl)

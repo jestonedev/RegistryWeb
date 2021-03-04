@@ -1,8 +1,13 @@
-﻿@*@model RegistryWeb.ViewModel.PrivatizationListVM;
+﻿@model RegistryWeb.ViewModel.PrivatizationListVM;
 @using RegistryWeb.SecurityServices;
 @{
     var securityService = (SecurityService)ViewData["SecurityService"];
 }
 <form asp-action="Index" method="get" class="filterForm">
-</form>*@
-
+    <input type="hidden" asp-for="OrderOptions.OrderDirection" />
+    <input type="hidden" asp-for="OrderOptions.OrderField" />
+    <input type="hidden" asp-for="PageOptions.CurrentPage" />
+    <input type="hidden" asp-for="PageOptions.SizePage" />
+    <input type="hidden" asp-for="FilterOptions.Address.AddressType" />
+    <input type="hidden" asp-for="FilterOptions.Address.Id" />
+</form>
