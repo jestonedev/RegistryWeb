@@ -22,9 +22,6 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.HasIndex(e => e.IdProcess)
                 .HasName("FK_owner_files_id_process");
 
-            builder.HasIndex(e => e.IdReasonType)
-                .HasName("FK_owner_files_id_reason_type");
-
             builder.Property(e => e.Id)
                 .HasColumnName("id")
                 .HasColumnType("int(11)");
@@ -33,17 +30,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_process")
                 .HasColumnType("int(11)");
 
-            builder.Property(e => e.IdReasonType)
-                .HasColumnName("id_reason_type")
-                .HasColumnType("int(11)");
-
             builder.Property(e => e.DateDownload)
                 .HasColumnName("date_download")
                 .HasColumnType("date");
 
-            builder.Property(e => e.DateDocument)
-                .HasColumnName("date_document")
-                .HasColumnType("date");
 
             builder.Property(e => e.FileOriginName)
                 .HasColumnName("file_origin_name")
@@ -69,11 +59,6 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .WithMany(op => op.OwnerFiles)
                 .HasForeignKey(e => e.IdProcess)
                 .HasConstraintName("FK_owner_files_id_process");
-
-            builder.HasOne(e => e.OwnerReasonType)
-                .WithMany(ort => ort.OwnerFiles)
-                .HasForeignKey(e => e.IdReasonType)
-                .HasConstraintName("FK_owner_files_id_reason_type");
 
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);

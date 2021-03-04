@@ -110,15 +110,10 @@ namespace RegistryWeb.Controllers
         {
             var ownerFileVM = new OwnerFileVM()
             {
-                OwnerFile = new OwnerFile()
-                {
-                    DateDocument = DateTime.Now,
-                    IdReasonType = 9 //Государственная регистрация права (ЕГРП)
-                },
+                OwnerFile = new OwnerFile(),
                 Action = action,
                 I = i
             };
-            ViewBag.OwnerReasonTypes = dataService.OwnerReasonTypes();
             return PartialView("OwnerFile", ownerFileVM);
         }
 
