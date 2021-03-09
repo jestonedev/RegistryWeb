@@ -110,7 +110,7 @@ namespace RegistryWeb.Controllers
         {
             var ownerFileVM = new OwnerFileVM()
             {
-                OwnerFile = new OwnerFile(),
+                OwnerFile = new OwnerFile() { DateDownload = DateTime.Now },
                 Action = action,
                 I = i
             };
