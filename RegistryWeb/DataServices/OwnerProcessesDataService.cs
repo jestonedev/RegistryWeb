@@ -438,7 +438,6 @@ namespace RegistryWeb.DataServices
                 .Include(op => op.Owners)
                     .ThenInclude(ow => ow.OwnerReasons)
                 .Include(op => op.OwnerFiles)
-                //    .ThenInclude(of => of.OwnerReasonType)
                 .AsNoTracking()
                 .FirstOrDefault(op => op.IdProcess == idProcess);
             ownerProcess.OwnerBuildingsAssoc =
