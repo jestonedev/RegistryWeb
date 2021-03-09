@@ -28,10 +28,8 @@ function ownerFileDocumentDelete(e) {
         var inputs = $(this).find('input');
         inputs[0].name = 'OwnerFiles[' + i + '].Id';
         inputs[1].name = 'OwnerFiles[' + i + '].IdProcess';
-        $(this).find('select')[0].name = 'OwnerFiles[' + i + '].IdReasonType';
-        inputs[2].name = 'OwnerFiles[' + i + '].DateDocument';
-        inputs[3].name = 'OwnerFiles[' + i + '].DateDownload';
-        inputs[4].name = 'OwnerFiles[' + i + '].FileDisplayName';
+        inputs[2].name = 'OwnerFiles[' + i + '].DateDownload';
+        inputs[3].name = 'OwnerFiles[' + i + '].FileDisplayName';
     });
     e.preventDefault();
 }

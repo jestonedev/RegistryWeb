@@ -9,7 +9,6 @@ namespace RegistryWeb.Models.Entities
         public OwnerReasonType()
         {
             OwnerReasons = new List<OwnerReason>();
-            OwnerFiles = new List<OwnerFile>();
         }
 
         public int IdReasonType { get; set; }
@@ -18,6 +17,5 @@ namespace RegistryWeb.Models.Entities
         public byte Deleted { get; set; }
 
         public virtual IList<OwnerReason> OwnerReasons { get; set; }
-        public virtual IList<OwnerFile> OwnerFiles { get; set; }
     }
 }
