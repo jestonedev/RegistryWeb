@@ -2,16 +2,16 @@
 @using RegistryWeb.Models.Entities;
 @model FundHistoryVM;
 
-@{ 
-    var i=0;
+@{
+    var i = 0;
 }
 <div id="fundshistory">
     <table class="table">
         <thead>
             <tr>
-                <th>Номер протокола</th>
-                <th>Дата протокола</th>
-                <th>Тип найма</th>                
+                <th>НПА вкл. в фонд</th>
+                <th>НПА искл. из фонда</th>
+                <th>Тип найма</th>
                 <th></th>
             </tr>
         </thead>
@@ -19,12 +19,29 @@
             @foreach (var item in Model.FundsHistory)
             {
                 <tr class="hover">
-                    <input type="hidden" asp-for="@item.IdFund" />
-                    @{i = i + 1;}
-                    <td id="@(i)fund">@item.ProtocolNumber</td>
-                    <td id="@(i)fund">@(item.ProtocolDate != null ? item.ProtocolDate.Value.ToString("dd.MM.yyyy") : "")</td>
-                    <td id="@(i)fund">@item.IdFundTypeNavigation.FundTypeName</td>
                     <td>
+                        <input type="hidden" asp-for="@item.IdFund" />
+                        @if (!string.IsNullOrEmpty(item.IncludeRestrictionNumber))
+                        {
+                            <span>№ @item.IncludeRestrictionNumber</span>
+                        }
+                        @if (item.IncludeRestrictionDate.HasValue)
+                        {
+                            <span>от @item.IncludeRestrictionDate.Value.ToString("dd.MM.yyyy")</span>
+                        }
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.ExcludeRestrictionNumber))
+                        {
+                            <span>№ @item.ExcludeRestrictionNumber</span>
+                        }
+                        @if (item.ExcludeRestrictionDate.HasValue)
+                        {
+                            <span>от @item.ExcludeRestrictionDate.Value.ToString("dd.MM.yyyy")</span>
+                        }
+                    <td>
+                        @item.IdFundTypeNavigation.FundTypeName</td>
+                    <td class="text-center">
                         <a class="btn btn-outline-dark oi oi-pencil" id="edit" title="Изменить" aria-label="Изменить"
                            asp-action="Edit" asp-route-idFund="@item.IdFund" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.typeObject" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                         <a class="btn btn-danger oi oi-x" id="delete" title="Удалить" aria-label="Удалить"

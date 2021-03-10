@@ -4,12 +4,10 @@
 @{
     var controller = Context.Session.Get<string>("Controller");
     var action = Context.Session.Get<string>("Action");
-    var fundheadClass = "col-8";
 
     if (ViewBag.Action == "Create")
     {
         ViewData["Title"] = "Создание нового фонда";
-        fundheadClass = "col-9";
     }
 
     if (ViewBag.Action == "Details" || ViewBag.Action == "Index")
@@ -24,7 +22,7 @@
         }
         if (ViewBag.typeObject == "SubPremise" || Model.TypeObject == "SubPremise")
         {
-            ViewData["Title"] = "История фонда комнаты №" + (ViewBag.Num == null ? " _" : ViewBag.Num) + " помещения " + ViewBag.Prem;
+            ViewData["Title"] = "История фонда комнаты №" + (ViewBag.Num == null ? " _" : ViewBag.Num) + " помещения №" + ViewBag.Prem;
         }
     }
     if (ViewBag.Action == "Edit")
@@ -32,7 +30,6 @@
         if (ViewBag.typeObject == "Premise" || Model.TypeObject == "Premise")
         {
             ViewData["Title"] = "Редактирование истории фонда помещения №" + Model.IdObject;
-            fundheadClass = "col-8";
         }
         if (ViewBag.typeObject == "Building" || Model.TypeObject == "Building")
         {
@@ -40,7 +37,7 @@
         }
         if (ViewBag.typeObject == "SubPremise" || Model.TypeObject == "SubPremise")
         {
-            ViewData["Title"] = "Редактирование истории фонда комнаты №" + (ViewBag.Num == null ? " _" : ViewBag.Num) + " помещения " + ViewBag.Prem;
+            ViewData["Title"] = "Редактирование истории фонда комнаты №" + (ViewBag.Num == null ? " _" : ViewBag.Num) + " помещения №" + ViewBag.Prem;
         }
     }
     if (ViewBag.Action == "Delete")
@@ -48,7 +45,6 @@
         if (ViewBag.typeObject == "Premise" || Model.TypeObject == "Premise")
         {
             ViewData["Title"] = "Удаление истории фонда помещения №" + Model.IdObject;
-            fundheadClass = "col-9";
         }
         if (ViewBag.typeObject == "Building" || Model.TypeObject == "Building")
         {
@@ -56,7 +52,7 @@
         }
         if (ViewBag.typeObject == "SubPremise" || Model.TypeObject == "SubPremise")
         {
-            ViewData["Title"] = "Удаление истории фонда комнаты №" + (ViewBag.Num == null ? " _" : ViewBag.Num) + " помещения " + ViewBag.Prem;
+            ViewData["Title"] = "Удаление истории фонда комнаты №" + (ViewBag.Num == null ? " _" : ViewBag.Num) + " помещения №" + ViewBag.Prem;
         }
     }
 }
@@ -66,43 +62,52 @@
     <script src="~/js/fundhistory.index.js" asp-append-version="true"></script>
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/fundshistory.css"  runat="server" />
+}
+
 <div id="fundhistory">
     <form asp-controller="FundHistory" asp-action="@ViewBag.Action" id="r-fundshistory-form" data-action="@ViewBag.Action" method="post">
 
         <div class="card">
             <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
 
-            <div class="card-header d-flex justify-content-between col-12">
-                <label class="form-check-label h2 @fundheadClass">@ViewData["Title"]</label>
-                @*<div class="col-4">*@
-                <a id="fundhistoryAdd" style="width: 38px;" class="form-control btn btn-success" title="Добавить фонд" asp-action="Create" asp-route-action="Create" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.typeObject" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">&#10010;</a>
-                <div class="btn-group" role="group" aria-label="Панель доступа">
+            <div class="card-header d-flex flex-column flex-lg-row">
+                <label class="form-check-label h2 col-sm-12 col-lg-8 col-xl-9 pl-0">@ViewData["Title"]</label>
 
-                    @if (ViewBag.ReturnUrl != null)
+                <div class="col-sm-12 col-lg-4 col-xl-3 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
+                    @if (ViewBag.Action == "Index")
                     {
-                        <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+                        <a id="fundhistoryAdd" class="btn btn-success" title="Добавить фонд"
+                           asp-action="Create" asp-route-action="Create" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.typeObject"
+                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
+                            &#10010;
+                        </a>
                     }
-                    else
-                    {
-                        <a class="form-control btn btn-primary" asp-controller="FundHistory" asp-action="Index" asp-route-isBack="true">Назад</a>
-                    }
-                    
-                    @if (ViewBag.Action == "Create")
-                    {
-                        <input type="submit" id="createBtn" value="Создать" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.typeObject"  asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"/>
-                    }
-                    @if (ViewBag.Action == "Edit")
-                    {
-                        <input type="submit" value="Сохранить" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.typeObject" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"/>
-                    }
-                    @if (ViewBag.Action == "Delete")
-                    {
-                        <input id="del" type="submit" value="Удалить" class="form-control btn btn-danger" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.typeObject" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"/>
-                    }
-
-                    <a href="#" id="fundbodyToggle" class="form-control btn btn-primary" title="Развернуть помещение" style="font-weight:bold;">∧</a>
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        @if (@ViewBag.ReturnUrl != null)
+                        {
+                            <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+                        }
+                        else
+                        {
+                            <a class="form-control btn btn-primary" asp-controller="FundHistory" asp-action="Index" asp-route-isBack="true">Назад</a>
+                        }
+                        @if (ViewBag.Action == "Create")
+                        {
+                             <input type="submit" id="createBtn" value="Создать" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.typeObject" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")" />
+                        }
+                        @if (ViewBag.Action == "Edit")
+                        {
+                            <input type="submit" value="Сохранить" class="form-control btn btn-success" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.typeObject" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")" />
+                        }
+                        @if (ViewBag.Action == "Delete")
+                        {
+                            <input id="del" type="submit" value="Удалить" class="form-control btn btn-danger" asp-route-IdObject="@ViewBag.idObject" asp-route-typeObject="@ViewBag.typeObject" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")" />
+                        }
+                        <a href="#" id="fundbodyToggle" class="form-control btn btn-primary" title="Развернуть помещение" style="font-weight:bold;">∧</a>
+                    </div>
                 </div>
-                @*</div>*@
             </div>
             <input type="hidden" asp-for="@Model.FundHistory.IdFund" />
             <input type="hidden" asp-for="@Model.FundHistory.Deleted" />
@@ -118,14 +123,7 @@
                                 <div class="form-group col-md-12 col-xl-4 r-form-group-label">
                                     <label asp-for="@Model.FundHistory.IdFundTypeNavigation.IdFundType">Тип найма</label>
                                     <select id="IdFundType" data-live-search="true" class="form-control" asp-for="@Model.FundHistory.IdFundType" title="Тип найма" asp-items="@Model.FundTypesList">
-                                        @if (Model.FundHistory.IdFundTypeNavigation != null)
-                                        {
-                                            <option>@Model.FundHistory.IdFundTypeNavigation.FundTypeName</option>
-                                        }
-                                        else
-                                        {
-                                            <option></option>
-                                        };
+                                        <option></option>
                                     </select>
                                     <span asp-validation-for="@Model.FundHistory.IdFundType" class="text-danger"></span>
                                 </div>
@@ -136,7 +134,7 @@
                                 </div>
                                 <div class="form-group col-md-12 col-xl-4 r-form-group-label">
                                     <label asp-for="@Model.FundHistory.ProtocolDate">Дата протокола ЖК</label>
-                                    <input type="date" class="form-control" asp-for="@Model.FundHistory.ProtocolDate" value="@(Model.FundHistory.ProtocolDate==null ? DateTime.Now.ToString("yyyy-MM-dd") : Model.FundHistory.ProtocolDate?.ToString("yyyy-MM-dd"))" title="Дата протокола ЖК">
+                                    <input type="date" class="form-control" asp-for="@Model.FundHistory.ProtocolDate" value="@(Model.FundHistory.ProtocolDate == null ? "" : Model.FundHistory.ProtocolDate?.ToString("yyyy-MM-dd"))" title="Дата протокола ЖК">
                                 </div>
                             </div>
                             <div class="form-row">
@@ -152,7 +150,12 @@
                         <div class="card-body">
                             <div class="form-row">
                                 <div class="form-check col" style="margin-left:20px;">
-                                    <input type="checkbox" class="form-check-input" id="includecheck" title="Реквизиты НПА по включению в фонд">
+                                    @{ 
+                                        var isChecked = !string.IsNullOrEmpty(Model.FundHistory.IncludeRestrictionNumber) || Model.FundHistory.IncludeRestrictionDate.HasValue ||
+                                            !string.IsNullOrEmpty(Model.FundHistory.IncludeRestrictionDescription);
+                                    }
+                                    <input type="checkbox" class="form-check-input" id="includecheck" title="Реквизиты НПА по включению в фонд" 
+                                           @Html.Raw(isChecked ? "checked" : "") @Html.Raw(ViewBag.Action == "Index" || ViewBag.Action == "Delete" ? "disabled" : "")>
                                     <label class="form-check-label">Реквизиты НПА по включению в фонд</label>
                                 </div>
                             </div>
@@ -163,7 +166,7 @@
                                 </div>
                                 <div class="form-group col-md-6 col-xl-4 r-form-group-label">
                                     <label asp-for="@Model.FundHistory.IncludeRestrictionDate">Дата реквизита</label>
-                                    <input type="date" disabled="disabled" class="form-control include" asp-for="@Model.FundHistory.IncludeRestrictionDate" value="@(Model.FundHistory.IncludeRestrictionDate==null ? DateTime.Now.ToString("yyyy-MM-dd") : Model.FundHistory.IncludeRestrictionDate?.ToString("yyyy-MM-dd"))" title="Дата протокола ЖК">
+                                    <input type="date" disabled="disabled" class="form-control include" asp-for="@Model.FundHistory.IncludeRestrictionDate" value="@(Model.FundHistory.IncludeRestrictionDate==null ? "" : Model.FundHistory.IncludeRestrictionDate?.ToString("yyyy-MM-dd"))" title="Дата протокола ЖК">
                                 </div>
                                 <div class="form-group col-md-12 col-xl-4 r-form-group-label">
                                     <label asp-for="@Model.FundHistory.IncludeRestrictionDescription">Наименование</label>
@@ -172,8 +175,13 @@
                             </div>
                             <div class="form-row">
                                 <div class="form-check col" style="margin-left:20px;">
-                                    <input type="checkbox" class="form-check-input" id="excludecheck" title="Реквизиты НПА по исключению из фонда">@*asp-for=""*@
-                                    <label class="form-check-label">Реквизиты НПА по исключению из фонда</label>@*asp-for=""*@
+                                    @{
+                                        isChecked = !string.IsNullOrEmpty(Model.FundHistory.ExcludeRestrictionNumber) || Model.FundHistory.ExcludeRestrictionDate.HasValue ||
+                                            !string.IsNullOrEmpty(Model.FundHistory.ExcludeRestrictionDescription);
+                                    }
+                                    <input type="checkbox" class="form-check-input" id="excludecheck" title="Реквизиты НПА по исключению из фонда" 
+                                           @Html.Raw(isChecked ? "checked" : "") @Html.Raw(ViewBag.Action == "Index" || ViewBag.Action == "Delete" ? "disabled" : "")>
+                                    <label class="form-check-label">Реквизиты НПА по исключению из фонда</label>
                                 </div>
                             </div>
                             <div class="form-row">
@@ -183,7 +191,7 @@
                                 </div>
                                 <div class="form-group col-md-6 col-xl-4 r-form-group-label">
                                     <label asp-for="@Model.FundHistory.ExcludeRestrictionDate">Дата реквизита</label>
-                                    <input type="date" disabled="disabled" class="form-control exclude" asp-for="@Model.FundHistory.ExcludeRestrictionDate" value="@(Model.FundHistory.ExcludeRestrictionDate==null ? DateTime.Now.ToString("yyyy-MM-dd") : Model.FundHistory.ExcludeRestrictionDate?.ToString("yyyy-MM-dd"))" title="Дата протокола ЖК">
+                                    <input type="date" disabled="disabled" class="form-control exclude" asp-for="@Model.FundHistory.ExcludeRestrictionDate" value="@(Model.FundHistory.ExcludeRestrictionDate==null ? "" : Model.FundHistory.ExcludeRestrictionDate?.ToString("yyyy-MM-dd"))" title="Дата протокола ЖК">
                                 </div>
                                 <div class="form-group col-md-12 col-xl-4 r-form-group-label">
                                     <label asp-for="@Model.FundHistory.ExcludeRestrictionDescription">Наименование</label>

@@ -3,56 +3,51 @@ var fundbodyToggle = function (e) {
     arrowAnimation($(this));
     $('#fundbody').toggle();
     e.preventDefault();
-}
-
-function refreshFormValidation(form) {
-    var form = form.removeData("validator").removeData("unobtrusiveValidation");
-    $.validator.unobtrusive.parse(form);
-    form.validate();
-}
-
+};
 
 $(function ()
 {
     var action = $('#r-fundshistory-form').data("action");
+    var now = new Date();
+    var day = ("0" + now.getDate()).slice(-2);
+    var month = ("0" + (now.getMonth() + 1)).slice(-2);
+    var today = now.getFullYear() + "-" + (month) + "-" + (day);
 
-    if (action == "Index")
+    if (action === "Index" || action === "Delete")
     {
-        $('select').prop('disabled', true);
-        $('input').prop('disabled', true);
-        $('textarea').prop('disabled', true);
-    }    
-    else if (action == "Delete")
-    {
-        $('select').prop('readonly', true);
-        $('input').prop('readonly', true);
-        $('textarea').prop('readonly', true);
-        $('#del').prop('readonly', false);
-        $('select').attr('readonly', 'readonly');
+        $('#fundbody select').prop('disabled', true);
+        $('#fundbody input').prop('disabled', true);
+        $('#fundbody textarea').prop('disabled', true);
     }
-    
 
     $('#fundbodyToggle').click(fundbodyToggle);
 
-    $('#includecheck').on("click", function (e)
-    {
-        if ($('#includecheck').is(':checked'))
-        {
+
+    $('#includecheck').on("change", function (e) {
+        if ($('#includecheck').is(':checked') && (action === "Create" || action === "Edit")) {
             $('.include').removeAttr('disabled');
+            var includeDate = $("#FundHistory_IncludeRestrictionDate");
+            if (includeDate.val() === "") {
+                includeDate.val(today);
+            }
         } else {
-
-                $('.include').attr('disabled', 'disabled');
-               }
+            $('.include').attr('disabled', 'disabled');
+        }
     });
 
-    $('#excludecheck').on("click", function (e) {
-        if ($('#excludecheck').is(':checked')) {
+    $('#excludecheck').on("change", function (e) {
+        if ($('#excludecheck').is(':checked') && (action === "Create" || action === "Edit")) {
             $('.exclude').removeAttr('disabled');
+            var excludeDate = $("#FundHistory_ExcludeRestrictionDate");
+            if (excludeDate.val() === "") {
+                excludeDate.val(today);
+            }
         } else {
-
-                $('.exclude').attr('disabled', 'disabled');
-               }
+            $('.exclude').attr('disabled', 'disabled');
+        }
     });
+
+    $('#includecheck, #excludecheck').change();
 
     $("#edit").on("click", function (e) {
         $('select').prop('disabled', false);
@@ -68,52 +63,54 @@ $(function ()
 
     });
 
-    $("select#IdFundType").on("change", function (e) {
-        $(this).css("border-color", "#CED4DA");
-
-    });
-
     $("form#r-fundshistory-form").on("submit", function (e) {
         $("button[data-id]").removeClass("input-validation-error");
         var isFormValid = $(this).valid();
         if (!isFormValid) {
-            $("select").each(function (idx, elem) {
-
-                var id = $(elem).prop("id");
-                $("#" + id).css("border-color", "#dc3545");
-                var name = $(elem).prop("name");
-                var errorSpan = $("span[data-valmsg-for='" + name + "']");
-                if (errorSpan.hasClass("field-validation-error")) {
-                    $("button[data-id='" + id + "']").addClass("input-validation-error");
-                }
-            });
             e.preventDefault();
         }
     });
 
     $("form").on("change", "select", function () {
-        var isValid = $(this).valid();
-        var id = $(this).prop("id");
-        if (!isValid) {
-            $("button[data-id='" + id + "']").addClass("input-validation-error");
-        } else {
-
-            $("button[data-id='" + id + "']").removeClass("input-validation-error");
-        }
+        $(this).valid();
     });
 
-    
+    $("#fundshistory tbody tr").on('click', function () {
+        var tr = $(this);
 
-    $('.table tr').click(function ()
-    {        
-        $('.table tr').removeClass('active1');            
-        $(this).addClass('active1');
+        $('.table tr').removeClass('active1');
+        tr.addClass('active1');
+        var idFund = tr.find('input[name$="IdFund"]').val();
+
+        $.getJSON('/FundsHistory/Details?' + "idFund=" + idFund, function (data) {
+            ostatockArray = data;
+            $(ostatockArray).each(function (idx, elem) {
+                $("select[name$='IdFundType']").val(elem.idFundType);
+                $("input[name$='ProtocolDate']").val(elem.protocolDate === null ? "" : elem.protocolDate.substr(0, 10));
+                $("input[name$='ProtocolNumber']").val(elem.protocolNumber);
+                $("textarea").val(elem.description);
+                
+                $("input[name$='IncludeRestrictionNumber']").val(elem.includeRestrictionNumber);
+                $("input[name$='IncludeRestrictionDate']").val(elem.includeRestrictionDate === null ? "" : elem.includeRestrictionDate.substr(0, 10));
+                $("input[name$='IncludeRestrictionDescription']").val(elem.includeRestrictionDescription);
+                if (elem.includeRestrictionNumber !== null || elem.includeRestrictionDate !== null || elem.includeRestrictionDescription !== null) {
+                    $("#includecheck").prop("checked", "checked");
+                } else {
+                    $("#includecheck").prop("checked", "");
+                }
+                
+                $("input[name$='ExcludeRestrictionNumber']").val(elem.excludeRestrictionNumber);
+                $("input[name$='ExcludeRestrictionDate']").val(elem.excludeRestrictionDate === null ? "" : elem.excludeRestrictionDate.substr(0, 10));
+                $("input[name$='ExcludeRestrictionDescription']").val(elem.excludeRestrictionDescription);
+
+                if (elem.excludeRestrictionNumber !== null || elem.excludeRestrictionDate !== null || elem.excludeRestrictionDescription !== null) {
+                    $("#excludecheck").prop("checked", "checked");
+                } else {
+                    $("#excludecheck").prop("checked", "");
+                }
+            });
+        });
     });
 
-
-
-
-   
-
-
+    $("#fundshistory tbody tr").first().click();
 });

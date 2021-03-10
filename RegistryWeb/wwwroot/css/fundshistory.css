@@ -13,7 +13,7 @@
 
 
 
-input.input-validation-error, button.input-validation-error, select .input-validation-error {
+.input-validation-error {
     border: 1px solid #dc3545;
 }
 
@@ -38,11 +38,6 @@ input.input-validation-error, button.input-validation-error, select .input-valid
     background-color: #007bff;
     color: white;
 }
-
-/*.active1 :hover {
-    background-color: #0068D8;
-    color: white;
-}*/
 
 .table tr .active1{/* :after{*/
     background-color: #007bff;

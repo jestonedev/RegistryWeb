@@ -49,10 +49,11 @@ namespace RegistryWeb.Controllers
             return View(viewModel);
         }
 
-        public JsonResult Details(int idFund, string returnUrl)
+        public IActionResult Details(int idFund)
         {
-            ViewBag.Action = "Details";
-            ViewBag.ReturnUrl = returnUrl;
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
+                return View("NotAccess");
+
             var fund = dataService.GetFundHistory(idFund);
             return Json(fund);
         }
@@ -68,6 +69,12 @@ namespace RegistryWeb.Controllers
 
             if (!CanEditFundHistory(IdObject, typeObject))
                 return View("NotAccess");
+
+            if (typeObject == "SubPremise")
+            {
+                ViewBag.Num = rc.SubPremises.FirstOrDefault(s => s.IdSubPremises == IdObject).SubPremisesNum;
+                ViewBag.Prem = rc.SubPremises.FirstOrDefault(s => s.IdSubPremises == IdObject).IdPremises;
+            }
 
             return View("FundHistory", dataService.GetFundHistoryView(dataService.CreateFundHistory(), IdObject, typeObject));
         }
@@ -88,7 +95,7 @@ namespace RegistryWeb.Controllers
             if (ModelState.IsValid)
             {                
                 dataService.Create(fh.FundHistory, IdObject, typeObject);
-                return View("Index", dataService.GetListViewModel(IdObject, typeObject));
+                return Redirect(returnUrl);
             }
             return View("FundHistory", dataService.GetFundHistoryView(fh.FundHistory, IdObject, typeObject));
         }
@@ -110,6 +117,12 @@ namespace RegistryWeb.Controllers
             if (fh == null)
                 return NotFound();
 
+            if (typeObject == "SubPremise")
+            {
+                ViewBag.Num = rc.SubPremises.FirstOrDefault(s => s.IdSubPremises == IdObject).SubPremisesNum;
+                ViewBag.Prem = rc.SubPremises.FirstOrDefault(s => s.IdSubPremises == IdObject).IdPremises;
+            }
+
             return View("FundHistory", dataService.GetFundHistoryView(fh, IdObject, typeObject));
         }
 
@@ -127,8 +140,7 @@ namespace RegistryWeb.Controllers
             if (ModelState.IsValid)
             {
                 dataService.Edit(fh.FundHistory, IdObject, typeObject);
-                return View("Index", dataService.GetListViewModel(IdObject, typeObject));
-                //return RedirectToAction("Index");
+                return Redirect(returnUrl);
             }
             ViewBag.Action = "Edit";
             ViewBag.ReturnUrl = returnUrl;
@@ -171,8 +183,7 @@ namespace RegistryWeb.Controllers
             if (ModelState.IsValid)
             {
                 dataService.Delete(fh.FundHistory.IdFund);
-                return View("Index", dataService.GetListViewModel(IdObject, typeObject));
-                //return RedirectToAction("Index");
+                return Redirect(returnUrl);
             }
             return View("FundHistory", dataService.GetFundHistoryView(fh.FundHistory, 0, ""));
         }/**/
