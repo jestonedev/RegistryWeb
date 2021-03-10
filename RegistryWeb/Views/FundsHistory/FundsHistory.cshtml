@@ -18,7 +18,12 @@
         <tbody>
             @foreach (var item in Model.FundsHistory)
             {
-                <tr class="hover">
+                var included = !string.IsNullOrEmpty(item.IncludeRestrictionNumber) || item.IncludeRestrictionDate.HasValue ||
+                    !string.IsNullOrEmpty(item.IncludeRestrictionDescription);
+                var excluded = !string.IsNullOrEmpty(item.ExcludeRestrictionNumber) || item.ExcludeRestrictionDate.HasValue ||
+                    !string.IsNullOrEmpty(item.ExcludeRestrictionDescription);
+
+                <tr class="hover @(included && !excluded ? "included" : "") @(excluded ? "excluded" : "")">
                     <td>
                         <input type="hidden" asp-for="@item.IdFund" />
                         @if (!string.IsNullOrEmpty(item.IncludeRestrictionNumber))

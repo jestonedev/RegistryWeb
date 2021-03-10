@@ -34,16 +34,15 @@
 
 
 /*Если строка выделена*/
-.table .active1{
-    background-color: #007bff;
+.table .active1 td{
+    background-color: #007bff !important;
     color: white;
 }
 
-.table tr .active1{/* :after{*/
-    background-color: #007bff;
-    color: white;
+.table tr.excluded td {
+    background-color: #ed969e;
 }
 
-
-
-
+.table tr.included td {
+    background-color: #7eec97;
+}

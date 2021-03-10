@@ -89,7 +89,7 @@ $(function ()
                 $("input[name$='ProtocolDate']").val(elem.protocolDate === null ? "" : elem.protocolDate.substr(0, 10));
                 $("input[name$='ProtocolNumber']").val(elem.protocolNumber);
                 $("textarea").val(elem.description);
-                
+
                 $("input[name$='IncludeRestrictionNumber']").val(elem.includeRestrictionNumber);
                 $("input[name$='IncludeRestrictionDate']").val(elem.includeRestrictionDate === null ? "" : elem.includeRestrictionDate.substr(0, 10));
                 $("input[name$='IncludeRestrictionDescription']").val(elem.includeRestrictionDescription);
@@ -98,7 +98,7 @@ $(function ()
                 } else {
                     $("#includecheck").prop("checked", "");
                 }
-                
+
                 $("input[name$='ExcludeRestrictionNumber']").val(elem.excludeRestrictionNumber);
                 $("input[name$='ExcludeRestrictionDate']").val(elem.excludeRestrictionDate === null ? "" : elem.excludeRestrictionDate.substr(0, 10));
                 $("input[name$='ExcludeRestrictionDescription']").val(elem.excludeRestrictionDescription);
@@ -111,6 +111,4 @@ $(function ()
             });
         });
     });
-
-    $("#fundshistory tbody tr").first().click();
 });
