@@ -171,23 +171,23 @@
                     </select>
                     <span asp-validation-for="@Model.Premise.IdBuilding" class="text-danger"></span>
                 </div>
+                <div class="form-group col-lg-2 col-md-4 r-form-group-label mb-2">
+                    <label class="rr-premises-label mb-1" asp-for="@Model.Premise.PremisesNum">Номер помещения</label>
+                    <input type="text" class="form-control input-premise-num btn-info" asp-for="@Model.Premise.PremisesNum" maxlength="255" title="Номер помещения">
+                    <span asp-validation-for="@Model.Premise.PremisesNum" class="text-danger"></span>
+                </div>
                 <div class="form-group col-lg-3 col-md-8 r-form-group-label mb-2">
                     <label class="mb-1" asp-for="@Model.Premise.IdPremisesType">Тип помещения</label>
                     <select class="selectpicker form-control" asp-for="@Model.Premise.IdPremisesType" title="Тип помещения"
                             asp-items="@Model.PremisesTypesList"></select>
                     <span asp-validation-for="@Model.Premise.IdPremisesType" class="text-danger"></span>
                 </div>
-                <div class="form-group col-lg-2 col-md-4 r-form-group-label mb-2">
-                    <label class="rr-premises-label mb-1" asp-for="@Model.Premise.PremisesNum">Номер помещения</label>
-                    <input type="text" class="form-control input-premise-num btn-info" asp-for="@Model.Premise.PremisesNum" maxlength="255" title="Номер помещения">
-                    <span asp-validation-for="@Model.Premise.PremisesNum" class="text-danger"></span>
-                </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group col-lg-3 col-md-6 r-form-group-label mb-2">
                     <label class="mb-1" asp-for="@Model.Premise.IdState">Текущее состояние</label>
-                    <select class="selectpicker form-control" data-live-search="true" asp-for="@Model.Premise.IdState" title="Текущее состояние"
+                    <select class="selectpicker form-control" data-style="btn-dark" data-live-search="true" asp-for="@Model.Premise.IdState" title="Текущее состояние"
                             asp-items="@Model.ObjectStatesList">
                         <option></option>
                     </select>
