@@ -75,13 +75,12 @@
             <th class="p-table-low-width-hide-cell">
                 Найм
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.Premises)
         {
-        <tr>
+        <tr style="position: relative">
             @if (ids.Contains(item.IdPremises))
             {
                 check = "checked";
@@ -116,7 +115,7 @@
                     <div class="col-auto">
                         <a class="btn btn-success oi oi-home" title="Здание" aria-label="Здание" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@item.IdBuilding" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                     </div>
-                    <div class="col-xl-9 col-lg-12 col-md-8">
+                    <div class="col-xl-10 col-lg-9 col-md-10">
                         @address
                         <div class="dopinfo">
                             Общая площадь: @item.TotalArea<span> м<sup>2</sup></span>, этаж: @item.Floor<br />
@@ -174,38 +173,29 @@
                         }
                     }
                 </div>
-            </td>
-            <td>
-                <div class="btn-group" role="group" aria-label="Панель доступа">
-                    @{
-                        var canDeleteBaseInfo = 
-                            (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal)) ||
-                            (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(item.IdState) && !item.SubPremises.Any(sp => !ObjectStateHelper.IsMunicipal(sp.IdState))) ||
-                            (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(item.IdState) && !item.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)));
-                        var canEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
-                        var canEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
-                    }
+                @{
+                    var canDeleteBaseInfo =
+                        (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal)) ||
+                        (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(item.IdState) && !item.SubPremises.Any(sp => !ObjectStateHelper.IsMunicipal(sp.IdState))) ||
+                        (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(item.IdState) && !item.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)));
+                    var canEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
+                    var canEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
+                }
+                <div class="btn-group rr-opacity-item-menu" role="group" aria-label="Панель доступа">
                     @if (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || canEditResettleInfo || canEditLitigationInfo)
                     {
-                        <div class="btn-group" role="group" aria-label="Панель доступа">
-                            <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                            <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@item.IdPremises">
-                                <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
-                                   asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
-                                   asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@item.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                <a class="btn btn-danger oi oi-x @(canDeleteBaseInfo ? "" : "disabled")" title="Удалить" aria-label="Удалить"
-                                   asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@item.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                            </div>
-                        </div>
+                        <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
+                           asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                        <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                           asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@item.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                        <a class="btn btn-danger oi oi-x @(canDeleteBaseInfo ? "" : "disabled")" title="Удалить" aria-label="Удалить"
+                           asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@item.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                     }
                     else
                     {
                         <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
                            asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-
                     }
-
                     <div class="btn-group" role="group" aria-label="Панель доступа">
 
                         <button class="btn btn-dark oi oi-grid-two-up dropdown-toggle" type="button" title="Связанные объекты" aria-label="Связанные объекты" id="objectsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
@@ -216,7 +206,7 @@
                             @if (securityService.HasPrivilege(Privileges.TenancyRead))
                             {
                                 <a class="dropdown-item" title="Найм помещения" aria-label="Найм помещения"
-                                   asp-controller="TenancyProcesses" asp-action="Index" 
+                                   asp-controller="TenancyProcesses" asp-action="Index"
                                    asp-route-filterOptions.IdPremises="@item.IdPremises"
                                    asp-route-filterOptions.Address.AddressType="Premise"
                                    asp-route-filterOptions.Address.Id="@item.IdPremises"
@@ -233,13 +223,13 @@
                             @if (securityService.HasPrivilege(Privileges.ClaimsRead))
                             {
                                 <a class="dropdown-item" title="Лицевые счета БКС" aria-label="Лицевые счета"
-                                   asp-controller="PaymentAccounts" asp-action="Index" 
+                                   asp-controller="PaymentAccounts" asp-action="Index"
                                    asp-route-filterOptions.IdPremises="@item.IdPremises"
                                    asp-route-filterOptions.Address.AddressType="Premise"
                                    asp-route-filterOptions.Address.Id="@item.IdPremises"
                                    asp-route-filterOptions.Address.Text="@address">Лицевые счета БКС</a>
                                 <a class="dropdown-item" title="Исковые работы" aria-label="Исковые работы"
-                                   asp-controller="Claims" asp-action="Index" 
+                                   asp-controller="Claims" asp-action="Index"
                                    asp-route-filterOptions.IdPremises="@item.IdPremises"
                                    asp-route-filterOptions.Address.AddressType="Premise"
                                    asp-route-filterOptions.Address.Id="@item.IdPremises"
@@ -247,7 +237,6 @@
                             }
                         </div>
                     </div>
-
                     <div class="btn-group" role="group" aria-label="Отчеты">
                         <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@item.IdPremises" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdPremises">
@@ -257,7 +246,6 @@
                             <a class="dropdown-item rr-report-premise-area" href="#" title="Справка о площади помещения" aria-label="Справка о площади помещения" data-id-premise="@item.IdPremises">Справка о площади помещения</a>
                         </div>
                     </div>
-
                 </div>
             </td>
         </tr>

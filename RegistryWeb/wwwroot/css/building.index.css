@@ -3,6 +3,11 @@
     font-size: 75%;
 }
 
+.dopinfo-alt {
+    color: #212529;
+    font-size: 75%;
+}
+
 .rr-building-label {
     white-space: nowrap;
     overflow: hidden;
