@@ -5,49 +5,49 @@
 @model PremisesVM<Premise>
 
 @{ 
-    var paymentInfo = Model.PaymentsInfo.FirstOrDefault();
-    if (paymentInfo == null) {
-        paymentInfo = new PaymentsInfo();
+    var paymentInfo = Model.PaymentsInfo;
+    if (Model.PaymentsInfo == null || !Model.PaymentsInfo.Any()) {
+        paymentInfo = new List<PaymentsInfo> { new PaymentsInfo() };
     }
 }
 
 <div class="form-row">
-    <div class="form-group col r-form-group-label">
-        <label for="Payment">Размер платы до 28.08.2019</label>
-        <input id="Payment" name="Payment" value="@(paymentInfo.Payment)" 
+    <div class="form-group col r-form-group-label mb-2">
+        <label class="mb-1" for="Payment">Размер платы до 28.08.2019</label>
+        <input id="Payment" name="Payment" value="@(paymentInfo.Select(p => p.Payment).Sum())" 
                type="text" class="form-control" title="Размер платы до 28.08.2019">
     </div>
-    <div class="form-group col r-form-group-label">
-            <label for="PaymentAfter">Размер платы после 28.08.2019</label>
-            <input id="PaymentAfter" name="PaymentAfter" value="@(paymentInfo.PaymentAfter28082019)" 
+    <div class="form-group col r-form-group-label mb-2">
+            <label class="mb-1" for="PaymentAfter">Размер платы после 28.08.2019</label>
+            <input id="PaymentAfter" name="PaymentAfter" value="@(paymentInfo.Select(p => p.PaymentAfter28082019).Sum())" 
                    type="text" class="form-control" title="Размер платы после 28.08.2019">
     </div>
 </div>
 
 <div class="form-row">
-    <div class="form-group col r-form-group-label">
-        <label class="rr-premises-label" for="Hb">Нб</label>
-        <input id="Hb" name="Nb" value="@(paymentInfo.Nb)"
+    <div class="form-group col r-form-group-label mb-0">
+        <label class="rr-premises-label mb-1" for="Hb">Нб</label>
+        <input id="Hb" name="Nb" value="@(paymentInfo[0].Nb)"
                type="text" class="form-control" title="Нб">
     </div>
-    <div class="form-group col r-form-group-label">
-        <label class="rr-premises-label" for="Kc">Кс</label>
-        <input id="Kc" name="Nb" value="@(paymentInfo.KC)"
+    <div class="form-group col r-form-group-label mb-0">
+        <label class="rr-premises-label mb-1" for="Kc">Кс</label>
+        <input id="Kc" name="Nb" value="@(paymentInfo[0].KC)"
                type="text" class="form-control" title="Кс">
     </div>
-    <div class="form-group col r-form-group-label">
-        <label class="rr-premises-label" for="K1">К1</label>
-        <input id="K1" name="Nb" value="@(paymentInfo.K1)"
+    <div class="form-group col r-form-group-label mb-0">
+        <label class="rr-premises-label mb-1" for="K1">К1</label>
+        <input id="K1" name="Nb" value="@(paymentInfo[0].K1)"
                type="text" class="form-control" title="К1">
     </div>
-    <div class="form-group col r-form-group-label">
-        <label class="rr-premises-label" for="K2">К2</label>
-        <input id="K2" name="Nb" value="@(paymentInfo.K2)"
+    <div class="form-group col r-form-group-label mb-0">
+        <label class="rr-premises-label mb-1" for="K2">К2</label>
+        <input id="K2" name="Nb" value="@(paymentInfo[0].K2)"
                type="text" class="form-control" title="К2">
     </div>
-    <div class="form-group col r-form-group-label">
-        <label class="rr-premises-label" for="K3">К3</label>
-        <input id="K3" name="Nb" value="@(paymentInfo.K3)"
+    <div class="form-group col r-form-group-label mb-0">
+        <label class="rr-premises-label mb-1" for="K3">К3</label>
+        <input id="K3" name="Nb" value="@(paymentInfo[0].K3)"
                type="text" class="form-control" title="К3">
     </div>
 </div>

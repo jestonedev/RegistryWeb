@@ -19,9 +19,12 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
 
         public void Configure(EntityTypeBuilder<TenancyPayment> builder)
         {
-            builder.HasKey(e => e.IdProcess);
+            builder.HasKey(e => new { e.Key });
 
             builder.ToTable("v_rent_objects_payment", nameDatebase);
+
+            builder.Property(e => e.Key)
+                .HasColumnName("key");
 
             builder.Property(e => e.IdProcess)
                 .HasColumnName("id_process");

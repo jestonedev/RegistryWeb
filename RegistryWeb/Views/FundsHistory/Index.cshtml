@@ -23,49 +23,4 @@
 {
     <script src="~/js/index.common.js" asp-append-version="true"></script>
     <script src="~/js/fundhistory.index.js" asp-append-version="true"></script>
-
-    <script type="text/javascript">
-        $(document).ready(function ()
-        {
-            $("td[id$='fund']").on('click', function ()
-            {
-                var tr = $(this).closest('tr');
-
-
-
-                var idFund = tr.find('input[name$="IdFund"]').val();
-                var action = $('#r-buildings-form').data("action");
-
-                $.getJSON('@Url.Action("Details")?' + "idFund=" + idFund + "&action=Details", function (data) 
-                {
-                    ostatockArray = data;
-                    $(ostatockArray).each(function (idx, elem) 
-                    {
-                        var now = new Date();
-                        var day = ("0" + now.getDate()).slice(-2);
-                        var month = ("0" + (now.getMonth() + 1)).slice(-2);
-                        var today = now.getFullYear() + "-" + (month) + "-" + (day);
-
-                        var date = elem.protocolDate == null ? today : elem.protocolDate.substr(0, 10);
-                        $("select[name$='IdFundType']").val(elem.idFundType);
-                        $("input[name$='ProtocolDate']").val(date);
-                        $("input[name$='ProtocolNumber']").val(elem.protocolNumber);
-                        $("textarea").val(elem.description);
-
-                        date = elem.includeRestrictionDate == null ? today : elem.includeRestrictionDate.substr(0, 10);
-                        $("input[name$='IncludeRestrictionNumber']").val(elem.includeRestrictionNumber);
-                        $("input[name$='IncludeRestrictionDate']").val(date);
-                        $("input[name$='IncludeRestrictionDescription']").val(elem.includeRestrictionDescription);
-
-                        date = elem.excludeRestrictionDate == null ? today : elem.excludeRestrictionDate.substr(0, 10);
-                        $("input[name$='ExcludeRestrictionNumber']").val(elem.excludeRestrictionNumber);
-                        $("input[name$='ExcludeRestrictionDate']").val(date);
-                        $("input[name$='ExcludeRestrictionDescription']").val(elem.excludeRestrictionDescription);
-                    });
-
-                    
-                });
-            });
-        });
-    </script>
 }

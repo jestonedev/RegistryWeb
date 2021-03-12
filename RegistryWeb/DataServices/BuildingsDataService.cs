@@ -117,7 +117,8 @@ namespace RegistryWeb.DataServices
         {
             return query
                 .Include(b => b.IdStreetNavigation)
-                .Include(b => b.IdStateNavigation);
+                .Include(b => b.IdStateNavigation)
+                .Include(b => b.IdStructureTypeNavigation);
         }
 
         private IQueryable<Building> GetQueryFilter(IQueryable<Building> query, BuildingsFilter filterOptions)

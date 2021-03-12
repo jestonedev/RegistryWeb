@@ -13,7 +13,7 @@
 
 
 
-input.input-validation-error, button.input-validation-error, select .input-validation-error {
+.input-validation-error {
     border: 1px solid #dc3545;
 }
 
@@ -29,26 +29,16 @@ input.input-validation-error, button.input-validation-error, select .input-valid
     color: white;
 } /*тень для выделенных строк*/
 
-
-
-
-
 /*Если строка выделена*/
-.table .active1{
-    background-color: #007bff;
+.table .active1 td{
+    background-color: #007bff !important;
     color: white;
 }
 
-/*.active1 :hover {
-    background-color: #0068D8;
-    color: white;
-}*/
-
-.table tr .active1{/* :after{*/
-    background-color: #007bff;
-    color: white;
+.table tr.excluded td {
+    background-color: #ed969e;
 }
 
-
-
-
+.table tr.included td {
+    background-color: #7eec97;
+}

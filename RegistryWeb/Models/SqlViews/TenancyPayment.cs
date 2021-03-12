@@ -7,6 +7,7 @@ namespace RegistryWeb.Models.SqlViews
 {
     public class TenancyPayment
     {
+        public string Key { get; set; }
         public int IdProcess { get; set; }
         public int IdBuilding { get; set; }
         public int? IdPremises { get; set; }

@@ -10,7 +10,7 @@
             Предыдущие периоды найма
             @{
                 var count = Model != null && Model.Any() ? Model.Count().ToString() : "";
-                var visible = Model != null && Model.Any() ? "" : "style='display: none;'";
+                var visible = Model != null && Model.Any() ? "style='margin-bottom: -3px;'" : "style='display: none;'";
             }
             <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visible)>
                 @count

@@ -132,3 +132,26 @@ input.input-validation-error, button.input-validation-error, textarea.input-vali
 .rr-index-tools-dropdown-menu.show {
     display: flex;
 }
+
+.rr-opacity-item-menu {
+    display: none;
+}
+
+.table tr:hover .rr-opacity-item-menu {
+    display: flex;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    background: white;
+    padding: 4pt 5pt;
+    border: 1px solid #ccc;
+    border-radius: .25rem;
+    padding-left: -50%;
+    opacity: 0.1;
+    transition: opacity 0.2s ease-in-out;
+    z-index: 1;
+}
+
+.rr-opacity-item-menu:hover {
+    opacity: 1 !important;
+}
