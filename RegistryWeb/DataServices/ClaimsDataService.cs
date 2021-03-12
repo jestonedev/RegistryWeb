@@ -818,7 +818,7 @@ namespace RegistryWeb.DataServices
                     GetRentObjects(new List<int> { idAccount.Value }).SelectMany( v => v.Value).ToList() : null,
                 CurrentExecutor = CurrentExecutor,
                 StateTypes = registryContext.ClaimStateTypes.ToList(),
-                Executors = registryContext.Executors.Where(r => action == "Create" || !r.IsInactive).ToList(),
+                Executors = registryContext.Executors.ToList(),
                 Judges = registryContext.Judges.Where(r => action == "Create" || !r.IsInactive).ToList(),
                 Signers = registryContext.SelectableSigners.Where(r => r.IdSignerGroup == 3).ToList(),
                 StateTypeRelations = registryContext.ClaimStateTypeRelations.ToList()
