@@ -73,7 +73,7 @@
                 }
             </th>
             <th class="p-table-low-width-hide-cell">
-                Плата за найм
+                Найм
             </th>
             <th></th>
         </tr>
@@ -130,7 +130,7 @@
                 <div class="dopinfo-alt">
                     Состояние: <span class="text-success"><b>@item.IdStateNavigation?.StateNeutral</b></span><br />
                     Тип помещения: @item.IdPremisesTypeNavigation?.PremisesTypeName<br />
-                    @if(ObjectStateHelper.IsMunicipal(item.IdState))
+                    @if (ObjectStateHelper.IsMunicipal(item.IdState))
                     {
                         <span>Фонд:</span> @GetTypeFund(item)
                     }
@@ -141,12 +141,36 @@
                     @if (securityService.HasPrivilege(Privileges.TenancyRead))
                     {
                         var paymentInfo =
-                                Model.PaymentsInfo.FirstOrDefault(pi => pi.IdObject == item.IdPremises && pi.AddresType == AddressTypes.Premise);
+                                Model.PaymentsInfo.Where(pi => (pi.IdObject == item.IdPremises && pi.AddresType == AddressTypes.Premise) ||
+                                    (item.SubPremises.Select(sp => sp.IdSubPremises).Any(id => id == pi.IdObject) && pi.AddresType == AddressTypes.SubPremise));
 
-                        @if (paymentInfo != null)
+                        @if (paymentInfo.Any())
                         {
-                            <span>До 28.08.2019: </span>@paymentInfo.Payment <span>руб.</span><br />
-                            <span>С 28.08.2019:</span> @paymentInfo.PaymentAfter28082019 <span>руб.</span>
+                            <div class="text-primary"><b>Плата за найм</b></div>
+                            <span>До 28.08.2019: </span>@paymentInfo.Select(p => p.Payment).Sum() <span>руб.</span><br />
+                            <span>С 28.08.2019:</span> @paymentInfo.Select(p => p.PaymentAfter28082019).Sum() <span>руб.</span>
+                        }
+
+                        @if (Model.ActiveTenancies.Any(t => t.Key == item.IdPremises))
+                        {
+                            <hr class="mt-1 mb-0 pt-0 pb-0" />
+                            var tenancies = Model.ActiveTenancies.First(t => t.Key == item.IdPremises).Value;
+                            if (tenancies.Count > 1)
+                            {
+                                <div class="text-primary"><b>Договоры найма:</b></div>
+
+                            }
+                            else if (tenancies.Count == 1)
+                            {
+                                <div class="text-primary"><b>Договор найма:</b></div>
+                            }
+                            foreach (var tenancy in tenancies)
+                            {
+                                <div>
+                                    @(string.IsNullOrEmpty(tenancy.RegistrationNum) ? "№ б/н" : "№ " + tenancy.RegistrationNum)
+                                    @(tenancy.RegistrationDate.HasValue ? " от " + tenancy.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")
+                                </div>
+                            }
                         }
                     }
                 </div>

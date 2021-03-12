@@ -82,7 +82,34 @@ namespace RegistryWeb.DataServices
             viewModel.Premises = GetQueryPage(query, viewModel.PageOptions).ToList();
             viewModel.PaymentsInfo = GetPaymentInfo(viewModel.Premises);
             viewModel.PremisesOwnershipRightCurrent = GetPremisesOwnershipRightCurrent(viewModel.Premises);
+            viewModel.ActiveTenancies = GetActiveTenancies(viewModel.Premises);
             return viewModel;
+        }
+
+        private Dictionary<int, List<TenancyProcess>> GetActiveTenancies(List<Premise> premises)
+        {
+            var ids = premises.Select(p => p.IdPremises).ToList();
+
+            var premiseProcesses = (from tpaRow in registryContext.TenancyPremisesAssoc
+                                    join tpRow in registryContext.TenancyProcesses
+                                    on tpaRow.IdProcess equals tpRow.IdProcess
+                                    where ids.Contains(tpaRow.IdPremise) && tpRow.RegistrationNum != null && !tpRow.RegistrationNum.Contains("н")
+                                    group tpRow by tpaRow.IdPremise into gp
+                                    select new { IdPremise = gp.Key, Processes = gp.ToList() }).ToDictionary(a => a.IdPremise, b => b.Processes);
+
+            var subPremiseProcesses = (from tspaRow in registryContext.TenancySubPremisesAssoc
+                                      join spRow in registryContext.SubPremises
+                                      on tspaRow.IdSubPremise equals spRow.IdSubPremises
+                                      join tpRow in registryContext.TenancyProcesses
+                                      on tspaRow.IdProcess equals tpRow.IdProcess
+                                      where ids.Contains(spRow.IdPremises) && tpRow.RegistrationNum != null && !tpRow.RegistrationNum.Contains("н")
+                                      group tpRow by spRow.IdPremises into gp
+                                      select new { IdPremise = gp.Key, Processes = gp.Distinct().ToList() }).ToDictionary(a => a.IdPremise, b => b.Processes);
+
+            return (from row in premiseProcesses.Union(subPremiseProcesses)
+                   group row by row.Key into gp
+                   select new { IdPremise = gp.Key, Processes = gp.Select(g => g.Value).ToList() })
+                   .ToDictionary(a => a.IdPremise, b => b.Processes.SelectMany(p => p).ToList());
         }
 
         private IQueryable<Premise> GetQueryIncludes(IQueryable<Premise> query)
