@@ -22,6 +22,21 @@
         });
     });
 
+    if ($("select[name$='Premise.IdPremisesType']").val() == "3")
+    {
+        $("input[name$='SubPremisesNum']").addClass("btn-info");
+    }
+
+    $("select[name$='Premise.IdPremisesType']").on("change", function ()
+    {
+        if ($("select[name$='Premise.IdPremisesType']").val() == "3")
+        {
+            $("input[name$='SubPremisesNum']").addClass("btn-info");
+        }
+        else $("input[name$='SubPremisesNum']").removeClass("btn-info");
+    });
+
+
     $("#Premise_IdPremisesComment").on("change", function () {
         var id = $(this).val();
         if (id === "1") {
