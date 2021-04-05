@@ -195,6 +195,30 @@ function countBadges(idNameComponentForm, flag) {
 }
 
 $(function () {
+    var timeout = undefined;
+
+
+    $(".btn-group .dropdown-toggle, .btn-group .dropdown-menu").hover(function () {
+        if (timeout !== undefined) {
+            clearTimeout(timeout);
+            timeout = undefined;
+        }
+        if ($(this).closest(".btn-group").hasClass("show")) return;
+        $(this).closest(".btn-group").find(".dropdown-toggle").dropdown('toggle');
+    }, function () {
+        if (!$(this).closest(".btn-group").hasClass("show")) return;
+        var self = this;
+        timeout = setTimeout(function () {
+            if (timeout !== undefined) {
+                clearTimeout(timeout);
+                timeout = undefined;
+            }
+            if (!$(self).closest(".btn-group").hasClass("show")) return;
+            $(self).closest(".btn-group").find(".dropdown-toggle").dropdown('toggle');
+        }, 200);
+    });
+    
+
     $(".modal").on("hide.bs.modal", function () {
         $(this).find(".input-validation-error").removeClass("input-validation-error").addClass("valid");
         $(this).find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid").text("");

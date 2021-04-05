@@ -20,8 +20,8 @@
         <tr style="align-content: center;">
             <th class="r-table-header-cell">
             </th>
-            <th class="r-table-header-cell" style="width:155px;">
-                № по реестру
+            <th class="r-table-header-cell" style="width:70px;">
+                №
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "IdClaim")
                 {
                     <a href="#" title="Сортировка по реестровому номеру" class="oi oi-sort-descending sort c-sorted" data-order-field="IdClaim" data-order-direction="0"></a>
@@ -58,7 +58,6 @@
                        data-order-field="Address" data-order-direction="@(Model.OrderOptions.OrderField == "Address" ? "1" : "0")"></a>
                 }
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -71,7 +70,7 @@
             }
             var lastClaimState = item.ClaimStates.OrderByDescending(cs => cs.IdState).FirstOrDefault();
             var isOpenedClaim = (lastClaimState == null || lastClaimState.IdStateType != 6);
-            <tr>
+            <tr style="position: relative">
                 @if (ids.Contains(item.IdClaim))
                 {
                     check = "checked";
@@ -214,7 +213,7 @@
                         }
                     </div>
                 </td>
-                <td>
+                <td style="position: relative">
                     @if (Model.RentObjects.ContainsKey(item.IdAccount))
                     {
                         <div class="mb-2">
@@ -229,28 +228,23 @@
                         <b>По БКС: </b><br />@item.IdAccountNavigation.RawAddress<br />
                         @item.IdAccountNavigation.Crn
                     </div>
-                </td>
-                <td>
-                    <div class="btn-group" role="group" aria-label="Панель доступа">
+
+                    <div class="btn-group rr-opacity-item-menu" role="group" aria-label="Панель доступа">
                         @if (securityService.HasPrivilege(Privileges.ClaimsWrite))
                         {
-                            <div class="btn-group" role="group" aria-label="Панель доступа">
-                                <button class="btn btn-primary oi oi-wrench dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@item.IdClaim" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                                <div class="dropdown-menu dropdown-menu-right but text-center" aria-labelledby="toolsBtn_@item.IdClaim">
-                                    <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                                       asp-controller="Claims" asp-action="Details" asp-route-idClaim="@item.IdClaim" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                    <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
-                                       asp-controller="Claims" asp-action="Edit" asp-route-idClaim="@item.IdClaim" asp-route-action="Edit" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                    <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                                       asp-controller="Claims" asp-action="Delete" asp-route-idClaim="@item.IdClaim" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                                </div>
-                            </div>
+                            <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                               asp-controller="Claims" asp-action="Details" asp-route-idClaim="@item.IdClaim" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                               asp-controller="Claims" asp-action="Edit" asp-route-idClaim="@item.IdClaim" asp-route-action="Edit" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                               asp-controller="Claims" asp-action="Delete" asp-route-idClaim="@item.IdClaim" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                         }
                         else
                         {
                             <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
                                asp-controller="Claims" asp-action="Details" asp-route-idClaim="@item.IdClaim" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                         }
+
 
                         <div class="btn-group" role="group" aria-label="Панель доступа">
 
