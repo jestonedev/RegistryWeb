@@ -56,7 +56,19 @@ namespace RegistryWeb.DataServices
             var privContract = registryContext.PrivContracts
                 .Include(pc => pc.ExecutorNavigation)
                 .SingleOrDefault(pc => pc.IdContract == idContract);
+            privContract.PrivContractors = registryContext.PrivContractors
+                .Include(pc => pc.KinshipNavigation)
+                .Where(pc => pc.IdContract == idContract)
+                .ToList();
             return privContract;
+        }
+
+        internal List<Kinship> Kinships { get => registryContext.Kinships.ToList(); }
+
+        public void Create(PrivContract contract)
+        {
+            registryContext.PrivContracts.Add(contract);
+            registryContext.SaveChanges();
         }
     }
 }

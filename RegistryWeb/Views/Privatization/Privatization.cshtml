@@ -1,6 +1,8 @@
-﻿@model RegistryWeb.Models.Entities.PrivContract;
+﻿@using RegistryWeb.ViewModel;
+@model RegistryWeb.Models.Entities.PrivContract;
 @{
-    ViewData["Title"] = "Договор приватизации №" + Model.RegNumber;
+    ViewData["Title"] = Model == null? "Новый договор приватизации":
+        "Договор приватизации №" + Model.RegNumber;
 }
 @section Styles {
     @*<link rel="stylesheet" href="~/css/owner.processes.css" asp-append-version="true" />*@
@@ -8,8 +10,8 @@
 @section Scripts {
     @*<script src="~/js/ownerProcess.address.js" asp-append-version="true"></script>
         <script src="~/js/ownerProcess.files.js" asp-append-version="true"></script>
-        <script src="~/js/ownerProcess.owner.js" asp-append-version="true"></script>
-        <script src="~/js/ownerProcess.common.js" asp-append-version="true"></script>*@
+        <script src="~/js/ownerProcess.owner.js" asp-append-version="true"></script>*@
+    <script src="~/js/privContract.common.js" asp-append-version="true"></script>
 }
 <div class="card">
     <div class="card-header d-flex flex-column flex-lg-row">
@@ -45,7 +47,7 @@
     <div class="card-body" id="privatization">
         <form enctype="multipart/form-data" asp-controller="Privatization" asp-action="@ViewBag.Action" id="privatizationForm" data-action="@ViewBag.Action" method="post">
             <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
-            <input type="hidden" value="@Model.IdContract" name="IdProcess" />
+            <input type="hidden" asp-for="IdContract"/>
             <div class="validation text-danger" asp-validation-summary="All"></div>
             <div class="form-group">
                 <label asp-for="RegNumber">RegNumber</label>
@@ -73,7 +75,44 @@
             </div>
             <div class="form-group">
                 <label>ExecutorName</label>
-                <input type="text" value="@Model.ExecutorNavigation?.ExecutorName" class="form-control" />
+                <input type="text" value="@Model?.ExecutorNavigation?.ExecutorName" class="form-control" />
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <h4>Контракторы</h4>
+                            <div class="btn-group" role="group">
+                                @if (ViewBag.Action == ActionTypeEnum.Edit)
+                                {
+                                    <a href="#" id="privContractorAdd" class="form-control btn btn-success" title="Добавить контрактора">
+                                        <span class="oi oi-plus"></span>
+                                    </a>
+                                }
+                                <a href="#" id="privContractorsToggle" class="form-control btn btn-primary" title="Развернуть контракторов">
+                                    <span class="oi oi-chevron-top"></span>
+                                </a>
+                            </div>
+                        </div>
+                        <ul class="list-group list-group-flush" id="privContractors" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
+                            <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.PrivContractors.Any()) ? "display: none" : "")">
+                                <i>Участники найма отсутствуют</i>
+                            </li>
+                            @if (Model != null && Model.PrivContractors.Any())
+                            {
+                                @for (var i = 0; i < Model.PrivContractors.Count(); i++)
+                                {
+                                    <partial name="PrivContract" model="@(new PrivContractorVM() {
+                                        PrivContractor = Model.PrivContractors[i],
+                                        I = i,
+                                        Action = ViewBag.Action
+                                    })" />
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
             </div>
         </form>
     </div>

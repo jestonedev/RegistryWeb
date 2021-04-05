@@ -10,4 +10,10 @@
     <input type="hidden" asp-for="PageOptions.SizePage" />
     <input type="hidden" asp-for="FilterOptions.Address.AddressType" />
     <input type="hidden" asp-for="FilterOptions.Address.Id" />
+    <div class="form-row">
+        <div class="form-group col-2 col-md-1 col-lg-1">
+            <a class="btn btn-success" title="Создать" aria-label="Создать"
+               asp-controller="Privatization" asp-action="Create" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">&#10010;</a>
+        </div>
+    </div>
 </form>

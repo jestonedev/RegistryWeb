@@ -38,12 +38,26 @@
     <tbody>
         @foreach (var contract in Model.PrivContracts)
         {
-        <tr>
+        <tr style="position: relative">
             <td>@contract.RegNumber</td>
             <td>Адрес</td>
             <td>
-                <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                   asp-controller="Privatization" asp-action="Details" asp-route-idContract="@contract.IdContract" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                <div class="btn-group rr-opacity-item-menu" role="group" aria-label="Панель доступа">
+                    @if (canEdit)
+                    {
+                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                           asp-controller="Privatization" asp-action="Details" asp-route-idContract="@contract.IdContract" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                        <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                           asp-controller="Privatization" asp-action="Edit" asp-route-idContract="@contract.IdContract" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                        <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                           asp-controller="Privatization" asp-action="Delete" asp-route-idContract="@contract.IdContract" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                           asp-controller="Privatization" asp-action="Details" asp-route-idContract="@contract.IdContract" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                    }
+                </div>
             </td>
         </tr>
         }

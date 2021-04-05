@@ -20,11 +20,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.HasKey(e => e.IdContractor);
 
             builder.Property(e => e.IdContractor)
-                .HasColumnName("id_contractors")
+                .HasColumnName("id_contractor")
                 .HasColumnType("int(11)")
                 .IsRequired();
 
-            builder.Property(e => e.IsNonontractor)
+            builder.Property(e => e.IsNoncontractor)
                 .HasColumnName("is_noncontractor")
                 .HasColumnType("tinyint")
                 .HasDefaultValueSql("0")
@@ -38,28 +38,38 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.Property(e => e.Surname)
                 .HasColumnName("surname")
                 .HasMaxLength(255)
-                .IsUnicode(false)
-                .IsRequired();
+                .IsUnicode(false);
 
             builder.Property(e => e.Name)
                 .HasColumnName("name")
                 .HasMaxLength(50)
-                .IsUnicode(false)
-                .IsRequired();
+                .IsUnicode(false);
 
             builder.Property(e => e.Patronymic)
                 .HasColumnName("patronymic")
-                .HasMaxLength(255)
-                .IsUnicode(false);
+                .HasMaxLength(255);
 
             builder.Property(e => e.IdKinship)
                 .HasColumnName("id_kinship")
-                .HasColumnType("int(11)")
-                .IsRequired();
+                .HasColumnType("int(11)");
 
             builder.Property(e => e.DateBirth)
                 .HasColumnName("date_birth")
                 .HasColumnType("date");
+
+            builder.Property(e => e.User)
+                .HasColumnName("user")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            builder.Property(e => e.InsertDate)
+                .HasColumnName("insert_date")
+                .HasColumnType("datetime");
+
+            builder.Property(e => e.Description)
+                .HasColumnName("description")
+                .HasMaxLength(2000)
+                .IsUnicode(false);
 
             builder.Property(e => e.Passport)
                 .HasColumnName("passport")
@@ -71,16 +81,19 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(50)
                 .IsUnicode(false);
 
-            builder.Property(e => e.Description)
-                .HasColumnName("description")
-                .HasMaxLength(2000)
-                .IsUnicode(false);
-
             builder.Property(e => e.Deleted)
                 .HasColumnName("deleted")
                 .HasColumnType("tinyint")
                 .HasDefaultValueSql("0")
                 .IsRequired();
+
+            builder.HasOne(e => e.PrivContractNavigation)
+                .WithMany(p => p.PrivContractors)
+                .HasForeignKey(e => e.IdContract);
+
+            builder.HasOne(e => e.KinshipNavigation)
+                .WithMany(p => p.PrivContractors)
+                .HasForeignKey(e => e.IdKinship);
 
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => !e.Deleted);

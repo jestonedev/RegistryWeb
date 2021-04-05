@@ -1,7 +1,14 @@
-﻿namespace RegistryWeb.Models.Entities
+﻿using System.Collections.Generic;
+
+namespace RegistryWeb.Models.Entities
 {
     public class PrivContract
     {
+        public PrivContract()
+        {
+            PrivContractors = new List<PrivContractor>();
+        }
+
         public int IdContract { get; set; }
         public string RegNumber { get; set; }
         public bool IsRefusenik { get; set; }
@@ -11,5 +18,6 @@
         public int? IdExecutor { get; set; }
 
         public virtual Executor ExecutorNavigation { get; set; }
+        public virtual IList<PrivContractor> PrivContractors { get; set; }
     }
 }
