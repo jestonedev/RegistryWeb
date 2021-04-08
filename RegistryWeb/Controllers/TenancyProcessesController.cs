@@ -307,7 +307,16 @@ namespace RegistryWeb.Controllers
             {
                 Code = 0
             });
-        }      
+        }
+
+        [HttpPost]
+        public IActionResult RegNumExist(string regNum, int idProcess)
+        {
+            if (regNum == null)
+                return Json(false);
+            var isExist = dataService.RegNumExist(regNum, idProcess);
+            return Json(isExist);
+        }
 
         public IActionResult TenancyProcessesReports(PageOptions pageOptions)
         {

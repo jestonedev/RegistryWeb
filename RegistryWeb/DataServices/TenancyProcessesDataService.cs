@@ -1095,6 +1095,19 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
+        public bool RegNumExist(string regNum, int idProcess)
+        {
+            var curRegNum = registryContext.TenancyProcesses
+                .SingleOrDefault(tp => tp.IdProcess == idProcess)
+                ?.RegistrationNum;
+            if (curRegNum == regNum)
+                return false;
+            return registryContext.TenancyProcesses
+                .Select(tp => tp.RegistrationNum)
+                .ToList()
+                .Any(num => num != null && num.Equals(regNum));
+        }
+
         public IEnumerable<TenancyReasonType> TenancyReasonTypes
         {
             get => registryContext.TenancyReasonTypes.AsNoTracking();
