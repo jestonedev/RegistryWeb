@@ -765,24 +765,24 @@ namespace RegistryWeb.DataServices
                                 buildingRow.IdState
                             };
             var premises = from tpaRow in tenancyPremisesAssoc
-                           join premiseRow in registryContext.Premises
-                           on tpaRow.IdPremise equals premiseRow.IdPremises
-                           join buildingRow in registryContext.Buildings
-                           on premiseRow.IdBuilding equals buildingRow.IdBuilding
-                           join streetRow in registryContext.KladrStreets
-                           on buildingRow.IdStreet equals streetRow.IdStreet
-                           join premiseTypesRow in registryContext.PremisesTypes
-                           on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
-                           select new
-                           {
-                               tpaRow.IdProcess,
-                               tpaRow.IdPremise,
-                               streetRow.IdStreet,
-                               buildingRow.IdBuilding,
-                               buildingRow.House,
-                               premiseRow.PremisesNum,
-                               premiseRow.IdState
-                           };
+                            join premiseRow in registryContext.Premises
+                            on tpaRow.IdPremise equals premiseRow.IdPremises
+                            join buildingRow in registryContext.Buildings
+                            on premiseRow.IdBuilding equals buildingRow.IdBuilding
+                            join streetRow in registryContext.KladrStreets
+                            on buildingRow.IdStreet equals streetRow.IdStreet
+                            join premiseTypesRow in registryContext.PremisesTypes
+                            on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
+                            select new
+                            {
+                                tpaRow.IdProcess,
+                                tpaRow.IdPremise,
+                                streetRow.IdStreet,
+                                buildingRow.IdBuilding,
+                                buildingRow.House,
+                                premiseRow.PremisesNum,
+                                premiseRow.IdState
+                            };
             var subPremises = from tspaRow in tenancySubPremisesAssoc
                               join subPremiseRow in registryContext.SubPremises
                               on tspaRow.IdSubPremise equals subPremiseRow.IdSubPremises
@@ -812,14 +812,16 @@ namespace RegistryWeb.DataServices
             {
                 var ids = buildings.Where(r => r.IdStreet == filterOptions.IdStreet).Select(r => r.IdProcess)
                     .Union(premises.Where(r => r.IdStreet == filterOptions.IdStreet).Select(r => r.IdProcess))
-                    .Union(subPremises.Where(r => r.IdStreet == filterOptions.IdStreet).Select(r => r.IdProcess));
+                    .Union(subPremises.Where(r => r.IdStreet == filterOptions.IdStreet).Select(r => r.IdProcess))
+                    .ToList();
                 idsProcess = ids;
             }
             if (!string.IsNullOrEmpty(filterOptions.House))
             {
                 var ids = buildings.Where(r => r.House == filterOptions.House).Select(r => r.IdProcess)
                     .Union(premises.Where(r => r.House == filterOptions.House).Select(r => r.IdProcess))
-                    .Union(subPremises.Where(r => r.House == filterOptions.House).Select(r => r.IdProcess));
+                    .Union(subPremises.Where(r => r.House == filterOptions.House).Select(r => r.IdProcess))
+                    .ToList();
                 if (idsProcess == null)
                 {
                     idsProcess = ids;
@@ -831,7 +833,8 @@ namespace RegistryWeb.DataServices
             if (!string.IsNullOrEmpty(filterOptions.PremisesNum))
             {
                 var ids = premises.Where(r => r.PremisesNum == filterOptions.PremisesNum).Select(r => r.IdProcess)
-                    .Union(subPremises.Where(r => r.PremisesNum == filterOptions.PremisesNum).Select(r => r.IdProcess));
+                    .Union(subPremises.Where(r => r.PremisesNum == filterOptions.PremisesNum).Select(r => r.IdProcess))
+                    .ToList();
                 if (idsProcess == null)
                 {
                     idsProcess = ids;
@@ -852,7 +855,8 @@ namespace RegistryWeb.DataServices
             {
                 idsProcess = buildings.Where(r => filterOptions.IdsObjectState.Any(s => s == r.IdState)).Select(r => r.IdProcess)
                     .Union(premises.Where(r => filterOptions.IdsObjectState.Any(s => s == r.IdState)).Select(r => r.IdProcess))
-                    .Union(subPremises.Where(r => filterOptions.IdsObjectState.Any(s => s == r.IdState)).Select(r => r.IdProcess));
+                    .Union(subPremises.Where(r => filterOptions.IdsObjectState.Any(s => s == r.IdState)).Select(r => r.IdProcess))
+                    .ToList();
                 query = (from row in query
                          join id in idsProcess
                          on row.IdProcess equals id
@@ -871,7 +875,8 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IdPremises != null)
             {
                 var ids = premises.Where(p => p.IdPremise == filterOptions.IdPremises).Select(p => p.IdProcess).Union(
-                        subPremises.Where(p => p.IdPremises == filterOptions.IdPremises).Select(p => p.IdProcess));
+                        subPremises.Where(p => p.IdPremises == filterOptions.IdPremises).Select(p => p.IdProcess))
+                        .ToList();
                 query = (from row in query
                          join id in ids
                          on row.IdProcess equals id
@@ -882,7 +887,8 @@ namespace RegistryWeb.DataServices
             {
                 var ids = premises.Where(p => p.IdBuilding == filterOptions.IdBuilding).Select(p => p.IdProcess).Union(
                         subPremises.Where(p => p.IdBuilding == filterOptions.IdBuilding).Select(p => p.IdProcess)).Union(
-                        buildings.Where(p => p.IdBuilding == filterOptions.IdBuilding).Select(p => p.IdProcess));
+                        buildings.Where(p => p.IdBuilding == filterOptions.IdBuilding).Select(p => p.IdProcess))
+                        .ToList();
                 query = (from row in query
                          join id in ids
                          on row.IdProcess equals id
@@ -891,7 +897,7 @@ namespace RegistryWeb.DataServices
 
             if (filterOptions.IdsOwnershipRightType != null && filterOptions.IdsOwnershipRightType.Any())
             {
-                var specialOwnershipRightTypeIds = new int[] { 1, 2, 6, 7 };
+                var specialOwnershipRightTypeIds = new int[] { 1, 2, 6, 7, 8 };
                 var specialIds = filterOptions.IdsOwnershipRightType.Where(id => specialOwnershipRightTypeIds.Contains(id));
                 var generalIds = filterOptions.IdsOwnershipRightType.Where(id => !specialOwnershipRightTypeIds.Contains(id));
                 var generalOwnershipRightsPremises = from owrRow in registryContext.OwnershipRights
