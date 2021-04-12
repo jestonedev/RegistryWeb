@@ -45,14 +45,16 @@ $(function () {
 
 
         regNum.val($.trim(regNum.val()));
-        if (regDate.val() !== "" && regNum.val() === "") {
-            let error = {};
-            error[regNum.attr("name")] = "Введите номер договора найма";
-            validator.showErrors(error);
-            isValid = false;
-        } else {
-            clearValidationError(regNum);
-            removeErrorFromValidator(validator, regNum);
+        if (!regNum.hasClass("input-validation-error")) {
+            if (regDate.val() !== "" && regNum.val() === "") {
+                let error = {};
+                error[regNum.attr("name")] = "Введите номер договора найма";
+                validator.showErrors(error);
+                isValid = false;
+            } else {
+                clearValidationError(regNum);
+                removeErrorFromValidator(validator, regNum);
+            }
         }
         if (regDate.val() === "" && $.trim(regNum.val()) !== "") {
             let error = {};
@@ -95,10 +97,35 @@ $(function () {
         tenancyCustomValidations(validator);
     });
 
+    $.validator.addMethod('regNumExist', function (value, element) {
+        var regNumExist = false;
+        var idProcess = $('#TenancyProcess_IdProcess').val();
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/TenancyProcesses/RegNumExist',
+            data: { regNum: value, idProcess },
+            async: false,
+            success: function (data) {
+                regNumExist = data;
+            }
+        });
+        return !regNumExist;
+    });
+
     $("#TenancyProcessForm").on("submit", function (e) {
         var action = $("#TenancyProcessForm").data("action");
         $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
         var validator = $(this).validate();
+        validator.settings.rules = {
+            "TenancyProcess.RegistrationNum": {
+                regNumExist: true
+            }
+        };
+        validator.settings.messages = {
+            "TenancyProcess.RegistrationNum": {
+                regNumExist: "Введенный номер уже используется"
+            }
+        };
         var isFormValid = $(this).valid();
         if (!tenancyCustomValidations(validator)) {
             isFormValid = false;

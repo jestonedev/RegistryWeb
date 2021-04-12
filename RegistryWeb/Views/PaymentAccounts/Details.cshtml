@@ -124,7 +124,8 @@
             <div class="pa-item mt-3"
                  data-date-display="@payment.Date.ToString("dd.MM.yyyy")" data-date="@payment.Date.ToString("yyyy-MM-dd")"
                  data-id="@i" style="display: none"
-                 data-account="@payment.PaymentAccountNavigation.Account" data-id-account="@payment.IdAccount" data-crn="@payment.PaymentAccountNavigation.Crn"
+                 data-account="@payment.PaymentAccountNavigation.Account" data-account-gis-zkh="@payment.PaymentAccountNavigation.AccountGisZkh"
+                 data-id-account="@payment.IdAccount" data-crn="@payment.PaymentAccountNavigation.Crn"
                  data-raw-address="@payment.PaymentAccountNavigation.RawAddress" data-address="@address" data-tenant="@payment.Tenant"
                  data-total-area="@payment.TotalArea" data-living-area="@payment.LivingArea" data-prescribed="@payment.Prescribed"
                  data-input-total="@payment.BalanceInput" data-input-tenancy="@payment.BalanceTenancy" data-input-penalties="@payment.BalanceInputPenalties"
@@ -149,15 +150,19 @@
             </div>
             <div class="card-body toggle-hide" id="GeneralInfo">
                 <div class="row">
-                    <div class="form-group col-sm-6 col-md-3">
+                    <div class="form-group col-sm-6 col-md-6 col-lg-2">
                         <label class="rr-account-label">Лицевой счет</label>
                         <input class="form-control" id="PaymentAccount" disabled type="text" />
                     </div>
-                    <div class="form-group col-sm-6 col-md-3">
+                    <div class="form-group col-sm-6 col-md-6 col-lg-2" title="Единый лицевой счет для ГИС ЖКХ">
+                        <label class="rr-account-label">ЕЛС</label>
+                        <input class="form-control" id="PaymentAccountGisZkh" disabled type="text" />
+                    </div>
+                    <div class="form-group col-sm-4 col-md-4 col-lg-2">
                         <label class="rr-account-label">СРН</label>
                         <input class="form-control" id="PaymentCrn" disabled type="text" />
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-sm-8 col-md-8 col-lg-6">
                         <label class="rr-account-label">Адерс по БКС</label>
                         <input class="form-control" id="PaymentRawAddress" disabled type="text" />
                     </div>

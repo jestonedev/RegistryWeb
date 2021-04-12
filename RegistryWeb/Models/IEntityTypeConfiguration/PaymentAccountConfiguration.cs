@@ -28,6 +28,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
+            builder.Property(e => e.AccountGisZkh)
+                .HasColumnName("account_gis_zkh")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
             builder.Property(e => e.Crn)
                 .HasColumnName("crn")
                 .HasMaxLength(255)

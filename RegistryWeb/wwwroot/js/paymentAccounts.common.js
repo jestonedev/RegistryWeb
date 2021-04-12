@@ -51,6 +51,7 @@ $(function () {
         $(".pa-item").hide();
         currentPaItem = $(".pa-item[data-id='" + id + "']");
         $("#PaymentAccount").val(currentPaItem.data("account"));
+        $("#PaymentAccountGisZkh").val(currentPaItem.data("account-gis-zkh"));
         $("#PaymentCrn").val(currentPaItem.data("crn"));
         $("#PaymentRawAddress").val(currentPaItem.data("raw-address"));
         $("#PaymentTenant").val(currentPaItem.data("tenant"));
