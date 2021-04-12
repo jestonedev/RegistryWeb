@@ -17,6 +17,7 @@ namespace RegistryWeb.Models.Entities
 
         public int IdAccount { get; set; }
         public string Account { get; set; }
+        public string AccountGisZkh { get; set; }
         public string Crn { get; set; }
         public string RawAddress { get; set; }
         public virtual IList<Payment> Payments { get; set; }

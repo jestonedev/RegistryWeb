@@ -89,6 +89,12 @@
                     @item.PaymentAccountNavigation.Account
                 </td>
                 <td>
+                    @if (@item.PaymentAccountNavigation.AccountGisZkh != null)
+                    {
+                    <div title="Единый лицевой счет для ГИС ЖКХ">
+                        <b>ЕЛС для ГИС ЖКХ:</b> @item.PaymentAccountNavigation.AccountGisZkh
+                    </div>
+                    }
                     <div>
                         <b>Наниматель:</b> @item.Tenant
                     </div>
@@ -234,7 +240,7 @@
                             @if (lastClaimInfo?.StartDeptPeriod != null || lastClaimInfo?.EndDeptPeriod != null)
                             {
                                 <span>Период:</span>
-                                if(lastClaimInfo?.StartDeptPeriod != null)
+                                if (lastClaimInfo?.StartDeptPeriod != null)
                                 {
                                     <span>с </span>@lastClaimInfo.StartDeptPeriod.Value.ToString("dd.MM.yyyy")
                                 }
