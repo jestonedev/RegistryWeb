@@ -243,6 +243,10 @@ namespace RegistryWeb.DataServices
             {
                 query = query.Where(p => p.PaymentAccountNavigation.Crn.Contains(filterOptions.Crn));
             }
+            if (!string.IsNullOrEmpty(filterOptions.AccountGisZkh))
+            {
+                query = query.Where(p => p.PaymentAccountNavigation.AccountGisZkh.Contains(filterOptions.AccountGisZkh));
+            }
             if (!string.IsNullOrEmpty(filterOptions.Account))
             {
                 query = query.Where(p => p.PaymentAccountNavigation.Account.Contains(filterOptions.Account));
