@@ -85,7 +85,7 @@
                             <label for="Person_PersonalAccount">Номер телефона</label>
                             <input type="text" id="Person_PersonalAccount" maxlength="255" name="Person.PersonalAccount" class="form-control" title="Телефон участника найма" />
                         </div>
-                        <div class="form-group col-md-6 offset-lg-2 col-lg-4">
+                        <div class="form-group col-md-6 col-lg-4">
                             <label for="Person_IncludeDate">Дата включения</label>
                             <div class="input-group date">
                                 <input type="date" id="Person_IncludeDate" name="Person.IncludeDate" class="form-control" title="Дата включения участника в найм">
@@ -95,6 +95,12 @@
                             <label for="Person_ExcludeDate">Дата исключения</label>
                             <div class="input-group date">
                                 <input type="date" id="Person_ExcludeDate" name="Person.ExcludeDate" class="form-control" title="Дата исключения участника из найм">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="Person_Email">E-mail</label>
+                            <div class="input-group date">
+                                <input type="text" id="Person_Email" maxlength="255"  name="Person.Email" class="form-control" title="Адрес электронной почты">
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -125,15 +131,15 @@
                                 <button id="cancelDocumentIssudeByBtn" style="display: none" class="btn pt-0 pb-0 pl-1 pr-1 text-danger" title="Отменить добавление">
                                     <span class="oi oi-ban"></span>
                                 </button>
-                                <input type="text" style="display: none" class="form-control" id="CustomDocumentIssuedBy" name="CustomDocumentIssuedBy" 
+                                <input type="text" style="display: none" class="form-control" id="CustomDocumentIssuedBy" name="CustomDocumentIssuedBy"
                                        placeholder="Наименование органа" title="Наименование органа" data-val="true" data-val-required="Укажите наименование органа">
                                 <span class="text-danger field-validation-valid" data-valmsg-for="CustomDocumentIssuedBy" data-valmsg-replace="true"></span>
                             }
                             <select class="selectpicker form-control" data-live-search="true" id="Person_IdDocumentIssuedBy" name="Person.IdDocumentIssuedBy" title="Кем выдан документ, удостоверяющий личность">
                                 <option></option>
-                                @foreach(DocumentIssuedBy documentIssudeBy in ViewBag.DocumentIssuedBy)
+                                @foreach (DocumentIssuedBy documentIssudeBy in ViewBag.DocumentIssuedBy)
                                 {
-                                <option data-tokens="@documentIssudeBy.DocumentIssuedByName" title="@documentIssudeBy.DocumentIssuedByName" value="@documentIssudeBy.IdDocumentIssuedBy">@(documentIssudeBy.DocumentIssuedByName.Length > 50 ? documentIssudeBy.DocumentIssuedByName.Substring(0, 50) + "..." : documentIssudeBy.DocumentIssuedByName)</option>
+                                    <option data-tokens="@documentIssudeBy.DocumentIssuedByName" title="@documentIssudeBy.DocumentIssuedByName" value="@documentIssudeBy.IdDocumentIssuedBy">@(documentIssudeBy.DocumentIssuedByName.Length > 50 ? documentIssudeBy.DocumentIssuedByName.Substring(0, 50) + "..." : documentIssudeBy.DocumentIssuedByName)</option>
                                 }
                             </select>
                         </div>

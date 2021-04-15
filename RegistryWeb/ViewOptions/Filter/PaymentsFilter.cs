@@ -9,6 +9,7 @@ namespace RegistryWeb.ViewOptions.Filter
 
         public string Crn { get; set; }
         public string Account { get; set; }
+        public string AccountGisZkh { get; set; }
         public string Tenant { get; set; }
         public string RawAddress { get; set; }
         public string IdStreet { get; set; }
@@ -89,7 +90,7 @@ namespace RegistryWeb.ViewOptions.Filter
 
         public bool IsModalEmpty()
         {
-            return Account == null && Crn == null && Tenant == null && RawAddress == null &&
+            return Account == null && AccountGisZkh == null && Crn == null && Tenant == null && RawAddress == null &&
                 IdStreet == null && House == null && PremisesNum == null && IdPreset == null && IdClaimsBehavior == null &&
                 BalanceInputTotal == null && BalanceInputTenancy == null && BalanceInputPenalties == null &&
                 BalanceInputDgiPadunPkk == null && ChargingTotal == null && ChargingTenancy == null && ChargingPenalties == null &&

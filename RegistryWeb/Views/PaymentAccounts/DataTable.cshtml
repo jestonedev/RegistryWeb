@@ -89,7 +89,7 @@
                     @item.PaymentAccountNavigation.Account
                 </td>
                 <td>
-                    @if (@item.PaymentAccountNavigation.AccountGisZkh != null)
+                    @if (!String.IsNullOrWhiteSpace(@item.PaymentAccountNavigation.AccountGisZkh))
                     {
                     <div title="Единый лицевой счет для ГИС ЖКХ">
                         <b>ЕЛС для ГИС ЖКХ:</b> @item.PaymentAccountNavigation.AccountGisZkh

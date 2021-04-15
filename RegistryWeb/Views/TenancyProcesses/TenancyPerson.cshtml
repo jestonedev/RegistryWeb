@@ -7,12 +7,13 @@
 
 <li class="list-group-item pl-3 pr-3 pb-3 pt-3">
     <input type="hidden" asp-for="IdPerson" id="IdPerson_@id" name="IdPerson_@id" />
-    <input type="hidden" asp-for="PersonalAccount" id="PersonalAccount_@id" name="PersonalAccount_@id"/>
+    <input type="hidden" asp-for="PersonalAccount" id="PersonalAccount_@id" name="PersonalAccount_@id" />
+    <input type="hidden" asp-for="Email" id="Email_@id" name="Email_@id" />
     <input type="hidden" asp-for="IncludeDate" id="IncludeDate_@id" name="IncludeDate_@id"
            value="@(Model.IncludeDate.HasValue ? Model.IncludeDate.Value.ToString("yyyy-MM-dd") : "")" />
     <input type="hidden" asp-for="ExcludeDate" id="ExcludeDate_@id" name="ExcludeDate_@id"
            value="@(Model.ExcludeDate.HasValue ? Model.ExcludeDate.Value.ToString("yyyy-MM-dd") : "")" />
-    <input type="hidden" asp-for="IdDocumentType" id="IdDocumentType_@id" name="IdDocumentType_@id"/>
+    <input type="hidden" asp-for="IdDocumentType" id="IdDocumentType_@id" name="IdDocumentType_@id" />
     <input type="hidden" asp-for="DocumentSeria" id="DocumentSeria_@id" name="DocumentSeria_@id" />
     <input type="hidden" asp-for="DocumentNum" id="DocumentNum_@id" name="DocumentNum_@id" />
     <input type="hidden" asp-for="IdDocumentIssuedBy" id="IdDocumentIssuedBy_@id" name="IdDocumentIssuedBy_@id" />

@@ -88,19 +88,23 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-row">
-                        <div class="form-group col-6 col-lg-3">
-                            <label asp-for="FilterOptions.Crn">СРН</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.Crn" title="СРН">
+                        <div class="form-group col-6 col-lg-2">
+                            <label asp-for="FilterOptions.AccountGisZkh">ЕЛС</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.AccountGisZkh" title="Единый лицевой счет для ГИС ЖКХ">
                         </div>
-                        <div class="form-group col-6 col-lg-3">
+                        <div class="form-group col-6 col-lg-2">
                             <label asp-for="FilterOptions.Account">Лицевой счет</label>
                             <input type="text" class="form-control input-filter-numbers" asp-for="FilterOptions.Account" title="Лицевой счет">
+                        </div>
+                        <div class="form-group col-6 col-lg-2">
+                            <label asp-for="FilterOptions.Crn">СРН</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.Crn" title="СРН">
                         </div>
                         <div class="form-group col-6 col-lg-3">
                             <label asp-for="FilterOptions.Tenant">ФИО нанимателя</label>
                             <input type="text" class="form-control input-filter-snp" asp-for="FilterOptions.Tenant" title="ФИО нанимателя">
                         </div>
-                        <div class="form-group col-6 col-lg-3">
+                        <div class="form-group col-12 col-lg-3">
                             <label asp-for="FilterOptions.RawAddress">Адрес по БКС</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.RawAddress" title="Адрес по БКС">
                         </div>
