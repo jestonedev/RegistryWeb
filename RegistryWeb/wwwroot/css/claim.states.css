@@ -1,9 +1,13 @@
-﻿.rr-claim-states-edit-buttons {
-    margin-top: 0;
+﻿.list-group-item.rr-claim-state-active {
+border-left: 2px solid red;
+}
+
+.rr-claim-states-edit-buttons {
+    margin-top: 6px;
 }
 
 @media(min-width: 768px) {
     .rr-claim-states-edit-buttons {
-        margin-top: 32px;
+        margin-top: 28px;
     }
 }
