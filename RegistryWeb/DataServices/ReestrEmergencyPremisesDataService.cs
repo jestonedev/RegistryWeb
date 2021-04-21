@@ -21,7 +21,8 @@ namespace RegistryWeb.DataServices
         private readonly string connString;
         private readonly string activityManagerPath;
 
-        public ReestrEmergencyPremisesDataService(RegistryContext registryContext, IConfiguration config, IHttpContextAccessor httpContextAccessor) : base(registryContext)
+        public ReestrEmergencyPremisesDataService(RegistryContext registryContext, AddressesDataService addressesDataService,
+            IConfiguration config, IHttpContextAccessor httpContextAccessor) : base(registryContext, addressesDataService)
         {
             sqlDriver = config.GetValue<string>("SqlDriver");
             connString = httpContextAccessor.HttpContext.User.FindFirst("connString").Value;

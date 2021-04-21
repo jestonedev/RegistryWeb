@@ -18,20 +18,19 @@ namespace RegistryWeb.DataServices
     public class ClaimsDataService : ListDataService<ClaimsVM, ClaimsFilter>
     {
         private readonly SecurityServices.SecurityService securityService;
-        private readonly AddressesDataService addressesDataService;
         private readonly IConfiguration config;
 
-        public ClaimsDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService, AddressesDataService addressesDataService, IConfiguration config) : base(registryContext)
+        public ClaimsDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService,
+            AddressesDataService addressesDataService, IConfiguration config) : base(registryContext, addressesDataService)
         {
             this.securityService = securityService;
-            this.addressesDataService = addressesDataService;
             this.config = config;
         }
 
         public override ClaimsVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, ClaimsFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
-            viewModel.Streets = registryContext.KladrStreets;
+            viewModel.Streets = addressesDataService.KladrStreets;
             viewModel.StateTypes = registryContext.ClaimStateTypes;
             return viewModel;
         }

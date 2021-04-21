@@ -1,7 +1,7 @@
 ﻿@model RegistryWeb.ViewModel.OwnerProcessesVM;
 @{ 
-    var kladrStreetsList = new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.FilterOptions.IdStreet);
-    var ownerTypesList = new SelectList(ViewBag.OwnerTypes, "IdOwnerType", "OwnerType1", Model.FilterOptions.IdOwnerType);
+    var kladrStreetsList = new SelectList(Model.KladrStreets, "IdStreet", "StreetName", Model.FilterOptions.IdStreet);
+    var ownerTypesList = new SelectList(Model.OwnerTypes, "IdOwnerType", "OwnerType1", Model.FilterOptions.IdOwnerType);
     var returnUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
 }
 <form asp-action="Index" method="get" class="filterForm">

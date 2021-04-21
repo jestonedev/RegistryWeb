@@ -48,10 +48,8 @@
                 <a class="btn btn-outline-secondary" href="#" id="filterClearBtn">&#10006;</a>
             </div>
         }
-        @*<div class="form-group col-2">
-            <a class="btn btn-block btn-success" asp-controller="Buildings" asp-action="BuildingReports">Отчеты</a>
-        </div>*@
     </div>
+
     <!-- Modal -->
     <div class="modal fade bd-example-modal-xl" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
@@ -70,30 +68,34 @@
                         </div>
                         <div class="form-group col-xl-4 col-md-4">
                             <label asp-for="FilterOptions.IdDecree">Постановление</label>
-                            <select class="selectpicker form-control" title="Постановление" asp-for="FilterOptions.IdDecree" asp-items="@{
-                                new SelectList(ViewBag.GovernmentDecrees, "IdDecree", "Number", Model.FilterOptions.IdDecree)}">
+                            <select class="selectpicker form-control" title="Постановление" asp-for="FilterOptions.IdDecree" asp-items="@Model.GovernmentDecreesList">
                                 <option selected></option>
                             </select>
                         </div>
                         <div class="form-group col-xl-4 col-md-4">
                             <label asp-for="FilterOptions.IdsObjectState">Текущее состояние</label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Текущее состояние" asp-for="FilterOptions.IdsObjectState" asp-items="@{
-                                new SelectList(ViewBag.ObjectStates, "IdState", "StateNeutral", Model.FilterOptions.IdsObjectState)}"></select>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Текущее состояние" asp-for="FilterOptions.IdsObjectState" asp-items="@Model.ObjectStatesList">
+                            </select>
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-xl-8 col-md-7 col-lg-6">
-                            <label asp-for="FilterOptions.IdStreet">Улица</label>
-                            <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@{
-                            new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.FilterOptions.IdStreet)}">
+                        <div class="form-group col-xl-2 col-md-4 col-lg-2">
+                            <label asp-for="FilterOptions.IdRegion">Район</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Район" asp-for="FilterOptions.IdRegion" asp-items="@Model.KladrRegionsList">
                                 <option selected></option>
                             </select>
                         </div>
-                        <div class="form-group col-xl-2 col-md-5 col-lg-3">
+                        <div class="form-group col-xl-6 col-md-8 col-lg-5">
+                            <label asp-for="FilterOptions.IdStreet">Улица</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@Model.KladrStreetsList">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-xl-2 col-md-4 col-lg-2">
                             <label asp-for="FilterOptions.House">Номер дома</label>
                             <input type="text" class="form-control input-filter-house" asp-for="FilterOptions.House" title="Номер дома">
                         </div>
-                        <div class="form-group col-xl-2 col-md-12 col-lg-3">
+                        <div class="form-group col-xl-2 col-md-8 col-lg-3">
                             <label asp-for="FilterOptions.CadastralNum" class="rr-building-label">Кадастровый номер</label>
                             <input type="text" class="form-control input-filter-cadastral-num" asp-for="FilterOptions.CadastralNum" title="Кадастровый номер">
                         </div>
@@ -112,7 +114,6 @@
                             <input type="text" class="form-control input-filter-numbers" asp-for="FilterOptions.StartupYear" title="Год ввода в эксплуатацию">
                         </div>
                     </div>
-
                     <div class="form-row">
                         <div class="form-group col-lg-3 col-md-6">
                             <label asp-for="FilterOptions.RestrictionNum">Номер реквизита п/с</label>
@@ -124,7 +125,8 @@
                         </div>
                         <div class="form-group col-lg-6 col-md-12">
                             <label asp-for="FilterOptions.IdsRestrictionType">Тип права собственности</label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип права собственности" asp-for="FilterOptions.IdsRestrictionType" asp-items="@Model.RestrictionsList"></select>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип права собственности" asp-for="FilterOptions.IdsRestrictionType" asp-items="@Model.RestrictionsList">
+                            </select>
                         </div>
                     </div>
                     <div class="form-row">
@@ -154,12 +156,10 @@
                                     </select>
                                 </div>
                                 <div class="col-8 pl-1">
-                                    <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип ограничения" asp-for="FilterOptions.IdsOwnershipRightType" asp-items="@{
-                                new SelectList(ViewBag.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName", Model.FilterOptions.IdsOwnershipRightType)}"></select>
+                                    <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип ограничения" asp-for="FilterOptions.IdsOwnershipRightType" asp-items="@Model.OwnershipRightTypesList">
+                                    </select>
                                 </div>
                             </div>
-
-                            
                         </div>
                     </div>
                 </div>

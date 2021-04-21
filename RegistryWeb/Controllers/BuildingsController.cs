@@ -50,15 +50,7 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("PageOptions");
                 HttpContext.Session.Remove("FilterOptions");
             }
-            ViewBag.ObjectStates = dataService.ObjectStates;
-            ViewBag.KladrStreets = dataService.KladrStreets;
-            ViewBag.OwnershipRightTypes = dataService.OwnershipRightTypes;
-            ViewBag.GovernmentDecrees = dataService.GovernmentDecrees;
             ViewBag.SecurityService = securityService;
-            ViewBag.SignersList = new SelectList(dataService.SelectableSigners.Select(s => new {
-                s.IdRecord,
-                Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
-            }), "IdRecord", "Snp");
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,

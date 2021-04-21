@@ -17,19 +17,26 @@ namespace RegistryWeb.DataServices
 {
     public class BuildingsDataService : ListDataService<BuildingsVM, BuildingsFilter>
     {
-        private readonly AddressesDataService addressesDataService;
         ReportService reportService;
 
-        public BuildingsDataService(RegistryContext registryContext, AddressesDataService addressesDataService, ReportService reportService) : base(registryContext)
+        public BuildingsDataService(RegistryContext registryContext, AddressesDataService addressesDataService, ReportService reportService) : base(registryContext, addressesDataService)
         {
-            this.addressesDataService = addressesDataService;
             this.reportService = reportService;
         }
 
         public override BuildingsVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, BuildingsFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
+            viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "id_region", "region");
+            viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
+            viewModel.ObjectStatesList = new SelectList(ObjectStates, "IdState", "StateFemale");
+            viewModel.OwnershipRightTypesList = new SelectList(registryContext.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName");
             viewModel.RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName");
+            viewModel.SignersList = new SelectList(registryContext.SelectableSigners.Where(s => s.IdSignerGroup == 1).ToList().Select(s => new {
+                s.IdRecord,
+                Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
+            }), "IdRecord", "Snp");
+            viewModel.GovernmentDecreesList = new SelectList(registryContext.GovernmentDecrees, "IdDecree", "Number");
             return viewModel;
         }
 
@@ -128,6 +135,7 @@ namespace RegistryWeb.DataServices
                 query = AddressFilter(query, filterOptions);
                 query = IdBuildingFilter(query, filterOptions);
                 query = IdDecreeFilter(query, filterOptions);
+                query = RegionFilter(query, filterOptions);
                 query = StreetFilter(query, filterOptions);
                 query = HouseFilter(query, filterOptions);
                 query = FloorsFilter(query, filterOptions);
@@ -278,6 +286,15 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IdDecree.HasValue)
             {
                 query = query.Where(b => b.IdDecree == filterOptions.IdDecree.Value);
+            }
+            return query;
+        }
+
+        private IQueryable<Building> RegionFilter(IQueryable<Building> query, BuildingsFilter filterOptions)
+        {
+            if (!string.IsNullOrEmpty(filterOptions.IdRegion))
+            {
+                query = query.Where(b => b.IdStreet.Contains(filterOptions.IdStreet));
             }
             return query;
         }

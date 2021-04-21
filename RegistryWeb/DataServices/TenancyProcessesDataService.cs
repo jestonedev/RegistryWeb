@@ -11,6 +11,8 @@ using RegistryWeb.DataHelpers;
 using System.Runtime.CompilerServices;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using RegistryWeb.Models.SqlViews;
+using RegistryWeb.SecurityServices;
 
 namespace RegistryWeb.DataServices
 {
@@ -19,11 +21,11 @@ namespace RegistryWeb.DataServices
         private readonly IQueryable<TenancyBuildingAssoc> tenancyBuildingsAssoc;
         private readonly IQueryable<TenancyPremiseAssoc> tenancyPremisesAssoc;
         private readonly IQueryable<TenancySubPremiseAssoc> tenancySubPremisesAssoc;
-        private readonly SecurityServices.SecurityService securityService;
-        private readonly AddressesDataService addressesDataService;
+        private readonly SecurityService securityService;
         private readonly IConfiguration config;
 
-        public TenancyProcessesDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService, AddressesDataService addressesDataService, IConfiguration config) : base(registryContext)
+        public TenancyProcessesDataService(RegistryContext registryContext, SecurityService securityService,
+            AddressesDataService addressesDataService, IConfiguration config) : base(registryContext, addressesDataService)
         {
             tenancyBuildingsAssoc = registryContext.TenancyBuildingsAssoc
                     .Include(oba => oba.BuildingNavigation)
@@ -49,7 +51,6 @@ namespace RegistryWeb.DataServices
                 .Include(oba => oba.ProcessNavigation)
                 .AsNoTracking();
             this.securityService = securityService;
-            this.addressesDataService = addressesDataService;
             this.config = config;
         }
 
@@ -58,7 +59,8 @@ namespace RegistryWeb.DataServices
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
             viewModel.ReasonTypes = registryContext.TenancyReasonTypes;
             viewModel.RentTypes = registryContext.RentTypes;
-            viewModel.Streets = registryContext.KladrStreets;
+            viewModel.Regions = addressesDataService.KladrRegions;
+            viewModel.Streets = addressesDataService.KladrStreets;
             viewModel.OwnershipRightTypes = registryContext.OwnershipRightTypes;
             viewModel.ObjectStates = registryContext.ObjectStates;
             return viewModel;
@@ -808,13 +810,28 @@ namespace RegistryWeb.DataServices
                               };
             IEnumerable<int> idsProcess = null;
 
+            if (!string.IsNullOrEmpty(filterOptions.IdRegion))
+            {
+                var ids = buildings.Where(r => r.IdStreet.Contains(filterOptions.IdRegion)).Select(r => r.IdProcess)
+                    .Union(premises.Where(r => r.IdStreet.Contains(filterOptions.IdRegion)).Select(r => r.IdProcess))
+                    .Union(subPremises.Where(r => r.IdStreet.Contains(filterOptions.IdRegion)).Select(r => r.IdProcess))
+                    .ToList();
+                idsProcess = ids;
+            }
             if (!string.IsNullOrEmpty(filterOptions.IdStreet))
             {
                 var ids = buildings.Where(r => r.IdStreet == filterOptions.IdStreet).Select(r => r.IdProcess)
                     .Union(premises.Where(r => r.IdStreet == filterOptions.IdStreet).Select(r => r.IdProcess))
                     .Union(subPremises.Where(r => r.IdStreet == filterOptions.IdStreet).Select(r => r.IdProcess))
                     .ToList();
-                idsProcess = ids;
+                if (idsProcess == null)
+                {
+                    idsProcess = ids;
+                }
+                else
+                {
+                    idsProcess = idsProcess.Intersect(ids);
+                }
             }
             if (!string.IsNullOrEmpty(filterOptions.House))
             {

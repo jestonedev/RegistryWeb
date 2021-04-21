@@ -18,20 +18,19 @@ namespace RegistryWeb.DataServices
     public class PaymentAccountsDataService : ListDataService<PaymentsVM, PaymentsFilter>
     {
         private readonly SecurityServices.SecurityService securityService;
-        private readonly AddressesDataService addressesDataService;
         private readonly IConfiguration config;
 
-        public PaymentAccountsDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService, AddressesDataService addressesDataService, IConfiguration config) : base(registryContext)
+        public PaymentAccountsDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService,
+            AddressesDataService addressesDataService, IConfiguration config) : base(registryContext, addressesDataService)
         {
             this.securityService = securityService;
-            this.addressesDataService = addressesDataService;
             this.config = config;
         }
 
         public override PaymentsVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, PaymentsFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
-            viewModel.Streets = registryContext.KladrStreets;
+            viewModel.Streets = addressesDataService.KladrStreets;
             return viewModel;
         }
 

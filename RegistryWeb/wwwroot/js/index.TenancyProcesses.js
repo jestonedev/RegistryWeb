@@ -4,16 +4,13 @@
 };
 
 var filterClearModal = function () {
-    $("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal input[type='hidden'], #filterModal select").val("");
+    resetModalForm($("form.filterForm"));
+    filterIdRegionChange();
     $("#FilterOptions_RegistrationDateSign, #FilterOptions_IssuedDateSign, #FilterOptions_BeginDateSign, #FilterOptions_EndDateSign")
         .val("=")
         .closest(".input-group")
         .find("button.dropdown-toggle")
         .text("=");
-    $('#FilterOptions_IdStreet, #FilterOptions_IdPreset').selectpicker('render');
-    $('#FilterOptions_IdsRentType').selectpicker('deselectAll');
-    $('#FilterOptions_IdsObjectState').selectpicker("deselectAll");
-    $('#FilterOptions_IdsOwnershipRightType').selectpicker("deselectAll");
 };
 var filterClear = function () {
     filterClearModal();
@@ -83,13 +80,33 @@ var selectEndDateState = function (e) {
         .find("#FilterOptions_EndDateSign")
         .val(value);
 };
-
+var filterIdRegionChange = function () {
+    var idRegion = $('#FilterOptions_IdRegion').selectpicker('val');
+    $.ajax({
+        type: 'POST',
+        url: window.location.origin + '/Address/GetKladrStreets',
+        dataType: 'json',
+        data: { idRegion },
+        success: function (data) {
+            var select = $('#filterModal #FilterOptions_IdStreet');
+            select.selectpicker('destroy');
+            select.find('option[value]').remove();
+            $.each(data, function (i, d) {
+                select.append('<option value="' + d.idStreet + '">' + d.streetName + '</option>');
+            });
+            select.selectpicker();
+        }
+    });
+}
 $(function () {
     $('#searchModalBtn').click(searchModal);
     $('#filterClearModalBtn').click(filterClearModal);
     $('#filterClearBtn').click(filterClear);
     initRegNumState();
-
+    $('#filterModal #FilterOptions_IdRegion').on('change', function (e) {
+        filterIdRegionChange();
+        e.preventDefault();
+    });
     $(".rr-registration-num-dropdown a.dropdown-item").click(selectRegNumState);
     $(".rr-registration-date-dropdown a.dropdown-item").click(selectRegistrationDateState);
     $(".rr-issued-date-dropdown a.dropdown-item").click(selectIssuedDateState);

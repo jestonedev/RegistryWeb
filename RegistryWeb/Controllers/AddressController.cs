@@ -22,14 +22,12 @@ namespace RegistryWeb.Controllers
             this.addressesDataService = addressesDataService;
         }
 
-        [HttpPost]
         public JsonResult AutocompleteStreet(string text)
         {
             var model = addressesDataService.GetStreetsByText(text).Select(s => new { s.IdStreet, s.StreetName });
             return Json(model);
         }
 
-        [HttpPost]
         public JsonResult AutocompleteFilterOptionsAddress(string text, bool isBuildings = false)
         {
             var addresses = addressesDataService.GetAddressesByText(text, isBuildings).GroupBy(a => a.AddressType);
@@ -40,7 +38,6 @@ namespace RegistryWeb.Controllers
             )) });
         }
 
-        [HttpPost]
         public JsonResult AutocompleteFilterOptionsAddressAlt(string text, bool isBuildings = false)
         {
             var addresses = addressesDataService.GetAddressesByText(text, isBuildings).GroupBy(a => a.AddressType);
@@ -51,17 +48,15 @@ namespace RegistryWeb.Controllers
             });
         }
 
-        [HttpPost]
         public IActionResult GetBuildingsSelectList(string idStreet)
         {
-            var buildings = addressesDataService.GetBuildingsByStreet(idStreet);
+            var buildings = addressesDataService.GetBuildings(idStreet);
             StringBuilder str = new StringBuilder();
             foreach(var b in buildings)
                 str.Append("<option value=\"" + b.IdBuilding + "\">" + b.House + "</option>");
             return Content(str.ToString());
         }
 
-        [HttpPost]
         public IActionResult GetPremisesTypeSelectList(int idBuilding)
         {
             if (idBuilding == 0)
@@ -74,7 +69,6 @@ namespace RegistryWeb.Controllers
             return Content(str.ToString());
         }
 
-        [HttpPost]
         public JsonResult GetPremisesTypeAsNumText(int idPremisesType)
         {
             if (idPremisesType == 0)
@@ -84,7 +78,6 @@ namespace RegistryWeb.Controllers
             return Json(new { premisesTypeAsNum });
         }
 
-        [HttpPost]
         public IActionResult GetPremisesNumSelectList(int idBuilding, int idPremisesType)
         {
             if (idPremisesType == 0 || idBuilding == 0)
@@ -96,7 +89,6 @@ namespace RegistryWeb.Controllers
             return Content(str.ToString());
         }
 
-        [HttpPost]
         public IActionResult GetSubPremisesNumSelectList(int idPremise)
         {
             if (idPremise == 0)
@@ -106,6 +98,30 @@ namespace RegistryWeb.Controllers
             foreach (var sp in subPremises)
                 str.Append("<option value=\"" + sp.IdSubPremises + "\">" + sp.SubPremisesNum + "</option>");
             return Content(str.ToString());
+        }
+
+        public JsonResult GetKladrStreets(string idRegion)
+        {
+            var streets = addressesDataService.GetKladrStreets(idRegion);
+            return Json(streets);
+        }
+
+        public JsonResult GetBuilding(string idStreet)
+        {
+            var buildings = addressesDataService.GetBuildings(idStreet);
+            return Json(buildings);
+        }
+
+        public JsonResult GetPremises(int? idBuilding)
+        {
+            var premises = addressesDataService.GetPremises(idBuilding);
+            return Json(premises);
+        }
+
+        public JsonResult GetSubPremises(int? idPremise)
+        {
+            var subPremises = addressesDataService.GetSubPremises(idPremise);
+            return Json(subPremises);
         }
     }
 }

@@ -18,11 +18,11 @@ namespace RegistryWeb.DataServices
         private readonly IQueryable<OwnerBuildingAssoc> ownerBuildingsAssoc;
         private readonly IQueryable<OwnerPremiseAssoc> ownerPremisesAssoc;
         private readonly IQueryable<OwnerSubPremiseAssoc> ownerSubPremisesAssoc;
-        private readonly AddressesDataService addressesDataService;
 
         public string AttachmentsPath { get; private set; }
 
-        public OwnerProcessesDataService(RegistryContext registryContext, AddressesDataService addressesDataService, IConfiguration config) : base(registryContext)
+        public OwnerProcessesDataService(RegistryContext registryContext, AddressesDataService addressesDataService,
+            IConfiguration config) : base(registryContext, addressesDataService)
         {
             AttachmentsPath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"OwnerProcesses");
 
@@ -49,12 +49,13 @@ namespace RegistryWeb.DataServices
                         .ThenInclude(p => p.IdPremisesTypeNavigation)
                 .Include(oba => oba.IdProcessNavigation)
                 .AsNoTracking();
-            this.addressesDataService = addressesDataService;
         }
 
         public override OwnerProcessesVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, OwnerProcessesFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
+            viewModel.KladrStreets = addressesDataService.KladrStreets;
+            viewModel.OwnerTypes = registryContext.OwnerType.AsNoTracking();
             return viewModel;
         }
 
@@ -410,12 +411,6 @@ namespace RegistryWeb.DataServices
             }
             return ownerProcess;
         }
-
-        internal IQueryable<KladrStreet> KladrStreets()
-            => registryContext.KladrStreets.AsNoTracking();
-
-        internal IQueryable<OwnerType> OwnerTypes()
-            => registryContext.OwnerType.AsNoTracking();
 
         internal IQueryable<OwnerReasonType> OwnerReasonTypes()
             => registryContext.OwnerReasonTypes.AsNoTracking();
