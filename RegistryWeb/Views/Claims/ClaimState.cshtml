@@ -20,15 +20,15 @@
     }
 }
 
-<li class="list-group-item">
+<li class="list-group-item pl-3 pr-3 pb-3 pt-3">
     <input type="hidden" value="@claimState.IdState" name="IdState_@id" />
     <div class="form-row">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата установки</label>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата установки</label>
             <input type="date" disabled class="form-control" value="@(claimState.DateStartState?.ToString("yyyy-MM-dd"))" id="DateStartState_@id" name="DateStartState_@id" title="Дата установки состояния">
         </div>
-        <div class="form-group col-12 @(ViewBag.Action == "Delete" || ViewBag.Action == "Details" ? "col-md-8" : "col-md-6")">
-            <label>Этап</label>
+        <div class="form-group col-12 @(ViewBag.Action == "Delete" || ViewBag.Action == "Details" ? "col-md-8" : "col-md-6") mb-2">
+            <label class="mb-1">Этап</label>
             <select class="selectpicker form-control" disabled id="IdStateType_@id" name="IdStateType_@id" title="Этап"
                     data-val="true" data-val-required="Выберите этап исковой работы">
                 @{ 
@@ -76,72 +76,70 @@
         }
     </div>
 
-    <div class="form-row">
-        <div class="form-group col-12 col-md-4">
-            <label>Исполнитель</label>
+    <div class="form-row rr-claim-ext-info">
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Исполнитель</label>
             <input type="text" disabled class="form-control" value="@claimState.Executor" maxlength="255" id="Executor_@id" name="Executor_@id" title="Исполнитель">
         </div>
-        <div class="form-group col-12 col-md-8">
-            <label>Примечание</label>
+        <div class="form-group col-12 col-md-8 mb-2">
+            <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.Description" maxlength="2048" id="Description_@id" name="Description_@id" title="Примечание">
         </div>
     </div>
 
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 1 ? "" : "d-none")" data-id-state-type="1">
-        <div class="form-group col-12">
-            <label>Кто сделал запрос</label>
+        <div class="form-group col-12 mb-2">
+            <label class="mb-1">Кто сделал запрос</label>
             <input type="text" disabled class="form-control" value="@claimState.BksRequester" id="BksRequester_@id" maxlength="255" name="BksRequester_@id" title="Кто сделал запрос">
         </div>
     </div>
 
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 2 ? "" : "d-none")" data-id-state-type="2">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата передачи</label>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата передачи</label>
             <input type="date" disabled class="form-control" value="@claimState.TransferToLegalDepartmentDate?.ToString("yyyy-MM-dd")" id="TransferToLegalDepartmentDate_@id" name="TransferToLegalDepartmentDate_@id" title="Дата передачи">
         </div>
-        <div class="form-group col-12 col-md-8">
-            <label>Кто передал</label>
+        <div class="form-group col-12 col-md-8 mb-2">
+            <label class="mb-1">Кто передал</label>
             <input type="text" disabled class="form-control" value="@claimState.TransferToLegalDepartmentWho" id="TransferToLegalDepartmentWho_@id" maxlength="255" name="TransferToLegalDepartmentWho_@id" title="Кто передал">
         </div>
     </div>
 
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 3 ? "" : "d-none")" data-id-state-type="3">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата принятия</label>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата принятия</label>
             <input type="date" disabled class="form-control" value="@claimState.AcceptedByLegalDepartmentDate?.ToString("yyyy-MM-dd")" id="AcceptedByLegalDepartmentDate_@id" name="AcceptedByLegalDepartmentDate_@id" title="Дата принятия">
         </div>
-        <div class="form-group col-12 col-md-8">
-            <label>Кто принял</label>
+        <div class="form-group col-12 col-md-8 mb-2">
+            <label class="mb-1">Кто принял</label>
             <input type="text" disabled class="form-control" value="@claimState.AcceptedByLegalDepartmentWho" id="AcceptedByLegalDepartmentWho_@id" maxlength="255" name="AcceptedByLegalDepartmentWho_@id" title="Кто принял">
         </div>
     </div>
 
-    <div class="rr-claim-ext-info @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
-        <h5>Направлено исковое заявление в суд</h5>
-        <hr class="mt-1" />
+    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
+        <h5><u>Направлено исковое заявление в суд</u></h5>
     </div>
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата направления</label>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата направления</label>
             <input type="date" disabled class="form-control" value="@claimState.ClaimDirectionDate?.ToString("yyyy-MM-dd")" id="ClaimDirectionDate_@id" name="ClaimDirectionDate_@id" title="Дата направления">
         </div>
-        <div class="form-group col-12 col-md-8">
-            <label>Примечание</label>
+        <div class="form-group col-12 col-md-8 mb-2">
+            <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.ClaimDirectionDescription" id="ClaimDirectionDescription_@id" maxlength="255" name="ClaimDirectionDescription_@id" title="Примечание">
         </div>
     </div>
 
-    <div class="rr-claim-ext-info @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
-        <h5>Вынесение судебного приказа</h5>
-        <hr class="mt-1" />
+    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
+        <h5><u>Вынесение судебного приказа</u></h5>
     </div>
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата вынесения с/п</label>
+        <div class="form-group col-12 col-md-4 mb-3 col-md-2">
+            <label class="mb-1">Дата вынесения с/п</label>
             <input type="date" disabled class="form-control" value="@claimState.CourtOrderDate?.ToString("yyyy-MM-dd")" id="CourtOrderDate_@id" name="CourtOrderDate_@id" title="Дата вынесения с/п">
         </div>
-        <div class="form-group col-12 col-md-8">
-            <label>Номер с/п</label>
+        <div class="form-group col-12 col-md-8 mb-3">
+            <label class="mb-1">Номер с/п</label>
             <input type="text" disabled class="form-control" value="@claimState.CourtOrderNum" id="CourtOrderNum_@id" maxlength="255" name="CourtOrderNum_@id" title="Номер с/п">
         </div>
     </div>
@@ -152,144 +150,136 @@
         </div>
     </div>
 
-    <div class="rr-claim-ext-info @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
-        <h5>Получение судебного приказа</h5>
-        <hr class="mt-1" />
+    <div class="rr-claim-ext-info mt-1 @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
+        <h5><u>Получение судебного приказа</u></h5>
     </div>
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата получения с/п</label>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата получения с/п</label>
             <input type="date" disabled class="form-control" value="@claimState.ObtainingCourtOrderDate?.ToString("yyyy-MM-dd")" id="ObtainingCourtOrderDate_@id" name="ObtainingCourtOrderDate_@id" title="Дата получения с/п">
         </div>
-        <div class="form-group col-12 col-md-8">
-            <label>Примечание</label>
+        <div class="form-group col-12 col-md-8 mb-2">
+            <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.ObtainingCourtOrderDescription" maxlength="255" id="ObtainingCourtOrderDescription_@id" name="ObtainingCourtOrderDescription_@id" title="Примечание">
         </div>
     </div>
 
-    <div class="rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <h5>Направление с/п приставам</h5>
-        <hr class="mt-1" />
+    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
+        <h5><u>Направление с/п приставам</u></h5>
     </div>
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата направления</label>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата направления</label>
             <input type="date" disabled class="form-control" value="@claimState.DirectionCourtOrderBailiffsDate?.ToString("yyyy-MM-dd")" id="DirectionCourtOrderBailiffsDate_@id" name="DirectionCourtOrderBailiffsDate_@id" title="Дата направления">
         </div>
-        <div class="form-group col-12 col-md-8">
-            <label>Примечание</label>
+        <div class="form-group col-12 col-md-8 mb-2">
+            <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.DirectionCourtOrderBailiffsDescription" maxlength="255" id="DirectionCourtOrderBailiffsDescription_@id" name="DirectionCourtOrderBailiffsDescription_@id" title="Примечание">
         </div>
     </div>
 
-    <div class="rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <h5>Постановление о возбуждении исполнительного производства</h5>
-        <hr class="mt-1" />
+    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
+        <h5><u>Постановление о возбуждении исполнительного производства</u></h5>
     </div>
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата возбуждения</label>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата возбуждения</label>
             <input type="date" disabled class="form-control" value="@claimState.EnforcementProceedingStartDate?.ToString("yyyy-MM-dd")" id="EnforcementProceedingStartDate_@id" name="EnforcementProceedingStartDate_@id" title="Дата возбуждения">
         </div>
-        <div class="form-group col-12 col-md-8">
-            <label>Примечание</label>
+        <div class="form-group col-12 col-md-8 mb-2">
+            <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.EnforcementProceedingStartDescription" maxlength="255" id="EnforcementProceedingStartDescription_@id" name="EnforcementProceedingStartDescription_@id" title="Примечание">
         </div>
     </div>
 
-    <div class="rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <h5>Постановление об окончании исполнительного производства</h5>
-        <hr class="mt-1" />
+    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
+        <h5><u>Постановление об окончании исполнительного производства</u></h5>
     </div>
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата окончания</label>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата окончания</label>
             <input type="date" disabled class="form-control" value="@claimState.EnforcementProceedingEndDate?.ToString("yyyy-MM-dd")" id="EnforcementProceedingEndDate_@id" name="EnforcementProceedingEndDate_@id" title="Дата окончания">
         </div>
-        <div class="form-group col-12 col-md-8">
-            <label>Примечание</label>
+        <div class="form-group col-12 col-md-8 mb-2">
+            <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.EnforcementProceedingEndDescription" maxlength="255" id="EnforcementProceedingEndDescription_@id" name="EnforcementProceedingEndDescription_@id" title="Примечание">
         </div>
     </div>
 
-    <div class="rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <h5>Постановление о прекращении исполнительного производства</h5>
-        <hr class="mt-1" />
+    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
+        <h5><u>Постановление о прекращении исполнительного производства</u></h5>
     </div>
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата прекращения</label>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата прекращения</label>
             <input type="date" disabled class="form-control" value="@claimState.EnforcementProceedingTerminateDate?.ToString("yyyy-MM-dd")" id="EnforcementProceedingTerminateDate_@id" name="EnforcementProceedingTerminateDate_@id" title="Дата прекращения">
         </div>
-        <div class="form-group col-12 col-md-8">
-            <label>Примечание</label>
+        <div class="form-group col-12 col-md-8 mb-2">
+            <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.EnforcementProceedingTerminateDescription" maxlength="255" id="EnforcementProceedingTerminateDescription_@id" name="EnforcementProceedingTerminateDescription_@id" title="Примечание">
         </div>
     </div>
 
-    <div class="rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <h5>Повторное направление с/п приставам</h5>
-        <hr class="mt-1" />
+    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
+        <h5><u>Повторное направление с/п приставам</u></h5>
     </div>
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата направления</label>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата направления</label>
             <input type="date" disabled class="form-control" value="@claimState.RepeatedDirectionCourtOrderBailiffsDate?.ToString("yyyy-MM-dd")" id="RepeatedDirectionCourtOrderBailiffsDate_@id" name="RepeatedDirectionCourtOrderBailiffsDate_@id" title="Дата направления">
         </div>
-        <div class="form-group col-12 col-md-8">
-            <label>Примечание</label>
+        <div class="form-group col-12 col-md-8 mb-2">
+            <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.RepeatedDirectionCourtOrderBailiffsDescription" maxlength="255" id="RepeatedDirectionCourtOrderBailiffsDescription_@id" name="RepeatedDirectionCourtOrderBailiffsDescription_@id" title="Примечание">
         </div>
     </div>
 
-    <div class="rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <h5>Повторное постановление о возбуждении исполнительного производства</h5>
-        <hr class="mt-1" />
+    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
+        <h5><u>Повторное постановление о возбуждении исполнительного производства</u></h5>
     </div>
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата возбуждения</label>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата возбуждения</label>
             <input type="date" disabled class="form-control" value="@claimState.RepeatedEnforcementProceedingStartDate?.ToString("yyyy-MM-dd")" id="RepeatedEnforcementProceedingStartDate_@id" name="RepeatedEnforcementProceedingStartDate_@id" title="Дата возбуждения">
         </div>
-        <div class="form-group col-12 col-md-8">
-            <label>Примечание</label>
+        <div class="form-group col-12 col-md-8 mb-2">
+            <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.RepeatedEnforcementProceedingStartDescription" maxlength="255" id="RepeatedEnforcementProceedingStartDescription_@id" name="RepeatedEnforcementProceedingStartDescription_@id" title="Примечание">
         </div>
     </div>
 
-    <div class="rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <h5>Повторное постановление об окончании исполнительного производства</h5>
-        <hr class="mt-1" />
+    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
+        <h5><u>Повторное постановление об окончании исполнительного производства</u></h5>
     </div>
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата окончания</label>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата окончания</label>
             <input type="date" disabled class="form-control" value="@claimState.RepeatedEnforcementProceedingEndDate?.ToString("yyyy-MM-dd")" id="RepeatedEnforcementProceedingEndDate_@id" name="RepeatedEnforcementProceedingEndDate_@id" title="Дата окончания">
         </div>
-        <div class="form-group col-12 col-md-8">
-            <label>Примечание</label>
+        <div class="form-group col-12 col-md-8 mb-2">
+            <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.RepeatedEnforcementProceedingEndDescription" maxlength="255" id="RepeatedEnforcementProceedingEndDescription_@id" name="RepeatedEnforcementProceedingEndDescription_@id" title="Примечание">
         </div>
     </div>
 
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 6 ? "" : "d-none")" data-id-state-type="6">
-        <div class="form-group col-12 col-md-4">
-            <label>Дата завершения</label>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата завершения</label>
             <input type="date" disabled class="form-control" value="@claimState.CourtOrderCompleteDate?.ToString("yyyy-MM-dd")" id="CourtOrderCompleteDate_@id" name="CourtOrderCompleteDate_@id" title="Дата окончания">
         </div>
-        <div class="form-group col-6 col-md-4">
-            <label>Причина завершения</label>
+        <div class="form-group col-6 col-md-4 mb-2">
+            <label class="mb-1">Причина завершения</label>
             <input type="text" disabled class="form-control" value="@claimState.CourtOrderCompleteReason" maxlength="255" id="CourtOrderCompleteReason_@id" name="CourtOrderCompleteReason_@id" title="Причина завершения">
         </div>
-        <div class="form-group col-6 col-md-4">
-            <label>Примечание</label>
+        <div class="form-group col-6 col-md-4 mb-2">
+            <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.CourtOrderCompleteDescription" maxlength="255" id="CourtOrderCompleteDescription_@id" name="CourtOrderCompleteDescription_@id" title="Примечание">
         </div>
     </div>
 
     @if (actualClaimStates.Count() != 0)
     {
-        <div class="form-row justify-content-center mb-3 mb-lg-2">
+        <div class="form-row justify-content-center mb-0">
             <a class="text-dark rr-claim-state-details" title="Подробнее" href="#"><span class="oi oi-chevron-bottom"></span></a>
         </div>
     }

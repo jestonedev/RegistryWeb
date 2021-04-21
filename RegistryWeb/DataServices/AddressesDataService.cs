@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using RegistryWeb.Models.Entities;
+using RegistryWeb.Models.SqlViews;
 
 namespace RegistryWeb.DataServices
 {
@@ -120,21 +121,21 @@ namespace RegistryWeb.DataServices
             return new List<Address>();
         }
 
-        public IQueryable<KladrStreet> GetStreetsByText(string text)
+        public IEnumerable<KladrStreet> GetStreetsByText(string text)
         {
             return registryContext.KladrStreets
                 .AsNoTracking()
                 .Where(s => s.StreetLong.Contains(text) || s.StreetName.Contains(text));
         }
 
-        public IQueryable<SubPremise> GetSubPremisesByPremisee(int idPremise)
+        public IEnumerable<SubPremise> GetSubPremisesByPremisee(int idPremise)
         {
             return registryContext.SubPremises
                 .AsNoTracking()
                 .Where(sp => sp.IdPremises == idPremise);
         }
 
-        public IQueryable<Premise> GetPremisesByBuildingAndType(int idBuilding, int idPremisesType)
+        public IEnumerable<Premise> GetPremisesByBuildingAndType(int idBuilding, int idPremisesType)
         {
             return 
                 registryContext.Premises
@@ -142,7 +143,7 @@ namespace RegistryWeb.DataServices
                 .Where(p => p.IdBuilding == idBuilding && p.IdPremisesType == idPremisesType);
         }
 
-        public IQueryable<PremisesType> GetPremiseTypesByBuilding(int idBuilding)
+        public IEnumerable<PremisesType> GetPremiseTypesByBuilding(int idBuilding)
         {
             return registryContext.Premises
                 .Include(p => p.IdPremisesTypeNavigation)
@@ -151,17 +152,48 @@ namespace RegistryWeb.DataServices
                 .Select(p => p.IdPremisesTypeNavigation)
                 .Distinct();
         }
+        public IEnumerable<KladrStreet> GetKladrStreets(string idRegion)
+        {
+            if (idRegion == null)
+                return registryContext.KladrStreets.AsNoTracking();
+            return registryContext.KladrStreets.Where(s => s.IdStreet.Contains(idRegion)).AsNoTracking();
+        }
 
-        public IQueryable<Building> GetBuildingsByStreet(string idStreet)
+        //GetBuildingsByStreet
+        //GetHouses
+        public IEnumerable<Building> GetBuildings(string idStreet)
         {
             return registryContext.Buildings
                 .AsNoTracking()
                 .Where(b => b.IdStreet == idStreet);
         }
 
-        public IQueryable<PremisesType> PremisesTypes { get {
-                return registryContext.PremisesTypes;
-            }
+        public IEnumerable<Premise> GetPremises(int? idBuilding)
+        {
+            return registryContext.Premises
+                .AsNoTracking()
+                .Where(r => r.IdBuilding == idBuilding);
+        }
+
+        public IEnumerable<SubPremise> GetSubPremises(int? idPremise)
+        {
+            return registryContext.SubPremises
+                .AsNoTracking()
+                .Where(r => r.IdPremises == idPremise);
+        }
+
+        public IEnumerable<KladrRegion> KladrRegions
+        {
+            get => registryContext.KladrRegions.AsNoTracking();
+        }
+
+        public IEnumerable<KladrStreet> KladrStreets
+        {
+            get => registryContext.KladrStreets.AsNoTracking();
+        }
+        public IEnumerable<PremisesType> PremisesTypes
+        {
+            get => registryContext.PremisesTypes.AsNoTracking();
         }
     }
 }

@@ -12,7 +12,8 @@ namespace RegistryWeb.DataServices
 {
     public class PrivatizationDataService : ListDataService<PrivatizationListVM, PrivatizationFilter>
     {
-        public PrivatizationDataService(RegistryContext registryContext) : base(registryContext)
+        public PrivatizationDataService(RegistryContext registryContext, AddressesDataService addressesDataService)
+            : base(registryContext, addressesDataService)
         {
         }
 

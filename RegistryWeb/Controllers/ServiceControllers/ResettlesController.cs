@@ -323,7 +323,6 @@ namespace RegistryWeb.Controllers.ServiceControllers
         {
             if (!securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo))
                 return Json(-2);
-            var id = 0;
             if (address == null)
                 return Json(new { Error = -3 });
 
@@ -335,24 +334,6 @@ namespace RegistryWeb.Controllers.ServiceControllers
             ViewBag.CanEditExtInfo = true;
 
             return PartialView("ResettleDocument", resettleDocument);
-        }
-
-        public JsonResult GetHouses(string idStreet)
-        {
-            IEnumerable<Building> buildings = registryContext.Buildings.Where(r => r.IdStreet == idStreet);
-            return Json(buildings);
-        }
-
-        public JsonResult GetPremises(int? idBuilding)
-        {
-            IEnumerable<Premise> premises = registryContext.Premises.Where(r => r.IdBuilding == idBuilding);
-            return Json(premises);
-        }
-
-        public JsonResult GetSubPremises(int? idPremise)
-        {
-            IEnumerable<SubPremise> subPremises = registryContext.SubPremises.Where(r => r.IdPremises == idPremise);
-            return Json(subPremises);
         }
     }
 }

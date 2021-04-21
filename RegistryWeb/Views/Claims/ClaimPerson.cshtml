@@ -5,51 +5,51 @@
     var id = Guid.NewGuid();
 }
 
-<li class="list-group-item">
+<li class="list-group-item pl-3 pr-3 pb-3 pt-3">
     <input type="hidden" value="@Model.IdPerson" name="IdPerson_@id" />
     <div class="form-row">
-        <div class="form-group col-md-3">
-            <label>Фамилия</label>
+        <div class="form-group col-md-3 mb-2">
+            <label class="mb-1">Фамилия</label>
             <input type="text" class="form-control input-chars" maxlength="50" disabled
                    data-val="true" data-val-required="Укажите фамилию"
                    asp-for="Surname" id="Surname_@id" name="Surname_@id" title="Фамилия">
             <span class="text-danger field-validation-valid" data-valmsg-for="Surname_@id" data-valmsg-replace="true"></span>
         </div>
-        <div class="form-group col-md-3">
-            <label>Имя</label>
+        <div class="form-group col-md-3 mb-2">
+            <label class="mb-1">Имя</label>
             <input type="text" class="form-control input-chars" maxlength="50" disabled
                    data-val="true" data-val-required="Укажите имя"
                    asp-for="Name" id="Surname_@id" name="Name_@id" title="Имя">
             <span class="text-danger field-validation-valid" data-valmsg-for="Name_@id" data-valmsg-replace="true"></span>
         </div>
-        <div class="form-group col-md-3">
-            <label>Отчество</label>
+        <div class="form-group col-md-3 mb-2">
+            <label class="mb-1">Отчество</label>
             <input type="text" class="form-control input-chars" maxlength="255" disabled asp-for="Patronymic" id="Patronymic_@id" name="Patronymic_@id" title="Отчество">
         </div>
-        <div class="form-group col-md-3">
-            <label>Дата рождения</label>
+        <div class="form-group col-md-3 mb-2">
+            <label class="mb-1">Дата рождения</label>
             <input type="date" class="form-control" disabled asp-for="DateOfBirth"
                    value="@(Model.DateOfBirth.HasValue ? Model.DateOfBirth.Value.ToString("yyyy-MM-dd") : "")"
                    id="DateOfBirth_@id" name="DateOfBirth_@id" title="Дата рождения">
         </div>
     </div>
     <div class="form-row">
-        <div class="form-group col-md-4">
-            <label>Место рождения</label>
+        <div class="form-group col-md-4 mb-2">
+            <label class="mb-1">Место рождения</label>
             <input type="text" class="form-control" maxlength="1024" disabled asp-for="PlaceOfBirth" id="PlaceOfBirth_@id" name="PlaceOfBirth_@id" title="Место рождения">
         </div>
 
-        <div class="form-group col-md-4">
-            <label>Место работы</label>
+        <div class="form-group col-md-4 mb-2">
+            <label class="mb-1">Место работы</label>
             <input type="text" class="form-control" maxlength="1024" disabled asp-for="WorkPlace" id="WorkPlace_@id" name="WorkPlace_@id" title="Место работы">
         </div>
 
-        <div class="form-group col-md-4">
-            <label>Паспорт</label>
+        <div class="form-group col-md-4 mb-2">
+            <label class="mb-1">Паспорт</label>
             <input type="text" class="form-control" maxlength="1024" disabled asp-for="Passport" id="Passport_@id" name="Passport_@id" title="Место работы">
         </div>
 
-        <div class="col-md-4 col-6">
+        <div class="col-md-4 col-6 mt-2">
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" disabled asp-for="IsClaimer" id="IsClaimer_@id" name="IsClaimer_@id" title="Является нанимателем">
                 <label class="form-check-label" asp-for="IsClaimer" title="Является нанимателем">Является нанимателем</label>
@@ -59,7 +59,7 @@
 
         @if (ViewBag.Action == "Edit")
         {
-            <div class="text-right text-md-center col-6 col-md-4 rr-claim-person-edit-buttons">
+            <div class="text-right text-md-center col-6 col-md-4 rr-claim-person-edit-buttons mt-2">
                 <div class="btn-group yes-no-panel" role="group" style="display: none" aria-label="Панель подтверждения">
                     <a class="btn btn-success claim-person-save-btn" title="Сохранить" aria-label="Сохранить" href="#"><span class="oi oi-check"></span></a>
                     <a class="btn btn-danger claim-person-cancel-btn" title="Отменить сохранение" aria-label="Отменить сохранение" href="#"><span class="oi oi-x"></span></a>
@@ -73,7 +73,7 @@
         @if (ViewBag.Action == "Create")
         {
             <a class="claim-person-edit-btn" style="display: none"></a>
-            <div class="text-right text-md-center col-6 col-md-4 rr-claim-person-edit-buttons">
+            <div class="text-right text-md-center col-6 col-md-4 rr-claim-person-edit-buttons mt-2">
                 <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">
                     <a class="btn btn-danger claim-person-cancel-btn" title="Нет" aria-label="Нет" href="#"><span class="oi oi-x"></span></a>
                 </div>

@@ -20,14 +20,11 @@
     text-overflow: ellipsis;
     max-width: 100%;
     margin-bottom: 0.24rem;
+    vertical-align: bottom;
 }
 
 .rr-claim-label {
     margin-bottom: 0.1rem;
-}
-
-.rr-claim-card {
-    margin-top: 10pt;
 }
 
 .rr-claim-ext-info {

@@ -5,7 +5,7 @@
     var id = Guid.NewGuid();
 }
 
-<li class="list-group-item">
+<li class="list-group-item pl-3 pr-3 pb-3 pt-3">
     <input type="hidden" asp-for="IdOrder" id="IdOrder_@id" name="IdOrder_@id" />
     <input type="hidden" asp-for="IdSigner" id="IdSigner_@id" name="IdSigner_@id" />
     <input type="hidden" asp-for="IdJudge" id="IdJudge_@id" name="IdJudge_@id" />
@@ -21,20 +21,20 @@
     <input type="hidden" asp-for="EndDeptPeriod" id="EndDeptPeriod_@id" name="EndDeptPeriod_@id"
            value="@(Model.EndDeptPeriod.HasValue ? Model.EndDeptPeriod.Value.ToString("yyyy-MM-dd") : "")" />
     <div class="form-row">
-        <div class="form-group col-6 col-md-3">
-            <label>Дата создания</label>
+        <div class="form-group col-6 col-md-3 mb-0 mb-md-2">
+            <label class="mb-1">Дата создания</label>
             <input type="date" class="form-control" disabled asp-for="CreateDate"
                    value="@(Model.CreateDate.HasValue ? Model.CreateDate.Value.ToString("yyyy-MM-dd") : "")"
                    id="CreateDate_@id" name="CreateDate_@id" title="Дата создания">
         </div>
-        <div class="form-group col-6 col-md-3">
-            <label class="rr-claim-label">Дата формирования</label>
+        <div class="form-group col-6 col-md-3 mb-0 mb-md-2">
+            <label class="rr-claim-label mb-1">Дата формирования</label>
             <input type="date" class="form-control" disabled asp-for="OrderDate"
                    value="@(Model.OrderDate.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : Model.OrderDate.ToString("yyyy-MM-dd"))"
                    id="OrderDate_@id" name="OrderDate_@id" title="Дата формирования">
         </div>
-        <div class="form-group col-9 col-md-4">
-            <label>Исполнитель</label>
+        <div class="form-group col-9 col-md-4 mb-0">
+            <label class="mb-1">Исполнитель</label>
             <select class="selectpicker form-control" disabled asp-for="IdExecutor"
                     asp-items="@(new SelectList(ViewBag.Executors, "IdExecutor", "ExecutorName"))" id="IdExecutor_@id" name="IdExecutor_@id" title="Исполнитель">
                 <option></option>

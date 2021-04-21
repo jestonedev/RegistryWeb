@@ -6,7 +6,7 @@
     $("#IdStreet").on('change', function () {
         var idStreet = $(this).val();
         if (idStreet === "") return;
-        $.getJSON('/Premises/GetHouse/?' + "streetId=" + idStreet, function (data) {
+        $.getJSON('/Address/GetBuilding/?' + "streetId=" + idStreet, function (data) {
             var options = "<option></option>";
             $(data).each(function (idx, elem) {
                 options += "<option value=" + elem.idBuilding + ">" + elem.house + "</option>";

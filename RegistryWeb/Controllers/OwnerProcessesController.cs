@@ -28,8 +28,6 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
-            ViewBag.KladrStreets = dataService.KladrStreets();
-            ViewBag.OwnerTypes = dataService.OwnerTypes();
             ViewBag.SecurityService = securityService;
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
