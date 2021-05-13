@@ -65,14 +65,16 @@ namespace RegistryWeb.DataServices
         {
             return registryContext.Claims
                 .Include(c => c.ClaimStates)
-                .Include(c => c.IdAccountNavigation);
+                .Include(c => c.IdAccountNavigation)
+                .Include(c => c.IdAccountAdditionalNavigation);
         }
 
         private IQueryable<Claim> GetQueryIncludes(IQueryable<Claim> query)
         {
             return query
                 .Include(c => c.ClaimStates)
-                .Include(c => c.IdAccountNavigation);
+                .Include(c => c.IdAccountNavigation)
+                .Include(c => c.IdAccountAdditionalNavigation);
         }
 
         private IQueryable<Claim> GetQueryFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
@@ -129,6 +131,7 @@ namespace RegistryWeb.DataServices
             }
 
             claim.IdAccountNavigation = null;
+            claim.IdAccountAdditionalNavigation = null;
             claim = FillClaimAmount(claim);
             registryContext.Claims.Add(claim);
             registryContext.SaveChanges();
@@ -221,6 +224,7 @@ namespace RegistryWeb.DataServices
         internal void Edit(Claim claim)
         {
             claim.IdAccountNavigation = null;
+            claim.IdAccountAdditionalNavigation = null;
             claim = FillClaimAmount(claim);
             registryContext.Claims.Update(claim);
             registryContext.SaveChanges();
@@ -466,7 +470,7 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IdAccount != null)
             {
                 var ids = GetAccountIdsWithSameAddress(filterOptions.IdAccount.Value);
-                query = query.Where(p => ids.Contains(p.IdAccount));
+                query = query.Where(p => ids.Contains(p.IdAccount) || p.IdAccount == filterOptions.IdAccount || p.IdAccountAdditional == filterOptions.IdAccount);
             }
 
             if (filterOptions.AmountTotal != null)
@@ -836,6 +840,7 @@ namespace RegistryWeb.DataServices
         public Claim GetClaim(int idClaim)
         {
             return registryContext.Claims.Include(r => r.IdAccountNavigation)
+                .Include(r => r.IdAccountAdditionalNavigation)
                 .Include(r => r.ClaimStates)
                 .Include(r => r.ClaimPersons)
                 .Include(r => r.ClaimFiles)

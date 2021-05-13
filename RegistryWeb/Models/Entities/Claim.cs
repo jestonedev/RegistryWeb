@@ -16,6 +16,7 @@ namespace RegistryWeb.Models.Entities
 
         public int IdClaim { get; set; }
         public int IdAccount { get; set; }
+        public int? IdAccountAdditional { get; set; }
         public decimal? AmountTenancy { get; set; }
         public decimal? AmountPenalties { get; set; }
         public decimal? AmountDgi { get; set; }
@@ -29,6 +30,7 @@ namespace RegistryWeb.Models.Entities
         public decimal? LastAccountBalanceOutput { get; set; }
         public byte Deleted { get; set; }
         public virtual PaymentAccount IdAccountNavigation { get; set; }
+        public virtual PaymentAccount IdAccountAdditionalNavigation { get; set; }
         public virtual ICollection<ClaimState> ClaimStates { get; set; }
         public virtual ICollection<ClaimPerson> ClaimPersons { get; set; }
         public virtual IList<ClaimFile> ClaimFiles { get; set; }
