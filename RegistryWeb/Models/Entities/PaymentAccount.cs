@@ -24,5 +24,6 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<PaymentAccountPremiseAssoc> PaymentAccountPremisesAssoc { get; set; }
         public virtual IList<PaymentAccountSubPremiseAssoc> PaymentAccountSubPremisesAssoc { get; set; }
         public virtual IList<Claim> Claims { get; set; }
+        public virtual IList<Claim> ClaimsByAdditional { get; set; }
     }
 }

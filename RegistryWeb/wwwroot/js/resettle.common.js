@@ -655,7 +655,7 @@ function getResettleHouses() {
     buildingToSelect.empty();
     buildingToSelect.append("<option></option>");
     buildingToSelect.selectpicker('refresh');
-    $.getJSON('/Address/GetBuildings', { idStreet: idStreet }, function (buildings) {
+    $.getJSON('/Address/GetBuilding', { idStreet: idStreet }, function (buildings) {
         $(buildings).each(function (idx, building) {
             var option = '<option value="' + building.idBuilding + '" data-total-area="' + building.totalArea + '" data-living-area="' + building.livingArea +'">' + building.house + '</option>';
             buildingToSelect.append(option);

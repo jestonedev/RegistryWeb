@@ -222,4 +222,43 @@ $(function () {
             $("input[name='Claim.RegistryAddress']").val("");
         }
     });
+
+    $("#Claim_IdAccountAdditionalNavigation_Account").on("input", function () {
+        $("#Claim_IdAccountAdditional").val("");
+    });
+
+    function selectAdditionalAccount(account) {
+        $("#Claim_IdAccountAdditional").val(account.idAccount);
+        $("#Claim_IdAccountAdditionalNavigation_Account").val(account.value);
+    }
+
+    $("#Claim_IdAccountAdditionalNavigation_Account").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + '/Claims/GetAccounts',
+                dataType: 'json',
+                data: { text: request.term },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        let account = { label: item.account, value: item.account, idAccount: item.idAccount };
+                        if (data.length === 1) {
+                            selectAdditionalAccount(account);
+                        }
+                        return account;
+                    }));
+                }
+            });
+        },
+        select: function (event, ui) {
+            selectAdditionalAccount(ui.item);
+        },
+        minLength: 3
+    });
+
+    $("#Claim_IdAccountAdditionalNavigation_Account").on("focusout", function () {
+        if ($('#Claim_IdAccountAdditional').val() === "") {
+            $('#Claim_IdAccountAdditionalNavigation_Account').val("");
+        }
+    });
 });
