@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using System;
@@ -109,6 +110,60 @@ namespace RegistryWeb.ReportServices
         private string AccountIdsToString(List<int> idAccounts)
         {
             return idAccounts.Select(r => r.ToString()).Aggregate((v, acc) => v + "," + acc);
+        }
+
+        internal int InvoiceGenerator(InvoiceGeneratorParam parametrs)
+        {
+            if (parametrs.Emails.Any())
+            {
+                var arguments = new Dictionary<string, object>
+                {
+                    { "id_account", parametrs.IdAcconut },
+                    { "--address", parametrs.Address },
+                    { "--account", parametrs.Account },
+                    { "--tenant", parametrs.Tenant },
+                    { "--on-date", parametrs.OnData.ToString("dd.MM.yyyy")},
+                    { "--balance-input", parametrs.BalanceInput },
+                    { "--charging", parametrs.Charging },
+                    { "--payed", parametrs.Payed },
+                    { "--recalc", parametrs.Recalc },
+                    { "--balance-output", parametrs.BalanceOutput },
+                    { "--total-area", parametrs.TotalArea },
+                    { "--prescribed", parametrs.Prescribed },
+                    { "--email", parametrs.Emails.Aggregate((x, y) => x + "," + y) }
+                };
+                return GenerateInvoice(arguments);
+            }
+            else return -6;
+        }
+
+        internal Dictionary<Dictionary<string, object>, int> InvoicesGenerator(List<InvoiceGeneratorParam> invoices)
+        {
+            var parametrs = new List<Dictionary<string, object>>();
+            foreach (var invoice in invoices)
+            {
+                if (invoice.Emails.Any())
+                {
+                    var arguments = new Dictionary<string, object>
+                    {
+                        { "id_account", invoice.IdAcconut },
+                        { "--address", invoice.Address },
+                        { "--account", invoice.Account },
+                        { "--tenant", invoice.Tenant },
+                        { "--on-date", invoice.OnData.ToString("dd.MM.yyyy")},
+                        { "--balance-input", invoice.BalanceInput },
+                        { "--charging", invoice.Charging },
+                        { "--payed", invoice.Payed },
+                        { "--recalc", invoice.Recalc },
+                        { "--balance-output", invoice.BalanceOutput },
+                        { "--total-area", invoice.TotalArea },
+                        { "--prescribed", invoice.Prescribed },
+                        { "--email", invoice.Emails.Aggregate((x, y) => x + "," + y) }
+                    };
+                    parametrs.Add(arguments);
+                }
+            }
+            return GenerateInvoices(parametrs);
         }
     }
 }

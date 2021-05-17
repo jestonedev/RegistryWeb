@@ -32,6 +32,10 @@
     </div>
 }
 
+    <div class="alert alert-primary text-center rr-errorsinv" style="display:none;">@**@
+        <p class="mb-0 rr-errorsinv-item"></p>
+    </div>
+
 <div class="form-row">
     <div class="form-group col-md-1 col-lg-3">
         <a class="form-control btn btn-primary" asp-controller="PaymentAccounts" asp-action="Index" asp-route-isBack="true">Назад</a>
@@ -46,6 +50,7 @@
             </button>
             <div class="dropdown-menu" aria-labelledby="reportButton">
                 <button class="dropdown-item rr-report-request-to-bsk" @(Model.Payments.Any() ? "" : "disabled") href="#" data-id-account="0">Запрос в БКС</button>
+                <button class="dropdown-item rr-report-rig" @(Model.Payments.Any() ? "" : "disabled") href="#" data-id-account="0">Отправить счёт-извещение</button>
                 <button class="dropdown-item" id="exportBtn" @(Model.Payments.Any() ? "" : "disabled") href="#">Экспорт</button>
             </div>
         </div>

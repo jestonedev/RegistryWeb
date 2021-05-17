@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using RegistryWeb.DataServices;
+using RegistryWeb.Models;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;
@@ -78,6 +80,151 @@ namespace RegistryWeb.Controllers
             catch (Exception ex)
             {
                 return Error(ex.Message);
+            }
+        }
+
+        public JsonResult InvoiceGenerator(int idAccount, DateTime onDate)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return Json(new { ErrorCode = -8 });
+            try
+            {
+                var paymentOnDate = dataService.GetPaymentOnDate(idAccount, onDate);
+                var inv = new LogInvoiceGenerator
+                {
+                    CreateDate = DateTime.Now,
+                    OnDate = onDate
+                };
+
+                if (paymentOnDate.Tenant == null)
+                {
+                    inv.IdAccount = idAccount;
+                    inv.Emails="";
+                    inv.Result_code = -6;
+                    
+                    return Json(new { ErrorCode = -6 });
+                }
+                if (!paymentOnDate.Emails.Any())
+                {
+                    inv.IdAccount = idAccount;
+                    inv.Emails = "";
+                    inv.Result_code = -7;
+                    
+                    return Json(new { ErrorCode = -7 });
+                }
+
+                var code = reportService.InvoiceGenerator(paymentOnDate);
+            
+                inv.IdAccount = paymentOnDate.IdAcconut;
+                inv.Emails = string.Join(", ", paymentOnDate.Emails).ToString();
+                inv.Result_code = code;
+                dataService.AddLIG(inv);
+
+                return Json(new { ErrorCode = code });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { ErrorCode = -9 });
+            }
+        }
+
+        public JsonResult InvoicesGenerator(DateTime onDate)
+        {
+            List<int> ids = GetSessionIds();
+            var jsonResults = new Dictionary<int, IEnumerable<string>>();
+
+            if (!ids.Any())
+                return Json(new { errorCode = -8, jsonResults });
+
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return Json(new { errorCode = -8, jsonResults });
+
+            var invoices = new List<InvoiceGeneratorParam>();
+            try
+            {
+                foreach(int idAccount in ids)                
+                    invoices.Add(dataService.GetPaymentOnDate(idAccount, onDate));
+
+                var nuls = invoices.FindAll(x => x.Tenant==null);
+                var emailfree = invoices.FindAll(x=> x.Tenant!=null && !x.Emails.Any());
+                if (nuls.Any())
+                {
+                    jsonResults.Add(-6, nuls.Select(s=>s.Account).AsEnumerable());
+
+                    foreach(var n in nuls)
+                    {
+                        //код для добавл-я записи в бд
+                        var inv = new LogInvoiceGenerator
+                        {
+                            IdAccount = n.IdAcconut,
+                            CreateDate = DateTime.Now,
+                            OnDate = n.OnData,
+                            Emails = string.Join(", ", n.Emails).ToString(),
+                            Result_code = -6
+                        };
+                        dataService.AddLIG(inv);
+                    }
+                }
+                if (emailfree.Any())
+                {
+                    jsonResults.Add(-7, emailfree.Select(s=>s.Account).AsEnumerable());
+
+                    foreach (var ef in emailfree)
+                    {
+                        //код для добавл-я записи в бд
+                        var inv = new LogInvoiceGenerator
+                        {
+                            IdAccount = ef.IdAcconut,
+                            CreateDate = DateTime.Now,
+                            OnDate = ef.OnData,
+                            Emails = string.Join(", ", ef.Emails).ToString(),
+                            Result_code = -7
+                        };
+                        dataService.AddLIG(inv);
+                    }
+                }
+
+                var listi=invoices.FindAll(x=>x!=null && x.Emails.Any());
+                if (listi.Count() > 0 && listi.Count() <= invoices.Count())
+                {
+                    var result = reportService.InvoicesGenerator(listi);
+
+                    var resultgr = result.GroupBy(t => t.Value)
+                             .ToDictionary(t=>t.Key, t=>t.Select(r=>r.Key).ToList());
+
+                    foreach(var u in resultgr)
+                    {
+                        int i;  var h = "";
+                        foreach(var res in resultgr.Values)
+                        {
+                            for (i = 0; i < res.Count; i++)
+                            {
+                                h += res[i]["--account"];
+                                if (i!=res.Count-1)
+                                    h += ", ";
+
+                                //код для добавл-я записи в бд
+                                var inv = new LogInvoiceGenerator
+                                {
+                                    IdAccount = Convert.ToInt32(res[i]["id_account"]),
+                                    CreateDate = DateTime.Now,
+                                    OnDate = Convert.ToDateTime(res[i]["--on-date"]),
+                                    Emails = res[i]["--email"].ToString(),
+                                    Result_code=u.Key
+                                };
+                                dataService.AddLIG(inv);
+                            }
+                        }
+                        jsonResults.Add(u.Key, h.Split(',').AsEnumerable());
+                    }
+                }
+                return Json(jsonResults);
+            }
+            catch (Exception ex)
+            {
+                jsonResults.Clear();
+                jsonResults.Add(-9, null);
+                return Json(jsonResults);
             }
         }
 
