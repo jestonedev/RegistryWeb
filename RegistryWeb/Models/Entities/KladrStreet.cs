@@ -9,6 +9,7 @@ namespace RegistryWeb.Models.Entities
     {
         public KladrStreet()
         {
+            PrivContracts = new List<PrivContract>();
             Buildings = new List<Building>();
         }
 
@@ -16,6 +17,7 @@ namespace RegistryWeb.Models.Entities
         public string StreetName { get; set; }
         public string StreetLong { get; set; }
 
+        public virtual IList<PrivContract> PrivContracts { get; set; }
         public virtual IList<Building> Buildings { get; set; }
     }
 }

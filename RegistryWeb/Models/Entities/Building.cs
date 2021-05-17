@@ -8,6 +8,7 @@ namespace RegistryWeb.Models.Entities
     {
         public Building()
         {
+            PrivContracts = new List<PrivContract>();
             FundsBuildingsAssoc = new List<FundBuildingAssoc>();
             OwnerBuildingsAssoc = new List<OwnerBuildingAssoc>();
             OwnershipBuildingsAssoc = new List<OwnershipBuildingAssoc>();
@@ -105,6 +106,7 @@ namespace RegistryWeb.Models.Entities
         public virtual FoundationType FoundationTypeNavigation { get; set; }
         public virtual GovernmentDecree GovernmentDecreeNavigation { get; set; }
         public virtual KladrStreet IdStreetNavigation { get; set; }
+        public virtual IList<PrivContract> PrivContracts { get; set; }
         public virtual IList<FundBuildingAssoc> FundsBuildingsAssoc { get; set; }
         public virtual IList<OwnerBuildingAssoc> OwnerBuildingsAssoc { get; set; }
         public virtual IList<OwnershipBuildingAssoc> OwnershipBuildingsAssoc { get; set; }
