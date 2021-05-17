@@ -385,10 +385,12 @@ function showClaimStateDetails(e) {
         icon.removeClass("oi-chevron-bottom");
         icon.addClass("oi-chevron-top");
         claimStateDetails.css("display", "flex");
+        $(this).closest(".list-group-item").addClass("rr-claim-state-active");
     } else {
         icon.addClass("oi-chevron-bottom");
         icon.removeClass("oi-chevron-top");
         claimStateDetails.css("display", "none");
+        $(this).closest(".list-group-item").removeClass("rr-claim-state-active");
     }
     e.preventDefault();
 }

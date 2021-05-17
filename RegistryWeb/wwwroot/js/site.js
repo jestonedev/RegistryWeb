@@ -175,10 +175,10 @@ function resetModalForm(jQElem, isForm = true) {
     form[0].reset();
     var inputs = form.find("input");
     inputs.val(null);
-    var selectpickers = form.find(".selectpicker");
-    selectpickers.val(null);
-    selectpickers.selectpicker("deselectAll");
-    selectpickers.selectpicker("refresh");
+    var selects = form.find("select");
+    selects.val(null);
+    selects.selectpicker("deselectAll");
+    selects.selectpicker("refresh");
 }
 
 //Функция вычисления количества элементов для компонентов

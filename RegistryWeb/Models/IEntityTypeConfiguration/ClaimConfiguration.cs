@@ -27,6 +27,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_account")
                 .HasColumnType("int(11)");
 
+            builder.Property(e => e.IdAccountAdditional)
+                 .HasColumnName("id_account_additional")
+                 .HasColumnType("int(11)");
+
             builder.Property(e => e.AmountTenancy)
                 .HasColumnName("amount_tenancy")
                 .HasColumnType("decimal");
@@ -82,6 +86,12 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasForeignKey(d => d.IdAccount)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_claims_payments_accounts_id_account");
+
+            builder.HasOne(e => e.IdAccountAdditionalNavigation)
+                .WithMany(e => e.ClaimsByAdditional)
+                .HasForeignKey(d => d.IdAccountAdditional)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_claims_id_account_additional");
 
             builder.HasQueryFilter(e => e.Deleted == 0);
         }

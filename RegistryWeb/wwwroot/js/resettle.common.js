@@ -655,7 +655,7 @@ function getResettleHouses() {
     buildingToSelect.empty();
     buildingToSelect.append("<option></option>");
     buildingToSelect.selectpicker('refresh');
-    $.getJSON('/Resettles/GetHouses', { idStreet: idStreet }, function (buildings) {
+    $.getJSON('/Address/GetBuilding', { idStreet: idStreet }, function (buildings) {
         $(buildings).each(function (idx, building) {
             var option = '<option value="' + building.idBuilding + '" data-total-area="' + building.totalArea + '" data-living-area="' + building.livingArea +'">' + building.house + '</option>';
             buildingToSelect.append(option);
@@ -688,7 +688,7 @@ function getResettlePremises() {
     premiseToSelect.empty();
     premiseToSelect.append("<option></option>");
     premiseToSelect.selectpicker('refresh');
-    $.getJSON('/Resettles/GetPremises', { idBuilding: idBuilding }, function (premises) {
+    $.getJSON('/Address/GetPremises', { idBuilding: idBuilding }, function (premises) {
         $(premises).each(function (idx, premise) {
             var option = '<option value="' + premise.idPremises + '" data-total-area="' + premise.totalArea + '" data-living-area="' + premise.livingArea +'">' + premise.premisesNum + '</option>';
             premiseToSelect.append(option);
@@ -727,7 +727,7 @@ function getResettleSubPremises() {
     var subPremisePrevIds = resettleElem.find('input[name="ResettleToSubPremises' + postfix +'Prev"]').map(function (idx, elem) { return $(elem).val() }).toArray();
     subPremiseToSelect.empty();
     subPremiseToSelect.selectpicker('refresh');
-    $.getJSON('/Resettles/GetSubPremises', { idPremise: idPremise }, function (subPremises) {
+    $.getJSON('/Address/GetSubPremises', { idPremise: idPremise }, function (subPremises) {
         $(subPremises).each(function (idx, subPremise) {
             var option = '<option value="' + subPremise.idSubPremises + '" data-total-area="' + subPremise.totalArea + '" data-living-area="' + subPremise.livingArea +'">' + subPremise.subPremisesNum + '</option>';
             subPremiseToSelect.append(option);

@@ -22,6 +22,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public string TenantSnp { get; set; }
         public string TenancyParticipantSnp { get; set; }
         public List<int> IdsRentType { get; set; }
+        public string IdRegion { get; set; }
         public string IdStreet { get; set; }
         public string House { get; set; }
         public string PremisesNum { get; set; }
@@ -45,7 +46,7 @@ namespace RegistryWeb.ViewOptions.Filter
                 (IdsReasonType == null || IdsReasonType.Count == 0) &&
                 TenantSnp == null && TenancyParticipantSnp == null &&
                 (IdsRentType == null || IdsRentType.Count == 0) &&
-                IdStreet == null && House == null && PremisesNum == null &&
+                IdRegion == null && IdStreet == null && House == null && PremisesNum == null &&
                 (IdsOwnershipRightType == null || IdsOwnershipRightType.Count == 0) &&
                 (IdsObjectState == null || IdsObjectState.Count == 0) &&
                 (!RegistrationNumIsEmpty) && IdPreset == null;

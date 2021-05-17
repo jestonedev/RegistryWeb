@@ -8,7 +8,7 @@ namespace RegistryWeb.ViewOptions.Filter
     public class BuildingsFilter : FilterAddressOptions
     {
         public int? IdBuilding { get; set; }
-        //public string Region { get; set; }
+        public string IdRegion { get; set; }
         public string IdStreet { get; set; }
         public int? IdDecree { get; set; }
         public string House { get; set; }
@@ -40,9 +40,9 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool IsModalEmpty()
         {
             return IsOwnershipRightEmpty() && IsRestrictionEmpty() &&
-                (IdBuilding == null || IdBuilding == 0) && (StartupYear == null) &&
+                (IdBuilding == null || IdBuilding == 0) && StartupYear == null &&
                 (IdDecree == null || IdDecree == 0) && CadastralNum == null &&
-                (IdStreet == null) && (House == null) && (Floors == null) && (Entrances == null) &&
+                IdRegion == null && IdStreet == null && House == null && Floors == null && Entrances == null &&
                 (IdsObjectState == null || IdsObjectState.Count == 0);
         }
 

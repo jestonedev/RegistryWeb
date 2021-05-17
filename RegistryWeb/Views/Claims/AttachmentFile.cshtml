@@ -11,11 +11,11 @@
     }
 }
 
-<li class="list-group-item">
+<li class="list-group-item pl-3 pr-3 pb-3 pt-3">
     <input type="hidden" value="@Model.IdFile" name="IdFile_@id" />
     <div class="form-row">
-        <div class="form-group @descriptionClass">
-            <label>Наименование и образ документа</label>
+        <div class="form-group mb-0 @descriptionClass">
+            <label class="mb-1">Наименование и образ документа</label>
             <div class="input-group">
                 <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="ClaimFileDescription_@id" title="Наименование">
                 <input type="file" name="ClaimFile_@id" style="position: absolute; left: -9999px; width: 1px; height: 1px" />

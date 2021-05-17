@@ -8,10 +8,12 @@ namespace RegistryWeb.DataServices
         where F: FilterOptions, new()
     {
         protected readonly RegistryContext registryContext;
+        protected readonly AddressesDataService addressesDataService;
 
-        public ListDataService(RegistryContext registryContext)
+        public ListDataService(RegistryContext registryContext, AddressesDataService addressesDataService)
         {
             this.registryContext = registryContext;
+            this.addressesDataService = addressesDataService;
         }
 
         public virtual IVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, F filterOptions)

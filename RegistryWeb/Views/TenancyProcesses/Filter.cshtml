@@ -191,17 +191,23 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-12 col-lg-6">
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label asp-for="FilterOptions.IdRegion">Район</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Район" asp-for="FilterOptions.IdRegion" asp-items="@(new SelectList(Model.Regions, "id_region", "region"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
                             <label asp-for="FilterOptions.IdStreet">Улица</label>
                             <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@(new SelectList(Model.Streets, "IdStreet", "StreetName"))">
                                 <option selected></option>
                             </select>
                         </div>
-                        <div class="form-group col-md-6 col-lg-3">
+                        <div class="form-group col-md-6 col-lg-2">
                             <label asp-for="FilterOptions.House">Номер дома</label>
                             <input type="text" class="form-control input-filter-house" asp-for="FilterOptions.House" title="Номер дома">
                         </div>
-                        <div class="form-group col-md-6 col-lg-3">
+                        <div class="form-group col-md-6 col-lg-2">
                             <label asp-for="FilterOptions.PremisesNum">Номер помещения</label>
                             <input type="text" class="form-control input-filter-premise-num" asp-for="FilterOptions.PremisesNum" title="Номер помещения">
                         </div>

@@ -1,5 +1,6 @@
 ﻿using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
+using RegistryWeb.Models.SqlViews;
 using RegistryWeb.ViewOptions.Filter;
 using System.Collections.Generic;
 
@@ -11,6 +12,7 @@ namespace RegistryWeb.ViewModel
         public Dictionary<int, List<TenancyRentObject>> RentObjects { get; set; }
         public IEnumerable<TenancyReasonType> ReasonTypes { get; set; }
         public IEnumerable<RentType> RentTypes { get; set; }
+        public IEnumerable<KladrRegion> Regions { get; set; }
         public IEnumerable<KladrStreet> Streets { get; set; }
         public IEnumerable<ObjectState> ObjectStates { get; set; }
         public IEnumerable<OwnershipRightType> OwnershipRightTypes { get; set; }

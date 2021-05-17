@@ -22,29 +22,24 @@ namespace RegistryWeb.DataServices
 {
     public class PremisesDataService : ListDataService<PremisesVM<Premise>, PremisesListFilter>
     {
-        private BuildingsDataService buildingsDataService;
-        private readonly AddressesDataService addressesDataService;
         private readonly IConfiguration config;
         private SecurityService securityService;
-        public PremisesDataService(RegistryContext rc, SecurityService securityService, 
-            BuildingsDataService buildingsDataService, AddressesDataService addressesDataService, IConfiguration config) : base(rc)
+        public PremisesDataService(RegistryContext registryContext, SecurityService securityService, 
+            AddressesDataService addressesDataService, IConfiguration config) : base(registryContext, addressesDataService)
         {
             this.securityService = securityService;
-            this.buildingsDataService = buildingsDataService;
-            this.addressesDataService = addressesDataService;
             this.config = config;
         }
 
         public override PremisesVM<Premise> InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, PremisesListFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
-            viewModel.KladrStreetsList = new SelectList(GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
-            viewModel.KladrRegionsList = new SelectList(KladrRegions, "id_region", "region");
-            viewModel.PremisesTypesList = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesType");
+            viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "id_region", "region");
+            viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
             viewModel.HeatingTypesList = new SelectList(HeatingTypes, "IdHeatingType", "IdHeatingType1");
             viewModel.StructureTypesList = new SelectList(StructureTypes, "IdStructureType", "StructureTypeName");
             viewModel.ObjectStatesList = new SelectList(ObjectStates, "IdState", "StateFemale");
-            viewModel.PremisesTypesList = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesTypeName");
+            viewModel.PremisesTypesList = new SelectList(addressesDataService.PremisesTypes, "IdPremisesType", "PremisesTypeName");
             viewModel.FundTypesList = new SelectList(registryContext.FundTypes, "IdFundType", "FundTypeName");
             viewModel.OwnershipRightTypesList = new SelectList(registryContext.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName");
             viewModel.RestrictionsList = new SelectList(registryContext.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName");
@@ -792,7 +787,6 @@ namespace RegistryWeb.DataServices
             return premise;
         }
 
-
         public List<ObjectState> GetObjectStatesWithRights(string action, bool canEditBaseInfo)
         {
             var objectStates = ObjectStates.ToList();
@@ -811,11 +805,11 @@ namespace RegistryWeb.DataServices
             var premisesVM = new PremisesVM<Premise>()
             {
                 Premise = premise,
-                KladrStreetsList = new SelectList(KladrStreets, "IdStreet", "StreetName"),
+                KladrStreetsList = new SelectList(addressesDataService.KladrStreets, "IdStreet", "StreetName"),
                 HeatingTypesList = new SelectList(HeatingTypes, "IdHeatingType", "IdHeatingType1"),
                 StructureTypesList = new SelectList(StructureTypes, "IdStructureType", "StructureTypeName"),
                 ObjectStatesList = new SelectList(objectStates, "IdState", "StateFemale"),
-                PremisesTypesList = new SelectList(registryContext.PremisesTypes, "IdPremisesType", "PremisesTypeName"),
+                PremisesTypesList = new SelectList(addressesDataService.PremisesTypes, "IdPremisesType", "PremisesTypeName"),
                 FundTypesList = new SelectList(registryContext.FundTypes, "IdFundType", "FundTypeName"),
                 LocationKeysList = new SelectList(registryContext.PremisesDoorKeys, "IdPremisesDoorKeys", "LocationOfKeys"),
                 CommentList = new SelectList(registryContext.PremisesComments, "IdPremisesComment", "PremisesCommentText"),
@@ -1036,35 +1030,9 @@ namespace RegistryWeb.DataServices
             get => registryContext.StructureTypes.AsNoTracking();
         }
 
-        public IEnumerable<KladrRegion> KladrRegions
-        {
-            get => registryContext.KladrRegions.AsNoTracking();
-        }
-
-        public IEnumerable<KladrStreet> GetKladrStreets(string idRegion)
-        {
-            if (idRegion == null)
-                return KladrStreets;
-            return registryContext.KladrStreets.Where(s => s.IdStreet.Contains(idRegion)).AsNoTracking();
-        }
-
-        public IEnumerable<KladrStreet> KladrStreets
-        {
-            get => registryContext.KladrStreets.AsNoTracking();
-        }
-
         public IEnumerable<HeatingType> HeatingTypes
         {
             get => registryContext.HeatingTypes.AsNoTracking();
-        }
-
-        public List<Building> GetHouses(string streetId)
-        {
-
-            var house = from bui in registryContext.Buildings
-                        where bui.IdStreet.Contains(streetId)
-                        select bui;
-            return house.ToList();
         }
 
         public void UpdateInfomationInPremises(List<Premise> premises, string description, DateTime? regDate, int? idState)
@@ -1087,7 +1055,5 @@ namespace RegistryWeb.DataServices
             }
             registryContext.SaveChanges();
         }
-
-
     }
 }

@@ -18,20 +18,19 @@ namespace RegistryWeb.DataServices
     public class ClaimsDataService : ListDataService<ClaimsVM, ClaimsFilter>
     {
         private readonly SecurityServices.SecurityService securityService;
-        private readonly AddressesDataService addressesDataService;
         private readonly IConfiguration config;
 
-        public ClaimsDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService, AddressesDataService addressesDataService, IConfiguration config) : base(registryContext)
+        public ClaimsDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService,
+            AddressesDataService addressesDataService, IConfiguration config) : base(registryContext, addressesDataService)
         {
             this.securityService = securityService;
-            this.addressesDataService = addressesDataService;
             this.config = config;
         }
 
         public override ClaimsVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, ClaimsFilter filterOptions)
         {
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
-            viewModel.Streets = registryContext.KladrStreets;
+            viewModel.Streets = addressesDataService.KladrStreets;
             viewModel.StateTypes = registryContext.ClaimStateTypes;
             return viewModel;
         }
@@ -66,14 +65,16 @@ namespace RegistryWeb.DataServices
         {
             return registryContext.Claims
                 .Include(c => c.ClaimStates)
-                .Include(c => c.IdAccountNavigation);
+                .Include(c => c.IdAccountNavigation)
+                .Include(c => c.IdAccountAdditionalNavigation);
         }
 
         private IQueryable<Claim> GetQueryIncludes(IQueryable<Claim> query)
         {
             return query
                 .Include(c => c.ClaimStates)
-                .Include(c => c.IdAccountNavigation);
+                .Include(c => c.IdAccountNavigation)
+                .Include(c => c.IdAccountAdditionalNavigation);
         }
 
         private IQueryable<Claim> GetQueryFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
@@ -130,6 +131,7 @@ namespace RegistryWeb.DataServices
             }
 
             claim.IdAccountNavigation = null;
+            claim.IdAccountAdditionalNavigation = null;
             claim = FillClaimAmount(claim);
             registryContext.Claims.Add(claim);
             registryContext.SaveChanges();
@@ -222,6 +224,7 @@ namespace RegistryWeb.DataServices
         internal void Edit(Claim claim)
         {
             claim.IdAccountNavigation = null;
+            claim.IdAccountAdditionalNavigation = null;
             claim = FillClaimAmount(claim);
             registryContext.Claims.Update(claim);
             registryContext.SaveChanges();
@@ -467,7 +470,7 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IdAccount != null)
             {
                 var ids = GetAccountIdsWithSameAddress(filterOptions.IdAccount.Value);
-                query = query.Where(p => ids.Contains(p.IdAccount));
+                query = query.Where(p => ids.Contains(p.IdAccount) || p.IdAccount == filterOptions.IdAccount || p.IdAccountAdditional == filterOptions.IdAccount);
             }
 
             if (filterOptions.AmountTotal != null)
@@ -837,6 +840,7 @@ namespace RegistryWeb.DataServices
         public Claim GetClaim(int idClaim)
         {
             return registryContext.Claims.Include(r => r.IdAccountNavigation)
+                .Include(r => r.IdAccountAdditionalNavigation)
                 .Include(r => r.ClaimStates)
                 .Include(r => r.ClaimPersons)
                 .Include(r => r.ClaimFiles)
