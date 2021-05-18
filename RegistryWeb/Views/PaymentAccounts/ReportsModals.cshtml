@@ -4,9 +4,10 @@
     SelectList signersList = null;
     if (signers != null)
     {
-        signersList = new SelectList(signers.Select(r => new {
+        signersList = new SelectList(signers.Select(r => new
+        {
             IdSigner = r.IdRecord,
-            Snp = r.Surname + " " + r.Name + (r.Patronymic !=null ? " " + r.Patronymic : "")
+            Snp = r.Surname + " " + r.Name + (r.Patronymic != null ? " " + r.Patronymic : "")
         }), "IdSigner", "Snp");
     }
 }
@@ -121,6 +122,37 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary rr-report-submit">Добавить</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="accountRegInGenForm">
+    <div class="modal fade" id="accountRegInGenModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <input type="hidden" name="Account.IdAccount" />
+                    <h5 class="modal-title">Отправка квитанции</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Account.IdAccount" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="Account.OnDate">Выберете за какой период</label>
+                            <input type="month" class="form-control" title="Период" name="Account.OnDate"
+                                   data-val="true" data-val-required="Укажите период" id="Account_OnDate"/>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Account.OnDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
                 </div>
             </div>

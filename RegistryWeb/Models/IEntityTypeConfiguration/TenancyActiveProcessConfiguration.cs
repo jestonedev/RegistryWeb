@@ -24,6 +24,19 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(17)
                 .IsUnicode(false);
 
+            builder.Property(e => e.IdBuilding)
+                .HasColumnName("id_building")
+                .HasMaxLength(17)
+                .IsUnicode(false);
+            builder.Property(e => e.IdPremises)
+                .HasColumnName("id_premises")
+                .HasMaxLength(17)
+                .IsUnicode(false);
+            builder.Property(e => e.IdSubPremises)
+                .HasColumnName("id_sub_premises")
+                .HasMaxLength(17)
+                .IsUnicode(false);
+
             builder.Property(e => e.Tenants)
                 .HasColumnName("tenants")
                 .IsUnicode(false);

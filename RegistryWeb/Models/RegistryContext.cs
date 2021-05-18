@@ -138,6 +138,7 @@ namespace RegistryWeb.Models
         //Журнал изменений
         public virtual DbSet<ChangeLog> ChangeLogs { get; set; }
         public virtual DbSet<LogObject> LogObjects { get; set; }
+        public virtual DbSet<LogInvoiceGenerator> LogInvoiceGenerator { get; set; }
         public virtual DbSet<LogType> LogTypes { get; set; }
         public virtual DbSet<LogOwnerProcess> LogOwnerProcesses { get; set; }
         public virtual DbSet<LogOwnerProcessValue> LogOwnerProcessesValue { get; set; }
@@ -180,6 +181,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new LogOwnerProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LogOwnerProcessValueConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LogObjectConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new LogInvoiceGeneratorConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LogTypeConfiguration(nameDatebase));
             
             modelBuilder.ApplyConfiguration(new AclPrivilegeConfiguration(nameDatebase));

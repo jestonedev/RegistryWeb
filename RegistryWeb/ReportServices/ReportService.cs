@@ -18,13 +18,15 @@ namespace RegistryWeb.ReportServices
         private readonly string sqlDriver;
         private readonly string connString;
         protected readonly string activityManagerPath;
+        protected readonly string invoiceGeneratorPath;
         private readonly string attachmentsPath;
 
         public ReportService(IConfiguration config, IHttpContextAccessor httpContextAccessor)
         {
             sqlDriver = config.GetValue<string>("SqlDriver");
             connString = httpContextAccessor.HttpContext.User.FindFirst("connString").Value;
-            activityManagerPath = config.GetValue<string>("ActivityManagerPath");    
+            activityManagerPath = config.GetValue<string>("ActivityManagerPath");
+            invoiceGeneratorPath = config.GetValue<string>("RegistryInvoiceGeneratorPath");
             attachmentsPath = config.GetValue<string>("AttachmentsPath");
         }
 
@@ -109,6 +111,16 @@ namespace RegistryWeb.ReportServices
             return argumentsString;
         }
 
+        private static string GetArgumentsForGenerator(Dictionary<string, object> arguments)
+        {
+            var argumentsString = "";
+            foreach (var argument in arguments)
+                argumentsString += string.Format(CultureInfo.InvariantCulture, " {0}=\"{1}\"",
+                    argument.Key,
+                    argument.Value == null ? "" : argument.Value.ToString());
+            return argumentsString;
+        }
+
         public byte[] DownloadFile(string fileName)
         {
             try
@@ -172,6 +184,66 @@ namespace RegistryWeb.ReportServices
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        protected int GenerateInvoice(Dictionary<string, object> arguments)
+        {
+            var logStr = new StringBuilder();
+            //var invoiceGeneratorPath = @"D:\Projects\registryinvoicegenerator\RegistryInvoiceGenerator\RegistryInvoiceGenerator\bin\Debug\netcoreapp2.2\";
+            try
+            {
+                using (var p = new Process())
+                {
+                    p.StartInfo.UseShellExecute = false;
+                    p.StartInfo.CreateNoWindow = true;
+                    p.StartInfo.FileName = "dotnet";
+                    p.StartInfo.WorkingDirectory = invoiceGeneratorPath;
+                    p.StartInfo.Arguments = "\"" + Path.Combine(invoiceGeneratorPath, "RegistryInvoiceGenerator.dll") + "\"" + GetArgumentsForGenerator(arguments);
+
+                    logStr.Append("<dl>\n<dt>Arguments\n<dd>" + p.StartInfo.Arguments + "\n");
+                    p.Start();
+                    p.WaitForExit();
+                    return p.ExitCode;
+                }
+            }
+            catch (Exception ex)
+            {
+                logStr.Append("<dl>\n<dt>Error\n<dd>" + ex.Message + "\n</dl>");
+                throw new Exception(logStr.ToString());
+            }
+        }
+
+        protected Dictionary<Dictionary<string, object>, int> GenerateInvoices(List<Dictionary<string, object>> invoices)
+        {
+            var runnedInvoices = new Dictionary<Dictionary<string, object>, Process>();
+            var runnInvoiceResults = new Dictionary<Dictionary<string, object>, int>();
+            var dic = new Dictionary<int, IEnumerable<string>>();
+            var invoiceGeneratorPath = @"D:\Projects\registryinvoicegenerator\RegistryInvoiceGenerator\RegistryInvoiceGenerator\bin\Debug\netcoreapp2.2\";
+
+            foreach (var invoice in invoices)
+            {
+                var p = new Process();
+                p.StartInfo.FileName = "dotnet";
+                p.StartInfo.WorkingDirectory = invoiceGeneratorPath;
+                p.StartInfo.Arguments = "\"" + Path.Combine(invoiceGeneratorPath, "RegistryInvoiceGenerator.dll") + "\"" + GetArgumentsForGenerator(invoice);                    
+                p.Start();
+
+                runnedInvoices.Add(invoice, p);                
+
+                if (runnedInvoices.Count >= 100 || runnedInvoices.Count==invoices.Count)
+                {
+                    foreach(var runnedInvoice in runnedInvoices)
+                    {
+                        if (!runnedInvoice.Value.HasExited)
+                            runnedInvoice.Value.WaitForExit();
+                        runnInvoiceResults.Add(runnedInvoice.Key, runnedInvoice.Value.ExitCode);
+                        runnedInvoice.Value.Dispose();
+
+                    }
+                    runnedInvoices.Clear();
+                }
+            }
+            return runnInvoiceResults;
         }
     }
 }

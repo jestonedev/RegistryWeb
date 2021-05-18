@@ -113,4 +113,179 @@
 
         form.submit();
     });
+
+
+//______________________________________________
+
+    $("body").on('click', ".rr-report-rig", function (e) {
+        var idAccount = $(this).data("id-account");
+        var modal = $("#accountRegInGenModal");
+        modal.find("[name='Account.IdAccount']").val(idAccount);
+        modal.find("input, textarea, select").prop("disabled", false);
+
+        refreshValidationForm($("#accountRegInGenForm"));
+
+        modal.modal("show");
+        e.preventDefault();
+    });    
+
+    $("#accountRegInGenModal .rr-report-submit").on("click", function (e)
+    {
+        e.preventDefault();
+        var isValid = $(this).closest("#accountRegInGenForm").valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight($(this).closest("#accountRegInGenForm"));
+            return false;
+        }
+
+        var OnDate = $("#accountRegInGenForm").find("[name='Account.OnDate']").val();
+
+        var idAccount = $("#accountRegInGenModal").find("[name='Account.IdAccount']").val();
+        if (idAccount != undefined && idAccount != 0)
+        {
+            var codeError = null;
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + "/PaymentAccountReports/InvoiceGenerator?idAccount=" + idAccount + "&OnDate=" + OnDate,
+                dataType: 'json',
+                data: { errorCode: codeError },
+                success: function (data) {
+                    switch (data.errorCode)
+                    {
+                        case 0: {
+                            alert("Успешное выполнение");
+                            break;
+                        }
+                        case -1: {
+                            alert("Ошибка при сохранении qr - кода");
+                            break;
+                        }
+                        case -2: {
+                            alert("Ошибка сохранения html - файла");
+                            break;
+                        }
+                        case -3: {
+                            alert("Ошибка конвертации html в pdf");
+                            break;
+                        }
+                        case -4: {
+                            alert("Ошибка отправки сообщения");
+                            break;
+                        }
+                        case -5: {
+                            alert("Ошибка удаления временных файлов");
+                            break;
+                        }
+                        case -6: {
+                            alert("По данному ЛС отсутствует платеж на указанную дату");
+                            break;
+                        }
+                        case -7: {
+                            alert("Отсутствует электронная почта для отправки");
+                            break;
+                        }
+                        case -8: {
+                            alert("Недостаточно прав на данную операцию");
+                            break;
+                        }
+                        case -9: {
+                            alert("Требуется отладка для определения ошибки");
+                            break;
+                        }
+                    }
+                }
+            });
+
+        }
+        else
+        {
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + "/PaymentAccountReports/InvoicesGenerator?OnDate=" + OnDate,
+                dataType: 'json',
+                success: function (data)
+                {
+                    console.log(data);
+                    var str = "<ul class='text-left'>";
+                    var mas = []
+                    for (let d in data)
+                    {
+                        if (data[d].length <= 8)
+                            mas = data[d];
+                        else
+                        {
+                            var dd=0;
+                            for (dd=0; dd<8; dd++)                            
+                                mas.push(data[d][dd]);                            
+                        }
+
+                        switch (d) {
+                            case "0": {
+                                str += "<li>Успешная отправка для ЛС: " + mas + ", ...<br>Всего: " + data[d].length + "</li>";
+                                mas.length = 0;
+                                break;
+                            }
+                            case "-1": {
+                                str += "<li>Ошибка при сохранении qr - кода для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
+                                mas.length = 0;
+                                break;
+                            }
+                            case "-2": {
+                                str += "<li>Ошибка сохранения html - файла для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
+                                mas.length = 0;
+                                break;
+                            }
+                            case "-3": {
+                                str += "<li>Ошибка конвертации html в pdf для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
+                                mas.length = 0;
+                                break;
+                            }
+                            case "-4": {
+                                str += "<li>Ошибка отправки сообщения для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
+                                mas.length = 0;
+                                break;
+                            }
+                            case "-5": {
+                                str += "<li>Ошибка удаления временных файлов для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
+                                mas.length = 0;
+                                break;
+                            }
+                            case "-6": {
+                                str += "<li>Отсутствие платежа на указанную дату для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
+                                mas.length = 0;
+                                break;
+                            }
+                            case "-7": {
+                                str += "<li>Отсутствует электронная почта для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
+                                mas.length = 0;
+                                break;
+                            }
+                            case "-8": {
+                                alert("Недостаточно прав на данную операцию");
+                                break;
+                            }
+                            case "-9": {
+                                alert("Требуется отладка для определения ошибки");
+                                break;
+                            }
+                        }
+                    }                
+                    str += "</ul>";
+                    if (str != "<ul class='text-left'>")
+                    {
+                        $(".rr-errorsinv").css("display", "block");
+                        $(".rr-errorsinv-item").html(str);
+                    }
+                    else
+                        $("rr-errorsinv").css("display", "none");
+
+                    $("#accountRegInGenModal").modal("hide");
+                }
+            });
+        }
+    });
+
+
+
+
 });
