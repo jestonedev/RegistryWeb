@@ -129,6 +129,8 @@ namespace RegistryWeb.DataServices
                     ligold.Emails=lig.Emails;
                 if (ligold.Result_code != lig.Result_code)
                     ligold.Result_code = lig.Result_code;
+                if (ligold.CreateDate != lig.CreateDate)
+                    ligold.CreateDate = lig.CreateDate;
 
                 registryContext.LogInvoiceGenerator.Update(ligold);
             }
