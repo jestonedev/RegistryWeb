@@ -712,9 +712,9 @@ namespace RegistryWeb.DataServices
                          on tRow.IdProcess equals tpRow.IdProcess
                          where tpRow.ExcludeDate == null &&
                              ((tenantSnp != null && tpRow.IdKinship == 1 &&
-                                 string.Concat(tpRow.Surname, " ", tpRow.Name, " ", tpRow.Patronymic == null ? "": tpRow.Patronymic).ToLowerInvariant().Contains(tenantSnp)) ||
+                                 string.Concat(tpRow.Surname.Trim(), " ", tpRow.Name.Trim(), " ", tpRow.Patronymic == null ? "": tpRow.Patronymic.Trim()).ToLowerInvariant().Contains(tenantSnp)) ||
                              (tenancyParticipantSnp != null &&
-                                 string.Concat(tpRow.Surname, " ", tpRow.Name, " ", tpRow.Patronymic == null ? "" : tpRow.Patronymic).ToLowerInvariant().Contains(tenancyParticipantSnp)))
+                                 string.Concat(tpRow.Surname.Trim(), " ", tpRow.Name.Trim(), " ", tpRow.Patronymic == null ? "" : tpRow.Patronymic.Trim()).ToLowerInvariant().Contains(tenancyParticipantSnp)))
                          select tRow).Distinct();
             }
             if (filterOptions.IdPreset != null)
