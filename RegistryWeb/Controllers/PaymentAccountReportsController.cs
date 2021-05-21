@@ -104,7 +104,7 @@ namespace RegistryWeb.Controllers
                     
                     return Json(new { ErrorCode = -6 });
                 }
-                if (!paymentOnDate.Emails.Any())
+                if (paymentOnDate.Tenant!=null && !paymentOnDate.Emails.Any())
                 {
                     inv.IdAccount = idAccount;
                     inv.Emails = "";
@@ -223,7 +223,7 @@ namespace RegistryWeb.Controllers
             catch (Exception ex)
             {
                 jsonResults.Clear();
-                jsonResults.Add(-9, null);
+                jsonResults.Add(-9, Enumerable.Repeat(ex.Message, 1));
                 return Json(jsonResults);
             }
         }

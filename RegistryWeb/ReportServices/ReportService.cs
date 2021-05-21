@@ -218,7 +218,7 @@ namespace RegistryWeb.ReportServices
             var runnedInvoices = new Dictionary<Dictionary<string, object>, Process>();
             var runnInvoiceResults = new Dictionary<Dictionary<string, object>, int>();
             var dic = new Dictionary<int, IEnumerable<string>>();
-            var invoiceGeneratorPath = @"D:\Projects\registryinvoicegenerator\RegistryInvoiceGenerator\RegistryInvoiceGenerator\bin\Debug\netcoreapp2.2\";
+            //var invoiceGeneratorPath = @"D:\Projects\registryinvoicegenerator\RegistryInvoiceGenerator\RegistryInvoiceGenerator\bin\Debug\netcoreapp2.2\";
 
             foreach (var invoice in invoices)
             {

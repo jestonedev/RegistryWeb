@@ -140,6 +140,7 @@
 
     $("#accountRegInGenModal .rr-report-submit").on("click", function (e)
     {
+        $("#accountRegInGenModal .rr-report-submit").prop("disabled", true);
         e.preventDefault();
         var isValid = $(this).closest("#accountRegInGenForm").valid();
         if (!isValid) {
@@ -166,7 +167,9 @@
                 url: window.location.origin + "/PaymentAccountReports/InvoiceGenerator?idAccount=" + idAccount + "&OnDate=" + OnDate,
                 dataType: 'json',
                 data: { errorCode: codeError },
-                success: function (data) {
+                success: function (data)
+                {
+                    $("#accountRegInGenModal .rr-report-submit").prop("disabled", false);
                     switch (data.errorCode)
                     {
                         case 0: {
@@ -212,7 +215,6 @@
                     }
                 }
             });
-
         }
         else
         {
@@ -222,7 +224,8 @@
                 dataType: 'json',
                 success: function (data)
                 {
-                    console.log(data);
+                    $("#accountRegInGenModal .rr-report-submit").prop("disabled", false);
+                    //console.log(data);
                     var str = "<ul class='text-left'>";
                     var mas = []
                     for (let d in data)
@@ -286,7 +289,8 @@
                                 break;
                             }
                         }
-                    }                
+                    }
+
                     str += "</ul>";
                     if (str != "<ul class='text-left'>")
                     {
