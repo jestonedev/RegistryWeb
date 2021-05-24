@@ -197,7 +197,6 @@ function countBadges(idNameComponentForm, flag) {
 $(function () {
     var timeout = undefined;
 
-
     $(".btn-group .dropdown-toggle, .btn-group .dropdown-menu").hover(function () {
         if (timeout !== undefined) {
             clearTimeout(timeout);
@@ -218,6 +217,10 @@ $(function () {
         }, 200);
     });
     
+
+    $(".modal").on("show.bs.modal", function () {
+        $(this).find('select').selectpicker('refresh');
+    });
 
     $(".modal").on("hide.bs.modal", function () {
         $(this).find(".input-validation-error").removeClass("input-validation-error").addClass("valid");
