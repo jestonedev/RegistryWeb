@@ -160,8 +160,7 @@
                 <div class="form-group col-6 col-xl-3 mb-2">
                     <label class="mb-1" asp-for="Claim.IdAccountAdditional">Лицевой счет (доп.)</label>
                     <input type="hidden" asp-for="Claim.IdAccountAdditional" />
-                    <input type="text" data-val="true" data-val-required="Выберите лицевой счет" class="form-control" asp-for="Claim.IdAccountAdditionalNavigation.Account" title="Номер лицевого счета БКС">
-                    <span asp-validation-for="Claim.IdAccountAdditionalNavigation.Account" class="text-danger"></span>
+                    <input type="text" class="form-control" asp-for="Claim.IdAccountAdditionalNavigation.Account" title="Номер лицевого счета БКС">
                 </div>
                 <div class="form-group col-12 col-md-4 col-xl-2 mb-2">
                     <label class="mb-1" asp-for="Claim.AtDate">Дата фомирования</label>

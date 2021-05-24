@@ -128,6 +128,15 @@
         modal.modal("show");
         e.preventDefault();
     });    
+        
+    if (navigator.userAgent.indexOf('YaBrowser') == -1) {
+        $("#dontforFirefox").css("display", "none");
+        $("#forFirefox").css("display", "block");
+    }
+    else {
+        $("#forFirefox").css("display", "none");
+        $("#dontforFirefox").css("display", "block");
+    }
 
     $("#accountRegInGenModal .rr-report-submit").on("click", function (e)
     {
@@ -138,7 +147,15 @@
             return false;
         }
 
-        var OnDate = $("#accountRegInGenForm").find("[name='Account.OnDate']").val();
+        var OnDate = null;
+        if (navigator.userAgent.indexOf('YaBrowser') == -1)
+            OnDate = $("#accountRegInGenForm").find("[name='Account.OnDate_Year']").val() + "-" + $("#accountRegInGenForm").find("[name='Account.OnDate_Month']").val();
+        else
+            OnDate = $("#accountRegInGenForm").find("[name='Account.OnDate']").val();
+        
+
+        if (OnDate==null)
+            onDate = new Date().getFullYear()+"-"+new Date().getMonth()
 
         var idAccount = $("#accountRegInGenModal").find("[name='Account.IdAccount']").val();
         if (idAccount != undefined && idAccount != 0)
@@ -284,7 +301,6 @@
             });
         }
     });
-
 
 
 
