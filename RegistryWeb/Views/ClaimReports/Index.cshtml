@@ -38,18 +38,25 @@
                 <div class="media-body pl-2 pr-2">Статистика по разделенным лицевым счетам</div>
             </div>
         </div>
-        <div class="col-12 col-md-6 offset-lg-2 col-lg-4 mb-3 rr-claim-common-modal-report" title="Подготовленные судебные приказы" 
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-claim-common-modal-report" title="Подготовленные судебные приказы" 
              data-action="ClaimCourtReport">
             <div class="media cardreport align-items-center p-2">
                 <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
                 <div class="media-body pl-2 pr-2">Подготовленные судебные приказы</div>
             </div>
         </div>
-        <div class="col-12 offset-md-3 col-md-6 offset-lg-0 col-lg-4 mb-3 rr-claim-common-modal-report" title="Отчет по тарифам аварийных помещений"
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-claim-common-modal-report" title="Отчет по тарифам аварийных помещений"
              data-action="ClaimEmergencyTariffReport">
             <div class="media cardreport align-items-center p-2">
                 <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
                 <div class="media-body pl-2 pr-2">Отчет по тарифам аварийных помещений</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-claim-common-modal-report" title="Отчет по факту рассылки квитанций"
+             data-action="ClaimFactMailing">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Отчет по факту рассылки квитанций</div>
             </div>
         </div>
     </div>
@@ -117,6 +124,15 @@
                                 <input type="checkbox" class="form-check-input" name="IsCurrentState">
                                 <label class="form-check-label" for="IsCurrentState" title="Текущее состояние">Текущее состояние</label>
                             </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <select name="Flag" class="form-control selectpicker" data-title="Выберите критерий рассылки">
+                                <option value="0">Все</option>
+                                <option value="1">Успешно отправленные</option>
+                                <option value="2">Ошибки отправки</option>
+                            </select>
                         </div>
                     </div>
                 </div>

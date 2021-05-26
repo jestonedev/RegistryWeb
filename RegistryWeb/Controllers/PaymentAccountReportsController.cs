@@ -101,7 +101,8 @@ namespace RegistryWeb.Controllers
                     inv.IdAccount = idAccount;
                     inv.Emails="";
                     inv.Result_code = -6;
-                    
+                    dataService.AddLIG(inv);
+
                     return Json(new { ErrorCode = -6 });
                 }
                 if (paymentOnDate.Tenant!=null && !paymentOnDate.Emails.Any())
@@ -109,7 +110,8 @@ namespace RegistryWeb.Controllers
                     inv.IdAccount = idAccount;
                     inv.Emails = "";
                     inv.Result_code = -7;
-                    
+                    dataService.AddLIG(inv);
+
                     return Json(new { ErrorCode = -7 });
                 }
 

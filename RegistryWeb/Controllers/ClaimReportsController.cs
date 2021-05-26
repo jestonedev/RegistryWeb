@@ -252,5 +252,21 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
+
+        public IActionResult GetClaimFactMailing(int flag, DateTime startDate, DateTime endDate)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.ClaimFactMailingReport(flag, startDate, endDate);
+                return File(file, xlsxMime, "Отчет по факту рассылки.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
     }
 }

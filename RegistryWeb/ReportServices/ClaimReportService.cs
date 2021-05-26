@@ -157,5 +157,39 @@ namespace RegistryWeb.ReportServices
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
+
+        internal byte[] ClaimFactMailingReport(int flag, DateTime startDate, DateTime endDate)
+        {
+            var resultcodes = new List<int>(){-9,-8,-7,-6,-5,-4,-3,-2,-1,0};
+            switch (flag)
+            {
+                case 1:
+                    resultcodes = resultcodes.Where(r=>r==0).ToList();
+                    break;
+                case 2:
+                    resultcodes = resultcodes.Where(r =>r!= 0).ToList();
+                    break;
+            }
+
+            endDate = endDate != null ? endDate : DateTime.Now;
+
+            var fileName = Path.GetTempFileName();
+            using (var sw = new StreamWriter(fileName))
+                sw.Write(ResultCodesIdsToString(resultcodes));
+
+            var arguments = new Dictionary<string, object> {
+                { "filterTmpFile", fileName },
+                { "date_from", startDate.ToString("yyyy-MM-dd") },
+                { "date_to", endDate.ToString("yyyy-MM-dd") }
+            };
+            //var fileName = "registry\\claims\\claim_fact_mailing";
+            var fileNameReport = GenerateReport(arguments, "registry\\claims\\claim_fact_mailing");
+            return DownloadFile(fileNameReport);
+        }
+
+        private string ResultCodesIdsToString(List<int> resultcodes)
+        {
+            return resultcodes.Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
+        }
     }
 }

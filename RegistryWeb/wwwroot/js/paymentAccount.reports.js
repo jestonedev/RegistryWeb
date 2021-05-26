@@ -141,6 +141,8 @@
     $("#accountRegInGenModal .rr-report-submit").on("click", function (e)
     {
         $("#accountRegInGenModal .rr-report-submit").prop("disabled", true);
+        $("#gifforrig").css("display", "block");
+
         e.preventDefault();
         var isValid = $(this).closest("#accountRegInGenForm").valid();
         if (!isValid) {
@@ -170,6 +172,7 @@
                 success: function (data)
                 {
                     $("#accountRegInGenModal .rr-report-submit").prop("disabled", false);
+                    $("#gifforrig").css("display", "none");
                     switch (data.errorCode)
                     {
                         case 0: {
@@ -225,6 +228,7 @@
                 success: function (data)
                 {
                     $("#accountRegInGenModal .rr-report-submit").prop("disabled", false);
+                    $("#gifforrig").css("display", "none");
                     //console.log(data);
                     var str = "<ul class='text-left'>";
                     var mas = []
