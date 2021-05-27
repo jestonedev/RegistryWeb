@@ -173,6 +173,7 @@
                 {
                     $("#accountRegInGenModal .rr-report-submit").prop("disabled", false);
                     $("#gifforrig").css("display", "none");
+                    $("#accountRegInGenModal").modal("hide");
                     switch (data.errorCode)
                     {
                         case 0: {

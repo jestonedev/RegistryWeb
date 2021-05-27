@@ -261,7 +261,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ClaimFactMailingReport(flag, startDate, endDate);
-                return File(file, xlsxMime, "Отчет по факту рассылки.xlsx");
+                return File(file, odsMime, "Отчет по факту рассылки.ods");
             }
             catch (Exception ex)
             {
