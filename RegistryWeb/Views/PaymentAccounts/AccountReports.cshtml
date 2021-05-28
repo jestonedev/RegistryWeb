@@ -50,7 +50,6 @@
             </button>
             <div class="dropdown-menu" aria-labelledby="reportButton">
                 <button class="dropdown-item rr-report-request-to-bsk" @(Model.Payments.Any() ? "" : "disabled") href="#" data-id-account="0">Запрос в БКС</button>
-                <button class="dropdown-item rr-report-rig" @(Model.Payments.Any() ? "" : "disabled") href="#" data-id-account="0">Отправить счёт-извещение</button>
                 <button class="dropdown-item" id="exportBtn" @(Model.Payments.Any() ? "" : "disabled") href="#">Экспорт</button>
             </div>
         </div>
@@ -62,6 +61,7 @@
             </button>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="operationsButton">
                 <button class="dropdown-item" @(canEdit && Model.Payments.Any() ? "" : "disabled") href="#" id="addClaim">Создать претензионно-исковую работу</button>
+                <button class="dropdown-item rr-report-rig" @(Model.Payments.Any() ? "" : "disabled") href="#" data-id-account="0">Отправить счёт-извещение</button>
             </div>
         </div>
     </div>
