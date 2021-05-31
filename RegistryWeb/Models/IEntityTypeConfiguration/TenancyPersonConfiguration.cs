@@ -103,6 +103,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
+            builder.Property(e => e.Comment)
+                .HasColumnName("comment")
+                .HasMaxLength(512)
+                .IsUnicode(false);
+
             builder.Property(e => e.RegistrationDate)
                 .HasColumnName("registration_date")
                 .HasColumnType("date");

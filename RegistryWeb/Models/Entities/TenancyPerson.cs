@@ -31,6 +31,7 @@ namespace RegistryWeb.Models.Entities
         public string ResidenceRoom { get; set; }
         public string PersonalAccount { get; set; }
         public string Email { get; set; }
+        public string Comment { get; set; }
         public DateTime? IncludeDate { get; set; }
         public DateTime? ExcludeDate { get; set; }
         public byte Deleted { get; set; }
