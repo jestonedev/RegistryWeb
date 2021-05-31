@@ -151,21 +151,38 @@
         modal.find("input[name='ActionUrl']").val(action);
         modal.find("input, textarea, select").prop("disabled", false);
 
+        var standartWrapper = modal.find("input[name='StartDate']").closest(".form-row");
         var executorWrapper = modal.find("select[name='Executor']").closest(".form-row");
         var claimStateTypeWrapper = modal.find("select[name='IdStateType']").closest(".form-row");
         var isCurrentStateWrapper = modal.find("input[name='IsCurrentState']").closest(".rr-claim-common-report-checkbox");
 
+        var factMailingWrapper = modal.find("select[name='Flag']").closest(".form-row");
+
+        standartWrapper.hide();
         executorWrapper.hide();
         claimStateTypeWrapper.hide();
         isCurrentStateWrapper.hide();
+        factMailingWrapper.hide();
 
         switch (action) {
             case "ClaimStatesReport":
+                standartWrapper.show();
                 executorWrapper.show();
                 break;
             case "ClaimExecutorsReport":
+                standartWrapper.show();
                 claimStateTypeWrapper.show();
                 isCurrentStateWrapper.show();
+                break;
+            case "ClaimCourtReport":
+                standartWrapper.show();
+                break;
+            case "ClaimEmergencyTariffReport":
+                standartWrapper.show();
+                break;
+            case "ClaimFactMailing":
+                standartWrapper.show();
+                factMailingWrapper.show();
                 break;
         }
 
@@ -197,6 +214,10 @@
                 var idStateType = form.find("select[name='IdStateType']").val();
                 var isCurrentState = form.find("input[name='IsCurrentState']").is(":checked");
                 url += "&idStateType=" + idStateType + "&isCurrentState=" + isCurrentState;
+                break;
+            case "ClaimFactMailing":
+                var flag = form.find("select[name='Flag']").val();
+                url += "&flag=" + flag;
                 break;
         }
 

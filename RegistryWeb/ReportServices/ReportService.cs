@@ -189,7 +189,7 @@ namespace RegistryWeb.ReportServices
         protected int GenerateInvoice(Dictionary<string, object> arguments)
         {
             var logStr = new StringBuilder();
-            //var invoiceGeneratorPath = @"D:\Projects\registryinvoicegenerator\RegistryInvoiceGenerator\RegistryInvoiceGenerator\bin\Debug\netcoreapp2.2\";
+
             try
             {
                 using (var p = new Process())
@@ -218,7 +218,7 @@ namespace RegistryWeb.ReportServices
             var runnedInvoices = new Dictionary<Dictionary<string, object>, Process>();
             var runnInvoiceResults = new Dictionary<Dictionary<string, object>, int>();
             var dic = new Dictionary<int, IEnumerable<string>>();
-            var invoiceGeneratorPath = @"D:\Projects\registryinvoicegenerator\RegistryInvoiceGenerator\RegistryInvoiceGenerator\bin\Debug\netcoreapp2.2\";
+            //var invoiceGeneratorPath = @"D:\Projects\registryinvoicegenerator\RegistryInvoiceGenerator\RegistryInvoiceGenerator\bin\Debug\netcoreapp2.2\";
 
             foreach (var invoice in invoices)
             {
