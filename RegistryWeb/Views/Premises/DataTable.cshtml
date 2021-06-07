@@ -132,11 +132,15 @@
 
             <td class="p-table-low-width-hide-cell">
                 <div class="dopinfo-alt">
-                    Состояние: <span class="text-success"><b>@item.IdStateNavigation?.StateNeutral</b></span><br />
-                    Тип помещения: @item.IdPremisesTypeNavigation?.PremisesTypeName<br />
+                    <span>Состояние: <b class="text-success">@item.IdStateNavigation?.StateNeutral</b></span><br />
+                    <span>Тип помещения: @item.IdPremisesTypeNavigation?.PremisesTypeName</span><br />
                     @if (ObjectStateHelper.IsMunicipal(item.IdState))
                     {
-                        <span>Фонд:</span> @GetTypeFund(item)
+                        <span>Фонд: @GetTypeFund(item)</span><br />
+                    }
+                    @if (item.IdPremisesComment != 1)
+                    {
+                        <span>Примечание: @item.IdPremisesCommentNavigation?.PremisesCommentText</span>
                     }
                 </div>
             </td>
