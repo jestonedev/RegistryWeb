@@ -11,6 +11,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public string Account { get; set; }
         public string AccountGisZkh { get; set; }
         public string Tenant { get; set; }
+        public bool Emails { get; set; }
         public string RawAddress { get; set; }
         public string IdStreet { get; set; }
         public string House { get; set; }
@@ -96,7 +97,7 @@ namespace RegistryWeb.ViewOptions.Filter
                 BalanceInputDgiPadunPkk == null && ChargingTotal == null && ChargingTenancy == null && ChargingPenalties == null &&
                 ChargingDgiPadunPkk == null && RecalcTenancy == null && RecalcPenalties == null && RecalcDgiPadunPkk == null &&
                 TransferBalance == null && PaymentTenancy == null && PaymentPenalties == null && PaymentDgiPadunPkk == null &&
-                BalanceOutputTotal == null && BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null;
+                BalanceOutputTotal == null && BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null && !Emails;
         }
     }
 }
