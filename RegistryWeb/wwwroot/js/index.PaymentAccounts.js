@@ -12,6 +12,7 @@
 var filterClearModal = function () {
     $("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal input[type='hidden'], #filterModal select").val("");
     $('#FilterOptions_IdStreet, #FilterOptions_IdPreset').selectpicker('render');
+    $("#filterModal input[type='checkbox']").prop("checked", false);
     $("form.filterForm").valid();
 };
 var filterClear = function () {
