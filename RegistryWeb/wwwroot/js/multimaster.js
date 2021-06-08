@@ -16,7 +16,12 @@
         });
         var data = {};
         filterOptions.each(function (idx, elem) {
-            data[$(elem).attr("name")] = $(elem).val();
+            if (data[$(elem).attr("name")] === undefined) {
+                if ($(elem).attr("type") === "checkbox")
+                    data[$(elem).attr("name")] = $(elem).prop("checked");
+                else
+                    data[$(elem).attr("name")] = $(elem).val();
+            }
         });
 
         var nameObject = null;
