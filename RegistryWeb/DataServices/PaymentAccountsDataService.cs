@@ -254,6 +254,10 @@ namespace RegistryWeb.DataServices
             {
                 query = query.Where(p => p.Tenant.Contains(filterOptions.Tenant));
             }
+            if (filterOptions.Emails)
+            {
+                query = EmailsFilter(query, filterOptions);
+            }
             if (!string.IsNullOrEmpty(filterOptions.RawAddress))
             {
                 query = query.Where(p => p.PaymentAccountNavigation.RawAddress.Contains(filterOptions.RawAddress));
@@ -808,6 +812,37 @@ namespace RegistryWeb.DataServices
             }
             return query;
         }
+
+        private IQueryable<Payment> EmailsFilter(IQueryable<Payment> query, PaymentsFilter filterOptions)
+        {
+            var anyEmails = registryContext.TenancyPersons
+                .Where(per => per.Email != null)
+                .Select(per => per.IdProcess)
+                .ToList();
+
+            if (anyEmails.Any())
+            {
+                var idPremises = registryContext.TenancyActiveProcesses
+                    .Where(tap => anyEmails.Contains(tap.IdProcess) && tap.IdPremises != null)
+                    .Select(tap => tap.IdPremises);
+
+                var idSubPremises = registryContext.TenancyActiveProcesses
+                    .Where(tap => anyEmails.Contains(tap.IdProcess) && tap.IdSubPremises != null)
+                    .Select(tap => tap.IdSubPremises);
+
+                var idAccounts = registryContext.PaymentAccountPremisesAssoc
+                                .Where(papa => idPremises.Contains(papa.IdPremise))
+                                .Select(p => p.IdAccount )
+                            .Union(registryContext.PaymentAccountSubPremisesAssoc
+                                .Where(papa => idSubPremises.Contains(papa.IdSubPremise))
+                                .Select(p => p.IdAccount))
+                            .ToList();
+
+                query = query.Where(q => idAccounts.Contains(q.IdAccount));
+            }
+            return query;
+        }
+
         private IQueryable<Payment> GetQueryOrder(IQueryable<Payment> query, OrderOptions orderOptions)
         {
             if (string.IsNullOrEmpty(orderOptions.OrderField))
