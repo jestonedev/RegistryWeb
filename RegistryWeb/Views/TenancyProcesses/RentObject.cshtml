@@ -7,7 +7,7 @@
     var idBuilding = "0";
     var idPremises = "0";
     var idSubPremises = "0";
-    var edit = !(ViewBag.Action == "Details" || ViewBag.Action == "Delete");
+    var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
     if (Model.Address.AddressType == AddressTypes.Building)
     {
         idBuilding = Model.Address.Id;
@@ -79,7 +79,7 @@
         </div>
         
 
-        @if (ViewBag.Action == "Edit")
+        @if (ViewBag.Action == "Edit" && canEdit)
         {
             <div class="text-md-right text-center col-md-2 rr-tenancy-rent-objects-edit-buttons d-none d-lg-block">
                 <div class="btn-group yes-no-panel" role="group" style="display: none" aria-label="Панель подтверждения">
@@ -101,7 +101,7 @@
                 </div>
             </div>
         }
-        @if (!edit)
+        @if (!canEdit)
         {
             <div class="text-md-right text-center col-md-3 col-lg-2 rr-tenancy-rent-objects-view-buttons d-none d-lg-block">
                 @if (Model.Address.AddressType == AddressTypes.Building)
@@ -146,7 +146,7 @@
         </div>
     </div>
     <div class="form-row d-block d-lg-none">
-        @if (ViewBag.Action == "Edit")
+        @if (ViewBag.Action == "Edit" && canEdit)
         {
             <div class="text-lg-right text-center col-12 col-lg-2 rr-tenancy-rent-objects-edit-buttons">
                 <div class="btn-group yes-no-panel" role="group" style="display: none" aria-label="Панель подтверждения">
@@ -168,7 +168,7 @@
                 </div>
             </div>
         }
-        @if (!edit)
+        @if (!canEdit)
         {
             <div class="text-lg-right text-center col-12 col-lg-2 rr-tenancy-rent-objects-view-buttons">
                 @if (Model.Address.AddressType == AddressTypes.Building)

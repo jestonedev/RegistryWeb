@@ -3,6 +3,7 @@
 
 @{
     var id = Guid.NewGuid();
+    var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
 }
 
 <li class="list-group-item pl-3 pr-3 pb-3 pt-3">
@@ -19,7 +20,7 @@
             <textarea disabled rows="1" class="form-control tenancy-agreement-content" asp-for="AgreementContent" title="@Model.AgreementContent" name="AgreementContent_@id"  id="AgreementContent_@id"></textarea>
         </div>
 
-        @if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+        @if ((ViewBag.Action == "Edit" && canEdit) || ViewBag.Action == "Create")
         {
             <div class="text-center text-md-right col-12 col-md-2 rr-tenancy-agreement-edit-buttons">
                 <div class="btn-group edit-del-panel" role="group" aria-label="Панель редактирования">
@@ -28,7 +29,7 @@
                 </div>
             </div>
         }
-        @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+        @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete" || (ViewBag.Action == "Edit" && !canEdit))
         {
             <div class="text-center text-md-right col-12 col-md-2 rr-tenancy-agreement-view-buttons">
                 <div class="btn-group" role="group" aria-label="Панель инструментов">

@@ -1,6 +1,11 @@
 ﻿@using RegistryWeb.Models.Entities
 @model IList<TenancyPerson>
 
+@{ 
+    var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
+    var canEditEmailsOnly = ((bool?)ViewBag.CanEditEmailsOnly) ?? true;
+}
+
 <link rel="stylesheet" href="~/css/tenancy.persons.css" />
 <script src="~/js/tenancyProcess.persons.js"></script>
 <form id="TenancyProcessPersonsForm">
@@ -24,7 +29,7 @@
                 <a href="#" data-for="TenancyProcessPersons" class="form-control btn btn-primary tenancy-process-toggler" title="Развернуть панель участников найма жилья" style="font-weight:bold;">∨</a>
             </div>
         </div>
-        <ul class="list-group list-group-flush toggle-hide" id="TenancyProcessPersons" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
+        <ul class="list-group list-group-flush toggle-hide" id="TenancyProcessPersons" data-action="@ViewBag.Action" data-can-edit-all="@canEdit" data-can-edit-emails-only="@canEditEmailsOnly" data-id="@ViewBag.Id">
             <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
                 <i>Участники найма отсутствуют</i>
             </li>
@@ -100,6 +105,7 @@
                         <div class="form-group col-md-6 col-lg-4">
                             <label for="Person_Email">E-mail</label>
                             <input type="email" id="Person_Email" maxlength="255" name="Person.Email" class="form-control" title="Адрес электронной почты">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Person.Email" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-md-12">
                             <label for="Person_Comment">Комментарий</label>
@@ -125,7 +131,7 @@
                         </div>
                         <div class="form-group col-md-6 col-lg-4">
                             <label for="Person_IdDocumentIssuedBy">Кем выдан</label>
-                            @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
+                            @if (ViewBag.Action == "Create" || (ViewBag.Action == "Edit" && canEdit))
                             {
                                 <button id="addDocumentIssudeByBtn" class="btn pt-0 pb-0 pl-1 pr-1 text-success" title="Добавить новый орган, выдающий документы, удостоверяющие личность">
                                     <span class="oi oi-plus"></span>

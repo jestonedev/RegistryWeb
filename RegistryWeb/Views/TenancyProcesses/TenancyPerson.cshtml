@@ -2,6 +2,7 @@
 @model TenancyPerson
 
 @{
+    var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
     var id = Guid.NewGuid();
 }
 
@@ -60,7 +61,7 @@
             <div class="text-right col-3 col-md-2 rr-tenancy-person-edit-buttons">
                 <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
                     <a class="btn btn-primary tenancy-person-edit-btn" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
-                    <a class="btn btn-danger tenancy-person-delete-btn" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
+                    <a class="btn btn-danger tenancy-person-delete-btn @(canEdit ? "" : "disabled")" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x delete"></span></a>
                 </div>
             </div>
         }
