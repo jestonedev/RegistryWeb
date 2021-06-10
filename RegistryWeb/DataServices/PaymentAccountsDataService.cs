@@ -12,6 +12,7 @@ using RegistryWeb.DataHelpers;
 using System.Runtime.CompilerServices;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace RegistryWeb.DataServices
 {
@@ -57,6 +58,8 @@ namespace RegistryWeb.DataServices
             viewModel.Payments = query.ToList();
             viewModel.RentObjects = GetRentObjects(viewModel.Payments);
             viewModel.ClaimsByAddresses = GetClaimsByAddresses(viewModel.Payments);
+            viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "id_region", "region");
+            viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
             return viewModel;
         }
 
