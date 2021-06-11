@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace RegistryWeb.DataServices
 {
@@ -32,6 +33,8 @@ namespace RegistryWeb.DataServices
             var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
             viewModel.Streets = addressesDataService.KladrStreets;
             viewModel.StateTypes = registryContext.ClaimStateTypes;
+            viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "id_region", "region");
+            viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
             return viewModel;
         }
 

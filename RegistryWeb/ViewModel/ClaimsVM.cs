@@ -1,5 +1,7 @@
-﻿using RegistryWeb.Models;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using RegistryWeb.Models;
 using RegistryWeb.Models.Entities;
+using RegistryWeb.Models.SqlViews;
 using RegistryWeb.ViewOptions.Filter;
 using System.Collections.Generic;
 
@@ -12,5 +14,8 @@ namespace RegistryWeb.ViewModel
         public Dictionary<int, Payment> LastPaymentInfo { get; set; }
         public IEnumerable<KladrStreet> Streets { get; set; }
         public IEnumerable<ClaimStateType> StateTypes { get; set; }
+        public IEnumerable<KladrRegion> Regions { get; set; }
+        public SelectList KladrRegionsList { get; set; }
+        public SelectList KladrStreetsList { get; set; }
     }
 }

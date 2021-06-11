@@ -14,6 +14,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public string Crn { get; set; }
         public string RawAddress { get; set; }
         public string IdStreet { get; set; }
+        public string IdRegion { get; set; }
         public string House { get; set; }
         public string PremisesNum { get; set; }
         public int? IdSubPremises { get; set; }
@@ -59,7 +60,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool IsModalEmpty()
         {
             return Account == null && Crn == null && IdClaim == null && RawAddress == null &&
-                IdStreet == null && House == null && PremisesNum == null && IdClaimState == null &&
+                IdRegion == null && IdStreet == null && House == null && PremisesNum == null && IdClaimState == null &&
                 ClaimStateDate == null && AtDate == null && CourtOrderNum == null &&
                  BalanceOutputTotal == null && BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null &&
                  AmountTotal == null && AmountTenancy == null && AmountPenalties == null && AmountDgiPadunPkk == null;
