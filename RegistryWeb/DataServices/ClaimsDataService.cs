@@ -272,6 +272,7 @@ namespace RegistryWeb.DataServices
                 string.IsNullOrEmpty(filterOptions.IdStreet) &&
                 string.IsNullOrEmpty(filterOptions.House) &&
                 string.IsNullOrEmpty(filterOptions.PremisesNum) &&
+                string.IsNullOrEmpty(filterOptions.IdRegion) &&
                 filterOptions.IdBuilding == null &&
                 filterOptions.IdPremises == null &&
                 filterOptions.IdSubPremises == null)
@@ -299,6 +300,18 @@ namespace RegistryWeb.DataServices
                     .Select(opa => opa.IdAccount);
                 var idSubPremiseAccounts = subPremisesAssoc
                     .Where(ospa => streets.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet))
+                    .Select(ospa => ospa.IdAccount);
+                idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
+                filtered = true;
+            }
+            else if (!string.IsNullOrEmpty(filterOptions.IdRegion))
+            {
+                var idPremiseAccounts = premisesAssoc
+                    .Where(opa => opa.PremiseNavigation.IdBuildingNavigation.IdStreet.StartsWith(filterOptions.IdRegion))
+                    .Select(opa => opa.IdAccount);
+                var idSubPremiseAccounts = subPremisesAssoc
+                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation
+                    .IdBuildingNavigation.IdStreet.StartsWith(filterOptions.IdRegion))
                     .Select(ospa => ospa.IdAccount);
                 idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
                 filtered = true;

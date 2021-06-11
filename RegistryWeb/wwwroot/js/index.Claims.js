@@ -10,11 +10,11 @@
 };
 
 var filterClearModal = function () {
-    $("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal input[type='hidden'], #filterModal select").val("");
-    $('#FilterOptions_IdStreet, #FilterOptions_IdClaimState').selectpicker('render');
-    $(".c-arithmetic-op").val(2);
-    filterIdRegionChange();
+    //$("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal input[type='hidden'], #filterModal select").val("");
+    //$('#FilterOptions_IdStreet, #FilterOptions_IdClaimState').selectpicker('render');
+    //$(".c-arithmetic-op").val(2);
     resetModalForm($("form.filterForm"));
+    filterIdRegionChange();
     $("form.filterForm").valid();
 };
 var filterClear = function () {
@@ -126,4 +126,5 @@ $(function () {
         $(elem).val($(elem).val().replace('.', ','));
     });
 
+    filterIdRegionChange();
 });

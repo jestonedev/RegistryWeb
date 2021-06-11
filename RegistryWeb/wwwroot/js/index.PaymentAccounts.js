@@ -13,8 +13,8 @@ var filterClearModal = function () {
     //$("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal input[type='hidden'], #filterModal select").val("");
     //$('#FilterOptions_IdStreet, #FilterOptions_IdPreset').selectpicker('render');
     //$("#filterModal input[type='checkbox']").prop("checked", false);
-    filterIdRegionChange();
     resetModalForm($("form.filterForm"));
+    filterIdRegionChange();
     $("form.filterForm").valid();
 };
 var filterClear = function () {
@@ -142,4 +142,6 @@ $(function () {
         filterIdRegionChange();
         $("form.filterForm").submit();
     });
+
+    filterIdRegionChange();
 });
