@@ -31,12 +31,15 @@ var filterIdRegionChange = function (e) {
         data: { idRegion },
         success: function (data) {
             var select = $('#filterModal #FilterOptions_IdStreet');
+            var value = select.val();
             select.selectpicker('destroy');
             select.find('option[value]').remove();
             $.each(data, function (i, d) {
                 select.append('<option value="' + d.idStreet + '">' + d.streetName + '</option>');
             });
             select.selectpicker();
+            select.val(value); 
+            select.selectpicker('refresh');
         }
     });
 }

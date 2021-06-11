@@ -118,7 +118,7 @@
                         </div>
                         <div class="form-group col-md-6 col-lg-4">
                             <label asp-for="FilterOptions.IdStreet">Улица</label>
-                            <select class="selectpicker form-control" data-size="10" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@(new SelectList(Model.Streets, "IdStreet", "StreetName"))">
+                            <select class="selectpicker form-control" data-size="10" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@Model.KladrStreetsList">
                                 <option selected></option>
                             </select>
                         </div>
