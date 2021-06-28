@@ -33,6 +33,11 @@ $(function () {
             }
             if ($("#Agreement_Type_TenantExclude").is(":checked")) {
                 $("#Agreement_Type_TenantNewIdKinship").prop("disabled", "disabled").selectpicker("refresh");
+                $("#Agreement_Type_TenantDeath").prop("disabled", "disabled");
+            }
+            if ($("#Agreement_Type_TenantDeath").is(":checked")) {
+                $("#Agreement_Type_TenantNewIdKinship").prop("disabled", "disabled").selectpicker("refresh");
+                $("#Agreement_Type_TenantExclude").prop("disabled", "disabled");
             }
             $("#Agreement_Type_TenancyPersonsWithoutTenant option[value]").remove();
             $("#Agreement_Type_TenancyPersons option[value]").remove();
@@ -54,6 +59,7 @@ $(function () {
                     $("#Agreement_Type_Tenant").val(surname + " " + name + (patronymic !== "" ? " " + patronymic : ""));
                     $("#Agreement_Type_Tenant").attr("data-id", idPersonElem.val());
                     $("#Agreement_Type_Tenant").attr("data-guid", idPersonElem.attr("id").split("_")[1]);
+                    $("#Agreement_Type_Tenant").attr("data-birthdate", formatDate($(elem).find("input[id^='DateOfBirth']").val()));
                 } else {
                     $("#Agreement_Type_TenancyPersonsWithoutTenant").append(createPersonOptionByElem($(elem)));
                 }
@@ -1191,6 +1197,7 @@ $(function () {
             CurrentTenantIdPerson: tenantElem.attr("data-id"),
             CurrentTenantGuid: tenantElem.attr("data-guid"),
             CurrentTenant: tenantElem.val(),
+            CurrentTenantBirthDate: tenantElem.data("birthdate"),
             CurrentTenantNewIdKinship: idKinship,
             CurrentTenantNewKinship: kinshipOption.text(),
             NewTenantIdPerson: personOption.data("id"),
@@ -1199,14 +1206,15 @@ $(function () {
             NewTenantName: personOption.data("name"),
             NewTenantPatronymic: personOption.data("patronymic"),
             NewTenantBirthDate: personOption.data("birthdate"),
-            ExcludeCurrentTenant: $("#agreementModal #Agreement_Type_TenantExclude").is(":checked")
+            ExcludeCurrentTenant: $("#agreementModal #Agreement_Type_TenantExclude").is(":checked"),
+            DeathCurrentTenant: $("#agreementModal #Agreement_Type_TenantDeath").is(":checked")
         };
     }
 
     function addChangeTenantInfoToContent(changeTenantInfo) {
         var contentElem = $("#agreementModal #Agreement_AgreementContent");
         var contentLines = [];
-
+        var text = "";
         var agreementDefaultText = getDefaultAgreementText();
         var oldTenant = changeTenantInfo.CurrentTenant;
         if (changeTenantInfo.CurrentTenant !== "") {
@@ -1218,18 +1226,13 @@ $(function () {
                     oldTenant = data.snpAccusative;
                 }
             });
-
+            if (changeTenantInfo.CurrentTenantBirthDate !== "") {
+                oldTenant += ", " + changeTenantInfo.CurrentTenantBirthDate + " г.р.";
+            }
             oldTenant = " «" + oldTenant + "»";
         }
-        agreementDefaultText = agreementDefaultText.replace("договорились:",
-            "в связи c ________________________________________ нанимателя" + oldTenant + ", договорились:");
-        contentLines.push(agreementDefaultText);
-
-        var text = "1) считать стороной по договору - нанимателем - ";
-
         var tenant = changeTenantInfo.NewTenantSurname + " " + changeTenantInfo.NewTenantName +
             (changeTenantInfo.NewTenantPatronymic !== "" ? " " + changeTenantInfo.NewTenantPatronymic : "");
-
         $.ajax({
             type: "GET",
             url: "/TenancyAgreements/GetSnpPartsCase?surname=" + changeTenantInfo.NewTenantSurname + "&name=" + changeTenantInfo.NewTenantName +
@@ -1239,19 +1242,31 @@ $(function () {
                 tenant = data.snpAccusative;
             }
         });
-
         if (changeTenantInfo.NewTenantBirthDate !== "") {
             tenant += ", " + changeTenantInfo.NewTenantBirthDate + " г.р.";
         }
         tenant = "«" + tenant + "»";
-        text += tenant;
-        contentLines.push(text);
+        if (changeTenantInfo.DeathCurrentTenant == true) {
+            contentLines.push(agreementDefaultText);
+            text = "1) исключить из договора нанимателя " + oldTenant + " - по смерти;"
+            contentLines.push(text);
+            text = "2) считать стороной по договору - нанимателем - " + tenant + ";"
+            contentLines.push(text);
+        }
+        else {
+            agreementDefaultText = agreementDefaultText.replace("договорились:",
+                "в связи c ________________________________________ нанимателя" + oldTenant + ", договорились:");
+            text = "1) считать стороной по договору - нанимателем - ";
+            text += tenant;
+            contentLines.push(agreementDefaultText);
+            contentLines.push(text);
+        }
         contentElem.val(contentLines.join("\n"));
     }
 
     function addChangeTenantInfoToModifications(changeTenantInfo) {
         if (changeTenantInfo.CurrentTenantGuid !== "") {
-            if (changeTenantInfo.ExcludeCurrentTenant) {
+            if (changeTenantInfo.ExcludeCurrentTenant || changeTenantInfo.DeathCurrentTenant) {
                 let checkbox = insertAutomateOperationsCheckBox("Исключить нанимателя «" + changeTenantInfo.CurrentTenant + "»");
                 modifications.push({
                     Checkbox: checkbox, Operation: "ExcludePerson", Info: {
@@ -1378,14 +1393,22 @@ $(function () {
         e.preventDefault();
     });
 
-    $("#agreementModal #Agreement_Type_TenantExclude").on("change", function (e) {
+    $("#agreementModal #Agreement_Type_TenantExclude, #agreementModal #Agreement_Type_TenantDeath").on("change", function (e) {
         var tenantNewKinshipElem = $("#Agreement_Type_TenantNewIdKinship");
-        if ($(this).is(":checked")) {
+        if ($(this).is(":checked")) {            
+            if ($(this).attr("id") == "Agreement_Type_TenantExclude") {
+                $("#Agreement_Type_TenantDeath").prop("disabled", "disabled");
+            }
+            else {
+                $("#Agreement_Type_TenantExclude").prop("disabled", "disabled");
+            }
             tenantNewKinshipElem.prop("disabled", "disabled");
             tenantNewKinshipElem.attr("data-val", false);
             clearValidationError(tenantNewKinshipElem);
             clearValidationError(tenantNewKinshipElem.closest(".bootstrap-select").find("button[data-id]"));
         } else {
+            $("#Agreement_Type_TenantExclude").prop("disabled", "");
+            $("#Agreement_Type_TenantDeath").prop("disabled", "");
             tenantNewKinshipElem.prop("disabled", "");
             tenantNewKinshipElem.attr("data-val", true);
         }

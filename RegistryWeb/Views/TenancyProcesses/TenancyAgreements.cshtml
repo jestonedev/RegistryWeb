@@ -84,6 +84,7 @@
                                     <option value="4">Изменить срок по коммерческому найму</option>
                                     <option value="5">Изменить срок по специализированному найму</option>
                                     <option value="6">Сменить нанимателя</option>
+                                    <option value="7">Члены семьи в новой редакции</option>
                                 </select>
                             </div>
                             <div class="col-1 text-right" style="margin-top: 32px">
@@ -200,10 +201,16 @@
                                 </select>
                                 <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenantNewIdKinship" data-valmsg-replace="true"></span>
                             </div>
-                            <div class="col-md-12 rr-agreement-type-field" data-agreement-types="6">
+                            <div class="col-md-6 rr-agreement-type-field" data-agreement-types="6">
                                 <div class="form-group form-check">
                                     <input type="checkbox" class="form-check-input" id="Agreement_Type_TenantExclude">
                                     <label class="form-check-label" for="Agreement_Type_TenantExclude">Исключить текущего нанимателя из найма</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 rr-agreement-type-field" data-agreement-types="6">
+                                <div class="form-group form-check">
+                                    <input type="checkbox" class="form-check-input" id="Agreement_Type_TenantDeath">
+                                    <label class="form-check-label" for="Agreement_Type_TenantDeath">Исключить текущего нанимателя по смерти</label>
                                 </div>
                             </div>
                             <div class="form-group col-md-12 rr-agreement-type-field" data-agreement-types="6">
