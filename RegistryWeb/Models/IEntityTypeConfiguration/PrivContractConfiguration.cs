@@ -166,6 +166,12 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.HasOne(e => e.PremiseNavigation)
                 .WithMany(p => p.PrivContracts)
                 .HasForeignKey(e => e.IdPremise);
+            builder.Property(e => e.IdSubPremise)
+                .HasColumnName("id_sub_premise_")
+                .HasColumnType("int(11)");
+            builder.HasOne(e => e.SubPremiseNavigation)
+                .WithMany(p => p.PrivContracts)
+                .HasForeignKey(e => e.IdSubPremise);
 
             builder.HasQueryFilter(e => !e.Deleted);
         }

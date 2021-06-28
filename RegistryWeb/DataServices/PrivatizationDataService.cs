@@ -40,6 +40,55 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
+        internal Address GetAddressRegistry(PrivContract contract)
+        {
+            if (contract.IdPremise != null)
+            {
+                var premise = registryContext.Premises
+                    .Include(p => p.IdPremisesTypeNavigation)
+                    .Include(p => p.IdBuildingNavigation)
+                        .ThenInclude(b => b.IdStreetNavigation)
+                    .SingleOrDefault(p => p.IdPremises == contract.IdPremise);
+                return new Address
+                {
+                    Id = premise?.IdPremises.ToString(),
+                    AddressType = AddressTypes.Premise,
+                    Text = premise?.GetAddress(),
+                    IdParents = new Dictionary<string, string>
+                    {
+                        {"IdStreet", premise?.IdBuildingNavigation?.IdStreet },
+                        {"IdBuilding", premise?.IdBuilding.ToString() },
+                        {"IdPremise", premise?.IdPremises.ToString() },
+                        {"IdSubPremise", null }
+                    }
+                };
+            }
+            if (contract.IdSubPremise != null)
+            {
+                var subPremise = registryContext.SubPremises
+                    .Include(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdPremisesTypeNavigation)
+                    .Include(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdBuildingNavigation)
+                            .ThenInclude(b => b.IdStreetNavigation)
+                    .SingleOrDefault(sp => sp.IdSubPremises == contract.IdSubPremise);
+                return new Address
+                {
+                    Id = subPremise?.IdSubPremises.ToString(),
+                    AddressType = AddressTypes.SubPremise,
+                    Text = subPremise?.GetAddress(),
+                    IdParents = new Dictionary<string, string>
+                    {
+                        {"IdStreet", subPremise?.IdPremisesNavigation?.IdBuildingNavigation?.IdStreet },
+                        {"IdBuilding", subPremise?.IdPremisesNavigation?.IdBuilding.ToString() },
+                        {"IdPremise", subPremise?.IdPremisesNavigation?.IdPremises.ToString() },
+                        {"IdSubPremise", subPremise?.IdSubPremises.ToString() }
+                    }
+                };
+            }
+            return null;
+        }
+
         private IQueryable<PrivContract> GetQuery()
         {
             return registryContext.PrivContracts.AsNoTracking();
@@ -57,6 +106,8 @@ namespace RegistryWeb.DataServices
             var privContract = registryContext.PrivContracts
                 .Include(pc => pc.ExecutorNavigation)
                 .SingleOrDefault(pc => pc.IdContract == idContract);
+            if (privContract == null)
+                return privContract;
             privContract.PrivContractors = registryContext.PrivContractors
                 .Include(pc => pc.KinshipNavigation)
                 .Where(pc => pc.IdContract == idContract)
@@ -65,10 +116,40 @@ namespace RegistryWeb.DataServices
         }
 
         internal List<Kinship> Kinships { get => registryContext.Kinships.ToList(); }
+        internal List<Executor> Executors { get => registryContext.Executors.ToList(); }
+
 
         public void Create(PrivContract contract)
         {
             registryContext.PrivContracts.Add(contract);
+            registryContext.SaveChanges();
+        }
+        public void Edit(PrivContract contract)
+        {
+            var oldContract = registryContext.PrivContracts
+                .Include(pc => pc.PrivContractors)
+                .AsNoTracking()
+                .SingleOrDefault(pc => pc.IdContract == contract.IdContract);
+            foreach (var oldContractor in oldContract.PrivContractors)
+            {
+                if (!contract.PrivContractors.Select(pc => pc.IdContractor).Contains(oldContractor.IdContractor))
+                {
+                    registryContext.Entry(oldContractor).Property(p => p.Deleted).IsModified = true;
+                    oldContractor.Deleted = true;
+                    contract.PrivContractors.Add(oldContractor);
+                }
+            }
+            registryContext.PrivContracts.Update(contract);
+            registryContext.SaveChanges();
+        }
+        public void Delete(int idContract)
+        {
+            var contract = registryContext.PrivContracts
+                .Include(pc => pc.PrivContractors)
+                .FirstOrDefault(pc => pc.IdContract == idContract);
+            foreach (var contractor in contract.PrivContractors)
+                contractor.Deleted = true;
+            contract.Deleted = true;
             registryContext.SaveChanges();
         }
     }

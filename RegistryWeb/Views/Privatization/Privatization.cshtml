@@ -1,8 +1,10 @@
-﻿@using RegistryWeb.ViewModel;
+﻿@using RegistryWeb.ViewOptions;
+@using RegistryWeb.SecurityServices;
 @model RegistryWeb.Models.Entities.PrivContract;
 @{
-    ViewData["Title"] = Model == null? "Новый договор приватизации":
+    ViewData["Title"] = Model == null ? "Новый договор приватизации" :
         "Договор приватизации №" + Model.RegNumber;
+    var canEdit = ((SecurityService)ViewData["SecurityService"])?.HasPrivilege(Privileges.PrivReadWrite) ?? false;
 }
 @section Styles {
     @*<link rel="stylesheet" href="~/css/owner.processes.css" asp-append-version="true" />*@
@@ -14,10 +16,13 @@
     <script src="~/js/privContract.common.js" asp-append-version="true"></script>
 }
 <div class="card">
-    <div class="card-header d-flex flex-column flex-lg-row">
-        <label class="form-check-label h2 col-sm-12 col-lg-6 col-xl-7 pl-0">@ViewData["Title"]</label>
-        <div class="col-sm-12 col-lg-6 col-xl-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
-            <div class="btn-group" role="group" aria-label="Панель доступа">
+    <div class="card-header d-flex justify-content-between">
+        <label class="form-check-label h2" title="@ViewData["Title"]"
+               style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            @ViewData["Title"]
+        </label>
+        <div>
+            <div class="btn-group" role="group" aria-label="Панель инструментов">
                 @if (@ViewBag.ReturnUrl != null)
                 {
                     <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
@@ -25,6 +30,31 @@
                 else
                 {
                     <a class="form-control btn btn-primary" asp-controller="Privatization" asp-action="Index">Назад</a>
+                }
+                @if (canEdit)
+                {
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        <button class="btn btn-primary dropdown-toggle" type="button" title="Переключить" aria-label="Переключить" id="toolsBtn_@Model.IdContract" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-wrench"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@Model.IdContract">
+                            @if (ViewBag.Action != ActionTypeEnum.Details)
+                            {
+                                <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                                   asp-controller="Privatization" asp-action="Details" asp-route-idContract="@Model.IdContract" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            }
+                            @if (ViewBag.Action != ActionTypeEnum.Edit)
+                            {
+                                <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                                   asp-controller="Privatization" asp-action="Edit" asp-route-idContract="@Model.IdContract" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            }
+                            @if (ViewBag.Action != ActionTypeEnum.Delete)
+                            {
+                                <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                                   asp-controller="Privatization" asp-action="Delete" asp-route-idContract="@Model.IdContract" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            }
+                        </div>
+                    </div>
                 }
                 @if (ViewBag.Action == ActionTypeEnum.Create)
                 {
@@ -47,44 +77,210 @@
     <div class="card-body" id="privatization">
         <form enctype="multipart/form-data" asp-controller="Privatization" asp-action="@ViewBag.Action" id="privatizationForm" data-action="@ViewBag.Action" method="post">
             <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
-            <input type="hidden" asp-for="IdContract"/>
+            <input type="hidden" asp-for="IdContract" />
             <div class="validation text-danger" asp-validation-summary="All"></div>
-            <div class="form-group">
-                <label asp-for="RegNumber">RegNumber</label>
-                <input type="text" asp-for="RegNumber" class="form-control" />
+            <div class="form-row">
+                <div class="form-group col-3">
+                    <label asp-for="RegNumber">Рег. номер</label>
+                    <input type="text" asp-for="RegNumber" class="form-control" title="@Model.RegNumber" />
+                </div>
+                <div class="form-group col-9">
+                    <label >Адрес</label>
+                    <div class="input-group">
+                        <input type="text" value="@ViewBag.AddressRegistry" class="form-control" title="Адрес в ЖФ" readonly />
+                        <div class="input-group-append">
+                            @if (ViewBag.Action == ActionTypeEnum.Create)
+                            {
+                                <button id="addressRegistryChangeBtn" class="btn btn-primary" type="button" title="Редактировать">
+                                    <span class="oi oi-pencil"></span>
+                                </button>
+                            }
+                            @if (ViewBag.Action == ActionTypeEnum.Edit)
+                            {
+                                <button id="addressRegistryChangeBtn" class="btn btn-success" type="button" title="Добавить">
+                                    <span class="oi oi-plus"></span>
+                                </button>
+                            }
+                            @if (Model.IdPremise != null || Model.IdSubPremise != null)
+                            {
+                                <button class="btn btn-success dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="HomesBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="oi oi-home"></span>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="HomesBtn">
+                                    @if (ViewBag.IdBuilding != null)
+                                    {
+                                        <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@ViewBag.IdBuilding">Здание</a>
+                                    }
+                                    @if (ViewBag.IdPremise != null)
+                                    {
+                                        <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@ViewBag.IdPremise">Помещение</a>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group form-check">
-                <input type="checkbox" asp-for="IsRefusenik" class="form-check-input" />
-                <label asp-for="IsRefusenik" class="form-check-label">IsRefusenik</label>
-            </div>
-            <div class="form-group form-check">
-                <input type="checkbox" asp-for="IsRefuse" class="form-check-input" />
-                <label asp-for="IsRefuse" class="form-check-label">IsRefuse</label>
-            </div>
-            <div class="form-group form-check">
-                <input type="checkbox" asp-for="IsRasprivatization" class="form-check-input" />
-                <label asp-for="IsRasprivatization" class="form-check-label">IsRasprivatization</label>
-            </div>
-            <div class="form-group form-check">
-                <input type="checkbox" asp-for="IsRelocation" class="form-check-input" />
-                <label asp-for="IsRelocation" class="form-check-label">IsRelocation</label>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdExecutor">IdExecutor</label>
-                <input type="text" asp-for="IdExecutor" class="form-control" />
-            </div>
-            <div class="form-group">
-                <label>ExecutorName</label>
-                <input type="text" value="@Model?.ExecutorNavigation?.ExecutorName" class="form-control" />
-            </div>
-
-            <div class="row">
+            <div class="form-row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header d-flex justify-content-between">
-                            <h4>Контракторы</h4>
+                            <h4>Информация из "Приватизации"</h4>
                             <div class="btn-group" role="group">
-                                @if (ViewBag.Action == ActionTypeEnum.Edit)
+                                <a href="#" id="privContractInfoToggle" class="form-control btn btn-primary" title="Развернуть информацию">
+                                    <span class="oi oi-chevron-bottom"></span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body" id="privContractInfo">
+                            <div class="form-row">
+                                <div class="form-group col-12">
+                                    <label asp-for="AddressPrivatization">Адрес</label>
+                                    <div class="input-group">
+                                        <input type="text" asp-for="AddressPrivatization" class="form-control" title="Адрес в старой программе" readonly />
+                                        @if (Model.IdPremise != null || Model.IdSubPremise != null)
+                                        {
+                                            <div class="input-group-append">
+                                                <button class="btn btn-success dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="PrivHomesBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <span class="oi oi-home"></span>
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="PrivHomesBtn">
+                                                    @if (ViewBag.IdBuilding != null)
+                                                    {
+                                                        <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@ViewBag.IdBuilding">Здание</a>
+                                                    }
+                                                    @if (ViewBag.IdPremise != null)
+                                                    {
+                                                        <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@ViewBag.IdPremise">Помещение</a>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="form-group col-6 col-lg-3">
+                                    <label asp-for="CadastreNumber">Кадастровый номер</label>
+                                    <input type="text" asp-for="CadastreNumber" class="form-control" readonly />
+                                </div>
+                                <div class="form-group col-6 col-lg-3">
+                                    <label asp-for="Floor">Этаж</label>
+                                    <input type="text" asp-for="Floor" class="form-control" readonly />
+                                </div>
+                                <div class="form-group col-6 col-lg-3">
+                                    <label asp-for="Rooms">Количество комнат</label>
+                                    <input type="text" asp-for="Rooms" class="form-control" readonly />
+                                </div>
+                                <div class="form-group col-6 col-lg-3">
+                                    <label asp-for="CeilingHeight">Высота помещения</label>
+                                    <input type="text" asp-for="CeilingHeight" class="form-control" readonly />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-6 col-lg-3">
+                                    <label asp-for="LivingSpace">Жилая площадь</label>
+                                    <input type="text" asp-for="LivingSpace" class="form-control" readonly />
+                                </div>
+                                <div class="form-group col-6 col-lg-3">
+                                    <label asp-for="LoggiaSpace">Площадь балконов</label>
+                                    <input type="text" asp-for="LoggiaSpace" class="form-control" readonly />
+                                </div>
+                                <div class="form-group col-6 col-lg-3">
+                                    <label asp-for="AncillarySpace">Подсобная площадь</label>
+                                    <input type="text" asp-for="AncillarySpace" class="form-control" readonly />
+                                </div>
+                                <div class="form-group col-6 col-lg-3">
+                                    <label asp-for="TotalSpace">Общая площадь</label>
+                                    <input type="text" asp-for="TotalSpace" class="form-control" readonly />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row ml-3 mb-2">
+                <div class="form-group form-check col-6 col-lg-4 mb-1">
+                    <input type="checkbox" asp-for="IsRefusenik" class="form-check-input" />
+                    <label asp-for="IsRefusenik" class="form-check-label">Отказник</label>
+                </div>
+                <div class="form-group form-check col-6 col-lg-4 mb-1">
+                    <input type="checkbox" asp-for="IsShares" class="form-check-input" />
+                    <label asp-for="IsShares" class="form-check-label">Подселение</label>
+                </div>
+                <div class="form-group form-check col-6 col-lg-4 mb-1">
+                    <input type="checkbox" asp-for="IsRasprivatization" class="form-check-input" />
+                    <label asp-for="IsRasprivatization" class="form-check-label">Расприватизация</label>
+                </div>
+                <div class="form-group form-check col-6 col-lg-4 mb-1">
+                    <input type="checkbox" id="IsHostel" name="IsHostel" class="form-check-input"
+                           @((Model.IsHostel ?? false) ? "checked" : "") />
+                    <label for="IsHostel" class="form-check-label">Общежитие</label>
+                </div>
+                <div class="form-group form-check col-6 col-lg-4 mb-1">
+                    <input type="checkbox" asp-for="IsRelocation" class="form-check-input" />
+                    <label asp-for="IsRelocation" class="form-check-label">Переселение</label>
+                </div>
+                <div class="form-group form-check col-6 col-lg-4 mb-1">
+                    <input type="checkbox" asp-for="IsRefuse" class="form-check-input" />
+                    <label asp-for="IsRefuse" class="form-check-label">Отказ со стороны муниципалитета</label>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label>Договор подготовлен</label>
+                    <select class="selectpicker form-control" asp-for="IdExecutor" title="Договор подготовлен"
+                            asp-items="@{new SelectList(ViewBag.Executors, "IdExecutor", "ExecutorName")}"></select>
+                    @*<input type="text" value="@Model?.ExecutorNavigation?.ExecutorName" class="form-control" />*@
+                </div>
+                <div class="form-group col-6">
+                    <label asp-for="User">Пользователь</label>
+                    <input type="text" asp-for="User" class="form-control" readonly/>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label asp-for="RegisterMfcNumber">Регистрационный МФЦ №</label>
+                    <input type="text" asp-for="RegisterMfcNumber" class="form-control" />
+                </div>
+                <div class="form-group col-6">
+                    <label asp-for="RegistrationDate">Дата регистрации</label>
+                    <input type="date" asp-for="RegistrationDate" class="form-control" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-6 col-lg-3">
+                    <label asp-for="ApplicationDate">Дата подачи заявления</label>
+                    <input type="date" asp-for="ApplicationDate" class="form-control" />
+                </div>
+                <div class="form-group col-6 col-lg-3">
+                    <label asp-for="DateIssue">Дата выдачи</label>
+                    <input type="date" asp-for="DateIssue" class="form-control" />
+                </div>
+                <div class="form-group col-6 col-lg-3">
+                    <label asp-for="InsertDate">Дата ввода данных о договоре</label>
+                    <input type="date" asp-for="InsertDate" class="form-control" />
+                </div>
+                <div class="form-group col-6 col-lg-3">
+                    <label asp-for="DateIssueCivil">Дата выдачи договора гражданам</label>
+                    <input type="date" asp-for="DateIssueCivil" class="form-control" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-12 col-lg-6">
+                    <label asp-for="Description">Основание расприватизации или отказа</label>
+                    <textarea rows="4" class="form-control" asp-for="Description" maxlength="767" title="Основание расприватизации или отказа"></textarea>
+                </div>
+                <div class="form-group col-12 col-lg-6">
+                    <label asp-for="AdditionalInfo">Дополнительные сведения</label>
+                    <textarea rows="4" class="form-control" asp-for="AdditionalInfo" maxlength="65535" title="Дополнительные сведения"></textarea>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <h4>Участники</h4>
+                            <div class="btn-group" role="group">
+                                @if (ViewBag.Action == ActionTypeEnum.Create || ViewBag.Action == ActionTypeEnum.Edit)
                                 {
                                     <a href="#" id="privContractorAdd" class="form-control btn btn-success" title="Добавить контрактора">
                                         <span class="oi oi-plus"></span>
@@ -95,7 +291,7 @@
                                 </a>
                             </div>
                         </div>
-                        <ul class="list-group list-group-flush" id="privContractors" data-action="@ViewBag.Action" data-id="@ViewBag.Id">
+                        <ul class="list-group list-group-flush" id="privContractors">
                             <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.PrivContractors.Any()) ? "display: none" : "")">
                                 <i>Участники найма отсутствуют</i>
                             </li>
@@ -103,11 +299,7 @@
                             {
                                 @for (var i = 0; i < Model.PrivContractors.Count(); i++)
                                 {
-                                    <partial name="PrivContract" model="@(new PrivContractorVM() {
-                                        PrivContractor = Model.PrivContractors[i],
-                                        I = i,
-                                        Action = ViewBag.Action
-                                    })" />
+                                    <partial name="PrivContractor" model="@Model.PrivContractors[i]"/>
                                 }
                             }
                         </ul>
@@ -117,3 +309,5 @@
         </form>
     </div>
 </div>
+
+<partial name="PrivModals">

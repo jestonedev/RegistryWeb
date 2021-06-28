@@ -81,6 +81,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasMaxLength(50)
                 .IsUnicode(false);
 
+            builder.Property(e => e.HasDover)
+                .HasColumnName("has_dover")
+                .HasColumnType("tinyint")
+                .HasDefaultValueSql("0");
+
             builder.Property(e => e.Deleted)
                 .HasColumnName("deleted")
                 .HasColumnType("tinyint")

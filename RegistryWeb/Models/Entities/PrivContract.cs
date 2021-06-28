@@ -52,11 +52,12 @@ namespace RegistryWeb.Models.Entities
         public string IdStreet { get; set; }
         public int? IdBuilding { get; set; }
         public int? IdPremise { get; set; }
-
+        public int? IdSubPremise { get; set; }
 
         public virtual KladrStreet StreetNavigation { get; set; }
         public virtual Building BuildingNavigation { get; set; }
         public virtual Premise PremiseNavigation { get; set; }
+        public virtual SubPremise SubPremiseNavigation { get; set; }
         public virtual Executor ExecutorNavigation { get; set; }
         public virtual IList<PrivContractor> PrivContractors { get; set; }
     }

@@ -7,6 +7,7 @@ namespace RegistryWeb.Models.Entities
     {
         public SubPremise()
         {
+            PrivContracts = new List<PrivContract>();
             FundsSubPremisesAssoc = new List<FundSubPremiseAssoc>();
             OwnerSubPremisesAssoc = new List<OwnerSubPremiseAssoc>();
             TenancySubPremisesAssoc = new List<TenancySubPremiseAssoc>();
@@ -29,6 +30,7 @@ namespace RegistryWeb.Models.Entities
 
         public virtual Premise IdPremisesNavigation { get; set; }
         public virtual ObjectState IdStateNavigation { get; set; }
+        public virtual IList<PrivContract> PrivContracts { get; set; }
         public virtual IList<FundSubPremiseAssoc> FundsSubPremisesAssoc { get; set; }
         public virtual IList<OwnerSubPremiseAssoc> OwnerSubPremisesAssoc { get; set; }
         public IList<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }

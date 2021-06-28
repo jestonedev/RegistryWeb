@@ -14,6 +14,7 @@ namespace RegistryWeb.Models.Entities
         public DateTime? DateBirth { get; set; }
         public string User { get; set; }
         public DateTime InsertDate { get; set; }
+        public bool? HasDover { get; set; }
         public string Description { get; set; }
         public string Passport { get; set; }
         public string Part { get; set; }        

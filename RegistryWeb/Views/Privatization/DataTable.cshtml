@@ -2,8 +2,7 @@
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.SecurityServices;
 @{
-    var securityService = (SecurityService)ViewData["SecurityService"];
-    var canEdit = true;
+    var canEdit = ((SecurityService)ViewData["SecurityService"]).HasPrivilege(Privileges.PrivReadWrite);
 }
 <table class="table table-hover b-table">
     <thead>
@@ -42,17 +41,12 @@
             <td title="@contract.RegNumber">
                 <div style="width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@contract.RegNumber</div>
             </td>
-            <td>
-                <div class="row">
-                    <div class="col-auto">@contract.AddressPrivatization</div>
-                    
-                </div>
-            </td>
+            <td>@contract.AddressPrivatization</td>
             <td>
                 <div class="btn-group float-right" role="group" aria-label="Панель доступа">
                     @if (contract.IdBuilding != null || contract.IdPremise != null)
                     {
-                        <button class="btn btn-success oi oi-home dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="homesBtn_@contract.IdContract" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <button class="btn btn-success oi oi-home dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="homesBtn_@contract.IdContract" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                         <div class="dropdown-menu" aria-labelledby="homesBtn_@contract.IdContract">
                             @if (contract.IdBuilding != null)
                             {

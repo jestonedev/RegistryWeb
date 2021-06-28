@@ -97,11 +97,7 @@ legend.r-scheduler-border {
 
 
 @media(min-width: 992px) {
-    .rr-restriction-edit-buttons, .rr-ownership-right-edit-buttons {
-        margin-top: 28px;
-    }
-
-    .rr-attachment-file-edit-buttons {
+    .rr-restriction-edit-buttons, .rr-ownership-right-edit-buttons, .rr-attachment-file-edit-buttons {
         margin-top: 28px;
     }
 }

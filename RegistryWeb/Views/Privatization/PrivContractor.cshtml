@@ -1,0 +1,55 @@
+﻿@model RegistryWeb.Models.Entities.PrivContractor;
+@{
+    var id = Guid.NewGuid();
+}
+<li class="list-group-item" data-id="@id" @Html.Raw(!Model.IsNoncontractor? "style=\"border-left: 2px solid #ffc107;\" title=\"Контрактор\"" : "title=\"Не контрактор\"")>
+    <input type="hidden" id="IdContractor_@id" name="IdContractor_@id"
+           value="@(Model.IdContractor == 0? id.ToString() : Model.IdContractor.ToString())"/>
+    <input type="hidden" asp-for="IsNoncontractor" id="IsNoncontractor_@id" name="IsNoncontractor_@id" />
+    <input type="hidden" asp-for="IdContract" id="IdContract_@id" name="IdContract_@id" />
+    <input type="hidden" asp-for="Passport" id="Passport_@id" name="Passport_@id" />
+    <input type="hidden" asp-for="Part" id="Part_@id" name="Part_@id" />
+    <input type="hidden" asp-for="HasDover" id="HasDover_@id" name="HasDover_@id" />
+    <input type="hidden" asp-for="Description" id="Description_@id" name="Description_@id" />
+    <input type="hidden" asp-for="User" id="User_@id" name="User_@id" />
+    <input type="hidden" value="@Model.InsertDate.ToString("yyyy-MM-dd")" id="InsertDate_@id" name="InsertDate_@id" />
+    <div class="form-row">
+        <div class="form-group col-4">
+            <label>Фамилия</label>
+            <input type="text" class="form-control" asp-for="Surname" id="Surname_@id" name="Surname_@id" title="Фамилия" readonly />
+        </div>
+        <div class="form-group col-4">
+            <label>Имя</label>
+            <input type="text" class="form-control" asp-for="Name" id="Name_@id" name="Name_@id" title="Имя" readonly/>
+        </div>
+        <div class="form-group col-4">
+            <label>Отчество</label>
+            <input type="text" class="form-control" asp-for="Patronymic" id="Patronymic_@id" name="Patronymic_@id" title="Отчество" readonly/>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-3">
+            <label>Дата рождения</label>
+            <input type="date" class="form-control" id="DateBirth_@id" name="DateBirth_@id" title="Дата рождения" readonly
+                   value="@(Model.DateBirth.HasValue ? Model.DateBirth.Value.ToString("yyyy-MM-dd") : "")" />
+        </div>
+        <div class="form-group col-6">
+            <label>Родственное отношение</label>
+            <select class="selectpicker form-control" asp-for="IdKinship" id="IdKinship_@id" name="IdKinship_@id" title="Родственные отношения"
+                    asp-items="@(new SelectList(ViewBag.Kinships, "IdKinship", "KinshipName"))"></select>
+        </div>
+        <div class="form-group d-flex align-items-end justify-content-end col-3">
+            @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
+            {
+                <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                    <a class="btn btn-primary priv-contract-edit-btn" title="Редактировать" aria-label="Редактировать" href="#"><span class="oi oi-pencil"></span></a>
+                    <a class="btn btn-danger priv-contract-delete-btn" title="Удалить" aria-label="Удалить" href="#"><span class="oi oi-x"></span></a>
+                </div>
+            }
+            @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
+            {
+                <a class="btn btn-primary priv-contract-details-btn" title="Подробнее" aria-label="Подробнее" href="#"><span class="oi oi-eye"></span></a>
+            }
+        </div>
+    </div>
+</li>
