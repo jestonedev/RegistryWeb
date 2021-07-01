@@ -39,9 +39,14 @@ $(function () {
                 $("#Agreement_Type_TenantNewIdKinship").prop("disabled", "disabled").selectpicker("refresh");
                 $("#Agreement_Type_TenantExclude").prop("disabled", "disabled");
             }
+            $("#agreementModal #Agreement_Type_Point").val("");
+            $("#agreementModal #Agreement_Type_SubPoint").val("");
+            $("#agreementModal #Agreement_Type_OldKinship").val("");
+            $("#agreementModal #Agreement_Type_NewKinship").val("");
+            $("#Agreement_Type_TenancyPersonsChangeKinship option[value]").remove();
             $("#Agreement_Type_TenancyPersonsWithoutTenant option[value]").remove();
             $("#Agreement_Type_TenancyPersons option[value]").remove();
-            $("#Agreement_Type_Tenant").val("").attr("data-id", "").attr("data-guid", "");
+            $("#Agreement_Type_Tenant").val("").attr("data-id", "").attr("data-guid", "").attr("data-birthdate", "");
             $("#Agreement_Type_Tenant").prop("disabled", "disabled");
             var personsElems = $("#TenancyProcessPersons .list-group-item").filter(function (idx, elem) {
                 return !$(elem).hasClass("rr-list-group-item-empty");
@@ -49,7 +54,8 @@ $(function () {
             personsElems.each(function (idx, elem) {
                 var excludeElem = $(elem).find("input[id^='ExcludeDate']");
                 if (excludeElem.val() !== "" && excludeElem.val() !== null) return;
-                $("#Agreement_Type_TenancyPersons").append(createPersonOptionByElem($(elem)));
+                var personOption = createPersonOptionByElem($(elem));
+                $("#Agreement_Type_TenancyPersons").append(personOption);
                 var kinshipElem = $(elem).find("select[id^='IdKinship']");
                 if (kinshipElem.val() === "1") {
                     var surname = $(elem).find("input[id^='Surname']").val();
@@ -61,13 +67,14 @@ $(function () {
                     $("#Agreement_Type_Tenant").attr("data-guid", idPersonElem.attr("id").split("_")[1]);
                     $("#Agreement_Type_Tenant").attr("data-birthdate", formatDate($(elem).find("input[id^='DateOfBirth']").val()));
                 } else {
-                    $("#Agreement_Type_TenancyPersonsWithoutTenant").append(createPersonOptionByElem($(elem)));
+                    $("#Agreement_Type_TenancyPersonsWithoutTenant").append(personOption);
+                    $("#Agreement_Type_TenancyPersonsChangeKinship").append(createPersonOptionByElem($(elem), true));
                 }
             });
         }
     }
 
-    function createPersonOptionByElem(personElem) {
+    function createPersonOptionByElem(personElem, isChangeKinship = false) {
         var idPerson = personElem.find("input[id^='IdPerson']").val();
         var guid = personElem.find("input[id^='IdPerson']").prop("id").split("_")[1];
         var surname = personElem.find("input[id^='Surname']").val();
@@ -78,7 +85,9 @@ $(function () {
         var kinship = kinshipElem.find("option[value='" + kinshipElem.val() + "']").text();
         return "<option data-surname='" + surname + "' data-name='" + name + "'" +
             " data-patronymic='" + patronymic + "' data-birthdate='" + birthDate + "'" +
-            " data-kinship='" + kinship + "' data-id='" + idPerson + "' value='" + guid + "'>" +
+            " data-id-kinship='" + kinshipElem.val() + "' data-kinship='" + kinship + "'" +
+            (isChangeKinship ? " data-id-new-kinship='' data-new-kinship=''" : "") +
+            " data-id='" + idPerson + "' value='" + guid + "'>" +
             surname + " " + name + (patronymic !== "" ? " " + patronymic : "") +
             ((birthDate !== "" && birthDate !== null) ? " (" + birthDate + " г.р.)" : "") +
             "</option>";
@@ -396,7 +405,7 @@ $(function () {
                     executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
                 } else {
                     onError("Во время исключения участника найма произошла ошибка: " + error.text);
-                }
+                }                
             }
         });
         executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
@@ -815,6 +824,11 @@ $(function () {
                 addChangeTenantInfoToContent(changeTenantInfo);
                 addChangeTenantInfoToModifications(changeTenantInfo);
                 break;
+            case "7":
+                var changeKinshipsInfo = getChangeKinshipTenantsInfo();
+                addChangeKinshipTenantsInfoToContent(changeKinshipsInfo);
+                addChangeKinshipTenantsInfoToModifications(changeKinshipsInfo);
+                break;
         }
     });
 
@@ -1211,6 +1225,23 @@ $(function () {
         };
     }
 
+    function getChangeKinshipTenantsInfo() {
+        return $("#agreementModal #Agreement_Type_TenancyPersonsChangeKinship option[value]")
+            .filter(function (ind, elem) {
+                return $(elem).attr("data-id-new-kinship") !== "" && $(elem).attr("data-id-new-kinship") !== undefined;
+            }).map(function (ind, elem) {
+                return {
+                    IdPerson: $(elem).attr("data-id"),
+                    Guid: $(elem).val(),
+                    Tenant: $(elem).text(),
+                    OldIdKinship: $(elem).data("id-kinship"),
+                    OldKinship: $(elem).data("kinship"),
+                    NewIdKinship: $(elem).attr("data-id-new-kinship"),
+                    NewKinship: $(elem).attr("data-new-kinship")
+                };
+            });
+    }
+
     function addChangeTenantInfoToContent(changeTenantInfo) {
         var contentElem = $("#agreementModal #Agreement_AgreementContent");
         var contentLines = [];
@@ -1264,6 +1295,33 @@ $(function () {
         contentElem.val(contentLines.join("\n"));
     }
 
+    function addChangeKinshipTenantsInfoToContent(changeKinshipsInfo) {
+        var contentElem = $("#agreementModal #Agreement_AgreementContent");
+        var content = contentElem.val();
+        var contentLines = content.split("\n");
+        var nextPoint = getNextHeaderPoint(contentLines);
+        var header = "\u200B" + nextPoint + ") изложить";
+        var pointHeader = "";
+        var point = $("#agreementModal #Agreement_Type_Point").val();
+        var subPoint = $("#agreementModal #Agreement_Type_SubPoint").val();
+        if (point !== "" && subPoint === "") {
+            pointHeader = " пункт " + point;
+        }
+        if (subPoint !== "" && point === "") {
+            pointHeader = " подпункт " + subPoint;
+        }
+        if (subPoint !== "" && point !== "") {
+            pointHeader = " подпункт " + subPoint + " пункта " + point;
+        }
+        header += pointHeader + " в новой редакции:";
+        contentLines.push(header);
+        changeKinshipsInfo.each(function (ind, elem) {
+            pointContent = "«" + elem.Tenant + " - " + elem.NewKinship + "»";
+            contentLines.push(pointContent);
+        });
+        contentElem.val(contentLines.join("\n"));
+    }
+
     function addChangeTenantInfoToModifications(changeTenantInfo) {
         if (changeTenantInfo.CurrentTenantGuid !== "") {
             if (changeTenantInfo.ExcludeCurrentTenant || changeTenantInfo.DeathCurrentTenant) {
@@ -1298,6 +1356,22 @@ $(function () {
                 Guid: changeTenantInfo.NewTenantGuid,
                 IdKinship: "1"
             }
+        });
+    }
+
+    function addChangeKinshipTenantsInfoToModifications(changeKinshipsInfo) {
+        changeKinshipsInfo.each(function (ind, elem) {
+            let checkbox =
+                insertAutomateOperationsCheckBox("Сменить значение «" + elem.OldKinship +
+                    "» для нанимателя «" + elem.Tenant +
+                    "» на родственное отношение «" + elem.NewKinship + "»");
+            modifications.push({
+                Checkbox: checkbox, Operation: "ChangeKinship", Info: {
+                    IdPerson: elem.IdPerson,
+                    Guid: elem.Guid,
+                    IdKinship: elem.NewIdKinship
+                }
+            });
         });
     }
 
@@ -1414,6 +1488,43 @@ $(function () {
         }
         tenantNewKinshipElem.selectpicker("refresh");
         refreshValidationForm($("#TenancyProcessAgreementsModalForm"));
+        e.preventDefault();
+    });
+
+    $("#agreementModal #Agreement_Type_TenancyPersonsChangeKinship").on("change", function (e) {
+        var personOption = $(this).find("option[value='" + $(this).val() + "']");
+        $("#Agreement_Type_OldKinship").val(personOption.data("kinship"));
+        $("#Agreement_Type_NewKinship option").prop("disabled", false);
+        $("#Agreement_Type_NewKinship option[value='" + personOption.data("id-kinship") + "']").prop("disabled", true);
+        $("#Agreement_Type_NewKinship").selectpicker("val", "");
+        $("#Agreement_Type_NewKinship").selectpicker("refresh");
+        if (personOption.attr("data-id-new-kinship") !== "") {
+            $("#agreementModal #Agreement_Type_NewKinship").selectpicker("val", personOption.attr("data-id-new-kinship"));
+        }
+        else {
+            $("#agreementModal #Agreement_Type_NewKinship").selectpicker("val", "");
+        }
+        e.preventDefault();
+    });
+
+    $("#agreementModal #Agreement_Type_NewKinship").on("change", function (e) {
+        var person = $("#agreementModal #Agreement_Type_TenancyPersonsChangeKinship option:selected");
+        if (person.attr("data-id-new-kinship") !== undefined) {
+            var kinship = $(this).find("option:selected");
+            if (kinship.val() !== "") {
+                person.attr("data-icon", "oi oi-check");
+                person.attr("data-id-new-kinship", kinship.val());
+                person.attr("data-new-kinship", kinship.text());
+            }
+            else {
+                person.removeAttr("data-icon");
+                person.attr("data-id-new-kinship", "");
+                person.attr("data-new-kinship", "");
+            }
+        }
+        $(this).find("option").prop("disabled", false);
+        $(this).find("option[value='" + person.data("id-kinship") + "']").prop("disabled", true);
+        $("#agreementModal #Agreement_Type_TenancyPersonsChangeKinship").selectpicker("refresh");
         e.preventDefault();
     });
 
