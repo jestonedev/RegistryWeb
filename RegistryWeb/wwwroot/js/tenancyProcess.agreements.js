@@ -1233,7 +1233,10 @@ $(function () {
                 return {
                     IdPerson: $(elem).attr("data-id"),
                     Guid: $(elem).val(),
-                    Tenant: $(elem).text(),
+                    TenantSurname: $(elem).data("surname"),
+                    TenantName: $(elem).data("name"),
+                    TenantPatronymic: $(elem).data("patronymic"),
+                    TenantBirthDate: $(elem).data("birthdate"),
                     OldIdKinship: $(elem).data("id-kinship"),
                     OldKinship: $(elem).data("kinship"),
                     NewIdKinship: $(elem).attr("data-id-new-kinship"),
@@ -1249,9 +1252,10 @@ $(function () {
         var agreementDefaultText = getDefaultAgreementText();
         var oldTenant = changeTenantInfo.CurrentTenant;
         if (changeTenantInfo.CurrentTenant !== "") {
+            var padeg = (changeTenantInfo.DeathCurrentTenant == true) ? "VINITELN" : "RODITLN";
             $.ajax({
                 type: "GET",
-                url: "/TenancyAgreements/GetSnpCase?snp=" + changeTenantInfo.CurrentTenant +"&padeg=RODITLN",
+                url: "/TenancyAgreements/GetSnpCase?snp=" + changeTenantInfo.CurrentTenant + "&padeg=" + padeg,
                 async: false,
                 success: function (data) {
                     oldTenant = data.snpAccusative;
@@ -1316,7 +1320,8 @@ $(function () {
         header += pointHeader + " в новой редакции:";
         contentLines.push(header);
         changeKinshipsInfo.each(function (ind, elem) {
-            pointContent = "«" + elem.Tenant + " - " + elem.NewKinship + "»";
+            pointContent = "«" + elem.TenantSurname + " " + elem.TenantName + " " +
+                elem.TenantPatronymic + " - " + elem.NewKinship + ", " + elem.TenantBirthDate + " г.р.»";
             contentLines.push(pointContent);
         });
         contentElem.val(contentLines.join("\n"));
@@ -1363,8 +1368,9 @@ $(function () {
         changeKinshipsInfo.each(function (ind, elem) {
             let checkbox =
                 insertAutomateOperationsCheckBox("Сменить значение «" + elem.OldKinship +
-                    "» для нанимателя «" + elem.Tenant +
-                    "» на родственное отношение «" + elem.NewKinship + "»");
+                    "» для нанимателя «" + elem.TenantSurname + " " + elem.TenantName + " " +
+                    elem.TenantPatronymic + ", " + elem.TenantBirthDate +
+                    " г.р.» на родственное отношение «" + elem.NewKinship + "»");
             modifications.push({
                 Checkbox: checkbox, Operation: "ChangeKinship", Info: {
                     IdPerson: elem.IdPerson,
