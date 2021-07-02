@@ -2,8 +2,9 @@
 @model TenancyRentPeriod;
 
 @{ 
+    var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
     var widthClass = "col-lg-12";
-    if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+    if ((ViewBag.Action == "Edit" && canEdit) || ViewBag.Action == "Create")
     {
         widthClass = "col-lg-9";
     }
@@ -31,7 +32,7 @@
                 <label class="form-check-label" title="На период трудовых отношений / пролонгирован">На период ТО / пролонгирован</label>
             </div>
         </div>
-        @if (ViewBag.Action == "Edit")
+        @if (ViewBag.Action == "Edit" && canEdit)
         {
             <div class="text-md-right text-center col-lg-3 rr-rent-period-edit-buttons d-none d-lg-block">
                 <div class="btn-group yes-no-panel" role="group" style="display: none" aria-label="Панель подтверждения">
@@ -55,7 +56,7 @@
         }
     </div>
 
-    @if (ViewBag.Action == "Edit")
+    @if (ViewBag.Action == "Edit" && canEdit)
     {
         <div class="text-center col-12 text-center rr-rent-period-edit-buttons d-lg-none">
             <div class="btn-group yes-no-panel" role="group" style="display: none" aria-label="Панель подтверждения">

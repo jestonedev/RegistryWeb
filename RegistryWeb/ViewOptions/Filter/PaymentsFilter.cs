@@ -11,6 +11,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public string Account { get; set; }
         public string AccountGisZkh { get; set; }
         public string Tenant { get; set; }
+        public bool Emails { get; set; }
         public string RawAddress { get; set; }
         public string IdStreet { get; set; }
         public string House { get; set; }
@@ -20,6 +21,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public int? IdBuilding { get; set; }
         public int? IdPreset { get; set; } // Поисковые пресеты
         public int? IdClaimsBehavior { get; set; } // Поведение при фильтрации с учетом исковых работ
+        public string IdRegion { get; set; }
         public DateTime? AtDate { get; set; }
         public int BalanceInputTotalOp { get; set; }
         public decimal? BalanceInputTotal { get; set;}
@@ -91,12 +93,12 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool IsModalEmpty()
         {
             return Account == null && AccountGisZkh == null && Crn == null && Tenant == null && RawAddress == null &&
-                IdStreet == null && House == null && PremisesNum == null && IdPreset == null && IdClaimsBehavior == null &&
+                IdRegion == null && IdStreet == null && House == null && PremisesNum == null && IdPreset == null && IdClaimsBehavior == null &&
                 BalanceInputTotal == null && BalanceInputTenancy == null && BalanceInputPenalties == null &&
                 BalanceInputDgiPadunPkk == null && ChargingTotal == null && ChargingTenancy == null && ChargingPenalties == null &&
                 ChargingDgiPadunPkk == null && RecalcTenancy == null && RecalcPenalties == null && RecalcDgiPadunPkk == null &&
                 TransferBalance == null && PaymentTenancy == null && PaymentPenalties == null && PaymentDgiPadunPkk == null &&
-                BalanceOutputTotal == null && BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null;
+                BalanceOutputTotal == null && BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null && !Emails;
         }
     }
 }

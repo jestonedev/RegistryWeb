@@ -62,10 +62,11 @@ namespace RegistryWeb.Controllers
             return View(vm);
         }
 
-        private void InitializeViewBag(string action, string returnUrl, bool canEditBaseInfo)
+        private void InitializeViewBag(string action, string returnUrl, bool canEditBaseInfo, bool canEditEmailsOnly)
         {
             ViewBag.Action = action;
             ViewBag.CanEditBaseInfo = canEditBaseInfo;
+            ViewBag.CanEditEmailsOnly = canEditEmailsOnly;
             if (returnUrl != null)
             {
                 ViewBag.ReturnUrl = returnUrl;
@@ -85,7 +86,7 @@ namespace RegistryWeb.Controllers
             var process = dataService.GetTenancyProcess(idProcess.Value);
             if (process == null)
                 return NotFound();
-            InitializeViewBag("Details", returnUrl, securityService.HasPrivilege(Privileges.TenancyWrite));
+            InitializeViewBag("Details", returnUrl, securityService.HasPrivilege(Privileges.TenancyWrite), securityService.HasPrivilege(Privileges.TenancyWriteEmailsOnly));
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(process));
         }
         
@@ -93,7 +94,7 @@ namespace RegistryWeb.Controllers
         {
             if (!securityService.HasPrivilege(Privileges.TenancyWrite))
                 return View("NotAccess");
-            InitializeViewBag("Create", null, true);
+            InitializeViewBag("Create", null, true, true);
             var vm = dataService.CreateTenancyProcessEmptyViewModel(idObject, addressType);
             if (idProcess != null)
             {
@@ -115,7 +116,7 @@ namespace RegistryWeb.Controllers
                     HttpContext.Request.Form.Files.Select(f => f).ToList());
                 return RedirectToAction("Details", new { tenancyProcessVM.TenancyProcess.IdProcess });
             }
-            InitializeViewBag("Create", null, true);
+            InitializeViewBag("Create", null, true, true);
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcessVM.TenancyProcess));
         }
         
@@ -129,11 +130,12 @@ namespace RegistryWeb.Controllers
                 return NotFound();
 
             var canEditBaseInfo = securityService.HasPrivilege(Privileges.TenancyWrite);
+            var canEditEmailsOnly = securityService.HasPrivilege(Privileges.TenancyWriteEmailsOnly);
 
-            if (!canEditBaseInfo)
+            if (!canEditBaseInfo && !canEditEmailsOnly)
                 return View("NotAccess");
 
-            InitializeViewBag("Edit", returnUrl, canEditBaseInfo);
+            InitializeViewBag("Edit", returnUrl, canEditBaseInfo, canEditEmailsOnly);
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcess));
         }
         
@@ -144,6 +146,7 @@ namespace RegistryWeb.Controllers
                 return NotFound();
 
             var canEditBaseInfo = securityService.HasPrivilege(Privileges.TenancyWrite);
+            var canEditEmailsOnly = securityService.HasPrivilege(Privileges.TenancyWriteEmailsOnly);
 
             if (!canEditBaseInfo)
                 return View("NotAccess");
@@ -154,7 +157,7 @@ namespace RegistryWeb.Controllers
                 dataService.Edit(tenancyProcessVM.TenancyProcess);
                 return RedirectToAction("Details", new { tenancyProcessVM.TenancyProcess.IdProcess });
             }
-            InitializeViewBag("Edit", returnUrl, canEditBaseInfo);
+            InitializeViewBag("Edit", returnUrl, canEditBaseInfo, canEditEmailsOnly);
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcessVM.TenancyProcess));
         }
         
@@ -170,7 +173,7 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.TenancyWrite))
                 return View("NotAccess");
             
-            InitializeViewBag("Delete", returnUrl, false);
+            InitializeViewBag("Delete", returnUrl, false, false);
 
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcess));
         }

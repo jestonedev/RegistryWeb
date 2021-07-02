@@ -15,7 +15,7 @@
 
 $(function () {
 
-    function tenancyPersonFillModal(tenancyPersonElem, action) {
+    function tenancyPersonFillModal(tenancyPersonElem, action, canEditAll, canEditEmailsOnly) {
         var modal = $("#personModal");
         var fields = tenancyPersonElem.find("input, select, textarea");
         var modalFields = modal.find("input, select, textarea");
@@ -24,10 +24,17 @@ $(function () {
             var name = $(elem).attr("name").split("_")[0];
             modal.find("[name='Person." + name + "']").val($(elem).val());
         });
-        if (action === "Details" || action === "Delete")
+        if (action === "Details" || action === "Delete") {
             modalFields.prop("disabled", "disabled");
-        else
+        } else
+        if (canEditAll === "True") {
             modalFields.prop("disabled", "");
+        } else if (canEditEmailsOnly === "True") {
+            modalFields.prop("disabled", "disabled");
+            modalFields.filter(function (idx, elem) { return $(elem).prop("name") === "Person.Email"; }).prop("disabled", "");
+        } else {
+            modalFields.prop("disabled", "disabled");
+        }
     }
 
     function tenancyPersonFillElem(tenancyPersonElem) {
@@ -280,6 +287,8 @@ $(function () {
 
     function addTenancyPerson(e) {
         let action = $('#TenancyProcessPersons').data('action');
+        let canEditAll = $("#TenancyProcessPersons").data("can-edit-all");
+        let canEditEmailsOnly = $("#TenancyProcessPersons").data("can-edit-emails-only");
 
         $.ajax({
             type: 'POST',
@@ -287,7 +296,7 @@ $(function () {
             data: { action },
             success: function (elem) {
                 addingTenancyPersonElem = elem;
-                tenancyPersonFillModal($(elem), action);
+                tenancyPersonFillModal($(elem), action, canEditAll, canEditEmailsOnly);
                 var modal = $("#personModal");
                 modal.modal('show');
             }
@@ -303,7 +312,9 @@ $(function () {
             tenancyPersonElem.attr("data-processing", "edit");
         }
         var action = $("#TenancyProcessPersons").data("action");
-        tenancyPersonFillModal(tenancyPersonElem, action);
+        var canEditAll = $("#TenancyProcessPersons").data("can-edit-all");
+        var canEditEmailsOnly = $("#TenancyProcessPersons").data("can-edit-emails-only");
+        tenancyPersonFillModal(tenancyPersonElem, action, canEditAll, canEditEmailsOnly);
         var modal = $("#personModal");
         modal.modal('show');
         e.preventDefault();

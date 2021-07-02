@@ -110,9 +110,15 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-12 col-lg-6">
+                        <div class="form-group col-md-6 col-lg-2">
+                            <label asp-for="FilterOptions.IdRegion">Район</label>
+                            <select class="selectpicker form-control" data-size="10" data-live-search="true" title="Район" asp-for="FilterOptions.IdRegion" asp-items="@Model.KladrRegionsList">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
                             <label asp-for="FilterOptions.IdStreet">Улица</label>
-                            <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@(new SelectList(Model.Streets, "IdStreet", "StreetName"))">
+                            <select class="selectpicker form-control" data-size="10" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@Model.KladrStreetsList">
                                 <option selected></option>
                             </select>
                         </div>
@@ -144,6 +150,12 @@
                                 <option value="1">Лицевые счета, по которым отсутствуют ИР с признаком "Не учитывать при фильтрации"</option>
                                 <option value="2">Лицевые счета, по которым присутствуют ИР с признаком "Не учитывать при фильтрации"</option>
                             </select>
+                        </div>
+                        <div class="form-group col-12 col-md-12">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="exampleCheck1" asp-for="FilterOptions.Emails">
+                                <label class="form-check-label" for="exampleCheck1">Указан адрес электронной почты</label>                        
+                            </div>
                         </div>
                     </div>
 

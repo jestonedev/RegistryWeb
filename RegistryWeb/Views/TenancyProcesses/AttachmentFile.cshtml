@@ -5,7 +5,7 @@
     var id = Guid.NewGuid();
     var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
     var descriptionClass = "col-md-12 col-lg-10";
-    if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    if (ViewBag.Action == "Details" || ViewBag.Action == "Delete" || (ViewBag.Action == "Edit" && !canEdit))
     {
         descriptionClass = "col-md-12 col-lg-12";
     }
@@ -20,14 +20,14 @@
                 <input type="text" maxlength="255" class="form-control" disabled value="@Model.Description" name="TenancyFileDescription_@id" title="Наименование">
                 <input type="file" name="TenancyFile_@id" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
                 <input type="hidden" name="TenancyFileRemove_@id" value="false" />
-                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+                @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete" || (ViewBag.Action == "Edit" && !canEdit))
                 {
                     <div class="input-group-append">
                         <a class="btn btn-success rr-tenancy-file-download @(string.IsNullOrEmpty(Model.FileName) ? "disabled" : "")"
                            href="/TenancyFiles/DownloadFile/?idFile=@Model.IdFile" title="Скачать образ документа" aria-label="Скачать образ документа"><span class="oi oi-data-transfer-download"></span></a>
                     </div>
                 }
-                @if (ViewBag.Action == "Edit")
+                @if (ViewBag.Action == "Edit" && canEdit)
                 {
                     <div class="input-group-append rr-tenancy-file-buttons">
                         <a class="btn btn-danger rr-tenancy-file-remove" style="display: none"
@@ -49,7 +49,7 @@
                 }
             </div>
         </div>
-        @if (ViewBag.Action == "Edit")
+        @if (ViewBag.Action == "Edit" && canEdit)
         {
             <div class="text-lg-right text-center col-lg-2 rr-tenancy-file-edit-buttons">
                 <div class="btn-group yes-no-panel" role="group" aria-label="Панель подтверждения">

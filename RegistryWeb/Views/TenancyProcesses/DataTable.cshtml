@@ -145,16 +145,19 @@
                 </div>
 
                 <div class="btn-group rr-opacity-item-menu" role="group" aria-label="Панель доступа">
-                        @if (securityService.HasPrivilege(Privileges.TenancyWrite))
+                        @if (securityService.HasPrivilege(Privileges.TenancyWrite) || securityService.HasPrivilege(Privileges.TenancyWriteEmailsOnly))
                         {
                             <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
                                asp-controller="TenancyProcesses" asp-action="Details" asp-route-idProcess="@item.IdProcess" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                             <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
                                asp-controller="TenancyProcesses" asp-action="Edit" asp-route-idProcess="@item.IdProcess" asp-route-action="Edit" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                            <a class="btn btn-outline-dark oi oi-layers" title="Копировать" aria-label="Копировать"
-                               asp-controller="TenancyProcesses" asp-action="Create" asp-route-idProcess="@item.IdProcess" asp-route-action="Create" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
-                               asp-controller="TenancyProcesses" asp-action="Delete" asp-route-idProcess="@item.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            @if (securityService.HasPrivilege(Privileges.TenancyWrite))
+                            {
+                                <a class="btn btn-outline-dark oi oi-layers" title="Копировать" aria-label="Копировать"
+                                   asp-controller="TenancyProcesses" asp-action="Create" asp-route-idProcess="@item.IdProcess" asp-route-action="Create" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                                <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                                   asp-controller="TenancyProcesses" asp-action="Delete" asp-route-idProcess="@item.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            }
                         }
                         else
                         {

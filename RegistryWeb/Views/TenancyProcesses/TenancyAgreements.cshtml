@@ -84,6 +84,7 @@
                                     <option value="4">Изменить срок по коммерческому найму</option>
                                     <option value="5">Изменить срок по специализированному найму</option>
                                     <option value="6">Сменить нанимателя</option>
+                                    <option value="7">Члены семьи в новой редакции</option>
                                 </select>
                             </div>
                             <div class="col-1 text-right" style="margin-top: 32px">
@@ -91,11 +92,11 @@
                                     <span class="oi oi-collapse-down"></span>
                                 </button>
                             </div>
-                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="0,1,2,5">
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="0,1,2,5,7">
                                 <label for="Agreement_Type_Point">Пункт</label>
                                 <input type="text" class="form-control" id="Agreement_Type_Point" title="Пункт">
                             </div>
-                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="0,1,2,5">
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="0,1,2,5,7">
                                 <label for="Agreement_Type_SubPoint">Подпункт</label>
                                 <input type="text" class="form-control" id="Agreement_Type_SubPoint" title="Подпункт">
                             </div>
@@ -200,10 +201,16 @@
                                 </select>
                                 <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenantNewIdKinship" data-valmsg-replace="true"></span>
                             </div>
-                            <div class="col-md-12 rr-agreement-type-field" data-agreement-types="6">
+                            <div class="col-md-6 rr-agreement-type-field" data-agreement-types="6">
                                 <div class="form-group form-check">
                                     <input type="checkbox" class="form-check-input" id="Agreement_Type_TenantExclude">
                                     <label class="form-check-label" for="Agreement_Type_TenantExclude">Исключить текущего нанимателя из найма</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 rr-agreement-type-field" data-agreement-types="6">
+                                <div class="form-group form-check">
+                                    <input type="checkbox" class="form-check-input" id="Agreement_Type_TenantDeath">
+                                    <label class="form-check-label" for="Agreement_Type_TenantDeath">Исключить текущего нанимателя по смерти</label>
                                 </div>
                             </div>
                             <div class="form-group col-md-12 rr-agreement-type-field" data-agreement-types="6">
@@ -212,6 +219,26 @@
                                     <option></option>
                                 </select>
                                 <span class="text-danger field-validation-valid" data-valmsg-for="Agreement_Type_TenancyPersonsWithoutTenant" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group col-lg-6 col-md-12 rr-agreement-type-field" data-agreement-types="7">
+                                <label for="Agreement_Type_TenancyPersonsChangeKinship">Наниматель</label>
+                                <select class="selectpicker form-control" id="Agreement_Type_TenancyPersonsChangeKinship" name="Agreement_Type_TenancyPersonsChangeKinship" title="Наниматель">
+                                </select>
+                            </div>
+                            <div class="form-group col-lg-3 col-md-6 rr-agreement-type-field" data-agreement-types="7">
+                                <label for="Agreement_Type_OldKinship">Текущая род. связь</label>
+                                <input type="text" class="form-control" id="Agreement_Type_OldKinship" name="Agreement_Type_OldKinship" title="Текущая родственная связь" readonly>
+                            </div>
+                            <div class="form-group col-lg-3 col-md-6 rr-agreement-type-field" data-agreement-types="7">
+                                <label for="Agreement_Type_NewKinship">Новая род. связь</label>
+                                <select class="selectpicker form-control" id="Agreement_Type_NewKinship" name="Agreement_Type_NewKinship" title="Новая родственная связь">
+                                    <option></option>
+                                    @foreach (var kinship in ViewBag.Kinships)
+                                    {
+                                        if (kinship.IdKinship == 1) { continue; }
+                                        <option value="@kinship.IdKinship">@kinship.KinshipName</option>
+                                    }
+                                </select>
                             </div>
                         }
                         <hr class="col-md-12 p-0" />

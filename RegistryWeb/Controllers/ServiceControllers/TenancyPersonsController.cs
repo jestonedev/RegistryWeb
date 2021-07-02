@@ -54,11 +54,11 @@ namespace RegistryWeb.Controllers.ServiceControllers
         {
             if (person == null)
                 return Json(new { Error = -1 });
-            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite) && !securityService.HasPrivilege(Privileges.TenancyWriteEmailsOnly))
                 return Json(new { Error = -2 });
 
             //Создать
-            if (person.IdPerson == 0)
+            if (person.IdPerson == 0 && securityService.HasPrivilege(Privileges.TenancyWrite))
             {
                 registryContext.TenancyPersons.Add(person);
                 registryContext.SaveChanges();
@@ -66,7 +66,16 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 return Json(new { person.IdPerson });
             }
             //Обновить            
-            registryContext.TenancyPersons.Update(person);
+            if (securityService.HasPrivilege(Privileges.TenancyWrite))
+            {
+                registryContext.TenancyPersons.Update(person);
+            } else
+            if (securityService.HasPrivilege(Privileges.TenancyWriteEmailsOnly))
+            {
+                var personDb = registryContext.TenancyPersons.FirstOrDefault(tp => tp.IdPerson == person.IdPerson);
+                personDb.Email = person.Email;
+                registryContext.TenancyPersons.Update(personDb);
+            }
             registryContext.SaveChanges();
             return Json(new { person.IdPerson });
         }

@@ -2,8 +2,9 @@
 @model TenancyReason
 
 @{ 
+    var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;
     var widthClass = "col-md-6";
-    if (ViewBag.Action == "Edit" || ViewBag.Action == "Create")
+    if ((ViewBag.Action == "Edit" && canEdit) || ViewBag.Action == "Create")
     {
         widthClass = "col-md-4";
     }
@@ -33,7 +34,7 @@
             <span class="text-danger field-validation-valid" data-valmsg-for="IdReasonType_@id" data-valmsg-replace="true"></span>
         </div>
 
-        @if (ViewBag.Action == "Edit")
+        @if (ViewBag.Action == "Edit" && canEdit)
         {
             <div class="text-md-right text-center col-md-2 rr-tenancy-reason-edit-buttons">
                 <div class="btn-group yes-no-panel" role="group" style="display: none" aria-label="Панель подтверждения">

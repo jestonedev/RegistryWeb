@@ -35,7 +35,7 @@
             @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
             {
                 <div class="btn-group" role="group" aria-label="Панель доступа">
-                    @if (ViewBag.Action == "Details" && (ViewBag.CanEditBaseInfo ?? false))
+                    @if (ViewBag.Action == "Details" && ((ViewBag.CanEditBaseInfo ?? false) || (ViewBag.CanEditEmailsOnly ?? false)))
                     {
                         <div class="btn-group" role="group" aria-label="Панель доступа">
                             <button class="btn btn-primary dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@Model.TenancyProcess.IdProcess" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -45,10 +45,8 @@
                                 <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
                                    asp-controller="TenancyProcesses" asp-action="Edit" asp-route-idProcess="@Model.TenancyProcess.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
 
-                                <a class="btn btn-outline-dark oi oi-layers" title="Копировать" aria-label="Копировать"
+                                <a class="btn btn-outline-dark oi oi-layers @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" title="Копировать" aria-label="Копировать"
                                    asp-controller="TenancyProcesses" asp-action="Create" asp-route-idProcess="@Model.TenancyProcess.IdProcess" asp-route-action="Create" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-
-
                                 <a class="btn btn-danger oi oi-x @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" title="Удалить" aria-label="Удалить"
                                    asp-controller="TenancyProcesses" asp-action="Delete" asp-route-idProcess="@Model.TenancyProcess.IdProcess" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                             </div>
@@ -99,7 +97,7 @@
                 {
                     <input type="submit" value="Создать" id="createBtn" class="form-control btn btn-success" />
                 }
-                @if (ViewBag.Action == "Edit")
+                @if (ViewBag.Action == "Edit" && (ViewBag.CanEditBaseInfo ?? false))
                 {
                     <input type="submit" value="Сохранить" id="editBtn" class="form-control btn btn-success" />
                 }
@@ -147,7 +145,7 @@
                     <input type="date" class="form-control" asp-for="TenancyProcess.BeginDate"
                            value="@(Model.TenancyProcess.BeginDate.HasValue ? Model.TenancyProcess.BeginDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата начала найма жилья">
                 </div>
-                @if (ViewBag.Action != "Edit")
+                @if (ViewBag.Action != "Edit" || !(ViewBag.CanEditBaseInfo ?? false))
                 {
                     <div class="form-group col-lg-4 col-md-6 mb-2">
                         <label class="mb-1 rr-tenancy-label" asp-for="TenancyProcess.EndDate">Дата окончания найма жилья</label>
@@ -320,7 +318,7 @@
     <script src="~/js/tenancyProcess.common.js" asp-append-version="true"></script>
     <script src="~/js/tenancyProcess.reports.js" asp-append-version="true"></script>
     <script src="~/lib/bootstrap4-toggle/js/bootstrap4-toggle.min.js"></script>
-    @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+    @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete" || (ViewBag.Action == "Edit" && !(ViewBag.CanEditBaseInfo ?? false)))
     {
         <script>
             $(function () {

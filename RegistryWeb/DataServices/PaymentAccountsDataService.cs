@@ -12,6 +12,7 @@ using RegistryWeb.DataHelpers;
 using System.Runtime.CompilerServices;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace RegistryWeb.DataServices
 {
@@ -57,6 +58,8 @@ namespace RegistryWeb.DataServices
             viewModel.Payments = query.ToList();
             viewModel.RentObjects = GetRentObjects(viewModel.Payments);
             viewModel.ClaimsByAddresses = GetClaimsByAddresses(viewModel.Payments);
+            viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "id_region", "region");
+            viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
             return viewModel;
         }
 
@@ -98,6 +101,7 @@ namespace RegistryWeb.DataServices
                 string.IsNullOrEmpty(filterOptions.IdStreet) &&
                 string.IsNullOrEmpty(filterOptions.House) &&
                 string.IsNullOrEmpty(filterOptions.PremisesNum) &&
+                string.IsNullOrEmpty(filterOptions.IdRegion) &&
                 filterOptions.IdBuilding == null &&
                 filterOptions.IdPremises == null &&
                 filterOptions.IdSubPremises == null)
@@ -125,6 +129,18 @@ namespace RegistryWeb.DataServices
                     .Select(opa => opa.IdAccount);
                 var idSubPremiseAccounts = subPremisesAssoc
                     .Where(ospa => streets.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet))
+                    .Select(ospa => ospa.IdAccount);
+                idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
+                filtered = true;
+            }
+            else if (!string.IsNullOrEmpty(filterOptions.IdRegion))
+            {
+                var idPremiseAccounts = premisesAssoc
+                    .Where(opa => opa.PremiseNavigation.IdBuildingNavigation.IdStreet.StartsWith(filterOptions.IdRegion))
+                    .Select(opa => opa.IdAccount);
+                var idSubPremiseAccounts = subPremisesAssoc
+                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation
+                    .IdBuildingNavigation.IdStreet.StartsWith(filterOptions.IdRegion))
                     .Select(ospa => ospa.IdAccount);
                 idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
                 filtered = true;
@@ -253,6 +269,10 @@ namespace RegistryWeb.DataServices
             if (!string.IsNullOrEmpty(filterOptions.Tenant))
             {
                 query = query.Where(p => p.Tenant.Contains(filterOptions.Tenant));
+            }
+            if (filterOptions.Emails)
+            {
+                query = EmailsFilter(query, filterOptions);
             }
             if (!string.IsNullOrEmpty(filterOptions.RawAddress))
             {
@@ -808,6 +828,37 @@ namespace RegistryWeb.DataServices
             }
             return query;
         }
+
+        private IQueryable<Payment> EmailsFilter(IQueryable<Payment> query, PaymentsFilter filterOptions)
+        {
+            var anyEmails = registryContext.TenancyPersons
+                .Where(per => per.Email != null)
+                .Select(per => per.IdProcess)
+                .ToList();
+
+            if (anyEmails.Any())
+            {
+                var idPremises = registryContext.TenancyActiveProcesses
+                    .Where(tap => anyEmails.Contains(tap.IdProcess) && tap.IdPremises != null)
+                    .Select(tap => tap.IdPremises);
+
+                var idSubPremises = registryContext.TenancyActiveProcesses
+                    .Where(tap => anyEmails.Contains(tap.IdProcess) && tap.IdSubPremises != null)
+                    .Select(tap => tap.IdSubPremises);
+
+                var idAccounts = registryContext.PaymentAccountPremisesAssoc
+                                .Where(papa => idPremises.Contains(papa.IdPremise))
+                                .Select(p => p.IdAccount )
+                            .Union(registryContext.PaymentAccountSubPremisesAssoc
+                                .Where(papa => idSubPremises.Contains(papa.IdSubPremise))
+                                .Select(p => p.IdAccount))
+                            .ToList();
+
+                query = query.Where(q => idAccounts.Contains(q.IdAccount));
+            }
+            return query;
+        }
+
         private IQueryable<Payment> GetQueryOrder(IQueryable<Payment> query, OrderOptions orderOptions)
         {
             if (string.IsNullOrEmpty(orderOptions.OrderField))
