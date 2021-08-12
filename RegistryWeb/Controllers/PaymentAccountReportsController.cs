@@ -124,7 +124,7 @@ namespace RegistryWeb.Controllers
 
                 return Json(new { ErrorCode = code });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Json(new { ErrorCode = -9 });
             }

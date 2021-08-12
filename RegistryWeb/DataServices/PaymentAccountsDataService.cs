@@ -221,6 +221,42 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        internal Dictionary<int, List<string>> GetTenantsEmails(List<int> ids)
+        {
+            var emailsDic = new Dictionary<int, List<string>>();
+            foreach (var id in ids)
+            {
+                int? idSubPremise = null;
+                var idPremise = registryContext.PaymentAccountPremisesAssoc
+                    .Where(papa => papa.IdAccount == id)
+                    .FirstOrDefault()
+                    ?.IdPremise;
+                if (idPremise == null)
+                {
+                    idSubPremise = registryContext.PaymentAccountSubPremisesAssoc
+                        .Where(paspa => paspa.IdAccount == id)
+                        .FirstOrDefault()
+                        ?.IdSubPremise;
+                }
+
+                var processes = registryContext.TenancyActiveProcesses
+                    .Where(tap => tap.IdPremises == idPremise && tap.IdSubPremises == idSubPremise);
+
+                List<string> emails = new List<string>();
+                foreach (var tp in processes)
+                {
+                    var curEmails = registryContext.TenancyPersons
+                        .Where(per => per.IdProcess == tp.IdProcess && per.Email != null)
+                        .Select(per => per.Email)
+                        .ToList();
+                    emails.AddRange(curEmails);
+                }
+                emails = emails.Distinct().ToList();
+                emailsDic.Add(id, emails);
+            }
+            return emailsDic;
+        }
+
         internal void CreateClaimMass(List<int> accountIds, DateTime atDate)
         {
             var payments = GetPaymentsForMassReports(accountIds).ToList();

@@ -117,24 +117,7 @@ namespace RegistryWeb.DataServices
 
         public void AddLIG(LogInvoiceGenerator lig)
         {
-            var ligold = registryContext.LogInvoiceGenerator
-                .FirstOrDefault(l=>l.IdAccount==lig.IdAccount && l.OnDate==lig.OnDate && 
-                (l.Emails==lig.Emails || l.Result_code==lig.Result_code));
-
-            if (ligold == null)
-                registryContext.LogInvoiceGenerator.Add(lig);
-            else
-            {
-                if (ligold.Emails != lig.Emails)
-                    ligold.Emails=lig.Emails;
-                if (ligold.Result_code != lig.Result_code)
-                    ligold.Result_code = lig.Result_code;
-                if (ligold.CreateDate != lig.CreateDate)
-                    ligold.CreateDate = lig.CreateDate;
-
-                registryContext.LogInvoiceGenerator.Update(ligold);
-            }
-
+            registryContext.LogInvoiceGenerator.Add(lig);
             registryContext.SaveChanges();
         }
     }

@@ -160,14 +160,14 @@ namespace RegistryWeb.ReportServices
 
         internal byte[] ClaimFactMailingReport(int flag, DateTime startDate, DateTime endDate)
         {
-            var resultcodes = new List<int>(){-9,-8,-7,-6,-5,-4,-3,-2,-1,0};
+            var resultcodes = new List<int>() { -9, -8, -7, -6, -5, -4, -3, -2, -1, 0 };
             switch (flag)
             {
                 case 1:
-                    resultcodes = resultcodes.Where(r=>r==0).ToList();
+                    resultcodes = resultcodes.Where(r => r == 0).ToList();
                     break;
                 case 2:
-                    resultcodes = resultcodes.Where(r =>r!= 0).ToList();
+                    resultcodes = resultcodes.Where(r => r != 0).ToList();
                     break;
             }
 
@@ -182,7 +182,6 @@ namespace RegistryWeb.ReportServices
                 { "date_from", startDate.ToString("yyyy-MM-dd") },
                 { "date_to", endDate.ToString("yyyy-MM-dd") }
             };
-            //var fileName = "registry\\claims\\claim_fact_mailing";
             var fileNameReport = GenerateReport(arguments, "registry\\claims\\claim_fact_mailing");
             return DownloadFile(fileNameReport);
         }

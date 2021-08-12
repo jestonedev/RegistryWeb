@@ -9,6 +9,7 @@
     var text = "Количество записей: " + Model.PageOptions.TotalRows;
     var canEdit = ViewBag.CanEdit;
     var errorPayments = (List<Payment>)ViewData["ErrorPayments"];
+    var emails = (Dictionary<int, List<string>>)ViewData["Emails"];
 }
 
 @section Scripts
@@ -72,6 +73,7 @@
         <tr>
             <th>№ по реестру</th>
             <th>Адрес</th>
+            <th>Электронная почта</th>
             <th width="100px"></th>
         </tr>
     </thead>
@@ -97,6 +99,15 @@
                             <b>По БКС: </b><br />@item.PaymentAccountNavigation.RawAddress<br />
                             @item.PaymentAccountNavigation.Crn
                         </div>
+                    </td>
+                    <td>
+                        @if(emails.ContainsKey(item.IdAccount))
+                        {
+                            foreach(var email in emails[item.IdAccount])
+                            {
+                                <div>@email</div>
+                            }
+                        }
                     </td>
                     <td>
                         <div class="btn-group" role="group" aria-label="Панель доступа">

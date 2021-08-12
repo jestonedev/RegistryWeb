@@ -180,6 +180,7 @@
             case "ClaimEmergencyTariffReport":
                 standartWrapper.show();
                 break;
+
             case "ClaimFactMailing":
                 standartWrapper.show();
                 factMailingWrapper.show();
@@ -229,7 +230,7 @@
 
     });
 
-    $("#ClaimSplitAccountsReport").on("click", function () {
+    $("#ClaimSplitAccountsReport").on("click", function (e) {
         url = "/ClaimReports/GetSplitAccountsReport";
         downloadFile(url);
         e.preventDefault();
