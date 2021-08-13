@@ -134,64 +134,58 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Отправка квитанции</h5>
+                    <h5 class="modal-title">Отправить счет-извещение</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="Account.IdAccount" />
+                    <input type="hidden" name="Account.Action" />
                     <div class="form-row">
                         <div class="form-group col-12">
-                            <div id="dontforFirefox" style="display:none;">
-                                <label>Выберете за какой период</label>
-                                <div class="form-group col-12">
-                                    <label for="Account.OnDate"></label>
-                                    <input type="month" class="form-control" title="Период" name="Account.OnDate"
-                                           data-date-format"="MM yyyy" data-val="true" data-val-required="Укажите период" id="Account_OnDate" />
-                                    <span class="text-danger field-validation-valid" data-valmsg-for="Account.OnDate" data-valmsg-replace="true"></span>
-                                </div>
-                            </div>
-
-                            <div id="forFirefox" style="display:none;">
-                                <label for="Account.OnDate">Выберете за какой период</label>
-                                <div class="form-row">
-                                    <div class="form-group col-6">                                        
-                                        <select name="Account.OnDate_Month" class="form-control selectpicker" data-title="Выберите месяц">
-                                            <option></option>
-                                            @{
-                                                Dictionary<int, string> months = new Dictionary<int, string>()
+                            <label for="Account.OnDate">Выберете за какой период</label>
+                            <div class="form-row">
+                                <div class="form-group col-6">
+                                    <select id="Account_OnDate_Month" name="Account.OnDate_Month" class="form-control selectpicker" data-title="Выберите месяц"
+                                            data-val="true" data-val-required="Укажите месяц">
+                                        <option></option>
+                                        @{
+                                            Dictionary<int, string> months = new Dictionary<int, string>()
                                                                                     { {1,"Январь"}, {2,"Февраль"}, {3,"Март"}, {4,"Апрель"}, {5,"Май"}, {6,"Июнь"},
                                                                                         {7,"Июль"}, {8,"Август"}, {9,"Сентябрь"}, {10,"Октябрь"}, {11,"Ноябрь"}, {12,"Декабрь"} };
-                                                @foreach (KeyValuePair<int, string> m in months)
-                                                {
-                                                    if (m.Key == (DateTime.Now.Month))
-                                                    {
-                                                        <option selected value="@m.Key">@m.Value</option>
-                                                    } else
-                                                    {
-                                                        <option value="@m.Key">@m.Value</option>
-                                                    }
-                                                }
-                                            }
-                                        </select>
-                                    </div>
-                                    <div class="form-group col-6">                                        
-                                        <select name="Account.OnDate_Year" class="form-control selectpicker" data-title="Выберите год">
-                                            <option></option>
-                                            @for (int i = DateTime.Now.Year; i > DateTime.Now.Year - 5; i--)
+                                            @foreach (KeyValuePair<int, string> m in months)
                                             {
-                                                if (i == DateTime.Now.Year)
+                                                if (m.Key == (DateTime.Now.Month))
                                                 {
-                                                    <option selected value="@i">@i</option>
+                                                    <option selected value="@m.Key">@m.Value</option>
                                                 }
                                                 else
                                                 {
-                                                    <option value="@i">@i</option>
+                                                    <option value="@m.Key">@m.Value</option>
                                                 }
                                             }
-                                        </select>
-                                    </div>
+                                        }
+                                    </select>
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="Account.OnDate_Month" data-valmsg-replace="true"></span>
+                                </div>
+                                <div class="form-group col-6">
+                                    <select id="Account_OnDate_Year" name="Account.OnDate_Year" class="form-control selectpicker" data-title="Выберите год"
+                                            data-val="true" data-val-required="Укажите год">
+                                        <option></option>
+                                        @for (int i = DateTime.Now.Year; i > DateTime.Now.Year - 5; i--)
+                                        {
+                                            if (i == DateTime.Now.Year)
+                                            {
+                                                <option selected value="@i">@i</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@i">@i</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="Account.OnDate_Year" data-valmsg-replace="true"></span>
                                 </div>
                             </div>
                         </div>

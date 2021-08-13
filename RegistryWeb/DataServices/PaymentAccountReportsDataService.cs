@@ -37,7 +37,7 @@ namespace RegistryWeb.DataServices
                     select row).Include(p => p.PaymentAccountNavigation).FirstOrDefault();
         }
 
-        public InvoiceGeneratorParam GetPaymentOnDate(int idAccount, DateTime onDate)
+        public InvoiceGeneratorParam GetInvoiceGeneratorParam(int idAccount, DateTime onDate)
         {
             var paymentDate = new DateTime(onDate.Year, onDate.Month, 1);
             paymentDate = paymentDate.AddMonths(1).AddDays(-1);
@@ -115,7 +115,19 @@ namespace RegistryWeb.DataServices
             }
         }
 
-        public void AddLIG(LogInvoiceGenerator lig)
+        public LogInvoiceGenerator InvoiceGeneratorParamToLog(InvoiceGeneratorParam param, int errorCode)
+        {
+            return new LogInvoiceGenerator
+            {
+                IdAccount = param.IdAcconut,
+                CreateDate = DateTime.Now,
+                OnDate = param.OnData,
+                Emails = string.Join(", ", param.Emails).ToString(),
+                ResultCode = errorCode
+            };
+        }
+
+        public void AddLogInvoiceGenerator(LogInvoiceGenerator lig)
         {
             registryContext.LogInvoiceGenerator.Add(lig);
             registryContext.SaveChanges();

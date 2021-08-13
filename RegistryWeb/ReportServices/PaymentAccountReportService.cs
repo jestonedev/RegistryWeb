@@ -112,56 +112,36 @@ namespace RegistryWeb.ReportServices
             return idAccounts.Select(r => r.ToString()).Aggregate((v, acc) => v + "," + acc);
         }
 
-        internal int InvoiceGenerator(InvoiceGeneratorParam parametrs)
+        internal Dictionary<Dictionary<string, object>, int> GenerateInvoices(List<InvoiceGeneratorParam> invoices, string action, string destDirectory = null)
         {
-            if (parametrs.Emails.Any())
+            var parametrs = new List<Dictionary<string, object>>();
+            if (action == "Export")
+            {
+                if (Directory.Exists(destDirectory)) Directory.Delete(destDirectory);
+                Directory.CreateDirectory(destDirectory);
+            }
+            foreach (var invoice in invoices)
             {
                 var arguments = new Dictionary<string, object>
                 {
-                    { "id_account", parametrs.IdAcconut },
-                    { "--address", parametrs.Address },
-                    { "--account", parametrs.Account },
-                    { "--tenant", parametrs.Tenant },
-                    { "--on-date", parametrs.OnData.ToString("dd.MM.yyyy")},
-                    { "--balance-input", parametrs.BalanceInput },
-                    { "--charging", parametrs.Charging },
-                    { "--payed", parametrs.Payed },
-                    { "--recalc", parametrs.Recalc },
-                    { "--balance-output", parametrs.BalanceOutput },
-                    { "--total-area", parametrs.TotalArea },
-                    { "--prescribed", parametrs.Prescribed },
-                    { "--email", parametrs.Emails.Aggregate((x, y) => x + "," + y) }
+                    { "id_account", invoice.IdAcconut },
+                    { "--address", invoice.Address },
+                    { "--account", invoice.Account },
+                    { "--tenant", invoice.Tenant },
+                    { "--on-date", invoice.OnData.ToString("dd.MM.yyyy")},
+                    { "--balance-input", invoice.BalanceInput },
+                    { "--charging", invoice.Charging },
+                    { "--payed", invoice.Payed },
+                    { "--recalc", invoice.Recalc },
+                    { "--balance-output", invoice.BalanceOutput },
+                    { "--total-area", invoice.TotalArea },
+                    { "--prescribed", invoice.Prescribed },
                 };
-                return GenerateInvoice(arguments);
-            }
-            else return -6;
-        }
-
-        internal Dictionary<Dictionary<string, object>, int> InvoicesGenerator(List<InvoiceGeneratorParam> invoices)
-        {
-            var parametrs = new List<Dictionary<string, object>>();
-            foreach (var invoice in invoices)
-            {
-                if (invoice.Emails.Any())
-                {
-                    var arguments = new Dictionary<string, object>
-                    {
-                        { "id_account", invoice.IdAcconut },
-                        { "--address", invoice.Address },
-                        { "--account", invoice.Account },
-                        { "--tenant", invoice.Tenant },
-                        { "--on-date", invoice.OnData.ToString("dd.MM.yyyy")},
-                        { "--balance-input", invoice.BalanceInput },
-                        { "--charging", invoice.Charging },
-                        { "--payed", invoice.Payed },
-                        { "--recalc", invoice.Recalc },
-                        { "--balance-output", invoice.BalanceOutput },
-                        { "--total-area", invoice.TotalArea },
-                        { "--prescribed", invoice.Prescribed },
-                        { "--email", invoice.Emails.Aggregate((x, y) => x + "," + y) }
-                    };
-                    parametrs.Add(arguments);
-                }
+                if (action == "Send")
+                    arguments.Add("--email", invoice.Emails.Aggregate((x, y) => x + "," + y));
+                else
+                    arguments.Add("--move-to-filename", Path.Combine(destDirectory, string.Format("Счет-извещение по ЛС № {0}.pdf", invoice.Account)));
+                parametrs.Add(arguments);
             }
             return GenerateInvoices(parametrs);
         }

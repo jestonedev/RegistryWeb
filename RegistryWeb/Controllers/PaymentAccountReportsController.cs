@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -21,6 +23,7 @@ namespace RegistryWeb.Controllers
         private readonly PaymentAccountReportsDataService dataService;
         private readonly SecurityService securityService;
         private const string zipMime = "application/zip";
+        private const string pdfMime = "application/pdf";
         private const string odtMime = "application/vnd.oasis.opendocument.text";
         private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
         private const string xlsxMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
@@ -83,151 +86,177 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public JsonResult InvoiceGenerator(int idAccount, DateTime onDate)
+        public IActionResult InvoiceGenerator(int? idAccount, DateTime onDate, string invoiceAction)
         {
+            var results = new Dictionary<int, IEnumerable<string>>();
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return Json(new { ErrorCode = -8 });
-            try
+                return Json(new { ErrorCode = -8, results });
+            List<int> ids = new List<int>();
+            if (idAccount == null)
             {
-                var paymentOnDate = dataService.GetPaymentOnDate(idAccount, onDate);
-                var inv = new LogInvoiceGenerator
-                {
-                    CreateDate = DateTime.Now,
-                    OnDate = onDate
-                };
-
-                if (paymentOnDate.Tenant == null)
-                {
-                    inv.IdAccount = idAccount;
-                    inv.Emails="";
-                    inv.Result_code = -6;
-                    dataService.AddLIG(inv);
-
-                    return Json(new { ErrorCode = -6 });
-                }
-                if (paymentOnDate.Tenant!=null && !paymentOnDate.Emails.Any())
-                {
-                    inv.IdAccount = idAccount;
-                    inv.Emails = "";
-                    inv.Result_code = -7;
-                    dataService.AddLIG(inv);
-
-                    return Json(new { ErrorCode = -7 });
-                }
-
-                var code = reportService.InvoiceGenerator(paymentOnDate);
-            
-                inv.IdAccount = paymentOnDate.IdAcconut;
-                inv.Emails = string.Join(", ", paymentOnDate.Emails).ToString();
-                inv.Result_code = code;
-                dataService.AddLIG(inv);
-
-                return Json(new { ErrorCode = code });
+                ids = GetSessionIds();
+            } else
+            {
+                ids.Add(idAccount.Value);
             }
-            catch (Exception)
+
+            if (!ids.Any())
+                return Json(new { ErrorCode = -8, results });
+
+            var invoices = new List<InvoiceGeneratorParam>();
+
+            foreach (int id in ids)
+                invoices.Add(dataService.GetInvoiceGeneratorParam(id, onDate));
+
+            var emptyPaymentsInvoices = invoices.FindAll(x => x.Tenant == null && x.Address == "");
+            if (emptyPaymentsInvoices.Any())
             {
-                return Json(new { ErrorCode = -9 });
+                results.Add(-6, emptyPaymentsInvoices.Select(s => s.Account).AsEnumerable());
+
+                if (invoiceAction == "Send")
+                    foreach (var emptyPayment in emptyPaymentsInvoices)
+                    {
+                        dataService.AddLogInvoiceGenerator(dataService.InvoiceGeneratorParamToLog(emptyPayment, -6));
+                    }
+            }
+
+            if (invoiceAction == "Send")
+            {
+                var emptyEmailsInvoices = invoices.FindAll(x => (x.Tenant != null || x.Address != "") && !x.Emails.Any());
+                if (emptyEmailsInvoices.Any())
+                {
+                    results.Add(-7, emptyEmailsInvoices.Select(s => s.Account).AsEnumerable());
+                    foreach (var emptyEmail in emptyEmailsInvoices)
+                    {
+                        dataService.AddLogInvoiceGenerator(dataService.InvoiceGeneratorParamToLog(emptyEmail, -7));
+                    }
+                }
+            }
+
+            if (invoiceAction == "Export" && results.Any())
+            {
+                return GenerateInvoiceError(results);
+            }
+
+            var correctInvoices = invoices.FindAll(x => (x.Tenant != null || x.Address != "") && 
+                ((invoiceAction == "Send" && x.Emails.Any()) || invoiceAction == "Export"));
+            if (correctInvoices.Count() > 0)
+            {
+                try
+                {
+                    var destDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", Guid.NewGuid().ToString());
+                    var resultInvoces = reportService.GenerateInvoices(correctInvoices, invoiceAction, destDirectory);
+                    var resultsGroupedByErrorCode = resultInvoces.GroupBy(t => t.Value)
+                         .ToDictionary(t => t.Key, t => t.Select(r => r.Key).ToList());
+
+                    foreach (var resultGroup in resultsGroupedByErrorCode)
+                    {
+                        var accounts = new List<string>();
+                        foreach (var invoiceArguments in resultsGroupedByErrorCode.Values)
+                        {
+                            for (var i = 0; i < invoiceArguments.Count; i++)
+                            {
+                                accounts.Add(invoiceArguments[i]["--account"].ToString());
+
+                                if (invoiceAction == "Send")
+                                {
+                                    var log = new LogInvoiceGenerator
+                                    {
+                                        IdAccount = Convert.ToInt32(invoiceArguments[i]["id_account"]),
+                                        CreateDate = DateTime.Now,
+                                        OnDate = Convert.ToDateTime(invoiceArguments[i]["--on-date"]),
+                                        Emails = invoiceArguments[i]["--email"].ToString(),
+                                        ResultCode = resultGroup.Key
+                                    };
+                                    dataService.AddLogInvoiceGenerator(log);
+                                }
+                            }
+                        }
+                        results.Add(resultGroup.Key, accounts);
+                    }
+
+                    if (invoiceAction == "Export" && results.Where(result => result.Key < 0).Any())
+                        return GenerateInvoiceError(results);
+
+                    if (invoiceAction == "Export")
+                        return InvoiceExport(destDirectory);
+                }
+                catch (Exception e)
+                {
+                    return Json(new { ErrorCode = -9 });
+                }
+            }
+            return Json(new { results });
+        }
+
+        private IActionResult InvoiceExport(string destDirectory)
+        {
+            var files = Directory.GetFiles(destDirectory);
+            if (!files.Any())
+            {
+                return Error("Неизвестная ошибка. Не сформировались файлы для скачивания");
+            }
+            if (files.Length == 1)
+            {
+                var fileName = files[0];
+                var fileInfo = new FileInfo(fileName);
+                var file = System.IO.File.ReadAllBytes(fileName);
+                Directory.Delete(destDirectory, true);
+                return File(file, pdfMime, fileInfo.Name);
+            }
+            else
+            {
+                var destZipFile = destDirectory + ".zip";
+                var fileInfo = new FileInfo(destZipFile);
+                ZipFile.CreateFromDirectory(destDirectory, destZipFile);
+                Directory.Delete(destDirectory, true);
+                var file = System.IO.File.ReadAllBytes(destZipFile);
+                System.IO.File.Delete(destZipFile);
+                return File(file, zipMime, fileInfo.Name);
             }
         }
 
-        public JsonResult InvoicesGenerator(DateTime onDate)
+        private IActionResult GenerateInvoiceError(Dictionary<int, IEnumerable<string>> results)
         {
-            List<int> ids = GetSessionIds();
-            var jsonResults = new Dictionary<int, IEnumerable<string>>();
-
-            if (!ids.Any())
-                return Json(new { errorCode = -8, jsonResults });
-
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return Json(new { errorCode = -8, jsonResults });
-
-            var invoices = new List<InvoiceGeneratorParam>();
-            try
+            var error = "";
+            foreach (var result in results.Where(r => r.Key != 0))
             {
-                foreach(int idAccount in ids)                
-                    invoices.Add(dataService.GetPaymentOnDate(idAccount, onDate));
-
-                var nuls = invoices.FindAll(x => x.Tenant==null);
-                var emailfree = invoices.FindAll(x=> x.Tenant!=null && !x.Emails.Any());
-                if (nuls.Any())
+                switch (result.Key)
                 {
-                    jsonResults.Add(-6, nuls.Select(s=>s.Account).AsEnumerable());
-
-                    foreach(var n in nuls)
-                    {
-                        //код для добавл-я записи в бд
-                        var inv = new LogInvoiceGenerator
-                        {
-                            IdAccount = n.IdAcconut,
-                            CreateDate = DateTime.Now,
-                            OnDate = n.OnData,
-                            Emails = string.Join(", ", n.Emails).ToString(),
-                            Result_code = -6
-                        };
-                        dataService.AddLIG(inv);
-                    }
+                    case -1:
+                        error += "Ошибка при сохранении qr - кода. ЛС № ";
+                        break;
+                    case -2:
+                        error += "Ошибка сохранения html - файла. ЛС № ";
+                        break;
+                    case -3:
+                        error += "Ошибка конвертации html в pdf. ЛС № ";
+                        break;
+                    case -4:
+                        error += "Ошибка отправки сообщения. ЛС № ";
+                        break;
+                    case -5:
+                        error += "Ошибка удаления временных файлов. ЛС № ";
+                        break;
+                    case -6:
+                        error += "Отсутствует платеж на указанную дату. ЛС № ";
+                        break;
+                    case -7:
+                        error += "Отсутствует электронная почта для отправки. ЛС № ";
+                        break;
+                    case -8:
+                        error += "Недостаточно прав на данную операцию. ЛС № ";
+                        break;
+                    default:
+                        error += "Неизвестная ошибка. ЛС № ";
+                        break;
                 }
-                if (emailfree.Any())
-                {
-                    jsonResults.Add(-7, emailfree.Select(s=>s.Account).AsEnumerable());
-
-                    foreach (var ef in emailfree)
-                    {
-                        //код для добавл-я записи в бд
-                        var inv = new LogInvoiceGenerator
-                        {
-                            IdAccount = ef.IdAcconut,
-                            CreateDate = DateTime.Now,
-                            OnDate = ef.OnData,
-                            Emails = string.Join(", ", ef.Emails).ToString(),
-                            Result_code = -7
-                        };
-                        dataService.AddLIG(inv);
-                    }
-                }
-
-                var listi=invoices.FindAll(x=>x!=null && x.Emails.Any());
-                if (listi.Count() > 0 && listi.Count() <= invoices.Count())
-                {
-                    var result = reportService.InvoicesGenerator(listi);
-
-                    var resultgr = result.GroupBy(t => t.Value)
-                             .ToDictionary(t=>t.Key, t=>t.Select(r=>r.Key).ToList());
-
-                    foreach(var u in resultgr)
-                    {
-                        int i;  var h = "";
-                        foreach(var res in resultgr.Values)
-                        {
-                            for (i = 0; i < res.Count; i++)
-                            {
-                                h += res[i]["--account"];
-                                if (i!=res.Count-1)
-                                    h += ", ";
-
-                                //код для добавл-я записи в бд
-                                var inv = new LogInvoiceGenerator
-                                {
-                                    IdAccount = Convert.ToInt32(res[i]["id_account"]),
-                                    CreateDate = DateTime.Now,
-                                    OnDate = Convert.ToDateTime(res[i]["--on-date"]),
-                                    Emails = res[i]["--email"].ToString(),
-                                    Result_code=u.Key
-                                };
-                                dataService.AddLIG(inv);
-                            }
-                        }
-                        jsonResults.Add(u.Key, h.Split(',').AsEnumerable());
-                    }
-                }
-                return Json(jsonResults);
+                if (result.Value.Count() > 8)
+                    error += result.Value.Take(8).Aggregate((acc, v) => acc + ", " + v) + "... ";
+                else
+                    error += result.Value.Aggregate((acc, v) => acc + ", " + v) + ". ";
             }
-            catch (Exception ex)
-            {
-                jsonResults.Clear();
-                jsonResults.Add(-9, Enumerable.Repeat(ex.Message, 1));
-                return Json(jsonResults);
-            }
+            return Error(error);
         }
 
         public IActionResult GetPaymentsExport()

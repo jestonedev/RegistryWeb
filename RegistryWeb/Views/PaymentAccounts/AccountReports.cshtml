@@ -62,7 +62,8 @@
             </button>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="operationsButton">
                 <button class="dropdown-item" @(canEdit && Model.Payments.Any() ? "" : "disabled") href="#" id="addClaim">Создать претензионно-исковую работу</button>
-                <button class="dropdown-item rr-report-rig" @(Model.Payments.Any() ? "" : "disabled") href="#" data-id-account="0">Отправить счёт-извещение</button>
+                <button class="dropdown-item rr-report-rig-send" @(Model.Payments.Any() ? "" : "disabled") href="#" data-id-account="0">Отправить счёт-извещение</button>
+                <button class="dropdown-item rr-report-rig-export" @(Model.Payments.Any() ? "" : "disabled") href="#" data-id-account="0">Сформировать счёт-извещение</button>
             </div>
         </div>
     </div>
