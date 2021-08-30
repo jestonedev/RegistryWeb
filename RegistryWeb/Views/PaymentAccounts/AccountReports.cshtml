@@ -9,6 +9,7 @@
     var text = "Количество записей: " + Model.PageOptions.TotalRows;
     var canEdit = ViewBag.CanEdit;
     var errorPayments = (List<Payment>)ViewData["ErrorPayments"];
+    var emails = (Dictionary<int, List<string>>)ViewData["Emails"];
 }
 
 @section Scripts
@@ -61,7 +62,8 @@
             </button>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="operationsButton">
                 <button class="dropdown-item" @(canEdit && Model.Payments.Any() ? "" : "disabled") href="#" id="addClaim">Создать претензионно-исковую работу</button>
-                <button class="dropdown-item rr-report-rig" @(Model.Payments.Any() ? "" : "disabled") href="#" data-id-account="0">Отправить счёт-извещение</button>
+                <button class="dropdown-item rr-report-rig-send" @(Model.Payments.Any() ? "" : "disabled") href="#" data-id-account="0">Отправить счёт-извещение</button>
+                <button class="dropdown-item rr-report-rig-export" @(Model.Payments.Any() ? "" : "disabled") href="#" data-id-account="0">Сформировать счёт-извещение</button>
             </div>
         </div>
     </div>
@@ -72,6 +74,7 @@
         <tr>
             <th>№ по реестру</th>
             <th>Адрес</th>
+            <th>Электронная почта</th>
             <th width="100px"></th>
         </tr>
     </thead>
@@ -97,6 +100,15 @@
                             <b>По БКС: </b><br />@item.PaymentAccountNavigation.RawAddress<br />
                             @item.PaymentAccountNavigation.Crn
                         </div>
+                    </td>
+                    <td>
+                        @if(emails.ContainsKey(item.IdAccount))
+                        {
+                            foreach(var email in emails[item.IdAccount])
+                            {
+                                <div>@email</div>
+                            }
+                        }
                     </td>
                     <td>
                         <div class="btn-group" role="group" aria-label="Панель доступа">

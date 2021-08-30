@@ -195,6 +195,23 @@ $(function () {
         return isValid;
     }
 
+    function updateCountPersonsBadge() {
+        var form = $('#TenancyProcessPersonsForm');
+        var badge = form.find(".rr-count-badge");
+        var count = $('#TenancyProcessPersonsForm').find('.list-group-item').length - 1;
+        var activeCount = $('#TenancyProcessPersonsForm').find('.list-group-item').filter(function (idx, elem) {
+            return $(elem).find('input[id^="ExcludeDate_"]').val() === "";
+        }).length;
+        if (count > 0) {
+            badge.text(activeCount + " / " + count);
+            badge.css("display", "inline-block");
+        }
+        else {
+            badge.find(".rr-count-badge").text('');
+            badge.css("display", "none");
+        }
+    }
+
     $("#personModal").on("click", "#savePersonModalBtn", function (e) {
         let action = $('#TenancyProcessPersons').data('action');
         var form = $("#TenancyProcessPersonsModalForm");
@@ -225,9 +242,7 @@ $(function () {
                     if (tenancyPersonReturn.idPerson > 0) {
                         form.find("[name='Person.IdPerson']").val(tenancyPersonReturn.idPerson);
                         updateInsertTenancyPersonElem();
-
-                        var flag = $("#TenancyProcessPersonsForm").find("rr-list-group-item-empty") != null ? true : false;
-                        countBadges('#TenancyProcessPersonsForm', flag);
+                        updateCountPersonsBadge();
 
                     } else {
                         alert('Произошла ошибка при сохранении');
@@ -269,9 +284,8 @@ $(function () {
                             if ($("#TenancyProcessPersons .list-group-item").length === 1) {
                                 $("#TenancyProcessPersons .rr-list-group-item-empty").show();
                             }
-
-                            var flag = $("#TenancyProcessPersonsForm").find("rr-list-group-item-empty") != null ? true : false;
-                            countBadges('#TenancyProcessPersonsForm', flag);
+                            
+                            updateCountPersonsBadge();
                         }
                         else {
                             alert("Ошибка удаления!");

@@ -186,48 +186,19 @@ namespace RegistryWeb.ReportServices
             }
         }
 
-        protected int GenerateInvoice(Dictionary<string, object> arguments)
-        {
-            var logStr = new StringBuilder();
-
-            try
-            {
-                using (var p = new Process())
-                {
-                    p.StartInfo.UseShellExecute = false;
-                    p.StartInfo.CreateNoWindow = true;
-                    p.StartInfo.FileName = "dotnet";
-                    p.StartInfo.WorkingDirectory = invoiceGeneratorPath;
-                    p.StartInfo.Arguments = "\"" + Path.Combine(invoiceGeneratorPath, "RegistryInvoiceGenerator.dll") + "\"" + GetArgumentsForGenerator(arguments);
-
-                    logStr.Append("<dl>\n<dt>Arguments\n<dd>" + p.StartInfo.Arguments + "\n");
-                    p.Start();
-                    p.WaitForExit();
-                    return p.ExitCode;
-                }
-            }
-            catch (Exception ex)
-            {
-                logStr.Append("<dl>\n<dt>Error\n<dd>" + ex.Message + "\n</dl>");
-                throw new Exception(logStr.ToString());
-            }
-        }
-
         protected Dictionary<Dictionary<string, object>, int> GenerateInvoices(List<Dictionary<string, object>> invoices)
         {
             var runnedInvoices = new Dictionary<Dictionary<string, object>, Process>();
             var runnInvoiceResults = new Dictionary<Dictionary<string, object>, int>();
             var dic = new Dictionary<int, IEnumerable<string>>();
-            //var invoiceGeneratorPath = @"D:\Projects\registryinvoicegenerator\RegistryInvoiceGenerator\RegistryInvoiceGenerator\bin\Debug\netcoreapp2.2\";
 
             foreach (var invoice in invoices)
             {
                 var p = new Process();
                 p.StartInfo.FileName = "dotnet";
                 p.StartInfo.WorkingDirectory = invoiceGeneratorPath;
-                p.StartInfo.Arguments = "\"" + Path.Combine(invoiceGeneratorPath, "RegistryInvoiceGenerator.dll") + "\"" + GetArgumentsForGenerator(invoice);                    
+                p.StartInfo.Arguments = "\"" + Path.Combine(invoiceGeneratorPath, "RegistryInvoiceGenerator.dll") + "\"" + GetArgumentsForGenerator(invoice);
                 p.Start();
-
                 runnedInvoices.Add(invoice, p);                
 
                 if (runnedInvoices.Count >= 100 || runnedInvoices.Count==invoices.Count)

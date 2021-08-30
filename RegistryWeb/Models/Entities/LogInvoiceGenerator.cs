@@ -12,6 +12,6 @@ namespace RegistryWeb.Models
         public DateTime CreateDate { get; set; }
         public DateTime OnDate { get; set; }
         public string Emails { get; set; }
-        public int Result_code { get; set; }
+        public int ResultCode { get; set; }
     }
 }

@@ -76,7 +76,7 @@
         $("#accountCalcDeptModal").modal("hide");
     });
 
-    $("#accountBksAndTransToLegalModal, #accountCalcDeptModal").on("change", "select", function () {
+    $("#accountBksAndTransToLegalModal, #accountCalcDeptModal, #accountRegInGenForm").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
 
@@ -117,197 +117,145 @@
 
 //______________________________________________
 
-    $("body").on('click', ".rr-report-rig", function (e) {
+    $("body").on('click', ".rr-report-rig-send, .rr-report-rig-export", function (e) {
         var idAccount = $(this).data("id-account");
         var modal = $("#accountRegInGenModal");
         modal.find("[name='Account.IdAccount']").val(idAccount);
         modal.find("input, textarea, select").prop("disabled", false);
 
-        refreshValidationForm($("#accountRegInGenForm"));
+        if ($(this).hasClass("rr-report-rig-send")) {
+            modal.find(".modal-title").text("Отправить счет-извещение");
+            modal.find(".rr-report-submit").text("Отправить");
+            modal.find("[name='Account.Action']").val("Send");
+        }
+        else {
+            modal.find(".modal-title").text("Сформировать счет-извещение");
+            modal.find(".rr-report-submit").text("Сформировать");
+            modal.find("[name='Account.Action']").val("Export");
+        }
 
+        refreshValidationForm($("#accountRegInGenForm"));
         modal.modal("show");
         e.preventDefault();
-    });    
-        
-    if (navigator.userAgent.indexOf('YaBrowser') == -1) {
-        $("#dontforFirefox").css("display", "none");
-        $("#forFirefox").css("display", "block");
-    }
-    else {
-        $("#forFirefox").css("display", "none");
-        $("#dontforFirefox").css("display", "block");
+    });
+
+    function invoiceGeneratorCodeToErrorText(errorCode) {
+        switch (errorCode) {
+            case 0: 
+                return "Отправка выполнена успешно";
+            case -1: 
+                return "Ошибка при сохранении qr - кода";
+            case -2: 
+                return "Ошибка сохранения html - файла";
+            case -3: 
+                return "Ошибка конвертации html в pdf";
+            case -4:
+                return "Ошибка отправки сообщения";
+            case -5: 
+                return "Ошибка удаления временных файлов";
+            case -6: 
+                return "Отсутствует платеж на указанную дату";
+            case -7: 
+                return "Отсутствует электронная почта для отправки";
+            case -8: 
+                return "Недостаточно прав на данную операцию";
+            default:
+                return "Неизвестная ошибка";
+        }
     }
 
     $("#accountRegInGenModal .rr-report-submit").on("click", function (e)
     {
-        $("#accountRegInGenModal .rr-report-submit").prop("disabled", true);
-        $("#gifforrig").css("display", "block");
-
         e.preventDefault();
-        var isValid = $(this).closest("#accountRegInGenForm").valid();
+
+        var form = $(this).closest("#accountRegInGenForm");
+        var isValid = form.valid();
         if (!isValid) {
-            fixBootstrapSelectHighlight($(this).closest("#accountRegInGenForm"));
+            fixBootstrapSelectHighlight(form);
             return false;
         }
 
-        var OnDate = null;
-        if (navigator.userAgent.indexOf('YaBrowser') == -1)
-            OnDate = $("#accountRegInGenForm").find("[name='Account.OnDate_Year']").val() + "-" + $("#accountRegInGenForm").find("[name='Account.OnDate_Month']").val();
-        else
-            OnDate = $("#accountRegInGenForm").find("[name='Account.OnDate']").val();
-        
+        $("#accountRegInGenModal .rr-report-submit").prop("disabled", true);
+        $("#gifforrig").css("display", "block");
 
-        if (OnDate==null)
-            onDate = new Date().getFullYear()+"-"+new Date().getMonth()
-
-        var idAccount = $("#accountRegInGenModal").find("[name='Account.IdAccount']").val();
-        if (idAccount != undefined && idAccount != 0)
-        {
-            var codeError = null;
-            $.ajax({
-                type: 'POST',
-                url: window.location.origin + "/PaymentAccountReports/InvoiceGenerator?idAccount=" + idAccount + "&OnDate=" + OnDate,
-                dataType: 'json',
-                data: { errorCode: codeError },
-                success: function (data)
-                {
-                    $("#accountRegInGenModal .rr-report-submit").prop("disabled", false);
-                    $("#gifforrig").css("display", "none");
-                    $("#accountRegInGenModal").modal("hide");
-                    switch (data.errorCode)
-                    {
-                        case 0: {
-                            alert("Успешное выполнение");
-                            break;
-                        }
-                        case -1: {
-                            alert("Ошибка при сохранении qr - кода");
-                            break;
-                        }
-                        case -2: {
-                            alert("Ошибка сохранения html - файла");
-                            break;
-                        }
-                        case -3: {
-                            alert("Ошибка конвертации html в pdf");
-                            break;
-                        }
-                        case -4: {
-                            alert("Ошибка отправки сообщения");
-                            break;
-                        }
-                        case -5: {
-                            alert("Ошибка удаления временных файлов");
-                            break;
-                        }
-                        case -6: {
-                            alert("По данному ЛС отсутствует платеж на указанную дату");
-                            break;
-                        }
-                        case -7: {
-                            alert("Отсутствует электронная почта для отправки");
-                            break;
-                        }
-                        case -8: {
-                            alert("Недостаточно прав на данную операцию");
-                            break;
-                        }
-                        case -9: {
-                            alert("Требуется отладка для определения ошибки");
-                            break;
-                        }
-                    }
-                }
-            });
+        var onDate = form.find("[name='Account.OnDate_Year']").val() + "-" + $("#accountRegInGenForm").find("[name='Account.OnDate_Month']").val() + "-01";
+        var idAccount = form.find("[name='Account.IdAccount']").val();
+        var action = form.find("[name='Account.Action']").val();
+        var url = window.location.origin + "/PaymentAccountReports/InvoiceGenerator?onDate=" + onDate + "&invoiceAction=" + action;
+        if (idAccount !== "" && idAccount !== "0") {
+            url += "&idAccount=" + idAccount;
         }
-        else
-        {
-            $.ajax({
-                type: 'POST',
-                url: window.location.origin + "/PaymentAccountReports/InvoicesGenerator?OnDate=" + OnDate,
-                dataType: 'json',
-                success: function (data)
-                {
-                    $("#accountRegInGenModal .rr-report-submit").prop("disabled", false);
-                    $("#gifforrig").css("display", "none");
-                    //console.log(data);
-                    var str = "<ul class='text-left'>";
-                    var mas = []
-                    for (let d in data)
-                    {
-                        if (data[d].length <= 8)
-                            mas = data[d];
+
+        if (action === "Send") {
+            if (idAccount !== "" && idAccount !== "0") {
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    dataType: 'json',
+                    success: function (data) {
+                        $("#accountRegInGenModal .rr-report-submit").prop("disabled", false);
+                        $("#gifforrig").css("display", "none");
+                        $("#accountRegInGenModal").modal("hide");
+                        if (data.errorCode !== undefined)
+                            alert(invoiceGeneratorCodeToErrorText(data.errorCode | 0));
+                        for (let code in data.results) {
+                            alert(invoiceGeneratorCodeToErrorText(code | 0));
+                            return;
+                        }
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    dataType: 'json',
+                    success: function (data) {
+                        $("#accountRegInGenModal .rr-report-submit").prop("disabled", false);
+                        $("#gifforrig").css("display", "none");
+                        var str = "<ul class='text-left'>";
+                        if (data.errorCode !== undefined) {
+                            str += invoiceGeneratorCodeToErrorText(data.errorCode);
+                        } else {
+                            for (let code in data.results) {
+                                var accounts = [];
+                                if (data.results[code].length <= 8)
+                                    accounts = data.results[code];
+                                else {
+                                    for (var i = 0; i < 8; i++)
+                                        accounts.push(data.results[accounts][i]);
+                                }
+
+                                switch (code) {
+                                    case "0": case "-1": case "-2": case "-3":
+                                    case "-4": case "-5": case "-6": case "-7":
+                                        str += "<li>" + invoiceGeneratorCodeToErrorText(code | 0) + ": " + accounts +
+                                            (data.results[code].length > 8 ? ", ..." : "") + "<br>Всего: " + data.results[code].length + "</li>";
+                                        break;
+                                    default:
+                                        alert(invoiceGeneratorCodeToErrorText(code | 0));
+                                        break;
+                                }
+                            }
+                        }
+
+                        str += "</ul>";
+                        if (str !== "<ul class='text-left'></ul>") {
+                            $(".rr-errorsinv").css("display", "block");
+                            $(".rr-errorsinv-item").html(str);
+                        }
                         else
-                        {
-                            var dd=0;
-                            for (dd=0; dd<8; dd++)                            
-                                mas.push(data[d][dd]);                            
-                        }
+                            $("rr-errorsinv").css("display", "none");
 
-                        switch (d) {
-                            case "0": {
-                                str += "<li>Успешная отправка для ЛС: " + mas + ", ...<br>Всего: " + data[d].length + "</li>";
-                                mas.length = 0;
-                                break;
-                            }
-                            case "-1": {
-                                str += "<li>Ошибка при сохранении qr - кода для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
-                                mas.length = 0;
-                                break;
-                            }
-                            case "-2": {
-                                str += "<li>Ошибка сохранения html - файла для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
-                                mas.length = 0;
-                                break;
-                            }
-                            case "-3": {
-                                str += "<li>Ошибка конвертации html в pdf для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
-                                mas.length = 0;
-                                break;
-                            }
-                            case "-4": {
-                                str += "<li>Ошибка отправки сообщения для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
-                                mas.length = 0;
-                                break;
-                            }
-                            case "-5": {
-                                str += "<li>Ошибка удаления временных файлов для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
-                                mas.length = 0;
-                                break;
-                            }
-                            case "-6": {
-                                str += "<li>Отсутствие платежа на указанную дату для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
-                                mas.length = 0;
-                                break;
-                            }
-                            case "-7": {
-                                str += "<li>Отсутствует электронная почта для ЛС: "+mas+", ...<br>Всего: "+data[d].length+"</li>";
-                                mas.length = 0;
-                                break;
-                            }
-                            case "-8": {
-                                alert("Недостаточно прав на данную операцию");
-                                break;
-                            }
-                            case "-9": {
-                                alert("Требуется отладка для определения ошибки");
-                                break;
-                            }
-                        }
+                        $("#accountRegInGenModal").modal("hide");
                     }
-
-                    str += "</ul>";
-                    if (str != "<ul class='text-left'>")
-                    {
-                        $(".rr-errorsinv").css("display", "block");
-                        $(".rr-errorsinv-item").html(str);
-                    }
-                    else
-                        $("rr-errorsinv").css("display", "none");
-
-                    $("#accountRegInGenModal").modal("hide");
-                }
-            });
+                });
+            }
+        } else {
+            $("#accountRegInGenModal .rr-report-submit").prop("disabled", false);
+            $("#gifforrig").css("display", "none");
+            $("#accountRegInGenModal").modal("hide");
+            downloadFile(url);
         }
     });
 

@@ -1,5 +1,9 @@
 ﻿@{
     ViewData["Title"] = "Ошибка";
+    @if (ViewData["Controller"].ToString() == "PaymentAccountReports")
+    {
+        ViewData["Controller"] = "PaymentAccounts";
+    }
     if (ViewData["Controller"].ToString() == "Account")
     {
         <div class="container mt-4 text-center">

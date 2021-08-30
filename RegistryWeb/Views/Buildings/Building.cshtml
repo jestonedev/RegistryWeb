@@ -1,6 +1,7 @@
 ﻿@model RegistryWeb.Models.Entities.Building;
 @using RegistryWeb.Extensions;
 @using RegistryWeb.SecurityServices;
+@using RegistryWeb.DataHelpers;
 
 @{
     var controller = Context.Session.Get<string>("Controller");
@@ -61,7 +62,7 @@
                             @if (securityService.HasPrivilege(Privileges.TenancyRead))
                             {
                                 <a class="dropdown-item" title="Найм помещения" aria-label="Найм помещения"
-                                   asp-controller="TenancyProcesses" asp-action="Index" 
+                                   asp-controller="TenancyProcesses" asp-action="Index"
                                    asp-route-filterOptions.IdBuilding="@Model.IdBuilding"
                                    asp-route-filterOptions.Address.AddressType="Building"
                                    asp-route-filterOptions.Address.Id="@Model.IdBuilding"
@@ -78,7 +79,7 @@
                             @if (securityService.HasPrivilege(Privileges.ClaimsRead))
                             {
                                 <a class="dropdown-item" title="Лицевые счета БКС" aria-label="Лицевые счета"
-                                   asp-controller="PaymentAccounts" asp-action="Index" 
+                                   asp-controller="PaymentAccounts" asp-action="Index"
                                    asp-route-filterOptions.IdBuilding="@Model.IdBuilding"
                                    asp-route-filterOptions.Address.AddressType="Building"
                                    asp-route-filterOptions.Address.Id="@Model.IdBuilding"
@@ -86,15 +87,17 @@
                             }
                         </div>
                     </div>
-
-                    <div class="btn-group" role="group" aria-label="Отчеты">
-                        <button class="btn btn-success dropdown-toggle" type="button" title="Отчеты" aria-label="отчеты" id="reportsBtn_@Model.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="oi oi-document"></span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.IdBuilding">
-                            <a class="dropdown-item rr-report-building-excerpt" href="#" title="Выписка на здание" aria-label="Выписка на здание" data-id-building="@Model.IdBuilding">Выписка на здание</a>
+                    @if (ObjectStateHelper.IsMunicipal(Model.IdState))
+                    {
+                        <div class="btn-group" role="group" aria-label="Отчеты">
+                            <button class="btn btn-success dropdown-toggle" type="button" title="Отчеты" aria-label="отчеты" id="reportsBtn_@Model.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="oi oi-document"></span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.IdBuilding">
+                                <a class="dropdown-item rr-report-building-excerpt" href="#" title="Выписка на здание" aria-label="Выписка на здание" data-id-building="@Model.IdBuilding">Выписка на здание</a>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
             }
             <div class="btn-group" role="group" aria-label="Панель доступа">

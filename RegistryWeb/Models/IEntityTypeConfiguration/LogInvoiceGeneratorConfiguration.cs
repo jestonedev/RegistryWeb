@@ -39,7 +39,7 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("emails")
                 .IsUnicode(false);
 
-            builder.Property(e => e.Result_code)
+            builder.Property(e => e.ResultCode)
                 .HasColumnName("result_code")
                 .HasColumnType("int(11)");
         }            

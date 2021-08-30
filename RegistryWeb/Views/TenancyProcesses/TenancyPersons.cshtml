@@ -15,10 +15,11 @@
                 Участники найма
                 @{
                     var count = Model != null && Model.Any() ? Model.Count().ToString() : "";
+                    var activeCount = Model != null && Model.Any() ? Model.Where(p => p.ExcludeDate == null).Count().ToString() : "";
                     var visible = Model != null && Model.Any() ? "" : "style='display: none;'";
                 }
                 <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visible)>
-                    @count
+                    @activeCount / @count
                 </span>
             </h4>
             <div class="btn-group" role="group">

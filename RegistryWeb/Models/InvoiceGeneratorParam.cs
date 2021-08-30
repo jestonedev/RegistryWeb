@@ -12,12 +12,6 @@ namespace RegistryWeb.Models
         public string Account { get; set; }
         public string Tenant { get; set; }
         public DateTime OnData { get; set; }
-        /*public decimal BalanceInput { get; set; }
-        public decimal Charging { get; set; }
-        public decimal Payed { get; set; }
-        public decimal Recalc { get; set; }
-        public decimal BalanceOutput { get; set; }
-        public double TotalArea { get; set; }*/
         public string BalanceInput { get; set; }
         public string Charging { get; set; }
         public string Payed { get; set; }
