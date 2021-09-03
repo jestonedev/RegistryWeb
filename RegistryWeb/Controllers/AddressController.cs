@@ -28,9 +28,9 @@ namespace RegistryWeb.Controllers
             return Json(model);
         }
 
-        public JsonResult AutocompleteFilterOptionsAddress(string text, bool isBuildings = false)
+        public JsonResult AutocompleteFilterOptionsAddress(string text, AddressTypes addressTypes = AddressTypes.Premise)
         {
-            var addresses = addressesDataService.GetAddressesByText(text, isBuildings).GroupBy(a => a.AddressType);
+            var addresses = addressesDataService.GetAddressesByText(text, addressTypes).GroupBy(a => a.AddressType);
             return Json(new { addressType = addresses.FirstOrDefault()?.Key.ToString(),
                 autocompletePairs = addresses.FirstOrDefault()?.Select(a => new Tuple<string, string>(
                 a.Id,
@@ -38,9 +38,9 @@ namespace RegistryWeb.Controllers
             )) });
         }
 
-        public JsonResult AutocompleteFilterOptionsAddressAlt(string text, bool isBuildings = false)
+        public JsonResult AutocompleteFilterOptionsAddressAlt(string text, AddressTypes addressTypes = AddressTypes.Premise)
         {
-            var addresses = addressesDataService.GetAddressesByText(text, isBuildings).GroupBy(a => a.AddressType);
+            var addresses = addressesDataService.GetAddressesByText(text, addressTypes).GroupBy(a => a.AddressType);
             return Json(new
             {
                 addressType = addresses.FirstOrDefault()?.Key.ToString(),

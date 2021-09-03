@@ -2,12 +2,12 @@
     $('input[name="FilterOptions.Address.Text"]').autocomplete({
         source: function (request, response) {
             var self = $(this.element);
-            var isBuildings = self.data("isBuildings");
+            var addressTypes = self.data("isBuildings") ? "Building" : "Premise";
             $.ajax({
                 type: 'POST',
                 url: window.location.origin + '/Address/AutocompleteFilterOptionsAddress' + (self.hasClass("rr-alt-address-search") ? "Alt" : ""),
                 dataType: 'json',
-                data: { text: request.term, isBuildings: isBuildings },
+                data: { text: request.term, addressTypes: addressTypes },
                 success: function (data) {
                     if (data !== "0" && data !== undefined) {
                         if (self.hasClass("rr-alt-address-search")) {
