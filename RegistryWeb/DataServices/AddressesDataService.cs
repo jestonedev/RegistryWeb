@@ -19,11 +19,12 @@ namespace RegistryWeb.DataServices
             this.registryContext = registryContext;
         }
 
-        public List<Address> GetAddressesByText(string text, bool isBuildings = false)
+        public List<Address> GetAddressesByText(string text, AddressTypes addressTypes = AddressTypes.Premise)
         {
             if (string.IsNullOrEmpty(text)) return new List<Address>();
-            var match = Regex.Match(text, @"^(.*?)[,]*[ ]*(д\.?)?[ ]*(\d+[а-яА-Я]?([\\\/]\d+[а-яА-Я]?)?)?[ ,-]*(кв\.?|ком\.?|пом\.?|кв\.?[ ]?ком\.?|ком\.?[ ]?кв\.?)?[ ]*(\d+[а-яА-Я]?)?[ ]*$");
+            var match = Regex.Match(text, @"^(.*?)[,]*[ ]*(д\.?)?[ ]*(\d+[а-яА-Я]?([\\\/]\d+[а-яА-Я]?)?)?[ ,-]*(кв\.?|ком\.?|пом\.?|кв\.?[ ]?ком\.?|ком\.?[ ]?кв\.?)?[ ]*(\d+[а-яА-Я]?)?[ ]*(к\.?|ком\.)?[ ]*(\d+[а-яА-Я]?|[а-яА-Я]?)$");
             var addressWordsList = new List<string>();
+            if (addressTypes == AddressTypes.None) return new List<Address>();
             if (!string.IsNullOrEmpty(match.Groups[1].Value))
             {
                 addressWordsList.Add(match.Groups[1].Value);
@@ -35,6 +36,10 @@ namespace RegistryWeb.DataServices
             if (!string.IsNullOrEmpty(match.Groups[6].Value))
             {
                 addressWordsList.Add(match.Groups[6].Value);
+            }
+            if (!string.IsNullOrEmpty(match.Groups[8].Value))
+            {
+                addressWordsList.Add(match.Groups[8].Value);
             }
             var addressWords = addressWordsList.ToArray();
             var street = addressWords[0].ToLowerInvariant();
@@ -54,7 +59,7 @@ namespace RegistryWeb.DataServices
             else
             {
                 var house = addressWords[1].ToLowerInvariant();
-                if (addressWords.Length == 2)
+                if (addressWords.Length == 2 && addressTypes != AddressTypes.Street)
                 {
                     return registryContext.Buildings
                         .Include(b => b.IdStreetNavigation)
@@ -69,10 +74,10 @@ namespace RegistryWeb.DataServices
                             AddressType = AddressTypes.Building
                         }).ToList();
                 }
-                else if (!isBuildings)
+                else
                 {
                     var premiseNum = addressWords[2].ToLowerInvariant();
-                    if (addressWords.Length == 3)
+                    if (addressWords.Length == 3 && addressTypes != AddressTypes.Street && addressTypes != AddressTypes.Building)
                     {
                         return registryContext.Premises
                             .Include(p => p.IdPremisesType)
@@ -91,7 +96,7 @@ namespace RegistryWeb.DataServices
                                 AddressType = AddressTypes.Premise
                             }).ToList();
                     }
-                    else if (addressWords.Length == 4)
+                    else if (addressWords.Length == 4 && addressTypes == AddressTypes.SubPremise)
                     {
                         var subPremisesNum = addressWords[3].ToLowerInvariant();
                         return registryContext.SubPremises

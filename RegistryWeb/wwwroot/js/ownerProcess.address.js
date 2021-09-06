@@ -5,7 +5,7 @@
                 type: 'POST',
                 url: window.location.origin + '/Address/AutocompleteFilterOptionsAddress',
                 dataType: 'json',
-                data: { text: request.term },
+                data: { text: request.term, addressTypes: "SubPremise"  },
                 success: function (data) {
                     if (data !== "0" && data !== undefined) {
                         response($.map(data.autocompletePairs, function (pair) {
