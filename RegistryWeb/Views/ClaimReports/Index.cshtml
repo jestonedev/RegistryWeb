@@ -3,6 +3,7 @@
 @model ClaimReportsVM;
 @{
     ViewData["Title"] = "Отчеты по претензионно-исковой работе";
+    var myKeys = new List<DateTime>(Model.MonthsList.Values);
 }
 
 @section styles
@@ -133,15 +134,15 @@
                                     data-val="true" data-val-required="Укажите месяц">
                                 <option></option>
                                 @{
-                                    @foreach (KeyValuePair<int, string> m in Model.MonthsList)
+                                    @foreach (KeyValuePair<int, DateTime> m in Model.MonthsList)
                                     {
-                                        if (m.Key == (DateTime.Now.Month))
+                                        if (m.Key == (myKeys[0]).Month)
                                         {
-                                            <option selected value="@m.Key">@m.Value</option>
+                                            <option selected value="@m.Key">@m.Value.ToString("MMMM")</option>
                                         }
                                         else
                                         {
-                                            <option value="@m.Key">@m.Value</option>
+                                            <option value="@m.Key">@m.Value.ToString("MMMM")</option>
                                         }
                                     }
                                 }
@@ -155,7 +156,7 @@
                                 <option></option>
                                 @for (int i = DateTime.Now.Year; i > DateTime.Now.Year - 5; i--)
                                 {
-                                    if (i == DateTime.Now.Year)
+                                    if (i == (myKeys[0]).Year)
                                     {
                                         <option selected value="@i">@i</option>
                                     }
@@ -173,15 +174,15 @@
                                     data-val="true" data-val-required="Укажите месяц">
                                 <option></option>
                                 @{
-                                    @foreach (KeyValuePair<int, string> m in Model.MonthsList)
+                                    @foreach (KeyValuePair<int, DateTime> m in Model.MonthsList)
                                     {
-                                        if (m.Key == (DateTime.Now.Month))
+                                        if (m.Key == (myKeys[0]).Month)
                                         {
-                                            <option selected value="@m.Key">@m.Value</option>
+                                            <option selected value="@m.Key">@m.Value.ToString("MMMM")</option>
                                         }
                                         else
                                         {
-                                            <option value="@m.Key">@m.Value</option>
+                                            <option value="@m.Key">@m.Value.ToString("MMMM")</option>
                                         }
                                     }
                                 }
@@ -195,7 +196,7 @@
                                 <option></option>
                                 @for (int i = DateTime.Now.Year; i > DateTime.Now.Year - 5; i--)
                                 {
-                                    if (i == DateTime.Now.Year)
+                                    if (i == (myKeys[0]).Year)
                                     {
                                         <option selected value="@i">@i</option>
                                     }

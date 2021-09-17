@@ -10,6 +10,7 @@
             Snp = r.Surname + " " + r.Name + (r.Patronymic != null ? " " + r.Patronymic : "")
         }), "IdSigner", "Snp");
     }
+    var myKeys = new List<DateTime>(Model.MonthsList.Values);
 }
 
 
@@ -151,16 +152,15 @@
                                             data-val="true" data-val-required="Укажите месяц">
                                         <option></option>
                                         @{
-                                            var myKeys = new List<int>(Model.MonthsList.Keys);
-                                            @foreach (KeyValuePair<int, string> m in Model.MonthsList)
+                                            @foreach (KeyValuePair<int, DateTime> m in Model.MonthsList)
                                             {
-                                                if (m.Key == (myKeys[0]))
+                                                if (m.Key == (myKeys[0]).Month)
                                                 {
-                                                    <option selected value="@m.Key">@m.Value</option>
+                                                    <option selected value="@m.Key">@m.Value.ToString("MMMM")</option>
                                                 }
                                                 else
                                                 {
-                                                    <option value="@m.Key">@m.Value</option>
+                                                    <option value="@m.Key">@m.Value.ToString("MMMM")</option>
                                                 }
                                             }
                                         }
@@ -173,7 +173,7 @@
                                         <option></option>
                                         @for (int i = DateTime.Now.Year; i > DateTime.Now.Year - 5; i--)
                                         {
-                                            if (i == DateTime.Now.Year)
+                                            if (i == (myKeys[0]).Year)
                                             {
                                                 <option selected value="@i">@i</option>
                                             }

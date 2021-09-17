@@ -4,6 +4,7 @@ using RegistryWeb.Models.SqlViews;
 using RegistryWeb.ViewOptions.Filter;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 
 namespace RegistryWeb.ViewModel
 {
@@ -16,6 +17,6 @@ namespace RegistryWeb.ViewModel
         public IEnumerable<KladrRegion> Regions { get; set; }
         public SelectList KladrRegionsList { get; set; }
         public SelectList KladrStreetsList { get; set; }
-        public Dictionary<int, string> MonthsList { get; set; }
+        public Dictionary<int, DateTime> MonthsList { get; set; }
     }
 }
