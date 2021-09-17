@@ -37,7 +37,7 @@ namespace RegistryWeb.DataServices
                     select row).Include(p => p.PaymentAccountNavigation).FirstOrDefault();
         }
 
-        public InvoiceGeneratorParam GetInvoiceGeneratorParam(int idAccount, DateTime onDate)
+        public InvoiceGeneratorParam GetInvoiceGeneratorParam(int idAccount, DateTime onDate, string textmessage)
         {
             var paymentDate = new DateTime(onDate.Year, onDate.Month, 1);
             paymentDate = paymentDate.AddMonths(1).AddDays(-1);
@@ -88,7 +88,8 @@ namespace RegistryWeb.DataServices
                     BalanceOutput = pay.BalanceOutputTotal.ToString().Replace(',', '.'),
                     TotalArea = pay.TotalArea.ToString().Replace(',', '.'),
                     Prescribed = pay.Prescribed,
-                    Emails = emails
+                    Emails = emails,
+                    TextMessage = textmessage
                 };
                 return ob;
             }
@@ -110,7 +111,8 @@ namespace RegistryWeb.DataServices
                     BalanceOutput = "",
                     TotalArea = "",
                     Prescribed = 0,
-                    Emails = new List<string>()
+                    Emails = new List<string>(),
+                    TextMessage=""
                 };
             }
         }

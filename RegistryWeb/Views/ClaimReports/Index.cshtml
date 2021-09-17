@@ -127,6 +127,86 @@
                         </div>
                     </div>
                     <div class="form-row">
+                        <label class="form-group col-1 ml-2" for="StDate_Month">С</label>
+                        <div class="form-group col-5">
+                            <select id="StDate_Month" name="StDate_Month" class="form-control selectpicker" data-title="Выберите месяц"
+                                    data-val="true" data-val-required="Укажите месяц">
+                                <option></option>
+                                @{
+                                    @foreach (KeyValuePair<int, string> m in Model.MonthsList)
+                                    {
+                                        if (m.Key == (DateTime.Now.Month))
+                                        {
+                                            <option selected value="@m.Key">@m.Value</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@m.Key">@m.Value</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="StDate_Month" data-valmsg-replace="true"></span>
+
+                        </div>
+                        <div class="form-group col-5  ml-4">
+                            <select id="StDate_Year" name="StDate_Year" class="form-control selectpicker" data-title="Выберите год"
+                                    data-val="true" data-val-required="Укажите год">
+                                <option></option>
+                                @for (int i = DateTime.Now.Year; i > DateTime.Now.Year - 5; i--)
+                                {
+                                    if (i == DateTime.Now.Year)
+                                    {
+                                        <option selected value="@i">@i</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@i">@i</option>
+                                    }
+                                }
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="StDate_Year" data-valmsg-replace="true"></span>
+                        </div>
+                        <label class="form-group col-1 ml-2" for="EndDate_Month">По</label>
+                        <div class="form-group col-5">
+                            <select id="EndDate_Month" name="EndDate_Month" class="form-control selectpicker" data-title="Выберите месяц"
+                                    data-val="true" data-val-required="Укажите месяц">
+                                <option></option>
+                                @{
+                                    @foreach (KeyValuePair<int, string> m in Model.MonthsList)
+                                    {
+                                        if (m.Key == (DateTime.Now.Month))
+                                        {
+                                            <option selected value="@m.Key">@m.Value</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@m.Key">@m.Value</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="EndDate_Month" data-valmsg-replace="true"></span>
+
+                        </div>
+                        <div class="form-group col-5  ml-4">
+                            <select id="EndDate_Year" name="EndDate_Year" class="form-control selectpicker" data-title="Выберите год"
+                                    data-val="true" data-val-required="Укажите год">
+                                <option></option>
+                                @for (int i = DateTime.Now.Year; i > DateTime.Now.Year - 5; i--)
+                                {
+                                    if (i == DateTime.Now.Year)
+                                    {
+                                        <option selected value="@i">@i</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@i">@i</option>
+                                    }
+                                }
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="EndDate_Year" data-valmsg-replace="true"></span>
+                        </div>
                         <div class="form-group col-12">
                             <select name="Flag" class="form-control selectpicker" data-title="Выберите критерий рассылки">
                                 <option selected value="0">Все</option>

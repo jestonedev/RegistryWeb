@@ -43,6 +43,17 @@ namespace RegistryWeb.DataServices
                 StateTypes = registryContext.ClaimStateTypes.ToList(),
                 CurrentExecutor = securityServices.Executor
             };
+
+            var monthsList = registryContext.Payments
+                            .Select(p => p.Date).Distinct()
+                            .OrderByDescending(p => p.Date).Take(6)
+                            .ToList();
+
+            viewModel.MonthsList = new Dictionary<int, string>();
+            for (var i = 0; i < monthsList.Count(); i++)
+                viewModel.MonthsList.Add(monthsList[i].Month, monthsList[i].Date.ToString("MMMM"));
+
+
             return viewModel;
         }
 

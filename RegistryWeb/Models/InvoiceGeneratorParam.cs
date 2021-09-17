@@ -18,6 +18,7 @@ namespace RegistryWeb.Models
         public string Recalc { get; set; }
         public string BalanceOutput { get; set; }
         public string TotalArea { get; set; }
+        public string TextMessage { get; set; }
         public int Prescribed { get; set; }
         public List<string> Emails { get; set; }
     }

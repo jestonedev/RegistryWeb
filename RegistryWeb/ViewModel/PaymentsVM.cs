@@ -16,5 +16,6 @@ namespace RegistryWeb.ViewModel
         public IEnumerable<KladrRegion> Regions { get; set; }
         public SelectList KladrRegionsList { get; set; }
         public SelectList KladrStreetsList { get; set; }
+        public Dictionary<int, string> MonthsList { get; set; }
     }
 }

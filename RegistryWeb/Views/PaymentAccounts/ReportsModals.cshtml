@@ -151,12 +151,10 @@
                                             data-val="true" data-val-required="Укажите месяц">
                                         <option></option>
                                         @{
-                                            Dictionary<int, string> months = new Dictionary<int, string>()
-                                                                                    { {1,"Январь"}, {2,"Февраль"}, {3,"Март"}, {4,"Апрель"}, {5,"Май"}, {6,"Июнь"},
-                                                                                        {7,"Июль"}, {8,"Август"}, {9,"Сентябрь"}, {10,"Октябрь"}, {11,"Ноябрь"}, {12,"Декабрь"} };
-                                            @foreach (KeyValuePair<int, string> m in months)
+                                            var myKeys = new List<int>(Model.MonthsList.Keys);
+                                            @foreach (KeyValuePair<int, string> m in Model.MonthsList)
                                             {
-                                                if (m.Key == (DateTime.Now.Month))
+                                                if (m.Key == (myKeys[0]))
                                                 {
                                                     <option selected value="@m.Key">@m.Value</option>
                                                 }
@@ -188,6 +186,10 @@
                                     <span class="text-danger field-validation-valid" data-valmsg-for="Account.OnDate_Year" data-valmsg-replace="true"></span>
                                 </div>
                             </div>
+                        </div>
+                        <div class="form-group col-12">
+                            <label class="mb-1" for="Account.TextMessage">Текст письма</label>
+                            <textarea rows="4" class="form-control" id="Account_TextMessage" name="Account.TextMessage" maxlength="4096" title="Текст письма"></textarea>
                         </div>
                     </div>
                 </div>
