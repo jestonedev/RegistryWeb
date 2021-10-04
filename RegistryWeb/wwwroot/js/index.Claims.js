@@ -15,6 +15,8 @@ var filterClearModal = function () {
     //$(".c-arithmetic-op").val(2);
     resetModalForm($("form.filterForm"));
     filterIdRegionChange();
+    $('#FilterOptions_IsCurrentState').prop('checked', false);
+    $('#FilterOptions_IsCurrentState').prop('disabled', true);
     $("form.filterForm").valid();
 };
 var filterClear = function () {
@@ -75,12 +77,25 @@ $(function () {
         filterIdRegionChange();
         e.preventDefault();
     });
+    $('#filterModal #FilterOptions_IdClaimState').on('change', function (e) {
+        if ($(this).val() == '') {
+            $('#FilterOptions_IsCurrentState').prop('checked', false);
+            $('#FilterOptions_IsCurrentState').prop('disabled',true);
+        }
+        else {
+            $('#FilterOptions_IsCurrentState').prop('disabled', false);
+        }
+        e.preventDefault();
+    });
     $('#filterClearModalBtn').click(filterClearModal);
     $('#filterClearBtn').click(filterClear);
 
     $("#filterModalShow").on("click", function (e) {
         e.preventDefault();
         var modal = $("#filterModal");
+        if ($('#FilterOptions_IsCurrentState').is(':checked')) {
+            $('#FilterOptions_IsCurrentState').prop('disabled', false);
+        }
         modal.modal('show');
     });
 

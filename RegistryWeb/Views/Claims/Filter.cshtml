@@ -258,6 +258,12 @@
                                 <input type="date" class="form-control" asp-for="FilterOptions.ClaimStateDate">
                             </div>
                         </div>
+                        <div class="form-group col-12">
+                            <div class="form-check">
+                                <input disabled type="checkbox" class="form-check-input" asp-for="FilterOptions.IsCurrentState">
+                                <label class="form-check-label" for="FilterOptions_IsCurrentState">Фильтровать только по текущему состоянию</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

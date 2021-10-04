@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace RegistryWeb.ViewOptions.Filter
 {
@@ -10,6 +9,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public string Account { get; set; }
         public int? IdClaimState { get; set; }
         public DateTime? ClaimStateDate { get; set; }
+        public bool IsCurrentState { get; set; }
         public int? ClaimStateDateOp { get; set; }
         public string Crn { get; set; }
         public string RawAddress { get; set; }
@@ -61,9 +61,9 @@ namespace RegistryWeb.ViewOptions.Filter
         {
             return Account == null && Crn == null && IdClaim == null && RawAddress == null &&
                 IdRegion == null && IdStreet == null && House == null && PremisesNum == null && IdClaimState == null &&
-                ClaimStateDate == null && AtDate == null && CourtOrderNum == null &&
-                 BalanceOutputTotal == null && BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null &&
-                 AmountTotal == null && AmountTenancy == null && AmountPenalties == null && AmountDgiPadunPkk == null;
+                ClaimStateDate == null && IsCurrentState == false && AtDate == null && CourtOrderNum == null &&
+                BalanceOutputTotal == null && BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null &&
+                AmountTotal == null && AmountTenancy == null && AmountPenalties == null && AmountDgiPadunPkk == null;
         }
     }
 }

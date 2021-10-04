@@ -531,41 +531,77 @@ namespace RegistryWeb.DataServices
 
             if (filterOptions.IdClaimState != null || filterOptions.ClaimStateDate != null)
             {
-                var maxDateClaimStates = from row in registryContext.ClaimStates
-                                         group row.IdState by row.IdClaim into gs
-                                         select new
-                                         {
-                                             IdClaim = gs.Key,
-                                             IdState = gs.Max()
-                                         };
-
-                var lastClaimsStates = (from row in registryContext.ClaimStates
-                                        join maxDateClaimStatesRow in maxDateClaimStates
-                                        on row.IdState equals maxDateClaimStatesRow.IdState
-                                        select new
-                                        {
-                                            row.IdClaim,
-                                            row.IdStateType,
-                                            row.DateStartState
-                                        }).ToList();
-                if (filterOptions.IdClaimState != null)
+                if (filterOptions.IsCurrentState)
                 {
-                    query = from row in query
-                            join lastClaimsStatesRow in lastClaimsStates
-                            on row.IdClaim equals lastClaimsStatesRow.IdClaim
-                            where lastClaimsStatesRow.IdStateType == filterOptions.IdClaimState
-                            select row;
+                    var maxDateClaimStates = from row in registryContext.ClaimStates
+                                             group row.IdState by row.IdClaim into gs
+                                             select new
+                                             {
+                                                 IdClaim = gs.Key,
+                                                 IdState = gs.Max()
+                                             };
+                    var lastClaimsStates = (from row in registryContext.ClaimStates
+                                            join maxDateClaimStatesRow in maxDateClaimStates
+                                            on row.IdState equals maxDateClaimStatesRow.IdState
+                                            select new
+                                            {
+                                                row.IdClaim,
+                                                row.IdStateType,
+                                                row.DateStartState
+                                            }).ToList();
+                    if (filterOptions.IdClaimState != null)
+                    {
+                        query = from row in query
+                                join lastClaimsStatesRow in lastClaimsStates
+                                on row.IdClaim equals lastClaimsStatesRow.IdClaim
+                                where lastClaimsStatesRow.IdStateType == filterOptions.IdClaimState
+                                select row;
+                    }
+                    if (filterOptions.ClaimStateDate != null)
+                    {
+                        query = from row in query
+                                join lastClaimsStatesRow in lastClaimsStates
+                                on row.IdClaim equals lastClaimsStatesRow.IdClaim
+                                where filterOptions.ClaimStateDateOp == 1 ?
+                                   lastClaimsStatesRow.DateStartState >= filterOptions.ClaimStateDate :
+                                   lastClaimsStatesRow.DateStartState <= filterOptions.ClaimStateDate
+                                select row;
+                    }
                 }
-
-                if (filterOptions.ClaimStateDate != null)
+                else
                 {
-                    query = from row in query
-                            join lastClaimsStatesRow in lastClaimsStates
-                            on row.IdClaim equals lastClaimsStatesRow.IdClaim
-                            where filterOptions.ClaimStateDateOp == 1 ?
-                               lastClaimsStatesRow.DateStartState >= filterOptions.ClaimStateDate :
-                               lastClaimsStatesRow.DateStartState <= filterOptions.ClaimStateDate
-                            select row;
+                    if (filterOptions.ClaimStateDate != null && filterOptions.IdClaimState != null)
+                    {
+                        query = from row in query
+                                join claimsStatesRow in registryContext.ClaimStates
+                                on row.IdClaim equals claimsStatesRow.IdClaim
+                                where claimsStatesRow.IdStateType == filterOptions.IdClaimState &&
+                                (filterOptions.ClaimStateDateOp == 1 ?
+                                   claimsStatesRow.DateStartState >= filterOptions.ClaimStateDate :
+                                   claimsStatesRow.DateStartState <= filterOptions.ClaimStateDate)
+                                select row;
+                    }
+                    else
+                    {
+                        if (filterOptions.IdClaimState != null)
+                        {
+                            query = from row in query
+                                    join claimsStatesRow in registryContext.ClaimStates
+                                    on row.IdClaim equals claimsStatesRow.IdClaim
+                                    where claimsStatesRow.IdStateType == filterOptions.IdClaimState
+                                    select row;
+                        }
+                        if (filterOptions.ClaimStateDate != null)
+                        {
+                            query = from row in query
+                                    join claimsStatesRow in registryContext.ClaimStates
+                                    on row.IdClaim equals claimsStatesRow.IdClaim
+                                    where filterOptions.ClaimStateDateOp == 1 ?
+                                       claimsStatesRow.DateStartState >= filterOptions.ClaimStateDate :
+                                       claimsStatesRow.DateStartState <= filterOptions.ClaimStateDate
+                                    select row;
+                        }
+                    }
                 }
             }
 
