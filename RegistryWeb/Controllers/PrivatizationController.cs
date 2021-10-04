@@ -43,6 +43,7 @@ namespace RegistryWeb.Controllers
             else
             {
                 contract.User = securityService.User.UserName;
+                contract.IdExecutor = 65536;
             }
             var addressRegistry = dataService.GetAddressRegistry(contract);
             ViewBag.AddressRegistry = addressRegistry?.Text;            
@@ -54,6 +55,8 @@ namespace RegistryWeb.Controllers
             ViewBag.SecurityService = securityService;
             ViewBag.Kinships = dataService.Kinships;
             ViewBag.Executors = dataService.Executors;
+            ViewBag.Regions = dataService.Regions;
+            ViewBag.Streets = dataService.Streets;
             return View("Privatization", contract);
         }
 
@@ -131,7 +134,6 @@ namespace RegistryWeb.Controllers
         {
             if (!securityService.HasPrivilege(Privileges.PrivReadWrite))
                 return Json(-2);
-
             var contractor = new PrivContractor()
             {
                 IdKinship = 64,
@@ -143,23 +145,5 @@ namespace RegistryWeb.Controllers
             ViewBag.Executors = dataService.Executors;
             return PartialView("PrivContractor", contractor);
         }
-        //[HttpPost]
-        //public IActionResult Edit(Building building, string returnUrl)
-        //{
-        //    ViewBag.ReturnUrl = returnUrl;
-        //    if (building == null)
-        //        return NotFound();
-        //    canEditBaseInfo = CanEditBuildingBaseInfo(building);
-        //    canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
-        //    canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
-        //    if (!canEditBaseInfo)
-        //        return View("NotAccess");
-        //    if (ModelState.IsValid)
-        //    {
-        //        dataService.Edit(building);
-        //        return RedirectToAction("Details", new { building.IdBuilding });
-        //    }
-        //    return Error("Здание не было сохранено!");
-        //}
     }
 }

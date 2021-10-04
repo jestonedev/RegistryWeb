@@ -77,6 +77,8 @@
     <div class="card-body" id="privatization">
         <form enctype="multipart/form-data" asp-controller="Privatization" asp-action="@ViewBag.Action" id="privatizationForm" data-action="@ViewBag.Action" method="post">
             <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
+            <input type="hidden" value="@Model.IdPremise" name="IdPremise" />
+            <input type="hidden" value="@Model.IdSubPremise" name="IdSubPremise" />
             <input type="hidden" asp-for="IdContract" />
             <div class="validation text-danger" asp-validation-summary="All"></div>
             <div class="form-row">
@@ -85,38 +87,20 @@
                     <input type="text" asp-for="RegNumber" class="form-control" title="@Model.RegNumber" />
                 </div>
                 <div class="form-group col-9">
-                    <label >Адрес</label>
+                    <label>Адрес</label>
                     <div class="input-group">
-                        <input type="text" value="@ViewBag.AddressRegistry" class="form-control" title="Адрес в ЖФ" readonly />
+                        <input id="addressRegistryText" name="AddressRegistryText"  type="text" value="@ViewBag.AddressRegistry" class="form-control" title="Адрес в ЖФ" readonly />
                         <div class="input-group-append">
-                            @if (ViewBag.Action == ActionTypeEnum.Create)
-                            {
-                                <button id="addressRegistryChangeBtn" class="btn btn-primary" type="button" title="Редактировать">
-                                    <span class="oi oi-pencil"></span>
-                                </button>
-                            }
-                            @if (ViewBag.Action == ActionTypeEnum.Edit)
-                            {
-                                <button id="addressRegistryChangeBtn" class="btn btn-success" type="button" title="Добавить">
-                                    <span class="oi oi-plus"></span>
-                                </button>
-                            }
-                            @if (Model.IdPremise != null || Model.IdSubPremise != null)
-                            {
-                                <button class="btn btn-success dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="HomesBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="oi oi-home"></span>
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="HomesBtn">
-                                    @if (ViewBag.IdBuilding != null)
-                                    {
-                                        <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@ViewBag.IdBuilding">Здание</a>
-                                    }
-                                    @if (ViewBag.IdPremise != null)
-                                    {
-                                        <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@ViewBag.IdPremise">Помещение</a>
-                                    }
-                                </div>
-                            }
+                            <button id="addressRegistryChangeBtn" class="btn btn-success" type="button">
+                                <span class="oi"></span>
+                            </button>
+                            <button class="btn btn-success dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="HomesBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="oi oi-home"></span>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="HomesBtn">
+                                <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@ViewBag.IdBuilding">Здание</a>
+                                <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@ViewBag.IdPremise">Помещение</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -228,12 +212,11 @@
                 <div class="form-group col-6">
                     <label>Договор подготовлен</label>
                     <select class="selectpicker form-control" asp-for="IdExecutor" title="Договор подготовлен"
-                            asp-items="@{new SelectList(ViewBag.Executors, "IdExecutor", "ExecutorName")}"></select>
-                    @*<input type="text" value="@Model?.ExecutorNavigation?.ExecutorName" class="form-control" />*@
+                            asp-items="@{new SelectList(ViewBag.Executors, "IdExecutor", "ExecutorName", Model.IdExecutor)}"></select>
                 </div>
                 <div class="form-group col-6">
                     <label asp-for="User">Пользователь</label>
-                    <input type="text" asp-for="User" class="form-control" readonly/>
+                    <input type="text" asp-for="User" class="form-control" readonly />
                 </div>
             </div>
             <div class="form-row">
@@ -299,7 +282,7 @@
                             {
                                 @for (var i = 0; i < Model.PrivContractors.Count(); i++)
                                 {
-                                    <partial name="PrivContractor" model="@Model.PrivContractors[i]"/>
+                                    <partial name="PrivContractor" model="@Model.PrivContractors[i]" />
                                 }
                             }
                         </ul>

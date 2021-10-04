@@ -16,11 +16,11 @@
     <div class="form-row">
         <div class="form-group col-4">
             <label>Фамилия</label>
-            <input type="text" class="form-control" asp-for="Surname" id="Surname_@id" name="Surname_@id" title="Фамилия" readonly />
+            <input type="text" class="form-control rr-сontractor-surname" asp-for="Surname" id="Surname_@id" name="Surname_@id" title="Фамилия" readonly />
         </div>
         <div class="form-group col-4">
             <label>Имя</label>
-            <input type="text" class="form-control" asp-for="Name" id="Name_@id" name="Name_@id" title="Имя" readonly/>
+            <input type="text" class="form-control rr-сontractor-name" asp-for="Name" id="Name_@id" name="Name_@id" title="Имя" readonly/>
         </div>
         <div class="form-group col-4">
             <label>Отчество</label>
@@ -30,7 +30,7 @@
     <div class="form-row">
         <div class="form-group col-3">
             <label>Дата рождения</label>
-            <input type="date" class="form-control" id="DateBirth_@id" name="DateBirth_@id" title="Дата рождения" readonly
+            <input type="date" class="form-control rr-сontractor-birthday" id="DateBirth_@id" name="DateBirth_@id" title="Дата рождения" readonly
                    value="@(Model.DateBirth.HasValue ? Model.DateBirth.Value.ToString("yyyy-MM-dd") : "")" />
         </div>
         <div class="form-group col-6">

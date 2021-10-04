@@ -3,7 +3,7 @@
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="ModalLabel">Участник</h5>
+                    <h5 class="modal-title">Участник</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -26,27 +26,24 @@
                         <div class="form-group col-md-6 col-lg-4">
                             <label for="PrivContractor_Patronymic">Отчество</label>
                             <input type="text" id="PrivContractor_Patronymic" maxlength="255" name="PrivContractor.Patronymic" class="form-control input-chars" title="Отчетство участника договора" />
-                            <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Patronymic" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6 col-lg-4">
                             <label for="PrivContractor_DateBirth">Дата рождения</label>
-                            <input type="date" id="PrivContractor_DateBirth" name="PrivContractor.DateBirth" class="form-control" title="Дата рождения участника найма">
+                            <input type="date" id="PrivContractor_DateBirth" name="PrivContractor.DateBirth" class="form-control" title="Дата рождения участника найма"
+                                   data-val="true" data-val-required="Укажите дату" >
                             <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.DateBirth" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-md-6 col-lg-4">
                             <label for="PrivContractor_IdKinship">Родственное отношение</label>
-                            <select class="selectpicker form-control" data-live-search="true" id="PrivContractor_IdKinship" name="PrivContractor.IdKinship" title="Родственное отношение" asp-items="@(new SelectList(ViewBag.Kinships, "IdKinship", "KinshipName"))"
-                                    data-val="true" data-val-required="Выберите родственное отношение"></select>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.IdKinship" data-valmsg-replace="true"></span>
+                            <select class="selectpicker form-control" data-live-search="true" id="PrivContractor_IdKinship" name="PrivContractor.IdKinship" title="Родственное отношение" asp-items="@(new SelectList(ViewBag.Kinships, "IdKinship", "KinshipName"))"></select>                            
                         </div>
                         <div class="form-group col-md-12 col-lg-4">
                             <label>Тип</label><br />
                             <input id="PrivContractor_IsNoncontractor" name="PrivContractor.IsNoncontractor"
                                    class="form-check-input" type="checkbox" data-toggle="toggle" data-on=" " data-off=" " data-onstyle="warning" data-offstyle="primary">
                             <label for="PrivContractor_IsNoncontractor" class="form-check-label ml-2"></label>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.IsNoncontractor" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="form-row">
@@ -62,12 +59,14 @@
                     <div class="form-row r-addition-fields-contractor">
                         <div class="form-group col-lg-8 col-6">
                             <label>Паспортные данные</label>
-                            <input type="text" class="form-control" id="PrivContractor_Passport" name="PrivContractor.Passport" title="Паспортные данные" />
+                            <input type="text" class="form-control" id="PrivContractor_Passport" name="PrivContractor.Passport" title="Паспортные данные"
+                                   data-val="true" data-val-required="Укажите данные"/>
                             <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Passport" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-lg-2 col-2">
                             <label>Доля</label>
-                            <input type="text" class="form-control" id="PrivContractor_Part" name="PrivContractor.Part" title="Доля" />
+                            <input type="text" class="form-control" id="PrivContractor_Part" name="PrivContractor.Part" title="Доля"
+                                   data-val="true" data-val-required="Укажите долю"/>
                             <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Part" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-lg-2 col-4">
@@ -75,14 +74,12 @@
                             <input id="PrivContractor_HasDover" name="PrivContractor.HasDover"
                                    class="form-check-input" type="checkbox" data-toggle="toggle" data-on=" " data-off=" " data-onstyle="warning" data-offstyle="primary">
                             <label for="PrivContractor_HasDover" class="form-check-label ml-2"></label>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.HasDover" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="form-row r-description">
                         <div class="form-group col-12">
                             <label for="PrivContractor_Description"></label>
                             <textarea rows="4" class="form-control" id="PrivContractor_Description" name="PrivContractor.Description" maxlength="2000" title="Основание расприватизации или отказа"></textarea>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Description" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                 </div>
@@ -103,45 +100,52 @@
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="ModalLabel">Участник</h5>
+                    <h5 class="modal-title">Адрес</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-row">
-                        @*<div class="form-group col-lg-2 col-md-4">
-                    <label for="AddressRegistry_IdRegion">Район</label>
-                    <select class="selectpicker form-control" data-live-search="true" title="Район" id="AddressRegistry_IdRegion" asp-items="@Model.KladrRegionsList">
-                        <option selected></option>
-                    </select>
-                </div>
-                <div class="form-group col-lg-4 col-md-8">
-                    <label for="AddressRegistry_IdStreet">Улица</label>
-                    <select class="selectpicker form-control" data-live-search="true" title="Улица" id="AddressRegistry_IdStreet" asp-items="@Model.KladrStreetsList">
-                        <option selected></option>
-                    </select>
-                </div>*@
-                        <div class="form-group col-lg-2 col-md-4">
-                            <label for="AddressRegistry_House">Номер дома</label>
+                        <div class="form-group col-6">
+                            <label for="AddressRegistry_IdRegion">Район</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Район" id="AddressRegistry_IdRegion" asp-items="@(new SelectList(ViewBag.Regions, "id_region", "region"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="AddressRegistry_IdStreet">Улица</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Улица" id="AddressRegistry_IdStreet" asp-items="@(new SelectList(ViewBag.Streets, "IdStreet", "StreetName"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-3">
+                            <label for="AddressRegistry_House">Дом</label>
                             <input type="text" class="form-control input-filter-house" id="AddressRegistry_House" title="Номер дома">
                         </div>
-                        <div class="form-group col-lg-2 col-md-4">
-                            <label for="AddressRegistry_PremisesNum">Номер помещения</label>
+                        <div class="form-group col-3">
+                            <label for="AddressRegistry_PremisesNum">Помещение</label>
                             <input type="text" class="form-control input-filter-premise-num" id="AddressRegistry_PremisesNum" title="Номер помещения">
                         </div>
-                        <div class="form-group col-lg-2 col-md-4">
+                        <div class="form-group col-3">
                             <label for="AddressRegistry_SubPremisesNum">Комната</label>
-                            <input type="text" class="form-control input-filter-numbers" id="AddressRegistry_SubPremisesNum" title="Этаж">
+                            <input type="text" class="form-control input-filter-numbers" id="AddressRegistry_SubPremisesNum" title="Комната">
+                        </div>
+                        <div class="form-group d-flex align-items-end justify-content-end col-3">
+                            <button id="searchAddressRegistryModalBtn" type="button" class="btn btn-secondary">Найти</button>
                         </div>
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-10">
-                        <label for="AddressRegistry_Text">Район</label>
+                    <div class="form-row">
+                        <input type="hidden" id="AddressRegistry_IdBuilding" />
+                        <input type="hidden" id="AddressRegistry_IdPremise" />
+                        <input type="hidden" id="AddressRegistry_IdSubPremise" />
+                        <div id="resultAddressRegistryModal" class="form-group col-12"></div>
                     </div>
-                    <div class="form-group col-2">
-                        <button id="chooseAddressRegistryBtn" type="button" class="btn btn-secondary">Выбрать</button>
+                    <div class="modal-footer">
+                        <button id="clearAddressRegistryModalBtn" type="button" class="btn btn-secondary">Очистить</button>
+                        <button id="setAddressRegistryModalBtn" type="button" class="btn btn-success" disabled>Выбрать</button>
                     </div>
                 </div>
             </div>

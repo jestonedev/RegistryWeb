@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using RegistryWeb.Models.Entities;
 using System.Collections.Generic;
+using RegistryWeb.Models.SqlViews;
 
 namespace RegistryWeb.DataServices
 {
@@ -117,7 +118,8 @@ namespace RegistryWeb.DataServices
 
         internal List<Kinship> Kinships { get => registryContext.Kinships.ToList(); }
         internal List<Executor> Executors { get => registryContext.Executors.ToList(); }
-
+        internal List<KladrRegion> Regions { get => registryContext.KladrRegions.ToList(); }
+        internal List<KladrStreet> Streets { get => registryContext.KladrStreets.ToList(); }
 
         public void Create(PrivContract contract)
         {

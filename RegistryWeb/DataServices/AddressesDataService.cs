@@ -200,5 +200,75 @@ namespace RegistryWeb.DataServices
         {
             get => registryContext.PremisesTypes.AsNoTracking();
         }
+
+        public List<Address> GetAddressesFromHisParts(PartsAddress parts)
+        {
+            if (parts.IdStreet == null || parts.House == null)
+                return null;
+            parts.House = parts.House.ToLowerInvariant();
+            if (parts.PremisesNum != null)
+            {
+                parts.PremisesNum = parts.PremisesNum.ToLowerInvariant();
+                if (parts.SubPremisesNum == null)
+                {
+                    return registryContext.Premises
+                        .Include(p => p.IdBuildingNavigation)
+                            .ThenInclude(b => b.IdStreetNavigation)
+                        .Include(p => p.IdPremisesTypeNavigation)
+                        .AsNoTracking()
+                        .Where(p => p.PremisesNum.ToLowerInvariant() == parts.PremisesNum
+                            && p.IdBuildingNavigation.House.ToLowerInvariant() == parts.House
+                            && p.IdBuildingNavigation.IdStreet == parts.IdStreet)
+                        .Select(p => new Address
+                        {
+                            AddressType = AddressTypes.Premise,
+                            Id = p.IdPremises.ToString(),
+                            IdParents = new Dictionary<string, string>
+                            {
+                                { "IdBuilding", p.IdBuilding.ToString() },
+                                { "IdPremise", p.IdPremises.ToString() },
+                                { "IdSubPremise", null },
+                            },
+                            Text = string.Concat(
+                                p.IdBuildingNavigation.IdStreetNavigation.StreetName, ", д.",
+                                p.IdBuildingNavigation.House, ", ",
+                                p.IdPremisesTypeNavigation.PremisesTypeShort,
+                                p.PremisesNum),
+                        }).ToList();
+                }
+                else
+                {
+                    parts.SubPremisesNum = parts.SubPremisesNum.ToLowerInvariant();
+                    return registryContext.SubPremises
+                        .Include(sp => sp.IdPremisesNavigation)
+                            .ThenInclude(p => p.IdBuildingNavigation)
+                                .ThenInclude(b => b.IdStreetNavigation)
+                        .Include(sp => sp.IdPremisesNavigation)
+                            .ThenInclude(p => p.IdPremisesTypeNavigation)
+                        .AsNoTracking()
+                        .Where(sp => sp.SubPremisesNum.ToLowerInvariant() == parts.SubPremisesNum
+                            && sp.IdPremisesNavigation.PremisesNum.ToLowerInvariant() == parts.PremisesNum
+                            && sp.IdPremisesNavigation.IdBuildingNavigation.House.ToLowerInvariant() == parts.House
+                            && sp.IdPremisesNavigation.IdBuildingNavigation.IdStreet == parts.IdStreet)
+                        .Select(sp => new Address
+                        {
+                            AddressType = AddressTypes.SubPremise,
+                            Id = sp.IdSubPremises.ToString(),
+                            IdParents = new Dictionary<string, string>
+                            {
+                                { "IdBuilding", sp.IdPremisesNavigation.IdBuilding.ToString() },
+                                { "IdPremise", sp.IdPremises.ToString() },
+                                { "IdSubPremise", sp.IdSubPremises.ToString() },
+                            },
+                            Text = string.Concat(
+                                sp.IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation.StreetName, ", д.",
+                                sp.IdPremisesNavigation.IdBuildingNavigation.House, ", ",
+                                sp.IdPremisesNavigation.IdPremisesTypeNavigation.PremisesTypeShort,
+                                sp.IdPremisesNavigation.PremisesNum, ", к.", sp.SubPremisesNum),
+                        }).ToList();
+                }
+            }
+            return null;
+        }
     }
 }

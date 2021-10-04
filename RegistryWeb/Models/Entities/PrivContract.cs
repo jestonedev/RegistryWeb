@@ -45,7 +45,7 @@ namespace RegistryWeb.Models.Entities
         //
         public string User { get; set; } //Договор подготовил
         public int? IdSpecialist { get; set; } //Специалист, подготовивший договор
-        public int IdExecutor { get; set; }
+        public int IdExecutor { get; set; } = 65536;
 
         //
         public string AddressPrivatization { get; set; } //Адрес в приватизации

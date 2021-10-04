@@ -7,6 +7,7 @@
                 dataType: 'json',
                 data: { text: request.term, addressTypes: "SubPremise"  },
                 success: function (data) {
+                    console.log(data);
                     if (data !== "0" && data !== undefined) {
                         response($.map(data.autocompletePairs, function (pair) {
                             return { label: pair.item2, value: pair.item2, id: pair.item1, addressType: data.addressType };
