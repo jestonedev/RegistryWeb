@@ -13,7 +13,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
+using Microsoft.AspNetCore;
 namespace RegistryWeb.DataServices
 {
     public class ClaimsDataService : ListDataService<ClaimsVM, ClaimsFilter>
@@ -124,7 +124,8 @@ namespace RegistryWeb.DataServices
             {
                 var addressInfix = GetPaymentAccountAddressInfix(claim.IdAccount);
                 var tenancyPersons = GetTenancyPersonForAddressInfix(addressInfix.Infix);
-                claim.ClaimPersons = tenancyPersons.Select(r => new ClaimPerson {
+                claim.ClaimPersons = tenancyPersons.Select(r => new ClaimPerson
+                {
                     Surname = r.Surname,
                     Name = r.Name,
                     Patronymic = r.Patronymic,
@@ -144,23 +145,23 @@ namespace RegistryWeb.DataServices
         {
             var allObjects = (from row in
                                 (from row in registryContext.TenancyBuildingsAssoc
-                                select new
-                                {
-                                    row.IdProcess,
-                                    Infix = string.Concat("b", row.IdBuilding)
-                                })
+                                 select new
+                                 {
+                                     row.IdProcess,
+                                     Infix = string.Concat("b", row.IdBuilding)
+                                 })
                                 .Union(from row in registryContext.TenancyPremisesAssoc
-                                        select new
-                                        {
-                                            row.IdProcess,
-                                            Infix = string.Concat("p", row.IdPremise)
-                                        })
+                                       select new
+                                       {
+                                           row.IdProcess,
+                                           Infix = string.Concat("p", row.IdPremise)
+                                       })
                                 .Union(from row in registryContext.TenancySubPremisesAssoc
-                                        select new
-                                        {
-                                            row.IdProcess,
-                                            Infix = string.Concat("sp", row.IdSubPremise)
-                                        })
+                                       select new
+                                       {
+                                           row.IdProcess,
+                                           Infix = string.Concat("sp", row.IdSubPremise)
+                                       })
                               orderby row.Infix
                               group row.Infix by row.IdProcess into gs
                               select new
@@ -170,10 +171,10 @@ namespace RegistryWeb.DataServices
                               }).AsEnumerable();
             var tenancyProcesses = (from tpRow in registryContext.TenancyProcesses
                                     .Where(tp => tp.RegistrationNum == null || !tp.RegistrationNum.Contains("н"))
-                                 join allObjectsRow in allObjects
-                                 on tpRow.IdProcess equals allObjectsRow.IdProcess
-                                 where allObjectsRow.AddressCode == infix
-                                 select tpRow).ToList();
+                                    join allObjectsRow in allObjects
+                                    on tpRow.IdProcess equals allObjectsRow.IdProcess
+                                    where allObjectsRow.AddressCode == infix
+                                    select tpRow).ToList();
             if (!tenancyProcesses.Any())
                 return new List<TenancyPerson>();
 
@@ -197,13 +198,13 @@ namespace RegistryWeb.DataServices
                                           IdAccount = row.IdAccount,
                                           Infix = string.Concat("sp", row.IdSubPremise)
                                       })
-                                   orderby row.Infix
-                                   group row.Infix by row.IdAccount into gs
-                                   select new PaymentAddressInfix
-                                   {
-                                       IdAccount = gs.Key,
-                                       Infix = string.Join("", gs)
-                                   }).FirstOrDefault();
+                    orderby row.Infix
+                    group row.Infix by row.IdAccount into gs
+                    select new PaymentAddressInfix
+                    {
+                        IdAccount = gs.Key,
+                        Infix = string.Join("", gs)
+                    }).FirstOrDefault();
         }
 
         internal int GetIdJudge(int idAccount)
@@ -393,7 +394,7 @@ namespace RegistryWeb.DataServices
 
         internal void AddClaimStateMass(List<int> ids, ClaimState claimState)
         {
-            foreach(var id in ids)
+            foreach (var id in ids)
             {
                 var claimStateCopy = JsonConvert.DeserializeObject<ClaimState>(JsonConvert.SerializeObject(claimState));
                 claimStateCopy.IdClaim = id;
@@ -481,6 +482,22 @@ namespace RegistryWeb.DataServices
                     select allRow.IdAccount).ToList();
         }
 
+        private bool DateComparison(ComparisonSignEnum sign, DateTime? date, DateTime? dateFrom, DateTime? dateTo)
+        {
+            switch (sign)
+            {
+                case ComparisonSignEnum.GreaterThanOrEqual:
+                    return date >= dateFrom;
+                case ComparisonSignEnum.LessThanOrEqual:
+                    return date <= dateFrom;
+                case ComparisonSignEnum.Equal:
+                    return date == dateFrom;
+                case ComparisonSignEnum.Between:
+                    return date >= dateFrom && date <= dateTo;
+            }
+            return false;
+        }
+
         public IQueryable<Claim> ClaimFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
         {
             if (filterOptions.IdAccount != null)
@@ -528,81 +545,139 @@ namespace RegistryWeb.DataServices
                 var idClaims = registryContext.ClaimStates.Where(cs => cs.IdStateType == 4 && cs.CourtOrderNum.Contains(filterOptions.CourtOrderNum)).Select(r => r.IdClaim).ToList();
                 query = query.Where(p => idClaims.Contains(p.IdClaim));
             }
+            
 
-            if (filterOptions.IdClaimState != null || filterOptions.ClaimStateDate != null)
+            if (filterOptions.IdClaimState != null)
             {
                 if (filterOptions.IsCurrentState)
                 {
-                    var maxDateClaimStates = from row in registryContext.ClaimStates
-                                             group row.IdState by row.IdClaim into gs
-                                             select new
-                                             {
-                                                 IdClaim = gs.Key,
-                                                 IdState = gs.Max()
-                                             };
-                    var lastClaimsStates = (from row in registryContext.ClaimStates
-                                            join maxDateClaimStatesRow in maxDateClaimStates
-                                            on row.IdState equals maxDateClaimStatesRow.IdState
-                                            select new
-                                            {
-                                                row.IdClaim,
-                                                row.IdStateType,
-                                                row.DateStartState
-                                            }).ToList();
-                    if (filterOptions.IdClaimState != null)
+                    var maxDateClaimStates =
+                        from row in registryContext.ClaimStates
+                        group row.IdState by row.IdClaim into gs
+                        select new
+                        {
+                            IdClaim = gs.Key,
+                            IdState = gs.Max()
+                        };
+                    var lastClaimsStates =
+                        (from row in registryContext.ClaimStates
+                        join maxDateClaimStatesRow in maxDateClaimStates
+                        on row.IdState equals maxDateClaimStatesRow.IdState
+                        select new
+                        {
+                            row.IdClaim,
+                            row.IdStateType,
+                            row.DateStartState,
+                            row.ClaimDirectionDate,
+                            row.CourtOrderDate,
+                            row.ObtainingCourtOrderDate
+                        }).ToList();
+
+                    query = from row in query
+                            join lastClaimsStatesRow in lastClaimsStates
+                            on row.IdClaim equals lastClaimsStatesRow.IdClaim
+                            where lastClaimsStatesRow.IdStateType == filterOptions.IdClaimState
+                            select row;
+
+                    if (filterOptions.ClaimDirectionDateFrom != null)
                     {
                         query = from row in query
                                 join lastClaimsStatesRow in lastClaimsStates
                                 on row.IdClaim equals lastClaimsStatesRow.IdClaim
-                                where lastClaimsStatesRow.IdStateType == filterOptions.IdClaimState
+                                where DateComparison(
+                                    filterOptions.ClaimDirectionDateOp,
+                                    lastClaimsStatesRow.ClaimDirectionDate,
+                                    filterOptions.ClaimDirectionDateFrom,
+                                    filterOptions.ClaimDirectionDateTo)
                                 select row;
                     }
-                    if (filterOptions.ClaimStateDate != null)
+
+                    if (filterOptions.CourtOrderDateFrom != null)
                     {
                         query = from row in query
                                 join lastClaimsStatesRow in lastClaimsStates
                                 on row.IdClaim equals lastClaimsStatesRow.IdClaim
-                                where filterOptions.ClaimStateDateOp == 1 ?
-                                   lastClaimsStatesRow.DateStartState >= filterOptions.ClaimStateDate :
-                                   lastClaimsStatesRow.DateStartState <= filterOptions.ClaimStateDate
+                                where DateComparison(
+                                    filterOptions.CourtOrderDateOp,
+                                    lastClaimsStatesRow.CourtOrderDate,
+                                    filterOptions.CourtOrderDateFrom,
+                                    filterOptions.CourtOrderDateTo)
+                                select row;
+                    }
+
+                    if (filterOptions.ObtainingCourtOrderDateFrom != null)
+                    {
+                        query = from row in query
+                                join lastClaimsStatesRow in lastClaimsStates
+                                on row.IdClaim equals lastClaimsStatesRow.IdClaim
+                                where DateComparison(
+                                    filterOptions.ObtainingCourtOrderDateOp,
+                                    lastClaimsStatesRow.ObtainingCourtOrderDate,
+                                    filterOptions.ObtainingCourtOrderDateFrom,
+                                    filterOptions.ObtainingCourtOrderDateTo)
                                 select row;
                     }
                 }
                 else
                 {
-                    if (filterOptions.ClaimStateDate != null && filterOptions.IdClaimState != null)
+                    query = from row in query
+                            join claimsStatesRow in registryContext.ClaimStates
+                            on row.IdClaim equals claimsStatesRow.IdClaim
+                            where claimsStatesRow.IdStateType == filterOptions.IdClaimState
+                            select row;
+
+                    if (filterOptions.ClaimDirectionDateFrom != null)
                     {
                         query = from row in query
                                 join claimsStatesRow in registryContext.ClaimStates
                                 on row.IdClaim equals claimsStatesRow.IdClaim
-                                where claimsStatesRow.IdStateType == filterOptions.IdClaimState &&
-                                (filterOptions.ClaimStateDateOp == 1 ?
-                                   claimsStatesRow.DateStartState >= filterOptions.ClaimStateDate :
-                                   claimsStatesRow.DateStartState <= filterOptions.ClaimStateDate)
+                                where DateComparison(
+                                    filterOptions.ClaimDirectionDateOp,
+                                    claimsStatesRow.ClaimDirectionDate,
+                                    filterOptions.ClaimDirectionDateFrom,
+                                    filterOptions.ClaimDirectionDateTo)
                                 select row;
                     }
-                    else
+
+                    if (filterOptions.CourtOrderDateFrom != null)
                     {
-                        if (filterOptions.IdClaimState != null)
-                        {
-                            query = from row in query
-                                    join claimsStatesRow in registryContext.ClaimStates
-                                    on row.IdClaim equals claimsStatesRow.IdClaim
-                                    where claimsStatesRow.IdStateType == filterOptions.IdClaimState
-                                    select row;
-                        }
-                        if (filterOptions.ClaimStateDate != null)
-                        {
-                            query = from row in query
-                                    join claimsStatesRow in registryContext.ClaimStates
-                                    on row.IdClaim equals claimsStatesRow.IdClaim
-                                    where filterOptions.ClaimStateDateOp == 1 ?
-                                       claimsStatesRow.DateStartState >= filterOptions.ClaimStateDate :
-                                       claimsStatesRow.DateStartState <= filterOptions.ClaimStateDate
-                                    select row;
-                        }
+                        query = from row in query
+                                join claimsStatesRow in registryContext.ClaimStates
+                                on row.IdClaim equals claimsStatesRow.IdClaim
+                                where DateComparison(
+                                    filterOptions.CourtOrderDateOp,
+                                    claimsStatesRow.CourtOrderDate,
+                                    filterOptions.CourtOrderDateFrom,
+                                    filterOptions.CourtOrderDateTo)
+                                select row;
+                    }
+
+                    if (filterOptions.ObtainingCourtOrderDateFrom != null)
+                    {
+                        query = from row in query
+                                join claimsStatesRow in registryContext.ClaimStates
+                                on row.IdClaim equals claimsStatesRow.IdClaim
+                                where DateComparison(
+                                    filterOptions.ObtainingCourtOrderDateOp,
+                                    claimsStatesRow.ObtainingCourtOrderDate,
+                                    filterOptions.ObtainingCourtOrderDateFrom,
+                                    filterOptions.ObtainingCourtOrderDateTo)
+                                select row;
                     }
                 }
+            }
+
+            if (filterOptions.ClaimStateDateFrom != null)
+            {
+                query = from row in query
+                        join claimsStatesRow in registryContext.ClaimStates
+                        on row.IdClaim equals claimsStatesRow.IdClaim
+                        where DateComparison(
+                            filterOptions.ClaimStateDateOp,
+                            claimsStatesRow.DateStartState,
+                            filterOptions.ClaimStateDateFrom,
+                            filterOptions.ClaimStateDateTo)
+                        select row;
             }
 
             if (filterOptions.BalanceOutputTotal != null || filterOptions.BalanceOutputTenancy != null ||
@@ -619,7 +694,8 @@ namespace RegistryWeb.DataServices
                 var lastPayments = (from row in registryContext.Payments
                                     join maxDatePaymentsRow in maxDatePayments
                                     on new { row.IdAccount, row.Date } equals new { maxDatePaymentsRow.IdAccount, maxDatePaymentsRow.Date }
-                                    select new {
+                                    select new
+                                    {
                                         row.IdAccount,
                                         row.BalanceOutputTotal,
                                         row.BalanceOutputTenancy,
@@ -860,7 +936,8 @@ namespace RegistryWeb.DataServices
 
             return new ClaimVM
             {
-                Claim = new Claim {
+                Claim = new Claim
+                {
                     IdAccount = idAccount ?? 0,
                     IdAccountNavigation = idAccount != null ? GetAccount(idAccount.Value) : null,
                     AmountTenancy = lastPaymentInfo?.BalanceOutputTenancy,
@@ -869,8 +946,8 @@ namespace RegistryWeb.DataServices
                     AmountPadun = lastPaymentInfo?.BalanceOutputPadun,
                     AmountPkk = lastPaymentInfo?.BalanceOutputPkk
                 },
-                RentObjects = idAccount != null ? 
-                    GetRentObjects(new List<int> { idAccount.Value }).SelectMany( v => v.Value).ToList() : null,
+                RentObjects = idAccount != null ?
+                    GetRentObjects(new List<int> { idAccount.Value }).SelectMany(v => v.Value).ToList() : null,
                 CurrentExecutor = CurrentExecutor,
                 StateTypes = registryContext.ClaimStateTypes.ToList(),
                 Executors = registryContext.Executors.ToList(),
