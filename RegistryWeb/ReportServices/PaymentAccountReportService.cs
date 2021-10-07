@@ -136,6 +136,7 @@ namespace RegistryWeb.ReportServices
                     { "--balance-output", invoice.BalanceOutput },
                     { "--total-area", invoice.TotalArea },
                     { "--prescribed", invoice.Prescribed },
+                    { "--message", invoice.TextMessage },
                 };
                 if (action == "Send")
                     arguments.Add("--email", invoice.Emails.Aggregate((x, y) => x + "," + y));

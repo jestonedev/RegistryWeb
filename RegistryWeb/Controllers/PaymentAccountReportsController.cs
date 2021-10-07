@@ -86,7 +86,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult InvoiceGenerator(int? idAccount, DateTime onDate, string invoiceAction)
+        public IActionResult InvoiceGenerator(int? idAccount, DateTime onDate, string invoiceAction, string textmessage)
         {
             var results = new Dictionary<int, IEnumerable<string>>();
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
@@ -106,7 +106,7 @@ namespace RegistryWeb.Controllers
             var invoices = new List<InvoiceGeneratorParam>();
 
             foreach (int id in ids)
-                invoices.Add(dataService.GetInvoiceGeneratorParam(id, onDate));
+                invoices.Add(dataService.GetInvoiceGeneratorParam(id, onDate, textmessage));
 
             var emptyPaymentsInvoices = invoices.FindAll(x => x.Tenant == null && x.Address == "");
             if (emptyPaymentsInvoices.Any())

@@ -182,7 +182,6 @@
                 break;
 
             case "ClaimFactMailing":
-                standartWrapper.show();
                 factMailingWrapper.show();
                 break;
         }
@@ -217,6 +216,10 @@
                 url += "&idStateType=" + idStateType + "&isCurrentState=" + isCurrentState;
                 break;
             case "ClaimFactMailing":
+                startDate = form.find("[name='StDate_Year']").val() + "-" + form.find("[name='StDate_Month']").val() + "-01";
+                endDate = form.find("[name='EndDate_Year']").val() + "-" + form.find("[name='EndDate_Month']").val() + "-01";
+                
+                url = "/ClaimReports/Get" + action + "?startDate=" + startDate + "&endDate=" + endDate;
                 var flag = form.find("select[name='Flag']").val();
                 url += "&flag=" + flag;
                 break;

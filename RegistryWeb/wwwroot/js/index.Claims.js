@@ -10,13 +10,16 @@
 };
 
 var filterClearModal = function () {
-    //$("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal input[type='hidden'], #filterModal select").val("");
-    //$('#FilterOptions_IdStreet, #FilterOptions_IdClaimState').selectpicker('render');
-    //$(".c-arithmetic-op").val(2);
     resetModalForm($("form.filterForm"));
-    filterIdRegionChange();
+    filterIdRegionChange();    
+    $("#FilterOptions_IsCurrentState").prop("checked", false);
+    $("#FilterOptions_IsCurrentState").prop("disabled", true);
+    $(".selectpicker[name$=Op]").selectpicker("val", 0);
+    $("input[name$=DateTo]").hide();
+    $(".rr-id-claim-state-4").hide();
     $("form.filterForm").valid();
 };
+
 var filterClear = function () {
     filterClearModal();
     $("form.filterForm").submit();
@@ -75,12 +78,25 @@ $(function () {
         filterIdRegionChange();
         e.preventDefault();
     });
+    $('#filterModal #FilterOptions_IdClaimState').on('change', function (e) {
+        if ($(this).val() == '') {
+            $('#FilterOptions_IsCurrentState').prop('checked', false);
+            $('#FilterOptions_IsCurrentState').prop('disabled',true);
+        }
+        else {
+            $('#FilterOptions_IsCurrentState').prop('disabled', false);
+        }
+        e.preventDefault();
+    });
     $('#filterClearModalBtn').click(filterClearModal);
     $('#filterClearBtn').click(filterClear);
 
     $("#filterModalShow").on("click", function (e) {
         e.preventDefault();
         var modal = $("#filterModal");
+        if ($('#FilterOptions_IsCurrentState').is(':checked')) {
+            $('#FilterOptions_IsCurrentState').prop('disabled', false);
+        }
         modal.modal('show');
     });
 
@@ -119,6 +135,38 @@ $(function () {
                 break;
             default:
                 input.val("");
+        }
+    });
+
+    $(".selectpicker[name$=Op]").on("change", function (e) {
+        var inputDateTo = $(this).closest(".input-group").find("input[name$=DateTo]");
+        inputDateTo.hide();
+        inputDateTo.val(null);
+        if ($(this).val() == 3) {
+            inputDateTo.show();
+        }
+        e.preventDefault();
+    });
+
+    $("#FilterOptions_IdClaimState").on("change", function (e) {
+        $(".rr-id-claim-state-4").hide();
+        $(".rr-id-claim-state-4 select").selectpicker("val", 0);
+        $(".rr-id-claim-state-4 input").val(null);
+        $(".rr-id-claim-state-4 input[name$=DateTo]").hide();
+        if ($(this).val() == 4) {
+            $(".rr-id-claim-state-4").show();
+        }
+        e.preventDefault();
+    });
+
+    if ($("#FilterOptions_IdClaimState").val() != 4) {
+        $(".rr-id-claim-state-4").hide();
+    }
+
+    $("input[name$=DateTo]").each(function (idx, elem) {
+        var selectOp = $(this).closest(".input-group").find("select[name$=Op]");
+        if (selectOp.val() != 3) {
+            $(this).hide();
         }
     });
 

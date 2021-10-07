@@ -30,3 +30,8 @@
 .rr-claim-ext-info {
     display: none;
 }
+
+.rr-comparison-sign {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}

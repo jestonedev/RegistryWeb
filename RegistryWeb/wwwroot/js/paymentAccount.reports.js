@@ -127,11 +127,13 @@
             modal.find(".modal-title").text("Отправить счет-извещение");
             modal.find(".rr-report-submit").text("Отправить");
             modal.find("[name='Account.Action']").val("Send");
+            modal.find("[name='Account.TextMessage']").closest(".form-group").css("display", "block");
         }
         else {
             modal.find(".modal-title").text("Сформировать счет-извещение");
             modal.find(".rr-report-submit").text("Сформировать");
             modal.find("[name='Account.Action']").val("Export");
+            modal.find("[name='Account.TextMessage']").closest(".form-group").css("display", "none");
         }
 
         refreshValidationForm($("#accountRegInGenForm"));
@@ -180,8 +182,9 @@
 
         var onDate = form.find("[name='Account.OnDate_Year']").val() + "-" + $("#accountRegInGenForm").find("[name='Account.OnDate_Month']").val() + "-01";
         var idAccount = form.find("[name='Account.IdAccount']").val();
+        var textmessage = form.find("[name='Account.TextMessage']").val();
         var action = form.find("[name='Account.Action']").val();
-        var url = window.location.origin + "/PaymentAccountReports/InvoiceGenerator?onDate=" + onDate + "&invoiceAction=" + action;
+        var url = window.location.origin + "/PaymentAccountReports/InvoiceGenerator?onDate=" + onDate + "&invoiceAction=" + action + "&textmessage=" + textmessage;
         if (idAccount !== "" && idAccount !== "0") {
             url += "&idAccount=" + idAccount;
         }

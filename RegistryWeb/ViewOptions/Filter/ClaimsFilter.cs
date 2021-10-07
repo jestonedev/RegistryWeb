@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using RegistryWeb.Models;
 
 namespace RegistryWeb.ViewOptions.Filter
 {
@@ -9,8 +9,19 @@ namespace RegistryWeb.ViewOptions.Filter
         public int? IdAccount { get; set; }
         public string Account { get; set; }
         public int? IdClaimState { get; set; }
-        public DateTime? ClaimStateDate { get; set; }
-        public int? ClaimStateDateOp { get; set; }
+        public bool IsCurrentState { get; set; }
+        public DateTime? ClaimStateDateFrom { get; set; }
+        public DateTime? ClaimStateDateTo { get; set; }        
+        public ComparisonSignEnum ClaimStateDateOp { get; set; }
+        public DateTime? ClaimDirectionDateFrom { get; set; }
+        public DateTime? ClaimDirectionDateTo { get; set; }
+        public ComparisonSignEnum ClaimDirectionDateOp { get; set; }
+        public DateTime? CourtOrderDateFrom { get; set; }
+        public DateTime? CourtOrderDateTo { get; set; }
+        public ComparisonSignEnum CourtOrderDateOp { get; set; }
+        public DateTime? ObtainingCourtOrderDateFrom { get; set; }
+        public DateTime? ObtainingCourtOrderDateTo { get; set; }
+        public ComparisonSignEnum ObtainingCourtOrderDateOp { get; set; }
         public string Crn { get; set; }
         public string RawAddress { get; set; }
         public string IdStreet { get; set; }
@@ -49,7 +60,6 @@ namespace RegistryWeb.ViewOptions.Filter
             BalanceOutputPenaltiesOp = 2;
             BalanceOutputTenancyOp = 2;
             BalanceOutputTotalOp = 2;
-            ClaimStateDateOp = 2;
         }
 
         public bool IsEmpty()
@@ -60,10 +70,15 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool IsModalEmpty()
         {
             return Account == null && Crn == null && IdClaim == null && RawAddress == null &&
-                IdRegion == null && IdStreet == null && House == null && PremisesNum == null && IdClaimState == null &&
-                ClaimStateDate == null && AtDate == null && CourtOrderNum == null &&
-                 BalanceOutputTotal == null && BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null &&
-                 AmountTotal == null && AmountTenancy == null && AmountPenalties == null && AmountDgiPadunPkk == null;
+                IdRegion == null && IdStreet == null && House == null && PremisesNum == null &&
+                AtDate == null && CourtOrderNum == null &&
+                BalanceOutputTotal == null && BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null &&
+                AmountTotal == null && AmountTenancy == null && AmountPenalties == null && AmountDgiPadunPkk == null &&
+                IdClaimState == null && IsCurrentState == false &&
+                ClaimStateDateFrom == null && ClaimStateDateTo == null &&
+                ClaimDirectionDateFrom == null && ClaimDirectionDateTo == null &&
+                CourtOrderDateFrom == null && CourtOrderDateTo == null &&
+                ObtainingCourtOrderDateFrom == null && ObtainingCourtOrderDateTo == null;
         }
     }
 }

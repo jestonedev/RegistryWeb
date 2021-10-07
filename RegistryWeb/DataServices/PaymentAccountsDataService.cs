@@ -60,6 +60,16 @@ namespace RegistryWeb.DataServices
             viewModel.ClaimsByAddresses = GetClaimsByAddresses(viewModel.Payments);
             viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "id_region", "region");
             viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
+
+            var monthsList = registryContext.Payments
+                            .Select(p => p.Date).Distinct()
+                            .OrderByDescending(p => p.Date).Take(6)
+                            .ToList();
+
+            viewModel.MonthsList =  new Dictionary<int, DateTime>();
+            for (var i=0;i<monthsList.Count();i++)            
+                viewModel.MonthsList.Add(monthsList[i].Month, monthsList[i].Date);
+
             return viewModel;
         }
 
@@ -1255,6 +1265,17 @@ namespace RegistryWeb.DataServices
             viewModel.Payments = GetQueryPage(payments, viewModel.PageOptions).ToList();
             viewModel.RentObjects = GetRentObjects(viewModel.Payments);
             viewModel.ClaimsByAddresses = GetClaimsByAddresses(viewModel.Payments);
+                       
+            var monthsList = registryContext.Payments
+                            .Select(p => p.Date).Distinct()
+                            .OrderByDescending(p => p.Date).Take(6)
+                            .ToList();
+
+            viewModel.MonthsList = new Dictionary<int, DateTime>();
+            for (var i = 0; i < monthsList.Count(); i++)
+                viewModel.MonthsList.Add(monthsList[i].Month, monthsList[i].Date);
+
+
             return viewModel;
         }
 
