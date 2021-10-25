@@ -157,14 +157,14 @@ namespace RegistryWeb.ReportServices
             {
                 columnHeaders = "{\"columnHeader\":\"№ по реестру\"},{\"columnHeader\":\"Адрес\"},{\"columnHeader\":\"Дом\"}," +
                     "{\"columnHeader\":\"Пом.\"},{\"columnHeader\":\"Тип помещения\"},{\"columnHeader\":\"Кадастровый номер\"}," +
-                    "{\"columnHeader\":\"Общая площадь\"},{\"columnHeader\":\"Текущее состояние\"},{\"columnHeader\":\"Текущий фонд\"}," +
+                    "{\"columnHeader\":\"Общая площадь\"},{\"columnHeader\":\"Общ. площадь дома\"},{\"columnHeader\":\"Текущее состояние\"},{\"columnHeader\":\"Текущий фонд\"}," +
                     "{\"columnHeader\":\"№ договора найма\"},{\"columnHeader\":\"Дата регистрации договора\"}," +
                     "{\"columnHeader\":\"Дата окончания договора\"},{\"columnHeader\":\"№ ордера найма\"},{\"columnHeader\":\"Дата ордера найма\"}," +
                     "{\"columnHeader\":\"Наниматель\"},{\"columnHeader\":\"Размер платы\"},{\"columnHeader\":\"Номер и дата включения в фонд\"}," +
                     "{\"columnHeader\":\"Дополнительные сведения\"}";
                 columnPatterns = "{\"columnPattern\":\"$column0$\"},{\"columnPattern\":\"$column1$\"},{\"columnPattern\":\"$column2$\"}," +
                     "{\"columnPattern\":\"$column3$\"},{\"columnPattern\":\"$column4$\"},{\"columnPattern\":\"$column5$\"}," +
-                    "{\"columnPattern\":\"$column6$\"},{\"columnPattern\":\"$column8$\"},{\"columnPattern\":\"$column9$\"}," +
+                    "{\"columnPattern\":\"$column6$\"},{\"columnPattern\":\"$b_total_area$\"},{\"columnPattern\":\"$column8$\"},{\"columnPattern\":\"$column9$\"}," +
                     "{\"columnPattern\":\"$column10$\"},{\"columnPattern\":\"$column11$\"}," +
                     "{\"columnPattern\":\"$column12$\"},{\"columnPattern\":\"$column13$\"},{\"columnPattern\":\"$column14$\"}," +
                     "{\"columnPattern\":\"$column15$\"},{\"columnPattern\":\"$column16$\"},{\"columnPattern\":\"$fund_info$\"}," +
@@ -174,11 +174,11 @@ namespace RegistryWeb.ReportServices
             {
                 columnHeaders = "{\"columnHeader\":\"№ по реестру\"},{\"columnHeader\":\"Адрес\"},{\"columnHeader\":\"Дом\"}," +
                     "{\"columnHeader\":\"Пом.\"},{\"columnHeader\":\"Тип помещения\"},{\"columnHeader\":\"Кадастровый номер\"}," +
-                    "{\"columnHeader\":\"Общая площадь\"},{\"columnHeader\":\"Текущее состояние\"},{\"columnHeader\":\"Текущий фонд\"}," +
+                    "{\"columnHeader\":\"Общая площадь\"},{\"columnHeader\":\"Общ. площадь дома\"},{\"columnHeader\":\"Текущее состояние\"},{\"columnHeader\":\"Текущий фонд\"}," +
                     "{\"columnHeader\":\"Дополнительные сведения\"}";
                 columnPatterns = "{\"columnPattern\":\"$column0$\"},{\"columnPattern\":\"$column1$\"},{\"columnPattern\":\"$column2$\"}," +
                     "{\"columnPattern\":\"$column3$\"},{\"columnPattern\":\"$column4$\"},{\"columnPattern\":\"$column5$\"}," +
-                    "{\"columnPattern\":\"$column6$\"},{\"columnPattern\":\"$column8$\"},{\"columnPattern\":\"$fund_info$\"}," +
+                    "{\"columnPattern\":\"$column6$\"},{\"columnPattern\":\"$b_total_area$\"},{\"columnPattern\":\"$column8$\"},{\"columnPattern\":\"$fund_info$\"}," +
                     "{\"columnPattern\":\"$description$\"}";
             }
 
