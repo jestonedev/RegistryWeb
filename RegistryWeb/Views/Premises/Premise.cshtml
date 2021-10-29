@@ -316,7 +316,8 @@
                 </div>
             </div>
 
-            @if ((ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete) && securityService.HasPrivilege(Privileges.TenancyRead))
+            @if ((ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete) && securityService.HasPrivilege(Privileges.TenancyRead)
+                && Model.PaymentsInfo != null && Model.PaymentsInfo.Any())
             {
                 <partial name="PaymentPartialView" model="@Model" />
             }

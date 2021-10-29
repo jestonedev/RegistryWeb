@@ -220,6 +220,18 @@
                                    asp-route-filterOptions.Address.AddressType="Premise"
                                    asp-route-filterOptions.Address.Id="@item.IdPremises"
                                    asp-route-filterOptions.Address.Text="@address">Процессы найма</a>
+
+
+                                var paymentInfo =
+                                            Model.PaymentsInfo.Where(pi => (pi.IdObject == item.IdPremises && pi.AddresType == AddressTypes.Premise) ||
+                                                (item.SubPremises.Select(sp => sp.IdSubPremises).Any(id => id == pi.IdObject) && pi.AddresType == AddressTypes.SubPremise));
+
+                                @if (paymentInfo.Any())
+                                {
+                                    <a class="dropdown-item" target="_blank" title="История изменения платы за найм" asp-controller="TenancyProcesses" asp-action="PaymentHistory" asp-route-id="@item.IdPremises" asp-route-target="@PaymentHistoryTarget.Premise" id="button-addon2">
+                                        История изменения платы за найм
+                                    </a>
+                                }
                             }
                             @if (securityService.HasPrivilege(Privileges.OwnerRead))
                             {

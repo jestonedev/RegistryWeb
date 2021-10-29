@@ -460,6 +460,137 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
+        internal List<PaymentHistoryViewModel> GetPaymentHistory(int id, PaymentHistoryTarget target)
+        {
+            switch(target)
+            {
+                case PaymentHistoryTarget.SubPremise:
+                    var payments = (from paymentRow in registryContext.TenancyPaymentsHistory
+                                    where paymentRow.IdSubPremises != null && paymentRow.IdSubPremises == id
+                                    select paymentRow).ToList();
+
+                    var subPremisesIds = payments.Select(p => p.IdSubPremises).Distinct();
+
+                    var activeTenanciesSubPremisesIds = 
+                        (from tpRow in registryContext.TenancyProcesses
+                        join personRow in registryContext.TenancyPersons
+                        on tpRow.IdProcess equals personRow.IdProcess
+                        join assocRow in registryContext.TenancySubPremisesAssoc
+                        on tpRow.IdProcess equals assocRow.IdProcess
+                        where subPremisesIds.Contains(assocRow.IdSubPremise) && (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н"))
+                        select assocRow.IdSubPremise).Distinct().ToList();
+                    return (from paymentRow in payments
+                            join subPremiseRow in registryContext.SubPremises.Where(r => subPremisesIds.Contains(r.IdSubPremises))
+                            on paymentRow.IdSubPremises equals subPremiseRow.IdSubPremises
+                            where activeTenanciesSubPremisesIds.Contains(subPremiseRow.IdSubPremises)
+                            select new PaymentHistoryViewModel
+                            {
+                                TenancyPaymentHistory = paymentRow,
+                                ObjectDescription = "Комната " + subPremiseRow.SubPremisesNum
+                            }).ToList();
+                case PaymentHistoryTarget.Premise:
+                    var paymentsSubPremises = (from paymentRow in registryContext.TenancyPaymentsHistory
+                                    where paymentRow.IdSubPremises != null && paymentRow.IdPremises == id
+                                    select paymentRow).ToList();
+
+                    subPremisesIds = paymentsSubPremises.Select(p => p.IdSubPremises).Distinct();
+
+                    activeTenanciesSubPremisesIds =
+                        (from tpRow in registryContext.TenancyProcesses
+                         join personRow in registryContext.TenancyPersons
+                         on tpRow.IdProcess equals personRow.IdProcess
+                         join assocRow in registryContext.TenancySubPremisesAssoc
+                         on tpRow.IdProcess equals assocRow.IdProcess
+                         where subPremisesIds.Contains(assocRow.IdSubPremise) && (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н"))
+                         select assocRow.IdSubPremise).Distinct().ToList();
+
+                    var paymentsPremises = (from paymentRow in registryContext.TenancyPaymentsHistory
+                                               where paymentRow.IdSubPremises == null && paymentRow.IdPremises == id
+                                               select paymentRow).ToList();
+
+                    var premisesIds = paymentsPremises.Select(p => p.IdPremises).Distinct();
+
+                    var activeTenanciesPremisesIds =
+                        (from tpRow in registryContext.TenancyProcesses
+                         join personRow in registryContext.TenancyPersons
+                         on tpRow.IdProcess equals personRow.IdProcess
+                         join assocRow in registryContext.TenancyPremisesAssoc
+                         on tpRow.IdProcess equals assocRow.IdProcess
+                         where premisesIds.Contains(assocRow.IdPremise) && (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н"))
+                         select assocRow.IdPremise).Distinct().ToList();
+                    
+                    return (from paymentRow in paymentsPremises
+                            where paymentRow.IdPremises != null && activeTenanciesPremisesIds.Contains(paymentRow.IdPremises.Value)
+                            select new PaymentHistoryViewModel
+                            {
+                                TenancyPaymentHistory = paymentRow,
+                                ObjectDescription = "Квартира"
+                            }).Union(
+                            from paymentRow in paymentsSubPremises
+                            join subPremiseRow in registryContext.SubPremises.Where(r => subPremisesIds.Contains(r.IdSubPremises))
+                            on paymentRow.IdSubPremises equals subPremiseRow.IdSubPremises
+                            where activeTenanciesSubPremisesIds.Contains(subPremiseRow.IdSubPremises)
+                            select new PaymentHistoryViewModel
+                            {
+                                TenancyPaymentHistory = paymentRow,
+                                ObjectDescription = "Комната №" + subPremiseRow.SubPremisesNum
+                            }).ToList();
+                case PaymentHistoryTarget.Tenancy:
+                    var process = registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons).Where(r => r.IdProcess == id).AsNoTracking().FirstOrDefault();
+                    var rentObjects = GetRentObjects(registryContext.TenancyProcesses.Where(r => r.IdProcess == id).AsNoTracking().ToList()).SelectMany(v => v.Value);
+                    premisesIds = rentObjects.Where(r => r.Address.AddressType == AddressTypes.Premise).Select(r => (int?)int.Parse(r.Address.Id)).ToList();
+                    paymentsPremises = (from paymentRow in registryContext.TenancyPaymentsHistory
+                                            where paymentRow.IdSubPremises == null && premisesIds.Contains(paymentRow.IdPremises)
+                                            select paymentRow).ToList();
+
+                    subPremisesIds = rentObjects.Where(r => r.Address.AddressType == AddressTypes.SubPremise).Select(r => (int?)int.Parse(r.Address.Id)).ToList();
+                    paymentsSubPremises = (from paymentRow in registryContext.TenancyPaymentsHistory
+                                           where paymentRow.IdSubPremises != null && subPremisesIds.Contains(paymentRow.IdSubPremises)
+                                           select paymentRow).ToList();
+                    var result = (from paymentRow in paymentsPremises
+                            select new PaymentHistoryViewModel
+                            {
+                                TenancyPaymentHistory = paymentRow,
+                                ObjectDescription =
+                                    rentObjects.Where(r => r.Address.AddressType == AddressTypes.Premise && r.Address.Id == paymentRow.IdPremises.ToString())
+                                        .Select(r => r.Address.Text).FirstOrDefault()
+                            }).Union(
+                            from paymentRow in paymentsSubPremises
+                            select new PaymentHistoryViewModel
+                            {
+                                TenancyPaymentHistory = paymentRow,
+                                ObjectDescription =
+                                    rentObjects.Where(r => r.Address.AddressType == AddressTypes.SubPremise && r.Address.Id == paymentRow.IdSubPremises.ToString())
+                                        .Select(r => r.Address.Text).FirstOrDefault()
+                            }
+                        ).ToList();
+                    if ((process.RegistrationNum != null && process.RegistrationNum.EndsWith("н")) || !process.TenancyPersons.Any())
+                    {
+                        result.Add(new PaymentHistoryViewModel {
+                            ObjectDescription = "Плата по процессу найма отсутствиет в связи с аннулированием договора"
+                        });
+                    }
+                    return result;
+            }
+            return null;
+        }
+
+        internal string GetPaymentHistoryTitle(int id, PaymentHistoryTarget target)
+        {
+            switch(target)
+            {
+                case PaymentHistoryTarget.Premise:
+                    return string.Format("за найм помещения №{0}", id);
+                case PaymentHistoryTarget.SubPremise:
+                    var subPremise = registryContext.SubPremises.FirstOrDefault(sp => sp.IdSubPremises == id);
+                    if (subPremise == null) throw new Exception(string.Format("Не удалось найти комнату с идентификатором {0}", id));
+                    return string.Format("за найм комнаты №{0} помещения №{1}", subPremise.SubPremisesNum, id);
+                case PaymentHistoryTarget.Tenancy:
+                    return string.Format("по найму №{0}", id);
+            }
+            throw new Exception("Некорректный тип целевого объекта для выборки истории найма");
+        }
+
         internal void UpdateExcludeDate(int? idProcess, DateTime? beginDate, DateTime? endDate, bool untilDismissal)
         {
             var process = registryContext.TenancyProcesses.FirstOrDefault(tp => tp.IdProcess == idProcess);

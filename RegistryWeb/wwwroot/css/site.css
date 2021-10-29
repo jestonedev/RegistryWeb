@@ -155,3 +155,7 @@ input.input-validation-error, button.input-validation-error, textarea.input-vali
 .rr-opacity-item-menu:hover {
     opacity: 1 !important;
 }
+
+.rr-payment-history-btn {
+    border-radius: 0 .25rem .25rem 0;
+}

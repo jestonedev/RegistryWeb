@@ -114,6 +114,7 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<BuildingDemolitionActFile> BuildingDemolitionActFiles { get; set; }
         public virtual IList<BuildingAttachmentFileAssoc> BuildingAttachmentFilesAssoc { get; set; }
         public virtual IList<JudgeBuildingAssoc> JudgeBuildingsAssoc { get; set; }
+        public virtual IList<TenancyPaymentHistory> TenancyPaymentsHistory { get; set; }
 
         public string GetAddress()
         {

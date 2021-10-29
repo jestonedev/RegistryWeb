@@ -435,6 +435,5 @@ namespace RegistryWeb.Controllers
             }
             return Json(1);
         }
-
     }
 }

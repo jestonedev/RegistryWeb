@@ -18,9 +18,15 @@
                type="text" class="form-control" title="Размер платы до 28.08.2019">
     </div>
     <div class="form-group col r-form-group-label mb-2">
-            <label class="mb-1" for="PaymentAfter">Размер платы после 28.08.2019</label>
-            <input id="PaymentAfter" name="PaymentAfter" value="@(paymentInfo.Select(p => p.PaymentAfter28082019).Sum())" 
+        <label class="mb-1" for="PaymentAfter">Размер платы после 28.08.2019</label>
+
+        <div class="input-group mb-3">
+            <input id="PaymentAfter" name="PaymentAfter" value="@(paymentInfo.Select(p => p.PaymentAfter28082019).Sum())"
                    type="text" class="form-control" title="Размер платы после 28.08.2019">
+            <a class="btn btn-outline-secondary rr-payment-history-btn" title="История изменения платы за найм" target="_blank" asp-controller="TenancyProcesses" asp-action="PaymentHistory" asp-route-id="@Model.Premise.IdPremises" asp-route-target="@PaymentHistoryTarget.Premise" id="button-addon2">
+                <span class="oi oi-eye"></span>
+            </a>
+        </div>
     </div>
 </div>
 

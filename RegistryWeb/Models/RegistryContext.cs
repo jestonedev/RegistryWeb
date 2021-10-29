@@ -107,6 +107,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<Executor> Executors { get; set; }
         public virtual DbSet<TenancyFile> TenancyFiles { get; set; }
         public virtual DbSet<TenancyProlongRentReason> TenancyProlongRentReasons { get; set; }
+        public virtual DbSet<TenancyPaymentHistory> TenancyPaymentsHistory { get; set; }
 
         // Переселение
         public virtual DbSet<ResettleInfo> ResettleInfos { get; set; }
@@ -271,6 +272,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new TenancyRentPeriodConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyFileConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyProlongRentReasonTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancyPaymentHistoryConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new ResettleInfoConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleKindConfiguration(nameDatebase));

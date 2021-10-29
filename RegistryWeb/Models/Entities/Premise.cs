@@ -78,6 +78,7 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<SubPremise> SubPremises { get; set; }
         public IList<TenancyPremiseAssoc> TenancyPremisesAssoc { get; set; }
         public virtual IList<PaymentAccountPremiseAssoc> PaymentAccountPremisesAssoc { get; set; }
+        public virtual IList<TenancyPaymentHistory> TenancyPaymentsHistory { get; set; }
 
         public string GetAddress()
         {

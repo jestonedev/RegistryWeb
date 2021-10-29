@@ -333,5 +333,13 @@ namespace RegistryWeb.Controllers
             ViewBag.CanEdit = securityService.HasPrivilege(Privileges.TenancyWrite);
             return View("TenancyProcessesReports", viewModel);
         }
+
+        public IActionResult PaymentHistory(int id, PaymentHistoryTarget target)
+        {
+            ViewBag.Title = dataService.GetPaymentHistoryTitle(id, target);
+            ViewBag.Target = target;
+            var viewModel = dataService.GetPaymentHistory(id, target);
+            return View(viewModel);
+        }
     }
 }

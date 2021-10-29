@@ -34,6 +34,7 @@ namespace RegistryWeb.Models.Entities
         public IList<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
         public virtual IList<ResettleInfoSubPremiseFrom> ResettleInfoSubPremisesFrom { get; set; }
         public virtual IList<PaymentAccountSubPremiseAssoc> PaymentAccountSubPremisesAssoc { get; set; }
+        public virtual IList<TenancyPaymentHistory> TenancyPaymentsHistory { get; set; }
 
         public string GetAddress()
         {

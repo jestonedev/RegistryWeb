@@ -1,0 +1,114 @@
+﻿@using RegistryWeb.ViewModel
+@model List<PaymentHistoryViewModel>
+
+@{
+    ViewData["Title"] = "История изменения платы "+ViewBag.Title;
+    var history = Model.Where(r => r.TenancyPaymentHistory != null);
+    var warningDescription = Model.FirstOrDefault(r => r.TenancyPaymentHistory == null)?.ObjectDescription;  // Уведомление об отсутствии платы за найм на текущий момент (по процессу найма)
+    var target = (PaymentHistoryTarget)ViewBag.Target;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if(!string.IsNullOrEmpty(warningDescription))
+{
+    <div class="alert alert-danger text-center" role="alert">
+        @warningDescription
+    </div>
+}
+
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr style="align-content: center;">
+            <th class="r-table-header-cell">
+                Объект
+            </th>
+            <th class="r-table-header-cell">
+                K1
+            </th>
+            <th class="r-table-header-cell">
+                K2
+            </th>
+            <th class="r-table-header-cell">
+                K3
+            </th>
+            <th class="r-table-header-cell">
+                Kc
+            </th>
+            <th class="r-table-header-cell">
+                Hb
+            </th>
+            <th class="r-table-header-cell">
+                Плата
+            </th>
+            <th class="r-table-header-cell">
+                Площадь
+            </th>
+            <th class="r-table-header-cell">
+                Дата изменения
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            string currentObject = null;
+            decimal? currentPayment = null;
+        }
+        @foreach (var historyItem in history.OrderBy(r => r.ObjectDescription).ThenBy(r => r.TenancyPaymentHistory.Date))
+        {
+            var lastItem = history.Where(r => r.ObjectDescription == historyItem.ObjectDescription)
+                .OrderBy(r => r.TenancyPaymentHistory.Date).Last() == historyItem && string.IsNullOrEmpty(warningDescription);
+            var payment = historyItem.TenancyPaymentHistory.GetPayment();
+            if (currentPayment == payment && currentObject == historyItem.ObjectDescription)
+            {
+                continue;
+            }
+            <tr>
+                <td class="@(lastItem ? "text-success" : "")">@(currentObject == historyItem.ObjectDescription ? "" : historyItem.ObjectDescription)</td>
+                <td class="@(lastItem ? "text-success" : "")">@historyItem.TenancyPaymentHistory.K1</td>
+                <td class="@(lastItem ? "text-success" : "")">@historyItem.TenancyPaymentHistory.K2</td>
+                <td class="@(lastItem ? "text-success" : "")">@historyItem.TenancyPaymentHistory.K3</td>
+                <td class="@(lastItem ? "text-success" : "")">@historyItem.TenancyPaymentHistory.Kc</td>
+                <td class="@(lastItem ? "text-success" : "")">@historyItem.TenancyPaymentHistory.Hb</td>
+                <td class="@(lastItem ? "text-success" : "")">@payment руб.</td>
+                <td class="@(lastItem ? "text-success" : "")">@historyItem.TenancyPaymentHistory.RentArea</td>
+                <td class="@(lastItem ? "text-success" : "")">@historyItem.TenancyPaymentHistory.Date.ToString("dd.MM.yyyy HH:mm:ss")</td>
+            </tr>
+            currentObject = historyItem.ObjectDescription;
+        }
+        @if (target == PaymentHistoryTarget.Premise && !history.Any(h => h.ObjectDescription == "Квартира"))
+        {
+            var historyGroups = history.GroupBy(r => r.ObjectDescription);
+            var totalArea = 0d;
+            var totalPayment = 0m;
+            RegistryWeb.Models.Entities.TenancyPaymentHistory coefs = null;
+            DateTime? date = null;
+            foreach (var historyGroup in historyGroups)
+            {
+                var lastItem = historyGroup.OrderBy(r => r.TenancyPaymentHistory.Date).Last();
+                totalPayment += lastItem.TenancyPaymentHistory.GetPayment();
+                totalArea += lastItem.TenancyPaymentHistory.RentArea;
+                if (coefs == null)
+                {
+                    coefs = lastItem.TenancyPaymentHistory;
+                }
+                if (date == null || date < lastItem.TenancyPaymentHistory.Date)
+                {
+                    date = lastItem.TenancyPaymentHistory.Date;
+                }
+            }
+
+            <tr>
+                <td><b>@(currentObject == "Итого по квартире" ? "" : "Итого по квартире")</b></td>
+                <td><b>@coefs.K1</b></td>
+                <td><b>@coefs.K2</b></td>
+                <td><b>@coefs.K3</b></td>
+                <td><b>@coefs.Kc</b></td>
+                <td><b>@coefs.Hb</b></td>
+                <td><b>@totalPayment руб.</b></td>
+                <td><b>@totalArea</b></td>
+                <td><b>@(date != null ? date.Value.ToString("dd.MM.yyyy HH:mm:ss") : "")</b></td>
+            </tr>
+    }
+    </tbody>
+</table>
