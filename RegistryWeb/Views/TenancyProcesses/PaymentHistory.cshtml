@@ -75,6 +75,7 @@
                 <td class="@(lastItem ? "text-success" : "")">@historyItem.TenancyPaymentHistory.Date.ToString("dd.MM.yyyy HH:mm:ss")</td>
             </tr>
             currentObject = historyItem.ObjectDescription;
+            currentPayment = payment;
         }
         @if (target == PaymentHistoryTarget.Premise && !history.Any(h => h.ObjectDescription == "Квартира"))
         {
