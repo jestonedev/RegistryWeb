@@ -128,9 +128,8 @@ namespace RegistryWeb.Controllers
             return RedirectToAction("Index");
         }
 
-
         [HttpPost]
-        public IActionResult PrivContractorAdd(ActionTypeEnum action)
+        public JsonResult PrivContractorAdd(ActionTypeEnum action)
         {
             if (!securityService.HasPrivilege(Privileges.PrivReadWrite))
                 return Json(-2);
@@ -140,6 +139,16 @@ namespace RegistryWeb.Controllers
                 User = securityService.User.UserName,
                 InsertDate = DateTime.Now
             };
+            var settings = new Newtonsoft.Json.JsonSerializerSettings();
+            settings.Formatting = Newtonsoft.Json.Formatting.Indented;
+            return Json(contractor, settings);
+        }
+
+        [HttpPost]
+        public IActionResult PrivContractorElemAdd(PrivContractor contractor, ActionTypeEnum action)
+        {
+            if (!securityService.HasPrivilege(Privileges.PrivReadWrite))
+                return Json(-2);
             ViewBag.Action = action;
             ViewBag.Kinships = dataService.Kinships;
             ViewBag.Executors = dataService.Executors;

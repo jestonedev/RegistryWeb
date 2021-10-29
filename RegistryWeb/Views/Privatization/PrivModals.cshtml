@@ -10,6 +10,7 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="PrivContractor_IdContractor" name="PrivContractor.IdContractor" />
+                    <input type="hidden" id="PrivContractor_IdContract" name="PrivContractor.IdContract" />
                     <div class="form-row">
                         <div class="form-group col-md-6 col-lg-4">
                             <label for="PrivContractor_Surname">Фамилия</label>
@@ -32,12 +33,12 @@
                         <div class="form-group col-md-6 col-lg-4">
                             <label for="PrivContractor_DateBirth">Дата рождения</label>
                             <input type="date" id="PrivContractor_DateBirth" name="PrivContractor.DateBirth" class="form-control" title="Дата рождения участника найма"
-                                   data-val="true" data-val-required="Укажите дату" >
+                                   data-val="true" data-val-required="Укажите дату">
                             <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.DateBirth" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-md-6 col-lg-4">
                             <label for="PrivContractor_IdKinship">Родственное отношение</label>
-                            <select class="selectpicker form-control" data-live-search="true" id="PrivContractor_IdKinship" name="PrivContractor.IdKinship" title="Родственное отношение" asp-items="@(new SelectList(ViewBag.Kinships, "IdKinship", "KinshipName"))"></select>                            
+                            <select class="selectpicker form-control" id="PrivContractor_IdKinship" name="PrivContractor.IdKinship" title="Родственное отношение" asp-items="@(new SelectList(ViewBag.Kinships, "IdKinship", "KinshipName"))"></select>
                         </div>
                         <div class="form-group col-md-12 col-lg-4">
                             <label>Тип</label><br />
@@ -60,13 +61,13 @@
                         <div class="form-group col-lg-8 col-6">
                             <label>Паспортные данные</label>
                             <input type="text" class="form-control" id="PrivContractor_Passport" name="PrivContractor.Passport" title="Паспортные данные"
-                                   data-val="true" data-val-required="Укажите данные"/>
+                                   data-val="true" data-val-required="Укажите данные" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Passport" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-lg-2 col-2">
                             <label>Доля</label>
                             <input type="text" class="form-control" id="PrivContractor_Part" name="PrivContractor.Part" title="Доля"
-                                   data-val="true" data-val-required="Укажите долю"/>
+                                   data-val="true" data-val-required="Укажите долю" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Part" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-lg-2 col-4">
@@ -79,7 +80,9 @@
                     <div class="form-row r-description">
                         <div class="form-group col-12">
                             <label for="PrivContractor_Description"></label>
-                            <textarea rows="4" class="form-control" id="PrivContractor_Description" name="PrivContractor.Description" maxlength="2000" title="Основание расприватизации или отказа"></textarea>
+                            <textarea rows="4" class="form-control" id="PrivContractor_Description" name="PrivContractor.Description" maxlength="2000" title="Основание расприватизации или отказа"
+                                      data-val="true" data-val-required="Заполните информацию или переключите Доверенность в положение Нет"></textarea>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Description" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                 </div>
@@ -88,7 +91,7 @@
                     {
                         <button id="savePrivContractorModalBtn" type="button" class="btn btn-secondary">Сохранить</button>
                     }
-                    <button id="closePrivContractorModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    <button id="closePrivContractorModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal" data-is-create="false">Закрыть</button>
                 </div>
             </div>
         </div>
