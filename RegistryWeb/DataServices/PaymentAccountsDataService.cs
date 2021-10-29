@@ -1133,6 +1133,16 @@ namespace RegistryWeb.DataServices
                    select row).ToList();
             viewModel.RentObjects = GetRentObjects(lastPayment);
             viewModel.ClaimsByAddresses = GetClaimsByAddresses(lastPayment);
+
+            var monthsList = registryContext.Payments
+                            .Select(p => p.Date).Distinct()
+                            .OrderByDescending(p => p.Date).Take(6)
+                            .ToList();
+
+            viewModel.MonthsList = new Dictionary<int, DateTime>();
+            for (var i = 0; i < monthsList.Count(); i++)
+                viewModel.MonthsList.Add(monthsList[i].Month, monthsList[i].Date);
+
             return viewModel;
         }
 
