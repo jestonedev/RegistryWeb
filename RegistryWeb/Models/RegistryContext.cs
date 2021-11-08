@@ -157,6 +157,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<PrivAgreement> PrivAgreements { get; set; }
         public virtual DbSet<PrivContract> PrivContracts { get; set; }
         public virtual DbSet<PrivContractor> PrivContractors { get; set; }
+        public virtual DbSet<PrivTypeOfProperty> TypesOfProperty { get; set; }
 
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
@@ -305,6 +306,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new PrivAgreementConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PrivContractConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PrivContractorConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PrivTypeOfPropertyConfiguration(nameDatebase));
         }
     }
 }

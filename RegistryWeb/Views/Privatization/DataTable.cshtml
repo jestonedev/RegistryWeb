@@ -4,34 +4,16 @@
 @{
     var canEdit = ((SecurityService)ViewData["SecurityService"]).HasPrivilege(Privileges.PrivReadWrite);
 }
-<table class="table table-hover b-table">
+<table class="table table-hover pr-table">
     <thead>
         <tr>
             <th class="align-middle" style="width:250px;">
-                №
-                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "IdBuilding")
-                {
-                    <a href="#" class="oi oi-sort-descending sort b-sorted" data-order-field="IdBuilding" data-order-direction="0"></a>
-                }
-                else
-                {
-                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "IdBuilding" ? "b-sorted" : "")"
-                       data-order-field="IdBuilding" data-order-direction="@(Model.OrderOptions.OrderField == "IdBuilding" ? "1" : "0")"></a>
-                }
+                Рег. №
             </th>
             <th class="align-middle">
                 Адрес
-                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Address")
-                {
-                    <a href="#" class="oi oi-sort-descending sort b-sorted" data-order-field="Address" data-order-direction="0"></a>
-                }
-                else
-                {
-                    <a href="#" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Address" ? "b-sorted" : "")"
-                       data-order-field="Address" data-order-direction="@(Model.OrderOptions.OrderField == "Address" ? "1" : "0")"></a>
-                }
             </th>
-            <th class="align-middle"></th>
+            <th class="align-middle">Информация о приватизации</th>
         </tr>
     </thead>
     <tbody>
@@ -39,14 +21,101 @@
         {
         <tr>
             <td title="@contract.RegNumber">
-                <div style="width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@contract.RegNumber</div>
+                <div>@contract.RegNumber</div>
             </td>
-            <td>@contract.AddressPrivatization</td>
             <td>
-                <div class="btn-group float-right" role="group" aria-label="Панель доступа">
+                @if (Model.PrivContractsAddresses[contract.IdContract] == null)
+                {
+                    <span class="text-danger" title="Адрес из старой программы">@contract.PrivAddress</span>
+                }
+                else
+                {
+                    <span>@Model.PrivContractsAddresses[contract.IdContract].Text</span>
+                }
+                    <div class="dopinfo">
+                        @if (contract.SubPremiseNavigation != null)
+                        {
+                            <div>
+                                <span>Общая площадь: </span> @contract.SubPremiseNavigation.TotalArea м<sup>2</sup>
+                            </div>
+                            <div>
+                                <span>Жилая площадь: </span> @contract.SubPremiseNavigation.LivingArea м<sup>2</sup>
+                            </div>
+                        }
+                        else
+                      if (contract.PremiseNavigation != null)
+                        {
+                            <div>
+                                <span>Общая площадь: </span> @contract.PremiseNavigation.TotalArea м<sup>2</sup>
+                            </div>
+                            <div>
+                                <span>Жилая площадь: </span> @contract.PremiseNavigation.LivingArea м<sup>2</sup>
+                            </div>
+                        }
+                        else
+                       if (contract.BuildingNavigation != null)
+                        {
+                            <div>
+                                <span>Общая площадь: </span> @contract.BuildingNavigation.TotalArea м<sup>2</sup>
+                            </div>
+                            <div>
+                                <span>Жилая площадь: </span> @contract.BuildingNavigation.LivingArea м<sup>2</sup>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-danger" title="Площадь из старой программы">
+                                <span>Общая площадь: </span> @contract.PrivTotalSpace м<sup>2</sup>
+                            </div>
+                            <div class="text-danger" title="Площадь из старой программы">
+                                <span>Жилая площадь: </span> @contract.PrivLivingSpace м<sup>2</sup>
+                            </div>
+                        }
+                    </div>
+            </td>
+            <td style="position: relative">
+                <div class="dopinfo-alt">
+                    @if (contract.ExecutorNavigation != null)
+                    {
+                        <div>
+                            <span>Договор подготовлен: </span> @contract.ExecutorNavigation.ExecutorName
+                        </div>
+                    }
+                    @if (contract.ApplicationDate.HasValue)
+                    {
+                        <div>
+                            <span>Дата подачи заявления: </span> @contract.ApplicationDate.Value.ToString("dd.MM.yyyy")
+                        </div>
+                    }
+                    @if (contract.DateIssue.HasValue)
+                    {
+                        <div>
+                            <span>Дата регистрации по договору: </span> @contract.DateIssue.Value.ToString("dd.MM.yyyy")
+                        </div>
+                    }
+                    @if (contract.RegistrationDate.HasValue)
+                    {
+                        <div>
+                            <span>Дата регистрации в ЕГРП: </span> @contract.RegistrationDate.Value.ToString("dd.MM.yyyy")
+                        </div>
+                    }
+                    @if (contract.DateIssueCivil.HasValue)
+                    {
+                        <div>
+                            <span>Дата выдачи договора гражданам: </span> @contract.DateIssueCivil.Value.ToString("dd.MM.yyyy")
+                        </div>
+                    }
+                    @if (contract.TypeOfProperty != null)
+                    {
+                        <div>
+                            <span>Вид собственности: </span> @contract.TypeOfProperty.Name
+                        </div>
+                    }
+                </div>
+                <div class="btn-group rr-opacity-item-menu" role="group" aria-label="Панель доступа">
                     @if (contract.IdBuilding != null || contract.IdPremise != null)
                     {
-                    <button class="btn btn-success oi oi-home dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="homesBtn_@contract.IdContract" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <button class="btn btn-success oi oi-home dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="homesBtn_@contract.IdContract" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                         <div class="dropdown-menu" aria-labelledby="homesBtn_@contract.IdContract">
                             @if (contract.IdBuilding != null)
                             {

@@ -94,15 +94,15 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownPrivatization" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Приватизация</a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownPrivatization">
-                            <a class="dropdown-item" asp-area="" asp-controller="Privatization" asp-action="Index">Договоры</a>
+                            <a class="dropdown-item" asp-area="" asp-controller="Privatization" asp-action="Index">Договоры приватизации</a>
                         </div>
                     </li>
                 </ul>
             </div>
-            <div class="ml-auto align-middle">
+            <div class="ml-auto align-middle d-none d-xl-block">
                 @await Component.InvokeAsync("DatabaseNameComponent")
             </div>
-            <div class="ml-auto align-middle">
+            <div class="ml-auto align-middle d-none d-xl-block">
                 <a asp-controller="PersonalSetting" asp-action="Details" class="btn btn-link">@User.Identity.Name</a>
             </div>
         </div>

@@ -21,6 +21,8 @@ namespace RegistryWeb.Controllers
         public IActionResult Index(PrivatizationListVM viewModel)
         {
             ViewBag.SecurityService = securityService;
+            ViewBag.Regions = dataService.Regions;
+            ViewBag.Streets = dataService.Streets;
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
@@ -42,7 +44,6 @@ namespace RegistryWeb.Controllers
             }
             else
             {
-                contract.User = securityService.User.UserName;
                 contract.IdExecutor = 65536;
             }
             var addressRegistry = dataService.GetAddressRegistry(contract);
@@ -57,6 +58,7 @@ namespace RegistryWeb.Controllers
             ViewBag.Executors = dataService.Executors;
             ViewBag.Regions = dataService.Regions;
             ViewBag.Streets = dataService.Streets;
+            ViewBag.TypesOfProperty = dataService.TypesOfProperty;
             return View("Privatization", contract);
         }
 
@@ -135,9 +137,7 @@ namespace RegistryWeb.Controllers
                 return Json(-2);
             var contractor = new PrivContractor()
             {
-                IdKinship = 64,
-                User = securityService.User.UserName,
-                InsertDate = DateTime.Now
+                IdKinship = 64
             };
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             settings.Formatting = Newtonsoft.Json.Formatting.Indented;

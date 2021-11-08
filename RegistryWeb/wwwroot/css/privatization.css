@@ -1,0 +1,49 @@
+﻿.pr-table > thead > tr > th a.sort {
+    color: #888;
+}
+
+.pr-table > thead > tr > th a.sort:hover {
+    color: black;
+}
+
+.pr-table > thead > tr > th a.sort.pr-sorted {
+    color: #007bff;
+}
+
+.pr-table > thead > tr > th a.sort.pr-sorted:hover {
+    color: #0056b3;
+}
+
+.pr-table > tbody td {
+    padding: 0.4rem 0.75rem;
+}
+
+.pr-table th {
+    white-space: nowrap;
+}
+
+.rr-priv-filter-label, .rr-priv-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 0.24rem;
+    vertical-align: bottom;
+}
+
+.dopinfo {
+    color: #888;
+    font-size: 75%;
+}
+
+.dopinfo-alt {
+    color: #212529;
+    font-size: 75%;
+}
+
+@media(min-width: 992px) {
+    .rr-is-refusenik-filter-checkbox {
+        padding-top: 24pt;
+        text-align: center;
+    }
+}

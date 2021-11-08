@@ -6,7 +6,7 @@
 
     $.validator.addMethod('addressRequired', function (value, element) {
         return $('#privatizationForm [name="IdPremise"]').val() != "" ||
-            $('#privatizationForm [name="IdSubPremise"]').val() != "";
+            $('#privatizationForm [name="IdSubPremise"]').val() != "" || $('#privatizationForm [name="IdBuilding"]').val() != "";
     }, 'Блок «Адрес» является обязательным для заполнения ');
     
     var validator = form.validate();
@@ -29,23 +29,29 @@
     validatorModal.settings.ignore = '.rr-valid-ignore';
     validatorModal.settings.ignoreTitle = true;
 
+    $("#RegNumber").on("change", function () {
+        $(this).valid();
+    });
+
     var action = form.attr('data-action');
-    if (action == 'Details' || action == 'Delete') {
-        $('select option:not(:selected)').attr('disabled', true);
-        $('input').attr('readonly', true);
-        $('textarea').attr('readonly', true);
-        $('input:checkbox').attr('disabled', true);
+    if (action === 'Details' || action === 'Delete') {
+        $('select').prop('disabled', true);
+        $('input').prop('disabled', true);
+        $('textarea').prop('disabled', true);
+        $('input[type="hidden"]').prop('disabled', false);
+        $('input[type="submit"]').prop('disabled', false);
     }
     $('#privContractInfo').hide();
-    $('#privContractors select option:not(:selected)').attr('disabled', true);
+    $('#privContractors select').attr('disabled', true);
     if ($('#privatizationForm [name="IdPremise"]').val() != "" ||
         $('#privatizationForm [name="IdSubPremise"]').val() != "") {
         $('#addressRegistryChangeBtn').attr('title', 'Редактировать');
         $('#addressRegistryChangeBtn span').addClass('oi-pencil');
     } else {
         $('#addressRegistryChangeBtn').attr('title', 'Добавить');
-        $('#addressRegistryChangeBtn span').addClass('oi-plus');
+        $('#addressRegistryChangeBtn span').removeClass("oi-pencil").addClass('oi-plus');
         $('#HomesBtn').hide();
+        $("#addressRegistryChangeBtn").closest(".input-group-append").append($("#addressRegistryChangeBtn"));
     }
     function getPrivContractorJson(privContractorElem, isModal = false) {
         var fields = privContractorElem.find('input, select, textarea');
@@ -72,15 +78,15 @@
         $.each(contractorJson, function (key, value) {
             if (key == 'IsNoncontractor') {
                 if (value == 'False' || value == "false" || value == false) {
-                    contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Контрактор');
+                    contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Участник');
                     contractorModal.find("[name='PrivContractor.IsNoncontractor']").bootstrapToggle('on');
                     contractorModal.find("[for='PrivContractor_Description']").text('Текст доверенности');
                     contractorModal.find(".r-addition-fields-contractor").show();
                 }
                 else {
-                    contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Не контрактор');
+                    contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Неучастник');
                     contractorModal.find("[name='PrivContractor.IsNoncontractor']").bootstrapToggle('off');
-                    contractorModal.find("[for='PrivContractor_Description']").text('Причина не участия');
+                    contractorModal.find("[for='PrivContractor_Description']").text('Причина неучастия');
                     contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore');
                     contractorModal.find("[name='PrivContractor.Passport']").addClass('rr-valid-ignore');
                     contractorModal.find("[name='PrivContractor.Part']").addClass('rr-valid-ignore');
@@ -136,11 +142,11 @@
     }
     function liIsNoncontractorChange(li, isNoncontractor) {
         if (isNoncontractor) {
-            li.attr('title', 'Не контрактор');
+            li.attr('title', 'Неучастник');
             li.removeAttr('style');
         }
         else {
-            li.attr('title', 'Контрактор');
+            li.attr('title', 'Участник');
             li.attr('style', 'border-left: 2px solid #ffc107;');
         }
     }
@@ -151,7 +157,7 @@
         contractorModal.find("[name='PrivContractor.Passport']").removeClass('rr-valid-ignore');
         contractorModal.find("[name='PrivContractor.Part']").removeClass('rr-valid-ignore');
         if ($(this).is(':checked')) {
-            contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Контрактор');
+            contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Участник');
             contractorModal.find("[for='PrivContractor_Description']").text('Текст доверенности');
             contractorModal.find('#PrivContractor_Passport').val(baseElem.find("[name^='Passport_']").val());
             contractorModal.find('#PrivContractor_Part').val(baseElem.find("[name^='Part_']").val());
@@ -173,8 +179,8 @@
             contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore');
             contractorModal.find("[name='PrivContractor.Passport']").addClass('rr-valid-ignore');
             contractorModal.find("[name='PrivContractor.Part']").addClass('rr-valid-ignore');
-            contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Не контрактор');
-            contractorModal.find("[for='PrivContractor_Description']").text('Причина не участия');
+            contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Неучастник');
+            contractorModal.find("[for='PrivContractor_Description']").text('Причина неучастия');
             contractorModal.find('.r-addition-fields-contractor input').val('');
             contractorModal.find('.r-addition-fields-contractor').hide();
         }
@@ -240,8 +246,6 @@
                     liIsNoncontractorChange(baseElem, true);
                 }
                 baseElem.find("[id^='Description']").val(contractorModal.find("[name$='Description']").val());
-                baseElem.find("[id^='User']").val(contractorModal.find("[name$='User']").val());
-                baseElem.find("[id^='InsertDate']").val(contractorModal.find("[name$='InsertDate']").val());
             }
             contractorModal.modal('hide');
         }         
@@ -287,9 +291,12 @@
         if ($('#addressRegistryChangeBtn span').hasClass('oi-plus')) {
             $('#addressRegistryChangeBtn span').addClass('oi-pencil').removeClass('oi-plus');
             $('#addressRegistryChangeBtn').attr('title', 'Редактировать');
+            var append = $("#addressRegistryChangeBtn").closest(".input-group-append");
+            append.append($("#HomesBtn"));
             $('#HomesBtn').show();
         }
         $('#addressRegistryText').val($('#resultAddressRegistryModal').text());
+        form.find('[name="IdBuilding"]').val($('#AddressRegistry_IdBuilding').val());
         form.find('[name="IdPremise"]').val($('#AddressRegistry_IdPremise').val());
         form.find('[name="IdSubPremise"]').val($('#AddressRegistry_IdSubPremise').val());
         form.find('[href^="/Buildings/Details"]')
@@ -338,11 +345,11 @@
             url: window.location.origin + '/Privatization/PrivContractorAdd',
             data: { action },
             success: function (contractorJson) {
-                contractorJson.InsertDate = new Date(contractorJson.InsertDate).toISOString().split('T')[0];
                 privContractorFillModal(contractorJson);
                 $('#savePrivContractorModalBtn').text('Создать');
                 $('#closePrivContractorModalBtn').attr('data-is-create','true');
                 contractorModal.modal('show');
+                $('#PrivContractor_IsNoncontractor').change();
             }
         });
         e.preventDefault();
@@ -354,6 +361,7 @@
         $('#savePrivContractorModalBtn').text('Сохранить');
         $('#closePrivContractorModalBtn').attr('data-is-create', 'false');
         contractorModal.modal('show');
+        $('#PrivContractor_IsNoncontractor').change();
         e.preventDefault();
     }
     function privContractorDelete(e) {
@@ -388,7 +396,7 @@
         privContractors.each(function (ind, elem) {
             var fields = $(elem).find('input, select, textarea');
             fields.each(function (i, el) {
-                var name = $(el).attr('name').split('_')[0];
+                var name = $(el).attr('id').split('_')[0];
                 $(el).attr('name', "PrivContractors[" + ind + "]." + name);
                 if (name == 'IdContractor' && !/^\d+$/.test($(el).val())) {
                     $(el).val(0);
@@ -398,9 +406,6 @@
         if (form.valid()) {
             form.submit();
         }
-        //$('input[data-val="true"]')
-        //    .removeAttr('aria-describedby')
-        //    .removeAttr('aria-invalid');
     });
     $('#privatizationDelete').click(function (e) {
         e.preventDefault();

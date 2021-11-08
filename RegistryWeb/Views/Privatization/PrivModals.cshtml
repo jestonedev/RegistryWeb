@@ -47,27 +47,17 @@
                             <label for="PrivContractor_IsNoncontractor" class="form-check-label ml-2"></label>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-6">
-                            <label>Добавил</label>
-                            <input type="text" class="form-control" id="PrivContractor_User" name="PrivContractor.User" title="Добавил" readonly />
-                        </div>
-                        <div class="form-group col-6">
-                            <label>Дата добавления</label>
-                            <input type="date" class="form-control" id="PrivContractor_InsertDate" name="PrivContractor.InsertDate" title="Дата добавления" readonly />
-                        </div>
-                    </div>
                     <div class="form-row r-addition-fields-contractor">
                         <div class="form-group col-lg-8 col-6">
                             <label>Паспортные данные</label>
                             <input type="text" class="form-control" id="PrivContractor_Passport" name="PrivContractor.Passport" title="Паспортные данные"
-                                   data-val="true" data-val-required="Укажите данные" />
+                                   data-val="true" data-val-required="Укажите данные" maxlength="2000" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Passport" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-lg-2 col-2">
                             <label>Доля</label>
                             <input type="text" class="form-control" id="PrivContractor_Part" name="PrivContractor.Part" title="Доля"
-                                   data-val="true" data-val-required="Укажите долю" />
+                                   data-val="true" data-val-required="Укажите долю" maxlength="50" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Part" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-lg-2 col-4">

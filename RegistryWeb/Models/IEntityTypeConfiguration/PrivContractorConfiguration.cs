@@ -57,15 +57,6 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("date_birth")
                 .HasColumnType("date");
 
-            builder.Property(e => e.User)
-                .HasColumnName("user")
-                .HasMaxLength(255)
-                .IsUnicode(false);
-
-            builder.Property(e => e.InsertDate)
-                .HasColumnName("insert_date")
-                .HasColumnType("datetime");
-
             builder.Property(e => e.Description)
                 .HasColumnName("description")
                 .HasMaxLength(2000)

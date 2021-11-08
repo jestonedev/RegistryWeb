@@ -19,15 +19,15 @@
                asp-controller="Privatization" asp-action="Create" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">&#10010;</a>
         </div>
         }
-        @*@if (Model.FilterOptions.IsAddressEmpty())
+        @if (Model.FilterOptions.IsAddressEmpty())
         {
-            <div class="form-group @((securityService.HasPrivilege(Privileges.PrivReadWrite)) ? "col-10 col-md-4 col-lg-6" : "col-12 col-md-5 col-lg-7")">
+            <div class="form-group @((securityService.HasPrivilege(Privileges.PrivReadWrite)) ? "col-6 col-md-8 col-lg-9" : "col-7 col-md-9 col-lg-10")">
                 <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
             </div>
         }
         else
         {
-            <div class="form-group @((securityService.HasPrivilege(Privileges.PrivReadWrite)) ? "col-10 col-md-4 col-lg-6" : "col-12 col-md-5 col-lg-7")">
+            <div class="form-group @((securityService.HasPrivilege(Privileges.PrivReadWrite)) ? "col-6 col-md-8 col-lg-9" : "col-7 col-md-9 col-lg-10")">
                 <div class="input-group">
                     <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
                     <div class="input-group-append h-auto d-inline-block">
@@ -39,24 +39,24 @@
 
         @if (Model.FilterOptions.IsModalEmpty())
         {
-            <div class="form-group col-6 col-md-3 col-lg-2">
+            <div class="form-group col-4 col-md-3 col-lg-2">
                 <a class="btn btn-block btn-secondary" href="#" id="filterModalShow">Фильтр</a>
             </div>
         }
         else
         {
-            <div class="form-group btn-group col-6 col-md-3 col-lg-2">
+            <div class="form-group btn-group col-4 col-md-3 col-lg-2">
                 <a class="btn btn-block btn-secondary" href="#" id="filterModalShow">Фильтр</a>
                 <a class="btn btn-outline-secondary" href="#" id="filterClearBtn">&#10006;</a>
             </div>
-        }*@
+        }
     </div>
     <!-- Modal -->
-    @*<div class="modal fade bd-example-modal-xl" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal fade bd-example-modal-xl" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalLabel">Фильтр процессов найма</h5>
+                    <h5 class="modal-title" id="modalLabel">Фильтр договоров приватизации</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -64,158 +64,56 @@
                 <div class="modal-body">
                     <div class="form-row">
                         <div class="form-group col-md-6 col-lg-3">
-                            <label asp-for="FilterOptions.IdProcess">Реестровый номер</label>
-                            <input type="text" class="form-control input-filter-numbers" asp-for="FilterOptions.IdProcess" title="Реестровый номер процесса найма">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.RegNumber">Рег. номер</label>
+                            <input type="text" class="form-control" maxlength="100" asp-for="FilterOptions.RegNumber" title="Регистрационный номер">
                         </div>
                         <div class="form-group col-md-6 col-lg-3">
-                            <label asp-for="FilterOptions.RegistrationNum">Номер договора</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend rr-registration-num-dropdown">
-                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Есть</button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">Есть</a>
-                                        <a class="dropdown-item" href="#">Нет</a>
-                                    </div>
-                                </div>
-                                <input type="text" class="form-control" asp-for="FilterOptions.RegistrationNum" title="Номер договора найма">
-                                <input type="hidden" asp-for="FilterOptions.RegistrationNumIsEmpty" />
-                            </div>
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.Surname">Фамилия</label>
+                            <input type="text" maxlength="255" class="form-control input-filter-chars" asp-for="FilterOptions.Surname" title="Фамилия">
                         </div>
                         <div class="form-group col-md-6 col-lg-3">
-                            <label asp-for="FilterOptions.RegistrationDate">Дата регистрации</label>
-                            <div class="input-group date">
-                                <div class="input-group-prepend rr-registration-date-dropdown">
-                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Model.FilterOptions.RegistrationDateSign</button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">=</a>
-                                        <a class="dropdown-item" href="#">≥</a>
-                                        <a class="dropdown-item" href="#">≤</a>
-                                    </div>
-                                </div>
-                                <input type="date" class="form-control" asp-for="FilterOptions.RegistrationDate" title="Дата регистрации договора">
-                                <input type="hidden" asp-for="FilterOptions.RegistrationDateSign" />
-                            </div>
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.Name">Имя</label>
+                            <input type="text" maxlength="50" class="form-control input-filter-chars" asp-for="FilterOptions.Name" title="Имя">
                         </div>
                         <div class="form-group col-md-6 col-lg-3">
-                            <label asp-for="FilterOptions.IssuedDate">Дата выдачи</label>
-                            <div class="input-group date">
-                                <div class="input-group-prepend rr-issued-date-dropdown">
-                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Model.FilterOptions.IssuedDateSign</button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">=</a>
-                                        <a class="dropdown-item" href="#">≥</a>
-                                        <a class="dropdown-item" href="#">≤</a>
-                                    </div>
-                                </div>
-                                <input type="date" class="form-control" asp-for="FilterOptions.IssuedDate" title="Дата выдачи договора">
-                                <input type="hidden" asp-for="FilterOptions.IssuedDateSign" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-12 col-lg-6 ">
-                            <label asp-for="FilterOptions.IdsRentType">Тип найма <b>содержит</b></label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Вид документа-основания" asp-for="FilterOptions.IdsRentType" asp-items="@(new SelectList(Model.RentTypes, "IdRentType", "RentTypeName"))"></select>
-                        </div>
-                        <div class="form-group col-md-6 col-lg-3">
-                            <label asp-for="FilterOptions.BeginDate">Дата начала действия</label>
-                            <div class="input-group date">
-                                <div class="input-group-prepend rr-begin-date-dropdown">
-                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Model.FilterOptions.BeginDateSign</button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">=</a>
-                                        <a class="dropdown-item" href="#">≥</a>
-                                        <a class="dropdown-item" href="#">≤</a>
-                                    </div>
-                                </div>
-                                <input type="date" class="form-control" asp-for="FilterOptions.BeginDate" title="Дата начала действия договора">
-                                <input type="hidden" asp-for="FilterOptions.BeginDateSign" />
-                            </div>
-                        </div>
-                        <div class="form-group col-md-6 col-lg-3">
-                            <label asp-for="FilterOptions.EndDate">Дата окончания</label>
-                            <div class="input-group date">
-                                <div class="input-group-prepend rr-end-date-dropdown">
-                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Model.FilterOptions.EndDateSign</button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">=</a>
-                                        <a class="dropdown-item" href="#">≥</a>
-                                        <a class="dropdown-item" href="#">≤</a>
-                                    </div>
-                                </div>
-                                <input type="date" class="form-control" asp-for="FilterOptions.EndDate" title="Дата окончания действия договора">
-                                <input type="hidden" asp-for="FilterOptions.EndDateSign" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6 col-lg-3">
-                            <label class="rr-tenancy-filter-label" asp-for="FilterOptions.ReasonDocNum">Номер документа-основания</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.ReasonDocNum" title="Номер документа-основания найма">
-                        </div>
-                        <div class="form-group col-md-6 col-lg-3">
-                            <label class="rr-tenancy-filter-label" asp-for="FilterOptions.ReasonDocDate">Дата документа-оснвоания</label>
-                            <div class="input-group date">
-                                <input type="date" class="form-control" asp-for="FilterOptions.ReasonDocDate" title="Дата документа-оснвоания найма">
-                            </div>
-                        </div>
-                        <div class="form-group col-md-12 col-lg-6 ">
-                            <label asp-for="FilterOptions.IdsReasonType">Вид документа-основания <b>содержит</b></label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Вид документа-основания" asp-for="FilterOptions.IdsReasonType" asp-items="@(new SelectList(Model.ReasonTypes, "IdReasonType", "ReasonName"))"></select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-12 col-lg-6">
-                            <label asp-for="FilterOptions.TenantSnp">ФИО нанимателя</label>
-                            <input type="text" class="form-control input-filter-snp" asp-for="FilterOptions.TenantSnp" title="ФИО нанимателя">
-                        </div>
-                        <div class="form-group col-md-12 col-lg-6">
-                            <label asp-for="FilterOptions.TenancyParticipantSnp">ФИО участника найма</label>
-                            <input type="text" class="form-control input-filter-snp" asp-for="FilterOptions.TenancyParticipantSnp" title="ФИО участника найма">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.Patronymic">Отчество</label>
+                            <input type="text" maxlength="255" class="form-control input-filter-chars" asp-for="FilterOptions.Patronymic" title="Отчество">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6 col-lg-4">
-                            <label asp-for="FilterOptions.IdRegion">Район</label>
-                            <select class="selectpicker form-control" data-live-search="true" title="Район" asp-for="FilterOptions.IdRegion" asp-items="@(new SelectList(Model.Regions, "id_region", "region"))">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.BirthDate">Дата рождения</label>
+                            <input type="date" class="form-control" asp-for="FilterOptions.BirthDate" title="Дата рождения">
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.DateIssueCivil">Дата выдачи договора гражданам</label>
+                            <input type="date" class="form-control" asp-for="FilterOptions.DateIssueCivil" title="Дата выдачи договора гражданам">
+                        </div>
+                        <div class="form-group form-check col-md-6 col-lg-4 rr-is-refusenik-filter-checkbox">
+                            <input type="checkbox" asp-for="FilterOptions.IsRefusenik" title="Услуга отозвана">
+                            <label class="form-check-label" asp-for="FilterOptions.IsRefusenik">Услуга отозвана</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.IdRegion">Район</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Район" asp-for="FilterOptions.IdRegion" asp-items="@(new SelectList(ViewBag.Regions, "id_region", "region"))">
                                 <option selected></option>
                             </select>
                         </div>
                         <div class="form-group col-md-6 col-lg-4">
-                            <label asp-for="FilterOptions.IdStreet">Улица</label>
-                            <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@(new SelectList(Model.Streets, "IdStreet", "StreetName"))">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.IdStreet">Улица</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@(new SelectList(ViewBag.Streets, "IdStreet", "StreetName"))">
                                 <option selected></option>
                             </select>
                         </div>
                         <div class="form-group col-md-6 col-lg-2">
-                            <label asp-for="FilterOptions.House">Номер дома</label>
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.House">Номер дома</label>
                             <input type="text" class="form-control input-filter-house" asp-for="FilterOptions.House" title="Номер дома">
                         </div>
                         <div class="form-group col-md-6 col-lg-2">
-                            <label asp-for="FilterOptions.PremisesNum">Номер помещения</label>
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.PremisesNum">Номер помещения</label>
                             <input type="text" class="form-control input-filter-premise-num" asp-for="FilterOptions.PremisesNum" title="Номер помещения">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-12 col-lg-6">
-                            <label asp-for="FilterOptions.IdsOwnershipRightType">Тип ограничения ЖП</label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип ограничения жилого помещения" asp-for="FilterOptions.IdsOwnershipRightType" asp-items="@(new SelectList(Model.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName"))"></select>
-                        </div>
-                        <div class="form-group col-md-12 col-lg-6">
-                            <label asp-for="FilterOptions.IdsObjectState">Состояние ЖП</label>
-                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Состояние жилого помещения" asp-for="FilterOptions.IdsObjectState" asp-items="@(new SelectList(Model.ObjectStates, "IdState", "StateNeutral"))"></select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-12">
-                            <label asp-for="FilterOptions.IdPreset">Особые критерии поиска</label>
-                            <select class="selectpicker form-control" title="Особые критерии поиска" asp-for="FilterOptions.IdPreset">
-                                <option></option>
-                                <option value="1">Наймы с заканчивающимся через 4 месяца сроком действия</option>
-                                <option value="2">Наймы с уже закончившимся сроком действия</option>
-                                <option value="3">Наймы с продлением</option>
-                                <option value="4">Наймы для аварийного жилья</option>
-                            </select>
                         </div>
                     </div>
                 </div>
@@ -225,5 +123,5 @@
                 </div>
             </div>
         </div>
-    </div>*@
+    </div>
 </form>
