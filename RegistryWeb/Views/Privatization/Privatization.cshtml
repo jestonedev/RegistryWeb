@@ -11,6 +11,7 @@
 }
 @section Scripts {
     <script src="~/js/privContract.common.js" asp-append-version="true"></script>
+    <script src="~/js/privatization.reports.js" asp-append-version="true"></script>
 }
 <div class="card">
     <div class="card-header d-flex flex-column flex-lg-row">
@@ -42,6 +43,18 @@
                                 <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
                                    asp-controller="Privatization" asp-action="Delete" asp-route-idContract="@Model.IdContract" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                             }
+                        </div>
+                    </div>
+                }
+                @if (ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details)
+                {
+                    <div class="btn-group" role="group" aria-label="Отчеты">
+                        <button class="btn btn-success dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@Model.IdContract" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-document"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.IdContract">
+                            <a class="dropdown-item rr-priv-report-contract" href="#" title="Договор" aria-label="Договор" data-id-contract="@Model.IdContract">Договор</a>
+                            <a class="dropdown-item rr-priv-report-contract-kumi" href="#" title="Договор КУМИ" aria-label="Договор КУМИ" data-id-contract="@Model.IdContract">Договор КУМИ</a>
                         </div>
                     </div>
                 }

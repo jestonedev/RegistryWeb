@@ -7,7 +7,7 @@
 <table class="table table-hover pr-table">
     <thead>
         <tr>
-            <th class="align-middle" style="width:250px;">
+            <th class="align-middle">
                 Рег. №
             </th>
             <th class="align-middle">
@@ -24,54 +24,74 @@
                 <div>@contract.RegNumber</div>
             </td>
             <td>
-                @if (Model.PrivContractsAddresses[contract.IdContract] == null)
-                {
-                    <span class="text-danger" title="Адрес из старой программы">@contract.PrivAddress</span>
-                }
-                else
-                {
-                    <span>@Model.PrivContractsAddresses[contract.IdContract].Text</span>
-                }
-                    <div class="dopinfo">
-                        @if (contract.SubPremiseNavigation != null)
+                <div class="row">
+                    @if (contract.IdBuilding != null || contract.IdPremise != null)
+                    {
+                        <div class="dropdown col-auto">
+                            <button class="btn btn-success oi oi-home dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="homesBtn_@contract.IdContract" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu" aria-labelledby="homesBtn_@contract.IdContract">
+                                @if (contract.IdBuilding != null)
+                                {
+                                    <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@contract.IdBuilding">Здание</a>
+                                }
+                                @if (contract.IdPremise != null)
+                                {
+                                    <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@contract.IdPremise">Помещение</a>
+                                }
+                            </div>
+                        </div>
+                    }
+                    <div class="@((contract.IdBuilding != null || contract.IdPremise != null ? "col-lg-9 col-md-8" : "col-12"))">
+                        @if (Model.PrivContractsAddresses[contract.IdContract] == null)
                         {
-                            <div>
-                                <span>Общая площадь: </span> @contract.SubPremiseNavigation.TotalArea м<sup>2</sup>
-                            </div>
-                            <div>
-                                <span>Жилая площадь: </span> @contract.SubPremiseNavigation.LivingArea м<sup>2</sup>
-                            </div>
-                        }
-                        else
-                      if (contract.PremiseNavigation != null)
-                        {
-                            <div>
-                                <span>Общая площадь: </span> @contract.PremiseNavigation.TotalArea м<sup>2</sup>
-                            </div>
-                            <div>
-                                <span>Жилая площадь: </span> @contract.PremiseNavigation.LivingArea м<sup>2</sup>
-                            </div>
-                        }
-                        else
-                       if (contract.BuildingNavigation != null)
-                        {
-                            <div>
-                                <span>Общая площадь: </span> @contract.BuildingNavigation.TotalArea м<sup>2</sup>
-                            </div>
-                            <div>
-                                <span>Жилая площадь: </span> @contract.BuildingNavigation.LivingArea м<sup>2</sup>
-                            </div>
+                            <span class="text-danger" title="Адрес из старой программы">@contract.PrivAddress</span>
                         }
                         else
                         {
-                            <div class="text-danger" title="Площадь из старой программы">
-                                <span>Общая площадь: </span> @contract.PrivTotalSpace м<sup>2</sup>
-                            </div>
-                            <div class="text-danger" title="Площадь из старой программы">
-                                <span>Жилая площадь: </span> @contract.PrivLivingSpace м<sup>2</sup>
-                            </div>
+                            <span>@Model.PrivContractsAddresses[contract.IdContract].Text</span>
                         }
+                        <div class="dopinfo">
+                            @if (contract.SubPremiseNavigation != null)
+                            {
+                                <div>
+                                    <span>Общая площадь: </span> @contract.SubPremiseNavigation.TotalArea м<sup>2</sup>
+                                </div>
+                                <div>
+                                    <span>Жилая площадь: </span> @contract.SubPremiseNavigation.LivingArea м<sup>2</sup>
+                                </div>
+                            }
+                            else
+                          if (contract.PremiseNavigation != null)
+                            {
+                                <div>
+                                    <span>Общая площадь: </span> @contract.PremiseNavigation.TotalArea м<sup>2</sup>
+                                </div>
+                                <div>
+                                    <span>Жилая площадь: </span> @contract.PremiseNavigation.LivingArea м<sup>2</sup>
+                                </div>
+                            }
+                            else
+                          if (contract.BuildingNavigation != null)
+                            {
+                                <div>
+                                    <span>Общая площадь: </span> @contract.BuildingNavigation.TotalArea м<sup>2</sup>
+                                </div>
+                                <div>
+                                    <span>Жилая площадь: </span> @contract.BuildingNavigation.LivingArea м<sup>2</sup>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-danger" title="Площадь из старой программы">
+                                    <span>Общая площадь: </span> @contract.PrivTotalSpace м<sup>2</sup>
+                                </div>
+                                <div class="text-danger" title="Площадь из старой программы">
+                                    <span>Жилая площадь: </span> @contract.PrivLivingSpace м<sup>2</sup>
+                                </div>
+                            }
+                        </div>
                     </div>
+                </div>
             </td>
             <td style="position: relative">
                 <div class="dopinfo-alt">
@@ -113,20 +133,6 @@
                     }
                 </div>
                 <div class="btn-group rr-opacity-item-menu" role="group" aria-label="Панель доступа">
-                    @if (contract.IdBuilding != null || contract.IdPremise != null)
-                    {
-                        <button class="btn btn-success oi oi-home dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="homesBtn_@contract.IdContract" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                        <div class="dropdown-menu" aria-labelledby="homesBtn_@contract.IdContract">
-                            @if (contract.IdBuilding != null)
-                            {
-                                <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@contract.IdBuilding">Здание</a>
-                            }
-                            @if (contract.IdPremise != null)
-                            {
-                                <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@contract.IdPremise">Помещение</a>
-                            }
-                        </div>
-                    }
                     @if (canEdit)
                     {
                         <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
@@ -141,6 +147,13 @@
                         <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
                            asp-controller="Privatization" asp-action="Details" asp-route-idContract="@contract.IdContract" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                     }
+                    <div class="btn-group" role="group" aria-label="Отчеты">
+                        <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@contract.IdContract" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@contract.IdContract">
+                            <a class="dropdown-item rr-priv-report-contract" href="#" title="Договор" aria-label="Договор" data-id-contract="@contract.IdContract">Договор</a>
+                            <a class="dropdown-item rr-priv-report-contract-kumi" href="#" title="Договор КУМИ" aria-label="Договор КУМИ" data-id-contract="@contract.IdContract">Договор КУМИ</a>
+                        </div>
+                    </div>
                 </div>
             </td>
         </tr>
