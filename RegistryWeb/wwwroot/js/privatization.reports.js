@@ -6,6 +6,7 @@
         var modal = $("#PrivCommonReportModal");
         modal.find("[name='ReportType']").val(idReoprt);
         modal.find(".modal-title").text($(this).attr("title"));
+        modal.find("[name='ReportName']").val($(this).attr("title"));
 
 
         modal.find("[data-report-ids]").each(function (idx, elem) {
@@ -68,6 +69,7 @@
 
     $("#PrivCommonReportModal .rr-report-submit, #PrivQuarterReportModal  .rr-report-submit").on('click', function () {
         $(this).closest('form').submit();
+        $(this).closest(".modal").modal("hide");
     });
 
     $("body").on('click', ".rr-priv-report-contract", function (e) {

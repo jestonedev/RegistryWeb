@@ -18,7 +18,7 @@ namespace RegistryWeb.ViewOptions
         Unprivatization = 9,
         ByAddress = 10,
         ByRegion = 11,
-        ByReqDate = 12,
+        ByApplicationDate = 12,
         OrderAdditional = 13,
         OrderExcludePremises = 14,
         RegistryForCpmu = 15,

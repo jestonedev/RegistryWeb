@@ -48,22 +48,62 @@ namespace RegistryWeb.Controllers
 
         public IActionResult QuarterReport(PrivQuarterReportSettings settings)
         {
-            return null;
+            if (!securityService.HasPrivilege(Privileges.PrivRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.GetQuarterReport(settings);
+                return File(file, odtMime, "Квартальный отчет.odt");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
         }
 
         public IActionResult CommonReport(PrivCommonReportSettings settings)
         {
-            return null;
+            if (!securityService.HasPrivilege(Privileges.PrivRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.GetCommonReport(settings);
+                return File(file, odtMime, string.Format("{0}.odt", settings.ReportName));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
         }
 
         public IActionResult GetContract(int idContract)
         {
-            return null;
+            if (!securityService.HasPrivilege(Privileges.PrivRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.GetContract(idContract);
+                return File(file, odtMime, string.Format(@"Договор № {0}.odt", idContract));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
         }
 
         public IActionResult GetContractKumi(int idContract)
         {
-            return null;
+            if (!securityService.HasPrivilege(Privileges.PrivRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.GetContractKumi(idContract);
+                return File(file, odtMime, string.Format(@"Договор КУМИ № {0}.odt", idContract));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
         }
     }
 }

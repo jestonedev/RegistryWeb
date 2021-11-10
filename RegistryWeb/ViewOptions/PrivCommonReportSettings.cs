@@ -8,6 +8,7 @@ namespace RegistryWeb.ViewOptions
     public class PrivCommonReportSettings
     {
         public PrivReportTypeEnum ReportType { get; set; }
+        public string ReportName { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public DateTime? RegEgrpStartDate { get; set; }
