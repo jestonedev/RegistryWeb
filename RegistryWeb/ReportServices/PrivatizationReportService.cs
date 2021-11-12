@@ -30,8 +30,8 @@ namespace RegistryWeb.ReportServices
 
         private string RangeDateToWhereClause(DateTime? startDate, DateTime? endDate)
         {
-            if (startDate == null) startDate = new DateTime(1991, 1, 1);
-            if (endDate == null) endDate = new DateTime(2200, 12, 31);
+            if (startDate == null) startDate = new DateTime(DateTime.Now.Year, 1, 1);
+            if (endDate == null) endDate = new DateTime(DateTime.Now.Year, 12, 31);
             return string.Format("BETWEEN STR_TO_DATE('{0}','%d.%m.%Y') AND STR_TO_DATE('{1}','%d.%m.%Y')",
                 startDate.Value.ToString("dd.MM.yyyy"), endDate.Value.ToString("dd.MM.yyyy"));
 
@@ -75,10 +75,10 @@ namespace RegistryWeb.ReportServices
                         }
                         where += ")";
                     }
-                    arguments.Add("param_date1", settings.StartDate.Value.ToString("dd.MM.yyyy"));
-                    arguments.Add("param_date2", settings.EndDate.Value.ToString("dd.MM.yyyy"));
+                    arguments.Add("param_date1", settings.StartDate.HasValue ? settings.StartDate.Value.ToString("dd.MM.yyyy") : "");
+                    arguments.Add("param_date2", settings.EndDate.HasValue ? settings.EndDate.Value.ToString("dd.MM.yyyy") : "");
                     break;
-                case PrivReportTypeEnum.ForProcuracy: //+
+                case PrivReportTypeEnum.ForProcuracy: // +
                     where = "date_issue " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
@@ -98,7 +98,7 @@ namespace RegistryWeb.ReportServices
                         where += string.Format(" AND vpei.house = '{0}'", settings.House);
                     }
                     break;
-                case PrivReportTypeEnum.PrivEstateWithAreaDetails:
+                case PrivReportTypeEnum.PrivEstateWithAreaDetails: // +
                     where = "date_issue " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
@@ -118,11 +118,11 @@ namespace RegistryWeb.ReportServices
                         where += string.Format(" AND estate_type = {0}", (int)settings.EstateType);
                     }
                     break;
-                case PrivReportTypeEnum.PrivSubPremises:
-                case PrivReportTypeEnum.PrivPremises:
-                case PrivReportTypeEnum.PrivHouses:
-                case PrivReportTypeEnum.PrivRoomsInPremiseWithSettle:
-                case PrivReportTypeEnum.Unprivatization:
+                case PrivReportTypeEnum.PrivSubPremises: // +
+                case PrivReportTypeEnum.PrivPremises: // +
+                case PrivReportTypeEnum.PrivHouses: // +
+                case PrivReportTypeEnum.PrivRoomsInPremiseWithSettle: // +
+                case PrivReportTypeEnum.Unprivatization: // +
                     where = "(1=1)";
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
@@ -135,29 +135,29 @@ namespace RegistryWeb.ReportServices
                     }
                     if (!string.IsNullOrEmpty(settings.IdStreet))
                     {
-                        where += string.Format(" AND id_street = '{0}'", settings.IdStreet);
+                        where += string.Format(" AND vpei.id_street = '{0}'", settings.IdStreet);
                     }
                     if (!string.IsNullOrEmpty(settings.House))
                     {
-                        where += string.Format(" AND house = '{0}'", settings.House);
+                        where += string.Format(" AND vpei.house = '{0}'", settings.House);
                     }
                     break;
-                case PrivReportTypeEnum.ByAddress:
+                case PrivReportTypeEnum.ByAddress: // +
                     where = "(1=1)";
                     if (!string.IsNullOrEmpty(settings.IdStreet))
                     {
-                        where += string.Format(" AND id_street = '{0}'", settings.IdStreet);
+                        where += string.Format(" AND vpei.id_street = '{0}'", settings.IdStreet);
                     }
                     if (!string.IsNullOrEmpty(settings.House))
                     {
-                        where += string.Format(" AND house = '{0}'", settings.House);
+                        where += string.Format(" AND vpei.house = '{0}'", settings.House);
                     }
                     break;
                 case PrivReportTypeEnum.ByRegion:
                     where = "(1=1)";
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
-                        where += " AND id_region IN('0'";
+                        where += " AND vpei.id_region IN('0'";
                         foreach (var IdRegion in settings.IdRegion)
                         {
                             where += string.Format(",'{0}'", IdRegion);
@@ -165,7 +165,7 @@ namespace RegistryWeb.ReportServices
                         where += ")";
                     }
                     break;
-                case PrivReportTypeEnum.ByApplicationDate:
+                case PrivReportTypeEnum.ByApplicationDate: // +
                     where = "application_date " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
                     break;
                 case PrivReportTypeEnum.OrderAdditional:
@@ -176,18 +176,18 @@ namespace RegistryWeb.ReportServices
                     }
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
-                        where += " AND id_region IN('0'";
+                        where += " AND (1=0";
                         foreach (var IdRegion in settings.IdRegion)
                         {
-                            where += string.Format(",'{0}'", IdRegion);
+                            where += string.Format(" OR id_region LIKE '%{0}%'", IdRegion);
                         }
                         where += ")";
                     }
-                    arguments.Add("param_date1", settings.StartDate.Value.ToString("dd.MM.yyyy"));
-                    arguments.Add("param_date2", settings.EndDate.Value.ToString("dd.MM.yyyy"));
+                    arguments.Add("param_date1", settings.StartDate.HasValue ? settings.StartDate.Value.ToString("dd.MM.yyyy") : "");
+                    arguments.Add("param_date2", settings.EndDate.HasValue ? settings.EndDate.Value.ToString("dd.MM.yyyy") : "");
                     arguments.Add("id_executor", settings.IdExecutor);
                     break;
-                case PrivReportTypeEnum.OrderExcludePremises:
+                case PrivReportTypeEnum.OrderExcludePremises: // +
                     where = "date_issue " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
                     if (settings.RegEgrpStartDate != null && settings.RegEgrpEndDate != null)
                     {
@@ -207,11 +207,11 @@ namespace RegistryWeb.ReportServices
                         where += ")";
                     }
                     break;
-                case PrivReportTypeEnum.RegistryForCpmu:
-                case PrivReportTypeEnum.StatByContractors:
+                case PrivReportTypeEnum.RegistryForCpmu:  // +
+                case PrivReportTypeEnum.StatByContractors: 
                     where = "date_issue " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
                     break;
-                case PrivReportTypeEnum.StatIssuedNotRegistred:
+                case PrivReportTypeEnum.StatIssuedNotRegistred:  // +
                     where = "(1=1)";
                     if (settings.RegContractStartDate != null && settings.RegContractEndDate != null)
                     {
@@ -223,15 +223,15 @@ namespace RegistryWeb.ReportServices
                     }
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
-                        where += " AND id_region IN('0'";
+                        where += " AND (1=0";
                         foreach (var IdRegion in settings.IdRegion)
                         {
-                            where += string.Format(",'{0}'", IdRegion);
+                            where += string.Format(" OR id_region LIKE '%{0}%'", IdRegion);
                         }
                         where += ")";
                     }
                     break;
-                case PrivReportTypeEnum.StatByIssueDate:
+                case PrivReportTypeEnum.StatByIssueDate:  // +
                     where = "(1=1)";
                     if (settings.StartDate != null && settings.EndDate != null)
                     {
@@ -243,10 +243,10 @@ namespace RegistryWeb.ReportServices
                     }
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
-                        where += " AND id_region IN('0'";
+                        where += " AND (1=0";
                         foreach (var IdRegion in settings.IdRegion)
                         {
-                            where += string.Format(",'{0}'", IdRegion);
+                            where += string.Format(" OR id_region LIKE '%{0}%'", IdRegion);
                         }
                         where += ")";
                     }
@@ -263,7 +263,7 @@ namespace RegistryWeb.ReportServices
                         }
                     }
                     break;
-                case PrivReportTypeEnum.StatByIssueCivilDate:
+                case PrivReportTypeEnum.StatByIssueCivilDate:  // +
                     where = "date_issue_civil " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
@@ -274,8 +274,17 @@ namespace RegistryWeb.ReportServices
                         }
                         where += ")";
                     }
+                    if (settings.IdRegion != null && settings.IdRegion.Any())
+                    {
+                        where += " AND (1=0";
+                        foreach (var IdRegion in settings.IdRegion)
+                        {
+                            where += string.Format(" OR id_region LIKE '%{0}%'", IdRegion);
+                        }
+                        where += ")";
+                    }
                     break;
-                case PrivReportTypeEnum.StatByRegDate:
+                case PrivReportTypeEnum.StatByRegDate:  // +
                     where = "(1=1)";
                     if (settings.StartDate != null && settings.EndDate != null)
                     {
@@ -287,22 +296,22 @@ namespace RegistryWeb.ReportServices
                     }
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
-                        where += " AND id_region IN('0'";
+                        where += " AND (1=0";
                         foreach (var IdRegion in settings.IdRegion)
                         {
-                            where += string.Format(",'{0}'", IdRegion);
+                            where += string.Format(" OR id_region LIKE '%{0}%'", IdRegion);
                         }
                         where += ")";
                     }
                     break;
-                case PrivReportTypeEnum.StatByRegEgrpDate:
+                case PrivReportTypeEnum.StatByRegEgrpDate:  // +
                     where = "registration_date " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
-                        where += " AND id_region IN('0'";
+                        where += " AND (1=0";
                         foreach (var IdRegion in settings.IdRegion)
                         {
-                            where += string.Format(",'{0}'", IdRegion);
+                            where += string.Format(" OR id_region LIKE '%{0}%'", IdRegion);
                         }
                         where += ")";
                     }
@@ -311,10 +320,10 @@ namespace RegistryWeb.ReportServices
                     where = "date_issue " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
-                        where += " AND id_region IN('0'";
+                        where += " AND (1=0";
                         foreach (var IdRegion in settings.IdRegion)
                         {
-                            where += string.Format(",'{0}'", IdRegion);
+                            where += string.Format(" OR id_region LIKE '%{0}%'", IdRegion);
                         }
                         where += ")";
                     }
@@ -324,7 +333,7 @@ namespace RegistryWeb.ReportServices
                     if (settings.StartDate == null && settings.EndDate == null)
                         where += "application_date IS NULL OR application_date " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
                     else
-                        where += "application_date =" + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
+                        where += "application_date " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
                         where += " AND id_region IN('0'";
@@ -336,7 +345,7 @@ namespace RegistryWeb.ReportServices
                     }
                     if (!string.IsNullOrEmpty(settings.IdStreet))
                     {
-                        where += string.Format(" AND id_street = '{0}'", settings.IdStreet);
+                        where += string.Format(" AND vpei.id_street = '{0}'", settings.IdStreet);
                     }
                     break;
                 default:

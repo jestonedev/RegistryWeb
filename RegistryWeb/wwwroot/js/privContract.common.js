@@ -218,7 +218,7 @@
                         $('#privContractors').append(elem);                
                         var li = $('#privContractors li').last();
                         li.find('select').selectpicker('render');
-                        li.find('select option:not(:selected)').attr('disabled', true);
+                        li.find('select').attr('disabled', true);
                     }
                 });
             }

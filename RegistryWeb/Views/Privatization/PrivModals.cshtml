@@ -38,7 +38,12 @@
                         </div>
                         <div class="form-group col-md-6 col-lg-4">
                             <label for="PrivContractor_IdKinship">Родственное отношение</label>
-                            <select class="selectpicker form-control" id="PrivContractor_IdKinship" name="PrivContractor.IdKinship" title="Родственное отношение" asp-items="@(new SelectList(ViewBag.Kinships, "IdKinship", "KinshipName"))"></select>
+                            <select class="selectpicker form-control" id="PrivContractor_IdKinship" name="PrivContractor.IdKinship" title="Родственное отношение">
+                                    @foreach (var rel in ViewBag.Kinships)
+                                    {
+                                        <option value="@rel.IdKinship">@(rel.IdKinship == 1 ? "заявитель" : rel.KinshipName)</option>
+                                    }
+                            </select>
                         </div>
                         <div class="form-group col-md-12 col-lg-4">
                             <label>Тип</label><br />
