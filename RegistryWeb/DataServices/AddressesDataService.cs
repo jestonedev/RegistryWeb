@@ -22,7 +22,7 @@ namespace RegistryWeb.DataServices
         public List<Address> GetAddressesByText(string text, AddressTypes addressTypes = AddressTypes.Premise)
         {
             if (string.IsNullOrEmpty(text)) return new List<Address>();
-            var match = Regex.Match(text, @"^(.*?)[,]*[ ]*(д\.?)?[ ]*(\d+[а-яА-Я]?([\\\/]\d+[а-яА-Я]?)?)?[ ,-]*(кв\.?|ком\.?|пом\.?|кв\.?[ ]?ком\.?|ком\.?[ ]?кв\.?)?[ ]*(\d+[а-яА-Я]?)?[ ]*(к\.?|ком\.)?[ ]*(\d+[а-яА-Я]?|[а-яА-Я]?)$");
+            var match = Regex.Match(text, @"^(.*?)[,]*[ ]*(д\.?)?[ ]*(\d+[а-яА-Я]?([\\\/]\d+[а-яА-Я]?)?)?[ ,-]*(кв\.?|ком\.?|пом\.?|кв\.?[ ]?ком\.?|ком\.?[ ]?кв\.?)?[ ]*(\d+[а-яА-Я]?)?[ ]*((([,]*[ ]+|[,]*[ ]*к\.?[ ]*|[,]*[ ]*ком\.[ ]*|[,][ ]*)?)(\d+[а-яА-Я]?|[ ]+[а-яА-Я]?))?$");
             var addressWordsList = new List<string>();
             if (addressTypes == AddressTypes.None) return new List<Address>();
             if (!string.IsNullOrEmpty(match.Groups[1].Value))
@@ -37,9 +37,9 @@ namespace RegistryWeb.DataServices
             {
                 addressWordsList.Add(match.Groups[6].Value);
             }
-            if (!string.IsNullOrEmpty(match.Groups[8].Value))
+            if (!string.IsNullOrEmpty(match.Groups[10].Value))
             {
-                addressWordsList.Add(match.Groups[8].Value);
+                addressWordsList.Add(match.Groups[10].Value);
             }
             var addressWords = addressWordsList.ToArray();
             var street = addressWords[0].ToLowerInvariant();

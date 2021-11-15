@@ -30,11 +30,10 @@ namespace RegistryWeb.ReportServices
 
         private string RangeDateToWhereClause(DateTime? startDate, DateTime? endDate)
         {
-            if (startDate == null) startDate = new DateTime(DateTime.Now.Year, 1, 1);
-            if (endDate == null) endDate = new DateTime(DateTime.Now.Year, 12, 31);
+            if (startDate == null) startDate = new DateTime(1991, 1, 1);
+            if (endDate == null) endDate = new DateTime(2100, 12, 31);
             return string.Format("BETWEEN STR_TO_DATE('{0}','%d.%m.%Y') AND STR_TO_DATE('{1}','%d.%m.%Y')",
                 startDate.Value.ToString("dd.MM.yyyy"), endDate.Value.ToString("dd.MM.yyyy"));
-
         }
 
         private Dictionary<string, object> BuildCommonReportArguments(PrivCommonReportSettings settings)
@@ -123,7 +122,7 @@ namespace RegistryWeb.ReportServices
                 case PrivReportTypeEnum.PrivHouses: // +
                 case PrivReportTypeEnum.PrivRoomsInPremiseWithSettle: // +
                 case PrivReportTypeEnum.Unprivatization: // +
-                    where = "(1=1)";
+                    where = "date_issue " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
                         where += " AND id_region IN('0'";
@@ -141,6 +140,8 @@ namespace RegistryWeb.ReportServices
                     {
                         where += string.Format(" AND vpei.house = '{0}'", settings.House);
                     }
+                    arguments.Add("param_date1", settings.StartDate.HasValue ? settings.StartDate.Value.ToString("dd.MM.yyyy") : "");
+                    arguments.Add("param_date2", settings.EndDate.HasValue ? settings.EndDate.Value.ToString("dd.MM.yyyy") : "");
                     break;
                 case PrivReportTypeEnum.ByAddress: // +
                     where = "(1=1)";
@@ -213,11 +214,11 @@ namespace RegistryWeb.ReportServices
                     break;
                 case PrivReportTypeEnum.StatIssuedNotRegistred:  // +
                     where = "(1=1)";
-                    if (settings.RegContractStartDate != null && settings.RegContractEndDate != null)
+                    if (settings.RegContractStartDate != null || settings.RegContractEndDate != null)
                     {
                         where += " AND date_issue " + RangeDateToWhereClause(settings.RegContractStartDate, settings.RegContractEndDate);
                     }
-                    if (settings.IssueCivilStartDate != null && settings.IssueCivilEndDate != null)
+                    if (settings.IssueCivilStartDate != null || settings.IssueCivilEndDate != null)
                     {
                         where += " AND date_issue_civil " + RangeDateToWhereClause(settings.IssueCivilStartDate, settings.IssueCivilEndDate);
                     }
@@ -233,11 +234,11 @@ namespace RegistryWeb.ReportServices
                     break;
                 case PrivReportTypeEnum.StatByIssueDate:  // +
                     where = "(1=1)";
-                    if (settings.StartDate != null && settings.EndDate != null)
+                    if (settings.RegContractStartDate != null || settings.RegContractEndDate != null)
                     {
-                        where += " AND date_issue " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
+                        where += " AND date_issue " + RangeDateToWhereClause(settings.RegContractStartDate, settings.RegContractEndDate);
                     }
-                    if (settings.IssueCivilStartDate != null && settings.IssueCivilEndDate != null)
+                    if (settings.IssueCivilStartDate != null || settings.IssueCivilEndDate != null)
                     {
                         where += " AND date_issue_civil " + RangeDateToWhereClause(settings.IssueCivilStartDate, settings.IssueCivilEndDate);
                     }
@@ -286,11 +287,11 @@ namespace RegistryWeb.ReportServices
                     break;
                 case PrivReportTypeEnum.StatByRegDate:  // +
                     where = "(1=1)";
-                    if (settings.StartDate != null && settings.EndDate != null)
+                    if (settings.StartDate != null || settings.EndDate != null)
                     {
                         where += " AND date_issue " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
                     }
-                    if (settings.RegEgrpStartDate != null && settings.RegEgrpEndDate != null)
+                    if (settings.RegEgrpStartDate != null || settings.RegEgrpEndDate != null)
                     {
                         where += " AND registration_date " + RangeDateToWhereClause(settings.RegEgrpStartDate, settings.RegEgrpEndDate);
                     }
@@ -305,7 +306,7 @@ namespace RegistryWeb.ReportServices
                     }
                     break;
                 case PrivReportTypeEnum.StatByRegEgrpDate:  // +
-                    where = "registration_date " + RangeDateToWhereClause(settings.StartDate, settings.EndDate);
+                    where = "registration_date " + RangeDateToWhereClause(settings.RegEgrpStartDate, settings.RegEgrpEndDate);
                     if (settings.IdRegion != null && settings.IdRegion.Any())
                     {
                         where += " AND (1=0";

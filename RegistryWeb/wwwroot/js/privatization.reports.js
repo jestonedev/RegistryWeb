@@ -21,6 +21,20 @@
                 $(this).hide();
         });
 
+        switch (idReoprt) {
+            case 12: case 22: case 23:
+                modal.find("label[for='PrivCommonReport_StartDate']").text("Дата подачи заявления с");
+                modal.find("label[for='PrivCommonReport_EndDate']").text("Дата подачи заявления по");
+                break;
+            case 18:
+                modal.find("label[for='PrivCommonReport_StartDate']").text("Дата выдачи гражданам с");
+                modal.find("label[for='PrivCommonReport_EndDate']").text("Дата выдачи гражданам по");
+                break;
+            default:
+                modal.find("label[for='PrivCommonReport_StartDate']").text("Дата рег. по договору с");
+                modal.find("label[for='PrivCommonReport_EndDate']").text("Дата рег. по договору по");
+        }
+
         refreshValidationForm($("#PrivCommonReportForm"));
 
         modal.modal("show");
