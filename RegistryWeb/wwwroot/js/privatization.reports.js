@@ -87,16 +87,64 @@
     });
 
     $("body").on('click', ".rr-priv-report-contract", function (e) {
+        var modal = $("#PrivContractModal");
         var idContract = $(this).data("id-contract");
-        url = "/PrivatizationReports/GetContract?idContract=" + idContract;
-        downloadFile(url);
+        modal.find("#PrivContract_IdContract").val(idContract);
+        modal.find("#PrivContract_IdContractType").val(1);
+        modal.modal('show');
         e.preventDefault();
     });
 
     $("body").on('click', ".rr-priv-report-contract-kumi", function (e) {
+        var modal = $("#PrivContractModal");
         var idContract = $(this).data("id-contract");
-        url = "/PrivatizationReports/GetContractKumi?idContract=" + idContract;
-        downloadFile(url);
+        modal.find("#PrivContract_IdContract").val(idContract);
+        modal.find("#PrivContract_IdContractType").val(2);
+        modal.modal('show');
         e.preventDefault();
+    });
+
+    var idOwnerSigners = undefined;
+
+    $('#PrivContractModal #PrivContract_IdOwner').on('change', function (e) {
+        if (idOwnerSigners === undefined) {
+            idOwnerSigners = $("#PrivContract_IdOwnerSigner option[data-id-owner]").clone(true);
+        }
+        var idOwner = $("#PrivContract_IdOwner").val() | 0;
+        $("#PrivContract_IdOwnerSigner option[data-id-owner]").remove();
+        idOwnerSigners.each(function (idx, elem) {
+            if ($(elem).data("id-owner") === idOwner) {
+                $("#PrivContract_IdOwnerSigner").append($(elem));
+            }
+        });
+        $("#PrivContract_IdOwnerSigner").selectpicker("refresh");
+        e.preventDefault();
+    });
+
+    $("#PrivContractModal").on("show.bs.modal", function () {
+        $(this).find('select').prop('disabled', false);
+        $(this).find('input').prop('disabled', false);
+        $(this).find('textarea').prop('disabled', false);
+        $(this).find("select").selectpicker("refresh");
+    });
+
+    $("#PrivContractModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var modal = $("#PrivContractModal");
+        var idContract = modal.find("#PrivContract_IdContract").val();
+        var idContractType = modal.find("#PrivContract_IdContractType").val();
+        var idOwner = modal.find("#PrivContract_IdOwner").val();
+        var idOwnerSigner = modal.find("#PrivContract_IdOwnerSigner").val();
+        var idContractKind = modal.find("#PrivContract_IdContractKind").val();
+        var url = "/PrivatizationReports/GetContract?IdContract=" + idContract + "&ContractType=" + idContractType + "&ContractKind=" + idContractKind +
+            "&IdOwner=" + idOwner + "&IdOwnerSigner=" + idOwnerSigner;
+        downloadFile(url);
+        $("#PrivContractModal").modal("hide");
+    });
+
+    $('#PrivContractModal #PrivContract_IdOwner').change();
+
+    $("#PrivContractModal").on("change", "select", function () {
+        fixBootstrapSelectHighlightOnChange($(this));
     });
 });

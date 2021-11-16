@@ -420,9 +420,6 @@ namespace RegistryWeb.ReportServices
 
         internal byte[] GetQuarterReport(PrivQuarterReportSettings settings)
         {
-            var startDate = new DateTime(settings.Year, settings.Quarter == null ? 1 : (settings.Quarter.Value - 1)*3 + 1, 1);
-            var endDate = new DateTime(settings.Quarter == null ? settings.Year+1 : settings.Year, settings.Quarter == null ? 1 : (settings.Quarter.Value - 1) * 3 + 4, 1);
-            endDate = endDate.AddMilliseconds(-1);
             var filterField = "";
             switch(settings.FilterField)
             {
@@ -439,32 +436,32 @@ namespace RegistryWeb.ReportServices
                     filterField = "application_date";
                     break;
             }
+            var quarter = 0;
+            if (settings.Quarter != null && settings.Quarter <= 4 && settings.Quarter >= 1)
+            {
+                quarter = settings.Quarter.Value;
+            }
             var arguments = new Dictionary<string, object> {
-                { "start_date",  startDate.ToString("dd.MM.yyyy") },
-                { "end_date",  endDate.ToString("dd.MM.yyyy") },
-                { "fitler_field", filterField }
+                { "year",  settings.Year },
+                { "quarter",  quarter },
+                { "filter_field", filterField }
             };
-            var fileNameReport = GenerateReport(arguments, "registry\\privatization\\quarter");
+            var fileNameReport = GenerateReport(arguments, "registry\\privatization\\rep_quarterly");
             return DownloadFile(fileNameReport);
         }
 
-        internal byte[] GetContractKumi(int idContract)
+        internal byte[] GetContract(PrivContractReportSettings settings)
         {
             // TODO диалог с дополнительными конфигурационными параметрами
             var arguments = new Dictionary<string, object> {
-                { "id_contract", idContract }
+                { "id_contract", settings.IdContract },
+                { "id_owner", settings.IdOwner },
+                { "id_owner_signer", settings.IdOwnerSigner },
+                { "contract_kind", (int)settings.ContractKind },
+                { "contract_type", (int)settings.ContractType },
             };
-            var fileNameReport = GenerateReport(arguments, "registry\\privatization\\contract_kumi");
-            return DownloadFile(fileNameReport);
-        }
-
-        internal byte[] GetContract(int idContract)
-        {
-            // TODO диалог с дополнительными конфигурационными параметрами
-            var arguments = new Dictionary<string, object> {
-                { "id_contract", idContract }
-            };
-            var fileNameReport = GenerateReport(arguments, "registry\\privatization\\contract");
+            var fileName = "registry\\privatization\\contract";
+            var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
     }

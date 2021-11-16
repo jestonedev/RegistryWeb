@@ -76,29 +76,14 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult GetContract(int idContract)
+        public IActionResult GetContract(PrivContractReportSettings settings)
         {
             if (!securityService.HasPrivilege(Privileges.PrivRead))
                 return View("NotAccess");
             try
             {
-                var file = reportService.GetContract(idContract);
-                return File(file, odtMime, string.Format(@"Договор № {0}.odt", idContract));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
-        }
-
-        public IActionResult GetContractKumi(int idContract)
-        {
-            if (!securityService.HasPrivilege(Privileges.PrivRead))
-                return View("NotAccess");
-            try
-            {
-                var file = reportService.GetContractKumi(idContract);
-                return File(file, odtMime, string.Format(@"Договор КУМИ № {0}.odt", idContract));
+                var file = reportService.GetContract(settings);
+                return File(file, odtMime, string.Format(@"Договор № {0}.odt", settings.IdContract));
             }
             catch (Exception ex)
             {

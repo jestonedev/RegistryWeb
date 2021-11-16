@@ -23,6 +23,8 @@ namespace RegistryWeb.Controllers
             ViewBag.SecurityService = securityService;
             ViewBag.Regions = dataService.Regions;
             ViewBag.Streets = dataService.Streets;
+            ViewBag.PrivEstateOwners = dataService.PrivEstateOwners;
+            ViewBag.PrivEstateOwnerSigners = dataService.PrivEstateOwnerSigners;
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
@@ -59,6 +61,8 @@ namespace RegistryWeb.Controllers
             ViewBag.Regions = dataService.Regions;
             ViewBag.Streets = dataService.Streets;
             ViewBag.TypesOfProperty = dataService.TypesOfProperty;
+            ViewBag.PrivEstateOwners = dataService.PrivEstateOwners;
+            ViewBag.PrivEstateOwnerSigners = dataService.PrivEstateOwnerSigners;
             return View("Privatization", contract);
         }
 

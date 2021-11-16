@@ -341,6 +341,8 @@ namespace RegistryWeb.DataServices
         internal List<KladrRegion> Regions { get => registryContext.KladrRegions.ToList(); }
         internal List<KladrStreet> Streets { get => registryContext.KladrStreets.ToList(); }
         internal List<PrivTypeOfProperty> TypesOfProperty { get => registryContext.TypesOfProperty.ToList(); }
+        internal List<PrivEstateOwner> PrivEstateOwners { get => registryContext.PrivEstateOwners.ToList(); }
+        internal List<SelectableSigner> PrivEstateOwnerSigners { get => registryContext.SelectableSigners.Where(r => r.IdOwner != null).ToList(); }
 
         public void Create(PrivContract contract)
         {
