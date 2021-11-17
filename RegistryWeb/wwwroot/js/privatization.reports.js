@@ -121,7 +121,7 @@
         e.preventDefault();
     });
 
-    $("#PrivContractModal").on("show.bs.modal", function () {
+    $("#PrivContractModal, #PrivRealtorWarrantModal").on("show.bs.modal", function () {
         $(this).find('select').prop('disabled', false);
         $(this).find('input').prop('disabled', false);
         $(this).find('textarea').prop('disabled', false);
@@ -146,5 +146,30 @@
 
     $("#PrivContractModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
+    });
+
+    $("body").on('click', ".rr-priv-report-warrant-realtor", function (e) {
+        var modal = $("#PrivRealtorWarrantModal");
+        var idContractor = $(this).data("id-contractor");
+        modal.find("#PrivRealtorWarrant_IdContractor").val(idContractor);
+        modal.modal('show');
+        e.preventDefault();
+    });
+
+    $("#PrivRealtorWarrantModal .rr-report-submit").on("click", function (e) {
+        var modal = $("#PrivRealtorWarrantModal");
+        var idContractor = modal.find("#PrivRealtorWarrant_IdContractor").val();
+        var idRealtor = modal.find("#PrivRealtorWarrant_IdRealtor").val();
+        var url = "/PrivatizationReports/GetContractorWarrant?IdContractor=" + idContractor + "&WarrantType=1&IdRealtor=" + idRealtor;
+        downloadFile(url);
+        modal.modal('hide');
+        e.preventDefault();
+    });
+
+    $("body").on('click', ".rr-priv-report-warrant-yu", function (e) {
+        var idContractor = $(this).data("id-contractor");
+        var url = "/PrivatizationReports/GetContractorWarrant?IdContractor=" + idContractor + "&WarrantType=2";
+        downloadFile(url);
+        e.preventDefault();
     });
 });

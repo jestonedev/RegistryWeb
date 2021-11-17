@@ -1,0 +1,32 @@
+﻿@using RegistryWeb.Models.Entities;
+@{ 
+    var selectedRealtor = ((List<PrivRealtor>)ViewBag.PrivRealtors).FirstOrDefault()?.IdRealtor;
+}
+<form id="PrivRealtorWarrantModalForm">
+    <div class="modal fade bd-example-modal-xl" id="PrivRealtorWarrantModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Доверенность (риелтор)</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="PrivRealtorWarrant_IdContractor" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="PrivRealtorWarrant_IdRealtor">Риелтор</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Риелтор" id="PrivRealtorWarrant_IdRealtor" asp-items="@(new SelectList(ViewBag.PrivRealtors, "IdRealtor", "Name", selectedRealtor))">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

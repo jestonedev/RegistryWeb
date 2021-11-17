@@ -79,13 +79,13 @@
             if (key == 'IsNoncontractor') {
                 if (value == 'False' || value == "false" || value == false) {
                     contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Участник');
-                    contractorModal.find("[name='PrivContractor.IsNoncontractor']").bootstrapToggle('on');
+                    contractorModal.find("[name='PrivContractor.IsNoncontractor']").prop("disabled", "").bootstrapToggle('on').prop("disabled", "disabled");;
                     contractorModal.find("[for='PrivContractor_Description']").text('Текст доверенности');
                     contractorModal.find(".r-addition-fields-contractor").show();
                 }
                 else {
                     contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Неучастник');
-                    contractorModal.find("[name='PrivContractor.IsNoncontractor']").bootstrapToggle('off');
+                    contractorModal.find("[name='PrivContractor.IsNoncontractor']").prop("disabled", "").bootstrapToggle('off').prop("disabled", "disabled");;
                     contractorModal.find("[for='PrivContractor_Description']").text('Причина неучастия');
                     contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore');
                     contractorModal.find("[name='PrivContractor.Passport']").addClass('rr-valid-ignore');
@@ -96,7 +96,7 @@
             else if (key == 'HasDover') {
                 if (value == 'False' || value == "false" || value == false) {
                     contractorModal.find("[for='PrivContractor_HasDover']").text('Нет');
-                    contractorModal.find("[name='PrivContractor.HasDover']").bootstrapToggle('off');
+                    contractorModal.find("[name='PrivContractor.HasDover']").prop("disabled", "").bootstrapToggle('off').prop("disabled", "disabled");;
                     contractorModal.find('.r-description').hide();
                     if (contractorModal.find("[name='PrivContractor.IsNoncontractor']").is(':checked')) {
                         contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore');
@@ -105,7 +105,7 @@
                 }
                 else {
                     contractorModal.find("[for='PrivContractor_HasDover']").text('Есть');
-                    contractorModal.find("[name='PrivContractor.HasDover']").bootstrapToggle('on');
+                    contractorModal.find("[name='PrivContractor.HasDover']").prop("disabled", "").bootstrapToggle('on').prop("disabled", "disabled");;
                 }
             }
             else {

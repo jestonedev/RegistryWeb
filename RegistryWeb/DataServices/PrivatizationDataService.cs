@@ -343,6 +343,7 @@ namespace RegistryWeb.DataServices
         internal List<PrivTypeOfProperty> TypesOfProperty { get => registryContext.TypesOfProperty.ToList(); }
         internal List<PrivEstateOwner> PrivEstateOwners { get => registryContext.PrivEstateOwners.ToList(); }
         internal List<SelectableSigner> PrivEstateOwnerSigners { get => registryContext.SelectableSigners.Where(r => r.IdOwner != null).ToList(); }
+        internal List<PrivRealtor> PrivRealtors { get => registryContext.PrivRealtors.ToList(); }
 
         public void Create(PrivContract contract)
         {

@@ -90,5 +90,21 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
+
+        public IActionResult GetContractorWarrant(PrivContractorWarrantReportSettings settings)
+        {
+            if (!securityService.HasPrivilege(Privileges.PrivRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.GetContractorWarrant(settings);
+                return File(file, odtMime, string.Format(@"Доверенность {1} № {0}.odt", 
+                    settings.IdContractor, settings.WarrantType == PrivContractorWarrantTypeEnum.Realtor ? "(риелтор)" : "в УЮ"));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
     }
 }

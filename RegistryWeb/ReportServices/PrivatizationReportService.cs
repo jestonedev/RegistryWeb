@@ -358,6 +358,23 @@ namespace RegistryWeb.ReportServices
             return arguments;
         }
 
+        internal byte[] GetContractorWarrant(PrivContractorWarrantReportSettings settings)
+        {
+            var arguments = new Dictionary<string, object> {
+                { "id_contractor", settings.IdContractor }
+            };
+            var fileName = "registry\\privatization\\dover_realtor";
+            if (settings.WarrantType == PrivContractorWarrantTypeEnum.Realtor)
+            {
+                arguments.Add("id_realtor", settings.IdRealtor);
+            } else
+            {
+                fileName = "registry\\privatization\\dover";
+            }
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+
         private string GetCommonReportConfigFile(PrivCommonReportSettings settings)
         {
             switch(settings.ReportType)
@@ -452,7 +469,6 @@ namespace RegistryWeb.ReportServices
 
         internal byte[] GetContract(PrivContractReportSettings settings)
         {
-            // TODO диалог с дополнительными конфигурационными параметрами
             var arguments = new Dictionary<string, object> {
                 { "id_contract", settings.IdContract },
                 { "id_owner", settings.IdOwner },

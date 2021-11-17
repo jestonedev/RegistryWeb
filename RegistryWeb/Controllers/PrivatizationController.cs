@@ -63,6 +63,7 @@ namespace RegistryWeb.Controllers
             ViewBag.TypesOfProperty = dataService.TypesOfProperty;
             ViewBag.PrivEstateOwners = dataService.PrivEstateOwners;
             ViewBag.PrivEstateOwnerSigners = dataService.PrivEstateOwnerSigners;
+            ViewBag.PrivRealtors = dataService.PrivRealtors;
             return View("Privatization", contract);
         }
 

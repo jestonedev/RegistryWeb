@@ -50,7 +50,21 @@
             }
             @if (ViewBag.Action == ActionTypeEnum.Details || ViewBag.Action == ActionTypeEnum.Delete)
             {
-                <a class="btn btn-primary priv-contract-details-btn" title="Подробнее" aria-label="Подробнее" href="#"><span class="oi oi-eye"></span></a>
+                <div class="btn-group edit-del-panel" role="group" aria-label="Панель реадктирования">
+                    <a class="btn btn-primary priv-contract-details-btn" title="Подробнее" aria-label="Подробнее" href="#"><span class="oi oi-eye"></span></a>
+                    @if (!Model.IsNoncontractor)
+                    {
+                        <div class="btn-group" role="group" aria-label="Отчеты">
+                            <button class="btn btn-success dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@id" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="oi oi-document"></span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@id">
+                                <a class="dropdown-item rr-priv-report-warrant-realtor" href="#" title="Доверенность (риелтор)" aria-label="Доверенность (риелтор)" data-id-contractor="@Model.IdContractor">Доверенность (риелтор)</a>
+                                <a class="dropdown-item rr-priv-report-warrant-yu" href="#" title="Доверенность в УЮ" aria-label="Доверенность в УЮ" data-id-contractor="@Model.IdContractor">Доверенность в УЮ</a>
+                            </div>
+                        </div>
+                    }
+                </div>
             }
         </div>
     </div>
