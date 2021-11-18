@@ -2,7 +2,126 @@
 @using RegistryWeb.SecurityServices;
 @{
     var securityService = (SecurityService)ViewData["SecurityService"];
+    var r = 0;
 }
 <form asp-action="Index" method="get" class="filterForm">
-</form>
+    <input type="hidden" asp-for="OrderOptions.OrderDirection" />
+    <input type="hidden" asp-for="OrderOptions.OrderField" />
+    <input type="hidden" asp-for="PageOptions.CurrentPage" />
+    <input type="hidden" asp-for="PageOptions.SizePage" />
+    <input type="hidden" asp-for="FilterOptions.Address.AddressType" />
+    <input type="hidden" asp-for="FilterOptions.Address.Id" />
+    <div class="form-row">
+        @if (securityService.HasPrivilege(Privileges.PrivReadWrite))
+        {
+        <div class="form-group col-2 col-md-1 col-lg-1">
+            <a class="btn btn-success" title="Создать" aria-label="Создать"
+               asp-controller="Privatization" asp-action="Create" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">&#10010;</a>
+        </div>
+        }
+        @if (Model.FilterOptions.IsAddressEmpty())
+        {
+            <div class="form-group @((securityService.HasPrivilege(Privileges.PrivReadWrite)) ? "col-6 col-md-8 col-lg-9" : "col-7 col-md-9 col-lg-10")">
+                <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+            </div>
+        }
+        else
+        {
+            <div class="form-group @((securityService.HasPrivilege(Privileges.PrivReadWrite)) ? "col-6 col-md-8 col-lg-9" : "col-7 col-md-9 col-lg-10")">
+                <div class="input-group">
+                    <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                    <div class="input-group-append h-auto d-inline-block">
+                        <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
+                    </div>
+                </div>
+            </div>
+        }
 
+        @if (Model.FilterOptions.IsModalEmpty())
+        {
+            <div class="form-group col-4 col-md-3 col-lg-2">
+                <a class="btn btn-block btn-secondary" href="#" id="filterModalShow">Фильтр</a>
+            </div>
+        }
+        else
+        {
+            <div class="form-group btn-group col-4 col-md-3 col-lg-2">
+                <a class="btn btn-block btn-secondary" href="#" id="filterModalShow">Фильтр</a>
+                <a class="btn btn-outline-secondary" href="#" id="filterClearBtn">&#10006;</a>
+            </div>
+        }
+    </div>
+    <!-- Modal -->
+    <div class="modal fade bd-example-modal-xl" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Фильтр договоров приватизации</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.RegNumber">Рег. номер</label>
+                            <input type="text" class="form-control" maxlength="100" asp-for="FilterOptions.RegNumber" title="Регистрационный номер">
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.Surname">Фамилия</label>
+                            <input type="text" maxlength="255" class="form-control input-filter-chars" asp-for="FilterOptions.Surname" title="Фамилия">
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.Name">Имя</label>
+                            <input type="text" maxlength="50" class="form-control input-filter-chars" asp-for="FilterOptions.Name" title="Имя">
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.Patronymic">Отчество</label>
+                            <input type="text" maxlength="255" class="form-control input-filter-chars" asp-for="FilterOptions.Patronymic" title="Отчество">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.BirthDate">Дата рождения</label>
+                            <input type="date" class="form-control" asp-for="FilterOptions.BirthDate" title="Дата рождения">
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.DateIssueCivil">Дата выдачи договора гражданам</label>
+                            <input type="date" class="form-control" asp-for="FilterOptions.DateIssueCivil" title="Дата выдачи договора гражданам">
+                        </div>
+                        <div class="form-group form-check col-md-6 col-lg-4 rr-is-refusenik-filter-checkbox">
+                            <input type="checkbox" asp-for="FilterOptions.IsRefusenik" title="Услуга отозвана">
+                            <label class="form-check-label" asp-for="FilterOptions.IsRefusenik">Услуга отозвана</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.IdRegion">Район</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Район" asp-for="FilterOptions.IdRegion" asp-items="@(new SelectList(ViewBag.Regions, "id_region", "region"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.IdStreet">Улица</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@(new SelectList(ViewBag.Streets, "IdStreet", "StreetName"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-2">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.House">Номер дома</label>
+                            <input type="text" class="form-control input-filter-house" asp-for="FilterOptions.House" title="Номер дома">
+                        </div>
+                        <div class="form-group col-md-6 col-lg-2">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.PremisesNum">Номер помещения</label>
+                            <input type="text" class="form-control input-filter-premise-num" asp-for="FilterOptions.PremisesNum" title="Номер помещения">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="searchModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Найти</button>
+                    <button id="filterClearModalBtn" type="button" class="btn btn-secondary">Очистить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

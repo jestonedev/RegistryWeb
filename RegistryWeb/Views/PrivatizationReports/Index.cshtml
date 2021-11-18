@@ -1,0 +1,382 @@
+﻿@using RegistryWeb.ViewModel
+@using RegistryWeb.Models.Entities
+@model PrivatizationReportsVM;
+@{
+    ViewData["Title"] = "Отчеты по приватизации";
+}
+
+@section styles
+    {
+    <link rel="stylesheet" href="~/css/object.report.css" runat="server" />
+}
+@section Scripts
+    {
+    <script src="~/js/privatization.reports.js" asp-append-version="true"></script>
+}
+
+<div>
+    <h2>@ViewData["Title"]</h2>
+    <br />
+    <div class="row mb-3">
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-quarter-modal-report" title="Квартальный отчет">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Квартальный отчет</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report d-none" data-report-id="1" title="Статистика по первым приватизированным квартирам">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Статистика по первым приватизированным квартирам</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="2" title="Не прошедшие регистрацию в РосРеестре">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Не прошедшие регистрацию в РосРеестре</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="3" title="Отчет для прокуратуры">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Отчет для прокуратуры</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="4" title="Отчет по прив.помещениям с расшифровкой площадей">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Отчет по прив.помещениям с расшифровкой площадей</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="5" title="Перечень приватиз. комнат в кв. с подсел.">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Перечень приватиз. комнат в кв. с подсел.</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="6" title="Перечень приватизированных жилых домов">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Перечень приватизированных жилых домов</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="7" title="Перечень приватизированных квартир">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Перечень приватизированных квартир</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="8" title="Перечень приватизированных комнат">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Перечень приватизированных комнат</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="9" title="Перечень расприватизированных ж.п.">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Перечень расприватизированных ж.п.</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report d-none" data-report-id="10" title="По адресу">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">По адресу</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report d-none" data-report-id="11" title="По району">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">По району</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="12" title="По дате подачи заявления">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">По дате подачи заявления</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="13" title="Приложение к распоряжению, перечень">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Приложение к распоряжению, перечень</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="14" title="Распоряжение об исключении ж.п.">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Распоряжение об исключении ж.п.</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="15" title="Реестр договоров для передачи в МКУ ЦПМУ">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Реестр договоров для передачи в МКУ ЦПМУ</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="16" title="Статистика по выданным, но не зарегистрированным">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Статистика по выданным, но не зарегистрированным</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="17" title="Статистика по дате регистрации по договору">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Статистика по дате регистрации по договору</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="18" title="Статистика по дате выдачи договора гражданам">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Статистика по дате выдачи договора гражданам</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="19" title="Статистика по дате регистрации">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Статистика по дате регистрации в ЕГРП #1</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="20" title="Статистика по дате регистрации в ЕГРП">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Статистика по дате регистрации в ЕГРП #2</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="21" title="Статистика по доверенному лицу">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Статистика по доверенному лицу</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="22" title="Статистика по отозванным услугам">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Статистика по отозванным услугам</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="23" title="Статистика по отказам">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Статистика по отказам</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report" data-report-id="24" title="Статистика по участникам">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Статистика по участникам</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="PrivQuarterReportForm" asp-action="QuarterReport">
+    <div class="modal fade" id="PrivQuarterReportModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Квартальный отчет</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="PrivQuarterReport_Year">Год</label>
+                            <input type="number" min="1991" max="2100" value="@DateTime.Now.Year" class="form-control" title="Год" name="Year"
+                                   id="PrivQuarterReport_Year" />
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="PrivQuarterReport_Quarter">Квартал</label>
+                            <input type="number" min="1" max="4" value="@(Math.Ceiling((DateTime.Now.Month - 1) / 3m)+1)" class="form-control" title="Квартал" name="Quarter"
+                                   id="PrivCommonReport_Quarter" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <div class="form-check">
+                                <input type="radio" checked name="FilterField" class="form-check-input" value="0" id="PrivQuarterReport_FilterRegDate">
+                                <label class="form-check-label" for="PrivQuarterReport_FilterRegDate">По дате регистрации по договору</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" name="FilterField" class="form-check-input" value="1" id="PrivQuarterReport_FilterRegEgrp">
+                                <label class="form-check-label" for="PrivQuarterReport_FilterRegEgrp">По дате регистрации в ЕГРП</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" name="FilterField" class="form-check-input" value="2" id="PrivQuarterReport_FilterIssueCivil">
+                                <label class="form-check-label" for="PrivQuarterReport_FilterIssueCivil">По дате выдачи договора гражданам</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" name="FilterField" class="form-check-input" value="3" id="PrivQuarterReport_FilterRequestDate">
+                                <label class="form-check-label" for="PrivQuarterReport_FilterRequestDate">По дате подачи заявления</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="PrivCommonReportForm" asp-action="CommonReport">
+    <div class="modal fade" id="PrivCommonReportModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="ReportType" />
+                    <input type="hidden" name="ReportName" />
+                    <div class="form-row" data-report-ids="2,3,4,5,6,7,8,9,12,13,14,15,18,21,22,23,24">
+                        <div class="form-group col-6">
+                            <label for="PrivCommonReport_StartDate">Дата рег. по договору с</label>
+                            <input type="date" class="form-control" title="Дата начала" name="StartDate"
+                                   id="PrivCommonReport_StartDate" />
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="PrivCommonReport_EndDate">Дата рег. по договору по</label>
+                            <input type="date" class="form-control" title="Дата окончания" name="EndDate"
+                                   id="PrivCommonReport_EndDate" />
+                        </div>
+                    </div>
+                    <div class="form-row" data-report-ids="13,14,19,20">
+                        <div class="form-group col-6">
+                            <label for="PrivCommonReport_RegEgrpStartDate">Дата рег. в ЕГРП с</label>
+                            <input type="date" class="form-control" title="Дата регистрации в ЕГРП с" name="RegEgrpStartDate"
+                                   id="PrivCommonReport_RegEgrpStartDate" />
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="PrivCommonReport_RegEgrpEndDate">Дата рег. в ЕГРП по</label>
+                            <input type="date" class="form-control" title="Дата регистрации в ЕГРП по" name="RegEgrpEndDate"
+                                   id="PrivCommonReport_RegEgrpEndDate" />
+                        </div>
+                    </div>
+                    <div class="form-row" data-report-ids="14">
+                        <div class="form-group col-6">
+                            <label for="PrivCommonReport_InsertStartDate">Дата внесения с</label>
+                            <input type="date" class="form-control" title="Дата внесения с" name="InsertStartDate"
+                                   id="PrivCommonReport_InsertStartDate" />
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="PrivCommonReport_InsertEndDate">Дата внесения по</label>
+                            <input type="date" class="form-control" title="Дата внесения по" name="InsertEndDate"
+                                   id="PrivCommonReport_InsertEndDate" />
+                        </div>
+                    </div>
+                    <div class="form-row" data-report-ids="16,17">
+                        <div class="form-group col-6">
+                            <label for="PrivCommonReport_RegContractStartDate">Дата рег. по договору с</label>
+                            <input type="date" class="form-control" title="Дата регистрации по договору с" name="RegContractStartDate"
+                                   id="PrivCommonReport_RegContractStartDate" />
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="PrivCommonReport_RegContractEndDate">Дата рег. по договору по</label>
+                            <input type="date" class="form-control" title="Дата регистрации по договору по" name="RegContractEndDate"
+                                   id="PrivCommonReport_RegContractEndDate" />
+                        </div>
+                    </div>
+                    <div class="form-row" data-report-ids="16,17,19">
+                        <div class="form-group col-6">
+                            <label for="PrivCommonReport_IssueCivilStartDate">Дата выдачи с</label>
+                            <input type="date" class="form-control" title="Дата выдачи с" name="IssueCivilStartDate"
+                                   id="PrivCommonReport_IssueCivilStartDate" />
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="PrivCommonReport_IssueCivilEndDate">Дата выдачи по</label>
+                            <input type="date" class="form-control" title="Дата выдачи по" name="IssueCivilEndDate"
+                                   id="PrivCommonReport_IssueCivilEndDate" />
+                        </div>
+                    </div>
+                    <div class="form-row" data-report-ids="1,2,3,4,5,6,7,8,9,11,13,14,16,17,18,19,20,21,22,23">
+                        <div class="form-group col-12">
+                            <label for="PrivCommonReport_IdRegion">Район</label>
+                            <select multiple class="selectpicker form-control" title="Район" name="IdRegion"
+                                    asp-items="@(new SelectList(Model.Regions, "id_region", "region"))"
+                                    id="PrivCommonReport_IdRegion"></select>
+                        </div>
+                    </div>
+                    <div class="form-row" data-report-ids="1,3,4,5,6,7,8,9,10,22,23">
+                        <div class="form-group col-12">
+                            <label for="PrivCommonReport_IdStreet">Улица</label>
+                            <select data-live-search="true" class="selectpicker form-control" title="Улица" name="IdStreet"
+                                    asp-items="@(new SelectList(Model.Streets, "IdStreet", "StreetName"))"
+                                    id="PrivCommonReport_IdStreet">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row" data-report-ids="1,3,5,6,7,8,9,10">
+                        <div class="form-group col-12">
+                            <label for="PrivCommonReport_House">Дом</label>
+                            <input type="text" maxlength="50" class="form-control" title="Дом" name="House"
+                                   id="PrivCommonReport_House" />
+                        </div>
+                    </div>
+                    <div class="form-row" data-report-ids="4">
+                        <div class="form-group col-12">
+                            <label for="PrivCommonReport_IdEstateType">Тип помещения</label>
+                            <select class="selectpicker form-control" title="Тип помещения" name="EstateType"
+                                    id="PrivCommonReport_IdEstateType">
+                                <option></option>
+                                @foreach (KeyValuePair<int, string> item in Model.PremiseTypes)
+                                {
+                                    <option value="@item.Key">@item.Value</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row" data-report-ids="12">
+                        <div class="form-group col-12">
+                            <label for="PrivCommonReport_IdLiteraType">Тип</label>
+                            <select class="selectpicker form-control" title="Тип" name="LiteraType"
+                                    did="PrivCommonReport_IdLiteraType">
+                                <option></option>
+                                @foreach (KeyValuePair<int, string> item in Model.LiteraTypes)
+                                {
+                                    <option value="@item.Key">@item.Value</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12" data-report-ids="13">
+                            <label for="PrivCommonReport_IdExecutor">Исполнитель</label>
+                            <select data-live-search="true" class="selectpicker form-control" title="Исполнитель" name="IdExecutor"
+                                    asp-items="@(new SelectList(Model.Executors, "IdExecutor", "ExecutorName"))"
+                                    id="PrivCommonReport_IdExecutor">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row" data-report-ids="17">
+                        <div class="form-group col-12">
+                            <label for="PrivCommonReport_IdOrder">Сортировка</label>
+                            <select class="selectpicker form-control" title="Сортировка" name="Order"
+                                    did="PrivCommonReport_IdOrder">
+                                <option></option>
+                                @foreach (KeyValuePair<int, string> item in Model.Order)
+                                {
+                                    <option value="@item.Key">@item.Value</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

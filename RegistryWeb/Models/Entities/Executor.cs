@@ -15,5 +15,6 @@ namespace RegistryWeb.Models.Entities
         public virtual IList<TenancyProcess> TenancyProcesses { get; set; }
         public virtual IList<TenancyAgreement> TenancyAgreements { get; set; }
         public virtual IList<ClaimCourtOrder> ClaimCourtOrders { get; set; }
+        public virtual IList<PrivContract> PrivContracts { get; set; }
     }
 }

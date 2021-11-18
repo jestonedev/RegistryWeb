@@ -1,6 +1,6 @@
 ﻿@model RegistryWeb.ViewModel.PrivatizationListVM;
 @{
-    ViewData["Title"] = "Приватизация";
+    ViewData["Title"] = "Договоры приватизации";
     var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
         "(" + Model.PageOptions.TotalRows + ")" :
         "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
@@ -8,11 +8,18 @@
 
 <h2>@ViewData["Title"] @text</h2>
 
-<partial name="Filter" model="Model"/>
+<partial name="Filter" model="Model" />
 <partial name="DataTable" model="Model" />
+<partial name="PrivContractModal">
+
 <page-link page-model="Model.PageOptions" page-action="Index"></page-link>
 
 @section Scripts {
+    <script src="~/js/address.filter.js" asp-append-version="true"></script>
+    <script src="~/js/index.common.js" asp-append-version="true"></script>
+    <script src="~/js/index.PrivContract.js" asp-append-version="true"></script>
+    <script src="~/js/privatization.reports.js" asp-append-version="true"></script>
 }
 @section styles{
+    <link rel="stylesheet" href="~/css/privatization.css" runat="server" />
 }

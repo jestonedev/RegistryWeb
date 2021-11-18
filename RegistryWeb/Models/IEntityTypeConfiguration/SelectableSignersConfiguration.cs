@@ -31,6 +31,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_signer_group")
                 .HasColumnType("int(11)");
 
+            builder.Property(e => e.IdOwner)
+                .HasColumnName("id_owner")
+                .HasColumnType("int(11)");
+
             builder.Property(e => e.Surname)
                 .IsRequired()
                 .HasColumnName("surname")
@@ -58,6 +62,15 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("phone")
                 .HasMaxLength(255)
                 .IsUnicode(false);
+
+            builder.Property(e => e.Deleted)
+                .HasColumnName("deleted")
+                .HasColumnType("tinyint(1)")
+                .HasDefaultValueSql("0");
+
+            builder.HasOne(e => e.PrivEstateOwner).WithMany(e => e.SelectableSigners)
+                .HasForeignKey(e => e.IdOwner)
+                .OnDelete(DeleteBehavior.Restrict);
 
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);
