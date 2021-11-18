@@ -8,6 +8,6 @@ namespace RegistryWeb.ViewModel
     public class PrivatizationListVM : ListVM<PrivatizationFilter>
     {
         public List<PrivContract> PrivContracts { get; set; }
-        public Dictionary<int, Address> PrivContractsAddresses { get; set; }
+        public Dictionary<int, List<Address>> PrivContractsAddresses { get; set; }
     }
 }

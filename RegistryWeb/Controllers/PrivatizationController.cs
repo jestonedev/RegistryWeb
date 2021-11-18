@@ -48,11 +48,8 @@ namespace RegistryWeb.Controllers
             {
                 contract.IdExecutor = 65536;
             }
-            var addressRegistry = dataService.GetAddressRegistry(contract);
-            ViewBag.AddressRegistry = addressRegistry?.Text;            
-            ViewBag.IdPremise = addressRegistry?.IdParents["IdPremise"];
-            ViewBag.IdBuilding = addressRegistry?.IdParents["IdBuilding"];
-            ViewBag.IdStreet = addressRegistry?.IdParents["IdStreet"];
+            var addressesRegistry = dataService.GetContractAddresses(contract);
+            ViewBag.AddressesRegistry = addressesRegistry;
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.Action = action;
             ViewBag.SecurityService = securityService;

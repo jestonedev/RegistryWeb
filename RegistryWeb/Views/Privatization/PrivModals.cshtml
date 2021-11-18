@@ -41,7 +41,7 @@
                             <select class="selectpicker form-control" id="PrivContractor_IdKinship" name="PrivContractor.IdKinship" title="Родственное отношение">
                                     @foreach (var rel in ViewBag.Kinships)
                                     {
-                                        <option value="@rel.IdKinship">@(rel.IdKinship == 1 ? "заявитель" : rel.KinshipName)</option>
+                                        <option value="@rel.IdKinship">@(rel.IdKinship == 1 ? "заявитель" : rel.IdKinship == 65 ? "член семьи заявителя" : rel.KinshipName)</option>
                                     }
                             </select>
                         </div>

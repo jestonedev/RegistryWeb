@@ -2,7 +2,7 @@
 @using RegistryWeb.SecurityServices;
 @model RegistryWeb.Models.Entities.PrivContract;
 @{
-    ViewData["Title"] = Model == null ? "Новый договор приватизации" :
+    ViewData["Title"] = Model.IdContract == 0 ? "Новый договор приватизации" :
         "Договор приватизации №" + Model.RegNumber;
     var canEdit = ((SecurityService)ViewData["SecurityService"])?.HasPrivilege(Privileges.PrivReadWrite) ?? false;
 }
@@ -94,31 +94,39 @@
             <input type="hidden" value="@Model.IdPremise" name="IdPremise" />
             <input type="hidden" value="@Model.IdSubPremise" name="IdSubPremise" />
             <input type="hidden" asp-for="IdContract" />
-            <div class="form-row">
+            <div class="form-row" id="MainEstate">
                 <div class="form-group col-3">
                     <label asp-for="RegNumber" class="mb-1">Рег. номер</label>
                     <input type="text" asp-for="RegNumber" maxlength="100" class="form-control" title="Регистрационный номер" />
                     <span asp-validation-for="RegNumber" class="text-danger"></span>
                 </div>
                 <div class="form-group col-9">
+                    @{
+                        var baseAddress = ((List<Address>)ViewBag.AddressesRegistry).First();
+                        var idBuilding = baseAddress?.IdParents?["IdBuilding"];
+                        var idPremises = baseAddress?.IdParents?["IdPremise"];
+                    }
                     <label class="mb-1">Адрес</label>
                     <div class="input-group">
-                        <input id="addressRegistryText" name="AddressRegistryText" type="text" value="@ViewBag.AddressRegistry" class="form-control" title="Адрес в жилищном фонде" readonly />
+                        <input id="addressRegistryText" name="AddressRegistryText" type="text" value="@baseAddress?.Text" class="form-control" title="Адрес в жилищном фонде" readonly />
 
-                        @if (ViewBag.IdBuilding != null && ViewBag.IdPremise != null || ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
+                        @if (idBuilding != null || ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                         {
                             <div class="input-group-append">
                                 <div class="dropdown-menu" aria-labelledby="HomesBtn">
-                                    <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@ViewBag.IdBuilding">Здание</a>
-                                    <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@ViewBag.IdPremise">Помещение</a>
+                                    <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@idBuilding">Здание</a>
+                                    <a class="dropdown-item @(idPremises == null ? "d-none" : "")" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@idPremises">Помещение</a>
                                 </div>
                                 @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                                 {
-                                    <button id="addressRegistryChangeBtn" class="btn btn-success" type="button">
-                                        <span class="oi @(ViewBag.IdBuilding != null && ViewBag.IdPremise != null ? "oi-pencil" : "oi-plus")"></span>
+                                    <button id="additionalAddressRegistryAddBtn" title="Добавить помещение" class="btn btn-success" style="@(idBuilding != null && (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create) ? "" : "display: none")" type="button">
+                                        <span class="oi oi-plus"></span>
+                                    </button>
+                                    <button id="addressRegistryChangeBtn" class="btn btn-success" title="oi @(idBuilding != null ? "Редактировать" : "Добавить помещение")" type="button">
+                                        <span class="oi @(idBuilding != null ? "oi-pencil" : "oi-plus")"></span>
                                     </button>
                                 }
-                                <button class="btn btn-success dropdown-toggle" style="@(ViewBag.IdBuilding != null && ViewBag.IdPremise != null ? "" : "display: none")" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="HomesBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <button class="btn btn-success dropdown-toggle" style="@(idBuilding != null ? "" : "display: none")" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="HomesBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <span class="oi oi-home"></span>
                                 </button>
                             </div>
@@ -126,6 +134,55 @@
                     </div>
                     <span class="text-danger field-validation-valid" data-valmsg-for="AddressRegistryText" data-valmsg-replace="true"></span>
                 </div>
+            </div>
+
+            <div id="AdditionalEstates" class="form-row">
+                @{
+                    var addresses = (List<Address>)ViewBag.AddressesRegistry;
+                    var additionalEstate = Model.PrivAdditionalEstates.Union(new List<RegistryWeb.Models.Entities.PrivAdditionalEstate>() {
+                        new RegistryWeb.Models.Entities.PrivAdditionalEstate() }).ToList();
+                    for (var i = 0; i < additionalEstate.Count(); i++)
+                    {
+                        var address = new Address();
+                        if ((i + 1) != addresses.Count())
+                        {
+                            address = addresses[i + 1];
+                        }
+                        var idContract = additionalEstate[i].IdContract;
+                        var idEstate = additionalEstate[i].IdEstate;
+                        idBuilding = address.IdParents?["IdBuilding"];
+                        idPremises = address.IdParents?["IdPremise"];
+                        var idSubPremises = address.IdParents?["IdSubPremise"];
+                        <div class="form-group offset-3 col-9 rr-priv-additional-estate @((i + 1) == addresses.Count() ? "d-none" : "")">
+                            <div class="input-group">
+                                <input name="AdditionalAddressRegistryText[@i]" id="AdditionalAddressRegistryText_@i" type="text" value="@address.Text" class="form-control" title="Адрес в жилищном фонде" readonly />
+                                <input type="hidden" value="@idEstate" id="IdEstate_@i" name="PrivAdditionalEstates[@i].IdEstate" />
+                                <input type="hidden" value="@idContract" id="IdContract_@i" name="PrivAdditionalEstates[@i].IdContract" />
+                                <input type="hidden" value="@idBuilding" id="IdBuilding_@i" name="PrivAdditionalEstates[@i].IdBuilding" />
+                                <input type="hidden" value="@idPremises" id="IdPremise_@i" name="PrivAdditionalEstates[@i].IdPremise" />
+                                <input type="hidden" value="@idSubPremises" id="IdSubPremise_@i" name="PrivAdditionalEstates[@i].IdSubPremise" />
+                                <div class="input-group-append">
+                                    <div class="dropdown-menu" aria-labelledby="HomesBtn_@i">
+                                        <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@idBuilding">Здание</a>
+                                        <a class="dropdown-item @(idPremises == null ? "d-none" : "")" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@idPremises">Помещение</a>
+                                    </div>
+                                    @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
+                                    {
+                                        <button id="additionalAddressRegistryDeleteBtn_@i" title="Удалить" class="btn btn-danger" type="button">
+                                            <span class="oi oi-trash"></span>
+                                        </button>
+                                        <button id="additionalAddressRegistryChangeBtn_@i" title="Редактировать" class="btn btn-success" type="button">
+                                            <span class="oi oi-pencil"></span>
+                                        </button>
+                                    }
+                                    <button class="btn btn-success dropdown-toggle" style="@(idBuilding != null ? "" : "display: none")" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="HomesBtn_@i" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="oi oi-home"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
             </div>
             <div class="form-row">
                 <div class="col-12">
@@ -151,13 +208,13 @@
                                                     <span class="oi oi-home"></span>
                                                 </button>
                                                 <div class="dropdown-menu" aria-labelledby="PrivHomesBtn">
-                                                    @if (ViewBag.IdBuilding != null)
+                                                    @if (idBuilding != null)
                                                     {
-                                                        <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@ViewBag.IdBuilding">Здание</a>
+                                                        <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@idBuilding">Здание</a>
                                                     }
-                                                    @if (ViewBag.IdPremise != null)
+                                                    @if (idPremises != null)
                                                     {
-                                                        <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@ViewBag.IdPremise">Помещение</a>
+                                                        <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@idPremises">Помещение</a>
                                                     }
                                                 </div>
                                             </div>
@@ -286,7 +343,7 @@
                         </div>
                         <ul class="list-group list-group-flush" id="privContractors">
                             <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.PrivContractors.Any()) ? "display: none" : "")">
-                                <i>Участники найма отсутствуют</i>
+                                <i>Участники приватизации отсутствуют</i>
                             </li>
                             @if (Model != null && Model.PrivContractors.Any())
                             {

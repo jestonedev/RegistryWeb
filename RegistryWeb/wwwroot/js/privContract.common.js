@@ -44,7 +44,8 @@
     $('#privContractInfo').hide();
     $('#privContractors select').attr('disabled', true);
     if ($('#privatizationForm [name="IdPremise"]').val() != "" ||
-        $('#privatizationForm [name="IdSubPremise"]').val() != "") {
+        $('#privatizationForm [name="IdSubPremise"]').val() != "" ||
+        $('#privatizationForm [name="IdBuilding"]').val() != "") {
         $('#addressRegistryChangeBtn').attr('title', 'Редактировать');
         $('#addressRegistryChangeBtn span').addClass('oi-pencil');
     } else {
@@ -53,6 +54,11 @@
         $('#HomesBtn').hide();
         $("#addressRegistryChangeBtn").closest(".input-group-append").append($("#addressRegistryChangeBtn"));
     }
+    var additionalEstateBlankItem = $(".rr-priv-additional-estate").last();
+    var additionalEstateTemplate = additionalEstateBlankItem.clone(true);
+    additionalEstateBlankItem.remove();
+
+
     function getPrivContractorJson(privContractorElem, isModal = false) {
         var fields = privContractorElem.find('input, select, textarea');
         var contractorJson = {};
@@ -207,7 +213,6 @@
         if (isValid) {
             var contractor = getPrivContractorJson($('#PrivContractorModal'), true);
             contractor.IsNoncontractor = !contractor.IsNoncontractor;
-            console.log(contractor);
             if ($('#closePrivContractorModalBtn').attr('data-is-create') == 'true') {
                 $.ajax({
                     async: false,
@@ -258,6 +263,32 @@
         addressModal.modal('show');
         e.preventDefault();
     }
+
+    function additionalAddresRegistryChange(e) {
+        var currentEstate = $(this).closest(".rr-priv-additional-estate");
+        var index = currentEstate.index();
+        addressModal.data('additional-estate-index', index);
+        addressModal.modal('show');
+        e.preventDefault();
+    }
+
+    function additionalAddresRegistryAdd(e) {
+        $("#AdditionalEstates").append(additionalEstateTemplate.clone(true));
+        var lastInsertedEstate = $(".rr-priv-additional-estate").last();
+        var lastInsertedEstateIndex = lastInsertedEstate.index();
+        lastInsertedEstate.removeClass("d-none");
+        var changeBtn = lastInsertedEstate.find("[id^='additionalAddressRegistryChangeBtn_']");
+        changeBtn.closest(".input-group-append").append(changeBtn);
+        addressModal.data('additional-estate-index', lastInsertedEstateIndex);
+        addressModal.modal('show');
+        e.preventDefault();
+    }
+
+    function additionalAddresRegistryDelete(e) {
+        $(this).closest(".rr-priv-additional-estate").remove();
+        e.preventDefault();
+    }
+
     function addressRegistryModalSearch(e) {
         $('#setAddressRegistryModalBtn').attr('disabled', true);
         $.ajax({
@@ -287,22 +318,57 @@
         });
         e.preventDefault();
     }
+
     function addressRegistryModalSet(e) {
-        if ($('#addressRegistryChangeBtn span').hasClass('oi-plus')) {
-            $('#addressRegistryChangeBtn span').addClass('oi-pencil').removeClass('oi-plus');
-            $('#addressRegistryChangeBtn').attr('title', 'Редактировать');
-            var append = $("#addressRegistryChangeBtn").closest(".input-group-append");
-            append.append($("#HomesBtn"));
-            $('#HomesBtn').show();
+        var additionalEstateIndex = addressModal.data("additional-estate-index");
+        if (additionalEstateIndex === undefined) {
+            if ($('#addressRegistryChangeBtn span').hasClass('oi-plus')) {
+                $('#addressRegistryChangeBtn span').addClass('oi-pencil').removeClass('oi-plus');
+                $('#addressRegistryChangeBtn').attr('title', 'Редактировать');
+                var append = $("#addressRegistryChangeBtn").closest(".input-group-append");
+                append.append($("#HomesBtn"));
+                $('#HomesBtn').show();
+                $("#additionalAddressRegistryAddBtn").show();
+            }
+            var mainEstateElem = $("#MainEstate");
+            mainEstateElem.find('#addressRegistryText').val($('#resultAddressRegistryModal').text());
+            form.find('[name="IdBuilding"]').val($('#AddressRegistry_IdBuilding').val());
+            form.find('[name="IdPremise"]').val($('#AddressRegistry_IdPremise').val());
+            form.find('[name="IdSubPremise"]').val($('#AddressRegistry_IdSubPremise').val());
+            mainEstateElem.find('#addressRegistryText').valid();
+            mainEstateElem.find('[href^="/Buildings/Details"]')
+                .attr('href', '/Buildings/Details?idBuilding=' + $('#AddressRegistry_IdBuilding').val());
+            var premiseHref = mainEstateElem.find('[href^="/Premises/Details"]');
+            if ($('#AddressRegistry_IdPremise').val() == "") {
+                premiseHref.addClass("d-none");
+            } else {
+                premiseHref.attr('href', '/Premises/Details?idPremises=' + $('#AddressRegistry_IdPremise').val());
+                premiseHref.removeClass("d-none");
+            }
+        } else {
+            addressModal.data("additional-estate-success", "true");
+            var additionalEstateElem = $($(".rr-priv-additional-estate")[additionalEstateIndex]);
+            additionalEstateElem.find("[name^='AdditionalAddressRegistryText']").val($('#resultAddressRegistryModal').text());
+            additionalEstateElem.find("[name$='.IdBuilding']").val($('#AddressRegistry_IdBuilding').val());
+            additionalEstateElem.find("[name$='.IdPremise']").val($('#AddressRegistry_IdPremise').val());
+            additionalEstateElem.find("[name$='.IdSubPremise']").val($('#AddressRegistry_IdSubPremise').val());
+            additionalEstateElem.find('[href^="/Buildings/Details"]')
+                .attr('href', '/Buildings/Details?idBuilding=' + $('#AddressRegistry_IdBuilding').val());
+            
+            premiseHref = additionalEstateElem.find('[href^="/Premises/Details"]');
+            if ($('#AddressRegistry_IdPremise').val() == "") {
+                premiseHref.addClass("d-none");
+            } else {
+                premiseHref.attr('href', '/Premises/Details?idPremises=' + $('#AddressRegistry_IdPremise').val());
+                premiseHref.removeClass("d-none");
+            }
+
+
+            var additionalEstateAppend = additionalEstateElem.find("[id^='additionalAddressRegistryChangeBtn_']").closest(".input-group-append");
+            var additionalEstateHomeBtn = additionalEstateElem.find("[id^='HomesBtn_']");
+            additionalEstateAppend.append(additionalEstateHomeBtn);
+            additionalEstateHomeBtn.show();
         }
-        $('#addressRegistryText').val($('#resultAddressRegistryModal').text());
-        form.find('[name="IdBuilding"]').val($('#AddressRegistry_IdBuilding').val());
-        form.find('[name="IdPremise"]').val($('#AddressRegistry_IdPremise').val());
-        form.find('[name="IdSubPremise"]').val($('#AddressRegistry_IdSubPremise').val());
-        form.find('[href^="/Buildings/Details"]')
-            .attr('href', '/Buildings/Details?idBuilding=' + $('#AddressRegistry_IdBuilding').val());
-        form.find('[href^="/Premises/Details"]')
-            .attr('href', '/Premises/Details?idPremises=' + $('#AddressRegistry_IdPremise').val());
         $('#resultAddressRegistryModal').text('');
         resetModalForm($("#AddressRegistryModalForm"));
         $('#setAddressRegistryModalBtn').attr('disabled', true);
@@ -382,6 +448,9 @@
     $("#savePrivContractorModalBtn").on('click', privContractorModalSave);
     $("#privContractorAdd").on('click', privContractorAdd);
     $("#addressRegistryChangeBtn").on('click', addressRegistryChange);
+    $("#AdditionalEstates").on('click', "[id^='additionalAddressRegistryChangeBtn_']", additionalAddresRegistryChange);
+    $("#AdditionalEstates").on('click', "[id^='additionalAddressRegistryDeleteBtn_']", additionalAddresRegistryDelete);
+    $("#additionalAddressRegistryAddBtn").on('click', additionalAddresRegistryAdd);
     $("#searchAddressRegistryModalBtn").on('click', addressRegistryModalSearch);
     $("#setAddressRegistryModalBtn").on('click', addressRegistryModalSet);
     $("#clearAddressRegistryModalBtn").on('click', addressRegistryModalClear);
@@ -403,7 +472,21 @@
                 }
             });
         });
+
+        var additionalEstate = $('.rr-priv-additional-estate');
+        additionalEstate.each(function (ind, elem) {
+            var fields = $(elem).find('input, select, textarea');
+            fields.each(function (i, el) {
+                var name = $(el).attr('id').split('_')[0];
+                $(el).attr('name', "PrivAdditionalEstates[" + ind + "]." + name);
+                if (name == 'IdEstate' && !/^\d+$/.test($(el).val())) {
+                    $(el).val(0);
+                }
+            });
+        });
+
         if (form.valid()) {
+            $("#privContractors").find('input, select, textarea').prop("disabled", "");
             form.submit();
         }
     });
@@ -411,4 +494,14 @@
         e.preventDefault();
         form.submit();
     }); 
+
+    addressModal.on("hide.bs.modal", function () {
+        var index = addressModal.data("additional-estate-index");
+        if (index !== undefined) {
+            addressModal.removeData("additional-estate-index");
+            if (addressModal.data("additional-estate-success") !== "true") {
+                $($(".rr-priv-additional-estate")[index]).remove();
+            }
+        }
+    });
 });
