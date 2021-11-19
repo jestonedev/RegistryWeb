@@ -85,13 +85,13 @@
             if (key == 'IsNoncontractor') {
                 if (value == 'False' || value == "false" || value == false) {
                     contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Участник');
-                    contractorModal.find("[name='PrivContractor.IsNoncontractor']").prop("disabled", "").bootstrapToggle('on').prop("disabled", "disabled");;
+                    contractorModal.find("[name='PrivContractor.IsNoncontractor']").prop("disabled", "").bootstrapToggle('on').prop("disabled", "disabled");
                     contractorModal.find("[for='PrivContractor_Description']").text('Текст доверенности');
                     contractorModal.find(".r-addition-fields-contractor").show();
                 }
                 else {
                     contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Неучастник');
-                    contractorModal.find("[name='PrivContractor.IsNoncontractor']").prop("disabled", "").bootstrapToggle('off').prop("disabled", "disabled");;
+                    contractorModal.find("[name='PrivContractor.IsNoncontractor']").prop("disabled", "").bootstrapToggle('off').prop("disabled", "disabled");
                     contractorModal.find("[for='PrivContractor_Description']").text('Причина неучастия');
                     contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore');
                     contractorModal.find("[name='PrivContractor.Passport']").addClass('rr-valid-ignore');
@@ -102,7 +102,7 @@
             else if (key == 'HasDover') {
                 if (value == 'False' || value == "false" || value == false) {
                     contractorModal.find("[for='PrivContractor_HasDover']").text('Нет');
-                    contractorModal.find("[name='PrivContractor.HasDover']").prop("disabled", "").bootstrapToggle('off').prop("disabled", "disabled");;
+                    contractorModal.find("[name='PrivContractor.HasDover']").prop("disabled", "").bootstrapToggle('off').prop("disabled", "disabled");
                     contractorModal.find('.r-description').hide();
                     if (contractorModal.find("[name='PrivContractor.IsNoncontractor']").is(':checked')) {
                         contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore');
@@ -111,7 +111,7 @@
                 }
                 else {
                     contractorModal.find("[for='PrivContractor_HasDover']").text('Есть');
-                    contractorModal.find("[name='PrivContractor.HasDover']").prop("disabled", "").bootstrapToggle('on').prop("disabled", "disabled");;
+                    contractorModal.find("[name='PrivContractor.HasDover']").prop("disabled", "").bootstrapToggle('on').prop("disabled", "disabled");
                 }
             }
             else {
@@ -119,10 +119,14 @@
             }
         });
         var modalFields = contractorModal.find('input, select, textarea');
-        if (action === 'Details' || action === 'Delete')
+        if (action === 'Details' || action === 'Delete') {
             modalFields.prop('disabled', 'disabled');
-        else
+            $("#PrivContractor_AddDefaultRefusenikReason").remove();
+            $("#PrivContractor_Passport").next(".input-group-append").remove();
+        }
+        else {
             modalFields.prop('disabled', '');
+        }
     }
     function privatizationToggle(e) {
         $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
@@ -156,8 +160,38 @@
             li.attr('style', 'border-left: 2px solid #ffc107;');
         }
     }
+
+    var clearDescriptionOnNoncontractroChange = false;
+
+    contractorModal.on("show.bs.modal", function () {
+        if (!docIssuedModalOpened) {
+            $("body").css("overflow", "hidden");
+            $('#PrivContractor_IsNoncontractor').change();
+            $("#PrivContractor_HasDover").change();
+            clearDescriptionOnNoncontractroChange = true;
+        }
+    });
+
+    contractorModal.on("shown.bs.modal", function () {
+        if (docIssuedModalOpened) {
+            docIssuedModalOpened = false;
+            if (passportStartSelection !== undefined && passportEndSelection !== undefined) {
+                $("#PrivContractor_Passport").focus();
+                $("#PrivContractor_Passport")[0].setSelectionRange(passportStartSelection, passportEndSelection);
+                passportStartSelection = undefined;
+                passportEndSelection = undefined;
+            }
+        }
+    });
+
+    contractorModal.on("hide.bs.modal", function () {
+        if (!docIssuedModalOpened) {
+            $("body").css("overflow", "");
+            clearDescriptionOnNoncontractroChange = false;
+        }
+    });
+
     function privContractorIsNoncontractorChange(e) {
-        var baseElem = getPrivContractorBaseElem();
         contractorModal.find('.r-description').show();
         contractorModal.find("[name='PrivContractor.Description']").removeClass('rr-valid-ignore');
         contractorModal.find("[name='PrivContractor.Passport']").removeClass('rr-valid-ignore');
@@ -165,32 +199,33 @@
         if ($(this).is(':checked')) {
             contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Участник');
             contractorModal.find("[for='PrivContractor_Description']").text('Текст доверенности');
-            contractorModal.find('#PrivContractor_Passport').val(baseElem.find("[name^='Passport_']").val());
-            contractorModal.find('#PrivContractor_Part').val(baseElem.find("[name^='Part_']").val());
             contractorModal.find('.r-addition-fields-contractor').show();
-            if (baseElem.find("[name^='HasDover_']").val() == 'True') {
-                contractorModal.find("[for='PrivContractor_HasDover']").text('Есть');
-                contractorModal.find("[name='PrivContractor.HasDover']").bootstrapToggle('on');
-            }
-            else {
+            if (clearDescriptionOnNoncontractroChange) {
+                contractorModal.find('#PrivContractor_Passport').val('');
+                contractorModal.find('#PrivContractor_Part').val('');
                 contractorModal.find("[for='PrivContractor_HasDover']").text('Нет');
                 contractorModal.find("[name='PrivContractor.HasDover']").bootstrapToggle('off');
                 contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore');
                 contractorModal.find('.r-description').hide();
             }
+            contractorModal.find("#PrivContractor_DefaultRefusenikReasonDropdown").hide();
         }
         else {
             contractorModal.find("[for='PrivContractor_HasDover']").text('Нет');
             contractorModal.find("[name='PrivContractor.HasDover']").bootstrapToggle('off');
-            contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore');
+            contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore').removeClass("input-validation-error");
+            contractorModal.find("[data-valmsg-for='PrivContractor.Description']").html('');
             contractorModal.find("[name='PrivContractor.Passport']").addClass('rr-valid-ignore');
             contractorModal.find("[name='PrivContractor.Part']").addClass('rr-valid-ignore');
             contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Неучастник');
             contractorModal.find("[for='PrivContractor_Description']").text('Причина неучастия');
+            contractorModal.find("#PrivContractor_DefaultRefusenikReasonDropdown").show();
             contractorModal.find('.r-addition-fields-contractor input').val('');
             contractorModal.find('.r-addition-fields-contractor').hide();
         }
-        contractorModal.find('#PrivContractor_Description').val(baseElem.find("[name^='Description_']").val());
+        if (clearDescriptionOnNoncontractroChange) {
+            contractorModal.find('#PrivContractor_Description').val('');
+        }
     }
     function privContractorHasDoverChange(e) {
         if (contractorModal.find("[name='PrivContractor.IsNoncontractor']").is(':checked')) {
@@ -427,7 +462,6 @@
         $('#savePrivContractorModalBtn').text('Сохранить');
         $('#closePrivContractorModalBtn').attr('data-is-create', 'false');
         contractorModal.modal('show');
-        $('#PrivContractor_IsNoncontractor').change();
         e.preventDefault();
     }
     function privContractorDelete(e) {
@@ -503,5 +537,42 @@
                 $($(".rr-priv-additional-estate")[index]).remove();
             }
         }
+    });
+
+    $("#PrivContractor_DefaultRefusenikReasonDropdown").on("click", '.dropdown-item', function (e) {
+        var textarea = $("#PrivContractor_Description");
+        var text = $(this).text();
+        textarea.val(text);
+        e.preventDefault();
+    });
+
+    var docIssuedModal = $("#DocumentsIssuedByModal");
+
+    var docIssuedModalOpened = false;
+    var passportStartSelection = undefined;
+    var passportEndSelection = undefined;
+
+    $("#PrivContractor_AddPassportIssuer").on("click", function (e) {
+        $("body").css("overflow", "hidden").removeClass("modal-open");
+        docIssuedModalOpened = true;
+        contractorModal.modal('hide');
+        docIssuedModal.modal('show');
+        e.preventDefault();
+    });
+
+    $("#SelectDocumentsIssuedByBtn").on("click", function (e) {
+        var name = $("#DocumentsIssuedByModal #DocumentsIssuedBy_DocumentIssuedByName").val();
+        var passportElem = $("#PrivContractor_Passport");
+        var passportElemValueLength = passportElem.val().length;
+        passportElem.val(passportElem.val() + name);
+        passportStartSelection = passportElemValueLength;
+        passportEndSelection = passportElemValueLength + name.length;
+        docIssuedModal.modal('hide');
+        contractorModal.modal('show');
+        e.preventDefault();
+    });
+
+    docIssuedModal.on("hide.bs.modal", function () {
+        contractorModal.modal('show');
     });
 });

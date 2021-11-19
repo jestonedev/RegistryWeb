@@ -55,8 +55,15 @@
                     <div class="form-row r-addition-fields-contractor">
                         <div class="form-group col-lg-8 col-6">
                             <label>Паспортные данные</label>
-                            <input type="text" class="form-control" id="PrivContractor_Passport" name="PrivContractor.Passport" title="Паспортные данные"
-                                   data-val="true" data-val-required="Укажите данные" maxlength="2000" />
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="PrivContractor_Passport" name="PrivContractor.Passport" title="Паспортные данные"
+                                       data-val="true" data-val-required="Укажите данные" maxlength="2000" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" id="PrivContractor_AddPassportIssuer" type="button">
+                                        <span class="oi oi-ellipses"></span>
+                                    </button>
+                                </div>
+                            </div>
                             <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Passport" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-lg-2 col-2">
@@ -75,7 +82,16 @@
                     <div class="form-row r-description">
                         <div class="form-group col-12">
                             <label for="PrivContractor_Description"></label>
-                            <textarea rows="4" class="form-control" id="PrivContractor_Description" name="PrivContractor.Description" maxlength="2000" title="Основание расприватизации или отказа"
+                            <div class="dropdown" id="PrivContractor_DefaultRefusenikReasonDropdown">
+                                <button class="btn pt-0 pb-0 pl-1 pr-1 text-success dropdown-toggle" type="button" id="PrivContractor_AddDefaultRefusenikReason" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" href="#">Заявление - отказ</a>
+                                    <a class="dropdown-item" href="#">Использовано право на приватизацию по адресу: г. Братск</a>
+                                    <a class="dropdown-item" href="#">Заявление - отказ серия 38АА № 0832793 от 26.02.2013</a>
+                                </div>
+                            </div>
+                            <textarea rows="4" class="form-control" id="PrivContractor_Description" name="PrivContractor.Description" maxlength="2000"
                                       data-val="true" data-val-required="Заполните информацию или переключите Доверенность в положение Нет"></textarea>
                             <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Description" data-valmsg-replace="true"></span>
                         </div>
@@ -145,6 +161,37 @@
                         <button id="clearAddressRegistryModalBtn" type="button" class="btn btn-secondary">Очистить</button>
                         <button id="setAddressRegistryModalBtn" type="button" class="btn btn-success" disabled>Выбрать</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="DocumentsIssuedByModalForm">
+    <div class="modal fade" id="DocumentsIssuedByModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Орган, выдавший удостоверение личности</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <select class="selectpicker form-control" data-live-search="true" title="Выберите орган" id="DocumentsIssuedBy_DocumentIssuedByName">
+                                @foreach (var documentIssudeBy in ViewBag.DocumentsIssuedBy)
+                                {
+                                    <option data-tokens="@documentIssudeBy.DocumentIssuedByName" title="@documentIssudeBy.DocumentIssuedByName" value="@documentIssudeBy.DocumentIssuedByName">@(documentIssudeBy.DocumentIssuedByName.Length > 50 ? documentIssudeBy.DocumentIssuedByName.Substring(0, 50) + "..." : documentIssudeBy.DocumentIssuedByName)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="SelectDocumentsIssuedByBtn" type="button" class="btn btn-success">Выбрать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
                 </div>
             </div>
         </div>
