@@ -1,0 +1,55 @@
+﻿@using RegistryWeb.ViewModel
+@using RegistryWeb.Models.Entities
+@using RegistryWeb.DataServices
+@using RegistryWeb.SecurityServices;
+@using RegistryWeb.Extensions;
+@model PrivRealtorVM<PrivRealtor>;
+@{
+    Context.Session.Set("Controller", "PrivRealtors");
+    Context.Session.Set("Action", "Index");
+    ViewData["Title"] = "Риелторы (" + Model.PageOptions.Rows + ")";
+    var securityService = (SecurityService)ViewData["SecurityService"];
+}
+
+@section scripts
+    {
+    <script src="~/js/privRealtors.common.js" asp-append-version="true"></script>
+}
+<h2>@ViewData["Title"]</h2>
+<form class="formsub" method="get" asp-controller="PrivRealtors" asp-action="Index" id="rr-priv-realtor-form" data-action="@ViewBag.Action">
+    <input type="hidden" asp-for="PageOptions.CurrentPage" />
+    <input type="hidden" asp-for="PageOptions.SizePage" />
+    <a class="btn btn-success mb-3" title="Добавить" aria-label="Добавить нового риелтора" asp-controller="PrivRealtors" asp-action="Create">&#10010;</a>
+</form>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>ФИО</th>
+            <th>Паспорт</th>
+            <th style="min-width: 150px">Дата рождения</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.PrivRealtors)
+        {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Passport</td>
+            <td>@item.DateBirth.ToString("dd.MM.yyyy")</td>
+            <td class="text-right">
+                <div class="btn-group">
+                    <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                       asp-controller="PrivRealtors" asp-action="Edit" asp-route-idRealtor="@item.IdRealtor" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                    <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                       asp-controller="PrivRealtors" asp-action="Delete" asp-route-idRealtor="@item.IdRealtor" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                </div>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<page-link page-model="Model.PageOptions" page-action="Index"></page-link>
+

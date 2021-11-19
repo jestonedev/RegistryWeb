@@ -154,6 +154,15 @@ namespace RegistryWeb.Models
         public virtual DbSet<AclUserRole> AclUserRoles { get; set; }
         public virtual DbSet<PersonalSetting> PersonalSettings { get; set; }
 
+        //Приватизация
+        public virtual DbSet<PrivAgreement> PrivAgreements { get; set; }
+        public virtual DbSet<PrivContract> PrivContracts { get; set; }
+        public virtual DbSet<PrivContractor> PrivContractors { get; set; }
+        public virtual DbSet<PrivTypeOfProperty> TypesOfProperty { get; set; }
+        public virtual DbSet<PrivEstateOwner> PrivEstateOwners { get; set; }
+        public virtual DbSet<PrivRealtor> PrivRealtors { get; set; }
+        public virtual DbSet<PrivAdditionalEstate> PrivAdditionalEstates { get; set; }
+
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
         public virtual DbSet<TenancyActiveProcess> TenancyActiveProcesses { get; set; }
@@ -298,6 +307,14 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new JudgeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new JudgeBuildingAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LawyerConfiguration(nameDatebase));
+
+            modelBuilder.ApplyConfiguration(new PrivAgreementConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PrivContractConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PrivContractorConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PrivTypeOfPropertyConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PrivEstateOwnerConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PrivRealtorConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PrivAdditionalEstateConfiguration(nameDatebase));
         }
     }
 }

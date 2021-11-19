@@ -12,6 +12,7 @@ namespace RegistryWeb.Models.Entities
 
         public int IdRecord { get; set; }
         public int IdSignerGroup { get; set; }
+        public int? IdOwner { get; set; }
         public string Surname { get; set; }
         public string Name { get; set; }
         public string Patronymic { get; set; }
@@ -20,5 +21,6 @@ namespace RegistryWeb.Models.Entities
         public byte Deleted { get; set; }
 
         public virtual IList<ClaimCourtOrder> ClaimCourtOrders { get; set; }
+        public PrivEstateOwner PrivEstateOwner { get; set; }
     }
 }

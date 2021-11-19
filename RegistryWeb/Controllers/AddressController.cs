@@ -123,5 +123,15 @@ namespace RegistryWeb.Controllers
             var subPremises = addressesDataService.GetSubPremises(idPremise);
             return Json(subPremises);
         }
+
+        public JsonResult GetAddressRegistryModal(PartsAddress parts)
+        {
+            var addressList = addressesDataService.GetAddressesFromHisParts(parts);
+            if (addressList == null || addressList.Count() == 0)
+                return Json(-1);
+            if (addressList.Count() > 1)
+                return Json(-2);
+            return Json(addressList[0]);
+        }
     }
 }

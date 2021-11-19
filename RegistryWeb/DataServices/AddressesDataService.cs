@@ -22,7 +22,7 @@ namespace RegistryWeb.DataServices
         public List<Address> GetAddressesByText(string text, AddressTypes addressTypes = AddressTypes.Premise)
         {
             if (string.IsNullOrEmpty(text)) return new List<Address>();
-            var match = Regex.Match(text, @"^(.*?)[,]*[ ]*(д\.?)?[ ]*(\d+[а-яА-Я]?([\\\/]\d+[а-яА-Я]?)?)?[ ,-]*(кв\.?|ком\.?|пом\.?|кв\.?[ ]?ком\.?|ком\.?[ ]?кв\.?)?[ ]*(\d+[а-яА-Я]?)?[ ]*(к\.?|ком\.)?[ ]*(\d+[а-яА-Я]?|[а-яА-Я]?)$");
+            var match = Regex.Match(text, @"^(.*?)[,]*[ ]*(д\.?)?[ ]*(\d+[а-яА-Я]?([\\\/]\d+[а-яА-Я]?)?)?[ ,-]*(кв\.?|ком\.?|пом\.?|кв\.?[ ]?ком\.?|ком\.?[ ]?кв\.?)?[ ]*(\d+[а-яА-Я]?)?[ ]*((([,]*[ ]+|[,]*[ ]*к\.?[ ]*|[,]*[ ]*ком\.[ ]*|[,][ ]*)?)(\d+[а-яА-Я]?|[ ]+[а-яА-Я]?))?$");
             var addressWordsList = new List<string>();
             if (addressTypes == AddressTypes.None) return new List<Address>();
             if (!string.IsNullOrEmpty(match.Groups[1].Value))
@@ -37,9 +37,9 @@ namespace RegistryWeb.DataServices
             {
                 addressWordsList.Add(match.Groups[6].Value);
             }
-            if (!string.IsNullOrEmpty(match.Groups[8].Value))
+            if (!string.IsNullOrEmpty(match.Groups[10].Value))
             {
-                addressWordsList.Add(match.Groups[8].Value);
+                addressWordsList.Add(match.Groups[10].Value);
             }
             var addressWords = addressWordsList.ToArray();
             var street = addressWords[0].ToLowerInvariant();
@@ -199,6 +199,84 @@ namespace RegistryWeb.DataServices
         public IEnumerable<PremisesType> PremisesTypes
         {
             get => registryContext.PremisesTypes.AsNoTracking();
+        }
+
+        public List<Address> GetAddressesFromHisParts(PartsAddress parts)
+        {
+            if (parts.IdStreet == null)
+                return null;
+            parts.House = parts.House.ToLowerInvariant();
+            parts.PremisesNum = parts.PremisesNum?.ToLowerInvariant();
+            parts.SubPremisesNum = parts.SubPremisesNum?.ToLowerInvariant();
+            if (parts.SubPremisesNum != null)
+            {
+                return registryContext.SubPremises
+                    .Include(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdBuildingNavigation)
+                            .ThenInclude(b => b.IdStreetNavigation)
+                    .Include(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdPremisesTypeNavigation)
+                    .AsNoTracking()
+                    .Where(sp => sp.SubPremisesNum.ToLowerInvariant() == parts.SubPremisesNum
+                        && sp.IdPremisesNavigation.PremisesNum.ToLowerInvariant() == parts.PremisesNum
+                        && sp.IdPremisesNavigation.IdBuildingNavigation.House.ToLowerInvariant() == parts.House
+                        && sp.IdPremisesNavigation.IdBuildingNavigation.IdStreet == parts.IdStreet)
+                    .Select(sp => new Address
+                    {
+                        AddressType = AddressTypes.SubPremise,
+                        Id = sp.IdSubPremises.ToString(),
+                        IdParents = new Dictionary<string, string>
+                        {
+                            { "IdBuilding", sp.IdPremisesNavigation.IdBuilding.ToString() },
+                            { "IdPremise", sp.IdPremises.ToString() },
+                            { "IdSubPremise", sp.IdSubPremises.ToString() },
+                        },
+                        Text = sp.GetAddress()
+                    }).ToList();
+            }
+            if (parts.PremisesNum != null)
+            {
+                return registryContext.Premises
+                    .Include(p => p.IdBuildingNavigation)
+                        .ThenInclude(b => b.IdStreetNavigation)
+                    .Include(p => p.IdPremisesTypeNavigation)
+                    .AsNoTracking()
+                    .Where(p => p.PremisesNum.ToLowerInvariant() == parts.PremisesNum
+                        && p.IdBuildingNavigation.House.ToLowerInvariant() == parts.House
+                        && p.IdBuildingNavigation.IdStreet == parts.IdStreet)
+                    .Select(p => new Address
+                    {
+                        AddressType = AddressTypes.Premise,
+                        Id = p.IdPremises.ToString(),
+                        IdParents = new Dictionary<string, string>
+                        {
+                            { "IdBuilding", p.IdBuilding.ToString() },
+                            { "IdPremise", p.IdPremises.ToString() },
+                            { "IdSubPremise", null },
+                        },
+                        Text = p.GetAddress(),
+                    }).ToList();
+            }
+            if (parts.House != null)
+            {
+                return registryContext.Buildings
+                        .Include(b => b.IdStreetNavigation).AsNoTracking()
+                       .Where(b => b.House.ToLowerInvariant() == parts.House
+                           && b.IdStreet == parts.IdStreet)
+                       .Select(b => new Address
+                       {
+                           AddressType = AddressTypes.Building,
+                           Id = b.IdBuilding.ToString(),
+                           IdParents = new Dictionary<string, string>
+                           {
+                            { "IdBuilding", b.IdBuilding.ToString() },
+                            { "IdPremise", null },
+                            { "IdSubPremise", null },
+                           },
+                           Text = b.GetAddress()
+                       }).ToList();
+            }
+            return null;
         }
     }
 }

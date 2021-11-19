@@ -1,0 +1,199 @@
+﻿<form id="PrivContractorModalForm">
+    <div class="modal fade bd-example-modal-xl" id="PrivContractorModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Участник</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="PrivContractor_IdContractor" name="PrivContractor.IdContractor" />
+                    <input type="hidden" id="PrivContractor_IdContract" name="PrivContractor.IdContract" />
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="PrivContractor_Surname">Фамилия</label>
+                            <input type="text" id="PrivContractor_Surname" maxlength="50" name="PrivContractor.Surname" class="form-control input-chars" title="Фамилия участника договора"
+                                   data-val="true" data-val-required="Укажите фамилию" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Surname" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="PrivContractor_Name">Имя</label>
+                            <input type="text" id="PrivContractor_Name" maxlength="50" name="PrivContractor.Name" class="form-control input-chars" title="Имя участника договора"
+                                   data-val="true" data-val-required="Укажите имя" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Name" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="PrivContractor_Patronymic">Отчество</label>
+                            <input type="text" id="PrivContractor_Patronymic" maxlength="255" name="PrivContractor.Patronymic" class="form-control input-chars" title="Отчетство участника договора" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="PrivContractor_DateBirth">Дата рождения</label>
+                            <input type="date" id="PrivContractor_DateBirth" name="PrivContractor.DateBirth" class="form-control" title="Дата рождения участника найма"
+                                   data-val="true" data-val-required="Укажите дату">
+                            <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.DateBirth" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label for="PrivContractor_IdKinship">Родственное отношение</label>
+                            <select class="selectpicker form-control" id="PrivContractor_IdKinship" name="PrivContractor.IdKinship" title="Родственное отношение">
+                                    @foreach (var rel in ViewBag.Kinships)
+                                    {
+                                        <option value="@rel.IdKinship">@(rel.IdKinship == 1 ? "заявитель" : rel.IdKinship == 65 ? "член семьи заявителя" : rel.KinshipName)</option>
+                                    }
+                            </select>
+                        </div>
+                        <div class="form-group col-md-12 col-lg-4">
+                            <label>Тип</label><br />
+                            <input id="PrivContractor_IsNoncontractor" name="PrivContractor.IsNoncontractor"
+                                   class="form-check-input" type="checkbox" data-toggle="toggle" data-on=" " data-off=" " data-onstyle="warning" data-offstyle="primary">
+                            <label for="PrivContractor_IsNoncontractor" class="form-check-label ml-2"></label>
+                        </div>
+                    </div>
+                    <div class="form-row r-addition-fields-contractor">
+                        <div class="form-group col-lg-8 col-6">
+                            <label>Паспортные данные</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="PrivContractor_Passport" name="PrivContractor.Passport" title="Паспортные данные"
+                                       data-val="true" data-val-required="Укажите данные" maxlength="2000" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" id="PrivContractor_AddPassportIssuer" type="button">
+                                        <span class="oi oi-ellipses"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Passport" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-lg-2 col-2">
+                            <label>Доля</label>
+                            <input type="text" class="form-control" id="PrivContractor_Part" name="PrivContractor.Part" title="Доля"
+                                   data-val="true" data-val-required="Укажите долю" maxlength="50" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Part" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-lg-2 col-4">
+                            <label>Доверенность</label><br />
+                            <input id="PrivContractor_HasDover" name="PrivContractor.HasDover"
+                                   class="form-check-input" type="checkbox" data-toggle="toggle" data-on=" " data-off=" " data-onstyle="warning" data-offstyle="primary">
+                            <label for="PrivContractor_HasDover" class="form-check-label ml-2"></label>
+                        </div>
+                    </div>
+                    <div class="form-row r-description">
+                        <div class="form-group col-12">
+                            <label for="PrivContractor_Description"></label>
+                            <div class="dropdown" id="PrivContractor_DefaultRefusenikReasonDropdown">
+                                <button class="btn pt-0 pb-0 pl-1 pr-1 text-success dropdown-toggle" type="button" id="PrivContractor_AddDefaultRefusenikReason" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" href="#">Заявление - отказ</a>
+                                    <a class="dropdown-item" href="#">Использовано право на приватизацию по адресу: г. Братск</a>
+                                    <a class="dropdown-item" href="#">Заявление - отказ серия 38АА № 0832793 от 26.02.2013</a>
+                                </div>
+                            </div>
+                            <textarea rows="4" class="form-control" id="PrivContractor_Description" name="PrivContractor.Description" maxlength="2000"
+                                      data-val="true" data-val-required="Заполните информацию или переключите Доверенность в положение Нет"></textarea>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="PrivContractor.Description" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @if (ViewBag.Action == ActionTypeEnum.Create || ViewBag.Action == ActionTypeEnum.Edit)
+                    {
+                        <button id="savePrivContractorModalBtn" type="button" class="btn btn-secondary">Сохранить</button>
+                    }
+                    <button id="closePrivContractorModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal" data-is-create="false">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="AddressRegistryModalForm">
+    <div class="modal fade bd-example-modal-xl" id="AddressRegistryModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Адрес</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="AddressRegistry_IdRegion">Район</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Район" id="AddressRegistry_IdRegion" asp-items="@(new SelectList(ViewBag.Regions, "id_region", "region"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="AddressRegistry_IdStreet">Улица</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Улица" id="AddressRegistry_IdStreet" asp-items="@(new SelectList(ViewBag.Streets, "IdStreet", "StreetName"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-3">
+                            <label for="AddressRegistry_House">Дом</label>
+                            <input type="text" class="form-control input-filter-house" id="AddressRegistry_House" title="Номер дома">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="AddressRegistry_PremisesNum">Помещение</label>
+                            <input type="text" class="form-control input-filter-premise-num" id="AddressRegistry_PremisesNum" title="Номер помещения">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="AddressRegistry_SubPremisesNum">Комната</label>
+                            <input type="text" class="form-control input-filter-numbers" id="AddressRegistry_SubPremisesNum" title="Комната">
+                        </div>
+                        <div class="form-group d-flex align-items-end justify-content-end col-3">
+                            <button id="searchAddressRegistryModalBtn" type="button" class="btn btn-secondary">Найти</button>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <input type="hidden" id="AddressRegistry_IdBuilding" />
+                        <input type="hidden" id="AddressRegistry_IdPremise" />
+                        <input type="hidden" id="AddressRegistry_IdSubPremise" />
+                        <div id="resultAddressRegistryModal" class="form-group col-12"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="clearAddressRegistryModalBtn" type="button" class="btn btn-secondary">Очистить</button>
+                        <button id="setAddressRegistryModalBtn" type="button" class="btn btn-success" disabled>Выбрать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="DocumentsIssuedByModalForm">
+    <div class="modal fade" id="DocumentsIssuedByModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Орган, выдавший удостоверение личности</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <select class="selectpicker form-control" data-live-search="true" title="Выберите орган" id="DocumentsIssuedBy_DocumentIssuedByName">
+                                @foreach (var documentIssudeBy in ViewBag.DocumentsIssuedBy)
+                                {
+                                    <option data-tokens="@documentIssudeBy.DocumentIssuedByName" title="@documentIssudeBy.DocumentIssuedByName" value="@documentIssudeBy.DocumentIssuedByName">@(documentIssudeBy.DocumentIssuedByName.Length > 50 ? documentIssudeBy.DocumentIssuedByName.Substring(0, 50) + "..." : documentIssudeBy.DocumentIssuedByName)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="SelectDocumentsIssuedByBtn" type="button" class="btn btn-success">Выбрать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
