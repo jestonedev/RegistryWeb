@@ -20,6 +20,8 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Index(PrivatizationListVM viewModel)
         {
+            if (!securityService.HasPrivilege(Privileges.PrivRead))
+                return View("NotAccess");
             ViewBag.SecurityService = securityService;
             ViewBag.Regions = dataService.Regions;
             ViewBag.Streets = dataService.Streets;

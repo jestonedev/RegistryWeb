@@ -115,6 +115,12 @@
                             Договор найма: № @item.RegistrationNum @(item.RegistrationDate.HasValue ? "от " + @item.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")
                         </div>
                     }
+                    @if(item.BeginDate != null || item.EndDate != null)
+                    {
+                        <div>
+                            Период действия: @(item.BeginDate.HasValue ? "с " + item.BeginDate.Value.ToString("dd.MM.yyyy") : "") @(item.EndDate.HasValue ? "по " + item.EndDate.Value.ToString("dd.MM.yyyy") : "на период ТО")
+                        </div>
+                    }
                     @if (item.TenancyReasons != null && item.TenancyReasons.Any())
                     {
                         var reason = item.TenancyReasons.OrderByDescending(r => r.IdReason).FirstOrDefault();

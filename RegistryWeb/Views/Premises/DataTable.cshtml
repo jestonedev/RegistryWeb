@@ -163,20 +163,24 @@
                         {
                             <hr class="mt-1 mb-0 pt-0 pb-0" />
                             var tenancies = Model.ActiveTenancies.First(t => t.Key == item.IdPremises).Value;
-                            if (tenancies.Count > 1)
+                            for (var i = 0; i < tenancies.Count; i++)
                             {
-                                <div class="text-primary"><b>Договоры найма:</b></div>
-
-                            }
-                            else if (tenancies.Count == 1)
-                            {
-                                <div class="text-primary"><b>Договор найма:</b></div>
-                            }
-                            foreach (var tenancy in tenancies)
-                            {
-                                <div>
-                                    @(string.IsNullOrEmpty(tenancy.RegistrationNum) ? "№ б/н" : "№ " + tenancy.RegistrationNum)
-                                    @(tenancy.RegistrationDate.HasValue ? " от " + tenancy.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")
+                                var tenancy = tenancies[i];
+                                <div class="@(i > 0 ? "mt-2" : "")">
+                                    <div class="text-primary"><b>Договор найма:</b></div>
+                                    <div>
+                                        @(string.IsNullOrEmpty(tenancy.RegistrationNum) ? "№ б/н" : "№ " + tenancy.RegistrationNum)
+                                        @(tenancy.RegistrationDate.HasValue ? " от " + tenancy.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")
+                                    </div>
+                                    <div>
+                                        @if (tenancy.BeginDate != null || tenancy.EndDate != null)
+                                        {
+                                            <div class="text-success"><b>Период действия:</b></div>
+                                            <div>
+                                                @(tenancy.BeginDate.HasValue ? "С " + tenancy.BeginDate.Value.ToString("dd.MM.yyyy") : "") @(tenancy.EndDate.HasValue ? "по " + tenancy.EndDate.Value.ToString("dd.MM.yyyy") : "на период ТО")
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
                             }
                         }
