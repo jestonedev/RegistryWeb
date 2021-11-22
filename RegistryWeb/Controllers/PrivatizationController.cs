@@ -20,6 +20,8 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Index(PrivatizationListVM viewModel)
         {
+            if (!securityService.HasPrivilege(Privileges.PrivRead))
+                return View("NotAccess");
             ViewBag.SecurityService = securityService;
             ViewBag.Regions = dataService.Regions;
             ViewBag.Streets = dataService.Streets;
@@ -48,11 +50,8 @@ namespace RegistryWeb.Controllers
             {
                 contract.IdExecutor = 65536;
             }
-            var addressRegistry = dataService.GetAddressRegistry(contract);
-            ViewBag.AddressRegistry = addressRegistry?.Text;            
-            ViewBag.IdPremise = addressRegistry?.IdParents["IdPremise"];
-            ViewBag.IdBuilding = addressRegistry?.IdParents["IdBuilding"];
-            ViewBag.IdStreet = addressRegistry?.IdParents["IdStreet"];
+            var addressesRegistry = dataService.GetContractAddresses(contract);
+            ViewBag.AddressesRegistry = addressesRegistry;
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.Action = action;
             ViewBag.SecurityService = securityService;
@@ -64,6 +63,7 @@ namespace RegistryWeb.Controllers
             ViewBag.PrivEstateOwners = dataService.PrivEstateOwners;
             ViewBag.PrivEstateOwnerSigners = dataService.PrivEstateOwnerSigners;
             ViewBag.PrivRealtors = dataService.PrivRealtors;
+            ViewBag.DocumentsIssuedBy = dataService.DocumentsIssuedBy;
             return View("Privatization", contract);
         }
 

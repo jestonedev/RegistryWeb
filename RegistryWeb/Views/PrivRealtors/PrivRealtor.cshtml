@@ -1,0 +1,83 @@
+﻿@using RegistryWeb.Extensions
+@using RegistryWeb.ViewOptions
+@using RegistryWeb.Models.Entities
+@using RegistryWeb.ViewModel
+@using RegistryWeb.SecurityServices;
+@using RegistryWeb.DataHelpers;
+@model PrivRealtorVM<PrivRealtor>
+@{
+    if (ViewBag.Action == "Create")
+    {
+        ViewData["Title"] = "Добавление нового риелтора";
+    }
+    else
+    {
+        ViewData["Title"] = "Риелтор №" + Model.PrivRealtor.IdRealtor;
+    }
+}
+
+@section scripts
+    {
+    <script src="~/js/privRealtors.common.js" asp-append-version="true"></script>
+}
+
+<form asp-controller="PrivRealtors" asp-action="@ViewBag.Action" id="deleteform" data-action="@ViewBag.Action">
+    <div class="card">
+        <div class="card-header d-flex flex-column flex-lg-row">
+            <label class="form-check-labe h2 col-sm-12 col-lg-8 col-xl-7 pl-0">@ViewData["Title"]</label>
+            <div class="col-sm-12 col-lg-4 col-xl-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
+                <div class="btn-group" role="group" aria-label="Панель доступа">
+                    @if (@ViewBag.ReturnUrl != null)
+                    {
+                        <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+                    }
+                    else
+                    {
+                        <a class="form-control btn btn-primary" asp-controller="PrivRealtors" asp-action="Index" asp-route-isBack="true">Назад</a>
+                    }
+                    @if (ViewBag.Action == "Create")
+                    {
+                        <input type="submit" value="Создать" id="createBtn" class="form-control btn btn-success" />
+                    }
+                    @if (ViewBag.Action == "Edit")
+                    {
+                        <input type="submit" value="Сохранить" id="editBtn" class="form-control btn btn-success" />
+                    }
+                    @if (ViewBag.Action == "Delete")
+                    {
+                        <input type="submit" value="Удалить" class="form-control btn btn-danger" />
+                    }
+                    <a href="#" data-for="privRealtor" class="form-control btn btn-primary priv-realtor-toggler" title="Развернуть помещение" style="font-weight:bold;">∧</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body" id="privRealtor">
+            <div class="validation" asp-validation-summary="ModelOnly"></div>
+            <input type="hidden" asp-for="PrivRealtor.IdRealtor" />
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label asp-for="PrivRealtor.Name" class="control-label">ФИО</label>
+                    <input type="text" asp-for="PrivRealtor.Name" maxlength="255" class="form-control" />
+                    <span asp-validation-for="PrivRealtor.Name" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-8">
+                    <label asp-for="PrivRealtor.Passport" class="control-label">Паспортные данные</label>
+                    <input type="text" asp-for="PrivRealtor.Passport" maxlength="2000" class="form-control" />
+                    <span asp-validation-for="PrivRealtor.Passport" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label asp-for="PrivRealtor.DateBirth" class="control-label">Дата рождения</label>
+                    <input type="date" asp-for="PrivRealtor.DateBirth" value="@(Model.PrivRealtor.DateBirth == DateTime.MinValue ? DateTime.Now.ToString("yyyy-MM-dd") : Model.PrivRealtor.DateBirth.ToString("yyyy-MM-dd"))" class="form-control" />
+                    <span asp-validation-for="PrivRealtor.DateBirth" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-8">
+                    <label asp-for="PrivRealtor.PlaceOfRegistration" class="control-label">Место регистрации</label>
+                    <input type="text" asp-for="PrivRealtor.PlaceOfRegistration" maxlength="2000" class="form-control" />
+                    <span asp-validation-for="PrivRealtor.PlaceOfRegistration" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

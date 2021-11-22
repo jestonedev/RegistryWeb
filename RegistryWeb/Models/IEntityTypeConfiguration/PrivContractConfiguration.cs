@@ -71,18 +71,21 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
             builder.HasOne(e => e.StreetNavigation)
                 .WithMany(p => p.PrivContracts)
                 .HasForeignKey(e => e.IdStreet);
+
             builder.Property(e => e.IdBuilding)
                 .HasColumnName("id_building")
                 .HasColumnType("int(11)");
             builder.HasOne(e => e.BuildingNavigation)
                 .WithMany(p => p.PrivContracts)
                 .HasForeignKey(e => e.IdBuilding);
+
             builder.Property(e => e.IdPremise)
                 .HasColumnName("id_premise")
                 .HasColumnType("int(11)");
             builder.HasOne(e => e.PremiseNavigation)
                 .WithMany(p => p.PrivContracts)
                 .HasForeignKey(e => e.IdPremise);
+
             builder.Property(e => e.IdSubPremise)
                 .HasColumnName("id_sub_premise")
                 .HasColumnType("int(11)");

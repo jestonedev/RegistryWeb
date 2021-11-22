@@ -47,3 +47,11 @@
         text-align: center;
     }
 }
+
+#PrivContractor_AddDefaultRefusenikReason::after {
+    margin-left: 0;
+}
+
+.r-description .dropdown {
+    display: inline-block;
+}

@@ -220,6 +220,7 @@ namespace RegistryWeb.DataServices
         private IQueryable<PrivContract> GetQueryIncludes(IQueryable<PrivContract> query)
         {
             return query
+                .Include(r => r.PrivAdditionalEstates)
                 .Include(r => r.ExecutorNavigation)
                 .Include(r => r.TypeOfProperty)
                 .Include(r => r.BuildingNavigation)
@@ -227,19 +228,30 @@ namespace RegistryWeb.DataServices
                 .Include(r => r.SubPremiseNavigation);
         }
 
-        private Dictionary<int, Address> GetPrivContractsAddresses(List<PrivContract> privContracts)
+        private Dictionary<int, List<Address>> GetPrivContractsAddresses(List<PrivContract> privContracts)
         {
-            var addresses = new Dictionary<int, Address>();
+            var addresses = new Dictionary<int, List<Address>>();
             foreach(var contract in privContracts)
             {
-                addresses.Add(contract.IdContract, GetAddressRegistry(contract));
+                addresses.Add(contract.IdContract, GetContractAddresses(contract));
             }
             return addresses;
         }
 
-        internal Address GetAddressRegistry(PrivContract contract)
+        internal List<Address> GetContractAddresses(PrivContract contract)
         {
-            if (contract.IdSubPremise != null)
+            var result = new List<Address>();
+            result.Add(GeAddresseByIds(contract.IdBuilding, contract.IdPremise, contract.IdSubPremise));
+            foreach(var additionalEstate in contract.PrivAdditionalEstates)
+            {
+                result.Add(GeAddresseByIds(additionalEstate.IdBuilding, additionalEstate.IdPremise, additionalEstate.IdSubPremise));
+            }
+            return result;
+        }
+
+        private Address GeAddresseByIds(int? idBuilding, int? idPremises, int? idSubPremises)
+        {
+            if (idSubPremises != null)
             {
                 var subPremise = registryContext.SubPremises
                     .Include(sp => sp.IdPremisesNavigation)
@@ -247,7 +259,7 @@ namespace RegistryWeb.DataServices
                     .Include(sp => sp.IdPremisesNavigation)
                         .ThenInclude(p => p.IdBuildingNavigation)
                             .ThenInclude(b => b.IdStreetNavigation)
-                    .SingleOrDefault(sp => sp.IdSubPremises == contract.IdSubPremise);
+                    .SingleOrDefault(sp => sp.IdSubPremises == idSubPremises);
                 return new Address
                 {
                     Id = subPremise?.IdSubPremises.ToString(),
@@ -262,13 +274,13 @@ namespace RegistryWeb.DataServices
                     }
                 };
             }
-            if (contract.IdPremise != null)
+            if (idPremises != null)
             {
                 var premise = registryContext.Premises
                     .Include(p => p.IdPremisesTypeNavigation)
                     .Include(p => p.IdBuildingNavigation)
                         .ThenInclude(b => b.IdStreetNavigation)
-                    .SingleOrDefault(p => p.IdPremises == contract.IdPremise);
+                    .SingleOrDefault(p => p.IdPremises == idPremises);
                 return new Address
                 {
                     Id = premise?.IdPremises.ToString(),
@@ -283,11 +295,11 @@ namespace RegistryWeb.DataServices
                     }
                 };
             }
-            if (contract.IdBuilding != null)
+            if (idBuilding != null)
             {
                 var building = registryContext.Buildings
                     .Include(r => r.IdStreetNavigation)
-                    .SingleOrDefault(b => b.IdBuilding == contract.IdBuilding);
+                    .SingleOrDefault(b => b.IdBuilding == idBuilding);
                 return new Address
                 {
                     Id = building?.IdBuilding.ToString(),
@@ -308,11 +320,13 @@ namespace RegistryWeb.DataServices
         private IQueryable<PrivContract> GetQuery()
         {
             return registryContext.PrivContracts
+                .Include(r => r.PrivAdditionalEstates)
                 .Include(r => r.ExecutorNavigation)
                 .Include(r => r.TypeOfProperty)
                 .Include(r => r.BuildingNavigation)
                 .Include(r => r.PremiseNavigation)
-                .Include(r => r.SubPremiseNavigation).AsNoTracking();
+                .Include(r => r.SubPremiseNavigation)
+                .AsNoTracking();
         }
 
         private IQueryable<PrivContract> GetQueryPage(IQueryable<PrivContract> query, PageOptions pageOptions)
@@ -325,6 +339,7 @@ namespace RegistryWeb.DataServices
         internal PrivContract GetPrivContract(int idContract)
         {
             var privContract = registryContext.PrivContracts
+                .Include(pc => pc.PrivAdditionalEstates)
                 .Include(pc => pc.ExecutorNavigation)
                 .SingleOrDefault(pc => pc.IdContract == idContract);
             if (privContract == null)
@@ -344,6 +359,7 @@ namespace RegistryWeb.DataServices
         internal List<PrivEstateOwner> PrivEstateOwners { get => registryContext.PrivEstateOwners.ToList(); }
         internal List<SelectableSigner> PrivEstateOwnerSigners { get => registryContext.SelectableSigners.Where(r => r.IdOwner != null).ToList(); }
         internal List<PrivRealtor> PrivRealtors { get => registryContext.PrivRealtors.ToList(); }
+        internal List<DocumentIssuedBy> DocumentsIssuedBy { get => registryContext.DocumentsIssuedBy.ToList(); }
 
         public void Create(PrivContract contract)
         {
@@ -356,6 +372,7 @@ namespace RegistryWeb.DataServices
             contract = UpdateEstateids(contract);
             var oldContract = registryContext.PrivContracts
                 .Include(pc => pc.PrivContractors)
+                .Include(pc => pc.PrivAdditionalEstates)
                 .AsNoTracking()
                 .SingleOrDefault(pc => pc.IdContract == contract.IdContract);
             foreach (var oldContractor in oldContract.PrivContractors)
@@ -367,52 +384,70 @@ namespace RegistryWeb.DataServices
                     contract.PrivContractors.Add(oldContractor);
                 }
             }
+
+            foreach (var oldEstate in oldContract.PrivAdditionalEstates)
+            {
+                if (!contract.PrivAdditionalEstates.Select(pc => pc.IdEstate).Contains(oldEstate.IdEstate))
+                {
+                    registryContext.Entry(oldEstate).Property(p => p.Deleted).IsModified = true;
+                    oldEstate.Deleted = true;
+                    contract.PrivAdditionalEstates.Add(oldEstate);
+                }
+            }
+
             registryContext.PrivContracts.Update(contract);
             registryContext.SaveChanges();
         }
 
-        private PrivContract UpdateEstateids(PrivContract contract)
+        private void BindEstateIds(IPrivEstateBinder binder)
         {
-            if (contract.IdSubPremise != null)
+            if (binder.IdSubPremise != null)
             {
                 var subPremise = registryContext.SubPremises
                     .Include(r => r.IdPremisesNavigation).ThenInclude(r => r.IdBuildingNavigation)
-                    .Where(r => r.IdSubPremises == contract.IdSubPremise).AsNoTracking().FirstOrDefault();
-                if(subPremise != null)
+                    .Where(r => r.IdSubPremises == binder.IdSubPremise).AsNoTracking().FirstOrDefault();
+                if (subPremise != null)
                 {
-                    contract.IdPremise = subPremise.IdPremises;
-                    contract.IdBuilding = subPremise.IdPremisesNavigation.IdBuilding;
-                    contract.IdStreet = subPremise.IdPremisesNavigation.IdBuildingNavigation.IdStreet;
-                } else
-                {
-                    contract.IdSubPremise = null;
+                    binder.IdPremise = subPremise.IdPremises;
+                    binder.IdBuilding = subPremise.IdPremisesNavigation.IdBuilding;
+                    binder.IdStreet = subPremise.IdPremisesNavigation.IdBuildingNavigation.IdStreet;
                 }
-            } else
-            if (contract.IdPremise != null)
+                else
+                {
+                    binder.IdSubPremise = null;
+                }
+            }
+            else
+            if (binder.IdPremise != null)
             {
                 var premise = registryContext.Premises.Include(r => r.IdBuildingNavigation)
-                    .Where(r => r.IdPremises == contract.IdPremise).AsNoTracking().FirstOrDefault();
+                    .Where(r => r.IdPremises == binder.IdPremise).AsNoTracking().FirstOrDefault();
                 if (premise != null)
                 {
-                    contract.IdBuilding = premise.IdBuilding;
-                    contract.IdStreet = premise.IdBuildingNavigation.IdStreet;
+                    binder.IdBuilding = premise.IdBuilding;
+                    binder.IdStreet = premise.IdBuildingNavigation.IdStreet;
                 }
                 else
                 {
-                    contract.IdPremise = null;
+                    binder.IdPremise = null;
                 }
-            } else
-            if (contract.IdBuilding != null)
+            }
+            else
             {
-                var building = registryContext.Buildings.Where(r => r.IdBuilding == contract.IdBuilding).AsNoTracking().FirstOrDefault();
+                var building = registryContext.Buildings.Where(r => r.IdBuilding == binder.IdBuilding).AsNoTracking().FirstOrDefault();
                 if (building != null)
                 {
-                    contract.IdStreet = building.IdStreet;
+                    binder.IdStreet = building.IdStreet;
                 }
-                else
-                {
-                    contract.IdBuilding = null;
-                }
+            }
+        }
+
+        private PrivContract UpdateEstateids(PrivContract contract)
+        {
+            BindEstateIds(contract);
+            foreach(var estate in contract.PrivAdditionalEstates)
+            {
+                BindEstateIds(estate);
             }
             return contract;
         }

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 
 namespace RegistryWeb.Models.Entities
 {
-    public class PrivContract
+    public class PrivContract: IPrivEstateBinder
     {
         public PrivContract()
         {
             PrivContractors = new List<PrivContractor>();
+            PrivAdditionalEstates = new List<PrivAdditionalEstate>();
         }
 
         public int IdContract { get; set; }
@@ -62,5 +63,6 @@ namespace RegistryWeb.Models.Entities
         public virtual Executor ExecutorNavigation { get; set; }
         public virtual PrivTypeOfProperty TypeOfProperty { get; set; }
         public virtual IList<PrivContractor> PrivContractors { get; set; }
+        public virtual IList<PrivAdditionalEstate> PrivAdditionalEstates { get; set; }
     }
 }

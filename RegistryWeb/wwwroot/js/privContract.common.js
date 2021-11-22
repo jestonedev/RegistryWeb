@@ -44,7 +44,8 @@
     $('#privContractInfo').hide();
     $('#privContractors select').attr('disabled', true);
     if ($('#privatizationForm [name="IdPremise"]').val() != "" ||
-        $('#privatizationForm [name="IdSubPremise"]').val() != "") {
+        $('#privatizationForm [name="IdSubPremise"]').val() != "" ||
+        $('#privatizationForm [name="IdBuilding"]').val() != "") {
         $('#addressRegistryChangeBtn').attr('title', 'Редактировать');
         $('#addressRegistryChangeBtn span').addClass('oi-pencil');
     } else {
@@ -53,6 +54,11 @@
         $('#HomesBtn').hide();
         $("#addressRegistryChangeBtn").closest(".input-group-append").append($("#addressRegistryChangeBtn"));
     }
+    var additionalEstateBlankItem = $(".rr-priv-additional-estate").last();
+    var additionalEstateTemplate = additionalEstateBlankItem.clone(true);
+    additionalEstateBlankItem.remove();
+
+
     function getPrivContractorJson(privContractorElem, isModal = false) {
         var fields = privContractorElem.find('input, select, textarea');
         var contractorJson = {};
@@ -79,13 +85,13 @@
             if (key == 'IsNoncontractor') {
                 if (value == 'False' || value == "false" || value == false) {
                     contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Участник');
-                    contractorModal.find("[name='PrivContractor.IsNoncontractor']").prop("disabled", "").bootstrapToggle('on').prop("disabled", "disabled");;
+                    contractorModal.find("[name='PrivContractor.IsNoncontractor']").prop("disabled", "").bootstrapToggle('on').prop("disabled", "disabled");
                     contractorModal.find("[for='PrivContractor_Description']").text('Текст доверенности');
                     contractorModal.find(".r-addition-fields-contractor").show();
                 }
                 else {
                     contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Неучастник');
-                    contractorModal.find("[name='PrivContractor.IsNoncontractor']").prop("disabled", "").bootstrapToggle('off').prop("disabled", "disabled");;
+                    contractorModal.find("[name='PrivContractor.IsNoncontractor']").prop("disabled", "").bootstrapToggle('off').prop("disabled", "disabled");
                     contractorModal.find("[for='PrivContractor_Description']").text('Причина неучастия');
                     contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore');
                     contractorModal.find("[name='PrivContractor.Passport']").addClass('rr-valid-ignore');
@@ -96,7 +102,7 @@
             else if (key == 'HasDover') {
                 if (value == 'False' || value == "false" || value == false) {
                     contractorModal.find("[for='PrivContractor_HasDover']").text('Нет');
-                    contractorModal.find("[name='PrivContractor.HasDover']").prop("disabled", "").bootstrapToggle('off').prop("disabled", "disabled");;
+                    contractorModal.find("[name='PrivContractor.HasDover']").prop("disabled", "").bootstrapToggle('off').prop("disabled", "disabled");
                     contractorModal.find('.r-description').hide();
                     if (contractorModal.find("[name='PrivContractor.IsNoncontractor']").is(':checked')) {
                         contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore');
@@ -105,7 +111,7 @@
                 }
                 else {
                     contractorModal.find("[for='PrivContractor_HasDover']").text('Есть');
-                    contractorModal.find("[name='PrivContractor.HasDover']").prop("disabled", "").bootstrapToggle('on').prop("disabled", "disabled");;
+                    contractorModal.find("[name='PrivContractor.HasDover']").prop("disabled", "").bootstrapToggle('on').prop("disabled", "disabled");
                 }
             }
             else {
@@ -113,10 +119,14 @@
             }
         });
         var modalFields = contractorModal.find('input, select, textarea');
-        if (action === 'Details' || action === 'Delete')
+        if (action === 'Details' || action === 'Delete') {
             modalFields.prop('disabled', 'disabled');
-        else
+            $("#PrivContractor_AddDefaultRefusenikReason").remove();
+            $("#PrivContractor_Passport").next(".input-group-append").remove();
+        }
+        else {
             modalFields.prop('disabled', '');
+        }
     }
     function privatizationToggle(e) {
         $(this).children('span').toggleClass('oi-chevron-top').toggleClass('oi-chevron-bottom');
@@ -150,8 +160,38 @@
             li.attr('style', 'border-left: 2px solid #ffc107;');
         }
     }
+
+    var clearDescriptionOnNoncontractroChange = false;
+
+    contractorModal.on("show.bs.modal", function () {
+        if (!docIssuedModalOpened) {
+            $("body").css("overflow", "hidden");
+            $('#PrivContractor_IsNoncontractor').change();
+            $("#PrivContractor_HasDover").change();
+            clearDescriptionOnNoncontractroChange = true;
+        }
+    });
+
+    contractorModal.on("shown.bs.modal", function () {
+        if (docIssuedModalOpened) {
+            docIssuedModalOpened = false;
+            if (passportStartSelection !== undefined && passportEndSelection !== undefined) {
+                $("#PrivContractor_Passport").focus();
+                $("#PrivContractor_Passport")[0].setSelectionRange(passportStartSelection, passportEndSelection);
+                passportStartSelection = undefined;
+                passportEndSelection = undefined;
+            }
+        }
+    });
+
+    contractorModal.on("hide.bs.modal", function () {
+        if (!docIssuedModalOpened) {
+            $("body").css("overflow", "");
+            clearDescriptionOnNoncontractroChange = false;
+        }
+    });
+
     function privContractorIsNoncontractorChange(e) {
-        var baseElem = getPrivContractorBaseElem();
         contractorModal.find('.r-description').show();
         contractorModal.find("[name='PrivContractor.Description']").removeClass('rr-valid-ignore');
         contractorModal.find("[name='PrivContractor.Passport']").removeClass('rr-valid-ignore');
@@ -159,32 +199,33 @@
         if ($(this).is(':checked')) {
             contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Участник');
             contractorModal.find("[for='PrivContractor_Description']").text('Текст доверенности');
-            contractorModal.find('#PrivContractor_Passport').val(baseElem.find("[name^='Passport_']").val());
-            contractorModal.find('#PrivContractor_Part').val(baseElem.find("[name^='Part_']").val());
             contractorModal.find('.r-addition-fields-contractor').show();
-            if (baseElem.find("[name^='HasDover_']").val() == 'True') {
-                contractorModal.find("[for='PrivContractor_HasDover']").text('Есть');
-                contractorModal.find("[name='PrivContractor.HasDover']").bootstrapToggle('on');
-            }
-            else {
+            if (clearDescriptionOnNoncontractroChange) {
+                contractorModal.find('#PrivContractor_Passport').val('');
+                contractorModal.find('#PrivContractor_Part').val('');
                 contractorModal.find("[for='PrivContractor_HasDover']").text('Нет');
                 contractorModal.find("[name='PrivContractor.HasDover']").bootstrapToggle('off');
                 contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore');
                 contractorModal.find('.r-description').hide();
             }
+            contractorModal.find("#PrivContractor_DefaultRefusenikReasonDropdown").hide();
         }
         else {
             contractorModal.find("[for='PrivContractor_HasDover']").text('Нет');
             contractorModal.find("[name='PrivContractor.HasDover']").bootstrapToggle('off');
-            contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore');
+            contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore').removeClass("input-validation-error");
+            contractorModal.find("[data-valmsg-for='PrivContractor.Description']").html('');
             contractorModal.find("[name='PrivContractor.Passport']").addClass('rr-valid-ignore');
             contractorModal.find("[name='PrivContractor.Part']").addClass('rr-valid-ignore');
             contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Неучастник');
             contractorModal.find("[for='PrivContractor_Description']").text('Причина неучастия');
+            contractorModal.find("#PrivContractor_DefaultRefusenikReasonDropdown").show();
             contractorModal.find('.r-addition-fields-contractor input').val('');
             contractorModal.find('.r-addition-fields-contractor').hide();
         }
-        contractorModal.find('#PrivContractor_Description').val(baseElem.find("[name^='Description_']").val());
+        if (clearDescriptionOnNoncontractroChange) {
+            contractorModal.find('#PrivContractor_Description').val('');
+        }
     }
     function privContractorHasDoverChange(e) {
         if (contractorModal.find("[name='PrivContractor.IsNoncontractor']").is(':checked')) {
@@ -207,7 +248,6 @@
         if (isValid) {
             var contractor = getPrivContractorJson($('#PrivContractorModal'), true);
             contractor.IsNoncontractor = !contractor.IsNoncontractor;
-            console.log(contractor);
             if ($('#closePrivContractorModalBtn').attr('data-is-create') == 'true') {
                 $.ajax({
                     async: false,
@@ -258,6 +298,32 @@
         addressModal.modal('show');
         e.preventDefault();
     }
+
+    function additionalAddresRegistryChange(e) {
+        var currentEstate = $(this).closest(".rr-priv-additional-estate");
+        var index = currentEstate.index();
+        addressModal.data('additional-estate-index', index);
+        addressModal.modal('show');
+        e.preventDefault();
+    }
+
+    function additionalAddresRegistryAdd(e) {
+        $("#AdditionalEstates").append(additionalEstateTemplate.clone(true));
+        var lastInsertedEstate = $(".rr-priv-additional-estate").last();
+        var lastInsertedEstateIndex = lastInsertedEstate.index();
+        lastInsertedEstate.removeClass("d-none");
+        var changeBtn = lastInsertedEstate.find("[id^='additionalAddressRegistryChangeBtn_']");
+        changeBtn.closest(".input-group-append").append(changeBtn);
+        addressModal.data('additional-estate-index', lastInsertedEstateIndex);
+        addressModal.modal('show');
+        e.preventDefault();
+    }
+
+    function additionalAddresRegistryDelete(e) {
+        $(this).closest(".rr-priv-additional-estate").remove();
+        e.preventDefault();
+    }
+
     function addressRegistryModalSearch(e) {
         $('#setAddressRegistryModalBtn').attr('disabled', true);
         $.ajax({
@@ -287,22 +353,57 @@
         });
         e.preventDefault();
     }
+
     function addressRegistryModalSet(e) {
-        if ($('#addressRegistryChangeBtn span').hasClass('oi-plus')) {
-            $('#addressRegistryChangeBtn span').addClass('oi-pencil').removeClass('oi-plus');
-            $('#addressRegistryChangeBtn').attr('title', 'Редактировать');
-            var append = $("#addressRegistryChangeBtn").closest(".input-group-append");
-            append.append($("#HomesBtn"));
-            $('#HomesBtn').show();
+        var additionalEstateIndex = addressModal.data("additional-estate-index");
+        if (additionalEstateIndex === undefined) {
+            if ($('#addressRegistryChangeBtn span').hasClass('oi-plus')) {
+                $('#addressRegistryChangeBtn span').addClass('oi-pencil').removeClass('oi-plus');
+                $('#addressRegistryChangeBtn').attr('title', 'Редактировать');
+                var append = $("#addressRegistryChangeBtn").closest(".input-group-append");
+                append.append($("#HomesBtn"));
+                $('#HomesBtn').show();
+                $("#additionalAddressRegistryAddBtn").show();
+            }
+            var mainEstateElem = $("#MainEstate");
+            mainEstateElem.find('#addressRegistryText').val($('#resultAddressRegistryModal').text());
+            form.find('[name="IdBuilding"]').val($('#AddressRegistry_IdBuilding').val());
+            form.find('[name="IdPremise"]').val($('#AddressRegistry_IdPremise').val());
+            form.find('[name="IdSubPremise"]').val($('#AddressRegistry_IdSubPremise').val());
+            mainEstateElem.find('#addressRegistryText').valid();
+            mainEstateElem.find('[href^="/Buildings/Details"]')
+                .attr('href', '/Buildings/Details?idBuilding=' + $('#AddressRegistry_IdBuilding').val());
+            var premiseHref = mainEstateElem.find('[href^="/Premises/Details"]');
+            if ($('#AddressRegistry_IdPremise').val() == "") {
+                premiseHref.addClass("d-none");
+            } else {
+                premiseHref.attr('href', '/Premises/Details?idPremises=' + $('#AddressRegistry_IdPremise').val());
+                premiseHref.removeClass("d-none");
+            }
+        } else {
+            addressModal.data("additional-estate-success", "true");
+            var additionalEstateElem = $($(".rr-priv-additional-estate")[additionalEstateIndex]);
+            additionalEstateElem.find("[name^='AdditionalAddressRegistryText']").val($('#resultAddressRegistryModal').text());
+            additionalEstateElem.find("[name$='.IdBuilding']").val($('#AddressRegistry_IdBuilding').val());
+            additionalEstateElem.find("[name$='.IdPremise']").val($('#AddressRegistry_IdPremise').val());
+            additionalEstateElem.find("[name$='.IdSubPremise']").val($('#AddressRegistry_IdSubPremise').val());
+            additionalEstateElem.find('[href^="/Buildings/Details"]')
+                .attr('href', '/Buildings/Details?idBuilding=' + $('#AddressRegistry_IdBuilding').val());
+            
+            premiseHref = additionalEstateElem.find('[href^="/Premises/Details"]');
+            if ($('#AddressRegistry_IdPremise').val() == "") {
+                premiseHref.addClass("d-none");
+            } else {
+                premiseHref.attr('href', '/Premises/Details?idPremises=' + $('#AddressRegistry_IdPremise').val());
+                premiseHref.removeClass("d-none");
+            }
+
+
+            var additionalEstateAppend = additionalEstateElem.find("[id^='additionalAddressRegistryChangeBtn_']").closest(".input-group-append");
+            var additionalEstateHomeBtn = additionalEstateElem.find("[id^='HomesBtn_']");
+            additionalEstateAppend.append(additionalEstateHomeBtn);
+            additionalEstateHomeBtn.show();
         }
-        $('#addressRegistryText').val($('#resultAddressRegistryModal').text());
-        form.find('[name="IdBuilding"]').val($('#AddressRegistry_IdBuilding').val());
-        form.find('[name="IdPremise"]').val($('#AddressRegistry_IdPremise').val());
-        form.find('[name="IdSubPremise"]').val($('#AddressRegistry_IdSubPremise').val());
-        form.find('[href^="/Buildings/Details"]')
-            .attr('href', '/Buildings/Details?idBuilding=' + $('#AddressRegistry_IdBuilding').val());
-        form.find('[href^="/Premises/Details"]')
-            .attr('href', '/Premises/Details?idPremises=' + $('#AddressRegistry_IdPremise').val());
         $('#resultAddressRegistryModal').text('');
         resetModalForm($("#AddressRegistryModalForm"));
         $('#setAddressRegistryModalBtn').attr('disabled', true);
@@ -361,7 +462,6 @@
         $('#savePrivContractorModalBtn').text('Сохранить');
         $('#closePrivContractorModalBtn').attr('data-is-create', 'false');
         contractorModal.modal('show');
-        $('#PrivContractor_IsNoncontractor').change();
         e.preventDefault();
     }
     function privContractorDelete(e) {
@@ -382,6 +482,9 @@
     $("#savePrivContractorModalBtn").on('click', privContractorModalSave);
     $("#privContractorAdd").on('click', privContractorAdd);
     $("#addressRegistryChangeBtn").on('click', addressRegistryChange);
+    $("#AdditionalEstates").on('click', "[id^='additionalAddressRegistryChangeBtn_']", additionalAddresRegistryChange);
+    $("#AdditionalEstates").on('click', "[id^='additionalAddressRegistryDeleteBtn_']", additionalAddresRegistryDelete);
+    $("#additionalAddressRegistryAddBtn").on('click', additionalAddresRegistryAdd);
     $("#searchAddressRegistryModalBtn").on('click', addressRegistryModalSearch);
     $("#setAddressRegistryModalBtn").on('click', addressRegistryModalSet);
     $("#clearAddressRegistryModalBtn").on('click', addressRegistryModalClear);
@@ -403,7 +506,21 @@
                 }
             });
         });
+
+        var additionalEstate = $('.rr-priv-additional-estate');
+        additionalEstate.each(function (ind, elem) {
+            var fields = $(elem).find('input, select, textarea');
+            fields.each(function (i, el) {
+                var name = $(el).attr('id').split('_')[0];
+                $(el).attr('name', "PrivAdditionalEstates[" + ind + "]." + name);
+                if (name == 'IdEstate' && !/^\d+$/.test($(el).val())) {
+                    $(el).val(0);
+                }
+            });
+        });
+
         if (form.valid()) {
+            $("#privContractors").find('input, select, textarea').prop("disabled", "");
             form.submit();
         }
     });
@@ -411,4 +528,51 @@
         e.preventDefault();
         form.submit();
     }); 
+
+    addressModal.on("hide.bs.modal", function () {
+        var index = addressModal.data("additional-estate-index");
+        if (index !== undefined) {
+            addressModal.removeData("additional-estate-index");
+            if (addressModal.data("additional-estate-success") !== "true") {
+                $($(".rr-priv-additional-estate")[index]).remove();
+            }
+        }
+    });
+
+    $("#PrivContractor_DefaultRefusenikReasonDropdown").on("click", '.dropdown-item', function (e) {
+        var textarea = $("#PrivContractor_Description");
+        var text = $(this).text();
+        textarea.val(text);
+        e.preventDefault();
+    });
+
+    var docIssuedModal = $("#DocumentsIssuedByModal");
+
+    var docIssuedModalOpened = false;
+    var passportStartSelection = undefined;
+    var passportEndSelection = undefined;
+
+    $("#PrivContractor_AddPassportIssuer").on("click", function (e) {
+        $("body").css("overflow", "hidden").removeClass("modal-open");
+        docIssuedModalOpened = true;
+        contractorModal.modal('hide');
+        docIssuedModal.modal('show');
+        e.preventDefault();
+    });
+
+    $("#SelectDocumentsIssuedByBtn").on("click", function (e) {
+        var name = $("#DocumentsIssuedByModal #DocumentsIssuedBy_DocumentIssuedByName").val();
+        var passportElem = $("#PrivContractor_Passport");
+        var passportElemValueLength = passportElem.val().length;
+        passportElem.val(passportElem.val() + name);
+        passportStartSelection = passportElemValueLength;
+        passportEndSelection = passportElemValueLength + name.length;
+        docIssuedModal.modal('hide');
+        contractorModal.modal('show');
+        e.preventDefault();
+    });
+
+    docIssuedModal.on("hide.bs.modal", function () {
+        contractorModal.modal('show');
+    });
 });

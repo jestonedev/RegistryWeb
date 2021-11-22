@@ -42,13 +42,22 @@
                         </div>
                     }
                     <div class="@((contract.IdBuilding != null || contract.IdPremise != null ? "col-lg-9 col-md-8" : "col-12"))">
-                        @if (Model.PrivContractsAddresses[contract.IdContract] == null)
-                        {
-                            <span class="text-danger" title="Адрес из старой программы">@contract.PrivAddress</span>
+                        @{
+                            var addressesRegistry = Model.PrivContractsAddresses[contract.IdContract];
                         }
-                        else
+
+                        @if (addressesRegistry.Any(r => r != null))
                         {
-                            <span>@Model.PrivContractsAddresses[contract.IdContract].Text</span>
+                            @foreach(var address in addressesRegistry)
+                            {
+                                if (address != null)
+                                {
+                                    <div><span>@address.Text</span></div>
+                                }
+                            }
+                        } else
+                        {
+                        <span class="text-danger" title="Адрес из старой программы">@contract.PrivAddress</span>
                         }
                         <div class="dopinfo">
                             @if (contract.SubPremiseNavigation != null)
@@ -61,7 +70,7 @@
                                 </div>
                             }
                             else
-                          if (contract.PremiseNavigation != null)
+                            if (contract.PremiseNavigation != null)
                             {
                                 <div>
                                     <span>Общая площадь: </span> @contract.PremiseNavigation.TotalArea м<sup>2</sup>
@@ -71,7 +80,7 @@
                                 </div>
                             }
                             else
-                          if (contract.BuildingNavigation != null)
+                            if (contract.BuildingNavigation != null)
                             {
                                 <div>
                                     <span>Общая площадь: </span> @contract.BuildingNavigation.TotalArea м<sup>2</sup>
