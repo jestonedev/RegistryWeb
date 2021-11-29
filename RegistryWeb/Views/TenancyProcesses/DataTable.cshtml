@@ -102,6 +102,7 @@
                             if (tenant != null)
                             {
                                 <span class="text-primary"><b>@(tenant.Surname + " " + tenant.Name + (string.IsNullOrEmpty(tenant.Patronymic) ? "" : " " + tenant.Patronymic))</b></span>
+                                <br><span>Дата рождения нанимателя: @(tenant.DateOfBirth.HasValue ? tenant.DateOfBirth.Value.ToString("dd.MM.yyyy") : "не указана")</span>
                             }
                             else
                             {
