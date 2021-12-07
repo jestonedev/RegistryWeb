@@ -88,7 +88,7 @@
         </div>
     </div>
     <div class="card-body pt-3 pb-3 pl-3 pr-3" id="privatization">
-        <form enctype="multipart/form-data" asp-controller="Privatization" asp-action="@ViewBag.Action" id="privatizationForm" data-action="@ViewBag.Action" method="post">
+        <form enctype="multipart/form-data" asp-controller="Privatization" autocomplete="off" asp-action="@ViewBag.Action" id="privatizationForm" data-action="@ViewBag.Action" method="post">
             <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
             <input type="hidden" value="@Model.IdBuilding" name="IdBuilding" />
             <input type="hidden" value="@Model.IdPremise" name="IdPremise" />

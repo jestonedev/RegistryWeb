@@ -162,6 +162,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<PrivEstateOwner> PrivEstateOwners { get; set; }
         public virtual DbSet<PrivRealtor> PrivRealtors { get; set; }
         public virtual DbSet<PrivAdditionalEstate> PrivAdditionalEstates { get; set; }
+        public virtual DbSet<PrivContractorWarrantTemplate> PrivContractorWarrantTemplates { get; set; }
 
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
@@ -315,6 +316,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new PrivEstateOwnerConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PrivRealtorConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PrivAdditionalEstateConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PrivContractorWarrantTemplateConfiguration(nameDatebase));
         }
     }
 }

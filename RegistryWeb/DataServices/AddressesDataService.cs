@@ -201,7 +201,7 @@ namespace RegistryWeb.DataServices
             get => registryContext.PremisesTypes.AsNoTracking();
         }
 
-        public List<Address> GetAddressesFromHisParts(PartsAddress parts)
+        public List<Tuple<Address, EmergencyInfo>> GetAddressesFromHisParts(PartsAddress parts)
         {
             if (parts.IdStreet == null)
                 return null;
@@ -220,8 +220,8 @@ namespace RegistryWeb.DataServices
                     .Where(sp => sp.SubPremisesNum.ToLowerInvariant() == parts.SubPremisesNum
                         && sp.IdPremisesNavigation.PremisesNum.ToLowerInvariant() == parts.PremisesNum
                         && sp.IdPremisesNavigation.IdBuildingNavigation.House.ToLowerInvariant() == parts.House
-                        && sp.IdPremisesNavigation.IdBuildingNavigation.IdStreet == parts.IdStreet)
-                    .Select(sp => new Address
+                        && sp.IdPremisesNavigation.IdBuildingNavigation.IdStreet == parts.IdStreet).ToList()
+                    .Select(sp => new Tuple<Address, EmergencyInfo>(new Address
                     {
                         AddressType = AddressTypes.SubPremise,
                         Id = sp.IdSubPremises.ToString(),
@@ -232,7 +232,13 @@ namespace RegistryWeb.DataServices
                             { "IdSubPremise", sp.IdSubPremises.ToString() },
                         },
                         Text = sp.GetAddress()
-                    }).ToList();
+                    },
+                    new EmergencyInfo
+                    {
+                        DemolishedDate = GetDemolishedDate(sp.IdPremisesNavigation.IdBuilding, sp.IdPremises),
+                        EmergencyDate = GetEmergencyDate(sp.IdPremisesNavigation.IdBuilding, sp.IdPremises),
+                        ExcludeEmergencyDate = GetExcludeEmergencyDate(sp.IdPremisesNavigation.IdBuilding, sp.IdPremises),
+                    })).ToList();
             }
             if (parts.PremisesNum != null)
             {
@@ -243,8 +249,8 @@ namespace RegistryWeb.DataServices
                     .AsNoTracking()
                     .Where(p => p.PremisesNum.ToLowerInvariant() == parts.PremisesNum
                         && p.IdBuildingNavigation.House.ToLowerInvariant() == parts.House
-                        && p.IdBuildingNavigation.IdStreet == parts.IdStreet)
-                    .Select(p => new Address
+                        && p.IdBuildingNavigation.IdStreet == parts.IdStreet).ToList()
+                    .Select(p => new Tuple<Address, EmergencyInfo>(new Address
                     {
                         AddressType = AddressTypes.Premise,
                         Id = p.IdPremises.ToString(),
@@ -255,15 +261,21 @@ namespace RegistryWeb.DataServices
                             { "IdSubPremise", null },
                         },
                         Text = p.GetAddress(),
-                    }).ToList();
+                    },
+                    new EmergencyInfo
+                    {
+                        DemolishedDate = GetDemolishedDate(p.IdBuilding, p.IdPremises),
+                        EmergencyDate = GetEmergencyDate(p.IdBuilding, p.IdPremises),
+                        ExcludeEmergencyDate = GetExcludeEmergencyDate(p.IdBuilding, p.IdPremises)
+                    })).ToList();
             }
             if (parts.House != null)
             {
                 return registryContext.Buildings
                         .Include(b => b.IdStreetNavigation).AsNoTracking()
                        .Where(b => b.House.ToLowerInvariant() == parts.House
-                           && b.IdStreet == parts.IdStreet)
-                       .Select(b => new Address
+                           && b.IdStreet == parts.IdStreet).ToList()
+                       .Select(b => new Tuple<Address, EmergencyInfo>(new Address
                        {
                            AddressType = AddressTypes.Building,
                            Id = b.IdBuilding.ToString(),
@@ -274,9 +286,67 @@ namespace RegistryWeb.DataServices
                             { "IdSubPremise", null },
                            },
                            Text = b.GetAddress()
-                       }).ToList();
+                       },
+                        new EmergencyInfo
+                        {
+                            DemolishedDate = GetDemolishedDate(b.IdBuilding, null),
+                            EmergencyDate = GetEmergencyDate(b.IdBuilding, null),
+                            ExcludeEmergencyDate = GetExcludeEmergencyDate(b.IdBuilding, null)
+                        })).ToList();
             }
             return null;
+        }
+
+        private DateTime? GetDemolishedDate(int idBuilding, int? idPremises)
+        {
+            var oba = registryContext.OwnershipBuildingsAssoc.Where(o => o.IdBuilding == idBuilding).Select(o => o.IdOwnershipRight);
+            if (idPremises != null)
+            {
+                oba = oba.Union(registryContext.OwnershipPremisesAssoc.Where(o => o.IdPremises == idPremises)
+                                                .Select(o => o.IdOwnershipRight));
+            }
+            var or = (from row in oba
+                      join oRow in registryContext.OwnershipRights on row equals oRow.IdOwnershipRight
+                      where oRow.IdOwnershipRightType == 1
+                      select oRow.Date).ToList();
+            if (or.Any())
+                return or.Max();
+            else return null;
+        }
+
+        private DateTime? GetEmergencyDate(int idBuilding, int? idPremises)
+        {
+            var oba = registryContext.OwnershipBuildingsAssoc.Where(o => o.IdBuilding == idBuilding).Select(o => o.IdOwnershipRight);
+            if (idPremises != null)
+            {
+                oba = oba.Union(registryContext.OwnershipPremisesAssoc.Where(o => o.IdPremises == idPremises)
+                                                .Select(o => o.IdOwnershipRight));
+            }
+            var or = (from row in oba
+                    join oRow in registryContext.OwnershipRights on row equals oRow.IdOwnershipRight
+                    where new int[] { 2, 7 }.Contains(oRow.IdOwnershipRightType)
+                    select oRow.Date).ToList();
+
+            if (or.Any())
+                return or.Max();
+            else return null;
+        }
+
+        private DateTime? GetExcludeEmergencyDate(int idBuilding, int? idPremises)
+        {
+            var oba = registryContext.OwnershipBuildingsAssoc.Where(o => o.IdBuilding == idBuilding).Select(o => o.IdOwnershipRight);
+            if (idPremises != null)
+            {
+                oba = oba.Union(registryContext.OwnershipPremisesAssoc.Where(o => o.IdPremises == idPremises)
+                                                .Select(o => o.IdOwnershipRight));
+            }
+            var or = (from row in oba
+                    join oRow in registryContext.OwnershipRights on row equals oRow.IdOwnershipRight
+                    where oRow.IdOwnershipRightType == 6
+                    select oRow.Date).ToList();
+            if (or.Any())
+                return or.Max();
+            else return null;
         }
     }
 }

@@ -63,6 +63,7 @@
         var fields = privContractorElem.find('input, select, textarea');
         var contractorJson = {};
         fields.each(function (idx, elem) {
+            if ($(elem).attr('id') === undefined) return;
             var name = $(elem).attr('id').split('_')[0];
             if (isModal) {
                 name = $(elem).attr('id').split('_')[1];
@@ -164,7 +165,7 @@
     var clearDescriptionOnNoncontractroChange = false;
 
     contractorModal.on("show.bs.modal", function () {
-        if (!docIssuedModalOpened) {
+        if (!subModalOpened) {
             $("body").css("overflow", "hidden");
             $('#PrivContractor_IsNoncontractor').change();
             $("#PrivContractor_HasDover").change();
@@ -173,8 +174,9 @@
     });
 
     contractorModal.on("shown.bs.modal", function () {
-        if (docIssuedModalOpened) {
-            docIssuedModalOpened = false;
+        $("#PrivContractor_IdKinship").selectpicker('refresh');
+        if (subModalOpened) {
+            subModalOpened = false;
             if (passportStartSelection !== undefined && passportEndSelection !== undefined) {
                 $("#PrivContractor_Passport").focus();
                 $("#PrivContractor_Passport")[0].setSelectionRange(passportStartSelection, passportEndSelection);
@@ -185,16 +187,32 @@
     });
 
     contractorModal.on("hide.bs.modal", function () {
-        if (!docIssuedModalOpened) {
+        if (!subModalOpened) {
             $("body").css("overflow", "");
             clearDescriptionOnNoncontractroChange = false;
+        }
+    });
+
+    $("#PrivContractor_DateBirth").on("change", function (e) {
+        var dateBirth = $("#PrivContractor_DateBirth").val();
+        contractorModal.find("[name='PrivContractor.HasDover']").removeAttr("disabled");
+        contractorModal.find("[name='PrivContractor.Passport']").addClass('rr-valid-ignore');
+        if (dateBirth !== "" && dateBirth !== undefined) {
+            var age = DatesDiffInYears(new Date(dateBirth), new Date());
+            if (age < 14) {
+                contractorModal.find("[name='PrivContractor.HasDover']").bootstrapToggle('on').attr("disabled", "disabled");
+                contractorModal.find("#PrivContractor_Passport").removeClass("input-validation-error");
+                contractorModal.find("[data-valmsg-for='PrivContractor.Passport']").empty();
+            } else
+            if ($("#PrivContractor_IsNoncontractor").is(':checked')) {
+                contractorModal.find("[name='PrivContractor.Passport']").removeClass('rr-valid-ignore');
+            }
         }
     });
 
     function privContractorIsNoncontractorChange(e) {
         contractorModal.find('.r-description').show();
         contractorModal.find("[name='PrivContractor.Description']").removeClass('rr-valid-ignore');
-        contractorModal.find("[name='PrivContractor.Passport']").removeClass('rr-valid-ignore');
         contractorModal.find("[name='PrivContractor.Part']").removeClass('rr-valid-ignore');
         if ($(this).is(':checked')) {
             contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Участник');
@@ -209,23 +227,25 @@
                 contractorModal.find('.r-description').hide();
             }
             contractorModal.find("#PrivContractor_DefaultRefusenikReasonDropdown").hide();
+            contractorModal.find("#PrivContractor_AddContractorWarrantTemplate").show();
         }
         else {
             contractorModal.find("[for='PrivContractor_HasDover']").text('Нет');
             contractorModal.find("[name='PrivContractor.HasDover']").bootstrapToggle('off');
             contractorModal.find("[name='PrivContractor.Description']").addClass('rr-valid-ignore').removeClass("input-validation-error");
             contractorModal.find("[data-valmsg-for='PrivContractor.Description']").html('');
-            contractorModal.find("[name='PrivContractor.Passport']").addClass('rr-valid-ignore');
             contractorModal.find("[name='PrivContractor.Part']").addClass('rr-valid-ignore');
             contractorModal.find("[for='PrivContractor_IsNoncontractor']").text('Неучастник');
             contractorModal.find("[for='PrivContractor_Description']").text('Причина неучастия');
             contractorModal.find("#PrivContractor_DefaultRefusenikReasonDropdown").show();
+            contractorModal.find("#PrivContractor_AddContractorWarrantTemplate").hide();
             contractorModal.find('.r-addition-fields-contractor input').val('');
             contractorModal.find('.r-addition-fields-contractor').hide();
         }
         if (clearDescriptionOnNoncontractroChange) {
             contractorModal.find('#PrivContractor_Description').val('');
         }
+        $("#PrivContractor_DateBirth").change();
     }
     function privContractorHasDoverChange(e) {
         if (contractorModal.find("[name='PrivContractor.IsNoncontractor']").is(':checked')) {
@@ -343,11 +363,23 @@
                 else if (elem == -2)
                     div.text("Найдено несколько адресов. Уточните запрос");
                 else {
-                    $('#AddressRegistry_IdBuilding').val(elem.idParents.IdBuilding);
-                    $('#AddressRegistry_IdPremise').val(elem.idParents.IdPremise);
-                    $('#AddressRegistry_IdSubPremise').val(elem.idParents.IdSubPremise);
-                    div.text(elem.text);
-                    $('#setAddressRegistryModalBtn').removeAttr('disabled');
+                    $('#AddressRegistry_IdBuilding').val(elem.item1.idParents.IdBuilding);
+                    $('#AddressRegistry_IdPremise').val(elem.item1.idParents.IdPremise);
+                    $('#AddressRegistry_IdSubPremise').val(elem.item1.idParents.IdSubPremise);
+                    if (elem.item2.demolishedDate !== null) {
+                        div.html(elem.item1.text + '<span class=rr-priv-address-label>Снесено</span>');
+                    } else
+                        if (elem.item2.emergencyDate !== null) {
+                            if (elem.item2.excludeEmergencyDate == null || new Date(elem.item2.emergencyDate) > new Date(elem.item2.excludeEmergencyDate)) {
+                                div.html(elem.item1.text + '<span class=rr-priv-address-label>Аварийное</span>');
+                            } else {
+                                div.text(elem.item1.text);
+                                $('#setAddressRegistryModalBtn').removeAttr('disabled');
+                            }
+                        } else {
+                            div.text(elem.item1.text);
+                            $('#setAddressRegistryModalBtn').removeAttr('disabled');
+                        }
                 }
             }
         });
@@ -413,6 +445,7 @@
     function addressRegistryModalClear(e) {
         $('#resultAddressRegistryModal').text('');
         resetModalForm($("#AddressRegistryModalForm"));
+        $("#AddressRegistry_IdRegion").change();
         e.preventDefault();
     }
     function idRegionAddressRegistryModalChange(e) {
@@ -473,11 +506,19 @@
         e.preventDefault();
     }
 
+    function snpChange() {
+        var val = $(this).val();
+        if (val.length > 0)
+            val = val[0].toUpperCase() + val.substr(1);
+        $(this).val(val);
+    }
+
 
     $('#privatizationToggle').on('click', privatizationToggle);
     $('#privContractorsToggle').on('click', privContractorsToggle);
     $('#privContractInfoToggle').on('click', privContractInfoToggle);
     $('#PrivContractor_IsNoncontractor').on('change', privContractorIsNoncontractorChange);
+    $('#PrivContractor_Surname, #PrivContractor_Name, #PrivContractor_Patronymic').on('focusout', snpChange);
     $('#PrivContractor_HasDover').on('change', privContractorHasDoverChange);
     $("#savePrivContractorModalBtn").on('click', privContractorModalSave);
     $("#privContractorAdd").on('click', privContractorAdd);
@@ -546,15 +587,14 @@
         e.preventDefault();
     });
 
+    var subModalOpened = false;
     var docIssuedModal = $("#DocumentsIssuedByModal");
-
-    var docIssuedModalOpened = false;
     var passportStartSelection = undefined;
     var passportEndSelection = undefined;
 
     $("#PrivContractor_AddPassportIssuer").on("click", function (e) {
         $("body").css("overflow", "hidden").removeClass("modal-open");
-        docIssuedModalOpened = true;
+        subModalOpened = true;
         contractorModal.modal('hide');
         docIssuedModal.modal('show');
         e.preventDefault();
@@ -575,4 +615,90 @@
     docIssuedModal.on("hide.bs.modal", function () {
         contractorModal.modal('show');
     });
+
+    docIssuedModal.on("shown.bs.modal", function () {
+        $("#DocumentsIssuedBy_DocumentIssuedByName").selectpicker("refresh");
+    });
+
+    var privContractorWarrantModal = $("#PrivContractorWarrantModal");
+
+    $("#PrivContractor_AddContractorWarrantTemplate").on("click", function (e) {
+        var dateBirth = $("#PrivContractor_DateBirth").val();
+
+        privContractorWarrantModal.find(".rr-priv-contractor-warrant").hide();
+        if (dateBirth === "" || dateBirth === undefined) {
+            privContractorWarrantModal.find(".rr-priv-contractor-warrant-other").show();
+        } else {
+            var age = DatesDiffInYears(new Date($("#PrivContractor_DateBirth").val()), new Date());
+            if (age < 14) {
+                privContractorWarrantModal.find(".rr-priv-contractor-warrant-14").show();
+            } else if (age < 18) {
+                privContractorWarrantModal.find(".rr-priv-contractor-warrant-18").show();
+            } else {
+                privContractorWarrantModal.find(".rr-priv-contractor-warrant-other").show();
+            }
+        }
+
+        $("body").css("overflow", "hidden").removeClass("modal-open");
+        subModalOpened = true;
+        contractorModal.modal('hide');
+        privContractorWarrantModal.modal('show');
+        e.preventDefault();
+    });
+
+    $("#SelecContractorWarrantTemplateBtn").on("click", function (e) {
+        var activeTemplate = privContractorWarrantModal.find(".rr-priv-contractor-warrant")
+            .filter(function (idx, elem) { return $(elem).css("display") !== "none"; }).first();
+        var warrantText = activeTemplate.find("select").val();
+        $("#PrivContractor_Description").val(warrantText);
+        privContractorWarrantModal.modal('hide');
+        contractorModal.modal('show');
+        e.preventDefault();
+    });
+
+    privContractorWarrantModal.on("hide.bs.modal", function () {
+        contractorModal.modal('show');
+    });
+
+    privContractorWarrantModal.on("shown.bs.modal", function () {
+        privContractorWarrantModal.find(".selectpicker").selectpicker("refresh");
+    });
+
+    function DatesDiffInYears(startDate, endDate) {
+        if (startDate.getFullYear === undefined || endDate.getFullYear === undefined) return null;
+        var years = endDate.getFullYear() - startDate.getFullYear();
+        var monthEq = endDate.getMonth() > startDate.getMonth() ? 1 : endDate.getMonth() === startDate.getMonth() ? 0 : -1;
+        var dayEq = endDate.getDate() > startDate.getDate() ? 1 : endDate.getDate() === startDate.getDate() ? 0 : -1;
+        if (monthEq === 1 || (monthEq === 0 && dayEq >= 0)) return years;
+        else return years - 1;
+    }
+
+    $.validator.addMethod('passportDateCorrect', function (value, element) {
+        if (value.length === 0) return true;
+        var matches = value.match("[0-9]{1,2}[\.][0-9]{1,2}[\.][0-9]{2,4}");
+        if (matches === undefined || matches === null || matches.length === 0) return true;
+        var match = matches[0];
+        var dateParts = match.split('.');
+        var day = dateParts[0];
+        var month = dateParts[1];
+        var year = dateParts[2];
+        if (year.length === 2) {
+            year = "20" + year;
+        } else
+            if (year.length === 3) return false;
+        var passportDate = new Date(year, month - 1, day);
+        var birthDate = $("#PrivContractor_DateBirth").val();
+        if (birthDate === "" || birthDate === undefined) return true;
+        var age = DatesDiffInYears(new Date(birthDate), new Date());
+        var passportAge = DatesDiffInYears(new Date(birthDate), new Date(passportDate));
+        if (age < 14) return true;
+        if (age < 20 && passportAge >= 14 && passportAge < 20) return true;
+        if (age < 45 && passportAge >= 20 && passportAge < 45) return true;
+        if (age >= 45 && passportAge >= 45) return true;
+        return false;
+    }, 'Паспорт является недействующим');
+
+    var contractorForm = $('#PrivContractorModalForm');
+    contractorValidator = contractorForm.validate();
+    contractorValidator.settings.rules["PrivContractor.Passport"].passportDateCorrect = true;
 });

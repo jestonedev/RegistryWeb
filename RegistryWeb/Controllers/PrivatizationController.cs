@@ -64,6 +64,7 @@ namespace RegistryWeb.Controllers
             ViewBag.PrivEstateOwnerSigners = dataService.PrivEstateOwnerSigners;
             ViewBag.PrivRealtors = dataService.PrivRealtors;
             ViewBag.DocumentsIssuedBy = dataService.DocumentsIssuedBy;
+            ViewBag.PrivContractorWarrantTemplates = dataService.PrivContractorWarrantTemplates;
             return View("Privatization", contract);
         }
 
