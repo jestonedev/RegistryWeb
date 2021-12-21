@@ -650,7 +650,8 @@
         var activeTemplate = privContractorWarrantModal.find(".rr-priv-contractor-warrant")
             .filter(function (idx, elem) { return $(elem).css("display") !== "none"; }).first();
         var warrantText = activeTemplate.find("select").val();
-        $("#PrivContractor_Description").val(warrantText);
+        var prevText = $.trim($("#PrivContractor_Description").val());
+        $("#PrivContractor_Description").val(prevText + (prevText.length >0 ? "\r\n" : "") + warrantText);
         privContractorWarrantModal.modal('hide');
         contractorModal.modal('show');
         e.preventDefault();

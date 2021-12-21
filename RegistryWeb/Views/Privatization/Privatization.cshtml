@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="~/css/privatization.css" asp-append-version="true" />
 }
 @section Scripts {
+    <script src="~/js/privContract.tab.js" asp-append-version="true"></script>
     <script src="~/js/privContract.common.js" asp-append-version="true"></script>
     <script src="~/js/privatization.reports.js" asp-append-version="true"></script>
 }
@@ -140,7 +141,7 @@
                 @{
                     var addresses = (List<Address>)ViewBag.AddressesRegistry;
                     var additionalEstate = Model.PrivAdditionalEstates.Union(new List<RegistryWeb.Models.Entities.PrivAdditionalEstate>() {
-                        new RegistryWeb.Models.Entities.PrivAdditionalEstate() }).ToList();
+                                new RegistryWeb.Models.Entities.PrivAdditionalEstate() }).ToList();
                     for (var i = 0; i < additionalEstate.Count(); i++)
                     {
                         var address = new Address();
@@ -361,5 +362,5 @@
 </div>
 
 <partial name="PrivModals">
-<partial name="PrivContractModal">
-<partial name="PrivRealtorWarrantModal">
+    <partial name="PrivContractModal">
+        <partial name="PrivRealtorWarrantModal">

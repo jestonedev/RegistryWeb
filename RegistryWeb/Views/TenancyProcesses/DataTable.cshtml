@@ -146,8 +146,8 @@
                 <div class="dopinfo-alt">
                     @if (Model.RentObjects.ContainsKey(item.IdProcess))
                     {
-                        <span>До 28.08.2019: </span>@(Model.RentObjects[item.IdProcess].Sum(r => r.Payment).ToString("#0.00")) <span>руб.</span><br />
-                        <span>С 28.08.2019:</span> @(Model.RentObjects[item.IdProcess].Sum(r => r.PaymentAfter28082019).ToString("#0.00")) <span>руб.</span>
+                        <div class="text-primary"><b>№1827 от 12.08.2014:</b></div>@(Model.RentObjects[item.IdProcess].Sum(r => r.Payment).ToString("#0.00")) <span>руб.</span><br />
+                        <div class="text-primary mt-2"><b>№1558 от 28.08.2019:</b></div>@(Model.RentObjects[item.IdProcess].Sum(r => r.PaymentAfter28082019).ToString("#0.00")) <span>руб.</span>
                     }
                 </div>
 
