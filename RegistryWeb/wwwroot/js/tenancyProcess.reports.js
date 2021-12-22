@@ -39,6 +39,13 @@
         e.preventDefault();
     });
 
+    $("body").on('click', ".rr-report-resettle", function (e) {
+        var idProcess = $(this).data("id-process");
+        url = "/TenancyReports/GetStatementResettle?idProcess=" + idProcess;
+        downloadFile(url);
+        e.preventDefault();
+    });
+
     $("body").on('click', ".rr-report-contract", function (e) {
         var idProcess = $(this).data("id-process");
         var contractType = $(this).data("contract-type");

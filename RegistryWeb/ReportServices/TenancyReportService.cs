@@ -41,6 +41,16 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
+        public byte[] StatementResettleSecondary(int idProcess)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "id_process", idProcess }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\statement_resettle_secondary");
+            return DownloadFile(fileNameReport);
+        }
+
         public byte[] Contract(int idProcess, int idRentType, int contractType, bool openDate)
         {
             var arguments = new Dictionary<string, object>
