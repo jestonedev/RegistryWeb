@@ -76,6 +76,29 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult GetStatementResettle(int idProcess)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+            try
+            {
+                if (!dataService.HasRentObjects(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
+                }
+                if (!dataService.HasTenant(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
+                }
+                var file = reportService.StatementResettleSecondary(idProcess);
+                return File(file, odtMime, string.Format(@"Заявление на переселение Вторичка № {0}.odt", idProcess));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
         public IActionResult GetContract(int idProcess, int idRentType, int contractType, bool openDate)
         {
             if (!securityService.HasPrivilege(Privileges.TenancyRead))
