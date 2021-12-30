@@ -217,7 +217,8 @@ namespace RegistryWeb.ReportServices
                 {"house", modalFilter.House ?? ""},
                 {"premise", modalFilter.PremiseNum ?? ""},
                 {"sub_premise", modalFilter.SubPremiseNum ?? ""},
-                {"address_filter", addressFilter}
+                {"address_filter", addressFilter},
+                {"summary_list_date", modalFilter.SummaryListDate?.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture)}
             };
             var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\order_web");
             return DownloadFile(fileNameReport);

@@ -26,5 +26,6 @@ namespace RegistryWeb.ViewOptions.Filter
         public string ResettleNum { get; set; }
         public DateTime? ResettleDate { get; set; }
         public int? IdResettleType { get; set; }
+        public DateTime? SummaryListDate { get; set; }
     }
 }

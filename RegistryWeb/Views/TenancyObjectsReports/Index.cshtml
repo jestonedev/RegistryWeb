@@ -258,6 +258,7 @@
                                 <option value="3">Дети сироты</option>
                                 <option value="4">По решению суда</option>
                                 <option value="5">Переселение 2013-2017</option>
+                                <option value="7">Переселение 2019-2025</option>
                             </select>
                             <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.OrderTypes" data-valmsg-replace="true"></span>
                         </div>
@@ -282,10 +283,11 @@
                             </div>
                         </div>
                     </fieldset>
-                    <fieldset class="form-row r-scheduler-border" data-selected-id="4">
+                    <fieldset class="r-scheduler-border" data-selected-id="4">
                         <legend class="r-scheduler-border">Гражданское дело</legend>
                         <div class="form-row">
-                            <div class="col-6">
+                            <div class="col-4">
+                                <label for="TenancyOrder__ResettleNum" style="color:white;">.</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text">№</div>
@@ -295,14 +297,13 @@
                                     <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtNum" data-valmsg-replace="true"></span>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-3">
+                                <label for="TenancyOrder__ResettleNum" style="color:white;">.</label>
                                 <input type="date" data-actions-box="true" class="form-control" title="Дата гражданского дела" name="TenancyOrder.CourtDate"
                                        data-val="true" data-val-required="Дата не указана" id="TenancyOrder__CourtDate" />
                                 <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtDate" data-valmsg-replace="true"></span>
                             </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-12">
+                            <div class="col-5">
                                 <label for="TenancyOrder__CourtType">Во исполнение решения</label>
                                 <select data-actions-box="true" class="selectpicker form-control" title="Во исполнение решения" name="TenancyOrder.CourtType"
                                         data-val="true" data-val-required="Не указан орган" id="TenancyOrder__CourtType">
@@ -314,10 +315,11 @@
                             </div>
                         </div>
                     </fieldset>
-                    <fieldset class="form-row r-scheduler-border" data-selected-id="5">
+                    <fieldset class="r-scheduler-border" data-selected-id="5">
                         <legend class="r-scheduler-border">Распоряжение</legend>
                         <div class="form-row">
-                            <div class="col-6">
+                            <div class="col-4">
+                                <label for="TenancyOrder__ResettleNum" style="color:white;">.</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text">№</div>
@@ -327,14 +329,13 @@
                                     <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.ResettleNum" data-valmsg-replace="true"></span>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-3">
+                                <label for="TenancyOrder__ResettleDate" style="color:white;">.</label>
                                 <input type="date" data-actions-box="true" class="form-control" title="Дата распоряжения" name="TenancyOrder.ResettleDate"
                                        data-val="true" data-val-required="Дата не указана" id="TenancyOrder__ResettleDate" />
                                 <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.ResettleDate" data-valmsg-replace="true"></span>
                             </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-12">
+                            <div class="col-5">
                                 <label for="TenancyOrder__ResettleType">Тип распоряжения</label>
                                 <select data-actions-box="true" class="selectpicker form-control" title="Тип распоряжения" name="TenancyOrder.ResettleType"
                                         data-val="true" data-val-required="Не указан тип распоряжения" id="TenancyOrder__ResettleType">
@@ -343,6 +344,17 @@
                                     <option value="3">Основное распоряжение</option>
                                 </select>
                                 <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.ResettleType" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="r-scheduler-border" data-selected-id="7">
+                        <legend class="r-scheduler-border">Распоряжение</legend>
+                        <div class="form-row">
+                            <div class="col-12">
+                                <label for="TenancyOrder__SummaryListDate">Дата сводного списка</label>
+                                <input type="date" data-actions-box="true" class="form-control" title="Дата сводного списка" name="TenancyOrder.SummaryListDate"
+                                       data-val="true" data-val-required="Дата не указана" id="TenancyOrder__SummaryListDate" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.SummaryListDate" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                     </fieldset>

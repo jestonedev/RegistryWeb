@@ -46,7 +46,7 @@ namespace RegistryWeb.Controllers
                     return File(file, odsMime, "Статистика");
                 }
                 file = reportService.GetTenancyStatisticForCoMSReporter(modalFilter);
-                return File(file, odtMime, "Статистика для МКУ ЦПМУ");
+                return File(file, odtMime, "Статистика для МКУ ЦПМУ.odt");
             }
             catch (Exception ex)
             {
@@ -61,7 +61,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.GetTenancyOrder(modalFilter);
-                return File(file, odtMime, "Распоряжения на найм жилья");
+                return File(file, odtMime, "Распоряжения на найм жилья.odt");
             }
             catch (Exception ex)
             {
@@ -76,7 +76,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.GetTenancyNotifiesList(dateFrom, dateTo);
-                return File(file, odsMime, "Уведомление по счетчикам (пер)");
+                return File(file, odsMime, "Уведомление по счетчикам (пер).ods");
             }
             catch (Exception ex)
             {
