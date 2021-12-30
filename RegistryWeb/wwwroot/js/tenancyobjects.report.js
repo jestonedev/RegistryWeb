@@ -86,12 +86,13 @@
         var resettleNum = $("#tenancyOrderModal").find("[name='TenancyOrder.ResettleNum']").val();
         var resettleDate = $("#tenancyOrderModal").find("[name='TenancyOrder.ResettleDate']").val();
         var idResettleType = $("#tenancyOrderModal").find("[name='TenancyOrder.ResettleType']").val();
+        var summarylistDate = $("#tenancyOrderModal").find("[name='TenancyOrder.SummaryListDate']").val();
         var url = "/TenancyObjectsReports/GetTenancyOrder?IdPreparer=" + idPreparer + "&IdLawyer=" + idLawyer + "&IdStreet=" + idStreet +
             "&House=" + house + "&PremiseNum=" + premiseNum + "&SubPremiseNum=" + subPremiseNum + "&OrderDateFrom=" + orderDateFrom +
             "&RegistrationDateFrom=" + registrationDateFrom + "&RegistrationDateTo=" + registrationDateTo +
             "&IdRentType=" + idRentType + "&IdOrderType=" + idOrderType + "&OrphansNum=" + orphansNum + "&OrphansDate=" + orphansDate +
             "&CourtNum=" + courtNum + "&CourtDate=" + courtDate + "&IdCourt=" + idCourt + "&ResettleNum=" + resettleNum +
-            "&ResettleDate=" + resettleDate + "&IdResettleType=" + idResettleType;
+            "&ResettleDate=" + resettleDate + "&IdResettleType=" + idResettleType + "&SummaryListDate=" + summarylistDate;
         downloadFile(url);
         $("#tenancyOrderModal").modal("hide");
         resetModalForm(form);
