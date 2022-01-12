@@ -273,10 +273,32 @@ namespace RegistryWeb.DataServices
                 var idPremises = from fundRow in registryContext.FundsHistory
                                  join maxFundRow in maxFunds
                                  on fundRow.IdFund equals maxFundRow.IdFund
-                                 where filterOptions.IdFundType.Contains(fundRow.IdFundType)
+                                 join premisesRow in registryContext.Premises
+                                 on maxFundRow.IdPremises equals premisesRow.IdPremises
+                                 where filterOptions.IdFundType.Contains(fundRow.IdFundType) && ObjectStateHelper.IsMunicipal(premisesRow.IdState)
                                  select maxFundRow.IdPremises;
+
+                var maxFundsSubPremises = from fundRow in registryContext.FundsHistory
+                               join fundSubPremisesRow in registryContext.FundsSubPremisesAssoc
+                               on fundRow.IdFund equals fundSubPremisesRow.IdFund
+                               where fundRow.ExcludeRestrictionDate == null
+                               group fundSubPremisesRow.IdFund by fundSubPremisesRow.IdSubPremises into gs
+                               select new
+                               {
+                                   IdSubPremises = gs.Key,
+                                   IdFund = gs.Max()
+                               };
+
+                var idPremisesByRooms = (from fundRow in registryContext.FundsHistory
+                                        join maxFundRow in maxFundsSubPremises
+                                        on fundRow.IdFund equals maxFundRow.IdFund
+                                        join subPremiseRow in registryContext.SubPremises
+                                        on maxFundRow.IdSubPremises equals subPremiseRow.IdSubPremises
+                                        where filterOptions.IdFundType.Contains(fundRow.IdFundType)
+                                        select subPremiseRow.IdPremises).Distinct();
+
                 query = from row in query
-                        join idPremise in idPremises
+                        join idPremise in idPremises.Union(idPremisesByRooms)
                         on row.IdPremises equals idPremise
                         select row;
             }

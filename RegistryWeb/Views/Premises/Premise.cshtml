@@ -33,7 +33,7 @@
     <script src="~/js/premises.reports.js" asp-append-version="true"></script>
 }
 
-<form asp-controller="Premise" enctype="multipart/form-data" asp-action="@ViewBag.Action" id="r-premises-form" data-action="@ViewBag.Action" data-addressType="@(ViewBag.addressType=="Premise" ? "3" : "")" method="post">
+<form asp-controller="Premise" autocomplete="off" enctype="multipart/form-data" asp-action="@ViewBag.Action" id="r-premises-form" data-action="@ViewBag.Action" data-addressType="@(ViewBag.addressType=="Premise" ? "3" : "")" method="post">
     <div class="card">
         <input type="hidden" asp-for="@Model.Premise.IdPremises" />
         <input type="hidden" asp-for="@Model.Premise.IdPremisesKind" value="1" />
@@ -211,7 +211,7 @@
                     {
                         <label class="mb-1" asp-for="@Model.IdFundType">Текущий фонд</label>
                         <select class="selectpicker form-control" data-live-search="true" asp-for="@Model.IdFundType"
-                                asp-items="@Model.FundTypesList" title="Текущее фонд">
+                                asp-items="@Model.FundTypesList" title="Текущий фонд">
                             <option></option>
                         </select>
                         <span asp-validation-for="@Model.IdFundType" class="text-danger"></span>
@@ -221,7 +221,7 @@
                     {
                         <label class="mb-1" asp-for="@Model.IdFundType">Текущий фонд</label>
                         <select disabled class="selectpicker form-control" data-live-search="true" asp-for="@Model.IdFundType"
-                                asp-items="@Model.FundTypesList" title="Текущее фонд">
+                                asp-items="@Model.FundTypesList" title="Текущий фонд">
                             <option></option>
                         </select>
                         <span asp-validation-for="@Model.IdFundType" class="text-danger"></span>
