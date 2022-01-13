@@ -144,6 +144,13 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
+        
+        public byte[] GetPayment()
+        {
+            var fileNameReport = GenerateReport(new Dictionary<string, object>(), "registry\\tenancy\\payment");
+            return DownloadFile(fileNameReport);
+        }
+
         private string getTenancyOrderFilter(TenancyOrderModalFilter objFilter)
         {
             if (objFilter.IdStreet == null && objFilter.House == null && objFilter.PremiseNum == null && objFilter.SubPremiseNum == null)

@@ -1,4 +1,12 @@
 ﻿$(document).ready(function () {
+    $("body").on('click', ".payment-report", function (e) {
+        var url = "/TenancyObjectsReports/GetPayment";
+        if (url !== undefined) {
+            downloadFile(url);
+        }
+        e.preventDefault();
+    });
+
     $(".report").on("click", function (e) {
         var idReportType = +$(this).data("idreporttype");
         switch (idReportType) {
