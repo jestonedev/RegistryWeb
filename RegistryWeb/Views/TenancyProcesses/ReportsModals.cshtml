@@ -108,6 +108,36 @@
     </div>
 </form>
 
+<form id="tenancyActAfForm">
+    <div class="modal fade" id="tenancyActAfModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Сформировать акт приема-передачи</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="TenancyActAf.IdProcess" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="TenancyActAf.IdPreparer">Сторона 1 в лице</label>
+                            <select class="selectpicker form-control" title="Выберите сотрудника" name="TenancyActAf.IdPreparer"
+                                    data-val="true" data-val-required="Выберите сотрудника" id="TenancyActAf_IdPreparer" asp-items="@preparersList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TenancyActAf.IdPreparer" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
 <form id="tenancyContractRegDateForm">
     <div class="modal fade" id="tenancyContractRegDateModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">

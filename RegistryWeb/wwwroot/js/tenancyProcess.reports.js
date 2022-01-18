@@ -46,6 +46,14 @@
         e.preventDefault();
     });
 
+    $("body").on('click', ".rr-report-act-af-tenant", function (e) {
+        var idProcess = $(this).data("id-process");
+        $("#tenancyActAfModal").find("[name='TenancyActAf.IdProcess']").val(idProcess);
+        $("#tenancyActAfModal").find("input, textarea, select").prop("disabled", false);
+        $('#tenancyActAfModal').modal('show');
+        e.preventDefault();
+    });
+
     $("body").on('click', ".rr-report-contract", function (e) {
         var idProcess = $(this).data("id-process");
         var contractType = $(this).data("contract-type");
@@ -101,6 +109,28 @@
         $("#openDateModal").modal("hide");
     });
 
+
+    $("#tenancyActAfModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+
+        var isValid = $(this).closest("#tenancyActAfForm").valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight($(this).closest("#tenancyActAfForm"));
+            return false;
+        }
+
+        var idProcess = $("#tenancyActAfModal").find("[name='TenancyActAf.IdProcess']").val();
+        var idPreparer = $("#tenancyActAfModal").find("[name='TenancyActAf.IdPreparer']").val();
+
+        var url = "/TenancyReports/GetActAf?idProcess=" + idProcess + "&idPreparer=" + idPreparer;
+
+        if (url !== undefined) {
+            downloadFile(url);
+        }
+
+        $("#tenancyActAfModal").modal("hide");
+    });
+
     $("body").on('click', ".rr-report-agreement", function (e) {
         var idAgreement = $(this).data("id-agreement");
         url = "/TenancyReports/GetAgreement?idAgreement=" + idAgreement;
@@ -132,7 +162,7 @@
         e.preventDefault();
     });
 
-    $("#preContractModal, #openDateModal, #tenancyWarningModal, #tenancyReasonModal").on("change", "select", function () {
+    $("#preContractModal, #openDateModal, #tenancyWarningModal, #tenancyReasonModal, #tenancyActAfModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
 
