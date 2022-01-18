@@ -95,6 +95,19 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
+
+
+        public byte[] ActAf(int idProcess, int idPreparer)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "id_process", idProcess },
+                { "id_preparer", idPreparer },
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\act_af");
+            return DownloadFile(fileNameReport);
+        }
+
         public byte[] Agreement(int idAgreement)
         {
             var arguments = new Dictionary<string, object>

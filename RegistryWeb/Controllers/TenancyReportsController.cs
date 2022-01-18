@@ -184,6 +184,29 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult GetActAf(int idProcess, int idPreparer)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+            try
+            {
+                if (!dataService.HasRentObjects(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
+                }
+                if (!dataService.HasTenant(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
+                }
+                var file = reportService.ActAf(idProcess, idPreparer);
+                return File(file, odtMime, string.Format(@"Акт приема-передачи (АФ) № {0}.odt", idProcess));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
         public IActionResult GetAgreement(int idAgreement)
         {
             if (!securityService.HasPrivilege(Privileges.TenancyRead))

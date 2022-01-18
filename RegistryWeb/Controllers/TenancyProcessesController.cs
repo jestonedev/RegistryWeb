@@ -48,9 +48,7 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("PageOptions");
                 HttpContext.Session.Remove("FilterOptions");
             }
-            ViewBag.SecurityService = securityService;
-            ViewBag.DistrictCommittees = new SelectList(dataService.DistrictCommittees, "IdCommittee", "NameNominative");
-            ViewBag.DistrictCommitteesPreambles = new SelectList(dataService.DistrictCommitteesPreContractPreambles, "IdPreamble", "Name");
+            InitializeViewBagCommonDictionaries();
 
             var vm = dataService.GetViewModel(
                 viewModel.OrderOptions,
@@ -62,6 +60,14 @@ namespace RegistryWeb.Controllers
             return View(vm);
         }
 
+        private void InitializeViewBagCommonDictionaries()
+        {
+            ViewBag.SecurityService = securityService;
+            ViewBag.DistrictCommittees = new SelectList(dataService.DistrictCommittees, "IdCommittee", "NameNominative");
+            ViewBag.DistrictCommitteesPreambles = new SelectList(dataService.DistrictCommitteesPreContractPreambles, "IdPreamble", "Name");
+            ViewBag.PreparersSelectList = new SelectList(dataService.Preparers, "IdPreparer", "PreparerName");
+        }
+
         private void InitializeViewBag(string action, string returnUrl, bool canEditBaseInfo, bool canEditEmailsOnly)
         {
             ViewBag.Action = action;
@@ -71,9 +77,7 @@ namespace RegistryWeb.Controllers
             {
                 ViewBag.ReturnUrl = returnUrl;
             }
-            ViewBag.SecurityService = securityService;
-            ViewBag.DistrictCommittees = new SelectList(dataService.DistrictCommittees, "IdCommittee", "NameNominative");
-            ViewBag.DistrictCommitteesPreambles = new SelectList(dataService.DistrictCommitteesPreContractPreambles, "IdPreamble", "Name");
+            InitializeViewBagCommonDictionaries();
         }
 
         // GET: TenancyProcesses/Details/5
