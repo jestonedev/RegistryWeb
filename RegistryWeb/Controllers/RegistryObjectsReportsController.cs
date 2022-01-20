@@ -74,7 +74,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.GetStatisticBuildingReport(typeReport);
-                return File(file, odsMime, "Статистика по муниципальным жилым зданиям");
+                return File(file, odsMime, "Статистика по муниципальным жилым зданиям.ods");
             }
             catch (Exception ex)
             {
@@ -89,7 +89,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.GetStatisticPremiseReport(typeReport);
-                return File(file, odsMime, "Статистика по муниципальным жилым помещениям");
+                return File(file, odsMime, "Статистика по муниципальным жилым помещениям.ods");
             }
             catch (Exception ex)
             {
