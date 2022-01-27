@@ -579,11 +579,23 @@ namespace RegistryWeb.DataServices
             registryContext.SaveChanges();
         }
 
-        internal void Edit(Building newBuilding)
+        internal void Edit(Building newBuilding, bool canEditBaseInfo, bool canEditLandInfo)
         {
             //Добавление и радактирование
-            registryContext.Buildings.Update(newBuilding);
-            registryContext.SaveChanges();
+            if (!canEditBaseInfo && canEditLandInfo)
+            {
+                var building = registryContext.Buildings.FirstOrDefault(r => r.IdBuilding == newBuilding.IdBuilding);
+                building.LandArea = newBuilding.LandArea;
+                building.LandCadastralDate = newBuilding.LandCadastralDate;
+                building.LandCadastralNum = newBuilding.LandCadastralNum;
+                registryContext.SaveChanges();
+            }
+            else
+            if (canEditBaseInfo)
+            {
+                registryContext.Buildings.Update(newBuilding);
+                registryContext.SaveChanges();
+            }
         }
     }
 }
