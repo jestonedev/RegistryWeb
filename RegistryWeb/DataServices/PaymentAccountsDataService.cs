@@ -1202,7 +1202,7 @@ namespace RegistryWeb.DataServices
         {
             var accountsAssoc = GetAccountIdsAssocs(payments);
             var accountsIds = accountsAssoc.Select(r => r.IdAccountActual);
-            var claims = registryContext.Claims.Where(c => accountsIds.Contains(c.IdAccount));
+            var claims = registryContext.Claims.Where(c => c.IdAccount != null && accountsIds.Contains(c.IdAccount.Value));
             var claimIds = claims.Select(r => r.IdClaim);
 
             var claimLastStatesIds = from row in registryContext.ClaimStates

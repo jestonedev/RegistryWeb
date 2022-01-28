@@ -64,9 +64,9 @@
         @foreach (var item in Model.Claims)
         {
             RegistryWeb.Models.Entities.Payment lastPaymentInfo = null;
-            if (Model.LastPaymentInfo.ContainsKey(item.IdAccount))
+            if (item.IdAccount != null && Model.LastPaymentInfo.ContainsKey(item.IdAccount.Value))
             {
-                lastPaymentInfo = Model.LastPaymentInfo[item.IdAccount];
+                lastPaymentInfo = Model.LastPaymentInfo[item.IdAccount.Value];
             }
             var lastClaimState = item.ClaimStates.OrderByDescending(cs => cs.IdState).FirstOrDefault();
             var isOpenedClaim = (lastClaimState == null || lastClaimState.IdStateType != 6);
@@ -214,11 +214,11 @@
                     </div>
                 </td>
                 <td style="position: relative">
-                    @if (Model.RentObjects.ContainsKey(item.IdAccount))
+                    @if (item.IdAccount != null && Model.RentObjects.ContainsKey(item.IdAccount.Value))
                     {
                         <div class="mb-2">
                             <b>По жилищному фонду: </b><br />
-                            @foreach (var address in Model.RentObjects[item.IdAccount])
+                            @foreach (var address in Model.RentObjects[item.IdAccount.Value])
                             {
                                 @await Component.InvokeAsync("ClaimsAddressComponent", new { address = address, idClaim = item.IdClaim })
                             }

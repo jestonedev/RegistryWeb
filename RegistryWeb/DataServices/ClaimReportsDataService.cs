@@ -32,7 +32,7 @@ namespace RegistryWeb.DataServices
 
         internal List<int> GetAccountIds(List<int> idClaims)
         {
-            return registryContext.Claims.Where(r => idClaims.Contains(r.IdClaim)).Select(r => r.IdAccount).Distinct().ToList();
+            return registryContext.Claims.Where(r => idClaims.Contains(r.IdClaim) && r.IdAccount != null).Select(r => r.IdAccount.Value).Distinct().ToList();
         }
 
         public ClaimReportsVM GetViewModel()

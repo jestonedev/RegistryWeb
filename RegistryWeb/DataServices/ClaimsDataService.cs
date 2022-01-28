@@ -122,7 +122,7 @@ namespace RegistryWeb.DataServices
             }
             if (claim.ClaimPersons == null || !claim.ClaimPersons.Any())
             {
-                var addressInfix = GetPaymentAccountAddressInfix(claim.IdAccount);
+                var addressInfix = GetPaymentAccountAddressInfix(claim.IdAccount ?? 0);
                 var tenancyPersons = GetTenancyPersonForAddressInfix(addressInfix.Infix);
                 claim.ClaimPersons = tenancyPersons.Select(r => new ClaimPerson
                 {
@@ -503,7 +503,7 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IdAccount != null)
             {
                 var ids = GetAccountIdsWithSameAddress(filterOptions.IdAccount.Value);
-                query = query.Where(p => ids.Contains(p.IdAccount) || p.IdAccount == filterOptions.IdAccount || p.IdAccountAdditional == filterOptions.IdAccount);
+                query = query.Where(p => ids.Contains(p.IdAccount ?? 0) || p.IdAccount == filterOptions.IdAccount || p.IdAccountAdditional == filterOptions.IdAccount);
             }
 
             if (filterOptions.AmountTotal != null)
@@ -895,13 +895,13 @@ namespace RegistryWeb.DataServices
 
         internal Dictionary<int, List<Address>> GetRentObjects(IEnumerable<Claim> claims)
         {
-            var ids = claims.Select(r => r.IdAccount).Distinct();
+            var ids = claims.Where(r => r.IdAccount != null).Select(r => r.IdAccount.Value).Distinct();
             return GetRentObjects(ids);
         }
 
         internal Dictionary<int, Payment> GetLastPaymentsInfo(IEnumerable<Claim> claims)
         {
-            var ids = claims.Select(r => r.IdAccount).Distinct();
+            var ids = claims.Where(r => r.IdAccount != null).Select(r => r.IdAccount.Value).Distinct();
             return GetLastPaymentsInfo(ids);
         }
 

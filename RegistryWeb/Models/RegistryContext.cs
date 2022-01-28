@@ -164,6 +164,14 @@ namespace RegistryWeb.Models
         public virtual DbSet<PrivAdditionalEstate> PrivAdditionalEstates { get; set; }
         public virtual DbSet<PrivContractorWarrantTemplate> PrivContractorWarrantTemplates { get; set; }
 
+        //Платежи
+        public virtual DbSet<KumiAccount> KumiAccounts { get; set; }
+        public virtual DbSet<KumiAccountState> KumiAccountStates { get; set; }
+        public virtual DbSet<KumiCharge> KumiCharges { get; set; }
+        public virtual DbSet<KumiPayment> KumiPayments { get; set; }
+        public virtual DbSet<KumiPaymentCharge> KumiPaymentCharges { get; set; }
+        public virtual DbSet<KumiPaymentClaim> KumiPaymentClaims { get; set; }
+
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
         public virtual DbSet<TenancyActiveProcess> TenancyActiveProcesses { get; set; }
@@ -317,6 +325,13 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new PrivRealtorConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PrivAdditionalEstateConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PrivContractorWarrantTemplateConfiguration(nameDatebase));
+
+            modelBuilder.ApplyConfiguration(new KumiAccountConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiAccountStateConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiChargeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPaymentConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPaymentChargeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPaymentClaimConfiguration(nameDatebase));
         }
     }
 }

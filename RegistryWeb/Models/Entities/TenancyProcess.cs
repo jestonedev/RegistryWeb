@@ -23,6 +23,7 @@ namespace RegistryWeb.Models.Entities
         public int? IdRentType { get; set; }
         public int? IdRentTypeCategory { get; set; }
         public int? IdWarrant { get; set; }
+        public int? IdAccount { get; set; }
         public string RegistrationNum { get; set; }
         public DateTime? RegistrationDate { get; set; }
         public DateTime? IssueDate { get; set; }
@@ -38,6 +39,7 @@ namespace RegistryWeb.Models.Entities
         public string SubTenancyNum { get; set; }
         public byte Deleted { get; set; }
 
+        public virtual KumiAccount IdAccountNavigation { get; set; }
         public virtual TenancyActiveProcess TenancyActiveContractNavigation { get; set; }
         public virtual RentTypeCategory IdRentTypeCategoryNavigation { get; set; }
         public virtual RentType IdRentTypeNavigation { get; set; }

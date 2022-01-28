@@ -80,11 +80,11 @@
                 <tr>
                     <td>@item.IdClaim</td>
                     <td>
-                        @if (Model.RentObjects.ContainsKey(item.IdAccount))
+                        @if (item.IdAccount != null && Model.RentObjects.ContainsKey(item.IdAccount.Value))
                         {
                             <div class="mb-2">
                                 <b>По жилищному фонду: </b><br />
-                                @foreach (var address in Model.RentObjects[item.IdAccount])
+                                @foreach (var address in Model.RentObjects[item.IdAccount.Value])
                                 {
                                     @await Component.InvokeAsync("ClaimsAddressComponent", new { address = address, idClaim = item.IdClaim })
                                 }
