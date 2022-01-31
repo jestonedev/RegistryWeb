@@ -102,6 +102,8 @@ namespace RegistryWeb
             services.AddTransient<PrivatizationReportsDataService>();
             services.AddTransient<PrivatizationReportService>();
             services.AddTransient<PrivRealtorService>();
+            services.AddTransient<KumiAccountsDataService>();
+            services.AddTransient<KumiPaymentsDataService>();
             services.AddHttpContextAccessor();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<TokenApiStorage>();
