@@ -12,6 +12,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public string IdStreet { get; set; }
         public string House { get; set; }
         public string PremisesNum { get; set; }
+        public string OldSystemAddress { get; set; }
         public DateTime? DateIssueCivil { get; set; }
         public string Surname { get; set; }
         public string Name { get; set; }
@@ -23,7 +24,7 @@ namespace RegistryWeb.ViewOptions.Filter
         {
             return RegNumber == null && IdRegion == null && IdStreet == null && House == null && 
                 PremisesNum == null && DateIssueCivil == null && Surname == null &&
-                Name == null && Patronymic == null && BirthDate == null && IsRefusenik == false;
+                Name == null && Patronymic == null && BirthDate == null && IsRefusenik == false && OldSystemAddress == null;
         }
 
         public bool IsEmpty()

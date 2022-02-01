@@ -41,7 +41,7 @@
     font-size: 75%;
 }
 
-@media(min-width: 992px) {
+@media(min-width: 768px) {
     .rr-is-refusenik-filter-checkbox {
         padding-top: 24pt;
         text-align: center;
