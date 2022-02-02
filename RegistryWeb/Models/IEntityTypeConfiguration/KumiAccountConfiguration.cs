@@ -58,8 +58,12 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("last_charge_date")
                 .HasColumnType("date");
 
-            builder.Property(e => e.CurrentBalance)
-                .HasColumnName("current_balance")
+            builder.Property(e => e.CurrentBalanceTenancy)
+                .HasColumnName("current_balance_tenancy")
+                .HasColumnType("decimal(12,2)");
+
+            builder.Property(e => e.CurrentBalancePenalty)
+                .HasColumnName("current_balance_penalty")
                 .HasColumnType("decimal(12,2)");
 
             builder.Property(e => e.Deleted)

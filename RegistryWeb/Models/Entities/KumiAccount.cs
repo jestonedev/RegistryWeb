@@ -20,7 +20,8 @@ namespace RegistryWeb.Models.Entities
         public byte RecalcMarker { get; set; }
         public string RecalcReason { get; set; }
         public DateTime? LastChargeDate { get; set; }
-        public decimal? CurrentBalance { get; set; }
+        public decimal? CurrentBalanceTenancy { get; set; }
+        public decimal? CurrentBalancePenalty { get; set; }
         public byte Deleted { get; set; }
         public virtual KumiAccountState State { get; set; }
         public virtual IList<TenancyProcess> TenancyProcesses { get; set; }
