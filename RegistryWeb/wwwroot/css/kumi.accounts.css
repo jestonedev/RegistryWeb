@@ -1,0 +1,52 @@
+﻿.tp-table > thead > tr > th a.sort {
+    color: #888;
+}
+
+.tp-table > thead > tr > th a.sort:hover {
+    color: black;
+}
+
+.tp-table > thead > tr > th a.sort.tp-sorted {
+    color: #007bff;
+}
+
+.tp-table > thead > tr > th a.sort.tp-sorted:hover {
+    color: #0056b3;
+}
+
+.rr-payment-filter-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 0.24rem;
+}
+
+.pa-open-claim-btn {
+    margin-top: 0;
+}
+
+@media(min-width: 576px) {
+    .pa-open-claim-btn {
+        margin-top: 27px;
+    }
+}
+
+@media(min-width: 768px) {
+    .pa-open-claim-btn {
+        margin-top: 31px;
+    }
+}
+
+.rr-account-list-eye-btn {
+    margin-top: -5px;
+    font-size: 80%;
+}
+
+.rr-account-list-eye-btn:focus  {
+    box-shadow: none;
+}
+
+.rr-account-additional-info {
+    display: none;
+}

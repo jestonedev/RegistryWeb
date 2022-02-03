@@ -1,7 +1,217 @@
-﻿
+﻿@model RegistryWeb.ViewModel.KumiAccountsVM;
+@using RegistryWeb.SecurityServices;
+
 @{
-    ViewData["Title"] = "Index";
+    var securityService = (SecurityService)ViewData["SecurityService"];
 }
 
-<h1>Index</h1>
+<form asp-action="Index" method="get" class="filterForm" autocomplete="off">
+    <input type="hidden" asp-for="OrderOptions.OrderDirection" />
+    <input type="hidden" asp-for="OrderOptions.OrderField" />
+    <input type="hidden" asp-for="PageOptions.CurrentPage" />
+    <input type="hidden" asp-for="PageOptions.SizePage" />
+    <input type="hidden" asp-for="FilterOptions.Address.AddressType" />
+    <input type="hidden" asp-for="FilterOptions.Address.Id" />
+
+    <div class="form-row">
+        @if (Model.FilterOptions.FrontSideAccount == null)
+        {
+            <div class="form-group col-12 col-md-3 col-lg-3">
+                <input type="text" class="form-control input-filter-numbers" title="Лицевой счет" asp-for="FilterOptions.FrontSideAccount" placeholder="Лицевой счет" />
+            </div>
+        }
+        else
+        {
+            <div class="form-group col-12 col-md-3 col-lg-3">
+                <div class="input-group">
+                    <input type="text" class="form-control input-filter-numbers" title="Лицевой счет" asp-for="FilterOptions.FrontSideAccount" placeholder="Лицевой счет" />
+                    <div class="input-group-append h-auto d-inline-block">
+                        <button class="btn btn-outline-secondary" type="button" id="accountFilterClearBtn">&#10006;</button>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (Model.FilterOptions.IsAddressEmpty())
+        {
+            var col_md = Model.FilterOptions.IsModalEmpty() ? "col-md-5" : "col-md-4";
+            var col_xl = Model.FilterOptions.IsModalEmpty() ? "col-xl-5" : "col-xl-4";
+            <div class="form-group col-12 @col_md col-lg-4 @col_xl">
+                <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+            </div>
+        }
+        else
+        {
+            <div class="form-group col-12 col-md-5 col-lg-4 col-xl-5">
+                <div class="input-group">
+                    <input type="text" class="form-control col rr-alt-address-search" asp-for="FilterOptions.Address.Text" title="Адрес" placeholder="Адрес" />
+                    <div class="input-group-append h-auto d-inline-block">
+                        <button class="btn btn-outline-secondary" type="button" id="addressFilterClearBtn">&#10006;</button>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (Model.FilterOptions.IsModalEmpty())
+        {
+            <div class="form-group col-6 col-md-2 col-lg-2 col-xl-1">
+                <a class="btn btn-block btn-secondary" href="#" id="filterModalShow">Фильтр</a>
+            </div>
+        }
+        else
+        {
+            <div class="form-group btn-group col-6 col-md-3 col-lg-2 col-xl-2">
+                <a class="btn btn-block btn-secondary" href="#" id="filterModalShow" title="Фильтр">Фильтр</a>
+                <a class="btn btn-outline-secondary" href="#" id="filterClearBtn" title="Сбросить фильтр">&#10006;</a>
+            </div>
+        }
+        <div class="form-group col-6 col-md-2 col-lg-3">
+            <div class="dropdown">
+                <button class="btn btn-success dropdown-toggle col-md-12" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Мастер операций">
+                    <span class="oi oi-grid-three-up"></span>
+                    <span class="d-md-none d-lg-inline">Мастер операций</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                    <a href="#" class="dropdown-item addselect">Добавить отфильтрованные лицевые счета БКС</a>
+                    <a class="dropdown-item" asp-controller="KumiAccounts" asp-action="AccountsReports">Перейти в мастер</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade bd-example-modal-xl" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Фильтр лицевых счетов</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-6 col-lg-3">
+                            <label asp-for="FilterOptions.AccountGisZkh">ЕЛС</label>
+                            <input type="text" class="form-control" asp-for="FilterOptions.AccountGisZkh" title="Единый лицевой счет для ГИС ЖКХ">
+                        </div>
+                        <div class="form-group col-6 col-lg-3">
+                            <label asp-for="FilterOptions.Account">Лицевой счет</label>
+                            <input type="text" class="form-control input-filter-numbers" asp-for="FilterOptions.Account" title="Лицевой счет">
+                        </div>
+                        <div class="form-group col-6 col-lg-6">
+                            <label asp-for="FilterOptions.Tenant">ФИО нанимателя</label>
+                            <input type="text" class="form-control input-filter-snp" asp-for="FilterOptions.Tenant" title="ФИО нанимателя">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-2">
+                            <label asp-for="FilterOptions.IdRegion">Район</label>
+                            <select class="selectpicker form-control" data-size="10" data-live-search="true" title="Район" asp-for="FilterOptions.IdRegion" asp-items="@Model.KladrRegionsList">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-4">
+                            <label asp-for="FilterOptions.IdStreet">Улица</label>
+                            <select class="selectpicker form-control" data-size="10" data-live-search="true" title="Улица" asp-for="FilterOptions.IdStreet" asp-items="@Model.KladrStreetsList">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.House">Номер дома</label>
+                            <input type="text" class="form-control input-filter-house" asp-for="FilterOptions.House" title="Номер дома">
+                        </div>
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label asp-for="FilterOptions.PremisesNum">Номер помещения</label>
+                            <input type="text" class="form-control input-filter-premise-num" asp-for="FilterOptions.PremisesNum" title="Номер помещения">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12 col-md-6">
+                            <label asp-for="FilterOptions.IdPreset">Особые критерии поиска</label>
+                            <select class="selectpicker form-control" title="Особые критерии поиска" asp-for="FilterOptions.IdPreset">
+                                <option></option>
+                                <option value="1">Лицевые счета без исковых работ</option>
+                                <option value="2">Лицевые счета с исковыми работами (включая завершенные)</option>
+                                <option value="3">Лицевые счета с незавершенными исковыми работами</option>
+                                <option value="4">Лицевые счета, в которых отсутствуют незавершенные исковые работы</option>
+                                <option value="5">В суд</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-12 col-md-6">
+                            <label asp-for="FilterOptions.IdClaimsBehavior">Правило учета ИР при фильтрации</label>
+                            <select class="selectpicker form-control" title="Исключенные из фильтрации ИР" asp-for="FilterOptions.IdClaimsBehavior">
+                                <option selected>Все лицевые счета (игнорировать признак)</option>
+                                <option value="1">Лицевые счета, по которым отсутствуют ИР с признаком "Не учитывать при фильтрации"</option>
+                                <option value="2">Лицевые счета, по которым присутствуют ИР с признаком "Не учитывать при фильтрации"</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-12 col-md-12">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="exampleCheck1" asp-for="FilterOptions.Emails">
+                                <label class="form-check-label" for="exampleCheck1">Указан адрес электронной почты</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card rr-account-sum-filter-card mt-2">
+                        <div class="card-header d-flex justify-content-between">
+                            <h3>Фильтр по платежу</h3>
+                            <div class="btn-group" role="group">
+                                <a href="#" id="AccountSumFiltersToggler" class="form-control btn btn-primary" title="Развернуть фильтр по платежу" style="font-weight:bold;">∨</a>
+                            </div>
+                        </div>
+                        <div class="card-body toggle-hide" id="AccountSumFilters">
+                            <div class="form-row">
+                                <input type="hidden" asp-for="FilterOptions.CurrentBalanceTotalOp" />
+                                <div class="form-group col-md-6 col-lg-4">
+                                    <label asp-for="FilterOptions.CurrentBalanceTotal" class="rr-payment-filter-label">Сальдо вх. (Итого)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.CurrentBalanceTotal">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.CurrentBalanceTenancyOp" />
+                                <div class="form-group col-md-6 col-lg-4">
+                                    <label asp-for="FilterOptions.CurrentBalanceTenancy" class="rr-payment-filter-label">Сальдо вх. (Найм)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.CurrentBalanceTenancy">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.CurrentBalancePenaltyOp" />
+                                <div class="form-group col-md-6 col-lg-4">
+                                    <label asp-for="FilterOptions.CurrentBalancePenalty" class="rr-payment-filter-label">Сальдо вх. (Пени)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.CurrentBalancePenalty">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="filterClearModalBtn" type="button" class="btn btn-secondary">Очистить</button>
+                    <button id="searchModalBtn" type="button" class="btn btn-secondary">Найти</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 

@@ -14,6 +14,7 @@ namespace RegistryWeb.Models.Entities
 
         public int IdAccount { get; set; }
         public string Account { get; set; }
+        public string AccountGisZkh { get; set; }
         public int IdState { get; set; }
         public DateTime BeginDate { get; set; }
         public DateTime? AnnualDate { get; set; }

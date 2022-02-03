@@ -7,7 +7,6 @@ namespace RegistryWeb.Models
 {
     public class TenancyRentObject
     {
-        public int IdProcess { get; set; }
         public Address Address { get; set; }
         public double TotalArea { get; set; }
         public double LivingArea { get; set; }

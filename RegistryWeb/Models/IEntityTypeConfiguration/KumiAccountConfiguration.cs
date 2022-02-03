@@ -30,6 +30,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .IsUnicode(false)
                 .IsRequired();
 
+            builder.Property(e => e.AccountGisZkh)
+                .HasColumnName("account_gis_zkh")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
             builder.Property(e => e.IdState)
                 .HasColumnName("id_state")
                 .HasColumnType("int(11)")

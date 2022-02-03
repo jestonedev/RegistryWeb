@@ -14,5 +14,7 @@ namespace RegistryWeb.ViewModel
         public DateTime? StartDeptPeriod { get; set; }
         public DateTime? EndDeptPeriod { get; set; }
         public bool EndedForFilter { get; set; }
+        public decimal? AmountTenancy { get; set; }
+        public decimal? AmountPenalty { get; set; }
     }
 }
