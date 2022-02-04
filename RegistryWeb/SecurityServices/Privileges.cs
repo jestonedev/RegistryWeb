@@ -46,13 +46,13 @@ namespace RegistryWeb.SecurityServices
         PrivDirectoriesReadWrite = 20480,
         PrivAnalize = 36864,
         PrivAll = PrivReadWrite | PrivDirectoriesReadWrite | PrivAnalize,
-        ExchangeRead = 65536,
-        ExchangeWrite = 131072,
-        ExchangeReadWrite = 196608,
-        ExchangeDirectoriesWrite = 262144,
-        ExchangeDirectoriesReadWrite = 327680,
-        ExchangeAnalize = 589824,
-        ExchangeAll = ExchangeReadWrite | ExchangeDirectoriesReadWrite | ExchangeAnalize,
+        AccountsRead = 65536,
+        AccountsWrite = 131072,
+        AccountsReadWrite = 196608,
+        AccountsDirectoriesWrite = 262144,
+        AccountsDirectoriesReadWrite = 327680,
+        AccountsAnalize = 589824,
+        AccountsAll = AccountsReadWrite | AccountsDirectoriesReadWrite | AccountsAnalize,
         OwnerRead = 1048576,
         OwnerWrite = 2097152,
         OwnerReadWrite = 3145728,
@@ -67,6 +67,6 @@ namespace RegistryWeb.SecurityServices
         ResettleAnalize = 150994944,
         ResettleAll = ResettleReadWrite | ResettleDirectoriesReadWrite | ResettleAnalize,
         OwnerAll = OwnerReadWrite | OwnerDirectoriesReadWrite | OwnerAnalize,
-        All = RegistryAll | TenancyAll | ClaimsAll | PrivAll | ExchangeAll | OwnerAll | ResettleAll
+        All = RegistryAll | TenancyAll | ClaimsAll | PrivAll | AccountsAll | OwnerAll | ResettleAll
     }
 }

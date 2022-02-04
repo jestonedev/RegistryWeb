@@ -14,9 +14,20 @@
     <input type="hidden" asp-for="FilterOptions.Address.Id" />
 
     <div class="form-row">
+        @if (securityService.HasPrivilege(Privileges.AccountsWrite))
+        {
+            <div class="form-group col-2 col-md-1 col-lg-1">
+                <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="TenancyProcesses" asp-action="Create"
+                   asp-route-idObject="@(Model.FilterOptions.IdBuilding ?? Model.FilterOptions.IdPremises ?? Model.FilterOptions.IdSubPremises)"
+                   asp-route-addressType="@(Model.FilterOptions.IdBuilding != null ? AddressTypes.Building :
+                                             Model.FilterOptions.IdPremises != null ? AddressTypes.Premise :
+                                             Model.FilterOptions.IdSubPremises != null ? AddressTypes.SubPremise : AddressTypes.None)">&#10010;</a>
+            </div>
+        }
+
         @if (Model.FilterOptions.FrontSideAccount == null)
         {
-            <div class="form-group col-12 col-md-3 col-lg-3">
+            <div class="form-group col-10 @(securityService.HasPrivilege(Privileges.AccountsWrite) ? "col-md-2 col-lg-2" : "col-md-3 col-lg-3")">
                 <input type="text" class="form-control input-filter-numbers" title="Лицевой счет" asp-for="FilterOptions.FrontSideAccount" placeholder="Лицевой счет" />
             </div>
         }
@@ -96,9 +107,16 @@
                             <label asp-for="FilterOptions.Account">Лицевой счет</label>
                             <input type="text" class="form-control input-filter-numbers" asp-for="FilterOptions.Account" title="Лицевой счет">
                         </div>
-                        <div class="form-group col-6 col-lg-6">
-                            <label asp-for="FilterOptions.Tenant">ФИО нанимателя</label>
-                            <input type="text" class="form-control input-filter-snp" asp-for="FilterOptions.Tenant" title="ФИО нанимателя">
+                        <div class="form-group col-6 col-lg-3">
+                            <label asp-for="FilterOptions.IdAccountState">Состояние</label>
+                            <select class="selectpicker form-control" title="Состояние лицевого счета" 
+                                asp-for="FilterOptions.IdAccountState" asp-items="@Model.AccountStates">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-6 col-lg-3">
+                            <label asp-for="FilterOptions.Tenant">ФИО участника найма</label>
+                            <input type="text" class="form-control input-filter-snp" asp-for="FilterOptions.Tenant" title="ФИО участника найма">
                         </div>
                     </div>
                     <div class="form-row">
@@ -132,7 +150,9 @@
                                 <option value="2">Лицевые счета с исковыми работами (включая завершенные)</option>
                                 <option value="3">Лицевые счета с незавершенными исковыми работами</option>
                                 <option value="4">Лицевые счета, в которых отсутствуют незавершенные исковые работы</option>
-                                <option value="5">В суд</option>
+                                <option value="5">Лицевые счета без привязки к найму</option>
+                                <option value="6">Действующие лицевые счета без действующих наймов</option>
+                                <option value="7">Аннулированные лицевые счета с действующими наймами</option>
                             </select>
                         </div>
                         <div class="form-group col-12 col-md-6">
@@ -153,7 +173,7 @@
 
                     <div class="card rr-account-sum-filter-card mt-2">
                         <div class="card-header d-flex justify-content-between">
-                            <h3>Фильтр по платежу</h3>
+                            <h3>Фильтр по сальдо</h3>
                             <div class="btn-group" role="group">
                                 <a href="#" id="AccountSumFiltersToggler" class="form-control btn btn-primary" title="Развернуть фильтр по платежу" style="font-weight:bold;">∨</a>
                             </div>

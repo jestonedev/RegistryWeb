@@ -14,5 +14,6 @@ namespace RegistryWeb.ViewModel
         public Dictionary<int, List<ClaimInfo>> ClaimsInfo { get; set; }
         public SelectList KladrRegionsList { get; set; }
         public SelectList KladrStreetsList { get; set; }
+        public SelectList AccountStates { get; set; }
     }
 }

@@ -26,7 +26,7 @@ namespace RegistryWeb.Controllers
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+            if (!securityService.HasPrivilege(Privileges.AccountsRead))
                 return View("NotAccess");
             if (isBack)
             {

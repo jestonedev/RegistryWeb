@@ -8,6 +8,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public string FrontSideAccount { get; set; }
         public string Account { get; set; }
         public string AccountGisZkh { get; set; }
+        public int? IdAccountState { get; set; }
         public string Tenant { get; set; }
         public bool Emails { get; set; }
         public string IdStreet { get; set; }
@@ -42,7 +43,7 @@ namespace RegistryWeb.ViewOptions.Filter
         {
             return Account == null && AccountGisZkh == null && Tenant == null &&
                 IdRegion == null && IdStreet == null && House == null && PremisesNum == null && IdPreset == null && IdClaimsBehavior == null &&
-                CurrentBalanceTenancy == null && CurrentBalancePenalty == null && CurrentBalanceTotal == null && !Emails;
+                CurrentBalanceTenancy == null && CurrentBalancePenalty == null && CurrentBalanceTotal == null && !Emails && IdAccountState == null;
         }
     }
 }
