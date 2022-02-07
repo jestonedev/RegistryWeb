@@ -10,7 +10,7 @@ $(function () {
         var idRentType = $(this).val();
         $("#TenancyProcess_IdRentTypeCategory option[value]").remove();
         $(idRentTypeCategories).each(function (idx, option) {
-            if ($(option).data("id-rent-type")+"" === idRentType) {
+            if ($(option).data("id-rent-type") + "" === idRentType) {
                 $("#TenancyProcess_IdRentTypeCategory").append(option);
             }
         });
@@ -45,10 +45,26 @@ $(function () {
 
 
         regNum.val($.trim(regNum.val()));
-        if (!regNum.hasClass("input-validation-error")) {
-            if (regDate.val() !== "" && regNum.val() === "") {
+        if (regDate.val() !== "" && regNum.val() === "") {
+            let error = {};
+            error[regNum.attr("name")] = "Введите номер договора найма";
+            validator.showErrors(error);
+            isValid = false;
+        } else {
+            var regNumExist = false;
+            var idProcess = $('#TenancyProcess_IdProcess').val();
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + '/TenancyProcesses/RegNumExist',
+                data: { regNum: regNum.val(), idProcess },
+                async: false,
+                success: function (data) {
+                    regNumExist = data;
+                }
+            });
+            if (regNumExist) {
                 let error = {};
-                error[regNum.attr("name")] = "Введите номер договора найма";
+                error[regNum.attr("name")] = "Введенный номер уже используется";
                 validator.showErrors(error);
                 isValid = false;
             } else {
@@ -65,7 +81,7 @@ $(function () {
             clearValidationError(regDate);
             removeErrorFromValidator(validator, regDate);
         }
-        
+
         var subTenancyNum = $("#TenancyProcess_SubTenancyNum");
         var subTenancyDate = $("#TenancyProcess_SubTenancyDate");
 
@@ -97,35 +113,10 @@ $(function () {
         tenancyCustomValidations(validator);
     });
 
-    $.validator.addMethod('regNumExist', function (value, element) {
-        var regNumExist = false;
-        var idProcess = $('#TenancyProcess_IdProcess').val();
-        $.ajax({
-            type: 'POST',
-            url: window.location.origin + '/TenancyProcesses/RegNumExist',
-            data: { regNum: value, idProcess },
-            async: false,
-            success: function (data) {
-                regNumExist = data;
-            }
-        });
-        return !regNumExist;
-    });
-
     $("#TenancyProcessForm").on("submit", function (e) {
         var action = $("#TenancyProcessForm").data("action");
         $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
         var validator = $(this).validate();
-        validator.settings.rules = {
-            "TenancyProcess.RegistrationNum": {
-                regNumExist: true
-            }
-        };
-        validator.settings.messages = {
-            "TenancyProcess.RegistrationNum": {
-                regNumExist: "Введенный номер уже используется"
-            }
-        };
         var isFormValid = $(this).valid();
         if (!tenancyCustomValidations(validator)) {
             isFormValid = false;
@@ -177,73 +168,73 @@ $(function () {
 
             e.preventDefault();
         } else
-        if (itemsInEditMode.length > 0 && action === "Edit") {
-            itemsInEditMode.each(function (idx, elem) {
-                if ($(elem).closest("ul.list-group").hasClass("toggle-hide")) {
-                    var toggler = $(elem).closest(".card").find(".card-header .tenancy-process-toggler").first();
-                    toggler.click();
+            if (itemsInEditMode.length > 0 && action === "Edit") {
+                itemsInEditMode.each(function (idx, elem) {
+                    if ($(elem).closest("ul.list-group").hasClass("toggle-hide")) {
+                        var toggler = $(elem).closest(".card").find(".card-header .tenancy-process-toggler").first();
+                        toggler.click();
+                    }
+                    var listGroupItem = $(elem).closest(".list-group-item");
+                    if (!listGroupItem.hasClass("list-group-item-warning")) {
+                        listGroupItem.addClass("list-group-item-warning");
+                    }
+                });
+                $([document.documentElement, document.body]).animate({
+                    scrollTop: itemsInEditMode.first().closest(".list-group-item").offset().top
+                }, 1000);
+
+                e.preventDefault();
+            }
+            else {
+                rentPeriodsCorrectNaming();
+                if (action !== "Create") return true;
+                var inputTemplate = "<input type='hidden' name='{0}' value='{1}'>";
+                // Переносим основания найма в форму
+                let tenancyReasons = getTenancyReasons();
+                for (let i = 0; i < tenancyReasons.length; i++) {
+                    let tr = "TenancyProcess.TenancyReasons[" + i + "].";
+                    $(this).append(inputTemplate.replace('{0}', tr + "IdReason").replace('{1}', tenancyReasons[i].IdReason));
+                    $(this).append(inputTemplate.replace('{0}', tr + "IdProcess").replace('{1}', tenancyReasons[i].IdProcess));
+                    $(this).append(inputTemplate.replace('{0}', tr + "IdReasonType").replace('{1}', tenancyReasons[i].IdReasonType));
+                    $(this).append(inputTemplate.replace('{0}', tr + "ReasonDate").replace('{1}', tenancyReasons[i].ReasonDate));
+                    $(this).append(inputTemplate.replace('{0}', tr + "ReasonNumber").replace('{1}', tenancyReasons[i].ReasonNumber));
                 }
-                var listGroupItem = $(elem).closest(".list-group-item");
-                if (!listGroupItem.hasClass("list-group-item-warning")) {
-                    listGroupItem.addClass("list-group-item-warning");
+
+                let tenancyPersons = getTenancyPersons();
+                for (let i = 0; i < tenancyPersons.length; i++) {
+                    let tp = "TenancyProcess.TenancyPersons[" + i + "].";
+                    for (let field in tenancyPersons[i]) {
+                        $(this).append(inputTemplate.replace('{0}', tp + field).replace('{1}', tenancyPersons[i][field]));
+                    }
                 }
-            });
-            $([document.documentElement, document.body]).animate({
-                scrollTop: itemsInEditMode.first().closest(".list-group-item").offset().top
-            }, 1000);
 
-            e.preventDefault();
-        }
-        else {
-            rentPeriodsCorrectNaming();
-            if (action !== "Create") return true;
-            var inputTemplate = "<input type='hidden' name='{0}' value='{1}'>";
-            // Переносим основания найма в форму
-            let tenancyReasons = getTenancyReasons();
-            for (let i = 0; i < tenancyReasons.length; i++) {
-                let tr = "TenancyProcess.TenancyReasons[" + i + "].";
-                $(this).append(inputTemplate.replace('{0}', tr + "IdReason").replace('{1}', tenancyReasons[i].IdReason));
-                $(this).append(inputTemplate.replace('{0}', tr + "IdProcess").replace('{1}', tenancyReasons[i].IdProcess));
-                $(this).append(inputTemplate.replace('{0}', tr + "IdReasonType").replace('{1}', tenancyReasons[i].IdReasonType));
-                $(this).append(inputTemplate.replace('{0}', tr + "ReasonDate").replace('{1}', tenancyReasons[i].ReasonDate));
-                $(this).append(inputTemplate.replace('{0}', tr + "ReasonNumber").replace('{1}', tenancyReasons[i].ReasonNumber));
-            }
-
-            let tenancyPersons = getTenancyPersons();
-            for (let i = 0; i < tenancyPersons.length; i++) {
-                let tp = "TenancyProcess.TenancyPersons[" + i + "].";
-                for (let field in tenancyPersons[i]) {
-                    $(this).append(inputTemplate.replace('{0}', tp + field).replace('{1}', tenancyPersons[i][field]));
+                let tenancyAgreements = getTenancyAgreements();
+                for (let i = 0; i < tenancyAgreements.length; i++) {
+                    let tp = "TenancyProcess.TenancyAgreements[" + i + "].";
+                    for (let field in tenancyAgreements[i]) {
+                        $(this).append(inputTemplate.replace('{0}', tp + field).replace('{1}', tenancyAgreements[i][field]));
+                    }
                 }
-            }
 
-            let tenancyAgreements = getTenancyAgreements();
-            for (let i = 0; i < tenancyAgreements.length; i++) {
-                let tp = "TenancyProcess.TenancyAgreements[" + i + "].";
-                for (let field in tenancyAgreements[i]) {
-                    $(this).append(inputTemplate.replace('{0}', tp + field).replace('{1}', tenancyAgreements[i][field]));
+                let tenancyRentObjects = getTenancyRentObjects();
+                for (let i = 0; i < tenancyRentObjects.length; i++) {
+                    let ro = "RentObjects[" + i + "].";
+                    $(this).append(inputTemplate.replace('{0}', ro + "Address.AddressType").replace('{1}', tenancyRentObjects[i].AddressType));
+                    $(this).append(inputTemplate.replace('{0}', ro + "Address.Id").replace('{1}', tenancyRentObjects[i].IdObject));
+                    $(this).append(inputTemplate.replace('{0}', ro + "RentArea").replace('{1}', tenancyRentObjects[i].RentArea));
+                }
+
+                let tenancyFiles = getTenancyFiles();
+                for (let i = 0; i < tenancyFiles.length; i++) {
+                    let tf = "TenancyProcess.TenancyFiles[" + i + "].";
+                    $(this).append(inputTemplate.replace('{0}', tf + "IdFile").replace('{1}', tenancyFiles[i].IdFile));
+                    $(this).append(inputTemplate.replace('{0}', tf + "IdProcess").replace('{1}', tenancyFiles[i].IdProcess));
+                    $(this).append(inputTemplate.replace('{0}', tf + "Description").replace('{1}', tenancyFiles[i].Description));
+                    let file = $(tenancyFiles[i].AttachmentFile).clone();
+                    file.attr("name", "TenancyFile[" + i + "]");
+                    $(this).append(file);
                 }
             }
-
-            let tenancyRentObjects = getTenancyRentObjects();
-            for (let i = 0; i < tenancyRentObjects.length; i++) {
-                let ro = "RentObjects[" + i + "].";
-                $(this).append(inputTemplate.replace('{0}', ro + "Address.AddressType").replace('{1}', tenancyRentObjects[i].AddressType));
-                $(this).append(inputTemplate.replace('{0}', ro + "Address.Id").replace('{1}', tenancyRentObjects[i].IdObject));
-                $(this).append(inputTemplate.replace('{0}', ro + "RentArea").replace('{1}', tenancyRentObjects[i].RentArea));
-            }
-
-            let tenancyFiles = getTenancyFiles();
-            for (let i = 0; i < tenancyFiles.length; i++) {
-                let tf = "TenancyProcess.TenancyFiles[" + i + "].";
-                $(this).append(inputTemplate.replace('{0}', tf + "IdFile").replace('{1}', tenancyFiles[i].IdFile));
-                $(this).append(inputTemplate.replace('{0}', tf + "IdProcess").replace('{1}', tenancyFiles[i].IdProcess));
-                $(this).append(inputTemplate.replace('{0}', tf + "Description").replace('{1}', tenancyFiles[i].Description));
-                let file = $(tenancyFiles[i].AttachmentFile).clone();
-                file.attr("name", "TenancyFile[" + i + "]");
-                $(this).append(file);
-            }
-        }
     });
 
     $("form").on("change", "select", function () {

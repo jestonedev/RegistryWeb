@@ -261,6 +261,10 @@ $(function () {
         return /^[0-9\\/а-яА-Я]*$/.test(value);
     });
 
+    $('.input-filter-account-zkh, .input-account-zkh').inputFilter(function (value) {
+        return /^[0-9а-яА-Я]*$/.test(value);
+    });
+
     $("#areaAvgCostModalBtn").on("click", function (e) {
         if ($("#areaAvgCostForm").length > 0) {
             $("#areaAvgCostForm").remove();

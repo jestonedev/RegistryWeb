@@ -22,19 +22,19 @@
     margin-bottom: 0.24rem;
 }
 
-.pa-open-claim-btn {
-    margin-top: 0;
+.account-open-claim-btn {
+    margin-top: 12px;
 }
 
 @media(min-width: 576px) {
-    .pa-open-claim-btn {
-        margin-top: 27px;
+    .account-open-claim-btn {
+        margin-top: 23px;
     }
 }
 
 @media(min-width: 768px) {
-    .pa-open-claim-btn {
-        margin-top: 31px;
+    .account-open-claim-btn {
+        margin-top: 27px;
     }
 }
 
@@ -49,4 +49,10 @@
 
 .rr-account-additional-info {
     display: none;
+}
+
+.rr-account-recalc-reason:disabled {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
 }

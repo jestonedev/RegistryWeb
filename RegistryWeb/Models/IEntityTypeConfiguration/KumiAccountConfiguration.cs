@@ -40,8 +40,8 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnType("int(11)")
                 .IsRequired();
 
-            builder.Property(e => e.BeginDate)
-                .HasColumnName("begin_date")
+            builder.Property(e => e.CreateDate)
+                .HasColumnName("create_date")
                 .HasColumnType("date")
                 .IsRequired();
 

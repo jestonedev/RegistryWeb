@@ -1,7 +1,200 @@
-﻿
+﻿@using RegistryWeb.ViewOptions;
+@using RegistryWeb.SecurityServices;
+@model RegistryWeb.Models.Entities.KumiAccount;
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = Model.IdAccount == 0 ? "Новый лицевой счет" :
+        "Лицевой счет №" + Model.Account;
+    var canEdit = ((SecurityService)ViewData["SecurityService"])?.HasPrivilege(Privileges.AccountsReadWrite) ?? false;
 }
+@section Styles {
+    <link rel="stylesheet" href="~/css/kumi.accounts.css" asp-append-version="true" />
+}
+@section Scripts {
+    <script src="~/js/kumiAccount.common.js" asp-append-version="true"></script>
+}
+<div class="card">
+    <div class="card-header d-flex flex-column flex-lg-row">
+        <label class="form-check-label h2 col-sm-12 col-lg-6 col-xl-7 pl-0" title="@ViewData["Title"]"
+               style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            @ViewData["Title"]
+        </label>
+        <div class="col-sm-12 col-lg-6 col-xl-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
+            <div class="btn-group" role="group" aria-label="Панель инструментов">
+                @if (canEdit && (ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details))
+                {
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        <button class="btn btn-primary dropdown-toggle" type="button" title="Переключить" aria-label="Переключить" id="toolsBtn_@Model.IdAccount" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-wrench"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@Model.IdAccount">
+                            @if (ViewBag.Action != ActionTypeEnum.Details)
+                            {
+                                <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                                   asp-action="Details" asp-route-idAccount="@Model.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            }
+                            @if (ViewBag.Action != ActionTypeEnum.Edit)
+                            {
+                                <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                                   asp-action="Edit" asp-route-idAccount="@Model.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            }
+                            @if (ViewBag.Action != ActionTypeEnum.Delete)
+                            {
+                                <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                                   asp-action="Delete" asp-route-idAccount="@Model.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            }
+                        </div>
+                    </div>
+                }
+                @if (ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details)
+                {
+                    <div class="btn-group" role="group" aria-label="Отчеты">
+                        <button class="btn btn-success dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@Model.IdAccount" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-document"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.IdAccount">
+                            <a class="dropdown-item rr-report-calc-debt" href="#" title="Расчет суммы задолженности" aria-label="Расчет суммы задолженности" data-id-account="@Model.IdAccount">Расчет суммы задолженности</a>
+                            <a class="dropdown-item rr-report-rig-send" href="#" title="Отправить счёт-извещение" aria-label="Отправить счёт-извещение" data-id-account="@Model.IdAccount">Отправить счёт-извещение</a>
+                            <a class="dropdown-item rr-report-rig-export" href="#" title="Сформировать счёт-извещение" aria-label="Сформировать счёт-извещение" data-id-account="@Model.IdAccount">Сформировать счёт-извещение</a>
+                        </div>
+                    </div>
+                }
+                @if (ViewBag.Action == ActionTypeEnum.Create)
+                {
+                    <a href="#" id="accountCreate" class="form-control btn btn-success">Создать</a>
+                }
+                @if (ViewBag.Action == ActionTypeEnum.Edit)
+                {
+                    <a href="#" id="accountEdit" class="form-control btn btn-success">Сохранить</a>
+                }
+                @if (ViewBag.Action == ActionTypeEnum.Delete)
+                {
+                    <a href="#" id="accountDelete" class="form-control btn btn-danger @((Model.Claims.Any() || Model.Charges.Any()) ? "disabled" : "")">Удалить</a>
+                }
+            </div>
 
-<h1>Index</h1>
+            <div class="btn-group" role="group" aria-label="Панель инструментов">
+                @if (@ViewBag.ReturnUrl != null)
+                {
+                    <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+                }
+                else
+                {
+                    <a class="form-control btn btn-primary" asp-action="Index">Назад</a>
+                }
+                    <a href="#" class="form-control btn btn-primary account-toggler" data-for="account" title="Развернуть" style="font-weight:bold;">∧</a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body pt-3 pb-3 pl-3 pr-3" id="account">
+        @if (ViewBag.Action == ActionTypeEnum.Delete && (Model.Claims.Any() || Model.Charges.Any()))
+        {
+            <div class="alert alert-danger text-center">Нельзя удалить лицевой счет, по которому имеются начисления или претензионно-исковые работы.<br/>Вместо это вы можете аннулировать его.</div>
+        }
 
+        <form autocomplete="off" asp-action="@ViewBag.Action" id="accountForm" data-action="@ViewBag.Action" method="post">
+            <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
+            <input type="hidden" asp-for="IdAccount" />
+            <div class="form-row">
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-account-label mb-1" asp-for="Account">Лицевой счет</label>
+                    <input type="text" asp-for="Account" title="Лицевой счет" class="form-control input-numbers" maxlength="255" />
+                    <span class="text-danger" asp-validation-for="Account"></span>
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-account-label mb-1" asp-for="AccountGisZkh">Лицевой счет ГИС ЖКХ</label>
+                    <input type="text" asp-for="AccountGisZkh" title="Лицевой сче ГИС ЖКХт" class="form-control input-account-zkh" maxlength="255" />
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-account-label mb-1">Состояние</label>
+                    <select class="selectpicker form-control" asp-for="IdState" title="Состояние"
+                            asp-items="@{new SelectList(ViewBag.States, "IdState", "State", Model.IdState)}"></select>
+                    <span class="text-danger" asp-validation-for="IdState"></span>
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-account-label mb-1" asp-for="CreateDate">Дата создания</label>
+                    <input type="date" asp-for="CreateDate" value="@(ViewBag.Action == ActionTypeEnum.Create ?
+                            DateTime.Now.Date.ToString("yyyy-MM-dd") : Model.CreateDate.ToString("yyyy-MM-dd"))"
+                           title="Дата создания" class="form-control" disabled />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-account-label mb-1" asp-for="LastChargeDate">Дата начисления</label>
+                    <input type="date" asp-for="LastChargeDate" title="Дата последнего начисления" class="form-control" disabled />
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-account-label mb-1" asp-for="CurrentBalanceTenancy">Сальдо найм</label>
+                    <input type="text" asp-for="CurrentBalanceTenancy" title="Текущее сальдо найм" class="form-control" disabled />
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-account-label mb-1" asp-for="CurrentBalancePenalty">Сальдо пени</label>
+                    <input type="text" asp-for="CurrentBalancePenalty" title="Текущее сальдо пени" class="form-control" disabled />
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-account-label mb-1" asp-for="AnnualDate">Дата аннулирования</label>
+                    <input type="date" asp-for="AnnualDate" title="Дата аннулирования" class="form-control" disabled />
+                </div>
+            </div>
+            @if (Model.RecalcMarker == 1)
+            {
+                <div class="form-row">
+                    <div class="form-group col-12">
+                        <label asp-for="RecalcReason">Требуется перерасчет</label>
+                        <input class="form-control rr-account-recalc-reason" asp-for="RecalcReason" maxlength="255" title="Требуется перерасчет" disabled />
+                    </div>
+                </div>
+            }
+            <input type="hidden" asp-for="RecalcMarker" />
+        </form>
+        @if (ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details)
+        {
+            <div class="card mt-3">
+                <div class="card-header d-flex justify-content-between pt-2 pb-2">
+                    <h3>Информация об исковых работах</h3>
+                    <div class="btn-group" role="group">
+                        <a href="#" data-for="ClaimsInfo" class="form-control btn btn-primary account-toggler" title="Развернуть панель сведений о претензионно-исковых работах" style="font-weight:bold;">∧</a>
+                    </div>
+                </div>
+                <ul class="list-group list-group-flush" id="ClaimsInfo">
+                    @if (Model.Claims.Any())
+                    {
+                        foreach (var claim in Model.Claims)
+                        {
+                            var lastState = claim.ClaimStates.OrderByDescending(r => r.IdState).FirstOrDefault();
+
+
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="form-group col-12 col-lg-5 mb-lg-0 mb-2">
+                                        <label class="rr-account-label mb-1">Текущеее состояние</label>
+                                        <input class="form-control" disabled type="text" value="@(lastState != null ? lastState.IdStateTypeNavigation.StateType : "")" />
+                                    </div>
+                                    <div class="form-group col-6 col-sm-5 col-lg-3 mb-0">
+                                        <label class="rr-account-label mb-1">Предьявлен период (с)</label>
+                                        <input class="form-control" disabled type="text" value="@claim.StartDeptPeriod?.ToString("dd.MM.yyyy")" />
+                                    </div>
+                                    <div class="form-group col-6 col-sm-5 col-lg-3 mb-0">
+                                        <label class="rr-account-label mb-1">Предьявлен период (по)</label>
+                                        <input class="form-control" disabled type="text" value="@claim.EndDeptPeriod?.ToString("dd.MM.yyyy")" />
+                                    </div>
+                                    <div class="col-12 col-sm-2 col-lg-1 text-center text-sm-right">
+                                        <a class="btn btn-primary account-open-claim-btn" asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.IdClaim"
+                                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
+                                            <span class="oi oi-eye"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="list-group-item text-center rr-list-group-item-empty">
+                            <i>Исковые работы отсутствуютт</i>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>

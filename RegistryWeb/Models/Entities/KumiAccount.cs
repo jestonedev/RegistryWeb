@@ -10,13 +10,18 @@ namespace RegistryWeb.Models.Entities
         public KumiAccount()
         {
             TenancyProcesses = new List<TenancyProcess>();
+            Claims = new List<Claim>();
+            Charges = new List<KumiCharge>();
+            IdState = 1;
         }
 
         public int IdAccount { get; set; }
+        [Required(ErrorMessage = "Введите лицевой счет")]
         public string Account { get; set; }
         public string AccountGisZkh { get; set; }
+        [Required(ErrorMessage = "Укажите состояние")]
         public int IdState { get; set; }
-        public DateTime BeginDate { get; set; }
+        public DateTime CreateDate { get; set; }
         public DateTime? AnnualDate { get; set; }
         public byte RecalcMarker { get; set; }
         public string RecalcReason { get; set; }

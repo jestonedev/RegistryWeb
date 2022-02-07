@@ -17,11 +17,8 @@
         @if (securityService.HasPrivilege(Privileges.AccountsWrite))
         {
             <div class="form-group col-2 col-md-1 col-lg-1">
-                <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="TenancyProcesses" asp-action="Create"
-                   asp-route-idObject="@(Model.FilterOptions.IdBuilding ?? Model.FilterOptions.IdPremises ?? Model.FilterOptions.IdSubPremises)"
-                   asp-route-addressType="@(Model.FilterOptions.IdBuilding != null ? AddressTypes.Building :
-                                             Model.FilterOptions.IdPremises != null ? AddressTypes.Premise :
-                                             Model.FilterOptions.IdSubPremises != null ? AddressTypes.SubPremise : AddressTypes.None)">&#10010;</a>
+                <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-action="Create" 
+                    asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">&#10010;</a>
             </div>
         }
 
@@ -33,7 +30,7 @@
         }
         else
         {
-            <div class="form-group col-12 col-md-3 col-lg-3">
+            <div class="form-group col-12 @(securityService.HasPrivilege(Privileges.AccountsWrite) ? "col-md-2 col-lg-2" : "col-md-3 col-lg-3")">
                 <div class="input-group">
                     <input type="text" class="form-control input-filter-numbers" title="Лицевой счет" asp-for="FilterOptions.FrontSideAccount" placeholder="Лицевой счет" />
                     <div class="input-group-append h-auto d-inline-block">
@@ -101,7 +98,7 @@
                     <div class="form-row">
                         <div class="form-group col-6 col-lg-3">
                             <label asp-for="FilterOptions.AccountGisZkh">ЕЛС</label>
-                            <input type="text" class="form-control" asp-for="FilterOptions.AccountGisZkh" title="Единый лицевой счет для ГИС ЖКХ">
+                            <input type="text" class="form-control input-filter-account-zkh" asp-for="FilterOptions.AccountGisZkh" title="Единый лицевой счет для ГИС ЖКХ">
                         </div>
                         <div class="form-group col-6 col-lg-3">
                             <label asp-for="FilterOptions.Account">Лицевой счет</label>

@@ -760,5 +760,62 @@ namespace RegistryWeb.DataServices
                     .ToDictionary(v => v.IdAccount, v => v.Claims.ToList());
             return result;
         }
+
+        internal KumiAccount GetKumiAccount(int idAccount)
+        {
+            var account = registryContext.KumiAccounts
+                .Include(r => r.TenancyProcesses)
+                .Include(r => r.Charges)
+                .Include(r => r.Claims)
+                .SingleOrDefault(a => a.IdAccount == idAccount);
+            foreach(var claim in account.Claims)
+            {
+                var currentClaimState = registryContext.ClaimStates.Include(r => r.IdStateTypeNavigation).Where(r => r.IdClaim == claim.IdClaim);
+                claim.ClaimStates = currentClaimState.ToList();
+            }
+            return account;
+        }
+
+        public void Create(KumiAccount account)
+        {
+            account.Charges = null;
+            account.Claims = null;
+            account.TenancyProcesses = null;
+            account.State = null;
+            registryContext.KumiAccounts.Add(account);
+            registryContext.SaveChanges();
+        }
+        public void Edit(KumiAccount account)
+        {
+            account.Charges = null;
+            account.Claims = null;
+            account.TenancyProcesses = null;
+            account.State = null;
+            registryContext.KumiAccounts.Update(account);
+            registryContext.SaveChanges();
+        }
+
+        public void Delete(int idAccount)
+        {
+            var account = registryContext.KumiAccounts
+                .Include(pc => pc.Charges)
+                .FirstOrDefault(pc => pc.IdAccount == idAccount);
+            if (account.Charges.Any()) throw new Exception("Нельзя удалить лицевой счет, по которому имеются начисления");
+            account.Deleted = 1;
+            registryContext.SaveChanges();
+        }
+
+        public bool AccountExists(string account, int idAccount)
+        {
+            var curAccount = registryContext.KumiAccounts
+                .SingleOrDefault(a => a.IdAccount == idAccount)
+                ?.Account;
+            if (curAccount == account)
+                return false;
+            return registryContext.KumiAccounts
+                .Select(a => a.Account).Count(num => num != null && num == account) > 0;
+        }
+
+        internal List<KumiAccountState> States { get => registryContext.KumiAccountStates.ToList(); }
     }
 }
