@@ -273,6 +273,15 @@
                                            asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
                                            asp-route-idPremises="@rentObject.Address.Id"></a>
                                     }
+                                    else
+                                    if (rentObject.Address.AddressType == AddressTypes.Building)
+                                    {
+                                        <span>@rentObject.Address.Text</span>
+                                        <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn"
+                                           asp-action="Details" asp-controller="Buildings"
+                                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
+                                           asp-route-idBuilding="@rentObject.Address.Id"></a>
+                                    }
                                 }
                             </div>
                             @if (i < tenancyInfos.Count() - 1)

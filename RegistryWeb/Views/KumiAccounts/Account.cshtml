@@ -1,5 +1,6 @@
 ﻿@using RegistryWeb.ViewOptions;
 @using RegistryWeb.SecurityServices;
+@using RegistryWeb.ViewModel;
 @model RegistryWeb.Models.Entities.KumiAccount;
 @{
     ViewData["Title"] = Model.IdAccount == 0 ? "Новый лицевой счет" :
@@ -94,6 +95,119 @@
         <form autocomplete="off" asp-action="@ViewBag.Action" id="accountForm" data-action="@ViewBag.Action" method="post">
             <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
             <input type="hidden" asp-for="IdAccount" />
+
+            <div id="TenancyInfo">
+                @{
+                    var tenancyInfo = (List<KumiAccountTenancyInfoVM>)ViewBag.TenancyInfo;
+                    tenancyInfo = tenancyInfo.Union(new List<KumiAccountTenancyInfoVM>() { new KumiAccountTenancyInfoVM {
+                        RentObjects = new List<TenancyRentObject> { new TenancyRentObject {  } }} }).ToList();
+                    for (var i = 0; i < tenancyInfo.Count(); i++)
+                    {
+                        var idProcess = tenancyInfo[i].TenancyProcess?.IdProcess;
+                        var tenancyRequisits = "";
+
+                        if (!string.IsNullOrEmpty(tenancyInfo[i].TenancyProcess?.RegistrationNum))
+                        {
+                            tenancyRequisits = "№ " + tenancyInfo[i].TenancyProcess.RegistrationNum + " "+
+                                (tenancyInfo[i].TenancyProcess.RegistrationDate.HasValue ? "от " + tenancyInfo[i].TenancyProcess.RegistrationDate.Value.ToString("dd.MM.yyyy") : "");
+                        } else
+                        if (tenancyInfo[i].TenancyProcess?.IdProcess != null)
+                        {
+                            tenancyRequisits = "Рег. №: " + tenancyInfo[i].TenancyProcess?.IdProcess;
+                        }
+                        var hideLastString = true;
+                        if ((ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create) && i == 0)
+                        {
+                            hideLastString = false;
+                        }
+
+                        <div class="form-row rr-tenancy-info @(((i + 1) == tenancyInfo.Count()) && hideLastString ? "d-none" : "")">
+                            <input type="hidden" value="@idProcess" id="IdProcess_@i" name="TenancyProcesses[@i].IdProcess" />
+                            <div class="form-group col-4">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <button class="btn btn-success dropdown-toggle @(idProcess != null ? "" : "disabled")" type="button" title="Процесс найма" aria-label="Процесс найма" id="HomesBtn_@i" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="oi oi-home"></span>
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="HomesBtn_@i">
+                                            <a class="dropdown-item" asp-action="Details" asp-controller="TenancyProcesses" asp-route-idProcess="@idProcess">Процесс найма</a>
+                                        </div>
+                                    </div>
+                                    <input name="TenancyRequisits[@i]" id="TenancyRequisits_@i" type="text" value="@tenancyRequisits" class="form-control" title="Реквизиты процесса найма" disabled />
+                                </div>
+                            </div>
+                            @{ 
+                                if (tenancyInfo[i].RentObjects == null || !tenancyInfo[i].RentObjects.Any())
+                                {
+                                    tenancyInfo[i].RentObjects = new List<TenancyRentObject> { new TenancyRentObject() };
+                                }
+                            }
+                            @for (var j = 0; j < tenancyInfo[i].RentObjects.Count; j++)
+                            {
+                                var rentObject = tenancyInfo[i].RentObjects[j].Address;
+
+                                var idBuilding = (string)null;
+                                var idPremise = (string)null;
+                                if (rentObject != null)
+                                {
+                                    switch (rentObject.AddressType)
+                                    {
+                                        case AddressTypes.Building:
+                                            idBuilding = rentObject?.Id;
+                                            break;
+                                        case AddressTypes.Premise:
+                                            idBuilding = rentObject?.IdParents?["Building"];
+                                            idPremise = rentObject?.Id;
+                                            break;
+                                        case AddressTypes.SubPremise:
+                                            idBuilding = rentObject?.IdParents?["Building"];
+                                            idPremise = rentObject?.IdParents?["Premise"];
+                                            break;
+                                    }
+                                }
+                                var address = rentObject?.Text;
+
+                                <div class="form-group rr-tenancy-address col-8 @(j > 0 ? "offset-4" : "")">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-success dropdown-toggle @(idBuilding != null ? "" : "disabled")" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="HomesBtn_@i" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <span class="oi oi-home"></span>
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="HomesBtn_@i">
+                                                <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@idBuilding">Здание</a>
+                                                <a class="dropdown-item @(idPremise == null ? "d-none" : "")" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@idPremise">Помещение</a>
+                                            </div>
+                                        </div>
+                                        <input name="TenancyAddress[@i]" id="TenancyAddress_@i" type="text" value="@address" class="form-control" title="Адрес" disabled />
+                                        @if (j == 0)
+                                        {
+                                            @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
+                                            {
+                                                <div class="input-group-append">
+                                                        <button id="tenancyDeleteBtn_@i" title="Удалить" style="@(idProcess != null ? "" : "display: none")" class="btn btn-danger" type="button">
+                                                            <span class="oi oi-trash"></span>
+                                                        </button>
+                                                        <button id="tenancyChangeBtn_@i" title="Редактировать" style="@(idProcess != null ? "" : "display: none")" class="btn btn-success" type="button">
+                                                            <span class="oi oi-pencil"></span>
+                                                        </button>
+                                                        @if (i == 0)
+                                                        {
+                                                            <button id="tenancyAddBtn" title="Добавить" class="btn btn-success" type="button">
+                                                                <span class="oi oi-plus"></span>
+                                                            </button>
+                                                        }
+                                                
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+            </div>
+
             <div class="form-row">
                 <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-account-label mb-1" asp-for="Account">Лицевой счет</label>
@@ -198,3 +312,5 @@
         }
     </div>
 </div>
+
+<partial name="AccountModals">

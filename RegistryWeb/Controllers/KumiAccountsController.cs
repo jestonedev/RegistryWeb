@@ -16,12 +16,15 @@ namespace RegistryWeb.Controllers
 {
     public class KumiAccountsController :  ListController<KumiAccountsDataService, KumiAccountsFilter>
     {
-        public KumiAccountsController(KumiAccountsDataService dataService, SecurityService securityService)
+        private TenancyProcessesDataService tenancyProcessesDataService { get; }
+
+        public KumiAccountsController(KumiAccountsDataService dataService, TenancyProcessesDataService tenancyProcessesDataService, SecurityService securityService)
             :base(dataService, securityService)
         {
             nameFilteredIdsDict = "filteredKumiAccountsIdsDict";
             nameIds = "idKumiAccounts";
             nameMultimaster = "KumiAccountsReports";
+            this.tenancyProcessesDataService = tenancyProcessesDataService;
         }
 
         public IActionResult Index(KumiAccountsVM viewModel, bool isBack = false)
@@ -71,6 +74,13 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = action;
             ViewBag.SecurityService = securityService;
             ViewBag.States = dataService.States;
+            ViewBag.Streets = dataService.Streets;
+            ViewBag.Regions = dataService.Regions;
+            var tenancyInfo = dataService.GetTenancyInfo(new List<KumiAccount> { account });
+            if (tenancyInfo.ContainsKey(account.IdAccount))
+                ViewBag.TenancyInfo = tenancyInfo[account.IdAccount];
+            else
+                ViewBag.TenancyInfo = new List<KumiAccountTenancyInfoVM>();
             return View("Account", account);
         }
 
@@ -149,6 +159,24 @@ namespace RegistryWeb.Controllers
                 return Json(false);
             var isExist = dataService.AccountExists(account, idAccount);
             return Json(isExist);
+        }
+
+        [HttpPost]
+        public IActionResult GetTenancyInfo(TenancyProcessesFilter filterOptions)
+        {
+            var tenancies = tenancyProcessesDataService.GetTenancyProcesses(filterOptions);
+            var count = tenancies.Count();
+            var tenanciesLimit = tenancies.Take(5).ToList();
+            var rentObjects = tenancyProcessesDataService.GetRentObjects(tenanciesLimit);
+            return Json(new {
+                Count = count,
+                Tenancies = tenanciesLimit.Select(r => new {
+                    r.IdProcess,
+                    r.RegistrationDate,
+                    r.RegistrationNum
+                }),
+                RentObjects = rentObjects
+            });
         }
     }
 }

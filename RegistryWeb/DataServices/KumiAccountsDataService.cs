@@ -453,7 +453,7 @@ namespace RegistryWeb.DataServices
                 .Take(pageOptions.SizePage);
         }
 
-        private Dictionary<int, List<KumiAccountTenancyInfoVM>> GetTenancyInfo(IEnumerable<KumiAccount> accounts)
+        public Dictionary<int, List<KumiAccountTenancyInfoVM>> GetTenancyInfo(IEnumerable<KumiAccount> accounts)
         {
             var accountTenancyIds = (from account in accounts
                                     join process in registryContext.TenancyProcesses
@@ -676,18 +676,18 @@ namespace RegistryWeb.DataServices
             }
 
             var result = new Dictionary<int, List<KumiAccountTenancyInfoVM>>();
-            foreach(var obj in objects.GroupBy(r => r.IdProcess))
+            foreach (var tenancyProcess in tenancyProcesses)
             {
-                var idAccount = accountTenancyIds.FirstOrDefault(r => r.IdProcess == obj.Key)?.IdAccount;
+                var idAccount = accountTenancyIds.FirstOrDefault(r => r.IdProcess == tenancyProcess.IdProcess)?.IdAccount;
                 if (idAccount == null) continue;
                 if (!result.ContainsKey(idAccount.Value))
                     result.Add(idAccount.Value, new List<KumiAccountTenancyInfoVM>());
-                var rentObjects = obj.Select(r => r.RentObject).ToList();
+                var rentObjects = objects.Where(r => r.IdProcess == tenancyProcess.IdProcess).Select(r => r.RentObject).ToList();
                 var tenancyInfo = new KumiAccountTenancyInfoVM
                 {
                     RentObjects = rentObjects,
-                    TenancyProcess = tenancyProcesses.FirstOrDefault(r => r.IdProcess == obj.Key),
-                    Tenant = registryContext.TenancyPersons.FirstOrDefault(r => r.IdProcess == obj.Key && r.ExcludeDate == null && r.IdKinship == 1)
+                    TenancyProcess = tenancyProcess,
+                    Tenant = registryContext.TenancyPersons.FirstOrDefault(r => r.IdProcess == tenancyProcess.IdProcess && r.ExcludeDate == null && r.IdKinship == 1)
                 };
                 result[idAccount.Value].Add(tenancyInfo);
             }
@@ -778,21 +778,43 @@ namespace RegistryWeb.DataServices
 
         public void Create(KumiAccount account)
         {
+            var tenancyProcesses = account.TenancyProcesses;
             account.Charges = null;
             account.Claims = null;
             account.TenancyProcesses = null;
             account.State = null;
             registryContext.KumiAccounts.Add(account);
             registryContext.SaveChanges();
+            UpdateTenancyProcesses(tenancyProcesses, account.IdAccount);
+            registryContext.SaveChanges();
         }
         public void Edit(KumiAccount account)
         {
+            var tenancyProcesses = account.TenancyProcesses;
             account.Charges = null;
             account.Claims = null;
             account.TenancyProcesses = null;
             account.State = null;
             registryContext.KumiAccounts.Update(account);
+            UpdateTenancyProcesses(tenancyProcesses, account.IdAccount);
             registryContext.SaveChanges();
+        }
+
+        private void UpdateTenancyProcesses(IList<TenancyProcess> tenancyProcesses, int idAccount)
+        {
+            var oldAccounts = registryContext.TenancyProcesses.Where(r => r.IdAccount == idAccount);
+            foreach(var tenancy in oldAccounts)
+            {
+                tenancy.IdAccount = null;
+            }
+            foreach (var tenancy in tenancyProcesses)
+            {
+                var tenancyDb = registryContext.TenancyProcesses.FirstOrDefault(r => r.IdProcess == tenancy.IdProcess);
+                if (tenancyDb != null)
+                {
+                    tenancyDb.IdAccount = idAccount;
+                }
+            }
         }
 
         public void Delete(int idAccount)
@@ -817,5 +839,7 @@ namespace RegistryWeb.DataServices
         }
 
         internal List<KumiAccountState> States { get => registryContext.KumiAccountStates.ToList(); }
+        internal List<KladrStreet> Streets { get => addressesDataService.KladrStreets.ToList(); }
+        internal List<KladrRegion> Regions { get => addressesDataService.KladrRegions.ToList(); }
     }
 }

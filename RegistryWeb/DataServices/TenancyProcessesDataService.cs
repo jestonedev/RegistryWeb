@@ -229,6 +229,13 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
+        public IQueryable<TenancyProcess> GetTenancyProcesses(TenancyProcessesFilter filterOptions)
+        {
+            var tenancyProcesses = GetQuery();
+            var query = GetQueryFilter(tenancyProcesses, filterOptions);
+            return query;
+        }
+
         private IQueryable<TenancyProcess> GetQuery()
         {
             return registryContext.TenancyProcesses;
@@ -242,7 +249,7 @@ namespace RegistryWeb.DataServices
                 .Include(tp => tp.TenancyReasons);
         }
 
-        private Dictionary<int, List<TenancyRentObject>> GetRentObjects(IEnumerable<TenancyProcess> tenancyProcesses)
+        public Dictionary<int, List<TenancyRentObject>> GetRentObjects(IEnumerable<TenancyProcess> tenancyProcesses)
         {
             var ids = tenancyProcesses.Select(r => r.IdProcess);
             var buildings = from tbaRow in tenancyBuildingsAssoc
@@ -983,6 +990,18 @@ namespace RegistryWeb.DataServices
                 var ids = premises.Where(r => r.PremisesNum == filterOptions.PremisesNum).Select(r => r.IdProcess)
                     .Union(subPremises.Where(r => r.PremisesNum == filterOptions.PremisesNum).Select(r => r.IdProcess))
                     .ToList();
+                if (idsProcess == null)
+                {
+                    idsProcess = ids;
+                }
+                else
+                {
+                    idsProcess = idsProcess.Intersect(ids);
+                }
+            }
+            if (!string.IsNullOrEmpty(filterOptions.SubPremisesNum))
+            {
+                var ids = subPremises.Where(r => r.SubPremisesNum == filterOptions.SubPremisesNum).Select(r => r.IdProcess).ToList();
                 if (idsProcess == null)
                 {
                     idsProcess = ids;
