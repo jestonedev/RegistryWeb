@@ -19,12 +19,14 @@ namespace RegistryWeb.DataServices
     public class ClaimsDataService : ListDataService<ClaimsVM, ClaimsFilter>
     {
         private readonly SecurityServices.SecurityService securityService;
+        private readonly KumiAccountsDataService kumiAccountsDataService;
         private readonly IConfiguration config;
 
         public ClaimsDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService,
-            AddressesDataService addressesDataService, IConfiguration config) : base(registryContext, addressesDataService)
+            AddressesDataService addressesDataService, KumiAccountsDataService kumiAccountsDataService, IConfiguration config) : base(registryContext, addressesDataService)
         {
             this.securityService = securityService;
+            this.kumiAccountsDataService = kumiAccountsDataService;
             this.config = config;
         }
 
@@ -59,7 +61,8 @@ namespace RegistryWeb.DataServices
                 viewModel.PageOptions.CurrentPage = 1;
             query = GetQueryPage(query, viewModel.PageOptions);
             viewModel.Claims = query.ToList();
-            viewModel.RentObjects = GetRentObjects(viewModel.Claims);
+            viewModel.RentObjectsBks = GetRentObjectsBks(viewModel.Claims);
+            viewModel.TenancyInfoKumi = GetTenancyInfoKumi(viewModel.Claims);
             viewModel.LastPaymentInfo = GetLastPaymentsInfo(viewModel.Claims);
             return viewModel;
         }
@@ -69,7 +72,8 @@ namespace RegistryWeb.DataServices
             return registryContext.Claims
                 .Include(c => c.ClaimStates)
                 .Include(c => c.IdAccountNavigation)
-                .Include(c => c.IdAccountAdditionalNavigation);
+                .Include(c => c.IdAccountAdditionalNavigation)
+                .Include(c => c.IdAccountKumiNavigation);
         }
 
         private IQueryable<Claim> GetQueryIncludes(IQueryable<Claim> query)
@@ -77,7 +81,8 @@ namespace RegistryWeb.DataServices
             return query
                 .Include(c => c.ClaimStates)
                 .Include(c => c.IdAccountNavigation)
-                .Include(c => c.IdAccountAdditionalNavigation);
+                .Include(c => c.IdAccountAdditionalNavigation)
+                .Include(c => c.IdAccountKumiNavigation);
         }
 
         private IQueryable<Claim> GetQueryFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
@@ -136,6 +141,7 @@ namespace RegistryWeb.DataServices
 
             claim.IdAccountNavigation = null;
             claim.IdAccountAdditionalNavigation = null;
+            claim.IdAccountKumiNavigation = null;
             claim = FillClaimAmount(claim);
             registryContext.Claims.Add(claim);
             registryContext.SaveChanges();
@@ -229,6 +235,7 @@ namespace RegistryWeb.DataServices
         {
             claim.IdAccountNavigation = null;
             claim.IdAccountAdditionalNavigation = null;
+            claim.IdAccountKumiNavigation = null;
             claim = FillClaimAmount(claim);
             registryContext.Claims.Update(claim);
             registryContext.SaveChanges();
@@ -257,14 +264,19 @@ namespace RegistryWeb.DataServices
             if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
                 viewModel.PageOptions.CurrentPage = 1;
             viewModel.Claims = GetQueryPage(claims, viewModel.PageOptions).ToList();
-            viewModel.RentObjects = GetRentObjects(viewModel.Claims);
+            viewModel.RentObjectsBks = GetRentObjectsBks(viewModel.Claims);
+            viewModel.TenancyInfoKumi = GetTenancyInfoKumi(viewModel.Claims);
+            viewModel.LastPaymentInfo = GetLastPaymentsInfo(viewModel.Claims);
             return viewModel;
         }
 
         public IQueryable<Claim> GetClaimsForMassReports(List<int> ids)
         {
             return registryContext.Claims
-                .Where(c => ids.Contains(c.IdClaim)).Include(c => c.IdAccountNavigation);
+                .Where(c => ids.Contains(c.IdClaim))
+                .Include(c => c.IdAccountNavigation)
+                .Include(c => c.IdAccountAdditionalNavigation)
+                .Include(c => c.IdAccountKumiNavigation);
         }
 
         public IQueryable<Claim> AddressFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
@@ -414,31 +426,45 @@ namespace RegistryWeb.DataServices
             registryContext.SaveChanges();
         }
 
-        internal PaymentAccount GetAccount(int idAccount)
+        internal PaymentAccount GetAccountBks(int idAccount)
         {
             return registryContext.PaymentAccounts
                 .FirstOrDefault(pa => pa.IdAccount == idAccount);
         }
 
-        internal IList<PaymentAccount> GetAccounts(string text)
+        internal KumiAccount GetAccountKumi(int idAccount)
         {
-            return registryContext.PaymentAccounts
-                .Where(pa => pa.Account.Contains(text)).Take(100).ToList();
+            return registryContext.KumiAccounts
+                .FirstOrDefault(a => a.IdAccount == idAccount);
+        }
+
+        internal IList<AccountBase> GetAccounts(string text, string type)
+        {
+            if (type == "BKS")
+                return registryContext.PaymentAccounts.Where(pa => pa.Account.Contains(text)).Take(100).Select(r => (AccountBase)r).ToList();
+            else
+            if (type == "KUMI")
+                return registryContext.KumiAccounts.Where(pa => pa.Account.Contains(text)).Take(100).Select(r => (AccountBase)r).ToList();
+            return null;
         }
 
         public IQueryable<Claim> PaymentAccountFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
         {
             if (!string.IsNullOrEmpty(filterOptions.Crn))
             {
-                query = query.Where(p => p.IdAccountNavigation.Crn.Contains(filterOptions.Crn));
+                query = query.Where(p => p.IdAccountNavigation.Crn.Contains(filterOptions.Crn) 
+                    || p.IdAccountAdditionalNavigation.Crn.Contains(filterOptions.Crn));
             }
             if (!string.IsNullOrEmpty(filterOptions.Account))
             {
-                query = query.Where(p => p.IdAccountNavigation.Account.Contains(filterOptions.Account));
+                query = query.Where(p => p.IdAccountNavigation.Account.Contains(filterOptions.Account) 
+                    || p.IdAccountAdditionalNavigation.Account.Contains(filterOptions.Account)
+                    || p.IdAccountKumiNavigation.Account.Contains(filterOptions.Account));
             }
             if (!string.IsNullOrEmpty(filterOptions.RawAddress))
             {
-                query = query.Where(p => p.IdAccountNavigation.RawAddress.Contains(filterOptions.RawAddress));
+                query = query.Where(p => p.IdAccountNavigation.RawAddress.Contains(filterOptions.RawAddress) 
+                    || p.IdAccountAdditionalNavigation.RawAddress.Contains(filterOptions.RawAddress));
             }
             return query;
         }
@@ -500,10 +526,14 @@ namespace RegistryWeb.DataServices
 
         public IQueryable<Claim> ClaimFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
         {
-            if (filterOptions.IdAccount != null)
+            if (filterOptions.IdAccountBks != null)
             {
-                var ids = GetAccountIdsWithSameAddress(filterOptions.IdAccount.Value);
-                query = query.Where(p => ids.Contains(p.IdAccount ?? 0) || p.IdAccount == filterOptions.IdAccount || p.IdAccountAdditional == filterOptions.IdAccount);
+                var ids = GetAccountIdsWithSameAddress(filterOptions.IdAccountBks.Value);
+                query = query.Where(p => ids.Contains(p.IdAccount ?? 0) || p.IdAccount == filterOptions.IdAccountBks || p.IdAccountAdditional == filterOptions.IdAccountBks);
+            }
+            if (filterOptions.IdAccountKumi != null)
+            {
+                query = query.Where(p => p.IdAccountKumi == filterOptions.IdAccountKumi);
             }
 
             if (filterOptions.AmountTotal != null)
@@ -826,7 +856,7 @@ namespace RegistryWeb.DataServices
         }
 
 
-        internal Dictionary<int, List<Address>> GetRentObjects(IEnumerable<int> idAccounts)
+        internal Dictionary<int, List<Address>> GetRentObjectsBks(IEnumerable<int> idAccounts)
         {
             var premises = from paRow in registryContext.PaymentAccountPremisesAssoc
                            join premiseRow in registryContext.Premises
@@ -893,10 +923,24 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
-        internal Dictionary<int, List<Address>> GetRentObjects(IEnumerable<Claim> claims)
+        internal Dictionary<int, List<Address>> GetRentObjectsBks(IEnumerable<Claim> claims)
         {
             var ids = claims.Where(r => r.IdAccount != null).Select(r => r.IdAccount.Value).Distinct();
-            return GetRentObjects(ids);
+            return GetRentObjectsBks(ids);
+        }
+
+        internal Dictionary<int, List<KumiAccountTenancyInfoVM>> GetTenancyInfoKumi(IEnumerable<Claim> claims)
+        {
+            var accounts = claims.Where(r => r.IdAccountKumi != null).Select(r => r.IdAccountKumiNavigation).Distinct();
+            return kumiAccountsDataService.GetTenancyInfo(accounts);
+        }
+
+        internal Dictionary<int, List<KumiAccountTenancyInfoVM>> GetTenancyInfoKumi(IEnumerable<int> idAccounts)
+        {
+            var accounts = idAccounts.Select(r => new KumiAccount {
+                IdAccount = r
+            } ).Distinct();
+            return kumiAccountsDataService.GetTenancyInfo(accounts);
         }
 
         internal Dictionary<int, Payment> GetLastPaymentsInfo(IEnumerable<Claim> claims)
@@ -929,25 +973,31 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
-        internal ClaimVM CreateClaimEmptyViewModel(int? idAccount = null, [CallerMemberName]string action = "")
+        internal ClaimVM CreateClaimEmptyViewModel(int? idAccountBks = null, int? idAccountKumi = null, [CallerMemberName]string action = "")
         {
-            var lastPaymentInfo = idAccount != null ?
-                    GetLastPaymentsInfo(new List<int> { idAccount.Value }).Select(v => v.Value).FirstOrDefault() : null;
+            var lastPaymentInfo = idAccountBks != null ?
+                    GetLastPaymentsInfo(new List<int> { idAccountBks.Value }).Select(v => v.Value).FirstOrDefault() : null;
+            KumiAccount kumiAccount = null;
+            if (idAccountKumi != null)
+                kumiAccount = GetAccountKumi(idAccountKumi.Value);
 
             return new ClaimVM
             {
                 Claim = new Claim
                 {
-                    IdAccount = idAccount ?? 0,
-                    IdAccountNavigation = idAccount != null ? GetAccount(idAccount.Value) : null,
-                    AmountTenancy = lastPaymentInfo?.BalanceOutputTenancy,
-                    AmountPenalties = lastPaymentInfo?.BalanceOutputPenalties,
-                    AmountDgi = lastPaymentInfo?.BalanceOutputDgi,
-                    AmountPadun = lastPaymentInfo?.BalanceOutputPadun,
-                    AmountPkk = lastPaymentInfo?.BalanceOutputPkk
+                    IdAccount = idAccountBks ?? 0,
+                    IdAccountNavigation = idAccountBks != null ? GetAccountBks(idAccountBks.Value) : null,
+                    IdAccountKumi = idAccountKumi ?? 0,
+                    IdAccountKumiNavigation = kumiAccount,
+                    AmountTenancy = kumiAccount != null ? kumiAccount.CurrentBalanceTenancy : lastPaymentInfo?.BalanceOutputTenancy,
+                    AmountPenalties = kumiAccount != null ? kumiAccount.CurrentBalancePenalty : lastPaymentInfo?.BalanceOutputPenalties,
+                    AmountDgi = kumiAccount != null ? null : lastPaymentInfo?.BalanceOutputDgi,
+                    AmountPadun = kumiAccount != null ? null : lastPaymentInfo?.BalanceOutputPadun,
+                    AmountPkk = kumiAccount != null ? null : lastPaymentInfo?.BalanceOutputPkk
                 },
-                RentObjects = idAccount != null ?
-                    GetRentObjects(new List<int> { idAccount.Value }).SelectMany(v => v.Value).ToList() : null,
+                RentObjectsBks = idAccountBks != null ?
+                    GetRentObjectsBks(new List<int> { idAccountBks.Value }).SelectMany(v => v.Value).ToList() : null,
+                TenancyInfoKumi = idAccountKumi != null ? GetTenancyInfoKumi(new List<int> { idAccountKumi.Value }).SelectMany(r => r.Value).ToList() : null,
                 CurrentExecutor = CurrentExecutor,
                 StateTypes = registryContext.ClaimStateTypes.ToList(),
                 Executors = registryContext.Executors.ToList(),
@@ -959,17 +1009,20 @@ namespace RegistryWeb.DataServices
 
         internal ClaimVM GetClaimViewModel(Claim claim, [CallerMemberName]string action = "")
         {
-            var claimVM = CreateClaimEmptyViewModel(null, action);
+            var claimVM = CreateClaimEmptyViewModel(null, null, action);
             claimVM.Claim = claim;
-            claimVM.RentObjects = GetRentObjects(new List<Claim> { claim }).SelectMany(r => r.Value).ToList();
+            claimVM.RentObjectsBks = GetRentObjectsBks(new List<Claim> { claim }).SelectMany(r => r.Value).ToList();
             claimVM.LastPaymentInfo = GetLastPaymentsInfo(new List<Claim> { claim }).Select(r => r.Value).FirstOrDefault();
+            claimVM.TenancyInfoKumi = GetTenancyInfoKumi(new List<Claim> { claim }).SelectMany(r => r.Value).ToList();
             return claimVM;
         }
 
         public Claim GetClaim(int idClaim)
         {
-            return registryContext.Claims.Include(r => r.IdAccountNavigation)
+            return registryContext.Claims
+                .Include(r => r.IdAccountNavigation)
                 .Include(r => r.IdAccountAdditionalNavigation)
+                .Include(r => r.IdAccountKumiNavigation)
                 .Include(r => r.ClaimStates)
                 .Include(r => r.ClaimPersons)
                 .Include(r => r.ClaimFiles)

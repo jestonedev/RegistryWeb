@@ -6,7 +6,8 @@ namespace RegistryWeb.ViewOptions.Filter
     public class ClaimsFilter : FilterAddressOptions
     {
         public int? IdClaim { get; set; }
-        public int? IdAccount { get; set; }
+        public int? IdAccountBks { get; set; }
+        public int? IdAccountKumi { get; set; }
         public string Account { get; set; }
         public int? IdClaimState { get; set; }
         public bool IsCurrentState { get; set; }
@@ -64,7 +65,7 @@ namespace RegistryWeb.ViewOptions.Filter
 
         public bool IsEmpty()
         {
-            return IsAddressEmpty() && IsModalEmpty() && IdBuilding == null && IdPremises == null && IdSubPremises == null && IdAccount == null;
+            return IsAddressEmpty() && IsModalEmpty() && IdBuilding == null && IdPremises == null && IdSubPremises == null && IdAccountBks == null && IdAccountKumi == null;
         }
 
         public bool IsModalEmpty()

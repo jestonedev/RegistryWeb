@@ -35,3 +35,9 @@
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
 }
+
+@media(min-width: 992px) {
+    .rr-claim-end-for-filter-checkbox {
+        margin-top: 22px;
+    }
+}

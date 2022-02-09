@@ -252,6 +252,13 @@
                             (regDateStr !== null ? "от " + regDateStr : "");
                     }
 
+                    var radioButton = "<div class='form-check'><input style='margin-top: -7px' name='tenancySelected' value='" + idProcess + "' type='radio' class='form-check-input'></div>";
+
+                    var account = tenancy.account;
+                    var accountInfo = "";
+                    if (account !== null)
+                        accountInfo = "<br/><span class='text-danger'><i>Привязан к ЛС № " + account + "</i></span><a class='btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn' href='/KumiAccounts/Details?idAccount=" + tenancy.idAccount + "' target='_blank'></a>";
+
                     var rentObjects = result.rentObjects[tenancy.idProcess];
                     if (rentObjects === undefined || rentObjects.length === 0) {
                         rentObjects = [{ address: { text: '' } }];
@@ -273,12 +280,9 @@
                                 break;
                         }
                         table += "<tr data-id-process='" + idProcess + "' data-id-building='" + idBuilding + "' data-id-premise='" + idPremises + "'>";
-                        var radioButton = "";
-                        if (j === 0) {
-                            radioButton = "<div class='form-check'><input name='tenancySelected' value='" + idProcess + "' type='radio' class='form-check-input'></div>";
-                        }
-                        table += "<td>" + radioButton + "</td>";
-                        table += "<td>" + (j === 0 ? tenancyRequisits : "") + "</td><td>" + rentObjects[j].address.text + "</td>";
+
+                        table += "<td style='vertical-align: middle'>" + (j === 0 ? radioButton : "") + "</td>";
+                        table += "<td>" + (j === 0 ? tenancyRequisits : "") + (j === 0 ? accountInfo : "") + "</td><td>" + rentObjects[j].address.text + "</td>";
                         table += "</tr>";
                     }
                 }

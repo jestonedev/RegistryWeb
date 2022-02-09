@@ -1,17 +1,36 @@
 ﻿
 $(function () {
+    var form = $("#ClaimForm");
+
     $('.claim-toggler').each(function (idx, e) {
         $(e).on('click', $('#' + $(e).data("for")), elementToogleHide);
     });
 
     function claimCustomValidations(validator) {
         var isValid = true;
-
+        var accountErrorWrapper = $("input[name='AnyAccountRequire']");
+        var idAccountBks = form.find("#Claim_IdAccountNavigation_Account");
+        var idAccountKumi = form.find("#Claim_IdAccountKumiNavigation_Account");
+        if (idAccountBks.val() === "" && idAccountKumi.val() === "") {
+            let error = {};
+            error["AnyAccountRequire"] = "Укажите лицевой счет БКС (осн.) или КУМИ";
+            validator.showErrors(error);
+            $(".rr-account-common-error").addClass("mb-2");
+            idAccountBks.addClass("input-validation-error");
+            idAccountKumi.addClass("input-validation-error");
+            isValid = false;
+        } else {
+            clearValidationError(accountErrorWrapper);
+            removeErrorFromValidator(validator, accountErrorWrapper);
+            $(".rr-account-common-error").removeClass("mb-2");
+            idAccountBks.removeClass("input-validation-error");
+            idAccountKumi.removeClass("input-validation-error");
+        }
         return isValid;
     }
 
-    $("#ClaimForm").on("submit", function (e) {
-        var action = $("#ClaimForm").data("action");
+    form.on("submit", function (e) {
+        var action = form.data("action");
         $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
         $("input.decimal").each(function (idx, elem) {
             $(elem).val($(elem).val().replace(".", ","));
@@ -126,7 +145,7 @@ $(function () {
     });
 
     $("#createBtn, #editBtn, #deleteBtn").on("click", function () {
-        $("#ClaimForm").submit();
+        form.submit();
     });
 
     $("#ClaimAmount .decimal").on("focusout", function () {
@@ -164,23 +183,38 @@ $(function () {
         $("#Claim_AmountTotal").val(totalSum.toFixed(2).replace(".", ","));
     });
 
-
+    // IdAccount
     $("#Claim_IdAccountNavigation_Account").on("input", function () {
         $("#Claim_IdAccount").val("");
     });
 
-    function selectAccount(account) {
-        $("#Claim_IdAccount").val(account.idAccount);
-        $("#Claim_IdAccountNavigation_Account").val(account.value);
+    function selectAccount(account, type) {
+        if (type == "BKS") {
+            $("#Claim_IdAccount").val(account.idAccount);
+            $("#Claim_IdAccountNavigation_Account").val(account.value);
+        } else
+        if (type == "KUMI") {
+            $("#Claim_IdAccountKumi").val(account.idAccount);
+            $("#Claim_IdAccountKumiNavigation_Account").val(account.value);
+        }
         if (account.idAccount !== "" && account.idAccount !== null) {
+            var amountHeader = $(".rr-claim-amount-sum-header");
+            amountHeader.html("Сумма к взысканию <span class='text-danger'>(обновляется...)</span>");
             $.ajax({
                 type: 'POST',
                 url: window.location.origin + '/Claims/GetAccountInfo',
                 dataType: 'json',
-                data: { idAccount: account.idAccount },
+                data: { idAccount: account.idAccount, type: type },
                 success: function (address) {
-                    $("input[name='Claim.BksAddress']").val(address.bksAddress);
-                    $("input[name='Claim.RegistryAddress']").val(address.registryAddress);
+                    if (type === "BKS") {
+                        $("input[name='Claim.BksAddress']").val(address.bksAddress);
+                        $("input[name='Claim.RegistryAddressBks']").val(address.registryAddress);
+                        amountHeader.html("Сумма к взысканию <span class='text-danger'>(по данным из ЛС БКС)</span>");
+                    }
+                    if (type === "KUMI") {
+                        $("input[name='Claim.RegistryAddressKumi']").val(address.registryAddress);
+                        amountHeader.html("Сумма к взысканию <span class='text-danger'>(по данным из ЛС КУМИ)</span>");
+                    }
                     $("input[id='Claim_AmountTenancy']").val(address.amountTenancy);
                     $("input[id='Claim_AmountPenalties']").val(address.amountPenalties);
                     $("input[id='Claim_AmountDgi']").val(address.amountDgi);
@@ -188,6 +222,17 @@ $(function () {
                     $("input[id='Claim_AmountPkk']").val(address.amountPkk).focusout();
                 }
             });
+        }
+        var accountErrorWrapper = $("input[name='AnyAccountRequire']");
+        var idAccountBks = form.find("#Claim_IdAccountNavigation_Account");
+        var idAccountKumi = form.find("#Claim_IdAccountKumiNavigation_Account");
+
+        if (idAccountBks.val() !== "" || idAccountKumi !== "") {
+            clearValidationError(accountErrorWrapper);
+            removeErrorFromValidator(form.validate(), accountErrorWrapper);
+            $(".rr-account-common-error").removeClass("mb-2");
+            idAccountBks.removeClass("input-validation-error");
+            idAccountKumi.removeClass("input-validation-error");
         }
     }
 
@@ -197,12 +242,12 @@ $(function () {
                 type: 'POST',
                 url: window.location.origin + '/Claims/GetAccounts',
                 dataType: 'json',
-                data: { text: request.term },
+                data: { text: request.term, type: "BKS" },
                 success: function (data) {
                     response($.map(data, function (item) {
                         let account = { label: item.account, value: item.account, idAccount: item.idAccount };
                         if (data.length === 1) {
-                            selectAccount(account);
+                            selectAccount(account, "BKS");
                         }
                         return account;
                     }));
@@ -210,7 +255,7 @@ $(function () {
             });
         },
         select: function (event, ui) {
-            selectAccount(ui.item);
+            selectAccount(ui.item, "BKS");
         },
         minLength: 3
     });
@@ -219,10 +264,11 @@ $(function () {
         if ($('#Claim_IdAccount').val() === "") {
             $('#Claim_IdAccountNavigation_Account').val("");
             $("input[name='Claim.BksAddress']").val("");
-            $("input[name='Claim.RegistryAddress']").val("");
+            $("input[name='Claim.RegistryAddressBks']").val("");
         }
     });
 
+    // IdAccountAddtional
     $("#Claim_IdAccountAdditionalNavigation_Account").on("input", function () {
         $("#Claim_IdAccountAdditional").val("");
     });
@@ -238,7 +284,7 @@ $(function () {
                 type: 'POST',
                 url: window.location.origin + '/Claims/GetAccounts',
                 dataType: 'json',
-                data: { text: request.term },
+                data: { text: request.term, type: 'BKS' },
                 success: function (data) {
                     response($.map(data, function (item) {
                         let account = { label: item.account, value: item.account, idAccount: item.idAccount };
@@ -259,6 +305,42 @@ $(function () {
     $("#Claim_IdAccountAdditionalNavigation_Account").on("focusout", function () {
         if ($('#Claim_IdAccountAdditional').val() === "") {
             $('#Claim_IdAccountAdditionalNavigation_Account').val("");
+        }
+    });
+
+    // IdAccountKumi
+    $("#Claim_IdAccountKumiNavigation_Account").on("input", function () {
+        $("#Claim_IdAccountKumi").val("");
+    });
+
+    $("#Claim_IdAccountKumiNavigation_Account").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + '/Claims/GetAccounts',
+                dataType: 'json',
+                data: { text: request.term, type: "KUMI" },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        let account = { label: item.account, value: item.account, idAccount: item.idAccount };
+                        if (data.length === 1) {
+                            selectAccount(account, "KUMI");
+                        }
+                        return account;
+                    }));
+                }
+            });
+        },
+        select: function (event, ui) {
+            selectAccount(ui.item, "KUMI");
+        },
+        minLength: 3
+    });
+
+    $("#Claim_IdAccountKumiNavigation_Account").on("focusout", function () {
+        if ($('#Claim_IdAccountKumi').val() === "") {
+            $('#Claim_IdAccountKumiNavigation_Account').val("");
+            $("input[name='Claim.RegistryAddressKumi']").val("");
         }
     });
 });

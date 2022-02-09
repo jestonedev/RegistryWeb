@@ -5,7 +5,7 @@ using RegistryWeb.Models.SqlViews;
 
 namespace RegistryWeb.Models.Entities
 {
-    public class KumiAccount
+    public class KumiAccount : AccountBase
     {
         public KumiAccount()
         {
@@ -15,10 +15,6 @@ namespace RegistryWeb.Models.Entities
             IdState = 1;
         }
 
-        public int IdAccount { get; set; }
-        [Required(ErrorMessage = "Введите лицевой счет")]
-        public string Account { get; set; }
-        public string AccountGisZkh { get; set; }
         [Required(ErrorMessage = "Укажите состояние")]
         public int IdState { get; set; }
         public DateTime CreateDate { get; set; }

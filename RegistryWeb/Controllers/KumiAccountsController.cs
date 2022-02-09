@@ -173,7 +173,9 @@ namespace RegistryWeb.Controllers
                 Tenancies = tenanciesLimit.Select(r => new {
                     r.IdProcess,
                     r.RegistrationDate,
-                    r.RegistrationNum
+                    r.RegistrationNum,
+                    r.IdAccount,
+                    r.IdAccountNavigation?.Account
                 }),
                 RentObjects = rentObjects
             });

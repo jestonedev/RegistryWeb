@@ -10,7 +10,8 @@ namespace RegistryWeb.ViewModel
     public class ClaimsVM : ListVM<ClaimsFilter>
     {
         public IEnumerable<Claim> Claims { get; set; }
-        public Dictionary<int, List<Address>> RentObjects { get; set; }
+        public Dictionary<int, List<Address>> RentObjectsBks { get; set; }
+        public Dictionary<int, List<KumiAccountTenancyInfoVM>> TenancyInfoKumi { get; set; }
         public Dictionary<int, Payment> LastPaymentInfo { get; set; }
         public IEnumerable<KladrStreet> Streets { get; set; }
         public IEnumerable<ClaimStateType> StateTypes { get; set; }

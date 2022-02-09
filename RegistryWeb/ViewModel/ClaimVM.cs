@@ -9,7 +9,8 @@ namespace RegistryWeb.ViewModel
     public class ClaimVM
     {
         public Claim Claim { get; set; }
-        public IList<Address> RentObjects { get; set; }
+        public IList<Address> RentObjectsBks { get; set; }
+        public IList<KumiAccountTenancyInfoVM> TenancyInfoKumi { get; set; }
         public Payment LastPaymentInfo { get; set; }
         public IEnumerable<ClaimStateType> StateTypes { get; set; }
         public IEnumerable<Executor> Executors { get; set; }

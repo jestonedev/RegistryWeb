@@ -18,6 +18,13 @@
     ViewData["Executors"] = Model.Executors;
     ViewData["Judges"] = Model.Judges;
     ViewData["Signers"] = Model.Signers;
+    
+    List<RegistryWeb.ViewModel.KumiAccountTenancyInfoVM> activeKumiTenancyInfo = null;
+    if (Model.Claim.IdAccountKumi != null && Model.TenancyInfoKumi != null)
+    {
+        activeKumiTenancyInfo = Model.TenancyInfoKumi.Where(r => r.TenancyProcess.TenancyPersons.Any(p => p.ExcludeDate == null || p.ExcludeDate > DateTime.Now)
+        && (r.TenancyProcess.RegistrationNum == null || !r.TenancyProcess.RegistrationNum.EndsWith("н"))).ToList();
+    }
 }
 
 @section styles {
@@ -34,7 +41,7 @@
             @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
             {
 
-                @if (Model.RentObjects.Any())
+                @if (Model.RentObjectsBks.Any())
                 {
                     <div class="btn-group" role="group" aria-label="Панель доступа">
                         <button class="btn btn-success dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="registryBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -42,7 +49,7 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="registryBtn">
                             @{
-                                var rentObjects = Model.RentObjects;
+                                var rentObjects = Model.RentObjectsBks;
                                 var premisesIds = rentObjects.Where(r => r.AddressType == AddressTypes.Premise).Select(r => r.Id)
                                                 .Union(rentObjects.Where(r => r.AddressType == AddressTypes.SubPremise).Select(r => r.IdParents["Premise"]))
                                                 .Select(r => int.Parse(r));
@@ -99,8 +106,16 @@
                             <span class="oi oi-grid-two-up"></span>
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@Model.Claim.IdClaim">
-                            <a class="dropdown-item" title="Лицевой счет БКС (основной)" aria-label="Лицевой счет БКС (основной)"
-                               asp-controller="PaymentAccounts" asp-action="Details" asp-route-idAccount="@Model.Claim.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет БКС (основной)</a>
+                            @if (Model.Claim.IdAccountKumi != null)
+                            {
+                                <a class="dropdown-item" title="Лицевой счет КУМИ" aria-label="Лицевой счет КУМИ"
+                                   asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@Model.Claim.IdAccountKumi" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет КУМИ</a>
+                            }
+                            @if (Model.Claim.IdAccount != null)
+                            {
+                                <a class="dropdown-item" title="Лицевой счет БКС (основной)" aria-label="Лицевой счет БКС (основной)"
+                                   asp-controller="PaymentAccounts" asp-action="Details" asp-route-idAccount="@Model.Claim.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет БКС (основной)</a>
+                            }
                             @if (Model.Claim.IdAccountAdditional != null)
                             {
                                 <a class="dropdown-item" title="Лицевой счет БКС (дополнительный)" aria-label="Лицевой счет БКС (дополнительный)"
@@ -147,32 +162,40 @@
         </div>
     </div>
     <div class="card-body pt-3 pb-3 pl-3 pr-3" id="Claim">
-        <form asp-controller="Claims" asp-action="@ViewBag.Action" id="ClaimForm" data-action="@ViewBag.Action" method="post" enctype="multipart/form-data">
+        <form asp-controller="Claims" asp-action="@ViewBag.Action" autocomplete="off" id="ClaimForm" data-action="@ViewBag.Action" method="post" enctype="multipart/form-data">
             <input type="hidden" asp-for="Claim.IdClaim" />
             <input type="hidden" value="@ViewBag.ReturnUrl" name="ReturnUrl" />
             <div class="row">
-                <div class="form-group col-6 col-xl-3 mb-2">
-                    <label class="mb-1" asp-for="Claim.IdAccount">Лицевой счет (осн.)</label>
-                    <input type="hidden" asp-for="Claim.IdAccount" />
-                    <input type="text" data-val="true" data-val-required="Выберите лицевой счет" class="form-control" asp-for="Claim.IdAccountNavigation.Account" title="Номер лицевого счета БКС">
-                    <span asp-validation-for="Claim.IdAccountNavigation.Account" class="text-danger"></span>
+                <div class="col-12 text-center rr-account-common-error">
+                    <input type="hidden" name="AnyAccountRequire"/>
+                    <span class="text-danger field-validation-valid" data-valmsg-for="AnyAccountRequire" data-valmsg-replace="true"></span>
                 </div>
-                <div class="form-group col-6 col-xl-3 mb-2">
-                    <label class="mb-1" asp-for="Claim.IdAccountAdditional">Лицевой счет (доп.)</label>
+                <div class="form-group col-12 col-md-4 mb-2">
+                    <label class="mb-1" asp-for="Claim.IdAccount">Лицевой счет БКС (осн.)</label>
+                    <input type="hidden" asp-for="Claim.IdAccount" />
+                    <input type="text" class="form-control" asp-for="Claim.IdAccountNavigation.Account" title="Номер лицевого счета БКС">
+                </div>
+                <div class="form-group col-12 col-md-4 mb-2">
+                    <label class="mb-1" asp-for="Claim.IdAccountAdditional">Лицевой счет БКС (доп.)</label>
                     <input type="hidden" asp-for="Claim.IdAccountAdditional" />
                     <input type="text" class="form-control" asp-for="Claim.IdAccountAdditionalNavigation.Account" title="Номер лицевого счета БКС">
                 </div>
-                <div class="form-group col-12 col-md-4 col-xl-2 mb-2">
+                <div class="form-group col-12 col-md-4 mb-2">
+                    <label class="mb-1" asp-for="Claim.IdAccountKumi">Лицевой счет КУМИ</label>
+                    <input type="hidden" asp-for="Claim.IdAccountKumi" />
+                    <input type="text" class="form-control" asp-for="Claim.IdAccountKumiNavigation.Account" title="Номер лицевого счета КУМИ">
+                </div>
+                <div class="form-group col-12 col-md-4 mb-2">
                     <label class="mb-1" asp-for="Claim.AtDate">Дата фомирования</label>
                     <input type="date" class="form-control" asp-for="Claim.AtDate"
                            value="@(Model.Claim.AtDate.HasValue ? Model.Claim.AtDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата формирования">
                 </div>
-                <div class="form-group col-12 col-md-4 col-xl-2 mb-2">
+                <div class="form-group col-12 col-md-4 mb-2">
                     <label class="mb-1" asp-for="Claim.StartDeptPeriod">Предъявлено с</label>
                     <input type="date" class="form-control" asp-for="Claim.StartDeptPeriod"
                            value="@(Model.Claim.StartDeptPeriod.HasValue ? Model.Claim.StartDeptPeriod.Value.ToString("yyyy-MM-dd") : "")" title="Дата начала предъявляемого периода">
                 </div>
-                <div class="form-group col-12 col-md-4 col-xl-2 mb-2">
+                <div class="form-group col-12 col-md-4 mb-2">
                     <label class="mb-1" asp-for="Claim.EndDeptPeriod">Предъявлено по</label>
                     <input type="date" class="form-control" asp-for="Claim.EndDeptPeriod"
                            value="@(Model.Claim.EndDeptPeriod.HasValue ? Model.Claim.EndDeptPeriod.Value.ToString("yyyy-MM-dd") : "")" title="Дата окончания предъявляемого периода">
@@ -181,23 +204,39 @@
             <div class="row">
                 @{
                     var bksAddress = Model.Claim.IdAccountNavigation?.RawAddress;
-                    var registryAddress = "";
-                    if (Model.RentObjects != null && Model.RentObjects.Any())
+                    var registryAddressBks = "";
+                    var registryAddressKumi = "";
+                    if (Model.Claim.IdAccountKumi != null && Model.TenancyInfoKumi != null && Model.TenancyInfoKumi.Any())
                     {
-                        registryAddress = Model.RentObjects.Select(r => r.Text).Aggregate((acc, v) => acc + ", " + v);
+                        List<Address> rentObjectsKumi = null;
+                        rentObjectsKumi = Model.TenancyInfoKumi.FirstOrDefault().RentObjects.Select(r => r.Address).ToList();
+                        if (activeKumiTenancyInfo.Any())
+                        {
+                            rentObjectsKumi = activeKumiTenancyInfo.FirstOrDefault().RentObjects.Select(r => r.Address).ToList();
+                        }
+                        if (rentObjectsKumi.Any())
+                        {
+                            registryAddressKumi = rentObjectsKumi.Select(r => r.Text).Aggregate((acc, v) => acc + ", " + v);
+                        }
+                    }
+                    if (Model.Claim.IdAccount != null && Model.RentObjectsBks != null && Model.RentObjectsBks.Any())
+                    {
+                        registryAddressBks = Model.RentObjectsBks.Select(r => r.Text).Aggregate((acc, v) => acc + ", " + v);
                     }
                 }
                 <div class="form-group col-12 col-lg-6 mb-2">
                     <label class="mb-1" for="Claim.BksAddress">Адрес по БКС</label>
-                    <input type="text" disabled name="Claim.BksAddress" value="@bksAddress" class="form-control" title="Адрес по БКСа">
+                    <input type="text" disabled name="Claim.BksAddress" value="@bksAddress" class="form-control" title="Адрес по БКС">
                 </div>
                 <div class="form-group col-12 col-lg-6 mb-2">
-                    <label class="mb-1" for="Claim.RegistryAddress">Адрес по жилищному фонду</label>
-                    <input type="text" disabled class="form-control" value="@registryAddress" name="Claim.RegistryAddress" title="Адрес по жилищному фонду">
+                    <label class="mb-1" for="Claim.RegistryAddressBks">Адрес по жилищному фонду БКС</label>
+                    <input type="text" disabled class="form-control" value="@registryAddressBks" name="Claim.RegistryAddressBks" title="Адрес по жилищному фонду БКС">
                 </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-md-6">
+                <div class="form-group col-12 col-lg-6 mb-2">
+                    <label class="mb-1" for="Claim.RegistryAddressKumi">Адрес по жилищному фонду КУМИ</label>
+                    <input type="text" disabled class="form-control" value="@registryAddressKumi" name="Claim.RegistryAddressKumi" title="Адрес по жилищному фонду КУМИ">
+                </div>
+                <div class="form-group col-12 col-lg-6 mb-2 text-center rr-claim-end-for-filter-checkbox">
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" asp-for="Claim.EndedForFilter">
                         <label class="form-check-label" asp-for="Claim.EndedForFilter" title="Не учитывать при фильтрации">Не учитывать при фильтрации</label>
@@ -208,7 +247,7 @@
                 <div class="col-12 rr-claim-card">
                     <div class="card mb-2">
                         <div class="card-header d-flex justify-content-between pt-2 pb-2">
-                            <h4 class="mt-1">Сумма к взысканию</h4>
+                            <h4 class="mt-1 rr-claim-amount-sum-header">Сумма к взысканию</h4>
                             <div class="btn-group" role="group">
                                 <a href="#" data-for="ClaimAmount" class="form-control btn btn-primary claim-toggler" title="Развернуть сумму к взысканию" style="font-weight:bold;">∨</a>
                             </div>
@@ -253,7 +292,7 @@
                     </div>
                 </div>
             </div>
-            @if ((ViewBag.Action == "Details" || ViewBag.Action == "Delete") && Model.LastPaymentInfo != null)
+            @if ((ViewBag.Action == "Details" || ViewBag.Action == "Delete") && (Model.LastPaymentInfo != null || Model.Claim.IdAccountKumiNavigation != null))
             {
                 <div class="row">
                     <div class="col-12 rr-claim-card">
@@ -265,62 +304,84 @@
                                 </div>
                             </div>
                             <div id="ClaimLastMonthBalance" class="card-body toggle-hide pt-3 pb-3 pl-3 pr-3">
-                                <h5>Входящее</h5>
-                                <hr class="mt-1 mb-1" />
-                                <div class="row">
-                                    <div class="form-group col-4 col-lg-2 mb-2">
-                                        <label class="rr-account-label mb-1">Итого</label>
-                                        <input class="form-control" value="@Model.LastPaymentInfo.BalanceInput" type="text" />
+                                @if (Model.LastPaymentInfo != null)
+                                {
+                                    <h5>Входящее БКС</h5>
+                                    <hr class="mt-1 mb-1" />
+                                    <div class="row">
+                                        <div class="form-group col-4 col-lg-2 mb-2">
+                                            <label class="rr-account-label mb-1">Итого</label>
+                                            <input class="form-control" value="@Model.LastPaymentInfo.BalanceInput" type="text" />
+                                        </div>
+                                        <div class="form-group col-4 col-lg-2 mb-2">
+                                            <label class="rr-account-label mb-1">Найм</label>
+                                            <input class="form-control" value="@Model.LastPaymentInfo.BalanceTenancy" type="text" />
+                                        </div>
+                                        <div class="form-group col-4 col-lg-2 mb-2">
+                                            <label class="rr-account-label mb-1">Пени</label>
+                                            <input class="form-control" value="@Model.LastPaymentInfo.BalanceInputPenalties" type="text" />
+                                        </div>
+                                        <div class="form-group col-4 col-lg-2 mb-2">
+                                            <label class="rr-account-label mb-1">ДГИ</label>
+                                            <input class="form-control" value="@Model.LastPaymentInfo.BalanceDgi" type="text" />
+                                        </div>
+                                        <div class="form-group col-4 col-lg-2 mb-2">
+                                            <label class="rr-account-label mb-1">Падун</label>
+                                            <input class="form-control" value="@Model.LastPaymentInfo.BalancePadun" type="text" />
+                                        </div>
+                                        <div class="form-group col-4 col-lg-2 mb-2">
+                                            <label class="rr-account-label mb-1">ПКК</label>
+                                            <input class="form-control" value="@Model.LastPaymentInfo.BalancePkk" type="text" />
+                                        </div>
                                     </div>
-                                    <div class="form-group col-4 col-lg-2 mb-2">
-                                        <label class="rr-account-label mb-1">Найм</label>
-                                        <input class="form-control" value="@Model.LastPaymentInfo.BalanceTenancy" type="text" />
+                                    <h5>Исходящее БКС</h5>
+                                    <hr class="mt-1 mb-1" />
+                                    <div class="row">
+                                        <div class="form-group col-4 col-lg-2 mb-2 mb-lg-0">
+                                            <label class="rr-account-label mb-1">Итого</label>
+                                            <input class="form-control" value="@Model.LastPaymentInfo.BalanceOutputTotal" type="text" />
+                                        </div>
+                                        <div class="form-group col-4 col-lg-2 mb-2 mb-lg-0">
+                                            <label class="rr-account-label mb-1">Найм</label>
+                                            <input class="form-control" value="@Model.LastPaymentInfo.BalanceOutputTenancy" type="text" />
+                                        </div>
+                                        <div class="form-group col-4 col-lg-2 mb-2 mb-lg-0">
+                                            <label class="rr-account-label mb-1">Пени</label>
+                                            <input class="form-control" value="@Model.LastPaymentInfo.BalanceOutputPenalties" type="text" />
+                                        </div>
+                                        <div class="form-group col-4 col-lg-2 @(Model.Claim.IdAccountKumiNavigation != null ? "mb-2" : "mb-0")">
+                                            <label class="rr-account-label mb-1">ДГИ</label>
+                                            <input class="form-control" value="@Model.LastPaymentInfo.BalanceOutputDgi" type="text" />
+                                        </div>
+                                        <div class="form-group col-4 col-lg-2 @(Model.Claim.IdAccountKumiNavigation != null ? "mb-2" : "mb-0")">
+                                            <label class="rr-account-label mb-1">Падун</label>
+                                            <input class="form-control" value="@Model.LastPaymentInfo.BalanceOutputPadun" type="text" />
+                                        </div>
+                                        <div class="form-group col-4 col-lg-2 @(Model.Claim.IdAccountKumiNavigation != null ? "mb-2" : "mb-0")">
+                                            <label class="rr-account-label mb-1">ПКК</label>
+                                            <input class="form-control" value="@Model.LastPaymentInfo.BalanceOutputPkk" type="text" />
+                                        </div>
                                     </div>
-                                    <div class="form-group col-4 col-lg-2 mb-2">
-                                        <label class="rr-account-label mb-1">Пени</label>
-                                        <input class="form-control" value="@Model.LastPaymentInfo.BalanceInputPenalties" type="text" />
+                                }
+                                @if (Model.Claim.IdAccountKumiNavigation != null)
+                                {
+                                    <h5>Исходящее КУМИ</h5>
+                                    <hr class="mt-1 mb-1" />
+                                    <div class="row">
+                                        <div class="form-group col-4 mb-2 mb-lg-0">
+                                            <label class="rr-account-label mb-1">Итого</label>
+                                            <input class="form-control" value="@(Model.Claim.IdAccountKumiNavigation.CurrentBalanceTenancy + Model.Claim.IdAccountKumiNavigation.CurrentBalancePenalty)" type="text" />
+                                        </div>
+                                        <div class="form-group col-4 mb-2 mb-lg-0">
+                                            <label class="rr-account-label mb-1">Найм</label>
+                                            <input class="form-control" value="@Model.Claim.IdAccountKumiNavigation.CurrentBalanceTenancy" type="text" />
+                                        </div>
+                                        <div class="form-group col-4 mb-2 mb-lg-0">
+                                            <label class="rr-account-label mb-1">Пени</label>
+                                            <input class="form-control" value="@Model.Claim.IdAccountKumiNavigation.CurrentBalancePenalty" type="text" />
+                                        </div>
                                     </div>
-                                    <div class="form-group col-4 col-lg-2 mb-2">
-                                        <label class="rr-account-label mb-1">ДГИ</label>
-                                        <input class="form-control" value="@Model.LastPaymentInfo.BalanceDgi" type="text" />
-                                    </div>
-                                    <div class="form-group col-4 col-lg-2 mb-2">
-                                        <label class="rr-account-label mb-1">Падун</label>
-                                        <input class="form-control" value="@Model.LastPaymentInfo.BalancePadun" type="text" />
-                                    </div>
-                                    <div class="form-group col-4 col-lg-2 mb-2">
-                                        <label class="rr-account-label mb-1">ПКК</label>
-                                        <input class="form-control" value="@Model.LastPaymentInfo.BalancePkk" type="text" />
-                                    </div>
-                                </div>
-                                <h5>Исходящее</h5>
-                                <hr class="mt-1 mb-1" />
-                                <div class="row">
-                                    <div class="form-group col-4 col-lg-2 mb-2 mb-lg-0">
-                                        <label class="rr-account-label mb-1">Итого</label>
-                                        <input class="form-control" value="@Model.LastPaymentInfo.BalanceOutputTotal" type="text" />
-                                    </div>
-                                    <div class="form-group col-4 col-lg-2 mb-2 mb-lg-0">
-                                        <label class="rr-account-label mb-1">Найм</label>
-                                        <input class="form-control" value="@Model.LastPaymentInfo.BalanceOutputTenancy" type="text" />
-                                    </div>
-                                    <div class="form-group col-4 col-lg-2 mb-2 mb-lg-0">
-                                        <label class="rr-account-label mb-1">Пени</label>
-                                        <input class="form-control" value="@Model.LastPaymentInfo.BalanceOutputPenalties" type="text" />
-                                    </div>
-                                    <div class="form-group col-4 col-lg-2 mb-0">
-                                        <label class="rr-account-label mb-1">ДГИ</label>
-                                        <input class="form-control" value="@Model.LastPaymentInfo.BalanceOutputDgi" type="text" />
-                                    </div>
-                                    <div class="form-group col-4 col-lg-2 mb-0">
-                                        <label class="rr-account-label mb-1">Падун</label>
-                                        <input class="form-control" value="@Model.LastPaymentInfo.BalanceOutputPadun" type="text" />
-                                    </div>
-                                    <div class="form-group col-4 col-lg-2 mb-0">
-                                        <label class="rr-account-label mb-1">ПКК</label>
-                                        <input class="form-control" value="@Model.LastPaymentInfo.BalanceOutputPkk" type="text" />
-                                    </div>
-                                </div>
+                                }
                             </div>
                         </div>
                     </div>

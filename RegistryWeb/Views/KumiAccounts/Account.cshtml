@@ -211,12 +211,12 @@
             <div class="form-row">
                 <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-account-label mb-1" asp-for="Account">Лицевой счет</label>
-                    <input type="text" asp-for="Account" title="Лицевой счет" class="form-control input-numbers" maxlength="255" />
+                    <input type="text" asp-for="Account" data-val="true" data-val-required="Укажите лицевой счет" title="Лицевой счет" class="form-control input-numbers" maxlength="255" />
                     <span class="text-danger" asp-validation-for="Account"></span>
                 </div>
                 <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-account-label mb-1" asp-for="AccountGisZkh">Лицевой счет ГИС ЖКХ</label>
-                    <input type="text" asp-for="AccountGisZkh" title="Лицевой сче ГИС ЖКХт" class="form-control input-account-zkh" maxlength="255" />
+                    <input type="text" asp-for="AccountGisZkh" title="Лицевой сче ГИС ЖКХ" class="form-control input-account-zkh" maxlength="255" />
                 </div>
                 <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-account-label mb-1">Состояние</label>

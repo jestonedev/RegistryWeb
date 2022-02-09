@@ -5,7 +5,7 @@ using RegistryWeb.Models.SqlViews;
 
 namespace RegistryWeb.Models.Entities
 {
-    public class PaymentAccount
+    public class PaymentAccount: AccountBase
     {
         public PaymentAccount()
         {
@@ -14,10 +14,6 @@ namespace RegistryWeb.Models.Entities
             PaymentAccountSubPremisesAssoc = new List<PaymentAccountSubPremiseAssoc>();
             Claims = new List<Claim>();
         }
-
-        public int IdAccount { get; set; }
-        public string Account { get; set; }
-        public string AccountGisZkh { get; set; }
         public string Crn { get; set; }
         public string RawAddress { get; set; }
         public virtual IList<Payment> Payments { get; set; }
