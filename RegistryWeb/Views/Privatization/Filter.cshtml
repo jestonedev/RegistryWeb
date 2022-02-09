@@ -81,15 +81,19 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-6 col-lg-4">
+                        <div class="form-group col-md-6 col-lg-3">
                             <label class="rr-priv-filter-label" asp-for="FilterOptions.BirthDate">Дата рождения</label>
                             <input type="date" class="form-control" asp-for="FilterOptions.BirthDate" title="Дата рождения">
                         </div>
-                        <div class="form-group col-md-6 col-lg-4">
+                        <div class="form-group col-md-6 col-lg-3">
                             <label class="rr-priv-filter-label" asp-for="FilterOptions.DateIssueCivil">Дата выдачи договора гражданам</label>
                             <input type="date" class="form-control" asp-for="FilterOptions.DateIssueCivil" title="Дата выдачи договора гражданам">
                         </div>
-                        <div class="form-group form-check col-md-6 col-lg-4 rr-is-refusenik-filter-checkbox">
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label class="rr-priv-filter-label" asp-for="FilterOptions.OldSystemAddress">Адрес из АИС "Приватизация"</label>
+                            <input type="text" maxlength="255" class="form-control" asp-for="FilterOptions.OldSystemAddress" title='Адрес из АИС "Приватизация"'>
+                        </div>
+                        <div class="form-group form-check col-md-6 col-lg-3 rr-is-refusenik-filter-checkbox">
                             <input type="checkbox" asp-for="FilterOptions.IsRefusenik" title="Услуга отозвана">
                             <label class="form-check-label" asp-for="FilterOptions.IsRefusenik">Услуга отозвана</label>
                         </div>
@@ -118,8 +122,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="searchModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Найти</button>
                     <button id="filterClearModalBtn" type="button" class="btn btn-secondary">Очистить</button>
+                    <button id="searchModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Найти</button>
                 </div>
             </div>
         </div>

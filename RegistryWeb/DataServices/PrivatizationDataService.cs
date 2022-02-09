@@ -49,6 +49,19 @@ namespace RegistryWeb.DataServices
             {
                 query = AddressFilter(query, filterOptions);
                 query = ModalFilter(query, filterOptions);
+                query = OldAddressFilter(query, filterOptions);
+            }
+            return query;
+        }
+
+        private IQueryable<PrivContract> OldAddressFilter(IQueryable<PrivContract> query, PrivatizationFilter filterOptions)
+        {
+            if (string.IsNullOrEmpty(filterOptions.OldSystemAddress)) return query;
+            var addressParts = filterOptions.OldSystemAddress.ToLowerInvariant().Split(' ');
+            query = query.Where(r => r.PrivAddress != null);
+            foreach (var part in addressParts)
+            {
+                query = query.Where(r => r.PrivAddress.ToLowerInvariant().Contains(part));
             }
             return query;
         }
