@@ -113,8 +113,9 @@ namespace RegistryWeb.DataServices
         {
             if (!string.IsNullOrEmpty(filterOptions.RegNumber))
             {
+                var regNum = filterOptions.RegNumber.Trim();
                 query = from row in query
-                        where row.RegNumber.Contains(filterOptions.RegNumber)
+                        where row.RegNumber.Contains(regNum)
                         select row;
             }
             if (filterOptions.DateIssueCivil != null)
