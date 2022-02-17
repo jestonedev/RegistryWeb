@@ -19,6 +19,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public string RestrictionNum { get; set; }
         public DateTime? RestrictionDate { get; set; }
         public List<int> IdsRestrictionType { get; set; }
+        public bool? IdsRestrictionTypeContains { get; set; }
         public string NumberOwnershipRight { get; set; }
         public DateTime? DateOwnershipRight { get; set; }
         public DateTime? StDateOwnershipRight { get; set; }
