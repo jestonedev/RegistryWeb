@@ -157,8 +157,8 @@
             <td>
                 <div>
                     <b>№ ЛС:</b> @item.Account 
-                    <span class="oi oi-media-record ml-1 @(item.IdState == 1 ? "text-success" : "text-danger")" 
-                          title="@(item.IdState == 1 ? "Действующий" : "Аннулированный")" style="font-size: 80%"></span>
+                    <span class="oi oi-media-record ml-1 @(item.IdState == 1 ? "text-success" :  item.IdState == 2 ? "text-danger" : "text-warning")" 
+                          title="@(item.IdState == 1 ? "Действующий" : item.IdState == 2 ? "Аннулированный" : "Не начисляется")" style="font-size: 80%"></span>
                 </div>
                 @if (!String.IsNullOrWhiteSpace(@item.AccountGisZkh))
                 {
@@ -207,7 +207,12 @@
                                    asp-route-idProcess="@tenancyInfo.TenancyProcess.IdProcess"></a>
                             </div>
                             <div>
-                                <b>Наниматель:</b> @tenancyInfo.Tenant.Surname @tenancyInfo.Tenant.Name @tenancyInfo.Tenant.Patronymic
+                                @{
+                                    var snp = tenancyInfo.Tenant?.Surname + " " + tenancyInfo.Tenant?.Name + " " + tenancyInfo.Tenant?.Patronymic;
+                                    snp = snp.Trim();
+                                }
+
+                                <b>Наниматель:</b> @(string.IsNullOrEmpty(snp) ? Html.Raw("<span class='text-danger'>не указан</span>") : Html.Raw(snp))
                             </div>
                             <div>
                                 <b>Период найма:</b>

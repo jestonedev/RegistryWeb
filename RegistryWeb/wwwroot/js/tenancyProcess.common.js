@@ -322,4 +322,34 @@ $(function () {
     });
 
     $("#TenancyProcess_UntilDismissal").change();
+
+    $("#TenancyProcess_IdAccountNavigation_Account").on("input", function () {
+        $("#TenancyProcess_IdAccount").val("");
+    });
+
+    $("#TenancyProcess_IdAccountNavigation_Account").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + '/Claims/GetAccounts',
+                dataType: 'json',
+                data: { text: request.term, type: "KUMI" },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        let account = { label: item.account, value: item.account, idAccount: item.idAccount };
+                        if (data.length === 1) {
+                            $("#TenancyProcess_IdAccount").val(account.idAccount);
+                            $("#TenancyProcess_IdAccountNavigation_Account").val(account.value);
+                        }
+                        return account;
+                    }));
+                }
+            });
+        },
+        select: function (event, ui) {
+            $("#TenancyProcess_IdAccount").val(ui.item.idAccount);
+            $("#TenancyProcess_IdAccountNavigation_Account").val(ui.item.value);
+        },
+        minLength: 3
+    });
 });

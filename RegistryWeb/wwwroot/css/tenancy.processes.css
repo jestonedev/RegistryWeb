@@ -85,3 +85,7 @@
 button[id^="homesBtn_"] {
     margin-bottom: 5px;
 }
+
+.rr-tenancy-account-btn {
+    border-radius: 0 .25rem .25rem 0;
+}

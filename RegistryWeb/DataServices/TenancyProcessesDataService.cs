@@ -201,6 +201,7 @@ namespace RegistryWeb.DataServices
                  .Include(tp => tp.TenancyRentPeriods)
                  .Include(tp => tp.TenancyAgreements)
                  .Include(tp => tp.TenancyFiles)
+                 .Include(tp => tp.IdAccountNavigation)
                  .FirstOrDefault(tp => tp.IdProcess == idProcess);
         }
 
@@ -671,14 +672,43 @@ namespace RegistryWeb.DataServices
                 }
             }
 
+            AddAndBindAccount(tenancyProcess);
+
             registryContext.TenancyProcesses.Add(tenancyProcess);
             registryContext.SaveChanges();
         }
 
         internal void Edit(TenancyProcess tenancyProcess)
         {
+            AddAndBindAccount(tenancyProcess);
             registryContext.TenancyProcesses.Update(tenancyProcess);
             registryContext.SaveChanges();
+        }
+
+        internal void AddAndBindAccount(TenancyProcess tenancyProcess)
+        {
+            var account = tenancyProcess.IdAccountNavigation?.Account;
+            tenancyProcess.IdAccountNavigation = null;
+            if (!string.IsNullOrEmpty(account))
+            {
+                account = account.Trim();
+                var kumiAccount = registryContext.KumiAccounts.FirstOrDefault(r => r.Account == account);
+                if (kumiAccount == null)
+                {
+                    kumiAccount = new KumiAccount
+                    {
+                        Account = account,
+                        IdState = 1,
+                        CurrentBalanceTenancy = 0,
+                        CurrentBalancePenalty = 0,
+                        CreateDate = DateTime.Now.Date,
+                        RecalcMarker = 0
+                    };
+                    registryContext.KumiAccounts.Add(kumiAccount);
+                    registryContext.SaveChanges();
+                }
+                tenancyProcess.IdAccount = kumiAccount.IdAccount;
+            }
         }
 
         internal void Delete(int idProcess)

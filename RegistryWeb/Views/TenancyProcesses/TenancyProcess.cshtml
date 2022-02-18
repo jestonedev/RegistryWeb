@@ -113,7 +113,7 @@
         </div>
     </div>
     <div class="card-body pt-3 pb-3 pl-3 pr-3" id="TenancyProcess">
-        <form asp-controller="TenancyProcesses" asp-action="@ViewBag.Action" id="TenancyProcessForm" data-action="@ViewBag.Action" method="post" enctype="multipart/form-data">
+        <form asp-controller="TenancyProcesses" asp-action="@ViewBag.Action" id="TenancyProcessForm" autocomplete="off" data-action="@ViewBag.Action" method="post" enctype="multipart/form-data">
             <input type="hidden" asp-for="TenancyProcess.IdProcess" />
             <input type="hidden" value="@ViewBag.ReturnUrl" name="ReturnUrl" />
             @foreach (var rentType in Model.RentTypes)
@@ -177,7 +177,7 @@
             </div>
 
             <div class="row">
-                <div class="form-group col-md-6 mb-2">
+                <div class="form-group col-md-4 mb-2">
                     <label class="mb-1" asp-for="TenancyProcess.IdRentType">Тип найма жилья</label>
                     <select class="selectpicker form-control" asp-for="TenancyProcess.IdRentType" asp-items="@(new SelectList(Model.RentTypes, "IdRentType", "RentTypeName"))"
                             title="Тип найма жилья" data-val="true" data-val-required="Выберите тип найма жилья">
@@ -185,7 +185,7 @@
                     </select>
                     <span asp-validation-for="TenancyProcess.IdRentType" class="text-danger"></span>
                 </div>
-                <div class="form-group col-md-6 mb-2">
+                <div class="form-group col-md-4 mb-2">
                     <label class="mb-1" asp-for="TenancyProcess.IdExecutor">Исполнитель/составитель</label>
                     <select class="selectpicker form-control" asp-for="TenancyProcess.IdExecutor" title="Исполнитель/составитель"
                             data-val="true" data-val-required="Выберите исполнителя/составителя">
@@ -209,6 +209,24 @@
                         }
                     </select>
                     <span asp-validation-for="TenancyProcess.IdExecutor" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-4 mb-2">
+                    <input type="hidden" asp-for="TenancyProcess.IdAccount" />
+                    <label class="mb-1" asp-for="TenancyProcess.IdAccount">Лицевой счет</label>
+                    @if ((ViewBag.Action == "Details" || ViewBag.Action == "Delete") && Model.TenancyProcess.IdAccount != null)
+                    {
+                        <div class="input-group">
+                            <input class="form-control" type="text" asp-for="TenancyProcess.IdAccountNavigation.Account" title="Номер лицевого счета" />
+                            <a class="btn btn-outline-secondary rr-tenancy-account-btn" title="Карточка лицевого счета" target="_blank" asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@Model.TenancyProcess.IdAccount">
+                                <span class="oi oi-eye"></span>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="text" class="form-control" asp-for="TenancyProcess.IdAccountNavigation.Account" title="Номер лицевого счета">
+                    }
+
                 </div>
             </div>
             <div class="row">

@@ -51,6 +51,7 @@
         tenancyInfo.each(function (ind, elem) {
             var idProcessElem = $(elem).find('input[id^="IdProcess"]');
             idProcessElem.attr('name', "TenancyProcesses[" + ind + "].IdProcess");
+            if (idProcessElem.val() === "") idProcessElem.remove();
         });
 
         var isValid = form.valid();
