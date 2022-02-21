@@ -84,16 +84,16 @@ let createBuildingClick = function (event) {
 };
 
 let updateDisableState = function (state, action, canEditBaseInfo, canEditLandInfo) {
-    let disableBaseInfo = state ? !(canEditBaseInfo && action != "Details" && action != "Delete") : state;
+    let disableBaseInfo = state ? !(canEditBaseInfo && action !== "Details" && action !== "Delete") : state;
     $('#building select').selectpicker("refresh").prop('disabled', disableBaseInfo).selectpicker("refresh");
-    $('#building input[type="checkbox"]').off('click');
-    $('#building input[type="checkbox"]').on('click', function () {
-        return !disableBaseInfo;
-    });
+
     $('#building input').attr('disabled', disableBaseInfo);
     $('#building textarea').attr('disabled', disableBaseInfo);
     if (!canEditBaseInfo && canEditLandInfo && action === "Edit") {
         $("#LandCadastralNum, #LandCadastralDate, #LandArea").attr('disabled', false);
+    }
+    if (!$("#IsMemorial").is(":checked") && !disableBaseInfo) {
+        $("#MemorialNumber, #MemorialDate, #MemorialNameOrg").attr('disabled', true);
     }
 };
 
