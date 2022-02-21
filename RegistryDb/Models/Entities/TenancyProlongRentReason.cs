@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace RegistryDb.Models.Entities
+﻿namespace RegistryDb.Models.Entities
 {
     public partial class TenancyProlongRentReason
     {

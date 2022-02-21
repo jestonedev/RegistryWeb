@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using RegistryDb.Models.SqlViews;
+﻿using System.Collections.Generic;
 
 namespace RegistryDb.Models.Entities
 {

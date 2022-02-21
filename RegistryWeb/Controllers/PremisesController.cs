@@ -6,17 +6,13 @@ using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
-using System.Runtime.CompilerServices;
 using RegistryDb.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RegistryDb.Models;
 using RegistryWeb.DataHelpers;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
-using System.IO;
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.Enums;
 

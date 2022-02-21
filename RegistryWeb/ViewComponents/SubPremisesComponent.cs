@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using RegistryDb.Models;
-using RegistryDb.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using RegistryWeb.ViewModel;
 using Microsoft.AspNetCore.Mvc.Rendering;

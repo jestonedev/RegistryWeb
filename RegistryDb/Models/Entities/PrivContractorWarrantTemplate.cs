@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-namespace RegistryDb.Models.Entities
+﻿namespace RegistryDb.Models.Entities
 {
     public partial class PrivContractorWarrantTemplate
     {

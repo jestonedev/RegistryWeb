@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -12,9 +11,7 @@ using RegistryWeb.Extensions;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryDb.Models.Entities;
-using RegistryDb.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
 using RegistryWeb.Enums;
 
 namespace RegistryWeb.Controllers

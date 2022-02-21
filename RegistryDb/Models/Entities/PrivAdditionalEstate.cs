@@ -1,5 +1,4 @@
 ﻿using RegistryDb.Interfaces;
-using System;
 
 namespace RegistryDb.Models.Entities
 {

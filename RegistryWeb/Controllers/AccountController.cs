@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RegistryWeb.Models;
-using RegistryWeb.ViewModel;
 using MySql.Data.MySqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.SecurityServices;
@@ -9,7 +7,6 @@ using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.Extensions;
 using RegistryWeb.ViewOptions;
-using RegistryDb.Models;
 using RegistryDb.Models.Entities;
 using RegistryWeb.Enums;
 

@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using RegistryDb.Models;
-using Microsoft.EntityFrameworkCore;
 using RegistryWeb.ViewModel;
 using RegistryWeb.Enums;
 

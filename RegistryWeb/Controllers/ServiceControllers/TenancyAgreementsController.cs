@@ -1,17 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text;
-using Microsoft.AspNetCore.Http;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using RegistryWeb.DataHelpers;
 using RegistryDb.Models;
 using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
-using RegistryWeb.ViewModel;
 using NameCaseLib;
 
 namespace RegistryWeb.Controllers.ServiceControllers

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using RegistryDb.Models.Entities;
 using RegistryDb.Models.SqlViews;
 using RegistryDb.Models.IEntityTypeConfiguration;

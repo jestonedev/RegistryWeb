@@ -1,9 +1,4 @@
-﻿using System.Diagnostics;
-using RegistryDb.Models.Entities;
-using Microsoft.AspNetCore.Mvc;
-using RegistryWeb.Models;
-using System.Linq;
-using RegistryWeb.SecurityServices;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
 namespace RegistryWeb.Controllers

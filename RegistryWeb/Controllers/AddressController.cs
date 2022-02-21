@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using RegistryWeb.DataServices;
 using RegistryWeb.Enums;
-using RegistryWeb.Models;
 using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers

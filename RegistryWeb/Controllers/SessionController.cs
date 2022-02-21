@@ -1,12 +1,9 @@
-﻿using RegistryWeb.DataServices;
-using RegistryWeb.SecurityServices;
-using RegistryWeb.ViewOptions;
+﻿using RegistryWeb.ViewOptions;
 using RegistryWeb.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc;
-using RegistryWeb.ViewOptions.Filter;
 
 namespace RegistryWeb.Controllers
 {
