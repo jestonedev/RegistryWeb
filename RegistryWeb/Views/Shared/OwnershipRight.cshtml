@@ -1,9 +1,10 @@
 ﻿@model RegistryWeb.ViewModel.OwnershipRightVM;
 @using RegistryWeb.Extensions;
 @using RegistryWeb.ViewOptions;
-@using RegistryWeb.Models.Entities;
+@using RegistryDb.Models.Entities;
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.DataHelpers;
+@using RegistryWeb.Enums;
 
 @{ 
     var canEdit = ((bool?)ViewBag.CanEditBaseInfo) ?? true;

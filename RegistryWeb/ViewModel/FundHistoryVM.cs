@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models.Entities;
 using System.Collections.Generic;
 
 namespace RegistryWeb.ViewModel

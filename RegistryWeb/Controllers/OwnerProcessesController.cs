@@ -6,11 +6,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
-using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models;
+using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.Controllers
 {

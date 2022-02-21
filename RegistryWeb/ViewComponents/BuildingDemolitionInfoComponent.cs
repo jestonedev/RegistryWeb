@@ -1,10 +1,11 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RegistryWeb.Models;
+using RegistryDb.Models;
 using RegistryWeb.ViewModel;
 using RegistryWeb.SecurityServices;
 using System;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.ViewComponents
 {

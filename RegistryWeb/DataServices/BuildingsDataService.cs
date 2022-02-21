@@ -1,6 +1,4 @@
-﻿using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
-using RegistryWeb.ViewModel;
+﻿using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.DataHelpers;
@@ -10,8 +8,11 @@ using System.Collections.Generic;
 using System;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
-using RegistryWeb.Models.SqlViews;
+using RegistryDb.Models.SqlViews;
+using RegistryDb.Models;
+using RegistryDb.Models.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.DataServices
 {

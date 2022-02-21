@@ -1,4 +1,5 @@
-﻿using RegistryWeb.Models;
+﻿using RegistryDb.Models;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.ViewOptions.Filter
 {

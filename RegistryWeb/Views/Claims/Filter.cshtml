@@ -1,6 +1,8 @@
 ﻿@model RegistryWeb.ViewModel.ClaimsVM;
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.Extensions;
+@using RegistryWeb.Enums;
+
 @{
     var securityService = (SecurityService)ViewData["SecurityService"];
     var signList = Html.GetEnumSelectList<ComparisonSignEnum>();

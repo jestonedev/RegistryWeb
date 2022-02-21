@@ -1,7 +1,7 @@
-﻿using RegistryWeb.Models.Entities;
+﻿using RegistryDb.Models.Entities;
 using System.Collections.Generic;
 using RegistryWeb.ViewOptions.Filter;
-using RegistryWeb.Models.SqlViews;
+using RegistryDb.Models.SqlViews;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace RegistryWeb.ViewModel

@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Text;
 using System.Diagnostics;
-using RegistryWeb.Models.Entities;
-using RegistryWeb.Models;
+using RegistryDb.Models.Entities;
+using RegistryDb.Models;
 using System.Globalization;
 using System.IO.Compression;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.ReportServices
 {

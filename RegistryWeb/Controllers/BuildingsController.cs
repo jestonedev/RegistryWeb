@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.DataHelpers;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
-using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models;
+using RegistryDb.Models.Entities;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.Controllers
 {

@@ -1,13 +1,15 @@
 ﻿using System;
-using RegistryWeb.Models;
+using RegistryDb.Models;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models.Entities;
 using System.Collections.Generic;
-using RegistryWeb.Models.SqlViews;
+using RegistryDb.Models.SqlViews;
+using RegistryWeb.Enums;
+using RegistryDb.Interfaces;
 
 namespace RegistryWeb.DataServices
 {

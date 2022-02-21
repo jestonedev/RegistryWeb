@@ -1,5 +1,7 @@
-﻿using RegistryWeb.Models.Entities;
-using RegistryWeb.Models;
+﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models;
+using RegistryWeb.Enums;
+
 namespace RegistryWeb.ViewModel
 {
     public class RestrictionVM : Restriction

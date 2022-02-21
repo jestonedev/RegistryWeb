@@ -1,4 +1,6 @@
-﻿using RegistryWeb.Models;
+﻿using RegistryDb.Models;
+using RegistryWeb.Enums;
+using RegistryWeb.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

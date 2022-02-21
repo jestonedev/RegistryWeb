@@ -1,5 +1,6 @@
-﻿using RegistryWeb.Models.Entities;
-using RegistryWeb.Models;
+﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models;
+
 namespace RegistryWeb.ViewModel
 {
     public class OwnershipRightVM : OwnershipRight

@@ -2,6 +2,7 @@
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.ViewModel;
+@using RegistryWeb.Enums;
 @model RegistryWeb.ViewModel.KumiAccountsVM;
 @{
     var ids = Context.Session.Get<List<int>>("idKumiAccounts") ?? new List<int>();
@@ -121,257 +122,258 @@
                 }
             }
 
-        <tr style="position: relative">
-            @if (ids.Contains(item.IdAccount))
-            {
-                check = "checked";
-            }
-            else
-            {
-                check = "";
-            }
-            <td class="align-middle">
-                <input type="checkbox" class="idCheckbox" data-id="@item.IdAccount" @Html.Raw(check) />
-                @if (tenancyOutOfPeriod || hasActiveTenanciesAndAnul || hasNoActiveTenanciesAndActive)
+            <tr style="position: relative">
+                @if (ids.Contains(item.IdAccount))
                 {
-                    var warning = "";
-                    if (hasNoActiveTenanciesAndActive)
-                    {
-                        warning = "Лицевой счет действующий, но отсутствуют действующие процессы найма (с нанимателем и без \"н\" в номере договора)";
-                    }
-                    else
-                    if (hasActiveTenanciesAndAnul)
-                    {
-                        warning = "Лицевой счет аннулирован, но присутствуют действующие процессы найма (с нанимателем и без \"н\" в номере договора)";
-                    }
-                    else
-                    if (tenancyOutOfPeriod)
-                    {
-                        warning += "У всех привязанных процессов найма период действия не указан или истек. Для социального найма период необязателен";
-                    }
-                    <br />
-                    <span class="oi oi-bell text-danger mt-2" style="font-size: 80%" title="@warning"></span>
-                }
-            </td>
-
-            <td>
-                <div>
-                    <b>№ ЛС:</b> @item.Account 
-                    <span class="oi oi-media-record ml-1 @(item.IdState == 1 ? "text-success" :  item.IdState == 2 ? "text-danger" : "text-warning")" 
-                          title="@(item.IdState == 1 ? "Действующий" : item.IdState == 2 ? "Аннулированный" : "Не начисляется")" style="font-size: 80%"></span>
-                </div>
-                @if (!String.IsNullOrWhiteSpace(@item.AccountGisZkh))
-                {
-                    <div title="Единый лицевой счет для ГИС ЖКХ">
-                        <b>ЕЛС для ГИС ЖКХ:</b> @item.AccountGisZkh
-                    </div>
-                }
-                <div>
-                    <b>Дата начисления:</b> @(item.LastChargeDate.HasValue ? item.LastChargeDate.Value.ToString("dd.MM.yyyy") : "н/а")
-                </div>
-                <hr class="m-0 mt-2 mb-1" />
-                <div>
-                    <b>Сальдо итого:</b> @(item.CurrentBalanceTenancy + item.CurrentBalancePenalty) руб.
-                </div>
-                <div>
-                    Найм: @item.CurrentBalanceTenancy руб., пени: @item.CurrentBalancePenalty руб.
-                </div>
-                <div>
-                    <b>Плата за найм: </b>@payment руб.
-                </div>
-            </td>
-            <td>
-                @if (Model.TenancyInfo.ContainsKey(item.IdAccount))
-                {
-                    var tenancyInfos = Model.TenancyInfo[item.IdAccount].OrderByDescending(r => r.TenancyProcess.IdProcess);
-                    @for (var i = 0; i < tenancyInfos.Count(); i++)
-                    {
-                        var tenancyInfo = tenancyInfos.ElementAt(i);
-                        <div class="@(i == 0 ? "" : "rr-account-additional-info")">
-                            <div>
-                                @if (!string.IsNullOrEmpty(tenancyInfo.TenancyProcess.RegistrationNum))
-                                {
-                                    <b>Договор:</b>
-                                    <span>
-                                        № @tenancyInfo.TenancyProcess.RegistrationNum
-                                        @(tenancyInfo.TenancyProcess.RegistrationDate.HasValue ? "от " + tenancyInfo.TenancyProcess.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")
-                                    </span>
-                                }
-                                else
-                                {
-                                    <b>Рег. №: </b><span>@tenancyInfo.TenancyProcess.IdProcess</span>
-                                }
-                                <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn"
-                                   asp-action="Details" asp-controller="TenancyProcesses"
-                                   asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
-                                   asp-route-idProcess="@tenancyInfo.TenancyProcess.IdProcess"></a>
-                            </div>
-                            <div>
-                                @{
-                                    var snp = tenancyInfo.Tenant?.Surname + " " + tenancyInfo.Tenant?.Name + " " + tenancyInfo.Tenant?.Patronymic;
-                                    snp = snp.Trim();
-                                }
-
-                                <b>Наниматель:</b> @(string.IsNullOrEmpty(snp) ? Html.Raw("<span class='text-danger'>не указан</span>") : Html.Raw(snp))
-                            </div>
-                            <div>
-                                <b>Период найма:</b>
-                                @if (((tenancyInfo.TenancyProcess.BeginDate != null || tenancyInfo.TenancyProcess.EndDate != null) &&
-                          tenancyInfo.TenancyProcess.TenancyRentPeriods.Any()) || tenancyInfo.TenancyProcess.TenancyRentPeriods.Count() > 1)
-                                {
-                                    <br />
-                                }
-                                @if (tenancyInfo.TenancyProcess.BeginDate != null || tenancyInfo.TenancyProcess.EndDate != null)
-                                {
-                                    @(tenancyInfo.TenancyProcess.BeginDate.HasValue ? "с " + tenancyInfo.TenancyProcess.BeginDate.Value.ToString("dd.MM.yyyy") : "")@(" ")
-                                    @(tenancyInfo.TenancyProcess.EndDate.HasValue ? "по " + tenancyInfo.TenancyProcess.EndDate.Value.ToString("dd.MM.yyyy") : "на период ТО")
-                                }
-                                @if (tenancyInfo.TenancyProcess.TenancyRentPeriods.Any())
-                                {
-                                    @if (tenancyInfo.TenancyProcess.BeginDate != null || tenancyInfo.TenancyProcess.EndDate != null)
-                                    {
-                                        <br />
-                                    }
-                                    for (var j = 0; j < tenancyInfo.TenancyProcess.TenancyRentPeriods.Count; j++)
-                                    {
-                                        var period = tenancyInfo.TenancyProcess.TenancyRentPeriods[j];
-                                        @if (period.BeginDate != null || period.EndDate != null)
-                                        {
-                                            @(period.BeginDate.HasValue ? "с " + period.BeginDate.Value.ToString("dd.MM.yyyy") : "")@(" ")
-                                            @(period.EndDate.HasValue ? "по " + period.EndDate.Value.ToString("dd.MM.yyyy") : "на период ТО")
-                                        }
-                                        if (j < tenancyInfo.TenancyProcess.TenancyRentPeriods.Count - 1)
-                                        {
-                                            <br />
-                                        }
-                                    }
-                                }
-                                @if (tenancyInfo.TenancyProcess.BeginDate == null && tenancyInfo.TenancyProcess.EndDate == null && !tenancyInfo.TenancyProcess.TenancyRentPeriods.Any())
-                                {
-                                    <span class="text-danger">не указан</span>
-                                }
-                            </div>
-                            <div>
-                                <b>Договор зарегистрирован:</b>
-                                @if (tenancyInfo.TenancyProcess.RegistrationDate != null)
-                                {
-                                    <span>@tenancyInfo.TenancyProcess.RegistrationDate.Value.ToString("dd.MM.yyyy")</span>
-                                }
-                                else
-                                {
-                                    <span class="text-danger">не указан</span>
-                                }
-                            </div>
-                            <div>
-                                <b>Адрес:</b>
-                                @foreach (var rentObject in tenancyInfo.RentObjects)
-                                {
-                                    if (tenancyInfo.RentObjects.Count > 1)
-                                    {
-                                        <br />
-                                    }
-                                    if (rentObject.Address.AddressType == AddressTypes.SubPremise || rentObject.Address.AddressType == AddressTypes.Premise)
-                                    {
-                                        <span>@rentObject.Address.Text</span>
-                                        <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn"
-                                           asp-action="Details" asp-controller="Premises"
-                                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
-                                           asp-route-idPremises="@rentObject.Address.Id"></a>
-                                    }
-                                    else
-                                    if (rentObject.Address.AddressType == AddressTypes.Building)
-                                    {
-                                        <span>@rentObject.Address.Text</span>
-                                        <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn"
-                                           asp-action="Details" asp-controller="Buildings"
-                                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
-                                           asp-route-idBuilding="@rentObject.Address.Id"></a>
-                                    }
-                                }
-                            </div>
-                            @if (i < tenancyInfos.Count() - 1)
-                            {
-                                <hr class="m-0 mt-2 mb-1" />
-                            }
-                        </div>
-                    }
-                    if (tenancyInfos.Count() > 1)
-                    {
-                        <div class="text-center  mt-2">
-                            <a class="text-dark rr-additional-info" title="Детальная информация" href="#"><span class="oi oi-chevron-bottom"></span></a>
-                        </div>
-                    }
+                    check = "checked";
                 }
                 else
                 {
-                    <span class="text-danger font-italic">н/а</span>
+                    check = "";
                 }
-            </td>
-            <td style="position: relative">
-                @if (Model.ClaimsInfo.ContainsKey(item.IdAccount))
-                {
-                    var claimsInfo = Model.ClaimsInfo[item.IdAccount].OrderByDescending(r => r.StartDeptPeriod);
-                    @for (var i = 0; i < claimsInfo.Count(); i++)
+                <td class="align-middle">
+                    <input type="checkbox" class="idCheckbox" data-id="@item.IdAccount" @Html.Raw(check) />
+                    @if (tenancyOutOfPeriod || hasActiveTenanciesAndAnul || hasNoActiveTenanciesAndActive)
                     {
-                        var claimInfo = claimsInfo.ElementAt(i);
-                        <div class="@(i == 0 ? "" : "rr-account-additional-info")">
-                            <div>
-                                <span>@claimInfo.ClaimCurrentState</span>
-                            </div>
-                            <div>
-                                <b>Период:</b>
-                                @if (claimInfo.StartDeptPeriod != null || claimInfo.EndDeptPeriod != null)
-                                {
-                                    @(claimInfo.StartDeptPeriod.HasValue ? "с " + claimInfo.StartDeptPeriod.Value.ToString("dd.MM.yyyy") : "")@(" ")
-                                    @(claimInfo.EndDeptPeriod.HasValue ? "по " + claimInfo.EndDeptPeriod.Value.ToString("dd.MM.yyyy") : "")
-                                }
-                                @if (claimInfo.StartDeptPeriod == null && claimInfo.EndDeptPeriod == null)
-                                {
-                                    <span class="text-danger">не указан</span>
-                                }
-                            </div>
-                            <div>
-                                <b>Предъявлено итого:</b> @(claimInfo.AmountTenancy+claimInfo.AmountPenalty) руб.<br />
-                                <span>Найм:</span> @claimInfo.AmountTenancy руб.<br />
-                                <span>Пени:</span> @claimInfo.AmountPenalty руб.
-                                <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn"
-                                   asp-action="Details" asp-controller="Claims"
-                                   asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
-                                   asp-route-idClaim="@claimInfo.IdClaim"></a>
-                            </div>
-                            @if (i < claimsInfo.Count() - 1)
-                            {
-                                <hr class="m-0 mt-2 mb-1" />
-                            }
+                        var warning = "";
+                        if (hasNoActiveTenanciesAndActive)
+                        {
+                            warning = "Лицевой счет действующий, но отсутствуют действующие процессы найма (с нанимателем и без \"н\" в номере договора)";
+                        }
+                        else
+                        if (hasActiveTenanciesAndAnul)
+                        {
+                            warning = "Лицевой счет аннулирован, но присутствуют действующие процессы найма (с нанимателем и без \"н\" в номере договора)";
+                        }
+                        else
+                        if (tenancyOutOfPeriod)
+                        {
+                            warning += "У всех привязанных процессов найма период действия не указан или истек. Для социального найма период необязателен";
+                        }
+                        <br />
+                        <span class="oi oi-bell text-danger mt-2" style="font-size: 80%" title="@warning"></span>
+                    }
+                </td>
+
+                <td>
+                    <div>
+                        <b>№ ЛС:</b> @item.Account
+                        <span class="oi oi-media-record ml-1 @(item.IdState == 1 ? "text-success" :  item.IdState == 2 ? "text-danger" : "text-warning")"
+                              title="@(item.IdState == 1 ? "Действующий" : item.IdState == 2 ? "Аннулированный" : "Не начисляется")" style="font-size: 80%"></span>
+                    </div>
+                    @if (!String.IsNullOrWhiteSpace(@item.AccountGisZkh))
+                    {
+                        <div title="Единый лицевой счет для ГИС ЖКХ">
+                            <b>ЕЛС для ГИС ЖКХ:</b> @item.AccountGisZkh
                         </div>
                     }
-                    if (claimsInfo.Count() > 1)
+                    <div>
+                        <b>Дата начисления:</b> @(item.LastChargeDate.HasValue ? item.LastChargeDate.Value.ToString("dd.MM.yyyy") : "н/а")
+                    </div>
+                    <hr class="m-0 mt-2 mb-1" />
+                    <div>
+                        <b>Сальдо итого:</b> @(item.CurrentBalanceTenancy + item.CurrentBalancePenalty) руб.
+                    </div>
+                    <div>
+                        Найм: @item.CurrentBalanceTenancy руб., пени: @item.CurrentBalancePenalty руб.
+                    </div>
+                    <div>
+                        <b>Плата за найм: </b>@payment руб.
+                    </div>
+                </td>
+                <td>
+                    @if (Model.TenancyInfo.ContainsKey(item.IdAccount))
                     {
-                        <div class="text-center  mt-2">
-                            <a class="text-dark rr-additional-info" title="Детальная информация" href="#"><span class="oi oi-chevron-bottom"></span></a>
-                        </div>
+                        var tenancyInfos = Model.TenancyInfo[item.IdAccount].OrderByDescending(r => r.TenancyProcess.IdProcess);
+                        @for (var i = 0; i < tenancyInfos.Count(); i++)
+                        {
+                            var tenancyInfo = tenancyInfos.ElementAt(i);
+                            <div class="@(i == 0 ? "" : "rr-account-additional-info")">
+                                <div>
+                                    @if (!string.IsNullOrEmpty(tenancyInfo.TenancyProcess.RegistrationNum))
+                                    {
+                                        <b>Договор:</b>
+                                        <span>
+                                            № @tenancyInfo.TenancyProcess.RegistrationNum
+                                            @(tenancyInfo.TenancyProcess.RegistrationDate.HasValue ? "от " + tenancyInfo.TenancyProcess.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <b>Рег. №: </b><span>@tenancyInfo.TenancyProcess.IdProcess</span>
+                                    }
+                                    <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn"
+                                       asp-action="Details" asp-controller="TenancyProcesses"
+                                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
+                                       asp-route-idProcess="@tenancyInfo.TenancyProcess.IdProcess"></a>
+                                </div>
+                                <div>
+                                    @{
+                                        var snp = tenancyInfo.Tenant?.Surname + " " + tenancyInfo.Tenant?.Name + " " + tenancyInfo.Tenant?.Patronymic;
+                                        snp = snp.Trim();
+                                    }
+
+                                    <b>Наниматель:</b> @(string.IsNullOrEmpty(snp) ? Html.Raw("<span class='text-danger'>не указан</span>") : Html.Raw(snp))
+                                </div>
+                                <div>
+                                    <b>Период найма:</b>
+                                    @if (((tenancyInfo.TenancyProcess.BeginDate != null || tenancyInfo.TenancyProcess.EndDate != null) &&
+                             tenancyInfo.TenancyProcess.TenancyRentPeriods.Any()) || tenancyInfo.TenancyProcess.TenancyRentPeriods.Count() > 1)
+                                    {
+                                        <br />
+                                    }
+                                    @if (tenancyInfo.TenancyProcess.BeginDate != null || tenancyInfo.TenancyProcess.EndDate != null)
+                                    {
+                                        @(tenancyInfo.TenancyProcess.BeginDate.HasValue ? "с " + tenancyInfo.TenancyProcess.BeginDate.Value.ToString("dd.MM.yyyy") : "")@(" ")
+                                        @(tenancyInfo.TenancyProcess.EndDate.HasValue ? "по " + tenancyInfo.TenancyProcess.EndDate.Value.ToString("dd.MM.yyyy") : "на период ТО")
+                                    }
+                                    @if (tenancyInfo.TenancyProcess.TenancyRentPeriods.Any())
+                                    {
+                                        @if (tenancyInfo.TenancyProcess.BeginDate != null || tenancyInfo.TenancyProcess.EndDate != null)
+                                        {
+                                            <br />
+                                        }
+                                        for (var j = 0; j < tenancyInfo.TenancyProcess.TenancyRentPeriods.Count; j++)
+                                        {
+                                            var period = tenancyInfo.TenancyProcess.TenancyRentPeriods[j];
+                                            @if (period.BeginDate != null || period.EndDate != null)
+                                            {
+                                                @(period.BeginDate.HasValue ? "с " + period.BeginDate.Value.ToString("dd.MM.yyyy") : "")@(" ")
+                                                @(period.EndDate.HasValue ? "по " + period.EndDate.Value.ToString("dd.MM.yyyy") : "на период ТО")
+                                            }
+                                            if (j < tenancyInfo.TenancyProcess.TenancyRentPeriods.Count - 1)
+                                            {
+                                                <br />
+                                            }
+                                        }
+                                    }
+                                    @if (tenancyInfo.TenancyProcess.BeginDate == null && tenancyInfo.TenancyProcess.EndDate == null && !tenancyInfo.TenancyProcess.TenancyRentPeriods.Any())
+                                    {
+                                        <span class="text-danger">не указан</span>
+                                    }
+                                </div>
+                                <div>
+                                    <b>Договор зарегистрирован:</b>
+                                    @if (tenancyInfo.TenancyProcess.RegistrationDate != null)
+                                    {
+                                        <span>@tenancyInfo.TenancyProcess.RegistrationDate.Value.ToString("dd.MM.yyyy")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger">не указан</span>
+                                    }
+                                </div>
+                                <div>
+                                    <b>Адрес:</b>
+                                    @foreach (var rentObject in tenancyInfo.RentObjects)
+                                    {
+                                        if (tenancyInfo.RentObjects.Count > 1)
+                                        {
+                                            <br />
+                                        }
+                                        if (rentObject.Address.AddressType == AddressTypes.SubPremise || rentObject.Address.AddressType == AddressTypes.Premise)
+                                        {
+                                            <span>@rentObject.Address.Text</span>
+                                            <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn"
+                                               asp-action="Details" asp-controller="Premises"
+                                               asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
+                                               asp-route-idPremises="@rentObject.Address.Id"></a>
+                                        }
+                                        else
+                                        if (rentObject.Address.AddressType == AddressTypes.Building)
+                                        {
+                                            <span>@rentObject.Address.Text</span>
+                                            <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn"
+                                               asp-action="Details" asp-controller="Buildings"
+                                               asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
+                                               asp-route-idBuilding="@rentObject.Address.Id"></a>
+                                        }
+                                    }
+                                </div>
+                                @if (i < tenancyInfos.Count() - 1)
+                                {
+                                    <hr class="m-0 mt-2 mb-1" />
+                                }
+                            </div>
+                        }
+                        if (tenancyInfos.Count() > 1)
+                        {
+                            <div class="text-center  mt-2">
+                                <a class="text-dark rr-additional-info" title="Детальная информация" href="#"><span class="oi oi-chevron-bottom"></span></a>
+                            </div>
+                        }
                     }
-                } else
-                {
-                    <span class="text-danger font-italic">н/а</span>
-                }
+                    else
+                    {
+                        <span class="text-danger font-italic">н/а</span>
+                    }
+                </td>
+                <td style="position: relative">
+                    @if (Model.ClaimsInfo.ContainsKey(item.IdAccount))
+                    {
+                        var claimsInfo = Model.ClaimsInfo[item.IdAccount].OrderByDescending(r => r.StartDeptPeriod);
+                        @for (var i = 0; i < claimsInfo.Count(); i++)
+                        {
+                            var claimInfo = claimsInfo.ElementAt(i);
+                            <div class="@(i == 0 ? "" : "rr-account-additional-info")">
+                                <div>
+                                    <span>@claimInfo.ClaimCurrentState</span>
+                                </div>
+                                <div>
+                                    <b>Период:</b>
+                                    @if (claimInfo.StartDeptPeriod != null || claimInfo.EndDeptPeriod != null)
+                                    {
+                                        @(claimInfo.StartDeptPeriod.HasValue ? "с " + claimInfo.StartDeptPeriod.Value.ToString("dd.MM.yyyy") : "")@(" ")
+                                        @(claimInfo.EndDeptPeriod.HasValue ? "по " + claimInfo.EndDeptPeriod.Value.ToString("dd.MM.yyyy") : "")
+                                    }
+                                    @if (claimInfo.StartDeptPeriod == null && claimInfo.EndDeptPeriod == null)
+                                    {
+                                        <span class="text-danger">не указан</span>
+                                    }
+                                </div>
+                                <div>
+                                    <b>Предъявлено итого:</b> @(claimInfo.AmountTenancy + claimInfo.AmountPenalty) руб.<br />
+                                    <span>Найм:</span> @claimInfo.AmountTenancy руб.<br />
+                                    <span>Пени:</span> @claimInfo.AmountPenalty руб.
+                                    <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn"
+                                       asp-action="Details" asp-controller="Claims"
+                                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
+                                       asp-route-idClaim="@claimInfo.IdClaim"></a>
+                                </div>
+                                @if (i < claimsInfo.Count() - 1)
+                                {
+                                    <hr class="m-0 mt-2 mb-1" />
+                                }
+                            </div>
+                        }
+                        if (claimsInfo.Count() > 1)
+                        {
+                            <div class="text-center  mt-2">
+                                <a class="text-dark rr-additional-info" title="Детальная информация" href="#"><span class="oi oi-chevron-bottom"></span></a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-danger font-italic">н/а</span>
+                    }
 
                     <div class="btn-group rr-opacity-item-menu" role="group" aria-label="Панель доступа">
                         @if (securityService.HasPrivilege(Privileges.AccountsWrite))
                         {
-                            <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"  target="_blank"
-                               asp-action="Details" 
-                               asp-route-idAccount="@item.IdAccount" 
-                               asp-route-action="Details" 
+                            <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее" target="_blank"
+                               asp-action="Details"
+                               asp-route-idAccount="@item.IdAccount"
+                               asp-route-action="Details"
                                asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                            <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"  target="_blank"
-                               asp-action="Edit" 
-                               asp-route-idAccount="@item.IdAccount" 
-                               asp-route-action="Edit" 
+                            <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить" target="_blank"
+                               asp-action="Edit"
+                               asp-route-idAccount="@item.IdAccount"
+                               asp-route-action="Edit"
                                asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
-                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"  target="_blank"
-                               asp-action="Delete" 
-                               asp-route-idAccount="@item.IdAccount" 
+                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить" target="_blank"
+                               asp-action="Delete"
+                               asp-route-idAccount="@item.IdAccount"
                                asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                         }
                         else
@@ -400,8 +402,8 @@
                             </div>
                         </div>
                     </div>
-            </td>
-        </tr>
+                </td>
+            </tr>
         }
     </tbody>
 </table>

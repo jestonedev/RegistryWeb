@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistryWeb.DataServices;
+using RegistryWeb.Enums;
 using RegistryWeb.Models;
 using RegistryWeb.ViewModel;
 

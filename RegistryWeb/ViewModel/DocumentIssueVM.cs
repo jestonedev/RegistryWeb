@@ -1,4 +1,4 @@
-﻿using RegistryWeb.Models.Entities;
+﻿using RegistryDb.Models.Entities;
 using RegistryWeb.ViewOptions;
 using System;
 using System.Collections.Generic;

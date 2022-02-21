@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using RegistryWeb.ViewOptions.Filter;
-using RegistryWeb.Models;
-using RegistryWeb.Models.SqlViews;
+using RegistryDb.Models;
+using RegistryDb.Models.SqlViews;
 using RegistryWeb.DataServices;
 
 namespace RegistryWeb.ViewModel

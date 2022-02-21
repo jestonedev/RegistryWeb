@@ -16,7 +16,6 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
-    <PackageReference Include="MySql.Data.EntityFrameworkCore" Version="8.0.19" />
     <PackageReference Include="NameCaseLib" Version="0.4.2" />
     <PackageReference Include="System.Text.Json" Version="5.0.0" />
   </ItemGroup>
@@ -24,6 +23,11 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\files\" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\RegistryDb\RegistryDb.csproj" />
   </ItemGroup>
 
 

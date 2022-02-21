@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models.Entities;
 using System;
 using System.Collections.Generic;
 

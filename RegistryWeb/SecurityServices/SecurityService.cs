@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
-using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models;
+using RegistryDb.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
-using RegistryWeb.Models;
+using RegistryDb.Models;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;

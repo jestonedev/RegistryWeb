@@ -1,5 +1,5 @@
-﻿using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+﻿using RegistryDb.Models;
+using RegistryDb.Models.Entities;
 using RegistryWeb.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,8 @@ using RegistryWeb.Extensions;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.Extensions.Configuration;
-using RegistryWeb.Models.SqlViews;
+using RegistryDb.Models.SqlViews;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.DataServices
 {

@@ -9,8 +9,9 @@ using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.Extensions;
 using RegistryWeb.ViewOptions;
-using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models;
+using RegistryDb.Models.Entities;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.Controllers
 {

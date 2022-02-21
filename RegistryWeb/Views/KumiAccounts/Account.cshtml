@@ -1,7 +1,8 @@
 ﻿@using RegistryWeb.ViewOptions;
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.ViewModel;
-@model RegistryWeb.Models.Entities.KumiAccount;
+@using RegistryWeb.Enums;
+@model RegistryDb.Models.Entities.KumiAccount;
 @{
     ViewData["Title"] = Model.IdAccount == 0 ? "Новый лицевой счет" :
         "Лицевой счет №" + Model.Account;

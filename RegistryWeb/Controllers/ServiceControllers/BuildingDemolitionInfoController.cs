@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models;
+using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ReportServices;
 using RegistryWeb.ViewModel;
@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.Controllers.ServiceControllers
 {

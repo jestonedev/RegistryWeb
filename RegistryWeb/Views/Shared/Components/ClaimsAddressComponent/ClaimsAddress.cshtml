@@ -1,20 +1,22 @@
-﻿@model List<Address>;
+﻿@using RegistryWeb.Enums;
+@using RegistryWeb.ViewModel;
+@model List<Address>;
 @{
     var address = (Address)ViewData["Address"];
 }
 <div>
-        <button class="btn btn-success oi oi-home dropdown-toggle mr-1" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="homesBtn_@ViewData["IdClaim"]_@address.Id" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-        <div class="dropdown-menu" aria-labelledby="homesBtn_@ViewData["IdClaim"]_@address.Id">
-            @foreach (var addr in Model)
+    <button class="btn btn-success oi oi-home dropdown-toggle mr-1" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="homesBtn_@ViewData["IdClaim"]_@address.Id" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+    <div class="dropdown-menu" aria-labelledby="homesBtn_@ViewData["IdClaim"]_@address.Id">
+        @foreach (var addr in Model)
+        {
+            if (addr.AddressType == AddressTypes.Building)
             {
-                if (addr.AddressType == AddressTypes.Building)
-                {
-                    <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@addr.Id" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Здание</a>
-                }
-                if (addr.AddressType == AddressTypes.Premise)
-                {
-                    <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@addr.Id" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Помещение</a>
-                }
+                <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@addr.Id" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Здание</a>
             }
-        </div>@address.Text
+            if (addr.AddressType == AddressTypes.Premise)
+            {
+                <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@addr.Id" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Помещение</a>
+            }
+        }
+    </div>@address.Text
 </div>

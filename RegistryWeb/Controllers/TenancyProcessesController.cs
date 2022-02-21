@@ -11,10 +11,11 @@ using RegistryWeb.ViewModel;
 using RegistryWeb.Extensions;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
-using RegistryWeb.Models.Entities;
-using RegistryWeb.Models;
+using RegistryDb.Models.Entities;
+using RegistryDb.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.Controllers
 {

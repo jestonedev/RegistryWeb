@@ -1,5 +1,5 @@
-﻿using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+﻿using RegistryDb.Models;
+using RegistryDb.Models.Entities;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
-using RegistryWeb.Models.SqlViews;
+using RegistryDb.Models.SqlViews;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 

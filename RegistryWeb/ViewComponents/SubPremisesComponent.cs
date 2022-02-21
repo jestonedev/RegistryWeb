@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models;
+using RegistryDb.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using RegistryWeb.ViewModel;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.DataHelpers;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.ViewComponents
 {

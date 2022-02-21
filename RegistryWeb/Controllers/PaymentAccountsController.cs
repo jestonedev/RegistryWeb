@@ -7,11 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
-using RegistryWeb.Models;
+using RegistryDb.Models;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.Controllers
 {

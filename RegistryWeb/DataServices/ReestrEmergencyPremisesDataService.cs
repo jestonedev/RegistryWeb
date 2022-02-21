@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Interfaces;
+using RegistryDb.Models;
+using RegistryDb.Models.Entities;
+using RegistryWeb.Enums;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;

@@ -1,4 +1,6 @@
-﻿@model RegistryWeb.ViewModel.PaymentsAccountTableVM;
+﻿@using RegistryWeb.Enums;
+@using RegistryWeb.ViewModel;
+@model RegistryWeb.ViewModel.PaymentsAccountTableVM;
 @{
     ViewData["Title"] = "История ЛС №" + Model.LastPayment.PaymentAccountNavigation.Account;
     string isChecked(bool value) => value ? "checked" : "";

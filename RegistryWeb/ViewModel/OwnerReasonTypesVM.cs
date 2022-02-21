@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models.Entities;
 using RegistryWeb.ViewOptions;
 
 namespace RegistryWeb.ViewModel

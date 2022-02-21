@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using RegistryWeb.Models.Entities;
-using RegistryWeb.Models.SqlViews;
+using RegistryDb.Models.Entities;
+using RegistryDb.Models.SqlViews;
 using System;
 using System.Collections.Generic;
 using System.Linq;

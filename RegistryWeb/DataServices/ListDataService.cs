@@ -1,4 +1,4 @@
-﻿using RegistryWeb.Models;
+﻿using RegistryDb.Models;
 using RegistryWeb.ViewOptions;
 
 namespace RegistryWeb.DataServices

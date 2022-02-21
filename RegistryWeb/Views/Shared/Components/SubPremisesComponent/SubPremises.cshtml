@@ -1,14 +1,15 @@
 ﻿@model IEnumerable<RegistryWeb.ViewModel.SubPremiseVM>;
 @using RegistryWeb.Extensions;
 @using RegistryWeb.ViewOptions;
-@using RegistryWeb.Models.Entities;
+@using RegistryDb.Models.Entities;
+@using RegistryWeb.Enums;
 @using RegistryWeb.SecurityServices;
 
 @{
     var securityService = (SecurityService)ViewBag.SecurityService;
 }
 <form id="subpremisesForm" autocomplete="off">
-        <script src="~/js/subPremises.common.js" asp-append-version="true"></script>
+    <script src="~/js/subPremises.common.js" asp-append-version="true"></script>
     <div class="card mb-2">
         <div class="card-header d-flex justify-content-between pt-2 pb-2">
             <h4 class="mt-1">

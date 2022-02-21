@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
+using RegistryDb.Models;
 using RegistryWeb.Models;
-using RegistryWeb.Models.Api;
 using System.IO;
 using System.Linq;
 using System.Net;

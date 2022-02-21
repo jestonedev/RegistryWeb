@@ -9,10 +9,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RegistryWeb.DataServices;
-using RegistryWeb.Models;
+using RegistryDb.Models;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;
+using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers
 {

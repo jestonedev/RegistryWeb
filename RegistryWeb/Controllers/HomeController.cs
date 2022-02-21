@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.Models;
 using System.Linq;

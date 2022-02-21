@@ -14,6 +14,9 @@ using Microsoft.AspNetCore.Authorization;
 using System;
 using RegistryWeb.ReportServices;
 using Microsoft.AspNetCore.Http.Features;
+using RegistryWeb.DataHelpers;
+using RegistryDb.Interfaces;
+using RegistryDb.Models;
 
 namespace RegistryWeb
 {
@@ -104,6 +107,7 @@ namespace RegistryWeb
             services.AddTransient<PrivRealtorService>();
             services.AddTransient<KumiAccountsDataService>();
             services.AddTransient<KumiPaymentsDataService>();
+            services.AddTransient<IDbConnectionSettings, DbConnectionSettings>();
             services.AddHttpContextAccessor();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<TokenApiStorage>();

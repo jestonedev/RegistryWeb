@@ -1,4 +1,5 @@
 ﻿using System;
+using RegistryWeb.Enums;
 using RegistryWeb.Models;
 
 namespace RegistryWeb.ViewModel

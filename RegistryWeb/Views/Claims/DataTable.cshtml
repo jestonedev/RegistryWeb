@@ -71,7 +71,7 @@
                 activeKumiTenancyInfo = kumiTenancyInfo.Where(r => r.TenancyProcess.TenancyPersons.Any(p => p.ExcludeDate == null || p.ExcludeDate > DateTime.Now)
                 && (r.TenancyProcess.RegistrationNum == null || !r.TenancyProcess.RegistrationNum.EndsWith("н"))).ToList();
             }
-            RegistryWeb.Models.Entities.Payment lastPaymentInfo = null;
+            RegistryDb.Models.Entities.Payment lastPaymentInfo = null;
             if (item.IdAccount != null && Model.LastPaymentInfo.ContainsKey(item.IdAccount.Value))
             {
                 lastPaymentInfo = Model.LastPaymentInfo[item.IdAccount.Value];
@@ -139,7 +139,7 @@
                         }
                         if (kumiTenancyInfo != null && kumiTenancyInfo.Any())
                         {
-                            RegistryWeb.Models.Entities.TenancyPerson tenant = null;
+                            RegistryDb.Models.Entities.TenancyPerson tenant = null;
                             if (activeKumiTenancyInfo.Any())
                             {
                                 tenant = activeKumiTenancyInfo.FirstOrDefault().Tenant;

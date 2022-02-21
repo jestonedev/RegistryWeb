@@ -1,5 +1,5 @@
-﻿using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+﻿using RegistryDb.Models;
+using RegistryDb.Models.Entities;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
@@ -11,8 +11,9 @@ using RegistryWeb.DataHelpers;
 using System.Runtime.CompilerServices;
 using System.IO;
 using Microsoft.Extensions.Configuration;
-using RegistryWeb.Models.SqlViews;
+using RegistryDb.Models.SqlViews;
 using RegistryWeb.SecurityServices;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.DataServices
 {

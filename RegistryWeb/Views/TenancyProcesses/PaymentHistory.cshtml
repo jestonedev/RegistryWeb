@@ -1,8 +1,9 @@
 ﻿@using RegistryWeb.ViewModel
+@using RegistryWeb.Enums;
 @model List<PaymentHistoryViewModel>
 
 @{
-    ViewData["Title"] = "История изменения платы "+ViewBag.Title;
+    ViewData["Title"] = "История изменения платы " + ViewBag.Title;
     var history = Model.Where(r => r.TenancyPaymentHistory != null);
     var warningDescription = Model.FirstOrDefault(r => r.TenancyPaymentHistory == null)?.ObjectDescription;  // Уведомление об отсутствии платы за найм на текущий момент (по процессу найма)
     var target = (PaymentHistoryTarget)ViewBag.Target;
@@ -10,7 +11,7 @@
 
 <h2>@ViewData["Title"]</h2>
 
-@if(!string.IsNullOrEmpty(warningDescription))
+@if (!string.IsNullOrEmpty(warningDescription))
 {
     <div class="alert alert-danger text-center" role="alert">
         @warningDescription
@@ -82,7 +83,7 @@
             var historyGroups = history.GroupBy(r => r.ObjectDescription);
             var totalArea = 0d;
             var totalPayment = 0m;
-            RegistryWeb.Models.Entities.TenancyPaymentHistory coefs = null;
+            RegistryDb.Models.Entities.TenancyPaymentHistory coefs = null;
             DateTime? date = null;
             foreach (var historyGroup in historyGroups)
             {
@@ -110,6 +111,6 @@
                 <td><b>@totalArea</b></td>
                 <td><b>@(date != null ? date.Value.ToString("dd.MM.yyyy HH:mm:ss") : "")</b></td>
             </tr>
-    }
+        }
     </tbody>
 </table>

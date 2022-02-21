@@ -1,6 +1,5 @@
-﻿using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
-using RegistryWeb.Models.SqlViews;
+﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models.SqlViews;
 using RegistryWeb.ViewOptions.Filter;
 using System.Collections.Generic;
 

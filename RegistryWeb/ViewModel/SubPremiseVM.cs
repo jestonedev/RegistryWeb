@@ -1,5 +1,5 @@
-﻿using RegistryWeb.Models.Entities;
-using RegistryWeb.Models;
+﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models;
 using System.Linq;
 
 namespace RegistryWeb.ViewModel

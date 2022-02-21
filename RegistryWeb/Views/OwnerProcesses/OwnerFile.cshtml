@@ -1,4 +1,5 @@
-﻿@model RegistryWeb.ViewModel.OwnerFileVM;
+﻿@using RegistryWeb.Enums;
+@model RegistryWeb.ViewModel.OwnerFileVM;
 @{
     var i = Model.I;
     var canEdit = Model.Action == ActionTypeEnum.Create || Model.Action == ActionTypeEnum.Edit;

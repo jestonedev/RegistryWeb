@@ -1,4 +1,5 @@
-﻿using RegistryWeb.Models;
+﻿using RegistryWeb.Enums;
+using RegistryWeb.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;

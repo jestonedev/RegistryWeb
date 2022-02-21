@@ -1,6 +1,7 @@
-﻿@using RegistryWeb.ViewOptions;
+﻿@using RegistryWeb.Enums;
+@using RegistryWeb.ViewModel;
 @using RegistryWeb.SecurityServices;
-@model RegistryWeb.Models.Entities.PrivContract;
+@model RegistryDb.Models.Entities.PrivContract;
 @{
     ViewData["Title"] = Model.IdContract == 0 ? "Новый договор приватизации" :
         "Договор приватизации №" + Model.RegNumber;
@@ -140,8 +141,8 @@
             <div id="AdditionalEstates" class="form-row">
                 @{
                     var addresses = (List<Address>)ViewBag.AddressesRegistry;
-                    var additionalEstate = Model.PrivAdditionalEstates.Union(new List<RegistryWeb.Models.Entities.PrivAdditionalEstate>() {
-                                new RegistryWeb.Models.Entities.PrivAdditionalEstate() }).ToList();
+                    var additionalEstate = Model.PrivAdditionalEstates.Union(new List<RegistryDb.Models.Entities.PrivAdditionalEstate>() {
+                                        new RegistryDb.Models.Entities.PrivAdditionalEstate() }).ToList();
                     for (var i = 0; i < additionalEstate.Count(); i++)
                     {
                         var address = new Address();
