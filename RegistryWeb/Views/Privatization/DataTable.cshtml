@@ -21,7 +21,7 @@
         {
         <tr>
             <td title="@contract.RegNumber">
-                <div>@contract.RegNumber</div>
+                <div style="font-weight: bold;">@contract.RegNumber</div>
             </td>
             <td>
                 <div class="row">
@@ -119,13 +119,13 @@
                     @if (contract.DateIssue.HasValue)
                     {
                         <div>
-                            <span>Дата регистрации по договору: </span> @contract.DateIssue.Value.ToString("dd.MM.yyyy")
+                            <span>Дата регистрации по договору: </span> <span class="text-primary"><b>@contract.DateIssue.Value.ToString("dd.MM.yyyy")</b></span>
                         </div>
                     }
                     @if (contract.RegistrationDate.HasValue)
                     {
                         <div>
-                            <span>Дата регистрации в ЕГРП: </span> @contract.RegistrationDate.Value.ToString("dd.MM.yyyy")
+                            <span>Дата регистрации в ЕГРП: </span> <span class="text-success"><b>@contract.RegistrationDate.Value.ToString("dd.MM.yyyy")</b></span>
                         </div>
                     }
                     @if (contract.DateIssueCivil.HasValue)
