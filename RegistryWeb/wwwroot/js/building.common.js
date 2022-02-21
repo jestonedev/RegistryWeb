@@ -84,13 +84,14 @@ let createBuildingClick = function (event) {
 };
 
 let updateDisableState = function (state, action, canEditBaseInfo, canEditLandInfo) {
-    $('select').selectpicker("refresh").prop('disabled', state).selectpicker("refresh");
+    let disableBaseInfo = state ? !(canEditBaseInfo && action != "Details" && action != "Delete") : state;
+    $('#building select').selectpicker("refresh").prop('disabled', disableBaseInfo).selectpicker("refresh");
     $('#building input[type="checkbox"]').off('click');
     $('#building input[type="checkbox"]').on('click', function () {
-        return !state;
+        return !disableBaseInfo;
     });
-    $('#building input').attr('disabled', state);
-    $('#building textarea').attr('disabled', state);
+    $('#building input').attr('disabled', disableBaseInfo);
+    $('#building textarea').attr('disabled', disableBaseInfo);
     if (!canEditBaseInfo && canEditLandInfo && action === "Edit") {
         $("#LandCadastralNum, #LandCadastralDate, #LandArea").attr('disabled', false);
     }
@@ -128,17 +129,28 @@ let editBuildingClick = function (e) {
     } else
     if (itemsInEditMode.length > 0) {
         itemsInEditMode.each(function (idx, elem) {
-            if ($(elem).closest("ul.list-group, .card-body").hasClass("toggle-hide")) {
+            var body = $(elem).closest("ul.list-group, .card-body");
+            var listGroupItem = $(elem).closest(".list-group-item, .card-body");
+            if ($(elem).attr("id") === "buildingDemolitionInfoSave") {
+                body = $("#buildingDemolitionInfoBlock");
+                listGroupItem = body;
+            }
+            if (body.hasClass("toggle-hide")) {
                 var toggler = $(elem).closest(".card").find("[id$='Toggle']").first();
                 toggler.click();
             }
-            var listGroupItem = $(elem).closest(".list-group-item, .card-body");
             if (!listGroupItem.hasClass("list-group-item-warning")) {
                 listGroupItem.addClass("list-group-item-warning");
             }
         });
+        var firstItemInEditMode = itemsInEditMode.first();
+        var scrollBody = firstItemInEditMode.closest(".list-group-item, .card-body");
+        if (firstItemInEditMode.attr("id") === "buildingDemolitionInfoSave") {
+            firstItemInEditMode = $("#buildingDemolitionInfoBlock");
+            scrollBody = firstItemInEditMode;
+        }
         $([document.documentElement, document.body]).animate({
-            scrollTop: itemsInEditMode.first().closest(".list-group-item, .card-body").offset().top
+            scrollTop: scrollBody.offset().top
         }, 1000);
 
         e.preventDefault();
