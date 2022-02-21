@@ -171,13 +171,13 @@ namespace RegistryDb.Models
 
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
+        public virtual DbSet<KladrRegion> KladrRegions { get; set; }
         public virtual DbSet<TenancyActiveProcess> TenancyActiveProcesses { get; set; }
         public virtual DbSet<TenancyPayment> TenancyPayments { get; set; }
         public virtual DbSet<TenancyPaymentAfter28082019> TenancyPaymentsAfter28082019 { get; set; }
         public virtual DbSet<OwnerActiveProcess> OwnerActiveProcesses { get; set; }
         public virtual DbSet<BuildingOwnershipRightCurrent> BuildingsOwnershipRightCurrent { get; set; }
         public virtual DbSet<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
-        public DbQuery<KladrRegion> KladrRegions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -185,13 +185,13 @@ namespace RegistryDb.Models
 
             //SQL-Views
             modelBuilder.ApplyConfiguration(new KladrStreetConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KladrRegionConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyActiveProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyPaymentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyPaymentAfter28082019Configuration(nameDatebase));
             modelBuilder.ApplyConfiguration(new OwnerActiveProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new BuildingOwnershipRightCurrentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremiseOwnershipRightCurrentConfiguration(nameDatebase));
-            modelBuilder.Query<KladrRegion>().ToView("v_kladr_regions");
 
             modelBuilder.ApplyConfiguration(new ChangeLogConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LogOwnerProcessConfiguration(nameDatebase));

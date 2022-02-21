@@ -2,7 +2,7 @@
 {
     public class KladrRegion
     {
-        public string id_region { get; set; }
-        public string region { get; set; }
+        public string IdRegion { get; set; }
+        public string Region { get; set; }
     }
 }

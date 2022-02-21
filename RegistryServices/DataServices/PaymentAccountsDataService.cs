@@ -56,7 +56,7 @@ namespace RegistryWeb.DataServices
             viewModel.Payments = query.ToList();
             viewModel.RentObjects = GetRentObjects(viewModel.Payments);
             viewModel.ClaimsByAddresses = GetClaimsByAddresses(viewModel.Payments);
-            viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "id_region", "region");
+            viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "IdRegion", "Region");
             viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
 
             var monthsList = registryContext.Payments

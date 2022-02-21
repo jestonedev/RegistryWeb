@@ -27,7 +27,7 @@ namespace RegistryWeb.ReportServices
         {
             var viewModel = new TenancyObjectReportsVM
             {
-                RegionsList = new SelectList(rc.KladrRegions, "id_region", "region"),
+                RegionsList = new SelectList(rc.KladrRegions, "IdRegion", "Region"),
                 StreetsList = new SelectList(rc.KladrStreets, "IdStreet", "StreetName"),
                 RentTypesList = new SelectList(rc.RentTypes, "IdRentType", "RentTypeName"),
                 TenancyReasonTypesList = new SelectList(rc.TenancyReasonTypes, "IdReasonType", "ReasonName"),

@@ -49,7 +49,7 @@ namespace RegistryWeb.DataServices
             viewModel.Accounts = query.ToList();
             viewModel.TenancyInfo = GetTenancyInfo(viewModel.Accounts);
             viewModel.ClaimsInfo = GetClaimsInfo(viewModel.Accounts);
-            viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "id_region", "region");
+            viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "IdRegion", "Region");
             viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
 
             return viewModel;

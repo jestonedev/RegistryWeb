@@ -16,7 +16,7 @@ namespace RegistryWeb.DataServices
         {
             var viewModel = new RegistryObjectReportsVM
             {
-                KladrRegionsList = new SelectList(registryContext.KladrRegions, "id_region", "region")
+                KladrRegionsList = new SelectList(registryContext.KladrRegions, "IdRegion", "Region")
             };
             return viewModel;
         }
