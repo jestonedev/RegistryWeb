@@ -59,12 +59,21 @@ namespace RegistryWeb.DataServices
         private IQueryable<PrivContract> OldAddressFilter(IQueryable<PrivContract> query, PrivatizationFilter filterOptions)
         {
             if (string.IsNullOrEmpty(filterOptions.OldSystemAddress)) return query;
-            var addressParts = filterOptions.OldSystemAddress.ToLowerInvariant().Split(' ');
-            query = query.Where(r => r.PrivAddress != null);
-            foreach (var part in addressParts)
+            var addressParts = filterOptions.OldSystemAddress.ToLowerInvariant().Split(' ', 3);
+            var streetPart = addressParts[0];
+            string housePart = null;
+            string premisePart = null;
+            if (addressParts.Count() > 1)
             {
-                query = query.Where(r => r.PrivAddress.ToLowerInvariant().Contains(part));
+                housePart = "д. "+addressParts[1];
             }
+            if (addressParts.Count() > 2)
+            {
+                premisePart = "кв. " + addressParts[2];
+            }
+            query = query.Where(r => r.PrivAddress != null && r.PrivAddress.Contains(streetPart) 
+                && (housePart == null || r.PrivAddress.Contains(housePart))
+                && (premisePart == null || r.PrivAddress.Contains(premisePart)));
             return query;
         }
 

@@ -295,7 +295,7 @@ namespace RegistryWeb.DataServices
         {
             if (!string.IsNullOrEmpty(filterOptions.IdRegion))
             {
-                query = query.Where(b => b.IdStreet.Contains(filterOptions.IdStreet));
+                query = query.Where(b => b.IdStreet.Contains(filterOptions.IdRegion));
             }
             return query;
         }
