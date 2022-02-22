@@ -240,7 +240,13 @@ $(function () {
     });
 
     $('.input-filter-cadastral-num, .input-cadastral-num').inputFilter(function (value) {
-        return /^(\d+:?)*$/.test(value);
+        return /^(\d+:?)*$/.test(value) || "нет данных".startsWith(value);
+    });
+
+    $('.input-cadastral-num').on('blur', function () {
+        if ("нет данных".startsWith($(this).val()) && $(this).val() !== "" && $(this).val() !== undefined) {
+            $(this).val("нет данных");
+        }
     });
 
     $('.input-filter-decimal, .input-decimal').inputFilter(function (value) {

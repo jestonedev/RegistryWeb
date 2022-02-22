@@ -83,10 +83,35 @@ let createBuildingClick = function (event) {
     }
 };
 
+let updateDisableState = function (state, action, canEditBaseInfo, canEditLandInfo) {
+    $('select').selectpicker("refresh").prop('disabled', state).selectpicker("refresh");
+    $('#building input[type="checkbox"]').off('click');
+    $('#building input[type="checkbox"]').on('click', function () {
+        return !state;
+    });
+    $('#building input').attr('disabled', state);
+    $('#building textarea').attr('disabled', state);
+    if (!canEditBaseInfo && canEditLandInfo && action === "Edit") {
+        $("#LandCadastralNum, #LandCadastralDate, #LandArea").attr('disabled', false);
+    }
+};
+
 let editBuildingClick = function (e) {
     $("input.decimal").each(function (idx, elem) {
         $(elem).val($(elem).val().replace(".", ","));
     });
+
+    var action = $('#building').data("action");
+    var canEditBaseInfo = JSON.parse($('#building').data("caneditbaseinfo").toLowerCase());
+    var canEditLandInfo = JSON.parse($('#building').data("caneditlandinfo").toLowerCase());
+    updateDisableState(false, action, canEditBaseInfo, canEditLandInfo);
+
+    if (canEditLandInfo && !canEditBaseInfo) {
+        $('select').selectpicker("refresh").prop('disabled', false);
+        $('#building input').attr('disabled', false);
+        $('#building textarea').attr('disabled', false);
+    }
+
     $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
     let buildingIsValid = $('#building').valid();
     let restrictionsIsValid = $("#restrictionsForm").valid();
@@ -98,6 +123,7 @@ let editBuildingClick = function (e) {
     });
 
     if (!buildingIsValid || !restrictionsIsValid || !ownershipRightsIsValid || !buildingDemolitionInfoValid) {
+        updateDisableState(true, action, canEditBaseInfo, canEditLandInfo);
         onSubmitErrorsPostProcessing();
     } else
     if (itemsInEditMode.length > 0) {
@@ -116,6 +142,7 @@ let editBuildingClick = function (e) {
         }, 1000);
 
         e.preventDefault();
+        updateDisableState(true, action, canEditBaseInfo, canEditLandInfo);
     }
      else {
         $('#building').submit();
@@ -159,16 +186,12 @@ let memorialCardClick = function () {
 };
 
 $(function () {
+    memorialCardClick();
     var action = $('#building').data("action");
     var canEditBaseInfo = JSON.parse($('#building').data("caneditbaseinfo").toLowerCase());
-    memorialCardClick();
+    var canEditLandInfo = JSON.parse($('#building').data("caneditlandinfo").toLowerCase());
     if (action === "Details" || action === "Delete" || !canEditBaseInfo) {
-        $('select').selectpicker("refresh").prop('disabled', true);
-        $('#building input[type="checkbox"]').click(function () {
-            return false;
-        });
-        $('#building input').attr('disabled', true);
-        $('#building textarea').attr('disabled', true);
+        updateDisableState(true, action, canEditBaseInfo, canEditLandInfo);
     }
     $('#buildingToggle').on('click', $('#building'), elementToogleHide);
     $('#createBtn').click(createBuildingClick);

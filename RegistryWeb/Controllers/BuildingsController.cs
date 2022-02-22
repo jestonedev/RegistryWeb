@@ -25,6 +25,7 @@ namespace RegistryWeb.Controllers
         bool canEditBaseInfo;
         bool canEditDemolishingInfo;
         bool canAttachAdditionalFiles;
+        bool canEditLandInfo;
 
         public BuildingsController(BuildingsDataService dataService, SecurityService securityService, OwnerReportService reportService)
             : base(dataService, securityService)
@@ -138,6 +139,7 @@ namespace RegistryWeb.Controllers
         public IActionResult Create()
         {
             canEditBaseInfo = securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal);
+            canEditLandInfo = canEditBaseInfo;
             canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
             canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
             if (!canEditBaseInfo)
@@ -182,6 +184,7 @@ namespace RegistryWeb.Controllers
             if (building == null)
                 return NotFound();
             canEditBaseInfo = CanEditBuildingBaseInfo(building);
+            canEditLandInfo = securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal);
             canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
             canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
             return GetBuildingView(building);
@@ -199,6 +202,7 @@ namespace RegistryWeb.Controllers
             if (!CanEditBuildingBaseInfo(building))
                 return View("NotAccess");
             canEditBaseInfo = false;
+            canEditLandInfo = false;
             canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
             canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
             return GetBuildingView(building);
@@ -229,6 +233,7 @@ namespace RegistryWeb.Controllers
             if (building == null)
                 return NotFound();
             canEditBaseInfo = CanEditBuildingBaseInfo(building);
+            canEditLandInfo = securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal);
             canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
             canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
             if (!(canEditBaseInfo || canEditDemolishingInfo || canAttachAdditionalFiles))
@@ -243,13 +248,14 @@ namespace RegistryWeb.Controllers
             if (building == null)
                 return NotFound();
             canEditBaseInfo = CanEditBuildingBaseInfo(building);
+            canEditLandInfo = securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal);
             canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
             canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
-            if (!canEditBaseInfo)
+            if (!canEditBaseInfo && !canEditLandInfo)
                 return View("NotAccess");
             if (ModelState.IsValid)
             {
-                dataService.Edit(building);
+                dataService.Edit(building, canEditBaseInfo, canEditLandInfo);
                 return RedirectToAction("Details", new { building.IdBuilding });
             }
             return Error("Здание не было сохранено!");
@@ -267,6 +273,7 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = actionType;
             ViewBag.SecurityService = securityService;
             ViewBag.CanEditBaseInfo = canEditBaseInfo;
+            ViewBag.CanEditLandInfo = canEditLandInfo;
             ViewBag.CanEditDemolishingInfo = canEditDemolishingInfo;
             ViewBag.CanAttachAdditionalFiles = canAttachAdditionalFiles;
             ViewBag.ObjectStates = dataService.GetObjectStates(securityService, action, canEditBaseInfo);

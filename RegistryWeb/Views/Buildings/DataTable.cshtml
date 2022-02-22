@@ -98,11 +98,12 @@
                     @{
                         var canEditBaseInfo = (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !Model.IsMunicipalDictionary[item.IdBuilding]) ||
                         (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && Model.IsMunicipalDictionary[item.IdBuilding]);
+                        var canEditLandInfo = securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal);
                         var canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
                         var canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
                     }
                     <div class="btn-group rr-opacity-item-menu" role="group" aria-label="Панель доступа">
-                        @if (canEditBaseInfo || canEditDemolishingInfo || canAttachAdditionalFiles)
+                        @if (canEditBaseInfo || canEditDemolishingInfo || canAttachAdditionalFiles || canEditLandInfo)
                         {
                             <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
                                asp-controller="Buildings" asp-action="Details" asp-route-idBuilding="@item.IdBuilding" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>

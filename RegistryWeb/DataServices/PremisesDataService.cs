@@ -474,34 +474,56 @@ namespace RegistryWeb.DataServices
             if ((filterOptions.IdsRestrictionType != null && filterOptions.IdsRestrictionType.Any()) ||
                 !string.IsNullOrEmpty(filterOptions.RestrictionNum) || filterOptions.RestrictionDate != null)
             {
-                query = (from q in query
-                         join rbaRow in registryContext.RestrictionBuildingsAssoc
-                         on q.IdBuilding equals rbaRow.IdBuilding into b
-                         from bRow in b.DefaultIfEmpty()
-                         join rRow in registryContext.Restrictions
-                         on bRow.IdRestriction equals rRow.IdRestriction into bor
-                         from borRow in bor.DefaultIfEmpty()
+                if (filterOptions.IdsRestrictionType != null && filterOptions.IdsRestrictionType.Any())
+                {
+                    var contains = filterOptions.IdsRestrictionTypeContains == null || filterOptions.IdsRestrictionTypeContains.Value;
 
-                         join rpaRow in registryContext.RestrictionPremisesAssoc
-                         on q.IdPremises equals rpaRow.IdPremises into p
-                         from pRow in p.DefaultIfEmpty()
-                         join rRow in registryContext.Restrictions
-                         on pRow.IdRestriction equals rRow.IdRestriction into por
-                         from porRow in por.DefaultIfEmpty()
+                    var idPremises = from rRow in registryContext.Restrictions
+                                     join pRow in registryContext.RestrictionPremisesAssoc
+                                     on rRow.IdRestriction equals pRow.IdRestriction
+                                     where filterOptions.IdsRestrictionType != null &&
+                                           filterOptions.IdsRestrictionType.Contains(rRow.IdRestrictionType)
+                                     select pRow.IdPremises;
 
-                         where (borRow != null &&
-                            ((filterOptions.IdsRestrictionType == null || !filterOptions.IdsRestrictionType.Any() ||
-                            filterOptions.IdsRestrictionType.Contains(borRow.IdRestrictionType)) &&
-                            (string.IsNullOrEmpty(filterOptions.RestrictionNum) ||
-                             borRow.Number.ToLower() == filterOptions.RestrictionNum.ToLower()) &&
-                             (filterOptions.RestrictionDate == null || borRow.Date == filterOptions.RestrictionDate))) ||
-                             (porRow != null &&
-                            ((filterOptions.IdsRestrictionType == null || !filterOptions.IdsRestrictionType.Any() ||
-                            filterOptions.IdsRestrictionType.Contains(porRow.IdRestrictionType)) &&
-                            (string.IsNullOrEmpty(filterOptions.RestrictionNum) ||
-                             porRow.Number.ToLower() == filterOptions.RestrictionNum.ToLower()) &&
-                             (filterOptions.RestrictionDate == null || porRow.Date == filterOptions.RestrictionDate)))
-                         select q).Distinct();
+                    var idBuildings = from rRow in registryContext.Restrictions
+                                      join bRow in registryContext.RestrictionBuildingsAssoc
+                                      on rRow.IdRestriction equals bRow.IdRestriction
+                                      where filterOptions.IdsRestrictionType != null &&
+                                            filterOptions.IdsRestrictionType.Contains(rRow.IdRestrictionType)
+                                      select bRow.IdBuilding;
+
+                    query = (from q in query
+                             where contains ? (idPremises.Contains(q.IdPremises) || idBuildings.Contains(q.IdBuilding))
+                                : (!idPremises.Contains(q.IdPremises) && !idBuildings.Contains(q.IdBuilding))
+                             select q).Distinct();
+                }
+                if (!string.IsNullOrEmpty(filterOptions.RestrictionNum) || filterOptions.RestrictionDate != null)
+                {
+                    query = (from q in query
+                             join rbaRow in registryContext.RestrictionBuildingsAssoc
+                             on q.IdBuilding equals rbaRow.IdBuilding into b
+                             from bRow in b.DefaultIfEmpty()
+                             join rRow in registryContext.Restrictions
+                             on bRow.IdRestriction equals rRow.IdRestriction into bor
+                             from borRow in bor.DefaultIfEmpty()
+
+                             join rpaRow in registryContext.RestrictionPremisesAssoc
+                             on q.IdPremises equals rpaRow.IdPremises into p
+                             from pRow in p.DefaultIfEmpty()
+                             join rRow in registryContext.Restrictions
+                             on pRow.IdRestriction equals rRow.IdRestriction into por
+                             from porRow in por.DefaultIfEmpty()
+
+                             where (borRow != null &&
+                                (string.IsNullOrEmpty(filterOptions.RestrictionNum) ||
+                                 borRow.Number.ToLower() == filterOptions.RestrictionNum.ToLower()) &&
+                                 (filterOptions.RestrictionDate == null || borRow.Date == filterOptions.RestrictionDate)) ||
+                                 (porRow != null &&
+                                (string.IsNullOrEmpty(filterOptions.RestrictionNum) ||
+                                 porRow.Number.ToLower() == filterOptions.RestrictionNum.ToLower()) &&
+                                 (filterOptions.RestrictionDate == null || porRow.Date == filterOptions.RestrictionDate))
+                             select q).Distinct();
+                }
             }
             return query;
         }

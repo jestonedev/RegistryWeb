@@ -36,7 +36,7 @@
                     <span class="oi oi-home"></span>
                 </a>
                 <div class="btn-group" role="group" aria-label="Панель доступа">
-                    @if (ViewBag.Action == ActionTypeEnum.Details && ((ViewBag.CanEditBaseInfo ?? false) || (ViewBag.CanEditDemolishingInfo ?? false)))
+                    @if (ViewBag.Action == ActionTypeEnum.Details && ((ViewBag.CanEditBaseInfo ?? false) || (ViewBag.CanEditDemolishingInfo ?? false) || (ViewBag.CanAttachAdditionalFiles ?? false) || (ViewBag.CanEditLandInfo ?? false)))
                     {
                         <div class="btn-group" role="group" aria-label="Панель доступа">
                             <button class="btn btn-primary dropdown-toggle" type="button" title="Инструменты" aria-label="Инструменты" id="toolsBtn_@Model.IdBuilding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -115,7 +115,7 @@
                 }
                 @if (ViewBag.Action == ActionTypeEnum.Edit)
                 {
-                    <input type="submit" value="Сохранить" id="editBtn" class="form-control btn btn-success  @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" />
+                    <input type="submit" value="Сохранить" id="editBtn" class="form-control btn btn-success  @(((ViewBag.CanEditBaseInfo ?? false) || (ViewBag.CanEditLandInfo ?? false)) ? "" : "disabled")" />
                 }
                 @if (ViewBag.Action == ActionTypeEnum.Delete)
                 {
@@ -127,7 +127,7 @@
         </div>
     </div>
     <div class="card-body pt-3 pb-3 pl-3 pr-3">
-        <form asp-controller="Buildings" asp-action="@ViewBag.Action" enctype="multipart/form-data" id="building" data-action="@ViewBag.Action" data-caneditbaseinfo="@ViewBag.CanEditBaseInfo" method="post">
+        <form asp-controller="Buildings" asp-action="@ViewBag.Action" enctype="multipart/form-data" id="building" data-action="@ViewBag.Action" data-caneditbaseinfo="@ViewBag.CanEditBaseInfo" data-caneditlandinfo="@ViewBag.CanEditLandInfo" method="post">
             <input type="hidden" asp-for="IdBuilding" />
             <div class="form-row">
                 <div class="form-group col-md-9 col-lg-8 mb-2">

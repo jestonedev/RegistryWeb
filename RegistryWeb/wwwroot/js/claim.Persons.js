@@ -15,7 +15,7 @@
             elem = list.find(".list-group-item").last();
             elem.find("select").selectpicker("refresh");
             elem.find(".input-chars").inputFilter(function (value) {
-                return /^([а-яА-Я]+)*$/.test(value);
+                return /^[а-яА-ЯёЁ]*$/.test(value);
             });
             elem.find(".claim-person-edit-btn").first().click();
             $([document.documentElement, document.body]).animate({
