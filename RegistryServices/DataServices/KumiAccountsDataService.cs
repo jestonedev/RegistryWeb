@@ -26,6 +26,274 @@ namespace RegistryWeb.DataServices
             return vm;
         }
 
+        public List<KumiAccountPrepareForPaymentCalculator> GetAccountsPrepareForPaymentCalculator(IQueryable<KumiAccount> accounts)
+        {
+            var result = new List<KumiAccountPrepareForPaymentCalculator>();
+            var tenancyInfo = GetTenancyInfo(accounts);
+            foreach(var account in accounts.Include(r => r.Charges).Include(r => r.Claims).ToList())
+            {
+                var accountInfo = new KumiAccountPrepareForPaymentCalculator();
+                accountInfo.Account = account;
+                if (tenancyInfo.ContainsKey(account.IdAccount))
+                {
+                    accountInfo.TenancyInfo = tenancyInfo[account.IdAccount];
+                    accountInfo.TenancyPaymentHistories = new Dictionary<int, List<TenancyPaymentHistory>>();
+                    foreach (var tenancy in accountInfo.TenancyInfo)
+                    {
+                        var paymentsHistory = new List<TenancyPaymentHistory>();
+                        foreach(var rentObject in tenancy.RentObjects)
+                        {
+                            if (!int.TryParse(rentObject.Address.Id, out int id)) continue;
+                            switch (rentObject.Address.AddressType)
+                            {
+                                case AddressTypes.Building:
+                                    paymentsHistory.AddRange(registryContext.TenancyPaymentsHistory.Where(r => r.IdBuilding == id
+                                        && r.IdPremises == null));
+                                    break;
+                                case AddressTypes.Premise:
+                                    paymentsHistory.AddRange(registryContext.TenancyPaymentsHistory.Where(r => r.IdPremises == id
+                                        && r.IdSubPremises == null));
+                                    break;
+                                case AddressTypes.SubPremise:
+                                    paymentsHistory.AddRange(registryContext.TenancyPaymentsHistory.Where(r => r.IdSubPremises == id));
+                                    break;
+                            }
+                        }
+                        accountInfo.TenancyPaymentHistories.Add(tenancy.TenancyProcess.IdProcess, paymentsHistory);
+                    }
+                }
+                var chargesIds = account.Charges.Select(r => r.IdCharge).ToList();
+                var claimsIds = account.Claims.Select(r => r.IdClaim).ToList();
+                accountInfo.Payments = registryContext.KumiPayments.Include(p => p.PaymentCharges)
+                    .Where(p => p.PaymentCharges.Any(r => chargesIds.Contains(r.IdCharge))).ToList()
+                    .Union(
+                        registryContext.KumiPayments.Include(p => p.PaymentClaims)
+                        .Where(p => p.PaymentClaims.Any(r => claimsIds.Contains(r.IdClaim))).ToList())
+                    .ToList();
+                if (accountInfo.TenancyInfo != null && accountInfo.TenancyInfo.Count > 0)
+                    result.Add(accountInfo);
+            }
+            return result;
+        }
+
+        public List<KumiAccountInfoForPaymentCalculator> GetAccountInfoForPaymentCalculator(List<KumiAccountPrepareForPaymentCalculator> accounts)
+        {
+            var result = new List<KumiAccountInfoForPaymentCalculator>();
+            foreach(var account in accounts)
+            {
+                var accountInfo = new KumiAccountInfoForPaymentCalculator
+                {
+                    IdAccount = account.Account.IdAccount
+                };
+                accountInfo.Payments = account.Payments;
+                accountInfo.Charges = account.Account.Charges.ToList();
+                accountInfo.TenancyInfo = new List<KumiTenancyInfoForPaymentCalculator>();
+                foreach(var tenancy in account.TenancyInfo)
+                {
+                    var tenancyInfo = new KumiTenancyInfoForPaymentCalculator
+                    {
+                        IdProcess = tenancy.TenancyProcess.IdProcess,
+                        RegistrationDate = tenancy.TenancyProcess.RegistrationDate,
+                        RegistrationNum = tenancy.TenancyProcess.RegistrationNum,
+                        Tenant = tenancy.Tenant
+                    };
+                    tenancyInfo.RentPeriods = BuildRentPeriodsForPaymentCalculator(tenancy.TenancyProcess);
+                    CorrectRentPeriodsForPaymentCalculator(tenancyInfo.RentPeriods, tenancy.TenancyProcess);
+                    CheckRentPeriodsForPaymentCalculator(tenancyInfo.RentPeriods, tenancy.TenancyProcess.IdProcess);
+                    tenancyInfo.RentPeriods = JoinRentPeriodForPaymentCalculator(tenancyInfo.RentPeriods);
+                    if (tenancyInfo.RentPeriods.Any())
+                        accountInfo.TenancyInfo.Add(tenancyInfo);
+
+                    tenancyInfo.RentPayments = BuldRentPaymentsForPaymentCalculator(account.TenancyPaymentHistories, 
+                        tenancyInfo.RentPeriods, tenancy);
+                }
+                result.Add(accountInfo);
+            }
+            return result;
+        }
+
+        private List<RentPaymentForPaymentCalculator> BuldRentPaymentsForPaymentCalculator(Dictionary<int, List<TenancyPaymentHistory>> tenancyPaymentHistories, 
+            List<RentPeriodForPaymentCalculator> rentPeriods, KumiAccountTenancyInfoVM tenancyInfo)
+        {
+            var result = new List<RentPaymentForPaymentCalculator>();
+            if (tenancyPaymentHistories.ContainsKey(tenancyInfo.TenancyProcess.IdProcess))
+            {
+                foreach (var historyInfo in tenancyPaymentHistories[tenancyInfo.TenancyProcess.IdProcess])
+                {
+                    var payment = new RentPaymentForPaymentCalculator();
+                    if (historyInfo.IdSubPremises != null)
+                    {
+                        payment.AddressType = AddressTypes.SubPremise;
+                        payment.IdObject = historyInfo.IdSubPremises.Value;
+                    }
+                    else
+                    if (historyInfo.IdPremises != null)
+                    {
+                        payment.AddressType = AddressTypes.Premise;
+                        payment.IdObject = historyInfo.IdPremises.Value;
+                    }
+                    else
+                    {
+                        payment.AddressType = AddressTypes.Building;
+                        payment.IdObject = historyInfo.IdBuilding;
+                    }
+                    payment.FromDate = historyInfo.Date;
+                    payment.Payment = Math.Round((historyInfo.K1 + historyInfo.K2 + historyInfo.K3) / 3
+                        * historyInfo.Kc * (decimal)historyInfo.RentArea * historyInfo.Hb, 2);
+                    result.Add(payment);
+                }
+            }
+
+            if (!result.Any())
+                foreach (var rentObject in tenancyInfo.RentObjects)
+                {
+                    var payment = new RentPaymentForPaymentCalculator
+                    {
+                        AddressType = rentObject.Address.AddressType
+                    };
+                    if (int.TryParse(rentObject.Address.Id, out int id))
+                        payment.IdObject = id;
+                    else continue;
+                    var firstRentPeriod = rentPeriods.OrderBy(r => r.FromDate).ThenBy(r => r.ToDate).FirstOrDefault();
+                    if (firstRentPeriod != null)
+                        payment.FromDate = firstRentPeriod.FromDate.Value;
+                    else
+                        payment.FromDate = DateTime.Now.Date;
+                    payment.Payment = rentObject.Payment;
+                    result.Add(payment);
+                }
+            return result;
+        }
+
+        private List<RentPeriodForPaymentCalculator> BuildRentPeriodsForPaymentCalculator(TenancyProcess process)
+        {
+            var result = new List<RentPeriodForPaymentCalculator>();
+            var rentPeriod = new RentPeriodForPaymentCalculator();
+
+            if (process.EndDate != null)
+                rentPeriod.ToDate = process.EndDate.Value;
+            else
+                rentPeriod.ToDate = DateTime.MaxValue;
+
+            if (process.BeginDate != null)
+                rentPeriod.FromDate = process.BeginDate.Value;
+
+            result.Add(rentPeriod);
+
+            for (var i = 0; i < process.TenancyRentPeriods.Count; i++)
+            {
+                var subRentPeriod = process.TenancyRentPeriods.ToList()[i];
+                rentPeriod = new RentPeriodForPaymentCalculator();
+
+                if (subRentPeriod.BeginDate != null)
+                    rentPeriod.FromDate = subRentPeriod.BeginDate.Value;
+                if (subRentPeriod.EndDate != null)
+                    rentPeriod.ToDate = subRentPeriod.EndDate.Value;
+
+                if (rentPeriod.ToDate != null || rentPeriod.FromDate != null)
+                    result.Add(rentPeriod);
+            }
+            return result;
+        }
+
+        private void CheckRentPeriodsForPaymentCalculator(List<RentPeriodForPaymentCalculator> rentPeriods, int idProcess)
+        {
+            for (var i = 0; i < rentPeriods.Count; i++)
+            {
+                var currentPeriod = rentPeriods[i];
+                if (currentPeriod.FromDate == null || currentPeriod.ToDate == null)
+                    throw new ApplicationException(string.Format("Ошибка определения периодов найма № {0}", idProcess));
+            }
+        }
+
+        private void CorrectRentPeriodsForPaymentCalculator(List<RentPeriodForPaymentCalculator> rentPeriods, TenancyProcess process)
+        {
+            for (var i = 0; i < rentPeriods.Count; i++)
+            {
+                var currentPeriod = rentPeriods[i];
+                RentPeriodForPaymentCalculator prevPeriod = rentPeriods
+                                .Where(r => r != currentPeriod)
+                                .Where(r => r.ToDate <= currentPeriod.FromDate || (r.ToDate == null && r.FromDate <= currentPeriod.FromDate)
+                                    || r.ToDate <= currentPeriod.ToDate || (r.ToDate == null && r.FromDate <= currentPeriod.ToDate))
+                                .OrderByDescending(r => r.ToDate == null ? r.FromDate : r.ToDate)
+                                .FirstOrDefault();
+                RentPeriodForPaymentCalculator nextPeriod = rentPeriods
+                                .Where(r => r != currentPeriod)
+                                .Where(r => r.FromDate >= currentPeriod.ToDate || (r.FromDate == null && r.ToDate >= currentPeriod.ToDate)
+                                    || r.FromDate <= currentPeriod.FromDate || (r.FromDate == null && r.FromDate <= currentPeriod.FromDate))
+                                .OrderByDescending(r => r.FromDate == null ? r.ToDate : r.FromDate)
+                                .FirstOrDefault();
+
+                if (nextPeriod == null && currentPeriod.ToDate == null)
+                {
+                    currentPeriod.ToDate = DateTime.MaxValue;
+                }
+                if (prevPeriod == null && currentPeriod.FromDate == null)
+                {
+                    if (process.RegistrationDate != null && currentPeriod.ToDate >= process.RegistrationDate.Value)
+                    {
+                        currentPeriod.FromDate = process.RegistrationDate.Value;
+                    }
+                    else
+                    if (process.IssueDate != null && currentPeriod.ToDate >= process.IssueDate.Value)
+                    {
+                        currentPeriod.FromDate = process.IssueDate.Value;
+                    }
+                }
+                if (currentPeriod.FromDate == null && prevPeriod != null && prevPeriod.ToDate != null)
+                {
+                    currentPeriod.FromDate = prevPeriod.ToDate.Value == DateTime.MaxValue ? prevPeriod.ToDate : prevPeriod.ToDate.Value.AddDays(1);
+                }
+                if (currentPeriod.FromDate != null && prevPeriod != null && prevPeriod.ToDate == null)
+                {
+                    prevPeriod.ToDate = currentPeriod.FromDate.Value.AddDays(-1);
+                }
+                if (currentPeriod.ToDate == null && nextPeriod != null && nextPeriod.FromDate == null)
+                {
+                    currentPeriod.ToDate = nextPeriod.ToDate;
+                    nextPeriod.FromDate = currentPeriod.FromDate;
+                }
+                if (currentPeriod.FromDate == null && prevPeriod != null && prevPeriod.ToDate == null)
+                {
+                    currentPeriod.FromDate = prevPeriod.FromDate;
+                    prevPeriod.ToDate = currentPeriod.ToDate;
+                }
+            }
+        }
+
+        private List<RentPeriodForPaymentCalculator> JoinRentPeriodForPaymentCalculator(List<RentPeriodForPaymentCalculator> rentPeriods)
+        {
+            var result = new List<RentPeriodForPaymentCalculator>();
+            RentPeriodForPaymentCalculator joinedPeriod = null;
+            for (var i = 0; i < rentPeriods.Count; i++)
+            {
+                var currentPeriod = rentPeriods[i];
+                RentPeriodForPaymentCalculator prevPeriod = null;
+                if (i < rentPeriods.Count - 1)
+                {
+                    prevPeriod = rentPeriods[i + 1];
+                }
+                if (joinedPeriod == null)
+                    joinedPeriod = currentPeriod;
+                if (prevPeriod == null)
+                {
+                    result.Add(joinedPeriod);
+                    return result;
+                }
+                var checkDate = prevPeriod.ToDate.Value == DateTime.MaxValue ? prevPeriod.ToDate.Value : prevPeriod.ToDate.Value.AddDays(1);
+                if (checkDate >= joinedPeriod.FromDate)
+                {
+                    joinedPeriod.FromDate = prevPeriod.FromDate;
+                    joinedPeriod.ToDate = joinedPeriod.ToDate > prevPeriod.ToDate ? joinedPeriod.ToDate : prevPeriod.ToDate;
+                } else
+                {
+                    result.Add(joinedPeriod);
+                    joinedPeriod = null;
+                }
+            }
+            return result;
+        }
+
         public KumiAccountsVM GetViewModel(
             OrderOptions orderOptions,
             PageOptions pageOptions,

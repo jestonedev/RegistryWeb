@@ -15,6 +15,12 @@ namespace RegistryDb.Models
         {
         }
 
+        public RegistryContext(string connectionString, string nameDatabase)
+        {
+            connString = connectionString;
+            this.nameDatebase = nameDatabase;
+        }
+
         public RegistryContext(DbContextOptions<RegistryContext> options, IDbConnectionSettings connectionSettings)
             : base(options)
         {
