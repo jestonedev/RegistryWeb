@@ -284,12 +284,12 @@
                 <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-priv-label mb-1">Договор подготовлен</label>
                     <select class="selectpicker form-control" data-live-search="true" asp-for="IdExecutor" title="Договор подготовлен"
-                            asp-items="@{new SelectList(ViewBag.Executors, "IdExecutor", "ExecutorName", Model.IdExecutor)}"></select>
+                            asp-items="@(new SelectList(ViewBag.Executors, "IdExecutor", "ExecutorName", Model.IdExecutor))"></select>
                 </div>
                 <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-priv-label mb-1">Вид собственности</label>
                     <select class="selectpicker form-control" data-live-search="true" asp-for="IdTypeProperty" title="Вид собственности"
-                            asp-items="@{new SelectList(ViewBag.TypesOfProperty, "IdTypeOfProperty", "Name", Model.IdTypeProperty)}"></select>
+                            asp-items="@(new SelectList(ViewBag.TypesOfProperty, "IdTypeOfProperty", "Name", Model.IdTypeProperty))"></select>
                 </div>
                 <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-priv-label mb-1" asp-for="ApplicationDate">Дата подачи заявления</label>

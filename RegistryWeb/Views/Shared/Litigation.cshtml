@@ -64,7 +64,7 @@
         <div class="form-group mb-2 @litigationTypeClass">
             <label class="mb-1">Тип документа</label>
             <select disabled class="form-control field-litigation selectpicker" title="Тип документа"
-                    asp-items="@{new SelectList(ViewBag.LitigationTypes, "IdLitigationType", "LitigationTypeName",Model.IdLitigationType)}" name="IdLitigationType">
+                    asp-items="@(new SelectList(ViewBag.LitigationTypes, "IdLitigationType", "LitigationTypeName",Model.IdLitigationType))" name="IdLitigationType">
                 <option></option>
             </select>
         </div>

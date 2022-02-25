@@ -98,7 +98,7 @@
         <div class="form-group mb-2 @ownershipRightTypeClass">
             <label class="mb-1">Тип документа</label>
             <select disabled class="form-control field-ownership-right selectpicker" title="Тип документа"
-                    asp-items="@{new SelectList(ViewBag.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName",Model.IdOwnershipRightType)}" name="IdOwnershipRightType">
+                    asp-items="@(new SelectList(ViewBag.OwnershipRightTypes, "IdOwnershipRightType", "OwnershipRightTypeName",Model.IdOwnershipRightType))" name="IdOwnershipRightType">
                 <option></option>
             </select>
         </div>
