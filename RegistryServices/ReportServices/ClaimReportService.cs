@@ -31,17 +31,17 @@ namespace RegistryWeb.ReportServices
                 { "signer", idSigner },
                 { "executor", securityService.Executor?.ExecutorLogin?.Split("\\")[1] }
             };
-            var fileName = "registry\\claims\\transfer_JD";
+            var fileName = "registry\\claims_correction\\transfer_JD";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
 
-        public byte[] RequestToBks(List<int> idAccounts, int idSigner, DateTime dateValue)
+        public byte[] RequestToBks(List<int> idClaims, int idSigner, DateTime dateValue)
         {
             var tmpFileName = Path.GetTempFileName();
-            var idAccountsStr = idAccounts.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
+            var idClaimsStr = idClaims.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
             using (var sw = new StreamWriter(tmpFileName))
-                sw.Write(idAccountsStr);
+                sw.Write(idClaimsStr);
             var arguments = new Dictionary<string, object>
             {
                 { "filterTmpFile", tmpFileName },
@@ -49,7 +49,32 @@ namespace RegistryWeb.ReportServices
                 { "signer", idSigner },
                 { "executor", securityService.Executor?.ExecutorLogin?.Split("\\")[1] }
             };
-            var fileName = "registry\\claims\\request_BKS";
+
+            /*
+            var tmpFileNameBks = "";
+            if (idAccountsBks.Count > 0)
+            {   // Bks
+                tmpFileNameBks = Path.GetTempFileName();
+                var idAccountsBksStr = idAccountsBks.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
+                using (var sw = new StreamWriter(tmpFileNameBks))
+                    sw.Write(idAccountsBksStr);
+            }
+            // Kumi
+            var tmpFileNameKumi = Path.GetTempFileName();
+            var idAccountsKumiStr = idAccountsKumi.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
+            using (var sw = new StreamWriter(tmpFileNameKumi))
+                sw.Write(idAccountsKumiStr);
+
+            var arguments = new Dictionary<string, object>
+            {
+                { "filterTmpFileBks", tmpFileNameBks },
+                { "filterTmpFileKumi", tmpFileNameKumi },
+                { "request_date_from", dateValue.ToString("dd.MM.yyyy") },
+                { "signer", idSigner },
+                { "executor", securityService.Executor?.ExecutorLogin?.Split("\\")[1] }
+            };*/
+
+            var fileName = "registry\\claims_correction\\request_BKS";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
@@ -61,7 +86,7 @@ namespace RegistryWeb.ReportServices
                 { "id_claim", idClaim },
                 { "id_order", idOrder }
             };
-            var fileName = "registry\\claims\\judicial_order";
+            var fileName = "registry\\claims_correction\\judicial_order";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
@@ -93,7 +118,7 @@ namespace RegistryWeb.ReportServices
                 { "columnHeaders", columnHeaders },
                 { "columnPatterns", columnPatterns }
             };
-            var fileNameReport = GenerateReport(arguments, "registry\\export");
+            var fileNameReport = GenerateReport(arguments, "registry\\claims_correction\\export");
             return DownloadFile(fileNameReport);
         }
 
@@ -105,7 +130,7 @@ namespace RegistryWeb.ReportServices
         public byte[] SplitAccountsReport()
         {
             var arguments = new Dictionary<string, object>();
-            var fileName = "registry\\claims\\payment_accounts_duplicate_statistic";
+            var fileName = "registry\\claims_correction\\payment_accounts_duplicate_statistic";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
@@ -117,7 +142,7 @@ namespace RegistryWeb.ReportServices
                 { "date_to", endDate.ToString("dd.MM.yyyy") },
                 { "implementer", executor }
             };
-            var fileName = "registry\\claims\\claim_states";
+            var fileName = "registry\\claims_correction\\claim_states";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
@@ -130,7 +155,7 @@ namespace RegistryWeb.ReportServices
                 { "claim_state_type", idStateType },
                 { "only_current_claim_state", isCurrentState ? "1" : "0" }
             };
-            var fileName = "registry\\claims\\claim_states_executors";
+            var fileName = "registry\\claims_correction\\claim_states_executors";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
@@ -141,7 +166,7 @@ namespace RegistryWeb.ReportServices
                 { "date_from", startDate.ToString("dd.MM.yyyy") },
                 { "date_to", endDate.ToString("dd.MM.yyyy") }
             };
-            var fileName = "registry\\claims\\claim_сcourt_orders_prepare";
+            var fileName = "registry\\claims_correction\\claim_сcourt_orders_prepare";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
@@ -152,7 +177,7 @@ namespace RegistryWeb.ReportServices
                 { "date_from", startDate.ToString("dd.MM.yyyy") },
                 { "date_to", endDate.ToString("dd.MM.yyyy") }
             };
-            var fileName = "registry\\claims\\tariffs";
+            var fileName = "registry\\claims_correction\\tariffs";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }

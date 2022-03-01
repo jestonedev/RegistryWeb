@@ -65,9 +65,9 @@
 </li>
 @for (var j = 0; j < Model.Owner.OwnerReasons.Count(); j++)
 {
-<partial name="OwnerReason" model="@{new OwnerReasonVM() {
+<partial name="OwnerReason" model="@(new OwnerReasonVM() {
     OwnerReason = Model.Owner.OwnerReasons[j],
     I = i,
     J = j,
-    Action = ViewBag.Action }} " />
+    Action = ViewBag.Action }) " />
 }

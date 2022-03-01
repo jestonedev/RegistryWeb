@@ -23,9 +23,15 @@ namespace RegistryWeb.DataServices
             return registryContext.ClaimStates.FirstOrDefault(r => r.IdClaim == idClaim && r.IdStateType == idStateType) != null;
         }
 
-        public List<int> GetAccountIds(List<int> idClaims)
+        public Tuple<List<int>, List<int>> GetAccountIds(List<int> idClaims)
         {
-            return registryContext.Claims.Where(r => idClaims.Contains(r.IdClaim) && r.IdAccount != null).Select(r => r.IdAccount.Value).Distinct().ToList();
+            var idAccountsBks = registryContext.Claims
+                .Where(r => idClaims.Contains(r.IdClaim) && r.IdAccount != null)
+                .Select(r => r.IdAccount.Value).Distinct().ToList();
+            var idAccountsKumi = registryContext.Claims
+                .Where(r => idClaims.Contains(r.IdClaim) && r.IdAccountKumi != null)
+                .Select(r => r.IdAccountKumi.Value).Distinct().ToList();
+            return new Tuple<List<int>, List<int>>(idAccountsBks, idAccountsKumi);
         }
 
         public ClaimReportsVM GetViewModel()
