@@ -50,30 +50,6 @@ namespace RegistryWeb.ReportServices
                 { "executor", securityService.Executor?.ExecutorLogin?.Split("\\")[1] }
             };
 
-            /*
-            var tmpFileNameBks = "";
-            if (idAccountsBks.Count > 0)
-            {   // Bks
-                tmpFileNameBks = Path.GetTempFileName();
-                var idAccountsBksStr = idAccountsBks.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
-                using (var sw = new StreamWriter(tmpFileNameBks))
-                    sw.Write(idAccountsBksStr);
-            }
-            // Kumi
-            var tmpFileNameKumi = Path.GetTempFileName();
-            var idAccountsKumiStr = idAccountsKumi.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
-            using (var sw = new StreamWriter(tmpFileNameKumi))
-                sw.Write(idAccountsKumiStr);
-
-            var arguments = new Dictionary<string, object>
-            {
-                { "filterTmpFileBks", tmpFileNameBks },
-                { "filterTmpFileKumi", tmpFileNameKumi },
-                { "request_date_from", dateValue.ToString("dd.MM.yyyy") },
-                { "signer", idSigner },
-                { "executor", securityService.Executor?.ExecutorLogin?.Split("\\")[1] }
-            };*/
-
             var fileName = "registry\\claims_correction\\request_BKS";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);

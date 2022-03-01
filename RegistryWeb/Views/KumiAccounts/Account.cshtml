@@ -90,7 +90,7 @@
     <div class="card-body pt-3 pb-3 pl-3 pr-3" id="account">
         @if (ViewBag.Action == ActionTypeEnum.Delete && (Model.Claims.Any() || Model.Charges.Any()))
         {
-            <div class="alert alert-danger text-center">Нельзя удалить лицевой счет, по которому имеются начисления или претензионно-исковые работы.<br/>Вместо это вы можете аннулировать его.</div>
+            <div class="alert alert-danger text-center">Нельзя удалить лицевой счет, по которому имеются начисления или претензионно-исковые работы.<br />Вместо это вы можете аннулировать его.</div>
         }
 
         <form autocomplete="off" asp-action="@ViewBag.Action" id="accountForm" data-action="@ViewBag.Action" method="post">
@@ -101,7 +101,7 @@
                 @{
                     var tenancyInfo = (List<KumiAccountTenancyInfoVM>)ViewBag.TenancyInfo;
                     tenancyInfo = tenancyInfo.Union(new List<KumiAccountTenancyInfoVM>() { new KumiAccountTenancyInfoVM {
-                        RentObjects = new List<TenancyRentObject> { new TenancyRentObject {  } }} }).ToList();
+                                RentObjects = new List<TenancyRentObject> { new TenancyRentObject {  } }} }).ToList();
                     for (var i = 0; i < tenancyInfo.Count(); i++)
                     {
                         var idProcess = tenancyInfo[i].TenancyProcess?.IdProcess;
@@ -109,9 +109,10 @@
 
                         if (!string.IsNullOrEmpty(tenancyInfo[i].TenancyProcess?.RegistrationNum))
                         {
-                            tenancyRequisits = "№ " + tenancyInfo[i].TenancyProcess.RegistrationNum + " "+
+                            tenancyRequisits = "№ " + tenancyInfo[i].TenancyProcess.RegistrationNum + " " +
                                 (tenancyInfo[i].TenancyProcess.RegistrationDate.HasValue ? "от " + tenancyInfo[i].TenancyProcess.RegistrationDate.Value.ToString("dd.MM.yyyy") : "");
-                        } else
+                        }
+                        else
                         if (tenancyInfo[i].TenancyProcess?.IdProcess != null)
                         {
                             tenancyRequisits = "Рег. №: " + tenancyInfo[i].TenancyProcess?.IdProcess;
@@ -137,7 +138,7 @@
                                     <input name="TenancyRequisits[@i]" id="TenancyRequisits_@i" type="text" value="@tenancyRequisits" class="form-control" title="Реквизиты процесса найма" disabled />
                                 </div>
                             </div>
-                            @{ 
+                            @{
                                 if (tenancyInfo[i].RentObjects == null || !tenancyInfo[i].RentObjects.Any())
                                 {
                                     tenancyInfo[i].RentObjects = new List<TenancyRentObject> { new TenancyRentObject() };
@@ -185,19 +186,19 @@
                                             @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                                             {
                                                 <div class="input-group-append">
-                                                        <button id="tenancyDeleteBtn_@i" title="Удалить" style="@(idProcess != null ? "" : "display: none")" class="btn btn-danger" type="button">
-                                                            <span class="oi oi-trash"></span>
+                                                    <button id="tenancyDeleteBtn_@i" title="Удалить" style="@(idProcess != null ? "" : "display: none")" class="btn btn-danger" type="button">
+                                                        <span class="oi oi-trash"></span>
+                                                    </button>
+                                                    <button id="tenancyChangeBtn_@i" title="Редактировать" style="@(idProcess != null ? "" : "display: none")" class="btn btn-success" type="button">
+                                                        <span class="oi oi-pencil"></span>
+                                                    </button>
+                                                    @if (i == 0)
+                                                    {
+                                                        <button id="tenancyAddBtn" title="Добавить" class="btn btn-success" type="button">
+                                                            <span class="oi oi-plus"></span>
                                                         </button>
-                                                        <button id="tenancyChangeBtn_@i" title="Редактировать" style="@(idProcess != null ? "" : "display: none")" class="btn btn-success" type="button">
-                                                            <span class="oi oi-pencil"></span>
-                                                        </button>
-                                                        @if (i == 0)
-                                                        {
-                                                            <button id="tenancyAddBtn" title="Добавить" class="btn btn-success" type="button">
-                                                                <span class="oi oi-plus"></span>
-                                                            </button>
-                                                        }
-                                                
+                                                    }
+
                                                 </div>
                                             }
                                         }
@@ -263,6 +264,87 @@
         </form>
         @if (ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details)
         {
+            <div class="card mt-2">
+                <div class="card-header d-flex justify-content-between pt-2 pb-2">
+                    <h3>Начисления</h3>
+                    <div class="btn-group" role="group">
+                        <a href="#" data-for="Charges" class="form-control btn btn-primary account-toggler" title="Развернуть панель сведений о начислениях" style="font-weight:bold;">∧</a>
+                    </div>
+                </div>
+                <div class="card-body p-0" id="Charges">
+                    @if (Model.Charges.Any())
+                    {
+                        <table class="table table-bordered table-striped m-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center p-1" title="Дата последнего начисления">Дата</th>
+                                    <th class="text-center p-1" title="Входящее сальдо найм">Вх. найм</th>
+                                    <th class="text-center p-1" title="Входящее сальдо пени">Вх. пени</th>
+                                    <th class="text-center p-1" title="Начислено найм">Начислено найм</th>
+                                    <th class="text-center p-1" title="Начислено пени">Начислено пени</th>
+                                    <th class="text-center p-1" title="Оплачено найм">Оплата найм</th>
+                                    <th class="text-center p-1" title="Оплачено пени">Оплата пени</th>
+                                    <th class="text-center p-1" title="Перерасчет найм">Перерасчет найм</th>
+                                    <th class="text-center p-1" title="Перерасчет пени">Перерасчет пени</th>
+                                    <th class="text-center p-1" title="Исходящее сальдо найм">Исх. найм</th>
+                                    <th class="text-center p-1" title="Исходящее сальдо пени">Исх. пени</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{ 
+                                    var i = 0;
+                                }
+                                @foreach (var charge in Model.Charges.OrderBy(r => r.EndDate))
+                                {
+                                    i++;
+                                    <tr class="@(i > 12 ? "rr-charge-archive" : "")">  
+                                        <td class="text-center p-1"><b>@charge.EndDate.ToString("dd.MM.yyyy")</b></td>
+                                        <td class="text-center p-1">@charge.InputTenancy</td>
+                                        <td class="text-center p-1">@charge.InputPenalty</td>
+                                        <td class="text-center p-1">@charge.ChargeTenancy</td>
+                                        <td class="text-center p-1">@charge.ChargePenalty</td>
+                                        <td class="text-center p-1">
+                                            @if (charge.PaymentTenancy > 0 || charge.PaymentPenalty > 0)
+                                            {
+                                                <a asp-controller="KumiPayments" asp-action="Index" asp-route-idCharge="@charge.IdCharge">@charge.PaymentTenancy</a>
+                                            }
+                                            else
+                                            {
+                                                @charge.PaymentTenancy
+                                            }
+                                        </td>
+                                        <td class="text-center p-1">
+                                            @if (charge.PaymentTenancy > 0 || charge.PaymentPenalty > 0)
+                                            {
+                                                <a asp-controller="KumiPayments" asp-action="Index" asp-route-idCharge="@charge.IdCharge">@charge.PaymentPenalty</a>
+                                            }
+                                            else
+                                            {
+                                                @charge.PaymentPenalty
+                                            }
+                                        </td>
+                                        <td class="text-center p-1">@charge.RecalcTenancy</td>
+                                        <td class="text-center p-1">@charge.RecalcPenalty</td>
+                                        <td class="text-center p-1">@charge.OutputTenancy</td>
+                                        <td class="text-center p-1">@charge.OutputPenalty</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        if (i > 12) {
+                            <div class="text-center mt-1 mb-1">
+                                <a class="text-dark rr-charge-archive-btn" title="Архив начислений" href="#"><span class="oi oi-chevron-bottom"></span></a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center rr-list-group-item-empty">
+                            <i>Начисления отсутствуют</i>
+                        </div>
+                    }
+                </div>
+            </div>
             <div class="card mt-3">
                 <div class="card-header d-flex justify-content-between pt-2 pb-2">
                     <h3>Информация об исковых работах</h3>
@@ -305,7 +387,7 @@
                     else
                     {
                         <li class="list-group-item text-center rr-list-group-item-empty">
-                            <i>Исковые работы отсутствуютт</i>
+                            <i>Исковые работы отсутствуют</i>
                         </li>
                     }
                 </ul>

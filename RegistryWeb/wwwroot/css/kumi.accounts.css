@@ -47,7 +47,7 @@
     box-shadow: none;
 }
 
-.rr-account-additional-info {
+.rr-account-additional-info, .rr-charge-archive {
     display: none;
 }
 
@@ -55,4 +55,20 @@
     color: #fff;
     background-color: #dc3545;
     border-color: #dc3545;
+}
+
+#Charges {
+    font-size: 50%;
+}
+
+@media(min-width: 768px) {
+    #Charges {
+        font-size: 70%;
+    }
+}
+
+@media(min-width: 992px) {
+    #Charges {
+        font-size: 80%;
+    }
 }

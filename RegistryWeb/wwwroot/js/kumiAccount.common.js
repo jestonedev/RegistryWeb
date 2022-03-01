@@ -382,4 +382,21 @@
         }
         return result;
     }
+
+    var toggleChargeArchive = function (e) {
+        var archive = $(this).closest("#Charges").find("tr.rr-charge-archive");
+        var icon = $(this).find(".oi");
+        if (icon.hasClass("oi-chevron-bottom")) {
+            icon.removeClass("oi-chevron-bottom");
+            icon.addClass("oi-chevron-top");
+            archive.show();
+        } else {
+            icon.addClass("oi-chevron-bottom");
+            icon.removeClass("oi-chevron-top");
+            archive.hide();
+        }
+        e.preventDefault();
+    };
+
+    $(".rr-charge-archive-btn").on("click", toggleChargeArchive);
 });
