@@ -9,3 +9,11 @@
 RegistryWeb/bin/
 RegistryWeb/obj/
 RegistryWeb/wwwroot/files/
+RegistryDb/bin/
+RegistryDb/obj/
+RegistryServices/bin/
+RegistryServices/obj/
+RegistryReformaGKH/bin/
+RegistryReformaGKH/obj/
+RegistryPaymentCalculator/bin/
+RegistryPaymentCalculator/obj/

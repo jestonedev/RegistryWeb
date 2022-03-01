@@ -28,6 +28,7 @@ namespace RegistryDb.Models.Entities
         public DateTime? IssueDate { get; set; }
         public DateTime? BeginDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public DateTime? AnnualDate { get; set; }
         public bool UntilDismissal { get; set; }
         public string ResidenceWarrantNum { get; set; }
         public DateTime? ResidenceWarrantDate { get; set; }

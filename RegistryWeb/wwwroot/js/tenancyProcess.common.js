@@ -113,6 +113,33 @@ $(function () {
         tenancyCustomValidations(validator);
     });
 
+    $("#TenancyProcess_RegistrationNum").on("change", function () {
+        var val = $(this).val();
+        if (val.indexOf("н") !== -1) {
+            var now = new Date();
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            if (month < 10) month = "0" + month;
+            var day = now.getDate();
+            if (day < 10) day = "0" + day;
+            $("#TenancyProcess_AnnualDate").val(year + "-" + month + "-" + day);
+        } else {
+            $("#TenancyProcess_AnnualDate").val("");
+        }
+    });
+
+    $("#TenancyProcess_AnnualDate").on("change", function () {
+        var val = $(this).val();
+        var regNumElem = $("#TenancyProcess_RegistrationNum");
+        var regNum = regNumElem.val();
+        if (val !== "") {
+            if (regNum.indexOf("н") === -1)
+                regNumElem.val(regNumElem.val() + "н");
+        } else {
+            regNumElem.val(regNumElem.val().replace(/н/g, ""));
+        }
+    });
+
     $("#TenancyProcessForm").on("submit", function (e) {
         var action = $("#TenancyProcessForm").data("action");
         $("button[data-id], .bootstrap-select").removeClass("input-validation-error");

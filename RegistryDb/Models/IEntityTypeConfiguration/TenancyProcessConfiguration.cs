@@ -76,6 +76,10 @@ namespace RegistryDb.Models.IEntityTypeConfiguration
                 .HasColumnName("issue_date")
                 .HasColumnType("date");
 
+            builder.Property(e => e.AnnualDate)
+               .HasColumnName("annual_date")
+               .HasColumnType("date");
+
             builder.Property(e => e.ProtocolDate)
                 .HasColumnName("protocol_date")
                 .HasColumnType("date");

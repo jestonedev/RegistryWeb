@@ -26,11 +26,297 @@ namespace RegistryWeb.DataServices
             return vm;
         }
 
+        public List<KumiCharge> CalcChargesInfo(KumiAccountInfoForPaymentCalculator account, DateTime startDate, DateTime endDate, bool forceDeleteOldCharges)
+        {
+            if (startDate > endDate) throw new ApplicationException(
+                string.Format("Дата начала расчета {0} превышает дату окончания завершенного периода {1}",
+                startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")));
+
+            var charges = new List<KumiCharge>();
+            DateTime? lastChargeDate = null;
+            if (!account.Charges.Any())
+            {
+                lastChargeDate = account.LastChargeDate;
+            } else
+            {
+                lastChargeDate = account.Charges.OrderByDescending(r => r.EndDate).First().EndDate;
+            }
+            if (lastChargeDate != null)
+            {
+                if (lastChargeDate.Value.AddDays(1).Month == lastChargeDate.Value.Month)
+                {
+                    lastChargeDate = lastChargeDate.Value.AddDays(-lastChargeDate.Value.Day).AddMonths(1);
+                }
+                if (startDate > lastChargeDate.Value.AddDays(1))
+                {
+                    startDate = lastChargeDate.Value.AddDays(1);
+                }
+            }
+            charges.AddRange(account.Charges.Where(r => r.EndDate < startDate));
+
+            while(startDate < endDate)
+            {
+                var subEndDate = startDate.AddMonths(1).AddDays(-1);
+                KumiCharge prevCharge = null;
+                if (charges.Any())
+                    prevCharge = charges.OrderByDescending(r => r.EndDate).First();
+                var charge = CalcChargeInfo(account, startDate, subEndDate, prevCharge, forceDeleteOldCharges, out bool outOfBound);
+                if (!outOfBound)
+                    charges.Add(charge);
+                startDate = startDate.AddMonths(1);
+            }
+            return charges;
+        }
+
+        public void UpdateChargesIntoDb(KumiAccountInfoForPaymentCalculator account, List<KumiCharge> chargingInfo, bool forceDeleteOldCharges)
+        {
+            var accRecalcTenancy = 0m;
+            var accRecalcPenalty = 0m;
+            var dbCharges = registryContext.KumiCharges.Include(r => r.PaymentCharges).AsNoTracking().Where(r => r.IdAccount == account.IdAccount).ToList();
+            var actualDbCharges = dbCharges.ToList();
+            foreach (var dbCharge in dbCharges)
+            {
+                if (!chargingInfo.Any(r => r.StartDate == dbCharge.StartDate && r.EndDate == dbCharge.EndDate))
+                {
+                    if (forceDeleteOldCharges)
+                    {
+                        foreach (var paymentCharge in dbCharge.PaymentCharges)
+                        {
+                            var payment = registryContext.KumiPayments.FirstOrDefault(r => r.IdPayment == paymentCharge.IdPayment);
+                            if (payment != null)
+                            {
+                                payment.IsPosted = 0;
+                            }
+                            dbCharge.PaymentCharges.Remove(paymentCharge);
+                        }
+                        registryContext.KumiCharges.Remove(dbCharge);
+                        actualDbCharges.Remove(dbCharge);
+                    } else
+                    {
+                        accRecalcPenalty -= dbCharge.OutputPenalty - dbCharge.InputPenalty;
+                        accRecalcTenancy -= dbCharge.OutputTenancy - dbCharge.InputTenancy;
+                    }
+                }
+            }
+            dbCharges = actualDbCharges;
+
+            var currentTenancy = 0m;
+            var currentPenalty = 0m;
+            DateTime? lastChargingDate = null;
+            var sortedChargingInfo = chargingInfo.OrderBy(r => r.EndDate).ToList();
+            for (var i = 0; i < sortedChargingInfo.Count; i++)
+            {
+                var charge = sortedChargingInfo[i];
+                var dbCharge = dbCharges.FirstOrDefault(r => r.StartDate == charge.StartDate && r.EndDate == charge.EndDate);
+                var prevDbCharge = dbCharges.OrderByDescending(r => r.EndDate).FirstOrDefault(r => r.EndDate < charge.EndDate);
+                var prevCharge = sortedChargingInfo.OrderByDescending(r => r.EndDate).FirstOrDefault(r => r.EndDate < charge.EndDate);
+                if (prevCharge != null && (prevDbCharge == null || prevDbCharge.EndDate < prevCharge.EndDate))
+                {
+                    prevDbCharge = prevCharge;
+                }
+
+                if (dbCharge == null)
+                {
+                    charge.PaymentCharges = null;
+                    if (dbCharges.Count(r => r.EndDate > charge.EndDate) > 0 && !forceDeleteOldCharges)
+                        throw new ApplicationException(
+                            string.Format("Невозможно перерасчитать с доплатой лицевой счет {0}. Используйте функция перерасчета с переначислением", 
+                                account.IdAccount));
+                    if (!forceDeleteOldCharges && prevDbCharge != null)
+                    {
+                        charge.InputTenancy = prevDbCharge.OutputTenancy;
+                        charge.InputPenalty = prevDbCharge.OutputPenalty;
+                    }
+
+                    if (charge.EndDate == DateTime.Now.Date.AddDays(-DateTime.Now.Date.Day) && !forceDeleteOldCharges)
+                    {
+                        charge.RecalcTenancy = accRecalcTenancy;
+                        charge.RecalcPenalty = accRecalcPenalty;
+                        charge.OutputTenancy = charge.InputTenancy + charge.ChargeTenancy - charge.PaymentTenancy + charge.RecalcTenancy;
+                        charge.OutputPenalty = charge.InputPenalty + charge.ChargePenalty - charge.PaymentPenalty + charge.RecalcPenalty;
+                    }
+                    registryContext.KumiCharges.Add(charge);
+                } else
+                {
+                    if (forceDeleteOldCharges)
+                    {
+                        charge.IdCharge = dbCharge.IdCharge;
+                        if (charge != dbCharge)
+                            registryContext.Update(charge);
+                    } else
+                    if (i == chargingInfo.Count - 1)
+                    {
+                        if (prevDbCharge != null)
+                        {
+                            charge.InputTenancy = prevDbCharge.OutputTenancy;
+                            charge.InputPenalty = prevDbCharge.OutputPenalty;
+                        }
+
+                        charge.IdCharge = dbCharge.IdCharge;
+                        charge.RecalcTenancy = accRecalcTenancy;
+                        charge.RecalcPenalty = accRecalcPenalty;
+                        charge.OutputTenancy = charge.InputTenancy + charge.ChargeTenancy - charge.PaymentTenancy + charge.RecalcTenancy;
+                        charge.OutputPenalty = charge.InputPenalty + charge.ChargePenalty - charge.PaymentPenalty + charge.RecalcPenalty;
+                        if (charge != dbCharge)
+                            registryContext.Update(charge);
+                    } else
+                    {
+                        accRecalcTenancy += charge.ChargeTenancy - dbCharge.ChargeTenancy - 
+                            (charge.PaymentTenancy - dbCharge.PaymentTenancy) + 
+                            (charge.RecalcTenancy - dbCharge.RecalcTenancy);
+                        accRecalcPenalty += charge.ChargePenalty - dbCharge.ChargePenalty - 
+                            (charge.PaymentPenalty - dbCharge.PaymentPenalty) +
+                            (charge.RecalcPenalty - dbCharge.RecalcPenalty);
+                    }
+                }
+
+                if (i == chargingInfo.Count - 1)
+                {
+                    currentTenancy = charge.OutputTenancy;
+                    currentPenalty = charge.OutputPenalty;
+                    lastChargingDate = charge.EndDate;
+                }
+            }
+            var accountDb = registryContext.KumiAccounts.FirstOrDefault(r => r.IdAccount == account.IdAccount);
+            accountDb.CurrentBalanceTenancy = currentTenancy;
+            accountDb.CurrentBalancePenalty = currentPenalty;
+            accountDb.LastChargeDate = lastChargingDate;
+            registryContext.SaveChanges();
+        }
+
+        public KumiCharge CalcChargeInfo(KumiAccountInfoForPaymentCalculator account, DateTime startDate, DateTime endDate,
+            KumiCharge prevCharge, bool forceDeleteOldCharges, out bool outOfBound)
+        {
+            var inputBalanceTenancy = account.CurrentBalanceTenancy;
+            var inputBalancePenalty = account.CurrentBalancePenalty;
+            if (prevCharge != null)
+            {
+                inputBalanceTenancy = prevCharge.OutputTenancy;
+                inputBalancePenalty = prevCharge.OutputPenalty;
+            } else
+            {
+                var dbCharge = registryContext.KumiCharges.AsNoTracking()
+                    .FirstOrDefault(r => r.IdAccount == account.IdAccount && r.StartDate == startDate && r.EndDate == endDate);
+                if (dbCharge != null)
+                {
+                    inputBalanceTenancy = dbCharge.InputTenancy;
+                    inputBalancePenalty = dbCharge.InputPenalty;
+                }
+            }
+
+            var recalcTenancy = 0m;
+            var recalcPenalty = 0m;
+            if (!forceDeleteOldCharges)
+            {
+                KumiCharge currentSavedCharge = account.Charges.FirstOrDefault(r => r.StartDate == startDate && r.EndDate == endDate);
+                if (currentSavedCharge != null)
+                {
+                    recalcTenancy = currentSavedCharge.RecalcTenancy;
+                    recalcPenalty = currentSavedCharge.RecalcPenalty;
+                }
+            }
+
+            var chargeTenancy = 0m;
+            foreach (var tenancy in account.TenancyInfo)
+            {
+                chargeTenancy += CalcChargeByTenancy(tenancy, startDate, endDate);
+            }
+            chargeTenancy = Math.Round(chargeTenancy, 2);
+            if (chargeTenancy != 0 || recalcTenancy != 0 || recalcPenalty != 0) // TODO
+                outOfBound = false;
+            else
+                outOfBound = true;
+            return new KumiCharge
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                IdAccount = account.IdAccount,
+                InputTenancy = inputBalanceTenancy,
+                InputPenalty = inputBalancePenalty,
+                ChargeTenancy = chargeTenancy,
+                ChargePenalty = 0,  // TODO
+                RecalcTenancy = recalcTenancy,
+                RecalcPenalty = recalcPenalty,
+                PaymentTenancy = 0, // TODO
+                PaymentPenalty = 0, // TODO
+                OutputTenancy = inputBalanceTenancy+ chargeTenancy + recalcTenancy,  // TODO
+                OutputPenalty = inputBalancePenalty + recalcPenalty,  // TODO
+            };
+        }
+
+        private decimal CalcChargeByTenancy(KumiTenancyInfoForPaymentCalculator tenancy, DateTime startDate, DateTime endDate)
+        {
+            var rentPayment = 0m;
+            if (tenancy.AnnualDate <= startDate)
+            {
+                return rentPayment;
+            }
+            foreach(var rentPaymentInfo in tenancy.RentPayments.GroupBy(r => new { r.IdObject, r.AddressType }))
+            {
+                var actualPaymentPeriods = rentPaymentInfo.Where(r => r.FromDate <= endDate && r.FromDate >= startDate).ToList();
+                var prevStartPaymentPeriod = rentPaymentInfo.Where(r => r.FromDate < startDate).OrderByDescending(r => r.FromDate).FirstOrDefault();
+                if (prevStartPaymentPeriod != null)
+                {
+                    actualPaymentPeriods.Add(prevStartPaymentPeriod);
+                }
+                var paymentPeriods = new List<RentSubPaymentForPaymentCalculator>();
+                foreach(var actualPaymentPeriod in actualPaymentPeriods)
+                {
+                    var paymentPeriod = new RentSubPaymentForPaymentCalculator
+                    {
+                        PaymentMonth = actualPaymentPeriod.Payment,
+                        FromDate = actualPaymentPeriod.FromDate > startDate ? actualPaymentPeriod.FromDate.Date : startDate
+                    };
+                    var nextPeriod = actualPaymentPeriods.OrderBy(r => r.FromDate).FirstOrDefault(r => r.FromDate > actualPaymentPeriod.FromDate);
+                    paymentPeriod.ToDate = nextPeriod == null ? endDate : nextPeriod.FromDate > endDate ? endDate : nextPeriod.FromDate.Date.AddDays(-1);
+                    paymentPeriods.Add(paymentPeriod);
+                }
+
+                var actualRentPeriods = tenancy.RentPeriods.Where(r => 
+                    (r.FromDate <= startDate && r.ToDate >= startDate) ||
+                    (r.FromDate <= endDate && r.ToDate >= endDate) ||
+                    (r.FromDate >= startDate && r.ToDate <= endDate)).ToList();
+                if (!actualRentPeriods.Any())
+                    continue;
+                foreach (var rentPeriod in actualRentPeriods)
+                {
+                    var rentFromDate = rentPeriod.FromDate > startDate ? rentPeriod.FromDate : startDate;
+                    var rentToDate = rentPeriod.ToDate > endDate ? endDate : rentPeriod.ToDate;
+
+                    foreach (var paymentPeriod in paymentPeriods)
+                    {
+                        var from = paymentPeriod.FromDate;
+                        var to = paymentPeriod.ToDate;
+                        if (paymentPeriod.FromDate <= rentFromDate && paymentPeriod.ToDate >= rentFromDate) // Пересечение левой границы
+                        {
+                            from = rentFromDate.Value;
+                            to = paymentPeriod.ToDate > rentToDate ? rentToDate.Value : paymentPeriod.ToDate;
+                        } else
+                        if (paymentPeriod.FromDate <= rentToDate && paymentPeriod.ToDate >= rentToDate) // Пересечение правой границы
+                        {
+                            from = paymentPeriod.FromDate;
+                            to = rentToDate.Value;
+                        } else
+                        if (paymentPeriod.FromDate >= rentFromDate && paymentPeriod.ToDate <= rentToDate) // Вложенный период
+                        {
+                            from = paymentPeriod.FromDate;
+                            to = paymentPeriod.ToDate;
+                        }
+                        var diffDays = (to - from).Days + 1;
+                        var monthDays = DateTime.DaysInMonth(from.Year, from.Month);
+                        var payment = paymentPeriod.PaymentMonth / monthDays * diffDays;
+                        rentPayment += payment;
+                    }
+                }
+            }
+            return rentPayment;
+        }
+
         public List<KumiAccountPrepareForPaymentCalculator> GetAccountsPrepareForPaymentCalculator(IQueryable<KumiAccount> accounts)
         {
             var result = new List<KumiAccountPrepareForPaymentCalculator>();
             var tenancyInfo = GetTenancyInfo(accounts);
-            foreach(var account in accounts.Include(r => r.Charges).Include(r => r.Claims).ToList())
+            foreach(var account in accounts.Include(r => r.Charges).Include(r => r.Claims).AsNoTracking().ToList())
             {
                 var accountInfo = new KumiAccountPrepareForPaymentCalculator();
                 accountInfo.Account = account;
@@ -83,7 +369,11 @@ namespace RegistryWeb.DataServices
             {
                 var accountInfo = new KumiAccountInfoForPaymentCalculator
                 {
-                    IdAccount = account.Account.IdAccount
+                    IdAccount = account.Account.IdAccount,
+                    Account = account.Account.Account,
+                    LastChargeDate = account.Account.LastChargeDate,
+                    CurrentBalanceTenancy = account.Account.CurrentBalanceTenancy ?? 0,
+                    CurrentBalancePenalty = account.Account.CurrentBalancePenalty ?? 0
                 };
                 accountInfo.Payments = account.Payments;
                 accountInfo.Charges = account.Account.Charges.ToList();
@@ -94,11 +384,12 @@ namespace RegistryWeb.DataServices
                     {
                         IdProcess = tenancy.TenancyProcess.IdProcess,
                         RegistrationDate = tenancy.TenancyProcess.RegistrationDate,
+                        AnnualDate = tenancy.TenancyProcess.AnnualDate,
                         RegistrationNum = tenancy.TenancyProcess.RegistrationNum,
                         Tenant = tenancy.Tenant
                     };
                     tenancyInfo.RentPeriods = BuildRentPeriodsForPaymentCalculator(tenancy.TenancyProcess);
-                    CorrectRentPeriodsForPaymentCalculator(tenancyInfo.RentPeriods, tenancy.TenancyProcess);
+                    CorrectRentPeriodsForPaymentCalculator(tenancyInfo.RentPeriods, tenancy.TenancyProcess, account.Account.CreateDate);
                     CheckRentPeriodsForPaymentCalculator(tenancyInfo.RentPeriods, tenancy.TenancyProcess.IdProcess);
                     tenancyInfo.RentPeriods = JoinRentPeriodForPaymentCalculator(tenancyInfo.RentPeriods);
                     if (tenancyInfo.RentPeriods.Any())
@@ -158,7 +449,7 @@ namespace RegistryWeb.DataServices
                     if (firstRentPeriod != null)
                         payment.FromDate = firstRentPeriod.FromDate.Value;
                     else
-                        payment.FromDate = DateTime.Now.Date;
+                        payment.FromDate = DateTime.Now.Date.AddDays(-DateTime.Now.Date.Day+1).AddMonths(-1);
                     payment.Payment = rentObject.Payment;
                     result.Add(payment);
                 }
@@ -206,7 +497,7 @@ namespace RegistryWeb.DataServices
             }
         }
 
-        private void CorrectRentPeriodsForPaymentCalculator(List<RentPeriodForPaymentCalculator> rentPeriods, TenancyProcess process)
+        private void CorrectRentPeriodsForPaymentCalculator(List<RentPeriodForPaymentCalculator> rentPeriods, TenancyProcess process, DateTime accountCreateDate)
         {
             for (var i = 0; i < rentPeriods.Count; i++)
             {
@@ -220,8 +511,8 @@ namespace RegistryWeb.DataServices
                 RentPeriodForPaymentCalculator nextPeriod = rentPeriods
                                 .Where(r => r != currentPeriod)
                                 .Where(r => r.FromDate >= currentPeriod.ToDate || (r.FromDate == null && r.ToDate >= currentPeriod.ToDate)
-                                    || r.FromDate <= currentPeriod.FromDate || (r.FromDate == null && r.FromDate <= currentPeriod.FromDate))
-                                .OrderByDescending(r => r.FromDate == null ? r.ToDate : r.FromDate)
+                                    || r.FromDate >= currentPeriod.FromDate || (r.FromDate == null && r.FromDate >= currentPeriod.FromDate))
+                                .OrderBy(r => r.FromDate == null ? r.ToDate : r.FromDate)
                                 .FirstOrDefault();
 
                 if (nextPeriod == null && currentPeriod.ToDate == null)
@@ -258,6 +549,10 @@ namespace RegistryWeb.DataServices
                     currentPeriod.FromDate = prevPeriod.FromDate;
                     prevPeriod.ToDate = currentPeriod.ToDate;
                 }
+                if (prevPeriod == null && nextPeriod == null && currentPeriod.FromDate == null)
+                {
+                    currentPeriod.FromDate = accountCreateDate;
+                }
             }
         }
 
@@ -265,14 +560,15 @@ namespace RegistryWeb.DataServices
         {
             var result = new List<RentPeriodForPaymentCalculator>();
             RentPeriodForPaymentCalculator joinedPeriod = null;
-            for (var i = 0; i < rentPeriods.Count; i++)
+            foreach (var rentPeriod in rentPeriods.OrderByDescending(r => r.FromDate))
             {
-                var currentPeriod = rentPeriods[i];
-                RentPeriodForPaymentCalculator prevPeriod = null;
-                if (i < rentPeriods.Count - 1)
-                {
-                    prevPeriod = rentPeriods[i + 1];
-                }
+                var currentPeriod = rentPeriod;
+                RentPeriodForPaymentCalculator prevPeriod = rentPeriods
+                                .Where(r => r != currentPeriod)
+                                .Where(r => r.ToDate <= currentPeriod.FromDate || (r.ToDate == null && r.FromDate <= currentPeriod.FromDate)
+                                    || r.ToDate <= currentPeriod.ToDate || (r.ToDate == null && r.FromDate <= currentPeriod.ToDate))
+                                .OrderByDescending(r => r.ToDate == null ? r.FromDate : r.ToDate)
+                                .FirstOrDefault();
                 if (joinedPeriod == null)
                     joinedPeriod = currentPeriod;
                 if (prevPeriod == null)

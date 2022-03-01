@@ -51,13 +51,9 @@
     vertical-align: bottom;
 }
 
-.rr-until-dismissal-checkbox {
-    padding-left: 2.2rem;
-}
-
 @media(min-width: 992px) {
     .rr-until-dismissal-checkbox {
-        padding-top: 34px;
+        padding-left: 2.2rem;
     }
 }
 
