@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace RegistryWeb.DataServices
 {
@@ -47,6 +48,12 @@ namespace RegistryWeb.DataServices
                     new KeyValuePair<int, string>(3, "Жилой дом")
                 }
             };
+
+            var monthsList = DateTimeFormatInfo.CurrentInfo.MonthNames.Take(12).ToList();
+
+            viewModel.MonthsList = new Dictionary<int, string>();
+            for (var i = 0; i < monthsList.Count(); i++)
+                viewModel.MonthsList.Add(i + 1, monthsList[i]);
 
             return viewModel;
         }

@@ -41,10 +41,29 @@
         e.preventDefault();
     });
 
-    $("body").on('click', ".rr-priv-quarter-modal-report", function (e) {
-        var modal = $("#PrivQuarterReportModal");
+    $("body").on('click', ".rr-priv-quarter-modal-report, .rr-priv-month-modal-report", function (e) {
+        var modal = $("#PrivMonthQuarterReportModal");
 
-        refreshValidationForm($("#PrivQuarterReportForm"));
+        var quarterdiv = $("#PrivMonthQuarterReportModal").find("input[name='Quarter']").closest(".form-group");
+        var monthdiv = $("#PrivMonthQuarterReportModal").find("select[name='Month']").closest(".form-group");
+        
+        switch ($(this).attr("title"))
+        {
+            case "Квартальный отчет":
+                modal.find("h5").text("Квартальный отчет");
+                quarterdiv.show();
+                monthdiv.hide();
+                modal.find("select[name='Month']").selectpicker('val', '');
+                break;            
+            case "Помесячный отчет":
+                modal.find("h5").text("Помесячный отчет");
+                quarterdiv.hide();
+                monthdiv.show();
+                modal.find("input[name='Quarter']").val('');
+                break;
+        }
+
+        refreshValidationForm($("#PrivMonthQuarterReportForm"));
 
         modal.modal("show");
         e.preventDefault();
@@ -81,7 +100,7 @@
         e.preventDefault();
     });
 
-    $("#PrivCommonReportModal .rr-report-submit, #PrivQuarterReportModal  .rr-report-submit").on('click', function () {
+    $("#PrivCommonReportModal .rr-report-submit, #PrivMonthQuarterReportModal  .rr-report-submit").on('click', function () {
         $(this).closest('form').submit();
         $(this).closest(".modal").modal("hide");
     });

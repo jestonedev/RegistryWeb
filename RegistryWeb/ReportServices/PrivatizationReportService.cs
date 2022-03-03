@@ -435,7 +435,7 @@ namespace RegistryWeb.ReportServices
             }
         }
 
-        internal byte[] GetQuarterReport(PrivQuarterReportSettings settings)
+        internal byte[] GetMonthQuarterReport(PrivQuarterReportSettings settings)
         {
             var filterField = "";
             switch(settings.FilterField)
@@ -461,9 +461,12 @@ namespace RegistryWeb.ReportServices
             var arguments = new Dictionary<string, object> {
                 { "year",  settings.Year },
                 { "quarter",  quarter },
+                { "month",  settings.Month },
                 { "filter_field", filterField }
             };
-            var fileNameReport = GenerateReport(arguments, "registry\\privatization\\rep_quarterly");
+
+            var nameReport = settings.Month.HasValue ? "registry\\privatization\\rep_month" : "registry\\privatization\\rep_quarterly";
+            var fileNameReport = GenerateReport(arguments, nameReport);
             return DownloadFile(fileNameReport);
         }
 
