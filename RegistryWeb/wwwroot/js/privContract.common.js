@@ -289,7 +289,11 @@
                 baseElem.find("[id^='Patronymic']").val(contractorModal.find("[name$='Patronymic']").val());
                 baseElem.find("[id^='DateBirth']").val(contractorModal.find("[name$='DateBirth']").val());
                 baseElem.find("[id^='IdKinship']").selectpicker('val', contractorModal.find("[name$='IdKinship']").val());
-                baseElem.find("[id^='IsNoncontractor']").val(!contractorModal.find("[name$='IsNoncontractor']").is(':checked'));
+                var isNonContractor = contractorModal.find("[name$='IsNoncontractor']").is(':checked');
+                baseElem.find("[id^='IsNoncontractor']").val(!isNonContractor);
+                baseElem.find("[id^='IsNoncontractorInfo']").val(!isNonContractor ? "Неучастник" : "Участник")
+                    .removeClass("text-danger").removeClass("text-success").addClass(!isNonContractor ? "text-danger" : "text-success");
+
                 if (contractorModal.find("[name$='IsNoncontractor']").is(':checked')) {
                     baseElem.find("[id^='Passport']").val(contractorModal.find("[name$='Passport']").val());
                     baseElem.find("[id^='Part']").val(contractorModal.find("[name$='Part']").val());
