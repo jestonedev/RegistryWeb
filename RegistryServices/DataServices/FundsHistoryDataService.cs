@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using RegistryWeb.ViewModel;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using RegistryServices.ViewModel.RegistryObjects;
 
 namespace RegistryWeb.DataServices
 {

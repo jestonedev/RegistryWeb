@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using RegistryDb.Models.SqlViews;
 using RegistryWeb.Enums;
 using RegistryDb.Interfaces;
+using RegistryServices.ViewModel.Privatization;
 
 namespace RegistryWeb.DataServices
 {

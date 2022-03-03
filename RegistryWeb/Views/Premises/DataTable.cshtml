@@ -5,7 +5,7 @@
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.DataServices;
 @using RegistryWeb.DataHelpers;
-@model RegistryWeb.ViewModel.PremisesVM<Premise>;
+@model RegistryServices.ViewModel.RegistryObjects.PremisesVM<Premise>;
 @{
     var ids = Context.Session.Get<List<int>>("idPremises") ?? new List<int>();
     Context.Session.Set("Controller", "Premises");

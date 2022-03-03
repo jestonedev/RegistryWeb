@@ -1,4 +1,6 @@
 ﻿@using RegistryWeb.ViewModel
+@using RegistryServices.ViewModel.Claims
+@using RegistryServices.ViewModel.KumiAccounts
 @using RegistryDb.Models.Entities
 @using RegistryWeb.Extensions;
 @model ClaimsVM;
@@ -78,8 +80,8 @@
         {
             foreach (var item in Model.Claims)
             {
-                List<RegistryWeb.ViewModel.KumiAccountTenancyInfoVM> kumiTenancyInfo = null;
-                List<RegistryWeb.ViewModel.KumiAccountTenancyInfoVM> activeKumiTenancyInfo = null;
+                List<KumiAccountTenancyInfoVM> kumiTenancyInfo = null;
+                List<KumiAccountTenancyInfoVM> activeKumiTenancyInfo = null;
                 if (item.IdAccountKumi != null && Model.TenancyInfoKumi.ContainsKey(item.IdAccountKumi.Value))
                 {
                     kumiTenancyInfo = Model.TenancyInfoKumi[item.IdAccountKumi.Value];

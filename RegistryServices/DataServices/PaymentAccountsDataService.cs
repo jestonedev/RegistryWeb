@@ -11,6 +11,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.Payments;
 
 namespace RegistryWeb.DataServices
 {

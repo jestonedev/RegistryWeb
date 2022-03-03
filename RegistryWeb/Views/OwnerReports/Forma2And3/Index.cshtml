@@ -1,4 +1,4 @@
-﻿@model RegistryWeb.ViewModel.Forma2VM;
+﻿@model RegistryServices.ViewModel.Owners.Forma2VM;
 @{
     ViewData["Title"] = "Отчет по форме 2 и 3";
     var text = "(Зданий всего: " + Model.GroupPremises.Count() + " | Помещений всего: " + Model.GroupPremises.Sum(gp => gp.Count()) + ")";

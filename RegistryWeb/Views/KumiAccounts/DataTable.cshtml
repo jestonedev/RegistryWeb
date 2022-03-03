@@ -1,9 +1,8 @@
 ﻿@using RegistryWeb.Extensions;
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.SecurityServices;
-@using RegistryWeb.ViewModel;
 @using RegistryWeb.Enums;
-@model RegistryWeb.ViewModel.KumiAccountsVM;
+@model RegistryServices.ViewModel.KumiAccounts.KumiAccountsVM;
 @{
     var ids = Context.Session.Get<List<int>>("idKumiAccounts") ?? new List<int>();
     var check = "";

@@ -2,7 +2,7 @@
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.Enums;
 @using RegistryWeb.SecurityServices;
-@model RegistryWeb.ViewModel.TenancyProcessesVM;
+@model RegistryServices.ViewModel.Tenancies.TenancyProcessesVM;
 @{
     var ids = Context.Session.Get<List<int>>("idTenancyProcesses") ?? new List<int>();
     var check = "";

@@ -1,6 +1,6 @@
-﻿@using RegistryWeb.ViewOptions;
-@using RegistryWeb.SecurityServices;
+﻿@using RegistryWeb.SecurityServices;
 @using RegistryWeb.ViewModel;
+@using RegistryServices.ViewModel.KumiAccounts;
 @using RegistryWeb.Enums;
 @model RegistryDb.Models.Entities.KumiAccount;
 @{
@@ -83,7 +83,7 @@
                 {
                     <a class="form-control btn btn-primary" asp-action="Index">Назад</a>
                 }
-                    <a href="#" class="form-control btn btn-primary account-toggler" data-for="account" title="Развернуть" style="font-weight:bold;">∧</a>
+                <a href="#" class="form-control btn btn-primary account-toggler" data-for="account" title="Развернуть" style="font-weight:bold;">∧</a>
             </div>
         </div>
     </div>
@@ -101,7 +101,7 @@
                 @{
                     var tenancyInfo = (List<KumiAccountTenancyInfoVM>)ViewBag.TenancyInfo;
                     tenancyInfo = tenancyInfo.Union(new List<KumiAccountTenancyInfoVM>() { new KumiAccountTenancyInfoVM {
-                                RentObjects = new List<TenancyRentObject> { new TenancyRentObject {  } }} }).ToList();
+                                                RentObjects = new List<TenancyRentObject> { new TenancyRentObject {  } }} }).ToList();
                     for (var i = 0; i < tenancyInfo.Count(); i++)
                     {
                         var idProcess = tenancyInfo[i].TenancyProcess?.IdProcess;
@@ -291,13 +291,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @{ 
+                                @{
                                     var i = 0;
                                 }
                                 @foreach (var charge in Model.Charges.OrderBy(r => r.EndDate))
                                 {
                                     i++;
-                                    <tr class="@(i > 12 ? "rr-charge-archive" : "")">  
+                                    <tr class="@(i > 12 ? "rr-charge-archive" : "")">
                                         <td class="text-center p-1"><b>@charge.EndDate.ToString("dd.MM.yyyy")</b></td>
                                         <td class="text-center p-1">@charge.InputTenancy</td>
                                         <td class="text-center p-1">@charge.InputPenalty</td>
@@ -331,7 +331,8 @@
                                 }
                             </tbody>
                         </table>
-                        if (i > 12) {
+                        if (i > 12)
+                        {
                             <div class="text-center mt-1 mb-1">
                                 <a class="text-dark rr-charge-archive-btn" title="Архив начислений" href="#"><span class="oi oi-chevron-bottom"></span></a>
                             </div>

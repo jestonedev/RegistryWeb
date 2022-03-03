@@ -2,7 +2,7 @@
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.ViewModel;
-@model RegistryWeb.ViewModel.PaymentsVM;
+@model RegistryServices.ViewModel.Payments.PaymentsVM;
 @{
     var ids = Context.Session.Get<List<int>>("idAccounts") ?? new List<int>();
     var check = "";

@@ -7,6 +7,7 @@ using RegistryWeb.SecurityServices;
 using RegistryWeb.ReportServices;
 using RegistryWeb.DataServices;
 using RegistryWeb.ViewModel;
+using RegistryServices.ViewModel.Owners;
 
 namespace RegistryWeb.Controllers
 {

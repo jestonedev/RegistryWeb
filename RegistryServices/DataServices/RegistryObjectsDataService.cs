@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryDb.Models;
+using RegistryServices.ViewModel.RegistryObjects;
 using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.DataServices

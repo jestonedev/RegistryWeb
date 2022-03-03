@@ -11,6 +11,8 @@ using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
+using RegistryServices.ViewModel.Claims;
+using RegistryServices.ViewModel.KumiAccounts;
 
 namespace RegistryWeb.Controllers
 {

@@ -11,6 +11,7 @@ using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.Payments;
 
 namespace RegistryWeb.Controllers
 {

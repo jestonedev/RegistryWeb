@@ -1,5 +1,5 @@
 ﻿@using RegistryWeb.Enums;
-@model RegistryWeb.ViewModel.BuildingDemolitionInfoVM;
+@model RegistryServices.ViewModel.RegistryObjects.BuildingDemolitionInfoVM;
 @{
     var demolishedPlanDate = Model.DemolishedPlanDate.HasValue ? Model.DemolishedPlanDate.Value.ToString("yyyy-MM-dd") : "";
     var demolishedFactDate = Model.DemolishedFactDate.HasValue ? Model.DemolishedFactDate.Value.ToString("yyyy-MM-dd") : "";

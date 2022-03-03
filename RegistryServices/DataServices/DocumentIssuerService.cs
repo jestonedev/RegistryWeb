@@ -5,7 +5,7 @@ using RegistryWeb.ViewOptions;
 using System.Linq;
 using System.Collections.Generic;
 using System;
-
+using RegistryServices.ViewModel.Tenancies;
 
 namespace RegistryWeb.DataServices
 {

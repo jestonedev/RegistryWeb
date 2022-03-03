@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using RegistryServices.ViewModel.RegistryObjects;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.SecurityServices;

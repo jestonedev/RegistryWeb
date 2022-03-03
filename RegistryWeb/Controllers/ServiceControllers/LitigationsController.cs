@@ -10,6 +10,7 @@ using RegistryDb.Models;
 using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
+using RegistryServices.ViewModel.RegistryObjects;
 
 namespace RegistryWeb.Controllers.ServiceControllers
 {

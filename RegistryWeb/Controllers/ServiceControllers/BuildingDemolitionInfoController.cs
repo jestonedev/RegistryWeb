@@ -10,6 +10,7 @@ using RegistryWeb.ReportServices;
 using RegistryWeb.ViewModel;
 using System.IO;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.RegistryObjects;
 
 namespace RegistryWeb.Controllers.ServiceControllers
 {

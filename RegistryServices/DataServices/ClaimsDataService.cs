@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.KumiAccounts;
+using RegistryServices.ViewModel.Claims;
 
 namespace RegistryWeb.DataServices
 {

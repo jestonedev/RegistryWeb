@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.DataHelpers;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.RegistryObjects;
 
 namespace RegistryWeb.ViewComponents
 {

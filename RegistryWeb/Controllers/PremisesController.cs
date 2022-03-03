@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.RegistryObjects;
 
 namespace RegistryWeb.Controllers
 {

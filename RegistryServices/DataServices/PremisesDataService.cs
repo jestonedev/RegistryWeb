@@ -16,6 +16,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using RegistryDb.Models.SqlViews;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.RegistryObjects;
 
 namespace RegistryWeb.DataServices
 {

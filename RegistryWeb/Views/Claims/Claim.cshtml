@@ -1,7 +1,8 @@
 ﻿@using RegistryWeb.Extensions
 @using RegistryWeb.Enums;
 @using RegistryWeb.ViewModel;
-@model RegistryWeb.ViewModel.ClaimVM;
+@using RegistryServices.ViewModel.KumiAccounts;
+@model RegistryServices.ViewModel.Claims.ClaimVM;
 @{
 
     if (ViewBag.Action == "Create")
@@ -21,7 +22,7 @@
     ViewData["Judges"] = Model.Judges;
     ViewData["Signers"] = Model.Signers;
     
-    List<RegistryWeb.ViewModel.KumiAccountTenancyInfoVM> activeKumiTenancyInfo = null;
+    List<KumiAccountTenancyInfoVM> activeKumiTenancyInfo = null;
     if (Model.Claim.IdAccountKumi != null && Model.TenancyInfoKumi != null)
     {
         activeKumiTenancyInfo = Model.TenancyInfoKumi.Where(r => r.TenancyProcess.TenancyPersons.Any(p => p.ExcludeDate == null || p.ExcludeDate > DateTime.Now)

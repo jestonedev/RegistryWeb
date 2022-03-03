@@ -10,6 +10,7 @@ using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.KumiAccounts;
 
 namespace RegistryWeb.DataServices
 {

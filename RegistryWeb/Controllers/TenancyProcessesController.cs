@@ -13,6 +13,7 @@ using RegistryWeb.ViewOptions.Filter;
 using RegistryDb.Models.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.Tenancies;
 
 namespace RegistryWeb.Controllers
 {

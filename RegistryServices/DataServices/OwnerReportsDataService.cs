@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RegistryDb.Models;
+using RegistryServices.ViewModel.Owners;
 using RegistryWeb.Enums;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;

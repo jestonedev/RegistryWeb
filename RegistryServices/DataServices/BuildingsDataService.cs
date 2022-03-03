@@ -13,6 +13,7 @@ using RegistryDb.Models;
 using RegistryDb.Models.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.RegistryObjects;
 
 namespace RegistryWeb.DataServices
 {

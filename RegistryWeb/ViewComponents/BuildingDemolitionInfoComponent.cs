@@ -6,6 +6,7 @@ using RegistryWeb.ViewModel;
 using RegistryWeb.SecurityServices;
 using System;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.RegistryObjects;
 
 namespace RegistryWeb.ViewComponents
 {

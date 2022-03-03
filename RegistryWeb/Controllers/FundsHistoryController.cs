@@ -6,6 +6,7 @@ using RegistryWeb.DataHelpers;
 using RegistryDb.Models;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
+using RegistryServices.ViewModel.RegistryObjects;
 
 namespace RegistryWeb.Controllers
 {

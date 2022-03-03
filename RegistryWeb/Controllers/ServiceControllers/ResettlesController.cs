@@ -11,6 +11,7 @@ using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.RegistryObjects;
 
 namespace RegistryWeb.Controllers.ServiceControllers
 {

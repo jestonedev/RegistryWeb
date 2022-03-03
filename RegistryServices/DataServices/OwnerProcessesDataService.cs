@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.Owners;
 
 namespace RegistryWeb.DataServices
 {

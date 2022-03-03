@@ -1,4 +1,4 @@
-﻿@model RegistryWeb.ViewModel.OwnerProcessesVM;
+﻿@model RegistryServices.ViewModel.Owners.OwnerProcessesVM;
 @{ 
     var kladrStreetsList = new SelectList(Model.KladrStreets, "IdStreet", "StreetName", Model.FilterOptions.IdStreet);
     var ownerTypesList = new SelectList(Model.OwnerTypes, "IdOwnerType", "OwnerType1", Model.FilterOptions.IdOwnerType);

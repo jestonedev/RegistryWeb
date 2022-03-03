@@ -1,6 +1,7 @@
 ﻿using RegistryDb.Models;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.ViewModel;
+using RegistryServices.ViewModel.KumiAccounts;
 
 namespace RegistryWeb.DataServices
 {

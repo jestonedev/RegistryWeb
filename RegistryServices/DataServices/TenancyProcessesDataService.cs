@@ -12,6 +12,8 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.Enums;
+using RegistryServices.ViewModel.Tenancies;
+using RegistryServices.ViewModel.Payments;
 
 namespace RegistryWeb.DataServices
 {
@@ -468,7 +470,7 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
-        public List<PaymentHistoryViewModel> GetPaymentHistory(int id, PaymentHistoryTarget target)
+        public List<PaymentHistoryVM> GetPaymentHistory(int id, PaymentHistoryTarget target)
         {
             switch(target)
             {
@@ -491,7 +493,7 @@ namespace RegistryWeb.DataServices
                             join subPremiseRow in registryContext.SubPremises.Where(r => subPremisesIds.Contains(r.IdSubPremises))
                             on paymentRow.IdSubPremises equals subPremiseRow.IdSubPremises
                             where activeTenanciesSubPremisesIds.Contains(subPremiseRow.IdSubPremises)
-                            select new PaymentHistoryViewModel
+                            select new PaymentHistoryVM
                             {
                                 TenancyPaymentHistory = paymentRow,
                                 ObjectDescription = "Комната " + subPremiseRow.SubPremisesNum
@@ -529,7 +531,7 @@ namespace RegistryWeb.DataServices
                     
                     return (from paymentRow in paymentsPremises
                             where paymentRow.IdPremises != null && activeTenanciesPremisesIds.Contains(paymentRow.IdPremises.Value)
-                            select new PaymentHistoryViewModel
+                            select new PaymentHistoryVM
                             {
                                 TenancyPaymentHistory = paymentRow,
                                 ObjectDescription = "Квартира"
@@ -538,7 +540,7 @@ namespace RegistryWeb.DataServices
                             join subPremiseRow in registryContext.SubPremises.Where(r => subPremisesIds.Contains(r.IdSubPremises))
                             on paymentRow.IdSubPremises equals subPremiseRow.IdSubPremises
                             where activeTenanciesSubPremisesIds.Contains(subPremiseRow.IdSubPremises)
-                            select new PaymentHistoryViewModel
+                            select new PaymentHistoryVM
                             {
                                 TenancyPaymentHistory = paymentRow,
                                 ObjectDescription = "Комната №" + subPremiseRow.SubPremisesNum
@@ -556,7 +558,7 @@ namespace RegistryWeb.DataServices
                                            where paymentRow.IdSubPremises != null && subPremisesIds.Contains(paymentRow.IdSubPremises)
                                            select paymentRow).ToList();
                     var result = (from paymentRow in paymentsPremises
-                            select new PaymentHistoryViewModel
+                            select new PaymentHistoryVM
                             {
                                 TenancyPaymentHistory = paymentRow,
                                 ObjectDescription =
@@ -564,7 +566,7 @@ namespace RegistryWeb.DataServices
                                         .Select(r => r.Address.Text).FirstOrDefault()
                             }).Union(
                             from paymentRow in paymentsSubPremises
-                            select new PaymentHistoryViewModel
+                            select new PaymentHistoryVM
                             {
                                 TenancyPaymentHistory = paymentRow,
                                 ObjectDescription =
@@ -574,7 +576,7 @@ namespace RegistryWeb.DataServices
                         ).ToList();
                     if ((process.RegistrationNum != null && process.RegistrationNum.EndsWith("н")) || !process.TenancyPersons.Any())
                     {
-                        result.Add(new PaymentHistoryViewModel {
+                        result.Add(new PaymentHistoryVM {
                             ObjectDescription = "Плата по процессу найма отсутствиет в связи с аннулированием договора"
                         });
                     }
