@@ -174,6 +174,16 @@ namespace RegistryDb.Models
         public virtual DbSet<KumiPayment> KumiPayments { get; set; }
         public virtual DbSet<KumiPaymentCharge> KumiPaymentCharges { get; set; }
         public virtual DbSet<KumiPaymentClaim> KumiPaymentClaims { get; set; }
+        public virtual DbSet<KumiKbkType> KumiKbkTypes { get; set; }
+        public virtual DbSet<KumiMemorialOrder> KumiMemorialOrders { get; set; }
+        public virtual DbSet<KumiOperationType> KumiOperationTypes { get; set; }
+        public virtual DbSet<KumiPayerStatus> KumiPayerStatuses { get; set; }
+        public virtual DbSet<KumiPaymentGroup> KumiPaymentGroups { get; set; }
+        public virtual DbSet<KumiPaymentGroupFile> KumiPaymentGroupFiles { get; set; }
+        public virtual DbSet<KumiPaymentInfoSource> KumiPaymentInfoSources { get; set; }
+        public virtual DbSet<KumiPaymentKind> KumiPaymentKinds { get; set; }
+        public virtual DbSet<KumiPaymentReason> KumiPaymentReasons { get; set; }
+        public virtual DbSet<KumiPaymentUf> KumiPaymentUfs { get; set; }
 
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
@@ -335,6 +345,16 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new KumiPaymentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentChargeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentClaimConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiKbkTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiMemorialOrderConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiOperationTypeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPayerStatusConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPaymentGroupConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPaymentGroupFileConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPaymentInfoSourceConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPaymentKindConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPaymentReasonConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPaymentUfConfiguration(nameDatebase));
         }
     }
 }
