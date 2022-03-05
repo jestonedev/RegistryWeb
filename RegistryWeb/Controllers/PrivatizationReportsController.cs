@@ -43,14 +43,16 @@ namespace RegistryWeb.Controllers
             return View("Index", viewModel);
         }
 
-        public IActionResult QuarterReport(PrivQuarterReportSettings settings)
+        public IActionResult MonthQuarterReport(PrivQuarterReportSettings settings)
         {
             if (!securityService.HasPrivilege(Privileges.PrivRead))
                 return View("NotAccess");
             try
             {
-                var file = reportService.GetQuarterReport(settings);
-                return File(file, odtMime, "Квартальный отчет.odt");
+                var file = reportService.GetMonthQuarterReport(settings);
+
+                var nameReport = settings.Month.HasValue ? "Месячный отчет.odt" : "Квартальный отчет.odt";
+                return File(file, odtMime, nameReport);
             }
             catch (Exception ex)
             {

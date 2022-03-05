@@ -6,6 +6,7 @@ namespace RegistryWeb.ViewOptions
     {
         public int Year { get; set; }
         public int? Quarter { get; set; }
+        public int? Month { get; set; }
         public PrivQuarterReportFilterFieldEnum FilterField { get; set; }
     }
 }

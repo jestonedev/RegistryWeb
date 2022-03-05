@@ -14,5 +14,6 @@ namespace RegistryServices.ViewModel.Privatization
         public List<KeyValuePair<int, string>> LiteraTypes { get; set; } // с литерой "п", без литеры "п" - без привязки к справочнику
         public List<Executor> Executors { get; set; }
         public List<KeyValuePair<int, string>> Order { get; set; } // сортировка по дате, по рег. номеру - без привязки к справочнику
+        public Dictionary<int, string> MonthsList { get; set; }
     }
 }

@@ -2,14 +2,15 @@
 @model PrivatizationReportsVM;
 @{
     ViewData["Title"] = "Отчеты по приватизации";
+    var myKeys = new List<string>(Model.MonthsList.Values);
 }
 
 @section styles
-    {
+{
     <link rel="stylesheet" href="~/css/object.report.css" runat="server" />
 }
 @section Scripts
-    {
+{
     <script src="~/js/privatization.reports.js" asp-append-version="true"></script>
 }
 
@@ -21,6 +22,12 @@
             <div class="media cardreport align-items-center p-2">
                 <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
                 <div class="media-body pl-2 pr-2">Квартальный отчет</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-month-modal-report" title="Помесячный отчет">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Помесячный отчет</div>
             </div>
         </div>
         <div class="col-12 col-md-6 col-lg-4 mb-3 rr-priv-common-modal-report d-none" data-report-id="1" title="Статистика по первым приватизированным квартирам">
@@ -170,8 +177,8 @@
     </div>
 </div>
 
-<form id="PrivQuarterReportForm" asp-action="QuarterReport">
-    <div class="modal fade" id="PrivQuarterReportModal" tabindex="-1" role="dialog">
+<form id="PrivMonthQuarterReportForm" asp-action="MonthQuarterReport">
+    <div class="modal fade" id="PrivMonthQuarterReportModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -187,10 +194,29 @@
                             <input type="number" min="1991" max="2100" value="@DateTime.Now.Year" class="form-control" title="Год" name="Year"
                                    id="PrivQuarterReport_Year" />
                         </div>
-                        <div class="form-group col-6">
+                        <div class="form-group col-6" id="Quarter">
                             <label for="PrivQuarterReport_Quarter">Квартал</label>
                             <input type="number" min="1" max="4" value="@(Math.Ceiling((DateTime.Now.Month - 1) / 3m)+1)" class="form-control" title="Квартал" name="Quarter"
                                    id="PrivCommonReport_Quarter" />
+                        </div>
+                        <div class="form-group col-6" id="Month">
+                            <label for="PrivQuarterReport_Month">Месяц</label>
+                            <select class="form-control" data-title="Выберите месяц" name="Month" id="PrivCommonReport_Month" data-val="true">
+                                <option ></option>
+                                @{
+                                    @foreach (KeyValuePair<int, string> m in Model.MonthsList)
+                                    {
+                                        if (m.Key == DateTime.Now.Month)
+                                        {
+                                            <option selected value="@m.Key">@m.Value</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@m.Key">@m.Value</option>
+                                        }
+                                    }
+                                }
+                            </select>
                         </div>
                     </div>
                     <div class="form-row">
