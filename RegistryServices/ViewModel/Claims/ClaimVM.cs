@@ -1,4 +1,7 @@
 ﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.Claims;
+using RegistryDb.Models.Entities.Common;
+using RegistryDb.Models.Entities.Payments;
 using RegistryServices.ViewModel.KumiAccounts;
 using RegistryWeb.ViewModel;
 using System.Collections.Generic;

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using RegistryServices.ViewModel.Privatization;
+using RegistryDb.Models.Entities.Privatization;
 
 namespace RegistryWeb.DataServices
 {

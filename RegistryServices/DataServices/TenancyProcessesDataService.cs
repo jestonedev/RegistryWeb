@@ -14,6 +14,10 @@ using RegistryWeb.SecurityServices;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.Tenancies;
 using RegistryServices.ViewModel.Payments;
+using RegistryDb.Models.Entities.Common;
+using RegistryDb.Models.Entities.KumiAccounts;
+using RegistryDb.Models.Entities.RegistryObjects.Kladr;
+using RegistryDb.Models.Entities.Tenancies;
 
 namespace RegistryWeb.DataServices
 {

@@ -16,6 +16,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.RegistryObjects;
+using RegistryDb.Models.Entities.RegistryObjects.Buildings;
 
 namespace RegistryWeb.Controllers
 {

@@ -11,6 +11,9 @@ using RegistryWeb.ViewOptions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.KumiAccounts;
+using RegistryDb.Models.Entities.KumiAccounts;
+using RegistryDb.Models.Entities.RegistryObjects.Kladr;
+using RegistryDb.Models.Entities.Tenancies;
 
 namespace RegistryWeb.DataServices
 {

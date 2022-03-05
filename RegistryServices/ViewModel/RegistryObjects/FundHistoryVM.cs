@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Funds;
 using System.Collections.Generic;
 
 namespace RegistryServices.ViewModel.RegistryObjects

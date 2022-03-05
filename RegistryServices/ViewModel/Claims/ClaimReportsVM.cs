@@ -1,4 +1,6 @@
 ﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.Claims;
+using RegistryDb.Models.Entities.Common;
 using System;
 using System.Collections.Generic;
 

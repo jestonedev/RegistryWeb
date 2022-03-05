@@ -1,12 +1,13 @@
-﻿@using RegistryDb.Models.Entities
+﻿@using RegistryDb.Models.Entities.Common
+@using RegistryDb.Models.Entities.Claims
 @model IList<ClaimCourtOrder>
 
-@{ 
+@{
     var id = Guid.NewGuid();
     var judges = ((IList<Judge>)ViewBag.Judges).Select(r => new
     {
         r.IdJudge,
-        Judge = r.Snp + " (участок №"+r.NumDistrict.ToString()+")"
+        Judge = r.Snp + " (участок №" + r.NumDistrict.ToString() + ")"
     });
 
     var signers = ((IList<SelectableSigner>)ViewBag.Signers).Select(r => new

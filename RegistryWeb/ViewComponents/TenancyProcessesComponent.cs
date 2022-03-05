@@ -6,6 +6,7 @@ using RegistryDb.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using RegistryWeb.ViewModel;
 using RegistryWeb.Enums;
+using RegistryDb.Models.Entities.Tenancies;
 
 namespace RegistryWeb.ViewComponents
 {

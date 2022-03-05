@@ -5,6 +5,8 @@ using RegistryWeb.ViewOptions.Filter;
 using RegistryDb.Models.SqlViews;
 using RegistryWeb.DataServices;
 using RegistryWeb.ViewModel;
+using RegistryDb.Models.Entities.RegistryObjects.Premises;
+using RegistryDb.Models.Entities.Tenancies;
 
 namespace RegistryServices.ViewModel.RegistryObjects
 {

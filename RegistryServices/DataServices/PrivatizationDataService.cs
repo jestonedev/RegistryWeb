@@ -11,6 +11,10 @@ using RegistryDb.Models.SqlViews;
 using RegistryWeb.Enums;
 using RegistryDb.Interfaces;
 using RegistryServices.ViewModel.Privatization;
+using RegistryDb.Models.Entities.Common;
+using RegistryDb.Models.Entities.Privatization;
+using RegistryDb.Models.Entities.RegistryObjects.Kladr;
+using RegistryDb.Models.Entities.Tenancies;
 
 namespace RegistryWeb.DataServices
 {

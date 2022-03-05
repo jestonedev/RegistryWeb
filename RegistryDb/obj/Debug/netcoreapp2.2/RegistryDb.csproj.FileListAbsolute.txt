@@ -1,6 +1,5 @@
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryDb\bin\Debug\netcoreapp2.2\RegistryDb.deps.json
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryDb\bin\Debug\netcoreapp2.2\RegistryDb.dll
-D:\Projects\Visual Studio Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csprojAssemblyReference.cache
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csproj.CoreCompileInputs.cache
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.AssemblyInfoInputs.cache
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.AssemblyInfo.cs
@@ -16,3 +15,4 @@ D:\Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.AssemblyIn
 D:\Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csproj.CoreCompileInputs.cache
 D:\Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.dll
 D:\Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.pdb
+D:\Projects\Visual Studio Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csprojAssemblyReference.cache

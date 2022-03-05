@@ -1,4 +1,5 @@
 ﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.Privatization;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
 using System.Collections.Generic;

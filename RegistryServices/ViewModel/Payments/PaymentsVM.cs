@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using RegistryWeb.ViewModel;
+using RegistryDb.Models.Entities.Payments;
+using RegistryDb.Models.Entities.RegistryObjects.Kladr;
 
 namespace RegistryServices.ViewModel.Payments
 {

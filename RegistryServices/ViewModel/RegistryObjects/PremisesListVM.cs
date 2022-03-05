@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.ViewModel;
+using RegistryDb.Models.Entities.RegistryObjects.Premises;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Funds;
+using RegistryDb.Models.Entities.RegistryObjects.Common;
 
 namespace RegistryServices.ViewModel.RegistryObjects
 {

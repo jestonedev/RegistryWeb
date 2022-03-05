@@ -16,6 +16,11 @@ using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.RegistryObjects;
+using RegistryDb.Models.Entities.RegistryObjects.Premises;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Ownerships;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Funds;
+using RegistryDb.Models.Entities.RegistryObjects.Common;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Restrictions;
 
 namespace RegistryWeb.Controllers
 {

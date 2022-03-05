@@ -1,4 +1,4 @@
-﻿@using RegistryDb.Models.Entities;
+﻿@using RegistryDb.Models.Entities.Privatization;
 @using RegistryWeb.Enums;
 @{
     var categoryLessThan18 = ((List<PrivContractorWarrantTemplate>)ViewBag.PrivContractorWarrantTemplates).Where(r => r.IdCategory == 0).OrderBy(r => r.WarrantText);

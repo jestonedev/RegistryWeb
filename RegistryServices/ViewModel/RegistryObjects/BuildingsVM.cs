@@ -4,6 +4,7 @@ using RegistryWeb.ViewOptions.Filter;
 using RegistryDb.Models.SqlViews;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.ViewModel;
+using RegistryDb.Models.Entities.RegistryObjects.Buildings;
 
 namespace RegistryServices.ViewModel.RegistryObjects
 {

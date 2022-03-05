@@ -14,6 +14,7 @@ using RegistryDb.Models.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.Tenancies;
+using RegistryDb.Models.Entities.Tenancies;
 
 namespace RegistryWeb.Controllers
 {

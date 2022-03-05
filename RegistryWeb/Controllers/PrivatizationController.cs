@@ -7,6 +7,7 @@ using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.Privatization;
+using RegistryDb.Models.Entities.Privatization;
 
 namespace RegistryWeb.Controllers
 {

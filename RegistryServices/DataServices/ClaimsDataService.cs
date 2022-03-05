@@ -15,6 +15,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.KumiAccounts;
 using RegistryServices.ViewModel.Claims;
+using RegistryDb.Models.Entities.Claims;
+using RegistryDb.Models.Entities.Common;
+using RegistryDb.Models.Entities.KumiAccounts;
+using RegistryDb.Models.Entities.Payments;
+using RegistryDb.Models.Entities.Tenancies;
 
 namespace RegistryWeb.DataServices
 {

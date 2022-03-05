@@ -14,6 +14,11 @@ using RegistryDb.Models.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.RegistryObjects;
+using RegistryDb.Models.Entities.Common;
+using RegistryDb.Models.Entities.RegistryObjects.Buildings;
+using RegistryDb.Models.Entities.RegistryObjects.Kladr;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Ownerships;
+using RegistryDb.Models.Entities.RegistryObjects.Common;
 
 namespace RegistryWeb.DataServices
 {

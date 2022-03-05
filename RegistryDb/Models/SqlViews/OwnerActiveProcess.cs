@@ -1,4 +1,5 @@
 ﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.Owners;
 
 namespace RegistryDb.Models.SqlViews
 {

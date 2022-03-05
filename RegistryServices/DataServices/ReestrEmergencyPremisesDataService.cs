@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using RegistryDb.Interfaces;
 using RegistryDb.Models;
 using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.RegistryObjects.Buildings;
 using RegistryServices.ViewModel.RegistryObjects;
 using RegistryWeb.Enums;
 using RegistryWeb.ViewModel;

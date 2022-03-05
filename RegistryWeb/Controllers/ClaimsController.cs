@@ -13,6 +13,7 @@ using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryServices.ViewModel.Claims;
 using RegistryServices.ViewModel.KumiAccounts;
+using RegistryDb.Models.Entities.Claims;
 
 namespace RegistryWeb.Controllers
 {

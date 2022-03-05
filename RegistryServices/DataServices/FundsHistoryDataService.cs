@@ -8,6 +8,7 @@ using RegistryWeb.ViewModel;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryServices.ViewModel.RegistryObjects;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Funds;
 
 namespace RegistryWeb.DataServices
 {

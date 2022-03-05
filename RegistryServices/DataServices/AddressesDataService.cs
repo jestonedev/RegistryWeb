@@ -8,6 +8,9 @@ using RegistryDb.Models.SqlViews;
 using RegistryDb.Models;
 using RegistryWeb.Enums;
 using RegistryWeb.ViewModel;
+using RegistryDb.Models.Entities.RegistryObjects.Buildings;
+using RegistryDb.Models.Entities.RegistryObjects.Premises;
+using RegistryDb.Models.Entities.RegistryObjects.Kladr;
 
 namespace RegistryWeb.DataServices
 {

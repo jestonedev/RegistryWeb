@@ -7,6 +7,9 @@ using RegistryDb.Models;
 using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.Enums;
+using RegistryDb.Models.Entities.RegistryObjects.Buildings;
+using RegistryDb.Models.Entities.RegistryObjects.Premises;
+using RegistryDb.Models.Entities.Tenancies;
 
 namespace RegistryWeb.Controllers.ServiceControllers
 {

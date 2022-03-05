@@ -12,6 +12,7 @@ using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.RegistryObjects;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Resettle;
 
 namespace RegistryWeb.Controllers.ServiceControllers
 {
@@ -299,7 +300,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             if (!int.TryParse(address.Id, out id))
                 return Json(new { Error = -4 });
 
-            var resettleInfo = new ResettleInfo { };
+            ResettleInfo resettleInfo = new ResettleInfo { };
             var resettleInfoVM = new ResettleInfoVM(resettleInfo, new Address { AddressType = address.AddressType }, registryContext);
             ViewBag.SecurityService = securityService;
             ViewBag.Action = action;

@@ -1,4 +1,5 @@
 ﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Restrictions;
 using RegistryWeb.Enums;
 
 namespace RegistryServices.ViewModel.RegistryObjects

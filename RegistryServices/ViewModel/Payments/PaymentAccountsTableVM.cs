@@ -1,4 +1,5 @@
 ﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.Payments;
 using RegistryWeb.ViewModel;
 using System.Collections.Generic;
 

@@ -12,6 +12,8 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.Owners;
+using RegistryDb.Models.Entities.Owners;
+using RegistryDb.Models.Entities.Owners.Log;
 
 namespace RegistryWeb.DataServices
 {

@@ -1,4 +1,8 @@
 ﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.RegistryObjects.Common;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Ownerships;
+using RegistryDb.Models.Entities.RegistryObjects.Kladr;
+using RegistryDb.Models.Entities.Tenancies;
 using RegistryDb.Models.SqlViews;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;

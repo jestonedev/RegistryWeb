@@ -1,5 +1,6 @@
 ﻿using RegistryDb.Models;
 using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.Tenancies;
 using System;
 using System.Collections.Generic;
 using System.Linq;

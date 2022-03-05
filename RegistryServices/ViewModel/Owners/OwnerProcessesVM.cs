@@ -1,4 +1,6 @@
 ﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.Owners;
+using RegistryDb.Models.Entities.RegistryObjects.Kladr;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
 using System.Collections.Generic;

@@ -83,7 +83,7 @@
             var historyGroups = history.GroupBy(r => r.ObjectDescription);
             var totalArea = 0d;
             var totalPayment = 0m;
-            RegistryDb.Models.Entities.TenancyPaymentHistory coefs = null;
+            RegistryDb.Models.Entities.Tenancies.TenancyPaymentHistory coefs = null;
             DateTime? date = null;
             foreach (var historyGroup in historyGroups)
             {

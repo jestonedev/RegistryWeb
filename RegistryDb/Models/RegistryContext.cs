@@ -1,8 +1,43 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RegistryDb.Models.Entities;
 using RegistryDb.Models.SqlViews;
-using RegistryDb.Models.IEntityTypeConfiguration;
 using RegistryDb.Interfaces;
+using RegistryDb.Models.IEntityTypeConfiguration.Acl;
+using RegistryDb.Models.IEntityTypeConfiguration.Payments;
+using RegistryDb.Models.IEntityTypeConfiguration.Claims;
+using RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts;
+using RegistryDb.Models.IEntityTypeConfiguration.Privatization;
+using RegistryDb.Models.IEntityTypeConfiguration.Owners;
+using RegistryDb.Models.IEntityTypeConfiguration.Tenancies;
+using RegistryDb.Models.IEntityTypeConfiguration.RegistryObjects.Kladr;
+using RegistryDb.Models.IEntityTypeConfiguration.RegistryObjects.Buildings;
+using RegistryDb.Models.IEntityTypeConfiguration.RegistryObjects.Premises;
+using RegistryDb.Models.IEntityTypeConfiguration.Common;
+using RegistryDb.Models.IEntityTypeConfiguration.Owners.Log;
+using RegistryDb.Models.IEntityTypeConfiguration.RegistryObjects.Common.Ownerships;
+using RegistryDb.Models.IEntityTypeConfiguration.RegistryObjects.Common;
+using RegistryDb.Models.IEntityTypeConfiguration.RegistryObjects.Common.Restrictions;
+using RegistryDb.Models.IEntityTypeConfiguration.RegistryObjects.Buildings.Litigations;
+using RegistryDb.Models.IEntityTypeConfiguration.RegistryObjects.Common.Funds;
+using RegistryDb.Models.Entities.Acl;
+using RegistryDb.Models.Entities.Claims;
+using RegistryDb.Models.Entities.Common;
+using RegistryDb.Models.Entities.KumiAccounts;
+using RegistryDb.Models.Entities.Owners;
+using RegistryDb.Models.Entities.Owners.Log;
+using RegistryDb.Models.Entities.Payments;
+using RegistryDb.Models.Entities.Privatization;
+using RegistryDb.Models.IEntityTypeConfiguration.RegistryObjects.Common.Resettle;
+using RegistryDb.Models.Entities.RegistryObjects.Buildings;
+using RegistryDb.Models.Entities.RegistryObjects.Buildings.Litigations;
+using RegistryDb.Models.Entities.RegistryObjects.Premises;
+using RegistryDb.Models.Entities.RegistryObjects.Kladr;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Resettle;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Ownerships;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Funds;
+using RegistryDb.Models.Entities.RegistryObjects.Common;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Restrictions;
+using RegistryDb.Models.Entities.Tenancies;
 
 namespace RegistryDb.Models
 {
@@ -42,7 +77,6 @@ namespace RegistryDb.Models
         public virtual DbSet<SubPremise> SubPremises { get; set; }
         public virtual DbSet<DocumentType> DocumentTypes { get; set; }
         public virtual DbSet<DocumentIssuedBy> DocumentsIssuedBy { get; set; }
-        public virtual DbSet<DocumentResidence> DocumentsResidence { get; set; }
         public virtual DbSet<FundType> FundTypes { get; set; }
         public virtual DbSet<FundBuildingAssoc> FundsBuildingsAssoc { get; set; }
         public virtual DbSet<FundHistory> FundsHistory { get; set; }
@@ -176,6 +210,7 @@ namespace RegistryDb.Models
         public virtual DbSet<KumiPaymentClaim> KumiPaymentClaims { get; set; }
         public virtual DbSet<KumiKbkType> KumiKbkTypes { get; set; }
         public virtual DbSet<KumiMemorialOrder> KumiMemorialOrders { get; set; }
+        public virtual DbSet<KumiMemorialOrderPaymentAssoc> KumiMemorialOrderPaymentAssocs { get; set; }
         public virtual DbSet<KumiOperationType> KumiOperationTypes { get; set; }
         public virtual DbSet<KumiPayerStatus> KumiPayerStatuses { get; set; }
         public virtual DbSet<KumiPaymentGroup> KumiPaymentGroups { get; set; }
@@ -184,6 +219,7 @@ namespace RegistryDb.Models
         public virtual DbSet<KumiPaymentKind> KumiPaymentKinds { get; set; }
         public virtual DbSet<KumiPaymentReason> KumiPaymentReasons { get; set; }
         public virtual DbSet<KumiPaymentUf> KumiPaymentUfs { get; set; }
+        public virtual DbSet<KumiPaymentCorrection> PaymentCorrections { get; set; }
 
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
@@ -235,18 +271,17 @@ namespace RegistryDb.Models
 
             modelBuilder.ApplyConfiguration(new DocumentTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new DocumentIssuedByConfiguration(nameDatebase));
-            modelBuilder.ApplyConfiguration(new DocumentResidenceConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new BuildingConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremiseConfiguration(nameDatebase));
-            modelBuilder.ApplyConfiguration(new PreparersConfiguration(nameDatebase));
-            modelBuilder.ApplyConfiguration(new SubPremiseConfiguration(nameDatebase));
-            modelBuilder.ApplyConfiguration(new ObjectStateConfiguration(nameDatebase));
-            modelBuilder.ApplyConfiguration(new HeatingTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremisesCommentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremisesDoorKeysConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremisesTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremisesKindConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new PreparersConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new SubPremiseConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ObjectStateConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new HeatingTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new StructureTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new StructureTypeOverlapConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new FoundationTypeConfiguration(nameDatebase));
@@ -299,11 +334,12 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new TenancyBuildingAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyPremiseAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancySubPremiseAssocConfiguration(nameDatebase));
-            modelBuilder.ApplyConfiguration(new ExecutorConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyRentPeriodConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyFileConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyProlongRentReasonTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyPaymentHistoryConfiguration(nameDatebase));
+
+            modelBuilder.ApplyConfiguration(new ExecutorConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new ResettleInfoConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleKindConfiguration(nameDatebase));
@@ -347,6 +383,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new KumiPaymentClaimConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiKbkTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiMemorialOrderConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiMemorialOrderPaymentAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiOperationTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPayerStatusConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentGroupConfiguration(nameDatebase));
@@ -355,6 +392,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new KumiPaymentKindConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentReasonConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentUfConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPaymentCorrectionConfiguration(nameDatebase));
         }
     }
 }

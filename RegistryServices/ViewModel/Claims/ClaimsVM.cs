@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.Claims;
+using RegistryDb.Models.Entities.Payments;
+using RegistryDb.Models.Entities.RegistryObjects.Kladr;
 using RegistryDb.Models.SqlViews;
 using RegistryServices.ViewModel.KumiAccounts;
 using RegistryWeb.ViewModel;

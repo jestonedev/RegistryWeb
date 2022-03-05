@@ -6,6 +6,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using RegistryServices.ViewModel.Tenancies;
+using RegistryDb.Models.Entities.Tenancies;
 
 namespace RegistryWeb.DataServices
 {

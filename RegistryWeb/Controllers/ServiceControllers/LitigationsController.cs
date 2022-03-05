@@ -11,6 +11,7 @@ using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryServices.ViewModel.RegistryObjects;
+using RegistryDb.Models.Entities.RegistryObjects.Buildings.Litigations;
 
 namespace RegistryWeb.Controllers.ServiceControllers
 {

@@ -3,11 +3,15 @@ using RegistryDb.Models;
 using System.Collections.Generic;
 using System.Linq;
 using RegistryWeb.ViewModel;
+using RegistryDb.Models.Entities.RegistryObjects.Buildings;
+using RegistryDb.Models.Entities.RegistryObjects.Premises;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Resettle;
 
 namespace RegistryServices.ViewModel.RegistryObjects
 {
     public class ResettleInfoVM : ResettleInfo
     {
+        public ResettleInfo Ri { get; }
         public Address Address { get; set; }
         public string IdStreet { get; set; }
         public int? IdBuilding { get; set; }
@@ -51,6 +55,7 @@ namespace RegistryServices.ViewModel.RegistryObjects
             ResettleDocuments = ri.ResettleDocuments;
             ResettleInfoTo = ri.ResettleInfoTo;
             ResettleInfoToFact = ri.ResettleInfoToFact;
+            Ri = ri;
             Address = address;
 
             // Плановый адрес переселения

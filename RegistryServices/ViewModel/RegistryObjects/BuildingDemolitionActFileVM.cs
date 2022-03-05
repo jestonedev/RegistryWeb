@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.RegistryObjects.Buildings;
 
 namespace RegistryServices.ViewModel.RegistryObjects
 {

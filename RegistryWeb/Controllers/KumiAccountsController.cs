@@ -10,6 +10,7 @@ using RegistryWeb.ViewOptions;
 using RegistryDb.Models.Entities;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.KumiAccounts;
+using RegistryDb.Models.Entities.KumiAccounts;
 
 namespace RegistryWeb.Controllers
 {

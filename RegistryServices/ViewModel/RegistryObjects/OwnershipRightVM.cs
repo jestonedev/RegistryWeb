@@ -1,4 +1,5 @@
 ﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Ownerships;
 using RegistryWeb.ViewModel;
 
 namespace RegistryServices.ViewModel.RegistryObjects

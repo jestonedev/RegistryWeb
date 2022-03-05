@@ -17,6 +17,14 @@ using Microsoft.Extensions.Configuration;
 using RegistryDb.Models.SqlViews;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.RegistryObjects;
+using RegistryDb.Models.Entities.Owners;
+using RegistryDb.Models.Entities.RegistryObjects.Buildings;
+using RegistryDb.Models.Entities.RegistryObjects.Premises;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Ownerships;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Funds;
+using RegistryDb.Models.Entities.RegistryObjects.Common;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Restrictions;
+using RegistryDb.Models.Entities.Tenancies;
 
 namespace RegistryWeb.DataServices
 {

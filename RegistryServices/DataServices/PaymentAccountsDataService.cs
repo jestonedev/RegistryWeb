@@ -12,6 +12,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.Payments;
+using RegistryDb.Models.Entities.Acl;
+using RegistryDb.Models.Entities.Claims;
+using RegistryDb.Models.Entities.Common;
+using RegistryDb.Models.Entities.Payments;
+using RegistryDb.Models.Entities.RegistryObjects.Premises;
 
 namespace RegistryWeb.DataServices
 {
