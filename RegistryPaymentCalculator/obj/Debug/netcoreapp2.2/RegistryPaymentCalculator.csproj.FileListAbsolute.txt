@@ -17,3 +17,5 @@ D:\Projects\Visual Studio Projects\RegistryWeb\RegistryPaymentCalculator\obj\Deb
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.dll
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.pdb
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\RegistryPaymentCalculator.dll.config
+D:\Projects\Visual Studio Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\RegistryPaymentsLoader.dll
+D:\Projects\Visual Studio Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\RegistryPaymentsLoader.pdb

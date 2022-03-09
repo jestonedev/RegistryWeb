@@ -32,3 +32,5 @@ D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryService
 D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.dll
 D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.pdb
 D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.genruntimeconfig.cache
+D:\Projects\Visual Studio Projects\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\RegistryPaymentsLoader.dll
+D:\Projects\Visual Studio Projects\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\RegistryPaymentsLoader.pdb

@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RegistryDb\RegistryDb.csproj" />
+    <ProjectReference Include="..\RegistryPaymentsLoader\RegistryPaymentsLoader.csproj" />
     <ProjectReference Include="..\RegistryReformaGKH\RegistryReformaGKH.csproj" />
   </ItemGroup>
 

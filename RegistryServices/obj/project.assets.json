@@ -4725,6 +4725,19 @@
           "bin/placeholder/RegistryDb.dll": {}
         }
       },
+      "RegistryPaymentsLoader/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v2.2",
+        "dependencies": {
+          "RegistryDb": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/RegistryPaymentsLoader.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/RegistryPaymentsLoader.dll": {}
+        }
+      },
       "RegistryReformaGKH/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.2",
@@ -12966,6 +12979,11 @@
       "path": "../RegistryDb/RegistryDb.csproj",
       "msbuildProject": "../RegistryDb/RegistryDb.csproj"
     },
+    "RegistryPaymentsLoader/1.0.0": {
+      "type": "project",
+      "path": "../RegistryPaymentsLoader/RegistryPaymentsLoader.csproj",
+      "msbuildProject": "../RegistryPaymentsLoader/RegistryPaymentsLoader.csproj"
+    },
     "RegistryReformaGKH/1.0.0": {
       "type": "project",
       "path": "../RegistryReformaGKH/RegistryReformaGKH.csproj",
@@ -12977,6 +12995,7 @@
       "Microsoft.AspNetCore.App >= 2.2.0",
       "Microsoft.NETCore.App >= 2.2.0",
       "RegistryDb >= 1.0.0",
+      "RegistryPaymentsLoader >= 1.0.0",
       "RegistryReformaGKH >= 1.0.0",
       "System.Text.Json >= 5.0.0"
     ]
@@ -13013,6 +13032,9 @@
           "projectReferences": {
             "D:\\Projects\\Visual Studio Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {
               "projectPath": "D:\\Projects\\Visual Studio Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj"
+            },
+            "D:\\Projects\\Visual Studio Projects\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj": {
+              "projectPath": "D:\\Projects\\Visual Studio Projects\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj"
             },
             "D:\\Projects\\Visual Studio Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj": {
               "projectPath": "D:\\Projects\\Visual Studio Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj"

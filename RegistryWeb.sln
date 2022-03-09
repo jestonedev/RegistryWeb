@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegistryReformaGKH", "Regis
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegistryServices", "RegistryServices\RegistryServices.csproj", "{DCA9A961-3D16-44AF-8987-DF686F2FE4C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistryPaymentCalculator", "RegistryPaymentCalculator\RegistryPaymentCalculator.csproj", "{AADEF8A0-2609-416E-9204-0C1A098C0241}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegistryPaymentCalculator", "RegistryPaymentCalculator\RegistryPaymentCalculator.csproj", "{AADEF8A0-2609-416E-9204-0C1A098C0241}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistryPaymentsLoader", "RegistryPaymentsLoader\RegistryPaymentsLoader.csproj", "{6BF9F75B-DD4F-4EDE-8F2F-5C431CF264C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{AADEF8A0-2609-416E-9204-0C1A098C0241}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AADEF8A0-2609-416E-9204-0C1A098C0241}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AADEF8A0-2609-416E-9204-0C1A098C0241}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BF9F75B-DD4F-4EDE-8F2F-5C431CF264C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BF9F75B-DD4F-4EDE-8F2F-5C431CF264C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BF9F75B-DD4F-4EDE-8F2F-5C431CF264C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BF9F75B-DD4F-4EDE-8F2F-5C431CF264C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3752,6 +3752,14 @@
           "RegistryDb.dll": {}
         }
       },
+      "RegistryPaymentsLoader/1.0.0": {
+        "dependencies": {
+          "RegistryDb": "1.0.0"
+        },
+        "runtime": {
+          "RegistryPaymentsLoader.dll": {}
+        }
+      },
       "RegistryReformaGKH/1.0.0": {
         "runtime": {
           "RegistryReformaGKH.dll": {}
@@ -3761,6 +3769,7 @@
         "dependencies": {
           "Microsoft.AspNetCore.App": "2.2.0",
           "RegistryDb": "1.0.0",
+          "RegistryPaymentsLoader": "1.0.0",
           "RegistryReformaGKH": "1.0.0",
           "System.Text.Json": "5.0.0"
         },
@@ -5828,6 +5837,11 @@
       "hashPath": "system.xml.xpath.xmldocument.4.0.1.nupkg.sha512"
     },
     "RegistryDb/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "RegistryPaymentsLoader/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
