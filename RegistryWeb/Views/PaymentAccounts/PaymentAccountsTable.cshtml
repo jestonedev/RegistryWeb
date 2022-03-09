@@ -1,6 +1,14 @@
 ﻿@model RegistryWeb.ViewModel.PaymentsAccountTableVM;
 @{
-    ViewData["Title"] = "История ЛС №" + Model.LastPayment.PaymentAccountNavigation.Account;
+    var paymentByAddress = ViewBag.PaymentsByAddress ?? false;
+    if (paymentByAddress)
+    {
+        ViewData["Title"] = "История начислений по ЖП";
+    }
+    else
+    {
+        ViewData["Title"] = "История начислений по ЛС №" + Model.LastPayment.PaymentAccountNavigation.Account;
+    }
     string isChecked(bool value) => value ? "checked" : "";
 }
 <link rel="stylesheet" type="text/css" href="~/lib/datatables/datatables.min.css" />
@@ -81,10 +89,14 @@
         </div>
     }
 }
-<table id="ttt" class="table table-bordered">
+<table id="ttt" data-payment-by-address="@paymentByAddress" class="table table-bordered">
     <thead>
         <tr>
             <th>Состояние на дату</th>
+            @if (paymentByAddress)
+            {
+                <th>Лицевой счет</th>
+            }
             <th>Наниматель</th>
             <th>S<sub>общ</sub></th>
             <th>S<sub>жил</sub></th>
@@ -125,6 +137,10 @@
         {
             <tr>
                 <td><b>@payment.Date.ToShortDateString()</b></td>
+                @if (paymentByAddress)
+                {
+                    <td>@payment.PaymentAccountNavigation.Account</td>
+                }
                 <td>@payment.Tenant</td>
                 <td>@payment.TotalArea</td>
                 <td>@payment.LivingArea</td>

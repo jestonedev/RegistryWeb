@@ -1169,6 +1169,30 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
+        public PaymentsAccountTableVM GetPaymentHistoryRentObjectTable(AclUser user, int idAccount)
+        {
+            var viewModel = new PaymentsAccountTableVM();
+            var lastPayment = GetQuery().Where(r => r.IdAccount == idAccount).ToList();
+            var accounts = GetAccountIdsAssocs(lastPayment);
+            var accountIds = accounts.Select(r => r.IdAccountActual);
+            viewModel.Payments = (from row in registryContext.Payments.Include(r => r.PaymentAccountNavigation)
+                                  where accountIds.Contains(row.IdAccount)
+                                  orderby row.Date ascending
+                                  select row).ToList();
+            viewModel.RentObjects = GetRentObjects(lastPayment);
+            viewModel.LastPayment = viewModel.Payments.FirstOrDefault();
+
+            var json = registryContext.PersonalSettings
+                .SingleOrDefault(ps => ps.IdUser == user.IdUser)
+                ?.PaymentAccauntTableJson;
+            if (json != null)
+            {
+                viewModel.PaymentAccountTableJson =
+                    JsonSerializer.Deserialize<PaymentAccountTableJson>(json);
+            }
+            return viewModel;
+        }
+
         public bool SavePaymentAccountTableJson(AclUser user, PaymentAccountTableJson vm)
         {
             try

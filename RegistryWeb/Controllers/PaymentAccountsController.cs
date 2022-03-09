@@ -87,6 +87,21 @@ namespace RegistryWeb.Controllers
             return View("PaymentAccountsTable", vm);
         }
 
+        public IActionResult PaymentAccountsRentObjectTable(int idAccount, string returnUrl)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+            if (idAccount == 0)
+                return NotFound();
+            ViewBag.IdAccount = idAccount;
+            ViewBag.ReturnUrl = returnUrl;
+            var vm = dataService.GetPaymentHistoryRentObjectTable(securityService.User, idAccount);
+            if (!vm.Payments.Any())
+                return Error("Ошибка формирования списка платежей по жилому помещению");
+            ViewBag.PaymentsByAddress = true;
+            return View("PaymentAccountsTable", vm);
+        }
+
         [HttpPost]
         public JsonResult SavePaymentAccountTableJson(PaymentAccountTableJson vm)
         {

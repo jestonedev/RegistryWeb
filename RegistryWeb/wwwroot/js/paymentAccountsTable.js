@@ -37,6 +37,9 @@
 }
 function getArrayHeaderTableSetting() {
     var arr = [{ name: "Date", visible: true }];
+    if ($("#ttt").data("paymentByAddress") === "True") {
+        arr.push({ name: "Account", visible: true });
+    }
     var inputs = $('#configModalForm input');
     for (var i = 0; i < inputs.length; i++) {
         arr.push({

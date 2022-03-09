@@ -111,7 +111,7 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
-        internal byte[] ClaimStatesReport(DateTime startDate, DateTime endDate, string executor)
+        internal byte[] ClaimExecutorReport(DateTime startDate, DateTime endDate, string executor)
         {
             var arguments = new Dictionary<string, object> {
                 { "date_from", startDate.ToString("dd.MM.yyyy") },
@@ -123,7 +123,7 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
-        internal byte[] ClaimExecutorsReport(DateTime startDate, DateTime endDate, int idStateType, bool isCurrentState)
+        internal byte[] ClaimStatesReport(DateTime startDate, DateTime endDate, int idStateType, bool isCurrentState)
         {
             var arguments = new Dictionary<string, object> {
                 { "date_from", startDate.ToString("dd.MM.yyyy") },
