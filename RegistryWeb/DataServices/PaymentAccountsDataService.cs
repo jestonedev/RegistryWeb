@@ -1180,7 +1180,7 @@ namespace RegistryWeb.DataServices
                                   orderby row.Date ascending
                                   select row).ToList();
             viewModel.RentObjects = GetRentObjects(lastPayment);
-            viewModel.LastPayment = viewModel.Payments.FirstOrDefault();
+            viewModel.LastPayment = viewModel.Payments.LastOrDefault();
 
             var json = registryContext.PersonalSettings
                 .SingleOrDefault(ps => ps.IdUser == user.IdUser)

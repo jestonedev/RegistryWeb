@@ -166,6 +166,7 @@
 
         switch (action) {
             case "ClaimStatesReport":
+            case "ClaimStatesAllDatesReport":
                 standartWrapper.show();
                 claimStateTypeWrapper.show();
                 isCurrentStateWrapper.show();
@@ -207,6 +208,7 @@
 
         switch (action) {
             case "ClaimStatesReport":
+            case "ClaimStatesAllDatesReport":
                 var idStateType = form.find("select[name='IdStateType']").val();
                 var isCurrentState = form.find("input[name='IsCurrentState']").is(":checked");
                 url += "&idStateType=" + idStateType + "&isCurrentState=" + isCurrentState;

@@ -204,6 +204,22 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult GetClaimStatesAllDatesReport(DateTime startDate, DateTime endDate, int idStateType, bool isCurrentState)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.ClaimStatesAllDatesReport(startDate, endDate, idStateType, isCurrentState);
+                return File(file, odsMime, "Отчет по стадиям исковых работ.ods");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
         public IActionResult GetClaimExecutorsReport(DateTime startDate, DateTime endDate, int idExecutor)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))

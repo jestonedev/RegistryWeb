@@ -12,9 +12,13 @@
     string isChecked(bool value) => value ? "checked" : "";
 }
 <link rel="stylesheet" type="text/css" href="~/lib/datatables/datatables.min.css" />
-<link rel="stylesheet" type="text/css" href="~/css/paymentAccountsTable.css" asp-append-version="true"/>
+<link rel="stylesheet" type="text/css" href="~/lib/datatables.net-buttons-bs4/buttons.bootstrap4.min.css" />
+<link rel="stylesheet" type="text/css" href="~/css/paymentAccountsTable.css" asp-append-version="true" />
 
 <script type="text/javascript" src="~/lib/datatables/datatables.min.js"></script>
+<script type="text/javascript" src="~/lib/datatables-buttons/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="~/lib/datatables-buttons/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="~/lib/datatables.net-buttons-bs4/buttons.bootstrap4.min.js"></script>
 <script type="text/javascript" src="~/js/paymentAccountsTable.js" asp-append-version="true"></script>
 
 <div class="d-inline-flex justify-content-start">
@@ -75,7 +79,7 @@
                 <div class="row">
                     <div class="form-group col">
                         <label>Документы права собственности</label>
-                        <div></div>                       
+                        <div></div>
                     </div>
                 </div>
                 <div class="row">
@@ -84,7 +88,7 @@
                         <div></div>
                     </div>
                 </div>
-                
+
             </div>
         </div>
     }
@@ -135,7 +139,7 @@
     <tbody>
         @foreach (var payment in Model.Payments)
         {
-            <tr>
+            <tr style="@(paymentByAddress && ViewBag.IdAccount == payment.IdAccount ? "background-color: #88FF63;" : "")">
                 <td><b>@payment.Date.ToShortDateString()</b></td>
                 @if (paymentByAddress)
                 {

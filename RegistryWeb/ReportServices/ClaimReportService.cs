@@ -136,6 +136,19 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
+        internal byte[] ClaimStatesAllDatesReport(DateTime startDate, DateTime endDate, int idStateType, bool isCurrentState)
+        {
+            var arguments = new Dictionary<string, object> {
+                { "date_from", startDate.ToString("dd.MM.yyyy") },
+                { "date_to", endDate.ToString("dd.MM.yyyy") },
+                { "claim_state_type", idStateType },
+                { "only_current_claim_state", isCurrentState ? "1" : "0" }
+            };
+            var fileName = "registry\\claims\\claim_states_all_dates";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+
         internal byte[] ClaimCourtReport(DateTime startDate, DateTime endDate)
         {
             var arguments = new Dictionary<string, object> {
