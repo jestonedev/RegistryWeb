@@ -166,13 +166,14 @@
 
         switch (action) {
             case "ClaimStatesReport":
-                standartWrapper.show();
-                executorWrapper.show();
-                break;
-            case "ClaimExecutorsReport":
+            case "ClaimStatesAllDatesReport":
                 standartWrapper.show();
                 claimStateTypeWrapper.show();
                 isCurrentStateWrapper.show();
+                break;
+            case "ClaimExecutorsReport":
+                standartWrapper.show();
+                executorWrapper.show();
                 break;
             case "ClaimCourtReport":
                 standartWrapper.show();
@@ -207,13 +208,14 @@
 
         switch (action) {
             case "ClaimStatesReport":
-                var idExecutor = form.find("select[name='Executor']").val();
-                url += "&idExecutor=" + idExecutor;
-                break;
-            case "ClaimExecutorsReport":
+            case "ClaimStatesAllDatesReport":
                 var idStateType = form.find("select[name='IdStateType']").val();
                 var isCurrentState = form.find("input[name='IsCurrentState']").is(":checked");
                 url += "&idStateType=" + idStateType + "&isCurrentState=" + isCurrentState;
+                break;
+            case "ClaimExecutorsReport":
+                var idExecutor = form.find("select[name='Executor']").val();
+                url += "&idExecutor=" + idExecutor;
                 break;
             case "ClaimFactMailing":
                 startDate = form.find("[name='StDate_Year']").val() + "-" + form.find("[name='StDate_Month']").val() + "-01";

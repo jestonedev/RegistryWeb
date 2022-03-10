@@ -187,15 +187,14 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult GetClaimStatesReport(DateTime startDate, DateTime endDate, int idExecutor)
+        public IActionResult GetClaimStatesReport(DateTime startDate, DateTime endDate, int idStateType, bool isCurrentState)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
                 return View("NotAccess");
 
             try
             {
-                var executor = dataService.GetExecutor(idExecutor);
-                var file = reportService.ClaimStatesReport(startDate, endDate, executor);
+                var file = reportService.ClaimStatesReport(startDate, endDate, idStateType, isCurrentState);            
                 return File(file, odsMime, "Отчет по стадиям исковых работ.ods");
             }
             catch (Exception ex)
@@ -204,14 +203,31 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult GetClaimExecutorsReport(DateTime startDate, DateTime endDate, int idStateType, bool isCurrentState)
+        public IActionResult GetClaimStatesAllDatesReport(DateTime startDate, DateTime endDate, int idStateType, bool isCurrentState)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
                 return View("NotAccess");
 
             try
             {
-                var file = reportService.ClaimExecutorsReport(startDate, endDate, idStateType, isCurrentState);
+                var file = reportService.ClaimStatesAllDatesReport(startDate, endDate, idStateType, isCurrentState);
+                return File(file, odsMime, "Отчет по стадиям исковых работ.ods");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetClaimExecutorsReport(DateTime startDate, DateTime endDate, int idExecutor)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var executor = dataService.GetExecutor(idExecutor);
+                var file = reportService.ClaimExecutorReport(startDate, endDate, executor);
                 return File(file, odsMime, "Отчет по исполнителям исковой работы.ods");
             }
             catch (Exception ex)

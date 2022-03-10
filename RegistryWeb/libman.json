@@ -12,6 +12,14 @@
       "files": [
         "moment-with-locales.min.js"
       ]
+    },
+    {
+      "library": "datatables-buttons@2.2.2",
+      "destination": "wwwroot/lib/datatables-buttons/"
+    },
+    {
+      "library": "datatables.net-buttons-bs4@2.2.2",
+      "destination": "wwwroot/lib/datatables.net-buttons-bs4/"
     }
   ]
 }

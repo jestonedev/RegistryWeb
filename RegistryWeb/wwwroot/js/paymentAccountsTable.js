@@ -37,6 +37,9 @@
 }
 function getArrayHeaderTableSetting() {
     var arr = [{ name: "Date", visible: true }];
+    if ($("#ttt").data("paymentByAddress") === "True") {
+        arr.push({ name: "Account", visible: true });
+    }
     var inputs = $('#configModalForm input');
     for (var i = 0; i < inputs.length; i++) {
         arr.push({
@@ -46,6 +49,20 @@ function getArrayHeaderTableSetting() {
     }
     return arr;
 }
+
+var visibleColumnIndexes = [];
+
+function updateDataTableExportCols(table) {
+    var columnIndexes = table.columns()[0];
+    while (visibleColumnIndexes.length > 0) {
+        visibleColumnIndexes.pop();
+    }
+    for (var i = 0; i < columnIndexes.length; i++)
+        if (table.column(columnIndexes[i]).visible()) {
+            visibleColumnIndexes.push(columnIndexes[i]);
+        }
+}
+
 $(document).ready(function () {
     var cols = getArrayHeaderTableSetting();
     var table = $('#ttt').DataTable({
@@ -53,12 +70,33 @@ $(document).ready(function () {
         fixedHeader: true,
         fixedColumns: true,
         scrollX: true,
+        scrollY: $(window).height() - $("#ttt").offset().top + 130,
         scrollCollapse: true,
         paging: false,
         ordering: false,
         info: false,
-        searching: false
+        searching: false,
+        dom: 'r<"text-right mb-2"B>t',
+        buttons: [
+            {
+                extend: 'copyHtml5',
+                text: 'Копировать',
+                exportOptions: {
+                    columns: visibleColumnIndexes
+                }
+            }
+        ],
+        language: {
+            buttons: {
+                copyTitle: 'Копирование',
+                copySuccess: {
+                    _: '%d строк скопировано',
+                    1: '1 строка скопирована'
+                }
+            }
+        }
     });
+    updateDataTableExportCols(table);
     $('.card-body').hide();
     $("#configModalShow").on("click", function (e) {
         e.preventDefault();
@@ -66,6 +104,7 @@ $(document).ready(function () {
     });
     $("#configModalForm .r-config-apply").on("click", function (e) {
         e.preventDefault();
+
         $("[id^='Column_']").each(function () {
             var name = this.id.substr(7);
             var isEnable = this.checked;
@@ -74,6 +113,7 @@ $(document).ready(function () {
                 col.visible(isEnable);
             }
         });
+        updateDataTableExportCols(table);
         var setting = getPaymentAccountTableSetting();
         $.ajax({
             async: false,

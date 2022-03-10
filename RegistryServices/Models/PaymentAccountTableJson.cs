@@ -2,6 +2,7 @@
 {
     public class PaymentAccountTableJson
     {
+        public bool HasAccount { get; set; }
         public bool HasTenant { get; set; }
         public bool HasTotalArea { get; set; }
         public bool HasLivingArea { get; set; }
