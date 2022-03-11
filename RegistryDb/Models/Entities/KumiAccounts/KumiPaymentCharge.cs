@@ -2,6 +2,7 @@
 
 namespace RegistryDb.Models.Entities.KumiAccounts
 {
+    [Serializable]
     public class KumiPaymentCharge
     {
         public KumiPaymentCharge()

@@ -25,6 +25,10 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("int(11)")
                 .IsRequired();
 
+            builder.Property(e => e.IdParentPayment)
+                .HasColumnName("id_parent_payment")
+                .HasColumnType("int(11)");
+
             builder.Property(e => e.IdGroup)
                 .HasColumnName("id_group")
                 .HasColumnType("int(11)")
@@ -39,6 +43,10 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnName("guid")
                 .HasMaxLength(36)
                 .IsUnicode(false);
+
+            builder.Property(e => e.IdPaymentDocCode)
+                .HasColumnName("id_payment_doc_code")
+                .HasColumnType("int(11)");
 
             builder.Property(e => e.NumDocument)
                 .HasColumnName("num_d")
@@ -221,6 +229,10 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .WithMany(e => e.Payments)
                 .HasForeignKey(e => e.IdSource);
 
+            builder.HasOne(e => e.PaymentDocCode)
+                .WithMany(e => e.Payments)
+                .HasForeignKey(e => e.IdPaymentDocCode);
+
             builder.HasOne(e => e.PaymentKind)
                 .WithMany(e => e.Payments)
                 .HasForeignKey(e => e.IdPaymentKind);
@@ -240,6 +252,10 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
             builder.HasOne(e => e.PayerStatus)
                 .WithMany(e => e.Payments)
                 .HasForeignKey(e => e.IdPayerStatus);
+
+            builder.HasOne(e => e.ParentPayment)
+                .WithMany(e => e.ChildPayments)
+                .HasForeignKey(e => e.IdParentPayment);
 
             builder.HasQueryFilter(r => r.Deleted == 0);
         }

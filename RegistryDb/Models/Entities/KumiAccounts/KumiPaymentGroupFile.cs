@@ -2,6 +2,7 @@
 
 namespace RegistryDb.Models.Entities.KumiAccounts
 {
+    [Serializable]
     public class KumiPaymentGroupFile
     {
         public int IdFile { get; set; }

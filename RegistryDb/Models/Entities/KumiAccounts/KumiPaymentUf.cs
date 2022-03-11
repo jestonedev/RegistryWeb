@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace RegistryDb.Models.Entities.KumiAccounts
 {
+    [Serializable]
     public class KumiPaymentUf
     {
         public int IdPaymentUf { get; set; }

@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace RegistryDb.Models.Entities.KumiAccounts
 {
+    [Serializable]
     public class KumiPaymentInfoSource
     {
         public KumiPaymentInfoSource()

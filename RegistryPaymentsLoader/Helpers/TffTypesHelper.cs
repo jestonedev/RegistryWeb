@@ -27,7 +27,7 @@ namespace RegistryPaymentsLoader.Helpers
         internal static decimal? StringToDecimal(string value)
         {
             if (string.IsNullOrWhiteSpace(value)) return null;
-            if (!decimal.TryParse(value, out decimal result)) return null;
+            if (!decimal.TryParse(value.Replace(".", ","), out decimal result)) return null;
             return result;
         }
     }

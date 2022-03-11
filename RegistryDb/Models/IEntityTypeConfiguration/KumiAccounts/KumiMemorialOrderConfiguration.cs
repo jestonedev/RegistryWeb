@@ -25,6 +25,11 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("int(11)")
                 .IsRequired();
 
+            builder.Property(e => e.IdGroup)
+                .HasColumnName("id_group")
+                .HasColumnType("int(11)")
+                .IsRequired();
+
             builder.Property(e => e.Guid)
                 .HasColumnName("guid")
                 .HasMaxLength(36)
@@ -94,6 +99,10 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
             builder.HasOne(e => e.KbkType)
                 .WithMany(e => e.MemorialOrders)
                 .HasForeignKey(e => e.IdKbkType);
+
+            builder.HasOne(e => e.PaymentGroup)
+                .WithMany(e => e.MemorialOrders)
+                .HasForeignKey(e => e.IdGroup);
 
             builder.HasQueryFilter(r => r.Deleted == 0);
         }

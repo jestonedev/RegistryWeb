@@ -41,9 +41,14 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasMaxLength(500)
                 .IsUnicode(false);
 
+            builder.Property(e => e.Date)
+                .HasColumnName("date")
+                .HasColumnType("datetime")
+                .IsRequired();
+
             builder.HasOne(e => e.Payment)
                 .WithMany(e => e.PaymentCorrections)
-                .HasForeignKey(e => e.IdCorrection);
+                .HasForeignKey(e => e.IdPayment);
         }
     }
 }

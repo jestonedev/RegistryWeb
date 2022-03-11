@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace RegistryDb.Models.Entities.KumiAccounts
 {
+    [Serializable]
     public class KumiPaymentGroup
     {
         public KumiPaymentGroup()
@@ -16,6 +17,7 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public string User { get; set; }
 
         public virtual IList<KumiPayment> Payments { get; set; }
+        public virtual IList<KumiMemorialOrder> MemorialOrders { get; set; }
         public virtual IList<KumiPaymentGroupFile> PaymentGroupFiles { get; set; }
     }
 }

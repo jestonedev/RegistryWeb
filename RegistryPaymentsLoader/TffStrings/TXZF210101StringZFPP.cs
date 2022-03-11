@@ -25,12 +25,12 @@ namespace RegistryPaymentsLoader.TffStrings
                 DatePay = TffTypesHelper.StringToDate(tffStringParts[22]),
                 PaymentKind = new KumiPaymentKind
                 {
-                    Name = tffStringParts[4]
+                    Code = tffStringParts[4]
                 },
                 OrderPay = TffTypesHelper.StringToInt(tffStringParts[24]),
                 OperationType = new KumiOperationType
                 {
-                    Name = tffStringParts[7]
+                    Code = tffStringParts[7]
                 },
                 Sum = TffTypesHelper.StringToDecimal(tffStringParts[3]) ?? 0,
                 Uin = tffStringParts[25],
@@ -42,13 +42,13 @@ namespace RegistryPaymentsLoader.TffStrings
                 Okato = null,
                 PaymentReason = new KumiPaymentReason
                 {
-                    Name = tffStringParts[30],
+                    Code = tffStringParts[30],
                 },
                 NumDocumentIndicator = tffStringParts[32],
                 DateDocumentIndicator = TffTypesHelper.StringToDate(tffStringParts[33]),
                 PayerStatus = new KumiPayerStatus
                 {
-                    Name = tffStringParts[27],
+                    Code = tffStringParts[27],
                 },
                 PayerInn = tffStringParts[8],
                 PayerKpp = tffStringParts[9],

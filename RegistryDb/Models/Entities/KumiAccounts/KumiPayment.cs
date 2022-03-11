@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace RegistryDb.Models.Entities.KumiAccounts
 {
+    [Serializable]
     public class KumiPayment
     {
         public KumiPayment()
@@ -11,8 +15,10 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         }
 
         public int IdPayment { get; set; }
+        public int? IdParentPayment { get; set; }
         public int IdGroup { get; set; }
         public int IdSource { get; set; }
+        public int? IdPaymentDocCode { get; set; }
         public string Guid { get; set; }
         public string NumDocument { get; set; }
         public DateTime? DateDocument { get; set; }
@@ -58,10 +64,52 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public virtual IList<KumiMemorialOrderPaymentAssoc> MemorialOrderPaymentAssocs { get; set; }
         public virtual KumiPaymentGroup PaymentGroup { get; set; }
         public virtual KumiPaymentInfoSource PaymentInfoSource { get; set; }
+        public virtual KumiPaymentDocCode PaymentDocCode { get; set; }
         public virtual KumiPaymentKind PaymentKind { get; set; }
         public virtual KumiOperationType OperationType { get; set; }
         public virtual KumiKbkType KbkType { get; set; }
         public virtual KumiPaymentReason PaymentReason { get; set; }
         public virtual KumiPayerStatus PayerStatus { get; set; }
+        public virtual KumiPayment ParentPayment { get; set; }
+        public virtual IList<KumiPayment> ChildPayments { get; set; }
+
+        public KumiPayment Copy(bool childPayment)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(ms, this);
+                ms.Position = 0;
+
+                var copyPayment = (KumiPayment)formatter.Deserialize(ms);
+                // Если платеж копируется как дочерний, то обнуляем идентификаторы и убираем уведомления об уточнении
+                if (childPayment)
+                {
+                    copyPayment.IdParentPayment = copyPayment.IdPayment;
+                    copyPayment.IdPayment = 0;
+                    if (copyPayment.MemorialOrderPaymentAssocs != null)
+                    {
+                        foreach (var order in copyPayment.MemorialOrderPaymentAssocs)
+                        {
+                            order.IdPayment = 0;
+                            order.IdAssoc = 0;
+                        }
+                    }
+                    if (copyPayment.PaymentUfs != null)
+                    {
+                        copyPayment.PaymentUfs = null;
+                    }
+                    if (copyPayment.PaymentCorrections != null)
+                    {
+                        foreach (var correction in copyPayment.PaymentCorrections)
+                        {
+                            correction.IdPayment = 0;
+                            correction.IdCorrection = 0;
+                        }
+                    }
+                }
+                return copyPayment;
+            }
+        }
     }
 }

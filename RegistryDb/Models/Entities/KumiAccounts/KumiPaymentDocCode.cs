@@ -4,14 +4,14 @@ using System.Collections.Generic;
 namespace RegistryDb.Models.Entities.KumiAccounts
 {
     [Serializable]
-    public class KumiPaymentKind
+    public class KumiPaymentDocCode
     {
-        public KumiPaymentKind()
+        public KumiPaymentDocCode()
         {
             Payments = new List<KumiPayment>();
         }
 
-        public int IdPaymentKind { get; set; }
+        public int IdPaymentDocCode { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }
 

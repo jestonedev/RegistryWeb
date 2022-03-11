@@ -9,15 +9,19 @@ using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace RegistryWeb.Controllers
 {
     public class KumiPaymentsController : ListController<KumiPaymentsDataService, KumiPaymentsFilter>
     {
-        public KumiPaymentsController(KumiPaymentsDataService dataService, SecurityService securityService)
+        private readonly ZipArchiveDataService zipArchiveDataService;
+
+        public KumiPaymentsController(KumiPaymentsDataService dataService, SecurityService securityService, ZipArchiveDataService zipArchiveDataService)
             : base(dataService, securityService)
         {
-
+            this.zipArchiveDataService = zipArchiveDataService;
         }
 
         public IActionResult Index()
@@ -29,11 +33,45 @@ namespace RegistryWeb.Controllers
         {
             var tffStrings = new List<TffString>();
             var kumiPaymentGroupFiles = new List<KumiPaymentGroupFile>();
+            List<Tuple<Stream, string>> resultFiles = new List<Tuple<Stream, string>>();
             foreach (var file in files)
             {
                 try
                 {
-                    var stream = file.OpenReadStream();
+                    var fileInfo = new FileInfo(file.FileName);
+                    if (new string[] { ".zip", ".7z" }.Contains(fileInfo.Extension?.ToLowerInvariant()))
+                    {
+                        var tmpFile = Path.GetTempFileName();
+                        using (var zipStream = new FileStream(tmpFile, FileMode.Truncate))
+                        {
+                            file.OpenReadStream().CopyTo(zipStream);
+                            zipStream.Flush();
+                            zipStream.Close();
+                        }
+                        var archiveFiles = zipArchiveDataService.UnpackRecursive(tmpFile);
+                        if (archiveFiles == null) continue;
+                        foreach(var archiveFile in archiveFiles)
+                        {
+                            var archiveFileInfo = new FileInfo(archiveFile);
+                            var stream = new FileStream(archiveFile, FileMode.Open);
+                            resultFiles.Add(new Tuple<Stream, string>(stream, archiveFileInfo.Name));
+                        }
+                    } else
+                    {
+                        resultFiles.Add(new Tuple<Stream, string>(file.OpenReadStream(), file.FileName));
+                    }                    
+                }
+                catch (Exception e)
+                {
+                    return Error(e.Message);
+                }
+            }
+
+            foreach(var file in resultFiles)
+            {
+                try
+                {
+                    var stream = file.Item1;
                     var tffFileLoader = TffFileLoaderFactory.CreateFileLoader(stream);
                     if (tffFileLoader == null) continue;
                     stream.Seek(0, System.IO.SeekOrigin.Begin);
@@ -41,21 +79,27 @@ namespace RegistryWeb.Controllers
                     stream.Close();
                     kumiPaymentGroupFiles.Add(new KumiPaymentGroupFile
                     {
-                        FileName = file.FileName,
+                        FileName = file.Item2,
                         FileVersion = tffFileLoader.Version
                     });
                 }
                 catch (BDFormatException e)
                 {
-                    return Error(string.Format("Файл {0}. "+e.Message, file.FileName));
+                    return Error(string.Format("Файл {0}. " + e.Message, file.Item2));
                 }
                 catch (Exception e)
                 {
                     return Error(e.Message);
                 }
             }
-            var errorModel = dataService.UploadInfoFromTff(tffStrings, kumiPaymentGroupFiles);
-            return View("UploadPaymentsResult", errorModel);
+            try
+            {
+                var errorModel = dataService.UploadInfoFromTff(tffStrings, kumiPaymentGroupFiles);
+                return View("UploadPaymentsResult", errorModel);
+            } catch(ApplicationException e)
+            {
+                return Error(e.Message);
+            }
         }
     }
 }

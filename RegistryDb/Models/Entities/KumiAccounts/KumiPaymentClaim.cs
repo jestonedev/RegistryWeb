@@ -3,6 +3,7 @@ using System;
 
 namespace RegistryDb.Models.Entities.KumiAccounts
 {
+    [Serializable]
     public class KumiPaymentClaim
     {
         public KumiPaymentClaim()
