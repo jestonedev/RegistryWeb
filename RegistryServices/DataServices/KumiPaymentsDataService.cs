@@ -12,6 +12,8 @@ using RegistryServices.Models;
 using RegistryPaymentsLoader.Models;
 using RegistryServices;
 using RegistryWeb.SecurityServices;
+using RegistryWeb.ViewOptions;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace RegistryWeb.DataServices
 {
@@ -59,7 +61,219 @@ namespace RegistryWeb.DataServices
 
             return loadState;
         }
-        
+
+        public override KumiPaymentsVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, KumiPaymentsFilter filterOptions)
+        {
+            var vm = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
+            vm.PaymentSourcesList = new SelectList(registryContext.KumiPaymentInfoSources.ToList(), "IdSource", "Name");
+            return vm;
+        }
+
+        public KumiPaymentsVM GetViewModel(OrderOptions orderOptions, PageOptions pageOptions, KumiPaymentsFilter filterOptions)
+        {
+            var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
+            var payments = GetQuery();
+            viewModel.PageOptions.TotalRows = payments.Count();
+            var query = GetQueryFilter(payments, viewModel.FilterOptions);
+            query = GetQueryOrder(query, viewModel.OrderOptions);
+            query = GetQueryIncludes(query);
+            var count = query.Count();
+            viewModel.PageOptions.Rows = count;
+            viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+
+            if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
+                viewModel.PageOptions.CurrentPage = 1;
+            query = GetQueryPage(query, viewModel.PageOptions);
+            viewModel.Payments = query.ToList();
+            return viewModel;
+        }
+
+        private IQueryable<KumiPayment> GetQueryOrder(IQueryable<KumiPayment> query, OrderOptions orderOptions)
+        {
+            if (string.IsNullOrEmpty(orderOptions.OrderField))
+            {
+                if (orderOptions.OrderDirection == OrderDirection.Ascending)
+                    return query.OrderBy(p => p.IdPayment);
+                else
+                    return query.OrderByDescending(p => p.IdPayment);
+            }
+            return query;
+        }
+
+        private IQueryable<KumiPayment> GetQuery()
+        {
+            return registryContext.KumiPayments
+                .Include(r => r.PaymentCharges)
+                .Include(r => r.PaymentClaims)
+                .Include(r => r.ChildPayments)
+                .Include(r => r.PaymentGroup);
+        }
+
+        private IQueryable<KumiPayment> GetQueryIncludes(IQueryable<KumiPayment> query)
+        {
+            return query
+                .Include(r => r.PaymentCharges)
+                .Include(r => r.PaymentClaims)
+                .Include(r => r.ChildPayments);
+        }
+
+        private IQueryable<KumiPayment> GetQueryFilter(IQueryable<KumiPayment> query, KumiPaymentsFilter filterOptions)
+        {
+            if (!filterOptions.IsEmpty())
+            {
+                if (filterOptions.IdParentPayment != null)
+                {
+                    return query.Where(r => r.IdPayment == filterOptions.IdParentPayment || r.IdParentPayment == filterOptions.IdParentPayment);
+                }
+                if(!string.IsNullOrWhiteSpace(filterOptions.CommonFilter))
+                {
+                    return CommonFilter(query, filterOptions.CommonFilter);
+                }
+                if (!filterOptions.IsModalEmpty())
+                {
+                    query = CommonPaymentFilter(query, filterOptions);
+                    query = PayerFilter(query, filterOptions);
+                    query = RecipientFilter(query, filterOptions);
+                }
+            }
+            return query;
+        }
+
+        private IQueryable<KumiPayment> RecipientFilter(IQueryable<KumiPayment> query, KumiPaymentsFilter filterOptions)
+        {
+            if (!string.IsNullOrEmpty(filterOptions.RecipientAccount))
+            {
+                query = query.Where(r => r.RecipientAccount != null && r.RecipientAccount.Contains(filterOptions.RecipientAccount));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.RecipientInn))
+            {
+                query = query.Where(r => r.RecipientInn != null && r.RecipientInn.Contains(filterOptions.RecipientInn));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.RecipientKpp))
+            {
+                query = query.Where(r => r.RecipientKpp != null && r.RecipientKpp.Contains(filterOptions.RecipientKpp));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.RecipientName))
+            {
+                query = query.Where(r => r.RecipientName != null && r.RecipientName.Contains(filterOptions.RecipientName));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.RecipientBankName))
+            {
+                query = query.Where(r => r.RecipientBankName != null && r.RecipientName.Contains(filterOptions.RecipientBankName));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.RecipientBankBik))
+            {
+                query = query.Where(r => r.RecipientBankBik != null && r.RecipientName.Contains(filterOptions.RecipientBankBik));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.RecipientBankAccount))
+            {
+                query = query.Where(r => r.RecipientBankAccount != null && r.RecipientName.Contains(filterOptions.RecipientBankAccount));
+            }
+            return query;
+        }
+
+        private IQueryable<KumiPayment> PayerFilter(IQueryable<KumiPayment> query, KumiPaymentsFilter filterOptions)
+        {
+            if(!string.IsNullOrEmpty(filterOptions.PayerAccount))
+            {
+                query = query.Where(r => r.PayerAccount != null && r.PayerAccount.Contains(filterOptions.PayerAccount));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.PayerInn))
+            {
+                query = query.Where(r => r.PayerInn != null && r.PayerInn.Contains(filterOptions.PayerInn));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.PayerKpp))
+            {
+                query = query.Where(r => r.PayerKpp != null && r.PayerKpp.Contains(filterOptions.PayerKpp));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.PayerName))
+            {
+                query = query.Where(r => r.PayerName != null && r.PayerName.Contains(filterOptions.PayerName));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.PayerBankName))
+            {
+                query = query.Where(r => r.PayerBankName != null && r.PayerName.Contains(filterOptions.PayerBankName));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.PayerBankBik))
+            {
+                query = query.Where(r => r.PayerBankBik != null && r.PayerName.Contains(filterOptions.PayerBankBik));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.PayerBankAccount))
+            {
+                query = query.Where(r => r.PayerBankAccount != null && r.PayerName.Contains(filterOptions.PayerBankAccount));
+            }
+            return query;
+        }
+
+        private IQueryable<KumiPayment> CommonPaymentFilter(IQueryable<KumiPayment> query, KumiPaymentsFilter filterOptions)
+        {
+            if (filterOptions.IdsSource != null && filterOptions.IdsSource.Any())
+            {
+                query = query.Where(r => filterOptions.IdsSource.Contains(r.IdSource));
+            }
+            if (filterOptions.LoadDate != null)
+            {
+                var endDate = filterOptions.LoadDate.Value.Date.AddDays(1);
+                query = query.Where(r => r.PaymentGroup.Date >= filterOptions.LoadDate && r.PaymentGroup.Date < endDate);
+            }
+            if (filterOptions.IsPosted != null)
+            {
+                var isPosted = filterOptions.IsPosted.Value ? 1 : 0;
+                query = query.Where(r => r.IsPosted == isPosted);
+            }
+            if (!string.IsNullOrEmpty(filterOptions.NumDocument))
+            {
+                query = query.Where(r => r.NumDocument != null && r.NumDocument.Contains(filterOptions.NumDocument));
+            }
+            if (filterOptions.DateDocument != null)
+            {
+                query = query.Where(r => r.DateDocument == filterOptions.DateDocument);
+            }
+            if (filterOptions.DateIn != null)
+            {
+                query = query.Where(r => r.DateIn == filterOptions.DateIn);
+            }
+            if (filterOptions.DateExecute != null)
+            {
+                query = query.Where(r => r.DateExecute == filterOptions.DateExecute);
+            }
+            if (!string.IsNullOrEmpty(filterOptions.Uin))
+            {
+                query = query.Where(r => r.Uin != null && r.Uin.Contains(filterOptions.Uin));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.Purpose))
+            {
+                query = query.Where(r => r.Purpose != null && r.Purpose.Contains(filterOptions.Purpose));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.Kbk))
+            {
+                query = query.Where(r => r.Kbk != null && r.Kbk.Contains(filterOptions.Kbk));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.Okato))
+            {
+                query = query.Where(r => r.Okato != null && r.Okato.Contains(filterOptions.Okato));
+            }
+            return query;
+        }
+
+        private IQueryable<KumiPayment> CommonFilter(IQueryable<KumiPayment> query, string commonFilter)
+        {
+            return query.Where(r =>
+                (r.Uin != null && r.Uin.Contains(commonFilter)) ||
+                (r.Purpose != null && r.Purpose.Contains(commonFilter)) ||
+                (r.PayerInn != null && r.PayerInn.Contains(commonFilter)) ||
+                (r.PayerKpp != null && r.PayerKpp.Contains(commonFilter)) ||
+                (r.PayerName != null && r.PayerName.Contains(commonFilter)) ||
+                (r.Kbk != null && r.Kbk.Contains(commonFilter)));
+        }
+
+        private IQueryable<KumiPayment> GetQueryPage(IQueryable<KumiPayment> query, PageOptions pageOptions)
+        {
+            return query
+                .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
+                .Take(pageOptions.SizePage);
+        }
+
         private void UploadMemorialOrders(List<KumiMemorialOrder> memorialOrders, KumiPaymentGroup group, KumiPaymentsUploadStateModel loadState)
         {
             foreach (var mo in memorialOrders.OrderBy(r => r.Guid).ThenBy(r => r.NumDocument).ThenBy(r => r.DateDocument).ThenBy(r => r.SumZach))

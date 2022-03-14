@@ -24,7 +24,7 @@
 
         @if (Model.FilterOptions.FrontSideAccount == null)
         {
-            <div class="form-group col-10 @(securityService.HasPrivilege(Privileges.AccountsWrite) ? "col-md-2 col-lg-2" : "col-md-3 col-lg-3")">
+            <div class="form-group @(securityService.HasPrivilege(Privileges.AccountsWrite) ? "col-10" : "col-12") @(securityService.HasPrivilege(Privileges.AccountsWrite) ? "col-md-2 col-lg-2" : "col-md-3 col-lg-3")">
                 <input type="text" class="form-control input-filter-numbers" title="Лицевой счет" asp-for="FilterOptions.FrontSideAccount" placeholder="Лицевой счет" />
             </div>
         }

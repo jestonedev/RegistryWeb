@@ -1,4 +1,5 @@
-﻿using RegistryDb.Models.Entities;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
@@ -9,5 +10,6 @@ namespace RegistryServices.ViewModel.KumiAccounts
     public class KumiPaymentsVM : ListVM<KumiPaymentsFilter>
     {
         public IEnumerable<KumiPayment> Payments { get; set; }
+        public SelectList PaymentSourcesList { get; set; }
     }
 }

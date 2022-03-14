@@ -40,6 +40,11 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("date")
                 .IsRequired();
 
+            builder.Property(e => e.Value)
+                .HasColumnName("value")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
             builder.HasOne(e => e.Payment).WithMany(e => e.PaymentCharges)
                 .HasForeignKey(e => e.IdPayment);
 

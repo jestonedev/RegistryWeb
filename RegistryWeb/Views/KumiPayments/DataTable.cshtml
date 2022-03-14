@@ -1,7 +1,189 @@
-﻿
+﻿@using RegistryWeb.Extensions;
+@using RegistryWeb.ViewOptions;
+@using RegistryWeb.SecurityServices;
+@model RegistryServices.ViewModel.KumiAccounts.KumiPaymentsVM;
 @{
-    ViewData["Title"] = "Index";
+    Context.Session.Set("Controller", "KumiPayments");
+    Context.Session.Set("Action", "Index");
+    Context.Session.Set("OrderOptions", Model.OrderOptions);
+    Context.Session.Set("FilterOptions", Model.FilterOptions);
+    Context.Session.Set("PageOptions", Model.PageOptions);
+    var securityService = (SecurityService)ViewData["SecurityService"];
 }
 
-<h1>Index</h1>
+<table class="table table-hover tp-table">
+    <thead>
+        <tr style="align-content: center;">
+            <th class="r-table-header-cell" style="width: 38px">
+            </th>
+            <th class="r-table-header-cell" style="min-width: 30%">
+                Платеж
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Date")
+                {
+                    <a href="#" title="Сортировка по дате платежа" class="oi oi-sort-descending sort tp-sorted" data-order-field="Date" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" title="Сортировка по дате платежа" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Date" ? "tp-sorted" : "")"
+                       data-order-field="Date" data-order-direction="@(Model.OrderOptions.OrderField == "Date" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="r-table-header-cell d-none d-lg-table-cell">
+                Назначение платежа
+            </th>
+            <th class="r-table-header-cell">
+                Плательщик
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Payments)
+        {
+            var sum = item.Sum;
+            var sumPosted = item.PaymentCharges.Select(r => r.Value).Sum() + item.PaymentClaims.Select(r => r.Value).Sum();
+            <tr style="position: relative" class="@(item.IdPayment == Model.FilterOptions.IdParentPayment ? "text-success" : "")" title="@(item.IdPayment == Model.FilterOptions.IdParentPayment ? "Родительский платеж" : "")">
+                <td style="vertical-align: middle; text-align: center">
+                    @{
+                        var warning = "";
+                        var cssClass = "";
+                        if (sumPosted > sum)
+                        {
+                            warning = "Распределеная сумма превышает фактическую по платежу";
+                            cssClass = "text-danger";
+                        }
+                        else
+                        if (sumPosted > 0 && sum > sumPosted)
+                        {
+                            warning = "Платеж распределен не полностью";
+                            cssClass = "text-warning";
+                        }
+                        else
+                        if (sumPosted == 0)
+                        {
+                            warning = "Платеж не распределен";
+                            cssClass = "text-warning";
+                        }
+                    }
+                    @if (!string.IsNullOrEmpty(warning))
+                    {
+                        <span class="oi oi-bell @cssClass" style="font-size: 80%" title="@warning"></span>
+                    }
+                    @if (item.ChildPayments.Any() && item.IdPayment != Model.FilterOptions.IdParentPayment)
+                    {
+                        <a asp-action="Index" asp-route-filterOptions.IdParentPayment="@item.IdPayment" title="Платеж был разбит при применении мемориального ордера. Для отображения связных платежей кликните по этой иконке">
+                            <span class="oi oi-link-intact text-primary" style="font-size: 80%"></span>
+                        </a>
+                    }
+                    @if (item.IdPayment == Model.FilterOptions.IdParentPayment && item.IdParentPayment != null)
+                    {
+                        <a asp-action="Index" asp-route-filterOptions.IdParentPayment="@item.IdParentPayment" title="К родительскому платежу">
+                            <span class="oi oi-arrow-top text-primary" style="font-size: 80%"></span>
+                        </a>
+                    }
+                </td>
+                <td>
+                    @{
+                            var isPl = item.IdSource == 3 || item.IdSource == 5;
+                    }
 
+                    <div>
+                        <b>Сумма:</b> @item.Sum руб.@(@sumPosted > 0 ? ", распределено: " + @sumPosted + " руб." : "")
+                    </div>
+                    @if (!string.IsNullOrEmpty(item.Kbk))
+                    {
+                        <div>
+                            <b>КБК:</b> @item.Kbk
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(item.NumDocument) || item.DateDocument != null)
+                    {
+                        <div>
+                            <b>@(isPl ? "Распоряжение" : "Платежный документ"):</b><br />
+                            @if (!string.IsNullOrEmpty(item.NumDocument))
+                            {
+                                <span>№ @item.NumDocument</span>
+                            }
+                            @if (!string.IsNullOrEmpty(item.NumDocument) && item.DateDocument != null)
+                            {
+                                <span> </span>
+                            }
+                            @if (item.DateDocument != null)
+                            {
+                                <span>от @item.DateDocument.Value.ToString("dd.MM.yyyy")</span>
+                            }
+                        </div>
+                    }
+                    @if (item.DateIn != null && !isPl)
+                    {
+                        <div>
+                            <b>Дата поступления в банк:</b><br />@item.DateIn.Value.ToString("dd.MM.yyyy")
+                        </div>
+                    }
+                    @if (item.DateExecute != null)
+                    {
+                        <div>
+                            <b>@(isPl ? "Дата исполнения" : "Дата списания со счета"):</b><br />@item.DateExecute.Value.ToString("dd.MM.yyyy")
+                        </div>
+                    }
+                </td>
+                <td class="d-none d-lg-table-cell">
+                    <div title="@item.Purpose" class="rr-payment-purpose">@item.Purpose</div>
+                </td>
+                <td style="position: relative">
+                    @if (item.PayerInn != null && item.PayerInn != "0")
+                    {
+                        <div>
+                            <b>ИНН:</b> @item.PayerInn
+                        </div>
+                    }
+                    @if (item.PayerKpp != null && item.PayerKpp != "0")
+                    {
+                        <div>
+                            <b>КПП:</b> @item.PayerKpp
+                        </div>
+                    }
+                    @if (item.PayerName != null)
+                    {
+                        <div>
+                            <b>Наименование:</b> @item.PayerName
+                        </div>
+                    }
+
+                    <div class="btn-group rr-opacity-item-menu" role="group" aria-label="Панель доступа">
+                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее" target="_blank"
+                           asp-action="Details"
+                           asp-route-idPayment="@item.IdPayment"
+                           asp-route-action="Details"
+                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                        @if (item.IdSource == 1 && securityService.HasPrivilege(Privileges.AccountsWrite))
+                        {
+                            <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить" target="_blank"
+                               asp-action="Edit"
+                               asp-route-idPayment="@item.IdPayment"
+                               asp-route-action="Edit"
+                               asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить" target="_blank"
+                               asp-action="Delete"
+                               asp-route-idPayment="@item.IdPayment"
+                               asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                        }
+
+                        <div class="btn-group" role="group" aria-label="Панель доступа">
+                            <button class="btn btn-dark oi oi-grid-two-up dropdown-toggle" type="button" title="Операции" aria-label="Операции" id="objectsBtn_@item.IdPayment" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@item.IdPayment">
+                                <a class="dropdown-item rr-apply-memorial-order" href="#" title="Привязать мемориальный ордер" aria-label="Привязать мемориальный ордер" data-id-payment="@item.IdPayment">Привязать мемориальный ордер</a>
+                                <a class="dropdown-item rr-distribute-payment" href="#" title="Распределить платеж" aria-label="Распределить платеж" data-id-payment="@item.IdPayment">Распределить платеж</a>
+                            </div>
+                        </div>
+                        <div class="btn-group" role="group" aria-label="Отчеты">
+                            <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@item.IdPayment" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdPayment">
+                                <a class="dropdown-item" asp-action="GetPaymentOrder" title="Платежное поручение" aria-label="Платежное поручение" asp-route-idPayment="@item.IdPayment">Платежное поручение</a>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,12 +1,31 @@
-﻿
+﻿@model RegistryServices.ViewModel.KumiAccounts.KumiPaymentsVM;
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Платежи";
+    var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
+        "(" + Model.PageOptions.TotalRows + ")" :
+        "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
 }
 
-<h1>Index</h1>
+@section styles
+    {
+    <link rel="stylesheet" href="~/css/kumi.payments.css" runat="server" />
+}
 
-<form asp-action="UploadPayments" method="post" enctype="multipart/form-data">
-    <input name="Files" type="file" multiple />
-    <button>Submit</button>
-</form>
+<div class="col info text-center" data-controller="KumiPayments"></div>
+
+<h2>@ViewData["Title"] @text</h2>
+
+<partial name="Filter" model="Model" />
+<partial name="DataTable" model="Model" />
+
+<page-link page-model="Model.PageOptions" page-action="Index"></page-link>
+
+@section Scripts {
+    <script src="~/js/index.common.js" asp-append-version="true"></script>
+    <script src="~/js/address.filter.js" asp-append-version="true"></script>
+    <script src="~/js/index.common.js" asp-append-version="true"></script>
+    <script src="~/js/index.kumi.payments.js" asp-append-version="true"></script>
+}
+
+
 

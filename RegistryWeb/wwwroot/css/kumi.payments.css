@@ -1,0 +1,41 @@
+﻿.tp-table > thead > tr > th a.sort {
+    color: #888;
+}
+
+.tp-table > thead > tr > th a.sort:hover {
+    color: black;
+}
+
+.tp-table > thead > tr > th a.sort.tp-sorted {
+    color: #007bff;
+}
+
+.tp-table > thead > tr > th a.sort.tp-sorted:hover {
+    color: #0056b3;
+}
+
+.rr-payment-filter-label,
+.rr-payment-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 0.24rem;
+}
+
+.rr-payment-purpose {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media(min-width: 768px) {
+    .rr-payment-purpose {
+        width: 200px;
+    }
+}
+
+@media(min-width: 992px) {
+    .rr-payment-purpose {
+        width: 300px;
+    }
+}

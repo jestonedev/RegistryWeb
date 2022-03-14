@@ -4,6 +4,7 @@ using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryPaymentsLoader;
 using RegistryPaymentsLoader.TffFileLoaders;
 using RegistryPaymentsLoader.TffStrings;
+using RegistryServices.ViewModel.KumiAccounts;
 using RegistryWeb.DataServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;
@@ -11,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using RegistryWeb.Extensions;
+using RegistryWeb.ViewOptions;
 
 namespace RegistryWeb.Controllers
 {
@@ -24,9 +27,32 @@ namespace RegistryWeb.Controllers
             this.zipArchiveDataService = zipArchiveDataService;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(KumiPaymentsVM viewModel, bool isBack = false)
         {
-            return View();
+            if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
+                return NotFound();
+            if (!securityService.HasPrivilege(Privileges.AccountsRead))
+                return View("NotAccess");
+            if (isBack)
+            {
+                viewModel.OrderOptions = HttpContext.Session.Get<OrderOptions>("OrderOptions");
+                viewModel.PageOptions = HttpContext.Session.Get<PageOptions>("PageOptions");
+                viewModel.FilterOptions = HttpContext.Session.Get<KumiPaymentsFilter>("FilterOptions");
+            }
+            else
+            {
+                HttpContext.Session.Remove("OrderOptions");
+                HttpContext.Session.Remove("PageOptions");
+                HttpContext.Session.Remove("FilterOptions");
+            }
+            ViewBag.SecurityService = securityService;
+
+            var vm = dataService.GetViewModel(
+                viewModel.OrderOptions,
+                viewModel.PageOptions,
+                viewModel.FilterOptions);
+
+            return View(vm);
         }
 
         public IActionResult UploadPayments(List<IFormFile> files)
