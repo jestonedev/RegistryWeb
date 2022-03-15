@@ -31,8 +31,7 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
 
             builder.Property(e => e.IdGroup)
                 .HasColumnName("id_group")
-                .HasColumnType("int(11)")
-                .IsRequired();
+                .HasColumnType("int(11)");
 
             builder.Property(e => e.IdSource)
                 .HasColumnName("id_source")

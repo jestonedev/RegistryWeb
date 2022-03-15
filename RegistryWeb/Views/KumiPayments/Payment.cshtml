@@ -1,7 +1,503 @@
-﻿
+﻿@using RegistryWeb.SecurityServices;
+@using RegistryWeb.ViewModel;
+@using RegistryServices.ViewModel.KumiAccounts;
+@using RegistryWeb.Enums;
+@model RegistryDb.Models.Entities.KumiAccounts.KumiPayment;
 @{
-    ViewData["Title"] = "Index";
+    if (Model.IdPayment == 0)
+    {
+        ViewData["Title"] = "Новый платеж";
+    }
+    else
+    {
+        var title = "Платеж";
+        if (!string.IsNullOrEmpty(Model.NumDocument) || Model.DateDocument != null)
+        {
+            if (!string.IsNullOrEmpty(Model.NumDocument))
+            {
+                title += " № " + Model.NumDocument;
+            }
+            if (Model.DateDocument != null)
+            {
+                title += " от " + Model.DateDocument.Value.ToString("dd.MM.yyyy");
+            }
+        } else
+        if (string.IsNullOrEmpty(Model.NumDocument) && Model.DateDocument == null && !string.IsNullOrEmpty(Model.Guid))
+        {
+            title += " УИН " + Model.Guid;
+        } else
+        {
+            title += " ID " + Model.IdPayment;
+        }
+        ViewData["Title"] = title;
+    }
+    var canEdit = Model.IdSource == 1 && (((SecurityService)ViewData["SecurityService"])?.HasPrivilege(Privileges.AccountsReadWrite) ?? false);
+    var isPl = Model.IdSource == 3 || Model.IdSource == 5;
+    var sumPosted = Model.PaymentCharges.Select(r => r.Value).Sum() + Model.PaymentClaims.Select(r => r.Value).Sum();
 }
+@section Styles {
+    <link rel="stylesheet" href="~/css/kumi.payments.css" asp-append-version="true" />
+}
+@section Scripts {
+    <script src="~/js/kumiPayments.common.js" asp-append-version="true"></script>
+}
+<div class="card">
+    <div class="card-header d-flex flex-column flex-lg-row">
+        <label class="form-check-label h2 col-sm-12 col-lg-7 pl-0" title="@ViewData["Title"]"
+               style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            @ViewData["Title"]
 
-<h1>Index</h1>
+            @if (Model.ChildPayments.Any())
+            {
+                <a asp-action="Index" asp-route-filterOptions.IdParentPayment="@Model.IdPayment" title="Платеж был разбит при применении мемориального ордера. Для отображения связных платежей кликните по этой иконке">
+                    <span class="oi oi-link-intact text-primary" style="font-size: 80%; text-decoration: none"></span></a>
+            }
+            @if (Model.IdParentPayment != null)
+            {
+                <a asp-action="Details" asp-route-IdPayment="@Model.IdParentPayment" title="Платеж был создан при применении мемориального ордера. Для отображения родительского платежа кликните по этой иконке">
+                    <span class="oi oi-arrow-top text-primary" style="font-size: 80%; text-decoration: none"></span></a>
+            }
+        </label>
+        <div class="col-sm-12 col-lg-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
+            <div class="btn-group" role="group" aria-label="Панель инструментов">
+                @if (canEdit && (ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details))
+                {
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        <button class="btn btn-primary dropdown-toggle" type="button" title="Переключить" aria-label="Переключить" id="toolsBtn_@Model.IdPayment" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-wrench"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="toolsBtn_@Model.IdPayment">
+                            @if (ViewBag.Action != ActionTypeEnum.Details)
+                            {
+                                <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                                   asp-action="Details" asp-route-idPayment="@Model.IdPayment" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            }
+                            @if (ViewBag.Action != ActionTypeEnum.Edit)
+                            {
+                                <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
+                                   asp-action="Edit" asp-route-idPayment="@Model.IdPayment" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            }
+                            @if (ViewBag.Action != ActionTypeEnum.Delete)
+                            {
+                                <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
+                                   asp-action="Delete" asp-route-idPayment="@Model.IdPayment" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            }
+                        </div>
+                    </div>
+                }
+                @if (ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details)
+                {
+                    <div class="btn-group" role="group" aria-label="Панель доступа">
+                        <button class="btn btn-dark dropdown-toggle" type="button" title="Операции" aria-label="Операции" id="objectsBtn_@Model.IdPayment" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-grid-two-up"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@Model.IdPayment" x-placement="bottom-end" style="position: absolute; transform: translate3d(-179px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
+                            @if (sumPosted == 0)
+                            {
+                                <a class="dropdown-item rr-apply-memorial-order" href="#" title="Привязать мемориальный ордер" aria-label="Привязать мемориальный ордер" data-id-payment="@Model.IdPayment">Привязать мемориальный ордер</a>
+                            }
+                            @if (Model.Sum > sumPosted)
+                            {
+                                <a class="dropdown-item rr-distribute-payment" href="#" title="Распределить платеж" aria-label="Распределить платеж" data-id-payment="@Model.IdPayment">Распределить платеж</a>
+                            }
+                            @if (sumPosted > 0)
+                            {
+                                <a class="dropdown-item rr-cancel-distribute-payment" href="#" title="Отменить распределение платежа" aria-label="Отменить распределение платежа" data-id-payment="@Model.IdPayment">Отменить распределение платежа</a>
+                            }
+                        </div>
+                    </div>
 
+                    <div class="btn-group" role="group" aria-label="Отчеты">
+                        <button class="btn btn-success dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@Model.IdPayment" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-document"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.IdPayment">
+                            <a class="dropdown-item" asp-action="GetPaymentOrder" title="Платежное поручение" aria-label="Платежное поручение" asp-route-idPayment="@Model.IdPayment">Платежное поручение</a>
+                        </div>
+                    </div>
+
+                    @if (Model.PaymentCorrections.Any())
+                    {
+                        <div class="btn-group" role="group" aria-label="Ревизии">
+                            <button class="btn btn-info dropdown-toggle" type="button" title="Отчеты" aria-label="Ревизии" id="reportsBtn_@Model.IdPayment" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="oi oi-code"></span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.IdPayment">
+                                <a class="dropdown-item active rr-payment-revision" href="#" title="Текущая ревизия" aria-label="Текущая ревизия"
+                                   data-sum="@Model.Sum" data-id-kbk-type="@Model.IdKbkType" data-kbk="@Model.Kbk" data-taget-code="@Model.TargetCode" data-okato="@Model.Okato"
+                                   data-payer-inn="@Model.PayerInn" data-payer-kpp="@Model.PayerKpp">Текущая ревизия</a>
+                                @foreach (var corrGroup in Model.PaymentCorrections.GroupBy(r => r.Date.Date))
+                                {
+                                    var sum = corrGroup.FirstOrDefault(r => r.FieldName == "Sum")?.FieldValue ?? Model.Sum.ToString();
+                                    var idKbkType = corrGroup.FirstOrDefault(r => r.FieldName == "IdKbkType")?.FieldValue ?? Model.IdKbkType?.ToString();
+                                    var kbk = corrGroup.FirstOrDefault(r => r.FieldName == "Kbk")?.FieldValue ?? Model.Kbk;
+                                    var targetCode = corrGroup.FirstOrDefault(r => r.FieldName == "TargetCode")?.FieldValue ?? Model.TargetCode;
+                                    var okato = corrGroup.FirstOrDefault(r => r.FieldName == "Okato")?.FieldValue ?? Model.Okato;
+                                    var payerInn = corrGroup.FirstOrDefault(r => r.FieldName == "PayerInn")?.FieldValue ?? Model.PayerInn;
+                                    var payerKpp = corrGroup.FirstOrDefault(r => r.FieldName == "PayerKpp")?.FieldValue ?? Model.PayerKpp;
+                                    <a class="dropdown-item rr-payment-revision" href="#" title="Текущая ревизия" aria-label="До @corrGroup.Key.ToString("dd.MM.yyyy")"
+                                       data-sum="@sum" data-id-kbk-type="@idKbkType" data-kbk="@kbk" data-taget-code="@targetCode" data-okato="@okato"
+                                       data-payer-inn="@payerInn" data-payer-kpp="@payerKpp">До @corrGroup.Key.ToString("dd.MM.yyyy")</a>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+                @if (ViewBag.Action == ActionTypeEnum.Create)
+                {
+                    <a href="#" id="paymentCreate" class="form-control btn btn-success">Создать</a>
+                }
+                @if (ViewBag.Action == ActionTypeEnum.Edit)
+                {
+                    <a href="#" id="paymentEdit" class="form-control btn btn-success @((Model.PaymentCharges.Any() || Model.PaymentClaims.Any()) ? "disabled" : "")">Сохранить</a>
+                }
+                @if (ViewBag.Action == ActionTypeEnum.Delete)
+                {
+                    <a href="#" id="paymentDelete" class="form-control btn btn-danger @((Model.PaymentCharges.Any() || Model.PaymentClaims.Any()) ? "disabled" : "")">Удалить</a>
+                }
+            </div>
+
+            <div class="btn-group" role="group" aria-label="Панель инструментов">
+                @if (@ViewBag.ReturnUrl != null)
+                {
+                    <a class="form-control btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+                }
+                else
+                {
+                    <a class="form-control btn btn-primary" asp-action="Index">Назад</a>
+                }
+                <a href="#" class="form-control btn btn-primary account-toggler" id="PaymentToggler" title="Развернуть" style="font-weight:bold;">∧</a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body pt-3 pb-3 pl-3 pr-3" id="Payment">
+        @if (ViewBag.Action == ActionTypeEnum.Delete && (Model.PaymentCharges.Any() || Model.PaymentClaims.Any()))
+        {
+            <div class="alert alert-danger text-center">Нельзя удалить распределенный платеж</div>
+        }
+        @if (ViewBag.Action == ActionTypeEnum.Edit && (Model.PaymentCharges.Any() || Model.PaymentClaims.Any()))
+        {
+            <div class="alert alert-danger text-center">Нельзя изменить распределенный платеж</div>
+        }
+
+        <form autocomplete="off" asp-action="@ViewBag.Action" id="paymentsForm" data-action="@ViewBag.Action" method="post">
+            <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
+            <input type="hidden" asp-for="IdPayment" />
+            <input type="hidden" asp-for="IdParentPayment" />
+            <input type="hidden" asp-for="IdGroup" />
+            <input type="hidden" asp-for="Guid" />
+
+            <div class="form-row">
+                @if (ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details)
+                {
+                    <div class="form-group col-12 @(Model.IdSource == 1 ? "" : "col-md-6 col-lg-9") mb-2">
+                        <label class="rr-payment-label mb-1">Источник информации</label>
+                        <select class="selectpicker form-control" asp-for="IdSource" title="Источник информации"
+                                asp-items="@(new SelectList(ViewBag.PaymentInfoSources, "IdSource", "Name", Model.IdSource))"></select>
+                        <span class="text-danger" asp-validation-for="IdSource"></span>
+                    </div>
+                    @if(Model.IdSource != 1)
+                    { 
+                        <div class="form-group col-12 col-md-6 col-lg-3 mb-2">
+                            <label class="rr-payment-label mb-1" asp-for="PaymentGroup.Date">Дата загрузки</label>
+                            <input type="date" asp-for="PaymentGroup.Date" value="@Model.PaymentGroup.Date.ToString("yyyy-MM-dd")"
+                                   title="Дата загрузки" class="form-control" disabled />
+                        </div>
+                    }
+                }
+                else
+                {
+                    <input type="hidden" asp-for="IdSource" />
+                }
+                <div class="form-group col-12 col-lg-6 mb-2">
+                    <label class="rr-payment-label mb-1">Код платежного документа</label>
+                    <select class="selectpicker form-control" asp-for="IdPaymentDocCode" title="Код платежного документа"
+                            asp-items="@(new SelectList(ViewBag.PaymentDocCodes, "IdPaymentDocCode", "Name", Model.IdPaymentDocCode))">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    @{
+                        var fieldTitle = isPl ? "№ распоряжения" : "№ платежного документа";
+                    }
+                    <label class="rr-payment-label mb-1" asp-for="NumDocument">@fieldTitle</label>
+                    <input type="text" asp-for="NumDocument" data-val="true" title="@fieldTitle" class="form-control input-numbers" maxlength="255" />
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    @{
+                        fieldTitle = isPl ? "Дата распоряжения" : "Дата платежного документа";
+                    }
+                    <label class="rr-payment-label mb-1" asp-for="DateDocument">@fieldTitle</label>
+                    <input type="date" asp-for="DateDocument" value="@(Model.DateDocument != null ? Model.DateDocument.Value.ToString("yyyy-MM-dd") : "")"
+                           title="@fieldTitle" class="form-control" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-payment-label mb-1" asp-for="Sum">Сумма</label>
+                    @if (ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details)
+                    {
+                        <div class="input-group">
+                            <input type="text" asp-for="Sum" data-val="true" data-val-required="Введите сумму платежа" title="Сумма платежа" class="form-control input-decimal" />
+
+                            <div class="input-group-append">
+                                <span class="input-group-text text-white
+                                      @(((sumPosted == 0 && Model.Sum != 0) || sumPosted > Model.Sum) ? "bg-danger" : sumPosted < Model.Sum ? "bg-warning" : "bg-success")"
+                                      id="basic-addon2" title="Распределено">@sumPosted.ToString("0.00")</span>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <input type="text" asp-for="Sum" data-val="true" data-val-required="Введите сумму платежа" title="Сумма платежа" class="form-control input-decimal" />
+                            <span class="text-danger" asp-validation-for="Sum"></span>
+                        }
+                </div>
+                @if (isPl)
+                {
+                    <input type="hidden" asp-for="DateIn" />
+                }
+                else
+                {
+                    <div class="form-group col-6 col-lg-3 mb-2">
+                        <label class="rr-payment-label mb-1" asp-for="DateIn">Дата поступления в банк</label>
+                        <input type="date" asp-for="DateIn" value="@(Model.DateIn != null ? Model.DateIn.Value.ToString("yyyy-MM-dd") : "")"
+                               title="Дата поступления в банк плательщика" class="form-control" />
+                    </div>
+                }
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    @{
+                        fieldTitle = isPl ? "Дата исполнения" : "Дата списания";
+                        var fieldDetailTitle = isPl ? "Дата исполнения распоряжения" : "Дата списания со счета плательщика";
+                    }
+                    <label class="rr-payment-label mb-1" asp-for="DateExecute">@fieldTitle</label>
+                    <input type="date" asp-for="DateExecute" value="@(Model.DateExecute != null ? Model.DateExecute.Value.ToString("yyyy-MM-dd") : "")"
+                           title="@fieldDetailTitle" class="form-control" />
+                </div>
+                @if (isPl)
+                {
+                    <input type="hidden" asp-for="DatePay" />
+                }
+                else
+                {
+                    <div class="form-group col-6 col-lg-3 mb-2">
+                        <label class="rr-payment-label mb-1" asp-for="DatePay">Срок платежа</label>
+                        <input type="date" asp-for="DatePay" value="@(Model.DatePay != null ? Model.DatePay.Value.ToString("yyyy-MM-dd") : "")"
+                               title="Срок платежа" class="form-control" />
+                    </div>
+                }
+
+                @if (isPl)
+                {
+                    <input type="hidden" asp-for="IdPaymentKind" />
+                }
+                else
+                {
+                    <div class="form-group col-6 col-lg-3 mb-2">
+                        <label class="rr-payment-label mb-1">Вид платежа</label>
+                        <select class="selectpicker form-control" asp-for="IdPaymentKind" title="Вид платежа"
+                                asp-items="@(new SelectList(ViewBag.PaymentKinds, "IdPaymentKind", "Name", Model.IdPaymentKind))">
+                            <option></option>
+                        </select>
+                    </div>
+                }
+
+                @if (isPl)
+                {
+                    <input type="hidden" asp-for="OrderPay" />
+                }
+                else
+                {
+                    <div class="form-group col-6 col-lg-3 mb-2">
+                        <label class="rr-payment-label mb-1" asp-for="OrderPay">Очередность платежа</label>
+                        <input type="text" asp-for="OrderPay" data-val="true" title="Очередность платежа" class="form-control input-numbers" maxlength="1" />
+                    </div>
+                }
+
+                @if (isPl)
+                {
+                    <input type="hidden" asp-for="IdOperationType" />
+                }
+                else
+                {
+                    <div class="form-group col-6 col-lg-3 mb-2">
+                        <label class="rr-payment-label mb-1">Вид операции</label>
+                        <select class="selectpicker form-control" asp-for="IdOperationType" title="Вид платежа"
+                                asp-items="@(new SelectList(ViewBag.OperationTypes, "IdOperationType", "Name", Model.IdOperationType))">
+                            <option></option>
+                        </select>
+                    </div>
+                }
+
+                <div class="form-group @(isPl ? "col-12 col-lg-6" : "col-6 col-lg-3" )  mb-2">
+                    <label class="rr-payment-label mb-1" asp-for="Uin">УИН</label>
+                    <input type="text" asp-for="Uin" data-val="true" title="Уникальный идентификатор начисления" class="form-control input-numbers" maxlength="25" />
+                </div>
+
+                <input type="hidden" asp-for="IdPurpose" />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-12 mb-2">
+                    <label asp-for="@Model.Purpose">Назначение платежа</label>
+                    <textarea asp-for="@Model.Purpose" class="form-control" rows="3" cols="10" maxlength="500"></textarea>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-payment-label mb-1" asp-for="Kbk">КБК</label>
+                    <input type="text" asp-for="Kbk" data-val="true" title="Код бюджетной классификации" class="form-control input-numbers" maxlength="20" />
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-payment-label mb-1">Тип КБК</label>
+                    <select class="selectpicker form-control" asp-for="IdKbkType" title="Тип КБК"
+                            asp-items="@(new SelectList(ViewBag.KbkTypes, "IdKbkType", "Name", Model.IdKbkType))">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-payment-label mb-1" asp-for="TargetCode">Код цели</label>
+                    <input type="text" asp-for="TargetCode" data-val="true" title="Код цели" class="form-control input-numbers" maxlength="25" />
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-payment-label mb-1" asp-for="Okato">Код ОКТМО</label>
+                    <input type="text" asp-for="Okato" data-val="true" title="Код по Общероссийскому классификатору территорий муниципальных образований получателя" class="form-control input-numbers" maxlength="20" />
+                </div>
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group col-12 col-lg-6 mb-2">
+                    <label class="rr-payment-label mb-1">Основание платежа</label>
+                    <select class="selectpicker form-control" asp-for="IdPaymentReason" title="Основание платежа"
+                            asp-items="@(new SelectList(ViewBag.PaymentReasons, "IdPaymentReason", "Name", Model.IdPaymentReason))">
+                        <option></option>
+                    </select>
+                </div>
+
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-payment-label mb-1" asp-for="NumDocumentIndicator">№ документа-основания</label>
+                    <input type="text" asp-for="NumDocumentIndicator" data-val="true" title="№ документа-основания" class="form-control" maxlength="15" />
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-payment-label mb-1" asp-for="DateDocumentIndicator">Дата документа-основания</label>
+                    <input type="date" asp-for="DateDocumentIndicator" value="@(Model.DateDocumentIndicator != null ? Model.DateDocumentIndicator.Value.ToString("yyyy-MM-dd") : "")"
+                           title="Дата документа-основания" class="form-control" />
+                </div>
+
+                @{
+                    fieldTitle = (isPl ? "Статус плательщика" : "Статус составителя  расчетного документа");
+                }
+                <div class="form-group col-12 mb-2">
+                    <label class="rr-payment-label mb-1">@fieldTitle</label>
+                    <select class="selectpicker form-control" asp-for="IdPayerStatus" title="@fieldTitle"
+                            asp-items="@(new SelectList(ViewBag.PayerStatuses, "IdPayerStatus", "Name", Model.IdPayerStatus))">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-12 mb-2">
+                    <label asp-for="@Model.Description">Примечание</label>
+                    <textarea asp-for="@Model.Description" class="form-control" rows="3" cols="10" maxlength="1024"></textarea>
+                </div>
+            </div>
+
+            <div class="card rr-payer-card mt-2">
+                <div class="card-header d-flex justify-content-between pt-2 pb-2">
+                    <h4 class="mt-1">Плательщик</h4>
+                    <div class="btn-group" role="group">
+                        <a href="#" id="PayerToggler" class="form-control btn btn-primary" title="Развернуть информацию по плательщику" style="font-weight:bold;">∧</a>
+                    </div>
+                </div>
+                <div class="card-body pt-3 pb-3 pl-3 pr-3" id="Payer">
+                    <div class="form-row">
+                        <div class="form-group col-lg-3 col-6 mb-2">
+                            <label asp-for="PayerInn" class="rr-payment-label mb-1">ИНН</label>
+                            <input type="text" class="form-control input-numbers" maxlength="12" asp-for="PayerInn" title="ИНН">
+                        </div>
+                        <div class="form-group col-lg-3 col-6 mb-2">
+                            <label asp-for="PayerKpp" class="rr-payment-label mb-1">КПП</label>
+                            <input type="text" class="form-control input-numbers" maxlength="12" asp-for="PayerKpp" title="ИНН">
+                        </div>
+                        <div class="form-group col-lg-6 col-12 mb-2">
+                            <label asp-for="PayerAccount" class="rr-payment-label mb-1">Лицевой счет</label>
+                            <input type="text" class="form-control input-numbers" maxlength="20" asp-for="PayerAccount" title="Лицевой счет">
+                        </div>
+                        <div class="form-group col-12 mb-2">
+                            <label asp-for="PayerName" class="rr-payment-label mb-1">Наименование плательщика</label>
+                            <input type="text" class="form-control" maxlength="2000" asp-for="PayerName"
+                                   title="@(ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details ? Model.PayerName : "Наименование плательщика")">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6 mb-2">
+                            <label asp-for="PayerBankBik" class="rr-payment-label mb-1">БИК банка</label>
+                            <input type="text" class="form-control input-numbers" maxlength="9" asp-for="PayerBankBik" title="БИК банка">
+                        </div>
+                        <div class="form-group col-6 mb-2">
+                            <label asp-for="PayerBankAccount" class="rr-payment-label mb-1">Корр. счет банка</label>
+                            <input type="text" class="form-control input-numbers" maxlength="20" asp-for="PayerBankAccount" title="Корр. счет банка">
+                        </div>
+                        <div class="form-group col-12 mb-2">
+                            <label asp-for="PayerBankName" class="rr-payment-label mb-1">Наименование банка</label>
+                            <input type="text" class="form-control" maxlength="160" asp-for="PayerBankName"
+                                   title="@(ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details ? Model.PayerBankName : "Наименование банка")">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card rr-recipient-card mt-2">
+                <div class="card-header d-flex justify-content-between pt-2 pb-2">
+                    <h4 class="mt-1">Получатель</h4>
+                    <div class="btn-group" role="group">
+                        <a href="#" id="RecipientToggler" class="form-control btn btn-primary" title="Развернуть информацию по получателю" style="font-weight:bold;">∧</a>
+                    </div>
+                </div>
+                <div class="card-body pt-3 pb-3 pl-3 pr-3" id="Recipient">
+                    <div class="form-row">
+                        <div class="form-group col-lg-3 col-6 mb-2">
+                            <label asp-for="RecipientInn" class="rr-payment-label mb-1">ИНН</label>
+                            <input type="text" class="form-control input-numbers" maxlength="12" asp-for="RecipientInn" title="ИНН">
+                        </div>
+                        <div class="form-group col-lg-3 col-6 mb-2">
+                            <label asp-for="RecipientKpp" class="rr-payment-label mb-1">КПП</label>
+                            <input type="text" class="form-control input-numbers" maxlength="12" asp-for="RecipientKpp" title="ИНН">
+                        </div>
+                        <div class="form-group col-lg-6 col-12 mb-2">
+                            <label asp-for="RecipientAccount" class="rr-payment-label mb-1">Лицевой счет</label>
+                            <input type="text" class="form-control input-numbers" maxlength="20" asp-for="RecipientAccount" title="Лицевой счет">
+                        </div>
+                        <div class="form-group col-12 mb-2">
+                            <label asp-for="RecipientName" class="rr-payment-label mb-1">Наименование получателя</label>
+                            <input type="text" class="form-control" maxlength="2000" asp-for="RecipientName"
+                                   title="@(ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details ? Model.RecipientName : "Наименование получателя")">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6 mb-2">
+                            <label asp-for="RecipientBankBik" class="rr-payment-label mb-1">БИК банка</label>
+                            <input type="text" class="form-control input-numbers" maxlength="9" asp-for="RecipientBankBik" title="БИК банка">
+                        </div>
+                        <div class="form-group col-6 mb-2">
+                            <label asp-for="RecipientBankAccount" class="rr-payment-label mb-1">Корр. счет банка</label>
+                            <input type="text" class="form-control input-numbers" maxlength="20" asp-for="RecipientBankAccount" title="Корр. счет банка">
+                        </div>
+                        <div class="form-group col-12 mb-2">
+                            <label asp-for="RecipientBankName" class="rr-payment-label mb-1">Наименование банка</label>
+                            <input type="text" class="form-control" maxlength="160" asp-for="RecipientBankName"
+                                   title="@(ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details ? Model.RecipientBankName : "Наименование банка")">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <input type="hidden" asp-for="IsPosted"/>
+
+        </form>
+    </div>
+</div>

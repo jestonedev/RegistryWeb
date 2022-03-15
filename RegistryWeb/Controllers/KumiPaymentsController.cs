@@ -14,6 +14,7 @@ using System.IO;
 using System.Linq;
 using RegistryWeb.Extensions;
 using RegistryWeb.ViewOptions;
+using RegistryWeb.Enums;
 
 namespace RegistryWeb.Controllers
 {
@@ -53,6 +54,114 @@ namespace RegistryWeb.Controllers
                 viewModel.FilterOptions);
 
             return View(vm);
+        }
+
+        private IActionResult GetView(int? idPayment, string returnUrl, ActionTypeEnum action, Privileges privilege)
+        {
+            if (!securityService.HasPrivilege(privilege))
+                return View("NotAccess");
+            KumiPayment payment = new KumiPayment {
+                IdSource = 1
+            };
+            if (action != ActionTypeEnum.Create)
+            {
+                if (!idPayment.HasValue)
+                    return NotFound();
+                payment = dataService.GetKumiPayment(idPayment.Value);
+                if (payment == null)
+                    return NotFound();
+            }
+            ViewBag.ReturnUrl = returnUrl;
+            ViewBag.Action = action;
+            ViewBag.SecurityService = securityService;
+            ViewBag.PaymentGroups = dataService.PaymentGroups;
+            ViewBag.PaymentInfoSources = dataService.PaymentInfoSources;
+            ViewBag.PaymentDocCodes = dataService.PaymentDocCodes;
+            ViewBag.PaymentKinds = dataService.PaymentKinds;
+            ViewBag.OperationTypes = dataService.OperationTypes;
+            ViewBag.KbkTypes = dataService.KbkTypes;
+            ViewBag.PaymentReasons = dataService.PaymentReasons;
+            ViewBag.PayerStatuses = dataService.PayerStatuses;
+            
+            return View("Payment", payment);
+        }
+
+        [HttpGet]
+        public IActionResult Create(string returnUrl)
+        {
+            return GetView(null, returnUrl, ActionTypeEnum.Create, Privileges.AccountsReadWrite);
+        }
+
+        [HttpGet]
+        public IActionResult Details(int? idPayment, string returnUrl)
+        {
+            return GetView(idPayment, returnUrl, ActionTypeEnum.Details, Privileges.AccountsRead);
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int? idPayment, string returnUrl)
+        {
+            return GetView(idPayment, returnUrl, ActionTypeEnum.Edit, Privileges.AccountsReadWrite);
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int? idPayment, string returnUrl)
+        {
+            return GetView(idPayment, returnUrl, ActionTypeEnum.Delete, Privileges.AccountsReadWrite);
+        }
+
+        [HttpPost]
+        public IActionResult Create(KumiPayment kumiPayment)
+        {
+            var canEdit = securityService.HasPrivilege(Privileges.AccountsReadWrite) && kumiPayment.IdSource == 1;
+            if (!canEdit)
+                return View("NotAccess");
+            if (kumiPayment == null)
+                return NotFound();
+            if (ModelState.IsValid)
+            {
+                dataService.Create(kumiPayment);
+                return RedirectToAction("Details", new { kumiPayment.IdPayment });
+            }
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult Delete(KumiPayment kumiPayment)
+        {
+            var dbPayment = dataService.GetKumiPayment(kumiPayment.IdPayment);
+            var canEdit = securityService.HasPrivilege(Privileges.AccountsReadWrite) && dbPayment.IdSource == 1;
+            if (!canEdit)
+                return View("NotAccess");
+            if (kumiPayment == null)
+                return NotFound();
+
+            if (dbPayment.PaymentClaims.Any() || dbPayment.PaymentCharges.Any())
+                return Error("Нельзя удалить распределенный платеж");
+
+            dataService.Delete(kumiPayment.IdPayment);
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult Edit(KumiPayment kumiPayment)
+        {
+            var dbPayment = dataService.GetKumiPayment(kumiPayment.IdPayment);
+            var canEdit = securityService.HasPrivilege(Privileges.AccountsReadWrite) && dbPayment.IdSource == 1;
+            if (!canEdit)
+                return View("NotAccess");
+            if (kumiPayment == null)
+                return NotFound();
+
+            if (dbPayment.PaymentClaims.Any() || dbPayment.PaymentCharges.Any())
+                return Error("Нельзя изменить распределенный платеж");
+
+            if (ModelState.IsValid)
+            {
+                dataService.Edit(kumiPayment);
+                return RedirectToAction("Details", new { kumiPayment.IdPayment });
+            }
+            return RedirectToAction("Index");
         }
 
         public IActionResult UploadPayments(List<IFormFile> files)

@@ -12,11 +12,15 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public KumiPayment()
         {
             PaymentCharges = new List<KumiPaymentCharge>();
+            PaymentClaims = new List<KumiPaymentClaim>();
+            PaymentUfs = new List<KumiPaymentUf>();
+            PaymentCorrections = new List<KumiPaymentCorrection>();
+            MemorialOrderPaymentAssocs = new List<KumiMemorialOrderPaymentAssoc>();
         }
 
         public int IdPayment { get; set; }
         public int? IdParentPayment { get; set; }
-        public int IdGroup { get; set; }
+        public int? IdGroup { get; set; }
         public int IdSource { get; set; }
         public int? IdPaymentDocCode { get; set; }
         public string Guid { get; set; }

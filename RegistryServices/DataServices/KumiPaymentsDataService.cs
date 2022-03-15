@@ -707,5 +707,69 @@ namespace RegistryWeb.DataServices
             
             return order;
         }
+
+        public KumiPayment GetKumiPayment(int idPayment)
+        {
+            var payment = registryContext.KumiPayments
+                .Include(r => r.PaymentCharges)
+                .Include(r => r.PaymentClaims)
+                .Include(r => r.ChildPayments)
+                .Include(r => r.PaymentGroup)
+                .Include(r => r.PaymentUfs)
+                .Include(r => r.PaymentCorrections)
+                .Include(r => r.MemorialOrderPaymentAssocs).AsNoTracking()
+                .SingleOrDefault(a => a.IdPayment == idPayment);
+            return payment;
+        }
+
+        public List<KumiMemorialOrder> GetKumiPaymentMemorialOrders(int idPayment)
+        {
+            var orders = (from order in registryContext.KumiMemorialOrders
+                         join assoc in registryContext.KumiMemorialOrderPaymentAssocs
+                         on order.IdOrder equals assoc.IdOrder
+                         where assoc.IdPayment == idPayment
+                         select order).ToList();
+            return orders;
+        }
+
+        public void Create(KumiPayment payment)
+        {
+            registryContext.KumiPayments.Add(payment);
+            registryContext.SaveChanges();
+        }
+
+        public void Edit(KumiPayment payment)
+        {
+            registryContext.KumiPayments.Update(payment);
+            registryContext.SaveChanges();
+        }
+
+        public void Delete(int idPayment)
+        {
+            var payments = registryContext.KumiPayments
+                .FirstOrDefault(pc => pc.IdPayment == idPayment);
+            payments.Deleted = 1;
+            registryContext.SaveChanges();
+        }
+
+        public bool AccountExists(string account, int idAccount)
+        {
+            var curAccount = registryContext.KumiAccounts
+                .SingleOrDefault(a => a.IdAccount == idAccount)
+                ?.Account;
+            if (curAccount == account)
+                return false;
+            return registryContext.KumiAccounts
+                .Select(a => a.Account).Count(num => num != null && num == account) > 0;
+        }
+
+        public List<KumiPaymentGroup> PaymentGroups { get => registryContext.KumiPaymentGroups.ToList(); }
+        public List<KumiPaymentInfoSource> PaymentInfoSources { get => registryContext.KumiPaymentInfoSources.ToList(); }
+        public List<KumiPaymentDocCode> PaymentDocCodes { get => registryContext.KumiPaymentDocCodes.ToList(); }
+        public List<KumiPaymentKind> PaymentKinds { get => registryContext.KumiPaymentKinds.ToList(); }
+        public List<KumiOperationType> OperationTypes { get => registryContext.KumiOperationTypes.ToList(); }
+        public List<KumiKbkType> KbkTypes { get => registryContext.KumiKbkTypes.ToList(); }
+        public List<KumiPaymentReason> PaymentReasons { get => registryContext.KumiPaymentReasons.ToList(); }
+        public List<KumiPayerStatus> PayerStatuses { get => registryContext.KumiPayerStatuses.ToList(); }
     }
 }
