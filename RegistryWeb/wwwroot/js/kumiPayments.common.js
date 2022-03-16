@@ -35,6 +35,7 @@
     $('#PayerToggler').on("click", $("#Payer"), elementToogleHide);
     $('#RecipientToggler').on("click", $("#Recipient"), elementToogleHide);
     $('#PaymentToggler').on("click", $("#Payment"), elementToogleHide);
+    $('#PaymentsUfsToggler').on("click", $("#PaymentsUfs"), elementToogleHide);
 
     $(".rr-payment-revision").on("click", function () {
         $(".rr-payment-revision").removeClass("active");

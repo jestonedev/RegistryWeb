@@ -16,6 +16,7 @@ namespace RegistryDb.Models.Entities.KumiAccounts
             PaymentUfs = new List<KumiPaymentUf>();
             PaymentCorrections = new List<KumiPaymentCorrection>();
             MemorialOrderPaymentAssocs = new List<KumiMemorialOrderPaymentAssoc>();
+            ChildPayments = new List<KumiPayment>();
         }
 
         public int IdPayment { get; set; }

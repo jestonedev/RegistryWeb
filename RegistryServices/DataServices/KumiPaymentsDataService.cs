@@ -172,6 +172,13 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        public int? GetKumiPaymentUfsLastNumber()
+        {
+            var lastNum = registryContext.KumiPaymentUfs.LastOrDefault()?.NumUf;
+            if (int.TryParse(lastNum, out int lastNumInt)) return lastNumInt;
+            return null;
+        }
+
         private IQueryable<KumiPayment> PayerFilter(IQueryable<KumiPayment> query, KumiPaymentsFilter filterOptions)
         {
             if(!string.IsNullOrEmpty(filterOptions.PayerAccount))

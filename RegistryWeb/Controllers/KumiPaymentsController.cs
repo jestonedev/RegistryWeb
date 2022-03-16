@@ -164,6 +164,43 @@ namespace RegistryWeb.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        public IActionResult AddPaymentUf(int? IdPayment)
+        {
+            if (!securityService.HasPrivilege(Privileges.AccountsWrite))
+                return Json(-2);
+            if (IdPayment == null) return Json(-3);
+
+            var dbPayment = dataService.GetKumiPayment(IdPayment.Value);
+
+            if (dbPayment == null) return Json(-4);
+
+            var numUf = dataService.GetKumiPaymentUfsLastNumber();
+
+            var paymentUf = new KumiPaymentUf {
+                NumUf = numUf == null ? "" : (numUf + 1).ToString(),
+                DateUf = DateTime.Now.Date,
+                Sum = dbPayment.Sum,
+                Purpose = dbPayment.Purpose,
+                Kbk = dbPayment.Kbk,
+                IdKbkType = dbPayment.IdKbkType,
+                TargetCode = dbPayment.TargetCode,
+                Okato = dbPayment.Okato,
+                RecipientInn = dbPayment.RecipientInn,
+                RecipientKpp = dbPayment.RecipientKpp,
+                RecipientName = dbPayment.RecipientName,
+                RecipientAccount = dbPayment.RecipientAccount
+            };
+            ViewBag.CanEditUfs = true;
+
+            return PartialView("PaymentUf", paymentUf);
+        }
+
+        public IActionResult DownloadPaymentUf(int idPaymentUf)
+        {
+            return null;
+        }
+
         public IActionResult UploadPayments(List<IFormFile> files)
         {
             var tffStrings = new List<TffString>();

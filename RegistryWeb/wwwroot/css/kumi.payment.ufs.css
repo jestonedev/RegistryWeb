@@ -1,0 +1,9 @@
+﻿.rr-payment-uf-edit-buttons, .rr-payment-uf-view-buttons {
+    margin-top: 16px;
+}
+
+@media(min-width: 996px) {
+    .rr-payment-uf-edit-buttons, .rr-payment-uf-view-buttons {
+        margin-top: 30px;
+    }
+}
