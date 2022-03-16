@@ -220,7 +220,8 @@ namespace RegistryDb.Models
         public virtual DbSet<KumiPaymentReason> KumiPaymentReasons { get; set; }
         public virtual DbSet<KumiPaymentUf> KumiPaymentUfs { get; set; }
         public virtual DbSet<KumiPaymentDocCode> KumiPaymentDocCodes { get; set; }
-        public virtual DbSet<KumiPaymentCorrection> PaymentCorrections { get; set; }
+        public virtual DbSet<KumiPaymentCorrection> KumiPaymentCorrections { get; set; }
+        public virtual DbSet<KumiPaymentSettingSet> KumiPaymentSettingSets { get; set; }
 
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
@@ -395,6 +396,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new KumiPaymentUfConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentCorrectionConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentDocCodeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPaymentSettingSetConfiguration(nameDatebase));
         }
     }
 }

@@ -1,0 +1,87 @@
+﻿<form id="PaymentUfDownloadModalForm">
+    <div class="modal fade" id="PaymentUfDownloadModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Сформировать уведомление</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="PaymentUfDownload_IdPayemntUf" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label class="rr-account-filter-label" for="PaymentUfDownload_IdSigner">Подписывающий</label>
+                            <select class="selectpicker form-control" title="Подписывающий" id="PaymentUfDownload_IdSigner" name="PaymentUfDownload_IdSigner"
+                                data-val="true" data-val-required="Укажите подписывающего" asp-items="@(new SelectList(ViewBag.PaymentUfSigners, "IdRecord", "Snp"))">
+                            </select>
+                            <span class="text-danger" data-valmsg-for="PaymentUfDownload_IdSigner" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-12">
+                            <label class="rr-account-filter-label" for="PaymentUfDownload_SignDate">Дата подписания</label>
+                            <input type="date" class="form-control" id="PaymentUfDownload_SignDate" name="PaymentUfDownload_SignDate" title="Дата подписания"
+                                   data-val="true" data-val-required="Введите дату подписания" value="@(DateTime.Now.ToString("yyyy-MM-dd"))">
+                            <span class="text-danger" data-valmsg-for="PaymentUfDownload_SignDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="PaymentUfsDownloadModalForm">
+    <div class="modal fade" id="PaymentUfsDownloadModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Сформировать файл с уведомлениями</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="PaymentUfDownload_IdPayemntUf" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label class="rr-account-filter-label" for="PaymentUfsDownload_IdSigner">Подписывающий</label>
+                            <select class="selectpicker form-control" title="Подписывающий" id="PaymentUfsDownload_IdSigner" name="PaymentUfsDownload_IdSigner"
+                                    data-val="true" data-val-required="Укажите подписывающего" asp-items="@(new SelectList(ViewBag.PaymentUfSigners, "IdRecord", "Snp"))"></select>
+                            <span class="text-danger" data-valmsg-for="PaymentUfsDownload_IdSigner" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-12">
+                            <label class="rr-account-filter-label" for="PaymentUfsDownload_SignDate">Дата подписания</label>
+                            <input type="date" class="form-control" id="PaymentUfsDownload_SignDate" name="PaymentUfsDownload_SignDate" title="Дата подписания"
+                                   data-val="true" data-val-required="Введите дату подписания" value="@(DateTime.Now.ToString("yyyy-MM-dd"))">
+                            <span class="text-danger" data-valmsg-for="PaymentUfsDownload_SignDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 pl-0 pr-0">
+                        <h5>Критерий отбора уведомлений</h5>
+                        <hr>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label class="rr-account-filter-label" for="PaymentUfsDownload_DateUf">Дата уведомления</label>
+                            <input type="date" class="form-control" id="PaymentUfsDownload_DateUf" name="PaymentUfsDownload_DateUf" title="Дата уведомления"
+                                   data-val="true" data-val-required="Введите дату уведомления" value="@(DateTime.Now.ToString("yyyy-MM-dd"))">
+                            <span class="text-danger" data-valmsg-for="PaymentUfsDownload_DateUf" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

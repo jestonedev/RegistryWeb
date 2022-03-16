@@ -47,4 +47,35 @@ $(function () {
         event.preventDefault();
         $(this).closest("form").submit();
     });
+
+
+    $("body").on("click", ".payment-ufs-download-btn", function (e) {
+        var modal = $("#PaymentUfsDownloadModal");
+        var modalFields = modal.find("input, select, textarea");
+        modalFields.prop("disabled", "");
+        modal.modal('show');
+        e.preventDefault();
+    });
+
+    $("#PaymentUfsDownloadModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var modal = $("#PaymentUfsDownloadModal");
+        var form = modal.closest("form");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return;
+        }
+        var idSigner = modal.find("#PaymentUfsDownload_IdSigner").val();
+        var signDate = modal.find("#PaymentUfsDownload_SignDate").val();
+        var dateUf = modal.find("#PaymentUfsDownload_DateUf").val();
+        var url = "/KumiPayments/DownloadPaymentUfs?IdSigner=" + idSigner + "&signDate=" + signDate + "&dateUf=" + dateUf;
+        downloadFile(url);
+        modal.modal("hide");
+    });
+
+    $("#PaymentUfsDownloadModal").on("change", "select", function () {
+        fixBootstrapSelectHighlightOnChange($(this));
+    });
+
 });

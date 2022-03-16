@@ -24,6 +24,12 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Common
                 .HasColumnName("id_executor")
                 .HasColumnType("int(11)");
 
+            builder.Property(e => e.ExecutorPost)
+                .IsRequired()
+                .HasColumnName("executor_post")
+                .HasMaxLength(100)
+                .IsUnicode(false);
+
             builder.Property(e => e.ExecutorName)
                 .IsRequired()
                 .HasColumnName("executor_name")

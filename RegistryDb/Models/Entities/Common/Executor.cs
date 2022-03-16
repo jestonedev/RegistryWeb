@@ -8,6 +8,7 @@ namespace RegistryDb.Models.Entities.Common
     public partial class Executor
     {
         public int IdExecutor { get; set; }
+        public string ExecutorPost { get; set; }
         public string ExecutorName { get; set; }
         public string ExecutorLogin { get; set; }
         public string Phone { get; set; }

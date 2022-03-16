@@ -25,8 +25,7 @@
             $(elem).val(value);
             if (name === "IdPaymentUf") {
                 var downloadBtn = paymentUfElem.find(".payment-uf-download-btn");
-                var href = downloadBtn.attr("href");
-                downloadBtn.attr("href", href.replace(/idPaymentUf=[0-9]/, 'idPaymentUf=' + value));
+                downloadBtn.attr("data-id-payment-uf", value);
             }
         });
     }
@@ -202,4 +201,34 @@
 
     $('#PaymentsUfsForm').on('click', '.payment-uf-delete-btn', deletePaymentUf);
     $("#PaymentsUfsForm").on("click", "#paymentUfAdd", addPaymentUf);
+
+    $("body").on("click", ".payment-uf-download-btn", function (e) {
+        var modal = $("#PaymentUfDownloadModal");
+        var modalFields = modal.find("input, select, textarea");
+        modalFields.prop("disabled", "");
+        modal.find("#PaymentUfDownload_IdPayemntUf").val($(this).attr("data-id-payment-uf"));
+        modal.modal('show');
+        e.preventDefault();
+    });
+
+    $("#PaymentUfDownloadModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var modal = $("#PaymentUfDownloadModal");
+        var form = modal.closest("form");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return;
+        }
+        var idSigner = modal.find("#PaymentUfDownload_IdSigner").val();
+        var signDate = modal.find("#PaymentUfDownload_SignDate").val();
+        var idPaymentUf = modal.find("#PaymentUfDownload_IdPayemntUf").val();
+        var url = "/KumiPayments/DownloadPaymentUf?IdPaymentUf=" + idPaymentUf + "&IdSigner=" + idSigner + "&signDate=" + signDate;
+        downloadFile(url);
+        modal.modal("hide");
+    });
+
+    $("#PaymentUfDownloadModal").on("change", "select", function () {
+        fixBootstrapSelectHighlightOnChange($(this));
+    });
 });

@@ -14,6 +14,10 @@ using RegistryServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.IO;
+using System.Text;
+using RegistryPaymentsLoader.TffFileLoaders;
+using RegistryDb.Models.Entities.Common;
 
 namespace RegistryWeb.DataServices
 {
@@ -177,6 +181,41 @@ namespace RegistryWeb.DataServices
             var lastNum = registryContext.KumiPaymentUfs.LastOrDefault()?.NumUf;
             if (int.TryParse(lastNum, out int lastNumInt)) return lastNumInt;
             return null;
+        }
+
+        public SelectableSigner GetSigner(int idSigner)
+        {
+            return registryContext.SelectableSigners.FirstOrDefault(r => r.IdRecord == idSigner);
+        }
+
+        public KumiPaymentUf GetKumiPaymentUf(int idPaymentUf)
+        {
+            return registryContext.KumiPaymentUfs
+                .Include(r => r.KbkType)
+                .Include(r => r.Payment).ThenInclude(r => r.PaymentDocCode)
+                .Include(r => r.Payment).ThenInclude(r => r.KbkType)
+                .AsNoTracking()
+                .FirstOrDefault(r => r.IdPaymentUf == idPaymentUf);
+        }
+
+        public List<KumiPaymentUf> GetKumiPaymentUfs(DateTime dateUf)
+        {
+            return registryContext.KumiPaymentUfs
+                    .Include(r => r.KbkType)
+                    .Include(r => r.Payment).ThenInclude(r => r.PaymentDocCode)
+                    .Include(r => r.Payment).ThenInclude(r => r.KbkType)
+                    .AsNoTracking()
+                    .Where(r => r.DateUf == dateUf).ToList();
+        }
+
+        public byte[] GetPaymentUfsFile(List<KumiPaymentUf> paymentUfs, KumiPaymentSettingSet paymentSettings, SelectableSigner signer, DateTime signDate)
+        {
+            return new TXUF180101FileCreator().CreateFile(paymentUfs, paymentSettings, securityService.Executor, signer, signDate);
+        }
+
+        public KumiPaymentSettingSet GetKumiPaymentSettings()
+        {
+            return registryContext.KumiPaymentSettingSets.FirstOrDefault();
         }
 
         private IQueryable<KumiPayment> PayerFilter(IQueryable<KumiPayment> query, KumiPaymentsFilter filterOptions)
@@ -371,7 +410,7 @@ namespace RegistryWeb.DataServices
                         foreach (var correction in corrections.Where(r => r.IdCorrection == 0))
                         {
                             correction.IdPayment = dbPayment.IdPayment;
-                            registryContext.PaymentCorrections.Add(correction);
+                            registryContext.KumiPaymentCorrections.Add(correction);
                         }
                     }
                     else
@@ -778,5 +817,6 @@ namespace RegistryWeb.DataServices
         public List<KumiKbkType> KbkTypes { get => registryContext.KumiKbkTypes.ToList(); }
         public List<KumiPaymentReason> PaymentReasons { get => registryContext.KumiPaymentReasons.ToList(); }
         public List<KumiPayerStatus> PayerStatuses { get => registryContext.KumiPayerStatuses.ToList(); }
+        public List<SelectableSigner> PaymentUfSigners { get => registryContext.SelectableSigners.Where(r => r.IdSignerGroup == 5).ToList(); }
     }
 }

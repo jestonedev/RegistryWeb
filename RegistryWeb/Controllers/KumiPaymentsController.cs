@@ -47,6 +47,7 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("FilterOptions");
             }
             ViewBag.SecurityService = securityService;
+            ViewBag.PaymentUfSigners = dataService.PaymentUfSigners.Select(r => new { r.IdRecord, Snp = (r.Surname + " " + r.Name + " " + r.Patronymic).Trim() }); ;
 
             var vm = dataService.GetViewModel(
                 viewModel.OrderOptions,
@@ -82,6 +83,7 @@ namespace RegistryWeb.Controllers
             ViewBag.KbkTypes = dataService.KbkTypes;
             ViewBag.PaymentReasons = dataService.PaymentReasons;
             ViewBag.PayerStatuses = dataService.PayerStatuses;
+            ViewBag.PaymentUfSigners = dataService.PaymentUfSigners.Select(r => new { r.IdRecord, Snp = (r.Surname + " " + r.Name + " " + r.Patronymic).Trim() });
             
             return View("Payment", payment);
         }
@@ -196,9 +198,23 @@ namespace RegistryWeb.Controllers
             return PartialView("PaymentUf", paymentUf);
         }
 
-        public IActionResult DownloadPaymentUf(int idPaymentUf)
+        public IActionResult DownloadPaymentUf(int idPaymentUf, int idSigner, DateTime? signDate)
         {
-            return null;
+            var paymentUf = dataService.GetKumiPaymentUf(idPaymentUf);
+            var paymentSettings = dataService.GetKumiPaymentSettings();
+            var signer = dataService.GetSigner(idSigner);
+            var file = dataService.GetPaymentUfsFile(new List<KumiPaymentUf> { paymentUf }, paymentSettings, signer, signDate ?? DateTime.Now.Date);
+            return File(file, "application/octet-stream", string.Format("{0}-{1} (уведомление).uf", paymentSettings.CodeUbp, paymentUf.NumUf));
+        }
+
+        public IActionResult DownloadPaymentUfs(int idSigner, DateTime? signDate, DateTime? dateUf)
+        {
+            var paymentUfs = dataService.GetKumiPaymentUfs(dateUf ?? DateTime.Now.Date);
+            if (paymentUfs.Count == 0) return Error(string.Format("Уведомления на дату {0} не найдены", (dateUf ?? DateTime.Now.Date).ToString("dd.MM.yyyy")));
+            var paymentSettings = dataService.GetKumiPaymentSettings();
+            var signer = dataService.GetSigner(idSigner);
+            var file = dataService.GetPaymentUfsFile(paymentUfs, paymentSettings, signer, signDate ?? DateTime.Now.Date);
+            return File(file, "application/octet-stream", string.Format("{0}-{1} (уведомления).uf", paymentSettings.CodeUbp, paymentUfs.Count));
         }
 
         public IActionResult UploadPayments(List<IFormFile> files)
