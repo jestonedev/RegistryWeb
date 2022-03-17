@@ -408,7 +408,14 @@ function changeClaimStateType(e) {
     });
 }
 
-$(function () {
+function openModalForOspStatement(e)
+{
+    $("#OspModal").find("input, textarea, select").prop("disabled", false);
+    $("#OspModal").modal('show');
+    e.preventDefault();
+}
+
+$(function (){
     $("#ClaimStatesForm").on("click", "#claimStateAdd", addClaimState);
     $('#ClaimStatesForm').on('click', '.claim-state-edit-btn', editClaimState);
     $('#ClaimStatesForm').on('click', '.claim-state-cancel-btn', cancelEditClaimState);
@@ -417,9 +424,5 @@ $(function () {
     $('#ClaimStatesForm').on('click', '.rr-claim-state-details', showClaimStateDetails);
     $('#ClaimStatesForm').on('change', 'select[name^="IdStateType"]', changeClaimStateType);
 
-
-    $("a#osp-btn").on("click", function (e) {
-        $("#OspModal").find("input, textarea, select").prop("disabled", false);
-        $("#OspModal").modal('show');
-    });
+    $("#ClaimStatesForm").on("click", "#osp-btn", openModalForOspStatement);
 });
