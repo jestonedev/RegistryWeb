@@ -203,5 +203,17 @@ namespace RegistryWeb.ReportServices
         {
             return resultcodes.Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
         }
+
+        internal byte[] ClaimCourtOspReport(int idClaim, DateTime createDate)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "id_claim", idClaim },
+                { "create_date", createDate }
+            };
+            var fileName = "registry\\claims\\statement_in_osp";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
     }
 }

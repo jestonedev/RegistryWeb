@@ -333,3 +333,33 @@
         </div>
     </div>
 </form>
+
+<form id="OspForm">
+    <div class="modal fade" id="OspModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Заявление о возбуждении исполнительного производства</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Claim.IdClaim" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="CreateDate">Дата заявления</label>
+                            <input type="date" class="form-control" title="Дата заявления" name="CreateDate"
+                                   data-val="true" data-val-required="Укажите дату заявления" id="CreateDate" value="@(DateTime.Now.Date.ToString("yyyy-MM-dd"))"/>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="CreateDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-court-osp-statement">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
