@@ -90,6 +90,11 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("decimal(12,2)")
                 .IsRequired();
 
+            builder.Property(e => e.Hidden)
+                .HasColumnName("hidden")
+                .HasColumnType("tinyint(1)")
+                .IsRequired();
+
             builder.Property(e => e.Deleted)
                 .HasColumnName("deleted")
                 .HasColumnType("tinyint(1)")

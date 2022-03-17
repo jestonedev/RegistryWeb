@@ -25,6 +25,7 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public decimal OutputTenancy { get; set; }
         public decimal OutputPenalty { get; set; }
         public byte Deleted { get; set; }
+        public byte Hidden { get; set; }
         public virtual KumiAccount Account { get; set; }
         public virtual IList<KumiPaymentCharge> PaymentCharges { get; set; }
 

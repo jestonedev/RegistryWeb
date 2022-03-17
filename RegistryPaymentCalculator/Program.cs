@@ -21,7 +21,7 @@ namespace RegistryPaymentCalculator
                 try
                 {
                     ConsoleLogger.Log("Выборка лицевых счетов");
-                    var accounts = db.KumiAccounts.Where(r => r.IdState == 1);
+                    var accounts = db.KumiAccounts.Where(r => r.IdState == 1 && r.IdAccount == 27);
                     ConsoleLogger.Log("Подготовка лицевых счетов");
                     var accountsPrepare = service.GetAccountsPrepareForPaymentCalculator(accounts);
                     accountsInfo = service.GetAccountInfoForPaymentCalculator(accountsPrepare);
@@ -64,7 +64,7 @@ namespace RegistryPaymentCalculator
                 }
 
                 var endDate = DateTime.Now.Date;
-                endDate = endDate.AddDays(-endDate.Day);
+                endDate = endDate.AddDays(-endDate.Day + 1).AddMonths(1).AddDays(-1);
 
                 foreach (var account in accountsInfo)
                 {
@@ -72,7 +72,7 @@ namespace RegistryPaymentCalculator
                     {
                         ConsoleLogger.Log(string.Format("Выставление начисления по ЛС {0}", account.Account));
                         var chargingInfo = service.CalcChargesInfo(account, startDate, endDate, forceDeleteOldCharges);
-                        service.UpdateChargesIntoDb(account, chargingInfo, forceDeleteOldCharges);
+                        service.UpdateChargesIntoDb(account, chargingInfo, forceDeleteOldCharges, true);
                     } catch(Exception e)
                     {
                         ConsoleLogger.Error(string.Format("Ошибка: {0}", e.Message));

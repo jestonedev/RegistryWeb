@@ -1,4 +1,5 @@
 ﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.Claims;
 using RegistryDb.Models.Entities.KumiAccounts;
 using System;
 using System.Collections.Generic;
@@ -16,5 +17,6 @@ namespace RegistryWeb.ViewModel
         public List<KumiTenancyInfoForPaymentCalculator> TenancyInfo { get; set; }
         public List<KumiCharge> Charges { get; set; }
         public List<KumiPayment> Payments { get; set; }
+        public List<Claim> Claims { get; set; }
     }
 }
