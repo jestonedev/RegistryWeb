@@ -416,4 +416,10 @@ $(function () {
     $('#ClaimStatesForm').on('click', '.claim-state-delete-btn', deleteClaimState);
     $('#ClaimStatesForm').on('click', '.rr-claim-state-details', showClaimStateDetails);
     $('#ClaimStatesForm').on('change', 'select[name^="IdStateType"]', changeClaimStateType);
+
+
+    $("a#osp-btn").on("click", function (e) {
+        $("#OspModal").find("input, textarea, select").prop("disabled", false);
+        $("#OspModal").modal('show');
+    });
 });

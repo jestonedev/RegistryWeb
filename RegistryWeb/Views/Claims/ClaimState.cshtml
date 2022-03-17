@@ -162,6 +162,10 @@
             <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.ObtainingCourtOrderDescription" maxlength="255" id="ObtainingCourtOrderDescription_@id" name="ObtainingCourtOrderDescription_@id" title="Примечание">
         </div>
+        @if (ViewBag.Action != "Create")
+        {
+            <a href="#" id="osp-btn" data-target="#OspModal">Заявление о возбуждении исполнительного производства</a>
+        }
     </div>
 
     <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">

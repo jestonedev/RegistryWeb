@@ -65,6 +65,14 @@
         e.preventDefault();
     });
 
+    $("body").on('click', ".rr-report-court-osp-statement", function (e) {
+        var idClaim = $("#Claim_IdClaim").val();
+        var createDate = $("#CreateDate").val();
+        url = "/ClaimReports/GetCourtOspStatement?idClaim=" + idClaim + "&createDate=" + createDate;
+        downloadFile(url);
+        e.preventDefault();
+    });
+
     $("#claimBksAndTransToLegalModal, #claimAddStateModal, #ClaimCommonReportModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
