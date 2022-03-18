@@ -1,4 +1,5 @@
 ﻿using RegistryDb.Models;
+using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryWeb.DataServices;
 using RegistryWeb.ViewModel;
 using System;
@@ -34,16 +35,15 @@ namespace RegistryPaymentCalculator
                         e.Message, Configuration.SmtpFrom, Configuration.SmtpErrorTo);
                     return;
                 }
-
-                var forceDeleteOldCharges = false;
-                var startDate = DateTime.Now.Date;
-                startDate = startDate.AddDays(-startDate.Day+1).AddMonths(-1);
+                
+                var startRewriteDate = DateTime.Now.Date;
+                startRewriteDate = startRewriteDate.AddDays(-startRewriteDate.Day+1).AddMonths(-1);
                 foreach(var arg in args)
                 {
                     if (string.IsNullOrWhiteSpace(arg)) continue;
                     
                     var argParts = arg.Split('=');
-                    if (argParts.Length == 2 && argParts[0].Trim() == "--start-date")
+                    if (argParts.Length == 2 && argParts[0].Trim() == "--start-rewrite-date")
                     {
                         var startDateStr = argParts[1];
                         var startDateParts = startDateStr.Split('.');
@@ -51,28 +51,32 @@ namespace RegistryPaymentCalculator
                         if (!int.TryParse(startDateParts[0], out int day)) continue;
                         if (!int.TryParse(startDateParts[1], out int month)) continue;
                         if (!int.TryParse(startDateParts[2], out int year)) continue;
-                        startDate = new DateTime(year, month, day);
-                        if (startDate.Day != 1)
+                        startRewriteDate = new DateTime(year, month, day);
+                        if (startRewriteDate.Day != 1)
                         {
-                            startDate = startDate.AddDays(-startDate.Day + 1);
+                            startRewriteDate = startRewriteDate.AddDays(-startRewriteDate.Day + 1);
                         }
-                    }
-                    if (argParts.Length == 1 && argParts[0].Trim() == "--delete-old-charges")
-                    {
-                        forceDeleteOldCharges = true;
                     }
                 }
 
-                var endDate = DateTime.Now.Date;
-                endDate = endDate.AddDays(-endDate.Day + 1).AddMonths(1).AddDays(-1);
+                var endCalcDate = DateTime.Now.Date;
+                endCalcDate = endCalcDate.AddDays(-endCalcDate.Day + 1).AddMonths(1).AddDays(-1);
 
                 foreach (var account in accountsInfo)
                 {
                     try
                     {
                         ConsoleLogger.Log(string.Format("Выставление начисления по ЛС {0}", account.Account));
-                        var chargingInfo = service.CalcChargesInfo(account, startDate, endDate, forceDeleteOldCharges);
-                        service.UpdateChargesIntoDb(account, chargingInfo, forceDeleteOldCharges, true);
+                        var startCalcDate = service.GetAccountStartCalcDate(account);
+                        if (startCalcDate == null) continue;
+                        var chargingInfo = service.CalcChargesInfo(account, startCalcDate.Value, endCalcDate);
+                        var recalcInsertIntoCharge = new KumiCharge();
+                        if (chargingInfo.Any()) recalcInsertIntoCharge = chargingInfo.Last();
+                        
+                        var dbChargingInfo = service.GetDbChargingInfo(account);
+                        startRewriteDate = service.CorrectStartRewriteDate(startRewriteDate, startCalcDate.Value, dbChargingInfo);
+                        service.CalcRecalcInfo(account, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, endCalcDate, startRewriteDate);
+                        service.UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate);
                     } catch(Exception e)
                     {
                         ConsoleLogger.Error(string.Format("Ошибка: {0}", e.Message));
