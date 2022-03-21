@@ -218,11 +218,16 @@ function saveClaimState(e) {
             processData: false,
             contentType: false,
             success: function (claimState) {
-                if (claimState.idState > 0) {
+                if (claimState.claimState.idState > 0) {
                     showEditDelPanelClaimState(claimStateElem);
-                    claimStateElem.find("input[name^='IdState']").val(claimState.idState);
+                    claimStateElem.find("input[name^='IdState']").val(claimState.claimState.idState);
                     claimStateElem.find("[id^='claimCourtOrderAdd']").addClass("disabled");
                     claimStateElem.find(".edit-del-court-order-panel a").addClass("disabled");
+
+                    if (claimState.claimState.idStateType==4)
+                        $("a#osp-btn").closest("div").removeClass("d-none");
+                    else $("a#osp-btn").closest("div").addClass("d-none");
+
                 } else {
                     alert("Произошла ошибка при изменении этапа исковой работы");
                 }
@@ -425,4 +430,9 @@ $(function (){
     $('#ClaimStatesForm').on('change', 'select[name^="IdStateType"]', changeClaimStateType);
 
     $("#ClaimStatesForm").on("click", "#osp-btn", openModalForOspStatement);
+
+    var elemForIdStateType4 = $("#ClaimStatesForm").find('[data-id-state-type="4"]');
+    if (elemForIdStateType4 != null && elemForIdStateType4.hasClass("d-none"))
+        $("a#osp-btn").closest("div").removeClass("d-none");
+    else $("a#osp-btn").closest("div").addClass("d-none");
 });
