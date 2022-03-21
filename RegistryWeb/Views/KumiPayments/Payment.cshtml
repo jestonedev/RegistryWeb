@@ -21,11 +21,13 @@
             {
                 title += " от " + Model.DateDocument.Value.ToString("dd.MM.yyyy");
             }
-        } else
-        if (string.IsNullOrEmpty(Model.NumDocument) && Model.DateDocument == null && !string.IsNullOrEmpty(Model.Guid))
+        }
+        else
+        if (string.IsNullOrEmpty(Model.NumDocument) && Model.DateDocument == null && !string.IsNullOrEmpty(Model.Uin))
         {
-            title += " УИН " + Model.Guid;
-        } else
+            title += " УИН " + Model.Uin;
+        }
+        else
         {
             title += " ID " + Model.IdPayment;
         }
@@ -45,6 +47,7 @@
 }
 @section Scripts {
     <script src="~/js/kumiPayments.common.js" asp-append-version="true"></script>
+    <script src="~/js/kumiPayments.memorialOrders.js" asp-append-version="true"></script>
 }
 <div class="card">
     <div class="card-header d-flex flex-column flex-lg-row">
@@ -55,12 +58,14 @@
             @if (Model.ChildPayments.Any())
             {
                 <a asp-action="Index" asp-route-filterOptions.IdParentPayment="@Model.IdPayment" title="Платеж был разбит при применении мемориального ордера. Для отображения связных платежей кликните по этой иконке">
-                    <span class="oi oi-link-intact text-primary" style="font-size: 80%; text-decoration: none"></span></a>
+                    <span class="oi oi-link-intact text-primary" style="font-size: 80%; text-decoration: none"></span>
+                </a>
             }
             @if (Model.IdParentPayment != null)
             {
                 <a asp-action="Details" asp-route-IdPayment="@Model.IdParentPayment" title="Платеж был создан при применении мемориального ордера. Для отображения родительского платежа кликните по этой иконке">
-                    <span class="oi oi-arrow-top text-primary" style="font-size: 80%; text-decoration: none"></span></a>
+                    <span class="oi oi-arrow-top text-primary" style="font-size: 80%; text-decoration: none"></span>
+                </a>
             }
         </label>
         <div class="col-sm-12 col-lg-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">
@@ -133,19 +138,80 @@
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.IdPayment">
                                 <a class="dropdown-item active rr-payment-revision" href="#" title="Текущая ревизия" aria-label="Текущая ревизия"
                                    data-sum="@Model.Sum" data-id-kbk-type="@Model.IdKbkType" data-kbk="@Model.Kbk" data-taget-code="@Model.TargetCode" data-okato="@Model.Okato"
-                                   data-payer-inn="@Model.PayerInn" data-payer-kpp="@Model.PayerKpp">Текущая ревизия</a>
+                                   data-recipient-inn="@Model.RecipientInn" data-recipient-kpp="@Model.RecipientKpp">Текущая ревизия</a>
                                 @foreach (var corrGroup in Model.PaymentCorrections.GroupBy(r => r.Date.Date))
                                 {
-                                    var sum = corrGroup.FirstOrDefault(r => r.FieldName == "Sum")?.FieldValue ?? Model.Sum.ToString();
-                                    var idKbkType = corrGroup.FirstOrDefault(r => r.FieldName == "IdKbkType")?.FieldValue ?? Model.IdKbkType?.ToString();
-                                    var kbk = corrGroup.FirstOrDefault(r => r.FieldName == "Kbk")?.FieldValue ?? Model.Kbk;
-                                    var targetCode = corrGroup.FirstOrDefault(r => r.FieldName == "TargetCode")?.FieldValue ?? Model.TargetCode;
-                                    var okato = corrGroup.FirstOrDefault(r => r.FieldName == "Okato")?.FieldValue ?? Model.Okato;
-                                    var payerInn = corrGroup.FirstOrDefault(r => r.FieldName == "PayerInn")?.FieldValue ?? Model.PayerInn;
-                                    var payerKpp = corrGroup.FirstOrDefault(r => r.FieldName == "PayerKpp")?.FieldValue ?? Model.PayerKpp;
+                                    var sum = "";
+                                    if (corrGroup.Where(r => r.FieldName == "Sum").Any())
+                                    {
+                                        sum = corrGroup.First(r => r.FieldName == "Sum").FieldValue;
+                                    } else
+                                    {
+                                        sum = Model.Sum.ToString();
+                                    }
+
+                                    var idKbkType = "";
+                                    if (corrGroup.Where(r => r.FieldName == "IdKbkType").Any())
+                                    {
+                                        idKbkType = corrGroup.First(r => r.FieldName == "IdKbkType").FieldValue;
+                                    }
+                                    else
+                                    {
+                                        idKbkType = Model.IdKbkType?.ToString();
+                                    }
+
+                                    var kbk = "";
+                                    if (corrGroup.Where(r => r.FieldName == "Kbk").Any())
+                                    {
+                                        kbk = corrGroup.First(r => r.FieldName == "Kbk").FieldValue;
+                                    }
+                                    else
+                                    {
+                                        kbk = Model.Kbk;
+                                    }
+
+                                    var targetCode = "";
+                                    if (corrGroup.Where(r => r.FieldName == "TargetCode").Any())
+                                    {
+                                        targetCode = corrGroup.First(r => r.FieldName == "TargetCode").FieldValue;
+                                    }
+                                    else
+                                    {
+                                        targetCode = Model.TargetCode;
+                                    }
+
+                                    var okato = "";
+                                    if (corrGroup.Where(r => r.FieldName == "Okato").Any())
+                                    {
+                                        okato = corrGroup.First(r => r.FieldName == "Okato").FieldValue;
+                                    }
+                                    else
+                                    {
+                                        okato = Model.Okato;
+                                    }
+
+                                    var recipientInn = "";
+                                    if (corrGroup.Where(r => r.FieldName == "RecipientInn").Any())
+                                    {
+                                        recipientInn = corrGroup.First(r => r.FieldName == "RecipientInn").FieldValue;
+                                    }
+                                    else
+                                    {
+                                        recipientInn = Model.RecipientInn;
+                                    }
+
+                                    var recipientKpp = "";
+                                    if (corrGroup.Where(r => r.FieldName == "RecipientKpp").Any())
+                                    {
+                                        recipientKpp = corrGroup.First(r => r.FieldName == "RecipientKpp").FieldValue;
+                                    }
+                                    else
+                                    {
+                                        recipientKpp = Model.RecipientKpp;
+                                    }
                                     <a class="dropdown-item rr-payment-revision" href="#" title="Текущая ревизия" aria-label="До @corrGroup.Key.ToString("dd.MM.yyyy")"
                                        data-sum="@sum" data-id-kbk-type="@idKbkType" data-kbk="@kbk" data-taget-code="@targetCode" data-okato="@okato"
-                                       data-payer-inn="@payerInn" data-payer-kpp="@payerKpp">До @corrGroup.Key.ToString("dd.MM.yyyy")</a>
+                                       data-recipient-inn="@recipientInn" data-recipient-kpp="@recipientKpp">До @corrGroup.Key.ToString("dd.MM.yyyy")</a>
                                 }
                             </div>
                         </div>
@@ -512,6 +578,14 @@
             <div class="row">
                 <div class="col-12">
                     <partial name="PaymentUfs" model="Model.PaymentUfs" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 mt-2">
+                    @{ 
+                        var memoryOrders = Model.MemorialOrderPaymentAssocs.Where(r => r.Order != null).Select(r => r.Order).ToList();
+                    }
+                    <partial name="MemoryOrders" model="@memoryOrders" />
                 </div>
             </div>
         }

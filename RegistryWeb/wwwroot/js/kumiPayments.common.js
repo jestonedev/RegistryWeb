@@ -36,13 +36,13 @@
     $('#RecipientToggler').on("click", $("#Recipient"), elementToogleHide);
     $('#PaymentToggler').on("click", $("#Payment"), elementToogleHide);
     $('#PaymentsUfsToggler').on("click", $("#PaymentsUfs"), elementToogleHide);
+    $('#MemoryOrdersToggler').on("click", $("#MemoryOrders"), elementToogleHide);
 
     $(".rr-payment-revision").on("click", function () {
         $(".rr-payment-revision").removeClass("active");
         var actualRevision = $(".rr-payment-revision").filter(function (idx, elem) {
             return $(elem).text() === "Текущая ревизия";
         });
-        console.log(actualRevision);
         $(this).addClass("active");
 
         var sum = $(this).data('sum');
@@ -92,22 +92,22 @@
             okatoElem.removeClass("text-danger");
         }
 
-        var payerInn = $(this).data('payerInn');
-        var payerInnElem = $("#PayerInn");
-        payerInnElem.val(payerInn);
-        if (actualRevision.data('payerInn') !== payerInn) {
-            payerInnElem.addClass("text-danger");
+        var recipientInn = $(this).data('recipientInn');
+        var recipientInnElem = $("#RecipientInn");
+        recipientInnElem.val(recipientInn);
+        if (actualRevision.data('recipientInn') !== recipientInn) {
+            recipientInnElem.addClass("text-danger");
         } else {
-            payerInnElem.removeClass("text-danger");
+            recipientInnElem.removeClass("text-danger");
         }
 
-        var payerKpp = $(this).data('payerKpp');
-        var payerKppElem = $("#PayerKpp");
-        payerKppElem.val(payerKpp);
-        if (actualRevision.data('payerKpp') !== payerKpp) {
-            payerKppElem.addClass("text-danger");
+        var recipientKpp = $(this).data('recipientKpp');
+        var recipientKppElem = $("#RecipientKpp");
+        recipientKppElem.val(recipientKpp);
+        if (actualRevision.data('recipientKpp') !== recipientKpp) {
+            recipientKppElem.addClass("text-danger");
         } else {
-            payerKppElem.removeClass("text-danger");
+            recipientKppElem.removeClass("text-danger");
         }
     });
 });

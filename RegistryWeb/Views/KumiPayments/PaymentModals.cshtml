@@ -85,3 +85,72 @@
         </div>
     </div>
 </form>
+
+<form id="MemorialOrderModalForm">
+    <div class="modal fade" id="MemorialOrderModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Поиск ордера</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input id="MemorialOrder_IdPayment" type="hidden" name="IdPayment" />
+                    @{ 
+                        var returnUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
+                        if (ViewBag.Action != null)
+                        {
+                            if (ViewBag.ReturnUrl != null)
+                            {
+                                returnUrl = ViewBag.ReturnUrl;
+                            } else
+                            {
+                                returnUrl = Url.Action("Index");
+                            }
+                        }
+                    }
+                    <input id="MemorialOrder_ReturnUrl" type="hidden" name="ReturnUrl" value="@returnUrl" />
+                    <div class="form-row">
+                        <div class="form-group col-12 col-md-4">
+                            <label class="rr-payment-label" for="MemorialOrder_NumDocument">№ документа/уведомления</label>
+                            <input type="text" class="form-control input-filter-numbers" maxlength="15" id="MemorialOrder_NumDocument" title="№ документа/уведомления">
+                        </div>
+                        <div class="form-group col-12 col-md-4">
+                            <label class="rr-payment-label" for="MemorialOrder_DateDocument">Дата документа/уведомления</label>
+                            <input type="date" class="form-control" id="MemorialOrder_DateDocument" title="Дата документа/уведомления">
+                        </div>
+                        <div class="form-group col-12 col-md-4">
+                            <label class="rr-account-filter-label" for="MemorialOrder_Sum">Сумма</label>
+                            <input type="text" class="form-control input-filter-decimal" id="MemorialOrder_Sum" title="Сумма">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12 col-md-4">
+                            <label class="rr-payment-label" for="MemorialOrder_Kbk">КБК</label>
+                            <input type="text" class="form-control input-filter-numbers" maxlength="20" id="MemorialOrder_Kbk" title="КБК">
+                        </div>
+                        <div class="form-group col-8 col-md-4">
+                            <label class="rr-payment-label" for="MemorialOrder_Okato">Код ОКТМО</label>
+                            <input type="text" class="form-control input-filter-numbers" maxlength="20" id="MemorialOrder_Okato" title="Код ОКТМО">
+                        </div>
+                        <div class="form-group d-flex align-items-end justify-content-end col-4 col-md-4">
+                            <button id="searchMemorialOrderModalBtn" type="button" class="btn btn-secondary">Найти</button>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div id="resultMemorialOrderModal" class="form-group col-12"></div>
+                    </div>
+                    <div class="form-row">
+                        <div id="errorMemorialOrderModal" class="form-group col-12 text-center"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="clearMemorialOrderModalBtn" type="button" class="btn btn-secondary">Очистить</button>
+                        <button id="setMemorialOrderModalBtn" type="button" class="btn btn-success" disabled>Привязать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

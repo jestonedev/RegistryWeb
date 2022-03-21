@@ -217,6 +217,78 @@ namespace RegistryWeb.Controllers
             return File(file, "application/octet-stream", string.Format("{0}-{1} (уведомления).uf", paymentSettings.CodeUbp, paymentUfs.Count));
         }
 
+        public IActionResult GetMemorialOrders(MemorialOrderFilter filterOptions)
+        {
+            var mo = dataService.GetMemorialOrders(filterOptions);
+            var count = mo.Count();
+            var moLimit = mo.Take(5).ToList();
+            return Json(new
+            {
+                Count = count,
+                MemorialOrders = moLimit.Select(r => new {
+                    r.IdOrder,
+                    r.NumDocument,
+                    r.DateDocument,
+                    r.SumZach,
+                    r.Kbk,
+                    r.Okato
+                })
+            });
+        }
+
+        [HttpPost]
+        public IActionResult CreateByMemorialOrder(int idOrder, string returnUrl)
+        {
+            var canEdit = securityService.HasPrivilege(Privileges.AccountsReadWrite);
+            if (!canEdit)
+                return View("NotAccess");
+            try
+            {
+                var payment = dataService.CreateByMemorialOrder(idOrder);
+                return Json(new
+                {
+                    State = "Success",
+                    RedirectUrl = Url.Action("Details", new { payment.IdPayment, returnUrl })
+                });
+            } catch (Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.Message
+                });
+            }
+
+        }
+
+        public IActionResult ApplyMemorialOrder(int idPayment, int idOrder, string returnUrl)
+        {
+            try
+            {
+                dataService.ApplyMemorialOrderToPayment(idPayment, idOrder, out bool updatedExistsPayment);
+                if (updatedExistsPayment)
+                {
+                    return Json(new
+                    {
+                        State = "Success",
+                        RedirectUrl = Url.Action("Details", new { IdPayment = idPayment, returnUrl })
+                    });
+                } else
+                    return Json(new
+                    {
+                        State = "Success",
+                        RedirectUrl = "/KumiPayments/Index?FilterOptions.IdParentPayment=" + idPayment
+                    });
+            } catch(Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.Message
+                });
+            }
+        }
+
         public IActionResult UploadPayments(List<IFormFile> files)
         {
             var tffStrings = new List<TffString>();

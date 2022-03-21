@@ -88,9 +88,9 @@ namespace RegistryPaymentsLoader.TffFileLoaders
         {
             // TODO Платежное поручение?
             return string.Format("UFPP|1|{0}|{1}|Платежное поручение|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}||||",
-               paymentUf.Payment.Guid, paymentUf.Payment.PaymentDocCode.Code, paymentUf.Payment.NumDocument, paymentUf.Payment.DateDocument?.ToString("dd.MM.yyyy"),
+               paymentUf.Payment.Guid, paymentUf.Payment.PaymentDocCode?.Code, paymentUf.Payment.NumDocument, paymentUf.Payment.DateDocument?.ToString("dd.MM.yyyy"),
                paymentUf.Payment.RecipientName?.Replace("|", " "), paymentUf.Payment.RecipientInn, paymentUf.Payment.RecipientKpp, paymentUf.Payment.Okato,
-               paymentUf.Payment.Kbk, paymentUf.Payment.KbkType.Code, paymentUf.Payment.TargetCode, paymentUf.Payment.Sum.ToString().Replace(",", "."), 
+               paymentUf.Payment.Kbk, paymentUf.Payment.KbkType?.Code, paymentUf.Payment.TargetCode, paymentUf.Payment.Sum.ToString().Replace(",", "."), 
                paymentUf.Payment.Purpose?.Replace("|", " "));
         }
 

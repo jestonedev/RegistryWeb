@@ -250,6 +250,140 @@ namespace RegistryWeb.DataServices
             }
             return query;
         }
+        public KumiPayment CreateByMemorialOrder(int idOrder)
+        {
+            var mo = registryContext.KumiMemorialOrders.Include(r => r.MemorialOrderPaymentAssocs)
+                .FirstOrDefault(r => r.IdOrder == idOrder);
+
+            if (mo == null) throw new ApplicationException("Не удалось найти мемориальный ордер");
+
+            if (mo.MemorialOrderPaymentAssocs != null && mo.MemorialOrderPaymentAssocs.Any())
+                throw new ApplicationException("Мемориальный оредр уже привязан к платежу");
+
+            if (mo.SumZach < 0)
+                throw new ApplicationException("Нельзя создать платеж на основе ордера с отрицательной суммой");
+
+            var payment = new KumiPayment {
+                IdSource = 1,
+                Sum = mo.SumZach,
+                Kbk = mo.Kbk,
+                IdKbkType = mo.IdKbkType,
+                Guid = mo.Guid,
+                Okato = mo.Okato,
+                RecipientInn = mo.InnAdb,
+                RecipientKpp = mo.KppAdb,
+                TargetCode = mo.TargetCode,
+                MemorialOrderPaymentAssocs = new List<KumiMemorialOrderPaymentAssoc> {
+                    new KumiMemorialOrderPaymentAssoc
+                    {
+                        IdOrder = idOrder
+                    }
+                }
+            };
+            registryContext.KumiPayments.Add(payment);
+            registryContext.SaveChanges();
+            return payment;
+
+        }
+
+        public void ApplyMemorialOrderToPayment(int idPayment, int idOrder, out bool updatedExistsPayment)
+        {
+            updatedExistsPayment = true;
+            // Если ордер уже подвязан, то пропускаем
+            var mo = registryContext.KumiMemorialOrders.Include(r => r.MemorialOrderPaymentAssocs)
+                .FirstOrDefault(r => r.IdOrder == idOrder);
+
+            if (mo == null) throw new ApplicationException("Не удалось найти мемориальный ордер");
+
+            if (mo.MemorialOrderPaymentAssocs != null && mo.MemorialOrderPaymentAssocs.Any())
+                throw new ApplicationException("Мемориальный оредр уже привязан к платежу");
+
+            var payment = GetQuery().FirstOrDefault(r => r.IdPayment == idPayment);
+
+            if (payment == null) throw new ApplicationException("Не удалось найти платеж");
+
+            if ((payment.PaymentCharges != null && payment.PaymentCharges.Any()) || (payment.PaymentClaims != null && payment.PaymentClaims.Any()))
+                throw new ApplicationException("Платеж распределен. Для привязки мемориального ордера необходимо отменить распределение платежа");
+
+            if (payment.Guid == null)
+            {
+                payment.Guid = mo.Guid;
+            }
+
+            if (payment.Guid != mo.Guid)
+                throw new ApplicationException(
+                    string.Format("Глобальный идентификатор платежа {0} не соответсвуют глобальному идентификатору платежного документа в мемориальном ордере {1}", 
+                    payment.Guid, mo.Guid));
+
+            var idParentPayment = payment.IdPayment;
+
+            var copyPayment = false;
+
+            ClearMemorialOrderFieldsValues(mo);
+
+           if (mo.SumZach >= 0 &&
+                (payment.Kbk != mo.Kbk || payment.IdKbkType != mo.IdKbkType || payment.TargetCode != mo.TargetCode ||
+                    payment.Okato != mo.Okato || payment.RecipientInn != mo.InnAdb || payment.RecipientKpp != mo.KppAdb))
+            {
+                copyPayment = true;
+            }
+           
+
+            if (copyPayment)
+                payment = payment.Copy(true);
+
+            payment = ApplyMemorialOrder(payment, mo);
+
+            if (payment.IdPayment != 0)
+            {
+                var corrections = payment.PaymentCorrections;
+                payment.PaymentCorrections = null;
+                registryContext.KumiPayments.Update(payment);
+                foreach (var correction in corrections.Where(r => r.IdCorrection == 0))
+                {
+                    correction.IdPayment = payment.IdPayment;
+                    registryContext.KumiPaymentCorrections.Add(correction);
+                }
+                updatedExistsPayment = true;
+            }
+            else
+            {
+                payment.IdParentPayment = idParentPayment;
+                registryContext.KumiPayments.Add(payment);
+                updatedExistsPayment = false;
+            }
+            registryContext.SaveChanges();
+        }
+
+        private void ClearMemorialOrderFieldsValues(KumiMemorialOrder mo)
+        {
+            if (string.IsNullOrEmpty(mo.InnAdb))
+                mo.InnAdb = null;
+            if (string.IsNullOrEmpty(mo.KppAdb))
+                mo.KppAdb = null;
+            if (string.IsNullOrEmpty(mo.TargetCode))
+                mo.TargetCode = null;
+            if (string.IsNullOrEmpty(mo.Kbk))
+                mo.Kbk = null;
+            if (string.IsNullOrEmpty(mo.NumDocument))
+                mo.NumDocument = null;
+        }
+
+        public IQueryable<KumiMemorialOrder> GetMemorialOrders(MemorialOrderFilter filterOptions)
+        {
+            var query = registryContext.KumiMemorialOrders.Include(mo => mo.MemorialOrderPaymentAssocs).Where(mo => mo.MemorialOrderPaymentAssocs.Count == 0);
+            if (!string.IsNullOrEmpty(filterOptions.NumDocument))
+                query = query.Where(r => r.NumDocument == filterOptions.NumDocument);
+            if (filterOptions.DateDocument != null)
+                query = query.Where(r => r.DateDocument == filterOptions.DateDocument);
+            if (filterOptions.Sum != null)
+                query = query.Where(r => r.SumZach == filterOptions.Sum);
+            if (!string.IsNullOrEmpty(filterOptions.Kbk))
+                query = query.Where(r => r.Kbk != null && r.Kbk.Contains(filterOptions.Kbk));
+            if (!string.IsNullOrEmpty(filterOptions.Okato))
+                query = query.Where(r => r.Okato != null && r.Okato.Contains(filterOptions.Okato));
+            return query;
+        }
 
         private IQueryable<KumiPayment> CommonPaymentFilter(IQueryable<KumiPayment> query, KumiPaymentsFilter filterOptions)
         {
@@ -361,6 +495,7 @@ namespace RegistryWeb.DataServices
                 // Если ордер уже подвязан, то пропускаем
                 if (mo.MemorialOrderPaymentAssocs != null && mo.MemorialOrderPaymentAssocs.Any()) continue;
 
+                ClearMemorialOrderFieldsValues(mo);
                 // Если сумма ордера отрицательная, то производим списание с платежа, соответствующего всем критериям
                 // Если сумма положительная, то создаем новый платеж на основании имеющегося и обновляем целевые строки
                 var dbPayments = registryContext.KumiPayments
@@ -374,7 +509,7 @@ namespace RegistryWeb.DataServices
                         r.PaymentUfs.Count(ru => ru.NumUf == mo.NumDocument && ru.DateUf == mo.DateDocument) > 0);
 
                 var dbConcretPayments = dbPayments.Where(r => r.Kbk == mo.Kbk && r.IdKbkType == mo.IdKbkType && r.TargetCode == mo.TargetCode &&
-                       r.Okato == mo.Okato && r.PayerInn == mo.InnAdb && r.PayerKpp == mo.KppAdb);
+                       r.Okato == mo.Okato && r.RecipientInn == mo.InnAdb && r.RecipientKpp == mo.KppAdb);
 
                 var copyPayment = true;
 
@@ -392,6 +527,8 @@ namespace RegistryWeb.DataServices
                 // Если платеж уже распределен, то пропускаем
                 if ((dbPayment.PaymentCharges != null && dbPayment.PaymentCharges.Any()) || (dbPayment.PaymentClaims != null && dbPayment.PaymentClaims.Any()))
                     continue;
+
+                var idParentPayment = dbPayment.IdPayment;
 
                 if (copyPayment)
                     dbPayment = dbPayment.Copy(true);
@@ -415,6 +552,7 @@ namespace RegistryWeb.DataServices
                     }
                     else
                     {
+                        dbPayment.IdParentPayment = idParentPayment;
                         registryContext.KumiPayments.Add(dbPayment);
                     }
                 }
@@ -551,7 +689,7 @@ namespace RegistryWeb.DataServices
             if (memorialOrder.SumZach < 0)
             {
                 if (payment.Kbk != memorialOrder.Kbk || payment.IdKbkType != memorialOrder.IdKbkType || payment.TargetCode != memorialOrder.TargetCode ||
-                    payment.Okato != memorialOrder.Okato || payment.PayerInn != memorialOrder.InnAdb || payment.PayerKpp != memorialOrder.KppAdb)
+                    payment.Okato != memorialOrder.Okato || payment.RecipientInn != memorialOrder.InnAdb || payment.RecipientKpp != memorialOrder.KppAdb)
                     throw new KumiPaymentCheckVtOperException(string.Format("Несоответствие данных мемориального ордера на списание по платежу {0}", payment.Guid));
                 payment.Sum = payment.Sum + memorialOrder.SumZach;
             }
@@ -565,8 +703,8 @@ namespace RegistryWeb.DataServices
             payment.Kbk = memorialOrder.Kbk;
             payment.TargetCode = memorialOrder.TargetCode;
             payment.Okato = memorialOrder.Okato;
-            payment.PayerInn = memorialOrder.InnAdb;
-            payment.PayerKpp = memorialOrder.KppAdb;
+            payment.RecipientInn = memorialOrder.InnAdb;
+            payment.RecipientKpp = memorialOrder.KppAdb;
 
             // Связываем мемориальные ордера с платежом
             if (payment.MemorialOrderPaymentAssocs == null)
@@ -628,21 +766,21 @@ namespace RegistryWeb.DataServices
                     Date = date
                 });
             }
-            if (payment.PayerInn != memorialOrder.InnAdb)
+            if (payment.RecipientInn != memorialOrder.InnAdb)
             {
                 payment.PaymentCorrections.Add(new KumiPaymentCorrection
                 {
-                    FieldName = "PayerInn",
-                    FieldValue = payment.PayerInn,
+                    FieldName = "RecipientInn",
+                    FieldValue = payment.RecipientInn,
                     Date = date
                 });
             }
-            if (payment.PayerKpp != memorialOrder.KppAdb)
+            if (payment.RecipientKpp != memorialOrder.KppAdb)
             {
                 payment.PaymentCorrections.Add(new KumiPaymentCorrection
                 {
-                    FieldName = "PayerKpp",
-                    FieldValue = payment.PayerKpp,
+                    FieldName = "RecipientKpp",
+                    FieldValue = payment.RecipientKpp,
                     Date = date
                 });
             }
@@ -765,6 +903,11 @@ namespace RegistryWeb.DataServices
                 .Include(r => r.PaymentCorrections)
                 .Include(r => r.MemorialOrderPaymentAssocs).AsNoTracking()
                 .SingleOrDefault(a => a.IdPayment == idPayment);
+            foreach(var assoc in payment.MemorialOrderPaymentAssocs)
+            {
+                assoc.Order = registryContext.KumiMemorialOrders.FirstOrDefault(r => r.IdOrder == assoc.IdOrder);
+                assoc.IdOrder = assoc.Order?.IdOrder ?? 0;
+            }
             return payment;
         }
 
@@ -793,8 +936,13 @@ namespace RegistryWeb.DataServices
         public void Delete(int idPayment)
         {
             var payments = registryContext.KumiPayments
+                .Include(r => r.MemorialOrderPaymentAssocs)
                 .FirstOrDefault(pc => pc.IdPayment == idPayment);
             payments.Deleted = 1;
+            foreach(var mo in payments.MemorialOrderPaymentAssocs)
+            {
+                registryContext.KumiMemorialOrderPaymentAssocs.Remove(mo);
+            }
             registryContext.SaveChanges();
         }
 
