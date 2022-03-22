@@ -70,6 +70,7 @@
         var createDate = $("#CreateDate").val();
         url = "/ClaimReports/GetCourtOspStatement?idClaim=" + idClaim + "&createDate=" + createDate;
         downloadFile(url);
+        $("#OspModal").modal('hide');
         e.preventDefault();
     });
 
