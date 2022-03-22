@@ -218,11 +218,16 @@ function saveClaimState(e) {
             processData: false,
             contentType: false,
             success: function (claimState) {
-                if (claimState.idState > 0) {
+                if (claimState.claimState.idState > 0) {
                     showEditDelPanelClaimState(claimStateElem);
-                    claimStateElem.find("input[name^='IdState']").val(claimState.idState);
+                    claimStateElem.find("input[name^='IdState']").val(claimState.claimState.idState);
                     claimStateElem.find("[id^='claimCourtOrderAdd']").addClass("disabled");
                     claimStateElem.find(".edit-del-court-order-panel a").addClass("disabled");
+
+                    if (claimState.claimState.idStateType==4)
+                        $("a#osp-btn").closest("div").removeClass("d-none");
+                    else $("a#osp-btn").closest("div").addClass("d-none");
+
                 } else {
                     alert("Произошла ошибка при изменении этапа исковой работы");
                 }
@@ -408,7 +413,14 @@ function changeClaimStateType(e) {
     });
 }
 
-$(function () {
+function openModalForOspStatement(e)
+{
+    $("#OspModal").find("input, textarea, select").prop("disabled", false);
+    $("#OspModal").modal('show');
+    e.preventDefault();
+}
+
+$(function (){
     $("#ClaimStatesForm").on("click", "#claimStateAdd", addClaimState);
     $('#ClaimStatesForm').on('click', '.claim-state-edit-btn', editClaimState);
     $('#ClaimStatesForm').on('click', '.claim-state-cancel-btn', cancelEditClaimState);
@@ -416,4 +428,11 @@ $(function () {
     $('#ClaimStatesForm').on('click', '.claim-state-delete-btn', deleteClaimState);
     $('#ClaimStatesForm').on('click', '.rr-claim-state-details', showClaimStateDetails);
     $('#ClaimStatesForm').on('change', 'select[name^="IdStateType"]', changeClaimStateType);
+
+    $("#ClaimStatesForm").on("click", "#osp-btn", openModalForOspStatement);
+
+    var elemForIdStateType4 = $("#ClaimStatesForm").find('[data-id-state-type="4"]');
+    if (elemForIdStateType4 != null && elemForIdStateType4.hasClass("d-none"))
+        $("a#osp-btn").closest("div").removeClass("d-none");
+    else $("a#osp-btn").closest("div").addClass("d-none");
 });

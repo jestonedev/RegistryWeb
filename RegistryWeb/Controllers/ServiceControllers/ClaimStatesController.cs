@@ -160,7 +160,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
 
                 registryContext.SaveChanges();
 
-                return Json(new { claimState.IdState });
+                return Json(new { claimState });
             }
             //Обновить    
             //Проверяем целостность графа переходов при обновлении
@@ -195,7 +195,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 UpdateCourtOrders(courtOrders, claimState.IdClaim);
 
             registryContext.SaveChanges();
-            return Json(new { claimState.IdState });
+            return Json(new { claimState });
         }
 
         private void UpdateCourtOrders(List<ClaimCourtOrder> newCourtOrders, int idClaim)
