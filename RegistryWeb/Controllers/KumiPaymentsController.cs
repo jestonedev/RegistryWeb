@@ -15,16 +15,28 @@ using System.Linq;
 using RegistryWeb.Extensions;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.Enums;
+using RegistryDb.Models.Entities.Claims;
+using RegistryServices.Enums;
 
 namespace RegistryWeb.Controllers
 {
     public class KumiPaymentsController : ListController<KumiPaymentsDataService, KumiPaymentsFilter>
     {
+        private readonly KumiAccountsDataService kumiAccountsDataService;
+        private readonly ClaimsDataService claimsDataService;
+        private readonly TenancyProcessesDataService tenancyProcessesDataService;
         private readonly ZipArchiveDataService zipArchiveDataService;
 
-        public KumiPaymentsController(KumiPaymentsDataService dataService, SecurityService securityService, ZipArchiveDataService zipArchiveDataService)
+        public KumiPaymentsController(KumiPaymentsDataService dataService, 
+            KumiAccountsDataService kumiAccountsDataService,
+            ClaimsDataService claimsDataService,
+            TenancyProcessesDataService tenancyProcessesDataService, 
+            SecurityService securityService, ZipArchiveDataService zipArchiveDataService)
             : base(dataService, securityService)
         {
+            this.kumiAccountsDataService = kumiAccountsDataService;
+            this.claimsDataService = claimsDataService;
+            this.tenancyProcessesDataService = tenancyProcessesDataService;
             this.zipArchiveDataService = zipArchiveDataService;
         }
 
@@ -47,7 +59,11 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("FilterOptions");
             }
             ViewBag.SecurityService = securityService;
-            ViewBag.PaymentUfSigners = dataService.PaymentUfSigners.Select(r => new { r.IdRecord, Snp = (r.Surname + " " + r.Name + " " + r.Patronymic).Trim() }); ;
+            ViewBag.PaymentUfSigners = dataService.PaymentUfSigners.Select(r => new { r.IdRecord, Snp = (r.Surname + " " + r.Name + " " + r.Patronymic).Trim() });
+            ViewBag.Regions = dataService.Regions;
+            ViewBag.Streets = dataService.Streets;
+            ViewBag.AccountStates = dataService.AccountStates;
+            ViewBag.ClaimStateTypes = dataService.ClaimStateTypes;
 
             var vm = dataService.GetViewModel(
                 viewModel.OrderOptions,
@@ -76,15 +92,19 @@ namespace RegistryWeb.Controllers
             ViewBag.Action = action;
             ViewBag.SecurityService = securityService;
             ViewBag.PaymentGroups = dataService.PaymentGroups;
-            ViewBag.PaymentInfoSources = dataService.PaymentInfoSources;
-            ViewBag.PaymentDocCodes = dataService.PaymentDocCodes;
-            ViewBag.PaymentKinds = dataService.PaymentKinds;
-            ViewBag.OperationTypes = dataService.OperationTypes;
-            ViewBag.KbkTypes = dataService.KbkTypes;
-            ViewBag.PaymentReasons = dataService.PaymentReasons;
-            ViewBag.PayerStatuses = dataService.PayerStatuses;
+            ViewBag.PaymentInfoSources = dataService.PaymentInfoSources.Select(r => new { r.IdSource, Name = "("+r.Code+") " + r.Name });
+            ViewBag.PaymentDocCodes = dataService.PaymentDocCodes.Select(r => new { r.IdPaymentDocCode, Name = "(" + r.Code + ") " + r.Name });
+            ViewBag.PaymentKinds = dataService.PaymentKinds.Select(r => new { r.IdPaymentKind, Name = "(" + r.Code + ") " + r.Name });
+            ViewBag.OperationTypes = dataService.OperationTypes.Select(r => new { r.IdOperationType, Name = "(" + r.Code + ") " + r.Name });
+            ViewBag.KbkTypes = dataService.KbkTypes.Select(r => new { r.IdKbkType, Name = "(" + r.Code + ") " + r.Name });
+            ViewBag.PaymentReasons = dataService.PaymentReasons.Select(r => new { r.IdPaymentReason, Name = "(" + r.Code + ") " + r.Name });
+            ViewBag.PayerStatuses = dataService.PayerStatuses.Select(r => new { r.IdPayerStatus, Name = "(" + r.Code + ") " + r.Name });
             ViewBag.PaymentUfSigners = dataService.PaymentUfSigners.Select(r => new { r.IdRecord, Snp = (r.Surname + " " + r.Name + " " + r.Patronymic).Trim() });
-            
+            ViewBag.Regions = dataService.Regions;
+            ViewBag.Streets = dataService.Streets;
+            ViewBag.AccountStates = dataService.AccountStates;
+            ViewBag.ClaimStateTypes = dataService.ClaimStateTypes;
+
             return View("Payment", payment);
         }
 
@@ -236,6 +256,104 @@ namespace RegistryWeb.Controllers
             });
         }
 
+        public IActionResult GetDistributePaymentToObjects(DistributePaymentToObjectFilter filterOptions)
+        {
+            IQueryable<KumiAccount> accountsResult = null;
+            IQueryable<Claim> claimsResult = null;
+            if (!filterOptions.IsTenancyEmpty())
+            {
+                var tenancies = tenancyProcessesDataService.GetTenancyProcesses(filterOptions);
+                accountsResult = tenancies.Where(r => r.IdAccount != null).Select(r => r.IdAccountNavigation);
+            }
+
+            if(!filterOptions.IsAccountEmpty())
+            {
+                var accounts = kumiAccountsDataService.GetKumiAccounts(new KumiAccountsFilter
+                {
+                    Account = filterOptions.Account,
+                    AccountGisZkh = filterOptions.AccountGisZkh,
+                    IdAccountState = filterOptions.IdAccountState
+                });
+                if (accountsResult == null)
+                    accountsResult = accounts;
+                else
+                {
+                    var ids = accounts.Select(r => r.IdAccount).ToList();
+                    accountsResult = accountsResult.Where(r => ids.Contains(r.IdAccount));
+                }
+            }
+
+            if (!filterOptions.IsClaimEmpty())
+            {
+                claimsResult = claimsDataService.GetClaimsForPaymentDistribute(new ClaimsFilter {
+                    AtDate = filterOptions.ClaimAtDate,
+                    CourtOrderNum = filterOptions.ClaimCourtOrderNum,
+                    IdClaimState = filterOptions.ClaimIdStateType,
+                    IsCurrentState = true
+                });
+            }
+
+
+            if (filterOptions.DistributeTo == KumiPaymentDistributeToEnum.ToClaim)
+            {
+                if (accountsResult != null)
+                {
+                    var claims = claimsDataService.GetClaimsByAccountIdsForPaymentDistribute(accountsResult.Select(r => r.IdAccount).ToList());
+                    if (claimsResult == null)
+                        claimsResult = claims;
+                    else
+                    {
+                        var ids = claims.Select(r => r.IdClaim).ToList();
+                        claimsResult = claimsResult.Where(r => ids.Contains(r.IdClaim));
+                    }
+                }
+
+                if (claimsResult == null)
+                    claimsResult = new List<Claim>().AsQueryable();
+                var count = claimsResult.Count();
+                if (count > 3)
+                    claimsResult = claimsResult.Take(3);
+                return Json(new
+                {
+                    Count = count,
+                    Claims = claimsResult.Select(r => new {
+                        r.IdClaim,
+                        r.IdAccountKumiNavigation.Account,
+                        IdAccount = r.IdAccountKumi,
+                        AccountState = r.IdAccountKumiNavigation.State.State,
+                        IdAccountState = r.IdAccountKumiNavigation.IdState,
+                        AmountTenancy = r.AmountTenancy + r.AmountDgi + r.AmountPadun + r.AmountPkk,
+                        r.AmountPenalties,
+                        r.AmountTenancyRecovered,
+                        r.AmountPenaltiesRecovered,
+                        r.StartDeptPeriod,
+                        r.EndDeptPeriod
+                    })
+                });
+            }
+            else
+            {
+                if (accountsResult == null)
+                    accountsResult = new List<KumiAccount>().AsQueryable();
+                var count = accountsResult.Count();
+                if (count > 3)
+                    accountsResult = accountsResult.Take(3);
+                return Json(new
+                {
+                    Count = count,
+                    Accounts = accountsResult.Select(r => new {
+                        r.IdAccount,
+                        r.Account,
+                        r.State.State,
+                        r.State.IdState,
+                        r.LastChargeDate,
+                        r.CurrentBalanceTenancy,
+                        r.CurrentBalancePenalty
+                    })
+                });
+            }
+        }
+
         [HttpPost]
         public IActionResult CreateByMemorialOrder(int idOrder, string returnUrl)
         {
@@ -280,6 +398,30 @@ namespace RegistryWeb.Controllers
                         RedirectUrl = "/KumiPayments/Index?FilterOptions.IdParentPayment=" + idPayment
                     });
             } catch(Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.Message
+                });
+            }
+        }
+
+        public IActionResult DistributePaymentToAccount(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo,
+            decimal tenancySum, decimal penaltySum)
+        {
+            try
+            {
+                var paymentDistributionInfo = dataService.DistributePaymentToAccount(idPayment, idObject, distributeTo, tenancySum, penaltySum);
+                return Json(new
+                {
+                    State = "Success",
+                    paymentDistributionInfo.Sum,
+                    paymentDistributionInfo.DistrubutedToTenancySum,
+                    paymentDistributionInfo.DistrubutedToPenaltySum
+                });
+            }
+            catch (Exception e)
             {
                 return Json(new
                 {

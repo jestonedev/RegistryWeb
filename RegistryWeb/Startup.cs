@@ -106,6 +106,7 @@ namespace RegistryWeb
             services.AddTransient<PrivRealtorService>();
             services.AddTransient<KumiAccountsDataService>();
             services.AddTransient<KumiPaymentsDataService>();
+            services.AddTransient<KumiPaymentsReportService>();
             services.AddTransient<ZipArchiveDataService>();
             services.AddTransient<IDbConnectionSettings, DbConnectionSettings>();
             services.AddHttpContextAccessor();

@@ -10,6 +10,7 @@ namespace RegistryWeb.ViewModel
     public class KumiAccountInfoForPaymentCalculator
     {
         public int IdAccount { get; set; }
+        public int IdState { get; set; }
         public string Account { get; set; }
         public DateTime? LastChargeDate { get; set; }
         public decimal CurrentBalanceTenancy { get; set; }

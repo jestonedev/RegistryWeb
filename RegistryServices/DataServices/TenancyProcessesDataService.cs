@@ -239,7 +239,7 @@ namespace RegistryWeb.DataServices
         {
             var tenancyProcesses = GetQuery();
             var query = GetQueryFilter(tenancyProcesses, filterOptions);
-            query = query.Include(r => r.IdAccountNavigation);
+            query = query.Include(r => r.IdAccountNavigation).ThenInclude(r => r.State);
             return query;
         }
 

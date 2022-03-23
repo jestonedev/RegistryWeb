@@ -2,8 +2,8 @@
     $("#clearMemorialOrderModalBtn").on('click', memorialOrderModalClear);
 
     function memorialOrderModalClear(e) {
-        $('#resultMemorialOrderModal').html('');
-        $('#errorMemorialOrderModal').html('');
+        $('#resultMemorialOrderModal').html('').closest('.form-row').addClass("d-none");
+        $('#errorMemorialOrderModal').html('').closest('.form-row').addClass("d-none");
         var idPayment = $("#MemorialOrder_IdPayment").val();
         var returnUrl = $("#MemorialOrder_ReturnUrl").val();
         resetModalForm($("#MemorialOrderModalForm"));
@@ -19,8 +19,8 @@
             $(elem).val($(elem).val().replace(".", ","));
         });
         var div = $('#resultMemorialOrderModal');
-        div.html("");
-        $('#errorMemorialOrderModal').html('');
+        div.html("").closest('.form-row').addClass("d-none");
+        $('#errorMemorialOrderModal').html('').closest('.form-row').addClass("d-none");
         $('#setMemorialOrderModalBtn').attr('disabled', true);
         $('#searchMemorialOrderModalBtn').text('Ищем...').attr('disabled', true);
         $.ajax({
@@ -69,7 +69,7 @@
                     table += "<tr><td colspan='4' class='text-center'><i class='text-danger'>Ордеры не найдены</i></td></tr>";
                 }
                 table += "</tbody></table>";
-                div.html(table);
+                div.html(table).closest('.form-row').removeClass("d-none");
                 $('#searchMemorialOrderModalBtn').text('Найти').attr('disabled', false);
             }
         });
@@ -109,6 +109,7 @@
             success: function (result) {
                 if (result.state === "Error") {
                     var errorElem = $("#errorMemorialOrderModal");
+                    errorElem.closest('.form-row').removeClass("d-none");
                     errorElem.html("<span class='text-danger'>" + result.error + "</span>");
                 } else {
                     if (action !== undefined)

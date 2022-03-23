@@ -39,3 +39,41 @@
         width: 300px;
     }
 }
+
+.rr-payment-list-eye-btn {
+    margin-top: -5px;
+    font-size: 80%;
+}
+
+.rr-payment-list-eye-btn:focus {
+    box-shadow: none;
+}
+
+#resultDistributePaymentToAccountModal td {
+    padding: 5px;
+}
+
+#resultDistributePaymentToAccountModal {
+    font-size: 50%;
+}
+
+#DistributePaymentToAccountModalForm .rr-payment-distribute-title {
+    margin-top: 33px;
+}
+
+@media(min-width: 768px) {
+    #resultDistributePaymentToAccountModal {
+        font-size: 70%;
+    }
+
+    #DistributePaymentToAccountModalForm .rr-payment-distribute-title {
+        margin-top: 38px;
+    }
+}
+
+@media(min-width: 992px) {
+
+    #resultDistributePaymentToAccountModal {
+        font-size: 100%;
+    }
+}

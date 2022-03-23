@@ -14,7 +14,8 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public int IdPayment { get; set; }
         public int IdClaim { get; set; }
         public DateTime Date { get; set; }
-        public decimal Value { get; set; }
+        public decimal TenancyValue { get; set; }
+        public decimal PenaltyValue { get; set; }
         public virtual KumiPayment Payment { get; set; }
         public virtual Claim Claim { get; set; }
     }

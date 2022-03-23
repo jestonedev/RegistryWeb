@@ -74,13 +74,26 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
+        public IQueryable<Claim> GetClaimsForPaymentDistribute(ClaimsFilter filterOptions)
+        {
+            var claims = GetQuery();
+            var query = GetQueryFilter(claims, filterOptions).Where(r => r.IdAccountKumi != null);
+            return query;
+        }
+
+        public IQueryable<Claim> GetClaimsByAccountIdsForPaymentDistribute(List<int> accountIds)
+        {
+            var claims = GetQuery();
+            return claims.Where(r => r.IdAccountKumi != null && accountIds.Contains(r.IdAccountKumi.Value));
+        }
+
         private IQueryable<Claim> GetQuery()
         {
             return registryContext.Claims
                 .Include(c => c.ClaimStates)
                 .Include(c => c.IdAccountNavigation)
                 .Include(c => c.IdAccountAdditionalNavigation)
-                .Include(c => c.IdAccountKumiNavigation);
+                .Include(c => c.IdAccountKumiNavigation).ThenInclude(r => r.State);
         }
 
         private IQueryable<Claim> GetQueryIncludes(IQueryable<Claim> query)

@@ -22,7 +22,7 @@ namespace RegistryPaymentCalculator
                 try
                 {
                     ConsoleLogger.Log("Выборка лицевых счетов");
-                    var accounts = db.KumiAccounts.Where(r => r.IdState == 1 && r.IdAccount == 27);
+                    var accounts = db.KumiAccounts.Where(r => r.IdState == 1);
                     ConsoleLogger.Log("Подготовка лицевых счетов");
                     var accountsPrepare = service.GetAccountsPrepareForPaymentCalculator(accounts);
                     accountsInfo = service.GetAccountInfoForPaymentCalculator(accountsPrepare);

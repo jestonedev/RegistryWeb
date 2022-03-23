@@ -11,7 +11,7 @@
     var securityService = (SecurityService)ViewData["SecurityService"];
 }
 
-<table class="table table-hover tp-table">
+<table class="table table-hover rr-payments-table">
     <thead>
         <tr style="align-content: center;">
             <th class="r-table-header-cell" style="width: 38px">
@@ -40,7 +40,7 @@
         @foreach (var item in Model.Payments)
         {
             var sum = item.Sum;
-            var sumPosted = item.PaymentCharges.Select(r => r.Value).Sum() + item.PaymentClaims.Select(r => r.Value).Sum();
+            var sumPosted = item.PaymentCharges.Select(r => r.TenancyValue + r.PenaltyValue).Sum() + item.PaymentClaims.Select(r => r.TenancyValue + r.PenaltyValue).Sum();
             <tr style="position: relative" class="@(item.IdPayment == Model.FilterOptions.IdParentPayment ? "text-success" : "")" title="@(item.IdPayment == Model.FilterOptions.IdParentPayment ? "Родительский платеж" : "")">
                 <td style="vertical-align: middle; text-align: center">
                     @{
@@ -64,10 +64,9 @@
                             cssClass = "text-warning";
                         }
                     }
-                    @if (!string.IsNullOrEmpty(warning))
-                    {
-                        <span class="oi oi-bell @cssClass" style="font-size: 80%" title="@warning"></span>
-                    }
+
+                    <span class="oi oi-bell rr-payment-bell @cssClass @(string.IsNullOrEmpty(warning) ? "d-none" : "")" style="font-size: 80%" title="@warning"></span>
+
                     @if (item.ChildPayments.Any() && item.IdPayment != Model.FilterOptions.IdParentPayment)
                     {
                         <a asp-action="Index" asp-route-filterOptions.IdParentPayment="@item.IdPayment" title="Платеж был разбит при применении мемориального ордера. Для отображения связных платежей кликните по этой иконке">
@@ -87,7 +86,7 @@
                     }
 
                     <div>
-                        <b>Сумма:</b> @item.Sum руб.@(@sumPosted > 0 ? ", распределено: " + @sumPosted + " руб." : "")
+                        <b>Сумма:</b> <span class="rr-payment-sum">@item.Sum руб.@(@sumPosted > 0 ? ", расп.: " + @sumPosted + " руб." : "")</span>
                     </div>
                     @if (!string.IsNullOrEmpty(item.Kbk))
                     {
@@ -172,25 +171,16 @@
                             <div class="btn-group" role="group" aria-label="Панель доступа">
                                 <button class="btn btn-dark oi oi-grid-two-up dropdown-toggle" type="button" title="Операции" aria-label="Операции" id="objectsBtn_@item.IdPayment" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@item.IdPayment">
-                                    @if (sumPosted == 0)
-                                    {
-                                        <a class="dropdown-item rr-apply-memorial-order" href="#" title="Привязать мемориальный ордер" aria-label="Привязать мемориальный ордер" data-id-payment="@item.IdPayment">Привязать мемориальный ордер</a>
-                                    }
-                                    @if (item.Sum > sumPosted)
-                                    {
-                                        <a class="dropdown-item rr-distribute-payment" href="#" title="Распределить платеж" aria-label="Распределить платеж" data-id-payment="@item.IdPayment">Распределить платеж</a>
-                                    }
-                                    @if (sumPosted > 0)
-                                    {
-                                        <a class="dropdown-item rr-cancel-distribute-payment" href="#" title="Отменить распределение платежа" aria-label="Отменить распределение платежа" data-id-payment="@item.IdPayment">Отменить распределение платежа</a>
-                                    }
+                                        <a class="dropdown-item rr-apply-memorial-order @(sumPosted == 0 ? "" : "d-none")" href="#" title="Привязать мемориальный ордер" aria-label="Привязать мемориальный ордер" data-id-payment="@item.IdPayment">Привязать мемориальный ордер</a>
+                                        <a class="dropdown-item rr-distribute-payment @(item.Sum > sumPosted ? "" : "d-none")" href="#" title="Распределить платеж" aria-label="Распределить платеж" data-id-payment="@item.IdPayment" data-payment-sum="@item.Sum" data-payment-sum-posted="@sumPosted">Распределить платеж</a>
+                                        <a class="dropdown-item rr-cancel-distribute-payment @(sumPosted > 0 ? "" : "d-none")" href="#" title="Отменить распределение платежа" aria-label="Отменить распределение платежа" data-id-payment="@item.IdPayment">Отменить распределение платежа</a>
                                 </div>
                             </div>
                         }
                         <div class="btn-group" role="group" aria-label="Отчеты">
                             <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@item.IdPayment" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdPayment">
-                                <a class="dropdown-item" asp-action="GetPaymentOrder" title="Платежное поручение" aria-label="Платежное поручение" asp-route-idPayment="@item.IdPayment">Платежное поручение</a>
+                                <a class="dropdown-item" asp-controller="KumiPaymentsReports" asp-action="GetPaymentOrder" title="Платежное поручение" aria-label="Платежное поручение" asp-route-idPayment="@item.IdPayment">Платежное поручение</a>
                             </div>
                         </div>
                     </div>

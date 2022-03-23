@@ -38,6 +38,7 @@ using RegistryDb.Models.Entities.RegistryObjects.Common.Funds;
 using RegistryDb.Models.Entities.RegistryObjects.Common;
 using RegistryDb.Models.Entities.RegistryObjects.Common.Restrictions;
 using RegistryDb.Models.Entities.Tenancies;
+using System.Linq;
 
 namespace RegistryDb.Models
 {
@@ -397,6 +398,15 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new KumiPaymentCorrectionConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentDocCodeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentSettingSetConfiguration(nameDatebase));
+        }
+
+        public void DetachAllEntities()
+        {
+            var changedEntriesCopy = ChangeTracker.Entries()
+                .ToList();
+
+            foreach (var entry in changedEntriesCopy)
+                entry.State = EntityState.Detached;
         }
     }
 }

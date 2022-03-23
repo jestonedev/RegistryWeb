@@ -40,8 +40,13 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("date")
                 .IsRequired();
 
-            builder.Property(e => e.Value)
-                .HasColumnName("value")
+            builder.Property(e => e.TenancyValue)
+                .HasColumnName("tenancy_value")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.PenaltyValue)
+                .HasColumnName("penalty_value")
                 .HasColumnType("decimal(12,2)")
                 .IsRequired();
 

@@ -242,15 +242,18 @@ namespace RegistryWeb.DataServices
                 charge.OutputTenancy = charge.InputTenancy + charge.ChargeTenancy - charge.PaymentTenancy + charge.RecalcTenancy;
                 charge.OutputPenalty = charge.InputPenalty + charge.ChargePenalty - charge.PaymentPenalty + charge.RecalcPenalty;
 
+                var notAddCharge = nextCharge == null && charge.PaymentTenancy == 0 && charge.PaymentPenalty == 0 && charge.ChargeTenancy == 0 &&
+                            charge.ChargePenalty == 0 && charge.RecalcTenancy == 0 && charge.RecalcPenalty == 0;
+
                 if (dbCharge == null)
                 {
-                    registryContext.KumiCharges.Add(charge);
+                    if (!notAddCharge)
+                        registryContext.KumiCharges.Add(charge);
                 }
                 else
                 {
                     charge.IdCharge = dbCharge.IdCharge;
-                    if (nextCharge == null && charge.PaymentTenancy == 0 && charge.PaymentPenalty == 0 && charge.ChargeTenancy == 0 &&
-                            charge.ChargePenalty == 0 && charge.RecalcTenancy == 0 && charge.RecalcPenalty == 0)
+                    if (notAddCharge)
                     {
                             registryContext.Remove(charge);
                             actualDbCharges.Remove(dbCharge);
@@ -298,16 +301,26 @@ namespace RegistryWeb.DataServices
 
             var recalcTenancy = 0m;
             var recalcPenalty = 0m;
+
+            var chargeTenancy = 0m;
+            var chargePenalty = 0m;
+
             KumiCharge currentSavedCharge = account.Charges.FirstOrDefault(r => r.StartDate == startDate && r.EndDate == endDate);
             if (currentSavedCharge != null)
             {
                 recalcTenancy = currentSavedCharge.RecalcTenancy;
                 recalcPenalty = currentSavedCharge.RecalcPenalty;
+                // Если лицевой счет не находится в статусе "Действующий", то переносим начисления, которые были сохранены в БД
+                // Игнорируем будущие периоды
+                if (endDate < DateTime.Now.Date && account.IdState != 1)
+                {
+                    chargeTenancy = currentSavedCharge.ChargeTenancy;
+                    chargePenalty = currentSavedCharge.ChargePenalty;
+                }
             }
-
-            var chargeTenancy = 0m;
-            var chargePenalty = 0m;  
-            if (endDate < DateTime.Now.Date)
+            // Если лицевой счет в статусе "Действующий", то перерасчитываем начисления
+            // Не начисляем за будущие периоды
+            if (endDate < DateTime.Now.Date && account.IdState == 1)
             {
                 foreach (var tenancy in account.TenancyInfo)
                 {
@@ -323,13 +336,13 @@ namespace RegistryWeb.DataServices
                 r.DateIn != null ? r.DateIn >= startDate && r.DateIn <= endDate :
                 r.DateDocument != null ? r.DateDocument >= startDate && r.DateDocument <= endDate : false);
 
-            var sum = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Sum(pc => pc.Value));
-
             var claimIds = account.Claims.Select(r => r.IdClaim).ToList();
-            sum += payments.Where(r => r.PaymentClaims.Any()).Sum(r => r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Select(pc => pc.Value).Sum());
 
-            var paymentPenalty = Math.Min(inputBalancePenalty + chargePenalty, sum);
-            var paymentTenancy = sum - paymentPenalty;
+            var paymentPenalty = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Sum(pc => pc.PenaltyValue))
+                + payments.Where(r => r.PaymentClaims.Any()).Sum(r => r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Select(pc => pc.PenaltyValue).Sum());
+
+            var paymentTenancy = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Sum(pc => pc.TenancyValue))
+                + payments.Where(r => r.PaymentClaims.Any()).Sum(r => r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Select(pc => pc.TenancyValue).Sum());
 
             if (chargeTenancy != 0 || chargePenalty != 0 || recalcTenancy != 0 || recalcPenalty != 0 || paymentPenalty != 0 || paymentTenancy != 0 ||
                 startDate == DateTime.Now.Date.AddDays(-DateTime.Now.Date.Day+1))
@@ -481,6 +494,7 @@ namespace RegistryWeb.DataServices
                 var accountInfo = new KumiAccountInfoForPaymentCalculator
                 {
                     IdAccount = account.Account.IdAccount,
+                    IdState = account.Account.IdState,
                     Account = account.Account.Account,
                     LastChargeDate = account.Account.LastChargeDate,
                     CurrentBalanceTenancy = account.Account.CurrentBalanceTenancy ?? 0,
@@ -729,6 +743,13 @@ namespace RegistryWeb.DataServices
             viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
 
             return viewModel;
+        }
+
+        public IQueryable<KumiAccount> GetKumiAccounts(KumiAccountsFilter filterOptions)
+        {
+            var kumiAccounts = GetQuery();
+            var query = GetQueryFilter(kumiAccounts, filterOptions);
+            return query;
         }
 
         private IQueryable<KumiAccount> GetQueryOrder(IQueryable<KumiAccount> query, OrderOptions orderOptions)

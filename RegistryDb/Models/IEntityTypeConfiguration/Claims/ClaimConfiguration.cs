@@ -55,6 +55,14 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Claims
                 .HasColumnName("amount_pkk")
                 .HasColumnType("decimal");
 
+            builder.Property(e => e.AmountTenancyRecovered)
+                .HasColumnName("amount_tenancy_recovered")
+                .HasColumnType("decimal");
+
+            builder.Property(e => e.AmountPenaltiesRecovered)
+                .HasColumnName("amount_penalties_recovered")
+                .HasColumnType("decimal");
+
             builder.Property(e => e.AtDate)
                 .HasColumnName("at_date")
                 .HasColumnType("date");

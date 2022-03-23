@@ -18,16 +18,23 @@ using System.IO;
 using System.Text;
 using RegistryPaymentsLoader.TffFileLoaders;
 using RegistryDb.Models.Entities.Common;
+using RegistryDb.Models.SqlViews;
+using RegistryDb.Models.Entities.RegistryObjects.Kladr;
+using RegistryDb.Models.Entities.Claims;
+using RegistryServices.Enums;
 
 namespace RegistryWeb.DataServices
 {
 
     public class KumiPaymentsDataService : ListDataService<KumiPaymentsVM, KumiPaymentsFilter>
     {
+        private readonly KumiAccountsDataService kumiAccountsDataService;
         private SecurityService securityService;
 
-        public KumiPaymentsDataService(RegistryContext registryContext, AddressesDataService addressesDataService, SecurityService securityService) : base(registryContext, addressesDataService)
+        public KumiPaymentsDataService(RegistryContext registryContext, KumiAccountsDataService kumiAccountsDataService,
+            AddressesDataService addressesDataService, SecurityService securityService) : base(registryContext, addressesDataService)
         {
+            this.kumiAccountsDataService = kumiAccountsDataService;
             this.securityService = securityService;
         }
 
@@ -399,7 +406,7 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IsPosted != null)
             {
                 var isPosted = filterOptions.IsPosted.Value ? 1 : 0;
-                query = query.Where(r => r.IsPosted == isPosted);
+                query = query.Where(r => (r.IsPosted == isPosted && r.Sum != 0) || (isPosted == 1 && r.Sum == 0));
             }
             if (!string.IsNullOrEmpty(filterOptions.NumDocument))
             {
@@ -434,6 +441,147 @@ namespace RegistryWeb.DataServices
                 query = query.Where(r => r.Okato != null && r.Okato.Contains(filterOptions.Okato));
             }
             return query;
+        }
+
+        public KumiPaymentDistributionInfo DistributePaymentToAccount(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo, decimal tenancySum, decimal penaltySum)
+        {
+            if (tenancySum < 0)
+                throw new ApplicationException("Указана отрицательная сумма, распределяемая на найм");
+
+            if (penaltySum < 0)
+                throw new ApplicationException("Указана отрицательная сумма, распределяемая на пени");
+
+            if(tenancySum + penaltySum == 0)
+                throw new ApplicationException("Не указана распределяемая сумма");
+
+            var payment = registryContext.KumiPayments.Include(r => r.PaymentClaims).Include(r => r.PaymentCharges).FirstOrDefault(r => r.IdPayment == idPayment);
+            if (payment == null)
+                throw new ApplicationException("Не найдена платеж в базе данных");
+            var distributedTenancySum = payment.PaymentCharges.Select(r => r.TenancyValue).Sum() +
+                payment.PaymentClaims.Select(r => r.TenancyValue).Sum();
+            var distributedPenaltySum = payment.PaymentCharges.Select(r => r.PenaltyValue).Sum() +
+                payment.PaymentClaims.Select(r => r.PenaltyValue).Sum();
+            if (payment.Sum < distributedTenancySum + distributedPenaltySum + tenancySum + penaltySum)
+                throw new ApplicationException(string.Format("Распределяемая сумма {0} превышает остаток по платежу {1}", tenancySum + penaltySum,
+                    payment.Sum - distributedTenancySum - distributedPenaltySum));
+
+            var isPl = payment.IdSource == 3 || payment.IdSource == 5;
+            var date = payment.DateExecute ?? payment.DateIn ?? payment.DateExecute;
+            if (date == null)
+                throw new ApplicationException("В платеже не указана " + (isPl ? "дата исполнения распоряжения" : "дата списания со счета"));
+
+            if (payment.Sum == distributedTenancySum + distributedPenaltySum + tenancySum + penaltySum)
+            {
+                payment.IsPosted = 1;
+                registryContext.KumiPayments.Update(payment);
+            }
+
+            IQueryable<KumiAccount> accounts = null;
+
+            switch (distributeTo)
+            {
+                case KumiPaymentDistributeToEnum.ToKumiAccount:
+                    accounts = registryContext.KumiAccounts.Where(r => r.IdAccount == idObject);
+                    if (accounts.Count() == 0)
+                        throw new ApplicationException(string.Format("Не найден лицевой счет с реестровым номером {0}", idObject));
+
+                    var account = accounts.First();
+                    if (accounts.First().IdState == 2)
+                        throw new ApplicationException(string.Format("Нельзя распределить платеж на аннулированный лицевой счет {0}", account.Account));
+
+                    var startPeriodDate = date.Value.AddDays(-date.Value.Day + 1);
+                    var endPeriodDate = date.Value.AddDays(-date.Value.Day + 1).AddMonths(1).AddDays(-1);
+                    var charge = registryContext.KumiCharges.AsNoTracking().FirstOrDefault(r => r.IdAccount == idObject && r.StartDate == startPeriodDate && r.EndDate == endPeriodDate);
+
+                    var paymentCharge = new KumiPaymentCharge
+                    {
+                        IdPayment = idPayment,
+                        TenancyValue = tenancySum,
+                        PenaltyValue = penaltySum,
+                        Date = DateTime.Now.Date
+                    };
+
+                    if (charge == null)
+                    {
+                        charge = new KumiCharge
+                        {
+                            IdAccount = idObject,
+                            StartDate = startPeriodDate,
+                            EndDate = endPeriodDate,
+                            PaymentTenancy = tenancySum,
+                            PaymentPenalty = penaltySum,
+                            Hidden = 1
+                        };
+                        paymentCharge.Charge = charge;
+                        registryContext.KumiCharges.Add(charge);
+                    } else
+                    {
+                        paymentCharge.IdCharge = charge.IdCharge;
+                    }
+                    registryContext.KumiPaymentCharges.Add(paymentCharge);
+                    break;
+                case KumiPaymentDistributeToEnum.ToClaim:
+                    var claim = registryContext.Claims.Include(r => r.ClaimStates).FirstOrDefault(r => r.IdClaim == idObject);
+                    var idAccount = claim.IdAccountKumi;
+                    if (claim == null)
+                        throw new ApplicationException(string.Format("Не найдена исковая работа с реестровым номером {0}", idObject));
+                    if (claim.ClaimStates.Any())
+                    {
+                        var lastState = claim.ClaimStates.Last();
+                        if (lastState.IdStateType == 6)
+                            throw new ApplicationException(string.Format("Нельзя распределить платеж на завершенную исковую работу", idObject));
+                    }
+                    if (idAccount == null)
+                        throw new ApplicationException(string.Format("Исковая работа {0} не привязана к лицевому счету КУМИ", idObject));
+                    accounts = registryContext.KumiAccounts.Where(r => r.IdAccount == idAccount);
+
+                    claim.AmountTenancyRecovered = (claim.AmountTenancyRecovered ?? 0) + tenancySum;
+                    claim.AmountPenaltiesRecovered = (claim.AmountPenaltiesRecovered ?? 0) + penaltySum;
+                    registryContext.Claims.Update(claim);
+
+                    registryContext.KumiPaymentClaims.Add(new KumiPaymentClaim
+                    {
+                        IdPayment = idPayment,
+                        IdClaim = idObject,
+                        TenancyValue = tenancySum,
+                        PenaltyValue = penaltySum,
+                        Date = DateTime.Now.Date
+                    });
+                    break;
+            }
+
+            registryContext.SaveChanges();
+            registryContext.DetachAllEntities();
+
+            // Recalculate
+            var accountsPrepare = kumiAccountsDataService.GetAccountsPrepareForPaymentCalculator(accounts);
+            var accountsInfo = kumiAccountsDataService.GetAccountInfoForPaymentCalculator(accountsPrepare);
+
+            var startRewriteDate = DateTime.Now.Date;
+            startRewriteDate = startRewriteDate.AddDays(-startRewriteDate.Day + 1).AddMonths(-1);
+
+            var endCalcDate = DateTime.Now.Date;
+            endCalcDate = endCalcDate.AddDays(-endCalcDate.Day + 1).AddMonths(1).AddDays(-1);
+            foreach (var account in accountsInfo)
+            {
+                var startCalcDate = kumiAccountsDataService.GetAccountStartCalcDate(account);
+                if (startCalcDate == null) continue;
+                var chargingInfo = kumiAccountsDataService.CalcChargesInfo(account, startCalcDate.Value, endCalcDate);
+                var recalcInsertIntoCharge = new KumiCharge();
+                if (chargingInfo.Any()) recalcInsertIntoCharge = chargingInfo.Last();
+
+                var dbChargingInfo = kumiAccountsDataService.GetDbChargingInfo(account);
+                startRewriteDate = kumiAccountsDataService.CorrectStartRewriteDate(startRewriteDate, startCalcDate.Value, dbChargingInfo);
+                kumiAccountsDataService.CalcRecalcInfo(account, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, endCalcDate, startRewriteDate);
+                kumiAccountsDataService.UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate);
+            }
+            return new KumiPaymentDistributionInfo
+            {
+                IdPayment = idPayment,
+                Sum = payment.Sum,
+                DistrubutedToTenancySum = distributedTenancySum + tenancySum,
+                DistrubutedToPenaltySum = distributedPenaltySum + penaltySum
+            };
         }
 
         private IQueryable<KumiPayment> CommonFilter(IQueryable<KumiPayment> query, string commonFilter)
@@ -966,5 +1114,9 @@ namespace RegistryWeb.DataServices
         public List<KumiPaymentReason> PaymentReasons { get => registryContext.KumiPaymentReasons.ToList(); }
         public List<KumiPayerStatus> PayerStatuses { get => registryContext.KumiPayerStatuses.ToList(); }
         public List<SelectableSigner> PaymentUfSigners { get => registryContext.SelectableSigners.Where(r => r.IdSignerGroup == 5).ToList(); }
+        public List<KladrRegion> Regions { get => registryContext.KladrRegions.ToList(); }
+        public List<KladrStreet> Streets { get => registryContext.KladrStreets.ToList(); }
+        public List<KumiAccountState> AccountStates { get => registryContext.KumiAccountStates.ToList(); }
+        public List<ClaimStateType> ClaimStateTypes { get => registryContext.ClaimStateTypes.ToList(); }
     }
 }

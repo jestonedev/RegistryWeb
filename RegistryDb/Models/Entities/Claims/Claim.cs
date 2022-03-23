@@ -20,6 +20,8 @@ namespace RegistryDb.Models.Entities.Claims
         public int? IdAccountKumi { get; set; }
         public decimal? AmountTenancy { get; set; }
         public decimal? AmountPenalties { get; set; }
+        public decimal? AmountTenancyRecovered { get; set; }
+        public decimal? AmountPenaltiesRecovered { get; set; }
         public decimal? AmountDgi { get; set; }
         public decimal? AmountPadun { get; set; }
         public decimal? AmountPkk { get; set; }
