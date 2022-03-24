@@ -50,7 +50,6 @@
         $('#errorDistributePaymentToAccountModal').html('').closest('.form-row').addClass("d-none");
         $("#DistributePaymentToAccountModalForm .rr-payment-distribute-sum").addClass("d-none");
         $('#setDistributePaymentToAccountModalBtn').attr('disabled', true);
-        $('')
         $('#searchDistributePaymentToAccountModalBtn').text('Ищем...').attr('disabled', true);
         $.ajax({
             async: true,
@@ -247,11 +246,11 @@
     });
 
 
-    $("#setDistributePaymentToAccountModalBtn").on('click', distributePaymentToAccountMModalSet);
+    $("#setDistributePaymentToAccountModalBtn").on('click', distributePaymentToAccountModalSet);
 
     var action = $("#paymentsForm").attr('data-action');
 
-    function distributePaymentToAccountMModalSet(e) {
+    function distributePaymentToAccountModalSet(e) {
         var modal = $("#DistributePaymentToAccountModal");
         $('#setDistributePaymentToAccountModalBtn').text('Сохраняем...').attr('disabled', true);
         var data = {
@@ -280,41 +279,10 @@
                         var index = $("#DistributePaymentToAccountModal").data("index");
                         var tr = $($(".rr-payments-table tbody tr")[index]);
                         var bell = tr.find(".rr-payment-bell");
-                        var paymentSumElem = tr.find(".rr-payment-sum");
                         var sumPosted = result.distrubutedToTenancySum + result.distrubutedToPenaltySum;
-                        tr.find(".rr-payment-bell").removeClass("text-danger").removeClass("text-warning").addClass("d-none");;
 
-                        if (sumPosted > result.sum) {
-                            bell.removeClass("d-none")
-                                .addClass("text-danger").attr("title", "Распределеная сумма превышает фактическую по платежу");
-                        } else
-                            if (sumPosted > 0 && result.sum > sumPosted)
-                        {
-                            bell.removeClass("d-none")
-                                .addClass("text-warning").attr("title", "Платеж распределен не полностью");
-                        } else
-                        if (sumPosted === 0 && result.sum !== 0)
-                        {
-                            bell.removeClass("d-none")
-                                .addClass("text-warning").attr("title", "Платеж не распределен");
-                        }
-
-                        tr.find(".rr-distribute-payment").data("paymentSumPosted", distributePaymentFormatSum(sumPosted));
-                        if (result.sum <= result.distrubutedToTenancySum + result.distrubutedToPenaltySum) {
-                            tr.find(".rr-distribute-payment").addClass("d-none");
-                        } else {
-                            tr.find(".rr-distribute-payment").removeClass("d-none");
-                        }
-                        if (result.distrubutedToTenancySum + result.distrubutedToPenaltySum > 0) {
-                            tr.find(".rr-cancel-distribute-payment").removeClass("d-none");
-                            tr.find(".rr-apply-memorial-order").addClass("d-none");
-                        } else {
-                            tr.find(".rr-cancel-distribute-payment").addClass("d-none");
-                            tr.find(".rr-apply-memorial-order").removeClass("d-none");
-                        }
-                        paymentSumElem.text(
-                            distributePaymentFormatSum(result.sum) + " руб., расп.: " +
-                            distributePaymentFormatSum(result.distrubutedToTenancySum + result.distrubutedToPenaltySum) + " руб");
+                        updatePaymentBell(bell, sumPosted, result.sum);
+                        updatePaymentTrState(tr, sumPosted, result.sum);
                     }
                     $("#DistributePaymentToAccountModal").modal('hide');
                 }
@@ -390,5 +358,126 @@
     $("#DistributePaymentToAccountModal").on("hide.bs.modal", function (e) {
         distributePaymentToAccountModalClear(e);
     });
-    
+
+    $(".rr-cancel-distribute-payment").on("click", function (e) {
+        var modal = $("#CancelDistributePaymentToAccountModal");
+
+        if (action === undefined) {
+            modal.data("index", $(this).closest("tr").index());
+        }
+        var idPayment = $(this).data("idPayment");
+        $("#CancelDistributePaymentToAccountModalForm").find("#CancelDistributePaymentToAccount_IdPayment").val(idPayment);
+
+        var paymentSum = $(this).data("paymentSum");
+        var paymentSumPosted = $(this).data("paymentSumPosted");
+        var paymentTitle = $(this).data("paymentTitle");
+
+        modal.find(".rr-payment-sum").text(distributePaymentFormatSum(paymentSum));
+        modal.find(".rr-payment-sum-posted").text(distributePaymentFormatSum(paymentSumPosted));
+        modal.find(".rr-payment-requisits").text(paymentTitle);
+
+        modal.modal('show');
+        e.preventDefault();
+    });
+
+    $("#CancelDistributePaymentToAccountModal").on("shown.bs.modal", function (e) {
+        var modal = $("#CancelDistributePaymentToAccountModal");
+
+        var data = {
+            "IdPayment": modal.find("#CancelDistributePaymentToAccount_IdPayment").val()
+        };
+        var url = window.location.origin + '/KumiPayments/DistributePaymentDetails';
+
+        $.ajax({
+            async: true,
+            type: 'POST',
+            url: url,
+            data: data,
+            success: function (result) {
+                modal.find(".rr-payment-distribution-details").html(result).removeClass("d-none");
+                modal.find(".rr-payment-distribution-details-loader").addClass("d-none");
+            }
+        });
+    });
+
+    $("#CancelDistributePaymentToAccountModal").on("hidden.bs.modal", function (e) {
+        var modal = $("#CancelDistributePaymentToAccountModal");
+        modal.find(".rr-payment-distribution-details").html("").addClass("d-none");
+        modal.find(".rr-payment-distribution-details-loader").removeClass("d-none");
+    });
+
+    $("#cancelDistributePaymentToAccountModalBtn").on('click', cancelDistributePaymentToAccountModal);
+
+    function cancelDistributePaymentToAccountModal(e) {
+        var modal = $("#CancelDistributePaymentToAccountModal");
+        $('#cancelDistributePaymentToAccountModalBtn').text('Отменяем...').attr('disabled', true);
+        var data = {
+            "IdPayment": modal.find("#CancelDistributePaymentToAccount_IdPayment").val()
+        };
+        var url = window.location.origin + '/KumiPayments/CancelDistributePaymentToAccount';
+
+        $.ajax({
+            async: true,
+            type: 'POST',
+            url: url,
+            data: data,
+            success: function (result) {
+                if (result.state === "Error") {
+                    var errorElem = $("#errorCanceDistributePaymentToAccountModal");
+                    errorElem.closest(".form-row").removeClass("d-none");
+                    errorElem.html("<span class='text-danger'>" + result.error + "</span>");
+                } else {
+                    if (action !== undefined)
+                        location.reload();
+                    else {
+                        var index = modal.data("index");
+                        var tr = $($(".rr-payments-table tbody tr")[index]);
+                        var bell = tr.find(".rr-payment-bell");
+                        var sumPosted = result.distrubutedToTenancySum + result.distrubutedToPenaltySum;
+                        updatePaymentBell(bell, sumPosted, result.sum);
+                        updatePaymentTrState(tr, sumPosted, result.sum);
+                    }
+                    modal.modal('hide');
+                }
+                $('#cancelDistributePaymentToAccountModalBtn').text("Отменить распределение").attr('disabled', false);
+            }
+        });
+
+        e.preventDefault();
+    }
+
+    function updatePaymentBell(bellElem, sumPosted, sumPayment) {
+        bellElem.removeClass("text-danger").removeClass("text-warning").addClass("d-none");
+        if (sumPosted > sumPayment) {
+            bellElem.removeClass("d-none")
+                .addClass("text-danger").attr("title", "Распределеная сумма превышает фактическую по платежу");
+        } else
+            if (sumPosted > 0 && sumPayment > sumPosted) {
+                bellElem.removeClass("d-none")
+                    .addClass("text-warning").attr("title", "Платеж распределен не полностью");
+            } else
+                if (sumPosted === 0 && sumPayment !== 0) {
+                    bellElem.removeClass("d-none")
+                        .addClass("text-warning").attr("title", "Платеж не распределен");
+                }
+    }
+
+    function updatePaymentTrState(tr, sumPosted, sumPayment) {
+        tr.find(".rr-distribute-payment").data("paymentSumPosted", distributePaymentFormatSum(sumPosted));
+        if (sumPayment <= sumPosted) {
+            tr.find(".rr-distribute-payment").addClass("d-none");
+        } else {
+            tr.find(".rr-distribute-payment").removeClass("d-none");
+        }
+        if (sumPosted > 0) {
+            tr.find(".rr-cancel-distribute-payment").removeClass("d-none");
+            tr.find(".rr-apply-memorial-order").addClass("d-none");
+        } else {
+            tr.find(".rr-cancel-distribute-payment").addClass("d-none");
+            tr.find(".rr-apply-memorial-order").removeClass("d-none");
+        }
+
+        var paymentSumElem = tr.find(".rr-payment-sum");
+        paymentSumElem.text(distributePaymentFormatSum(sumPayment) + " руб." + (sumPosted > 0 ? ", расп.: " + distributePaymentFormatSum(sumPosted) + " руб": ""));
+    }
 });

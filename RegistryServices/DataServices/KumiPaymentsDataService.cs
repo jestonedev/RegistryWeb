@@ -443,6 +443,81 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        public KumiPaymentDistributionInfo CancelDistributePaymentToAccount(int idPayment)
+        {
+            var payment = registryContext.KumiPayments.Include(r => r.PaymentClaims).Include(r => r.PaymentCharges).FirstOrDefault(r => r.IdPayment == idPayment);
+            if (payment == null)
+                throw new ApplicationException("Не найдена платеж в базе данных");
+
+            var idClaims = payment.PaymentClaims.Select(r => r.IdClaim);
+            var idCharges = payment.PaymentCharges.Select(r => r.IdCharge);
+            List<int> idAccounts =
+                registryContext.KumiCharges.Where(r => idCharges.Contains(r.IdCharge)).Select(r => r.IdAccount).Union(
+                registryContext.Claims.Where(r => r.IdAccountKumi != null && idClaims.Contains(r.IdClaim)).Select(r => r.IdAccountKumi.Value)).Distinct().ToList();
+
+            IQueryable<KumiAccount> accounts = registryContext.KumiAccounts.Where(r => idAccounts.Contains(r.IdAccount));
+
+            foreach(var paymentClaim in payment.PaymentClaims.GroupBy(r => r.IdClaim))
+            {
+                var claim = registryContext.Claims.FirstOrDefault(r => r.IdClaim == paymentClaim.Key);
+                if (claim == null)
+                    throw new ApplicationException(
+                        string.Format("Произошла ошибка во время отмены распределения платежа. Не найдена исковая работа с идентификатором {0}", claim.IdClaim));
+
+                claim.AmountTenancyRecovered = (claim.AmountTenancyRecovered ?? 0) - paymentClaim.Select(r => r.TenancyValue).Sum();
+                claim.AmountPenaltiesRecovered = (claim.AmountPenaltiesRecovered ?? 0) - paymentClaim.Select(r => r.PenaltyValue).Sum();
+                registryContext.Claims.Update(claim);
+            }
+
+            foreach(var paymentClaim in payment.PaymentClaims)
+            {
+                registryContext.KumiPaymentClaims.Remove(paymentClaim);
+            }
+
+            foreach (var paymentCharge in payment.PaymentCharges)
+            {
+                registryContext.KumiPaymentCharges.Remove(paymentCharge);
+            }
+
+            registryContext.SaveChanges();
+            registryContext.DetachAllEntities();
+
+            // Recalculate
+            var startRewriteDate = DateTime.Now.Date;
+            startRewriteDate = startRewriteDate.AddDays(-startRewriteDate.Day + 1).AddMonths(-1);
+            var endCalcDate = DateTime.Now.Date;
+            endCalcDate = endCalcDate.AddDays(-endCalcDate.Day + 1).AddMonths(1).AddDays(-1);
+            RecalculateAccounts(accounts, startRewriteDate, endCalcDate);  
+
+            return new KumiPaymentDistributionInfo
+            {
+                IdPayment = idPayment,
+                Sum = payment.Sum,
+                DistrubutedToTenancySum = 0,
+                DistrubutedToPenaltySum = 0
+            };
+        }
+
+        private void RecalculateAccounts(IQueryable<KumiAccount> accounts, DateTime startRewriteDate, DateTime endCalcDate)
+        {
+            var accountsPrepare = kumiAccountsDataService.GetAccountsPrepareForPaymentCalculator(accounts);
+            var accountsInfo = kumiAccountsDataService.GetAccountInfoForPaymentCalculator(accountsPrepare);
+
+            foreach (var account in accountsInfo)
+            {
+                var startCalcDate = kumiAccountsDataService.GetAccountStartCalcDate(account);
+                if (startCalcDate == null) continue;
+                var chargingInfo = kumiAccountsDataService.CalcChargesInfo(account, startCalcDate.Value, endCalcDate);
+                var recalcInsertIntoCharge = new KumiCharge();
+                if (chargingInfo.Any()) recalcInsertIntoCharge = chargingInfo.Last();
+
+                var dbChargingInfo = kumiAccountsDataService.GetDbChargingInfo(account);
+                startRewriteDate = kumiAccountsDataService.CorrectStartRewriteDate(startRewriteDate, startCalcDate.Value, dbChargingInfo);
+                kumiAccountsDataService.CalcRecalcInfo(account, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, endCalcDate, startRewriteDate);
+                kumiAccountsDataService.UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate);
+            }
+        }
+
         public KumiPaymentDistributionInfo DistributePaymentToAccount(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo, decimal tenancySum, decimal penaltySum)
         {
             if (tenancySum < 0)
@@ -554,27 +629,12 @@ namespace RegistryWeb.DataServices
             registryContext.DetachAllEntities();
 
             // Recalculate
-            var accountsPrepare = kumiAccountsDataService.GetAccountsPrepareForPaymentCalculator(accounts);
-            var accountsInfo = kumiAccountsDataService.GetAccountInfoForPaymentCalculator(accountsPrepare);
-
             var startRewriteDate = DateTime.Now.Date;
             startRewriteDate = startRewriteDate.AddDays(-startRewriteDate.Day + 1).AddMonths(-1);
-
             var endCalcDate = DateTime.Now.Date;
             endCalcDate = endCalcDate.AddDays(-endCalcDate.Day + 1).AddMonths(1).AddDays(-1);
-            foreach (var account in accountsInfo)
-            {
-                var startCalcDate = kumiAccountsDataService.GetAccountStartCalcDate(account);
-                if (startCalcDate == null) continue;
-                var chargingInfo = kumiAccountsDataService.CalcChargesInfo(account, startCalcDate.Value, endCalcDate);
-                var recalcInsertIntoCharge = new KumiCharge();
-                if (chargingInfo.Any()) recalcInsertIntoCharge = chargingInfo.Last();
+            RecalculateAccounts(accounts, startRewriteDate, endCalcDate);
 
-                var dbChargingInfo = kumiAccountsDataService.GetDbChargingInfo(account);
-                startRewriteDate = kumiAccountsDataService.CorrectStartRewriteDate(startRewriteDate, startCalcDate.Value, dbChargingInfo);
-                kumiAccountsDataService.CalcRecalcInfo(account, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, endCalcDate, startRewriteDate);
-                kumiAccountsDataService.UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate);
-            }
             return new KumiPaymentDistributionInfo
             {
                 IdPayment = idPayment,
@@ -1055,6 +1115,16 @@ namespace RegistryWeb.DataServices
             {
                 assoc.Order = registryContext.KumiMemorialOrders.FirstOrDefault(r => r.IdOrder == assoc.IdOrder);
                 assoc.IdOrder = assoc.Order?.IdOrder ?? 0;
+            }
+            foreach (var assoc in payment.PaymentCharges)
+            {
+                assoc.Charge = registryContext.KumiCharges.Include(r => r.Account).FirstOrDefault(r => r.IdCharge == assoc.IdCharge);
+                assoc.IdCharge = assoc.Charge?.IdCharge ?? 0;
+            }
+            foreach (var assoc in payment.PaymentClaims)
+            {
+                assoc.Claim = registryContext.Claims.Include(r => r.IdAccountKumiNavigation).FirstOrDefault(r => r.IdClaim == assoc.IdClaim);
+                assoc.IdClaim = assoc.Claim?.IdClaim ?? 0;
             }
             return payment;
         }

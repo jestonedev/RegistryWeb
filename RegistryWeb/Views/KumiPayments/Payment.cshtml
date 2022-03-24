@@ -4,33 +4,35 @@
 @using RegistryWeb.Enums;
 @model RegistryDb.Models.Entities.KumiAccounts.KumiPayment;
 @{
+    var subTitle = "";
     if (Model.IdPayment == 0)
     {
         ViewData["Title"] = "Новый платеж";
     }
     else
     {
-        var title = "Платеж";
+        var title = "Платеж ";
         if (!string.IsNullOrEmpty(Model.NumDocument) || Model.DateDocument != null)
         {
             if (!string.IsNullOrEmpty(Model.NumDocument))
             {
-                title += " № " + Model.NumDocument;
+                subTitle += "№ " + Model.NumDocument;
             }
             if (Model.DateDocument != null)
             {
-                title += " от " + Model.DateDocument.Value.ToString("dd.MM.yyyy");
+                subTitle += " от " + Model.DateDocument.Value.ToString("dd.MM.yyyy");
             }
         }
         else
         if (string.IsNullOrEmpty(Model.NumDocument) && Model.DateDocument == null && !string.IsNullOrEmpty(Model.Uin))
         {
-            title += " УИН " + Model.Uin;
+            subTitle += "УИН " + Model.Uin;
         }
         else
         {
-            title += " ID " + Model.IdPayment;
+            subTitle += "ID " + Model.IdPayment;
         }
+        title += subTitle;
         ViewData["Title"] = title;
     }
     // Если платеж занесен вручную и есть права на запись, то его можно уточнить
@@ -107,7 +109,8 @@
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@Model.IdPayment" x-placement="bottom-end" style="position: absolute; transform: translate3d(-179px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
                                     <a class="dropdown-item rr-apply-memorial-order @(sumPosted == 0 ? "" : "d-none")" href="#" title="Привязать мемориальный ордер" aria-label="Привязать мемориальный ордер" data-id-payment="@Model.IdPayment">Привязать мемориальный ордер</a>
                                     <a class="dropdown-item rr-distribute-payment @(Model.Sum > sumPosted ? "" : "d-none")" href="#" title="Распределить платеж" aria-label="Распределить платеж" data-id-payment="@Model.IdPayment" data-payment-sum="@Model.Sum" data-payment-sum-posted="@sumPosted">Распределить платеж</a>
-                                    <a class="dropdown-item rr-cancel-distribute-payment @(sumPosted > 0 ? "" : "d-none")" href="#" title="Отменить распределение платежа" aria-label="Отменить распределение платежа" data-id-payment="@Model.IdPayment">Отменить распределение платежа</a>
+                                    <a class="dropdown-item rr-cancel-distribute-payment @(sumPosted > 0 ? "" : "d-none")" href="#" title="Отменить распределение платежа" aria-label="Отменить распределение платежа" data-id-payment="@Model.IdPayment" 
+                                            data-payment-sum="@Model.Sum" data-payment-sum-posted="@sumPosted" data-payment-title="@subTitle">Отменить распределение платежа</a>
                             </div>
                         </div>
                     }
@@ -310,15 +313,21 @@
                             <div class="input-group-append">
                                 <span class="input-group-text text-white
                                       @(((sumPosted == 0 && Model.Sum != 0) || sumPosted > Model.Sum) ? "bg-danger" : sumPosted < Model.Sum ? "bg-warning" : "bg-success")"
-                                      id="basic-addon2" title="Распределено">@sumPosted.ToString("0.00")</span>
-                                </div>
+                                      id="basic-addon2" title="Распределено">
+                                    @sumPosted.ToString("0.00")
+                                    @if (Model.PaymentCharges.Any() || Model.PaymentClaims.Any())
+                                    {
+                                        <a class="btn oi oi-eye pl-2 p-0 text-white rr-payment-distribution-details-eye-btn" title="Детализация распределения платежа" href="#"></a>
+                                    }
+                                </span>
                             </div>
-                        }
-                        else
-                        {
-                            <input type="text" asp-for="Sum" data-val="true" data-val-required="Введите сумму платежа" title="Сумма платежа" class="form-control input-decimal" />
-                            <span class="text-danger" asp-validation-for="Sum"></span>
-                        }
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="text" asp-for="Sum" data-val="true" data-val-required="Введите сумму платежа" title="Сумма платежа" class="form-control input-decimal" />
+                        <span class="text-danger" asp-validation-for="Sum"></span>
+                    }
                 </div>
                 @if (isPl)
                 {
@@ -562,12 +571,33 @@
                 </div>
             </div>
 
-
             <input type="hidden" asp-for="IsPosted" />
         </form>
 
         @if (ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details)
         {
+            @if (Model.PaymentCharges.Any() || Model.PaymentClaims.Any())
+            {
+                <div class="modal fade" id="PaymentDistributionDetailsModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Детализация распределения платежа</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <partial name="PaymentDistribution" model="Model" />
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
             <div class="row">
                 <div class="col-12">
                     <partial name="PaymentUfs" model="Model.PaymentUfs" />
@@ -584,5 +614,7 @@
         }
     </div>
 </div>
+
+
 
 <partial name="PaymentModals" />

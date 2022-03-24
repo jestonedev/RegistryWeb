@@ -37,6 +37,7 @@
     $('#PaymentToggler').on("click", $("#Payment"), elementToogleHide);
     $('#PaymentsUfsToggler').on("click", $("#PaymentsUfs"), elementToogleHide);
     $('#MemoryOrdersToggler').on("click", $("#MemoryOrders"), elementToogleHide);
+    
 
     $(".rr-payment-revision").on("click", function () {
         $(".rr-payment-revision").removeClass("active");
@@ -109,5 +110,11 @@
         } else {
             recipientKppElem.removeClass("text-danger");
         }
+    });
+
+    $(".rr-payment-distribution-details-eye-btn").on("click", function (e) {
+        var modal = $("#PaymentDistributionDetailsModal");
+        modal.modal('show');
+        e.preventDefault();
     });
 });

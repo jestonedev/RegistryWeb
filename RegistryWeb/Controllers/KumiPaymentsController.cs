@@ -431,6 +431,29 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult CancelDistributePaymentToAccount(int idPayment)
+        {
+            try
+            {
+                var paymentDistributionInfo = dataService.CancelDistributePaymentToAccount(idPayment);
+                return Json(new
+                {
+                    State = "Success",
+                    paymentDistributionInfo.Sum,
+                    paymentDistributionInfo.DistrubutedToTenancySum,
+                    paymentDistributionInfo.DistrubutedToPenaltySum
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.Message
+                });
+            }
+        }
+
         public IActionResult UploadPayments(List<IFormFile> files)
         {
             var tffStrings = new List<TffString>();
@@ -502,6 +525,12 @@ namespace RegistryWeb.Controllers
             {
                 return Error(e.Message);
             }
+        }
+
+        public IActionResult DistributePaymentDetails(int idPayment)
+        {
+            var payment = dataService.GetKumiPayment(idPayment);
+            return PartialView("PaymentDistribution", payment);
         }
     }
 }

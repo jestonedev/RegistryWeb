@@ -57,6 +57,10 @@
     font-size: 50%;
 }
 
+#PaymentDistributionDetailsModal, #CancelDistributePaymentToAccountModal {
+    font-size: 70%;
+}
+
 #DistributePaymentToAccountModalForm .rr-payment-distribute-title {
     margin-top: 33px;
 }
@@ -64,6 +68,10 @@
 @media(min-width: 768px) {
     #resultDistributePaymentToAccountModal {
         font-size: 70%;
+    }
+
+    #PaymentDistributionDetailsModal, #CancelDistributePaymentToAccountModal {
+        font-size: 80%;
     }
 
     #DistributePaymentToAccountModalForm .rr-payment-distribute-title {
@@ -76,4 +84,25 @@
     #resultDistributePaymentToAccountModal {
         font-size: 100%;
     }
+
+    #PaymentDistributionDetailsModal, #CancelDistributePaymentToAccountModal {
+        font-size: 100%;
+    }
+}
+
+.rr-payment-distribution-details-eye-btn {
+    font-size: 80%;
+}
+
+.rr-payment-distribution-details-eye-btn:focus, .rr-payment-assoc-eye-btn:focus {
+    box-shadow: none;
+}
+
+.rr-payment-assoc-eye-btn {
+    font-size: 80%;
+    margin-top: -5px;
+}
+
+#PaymentDistributionDetailsModal td, #PaymentDistributionDetailsModal th, #CancelDistributePaymentToAccountModal td, #CancelDistributePaymentToAccountModal th {
+    vertical-align: middle;
 }
