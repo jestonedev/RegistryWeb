@@ -159,6 +159,25 @@ namespace RegistryWeb.DataServices
                 }).ToList();
             }
 
+            if (claim.ClaimPersons == null || !claim.ClaimPersons.Any())
+            {
+                var prevClaim = registryContext.Claims.Include(r => r.ClaimPersons).Where(r => r.IdAccount == claim.IdAccount).OrderByDescending(r => r.IdClaim).FirstOrDefault();
+                if (prevClaim != null)
+                {
+                    claim.ClaimPersons = prevClaim.ClaimPersons.Select(r => new ClaimPerson
+                    {
+                        Surname = r.Surname,
+                        Name = r.Name,
+                        Patronymic = r.Patronymic,
+                        DateOfBirth = r.DateOfBirth,
+                        Passport = r.Passport,
+                        PlaceOfBirth = r.PlaceOfBirth,
+                        WorkPlace = r.WorkPlace,
+                        IsClaimer = r.IsClaimer
+                    }).ToList();
+                }
+            }
+
             claim.IdAccountNavigation = null;
             claim.IdAccountAdditionalNavigation = null;
             claim.IdAccountKumiNavigation = null;
