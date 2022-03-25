@@ -157,6 +157,8 @@ function refreshClaimState(claimStateElem, claimState) {
     claimStateElem.find("[name^='RepeatedEnforcementProceedingStartDescription']").val(claimState.repeatedEnforcementProceedingStartDescription);
     claimStateElem.find("[name^='RepeatedEnforcementProceedingEndDate']").val(claimState.repeatedEnforcementProceedingEndDate);
     claimStateElem.find("[name^='RepeatedEnforcementProceedingEndDescription']").val(claimState.repeatedEnforcementProceedingEndDescription);
+    claimStateElem.find("[name^='CourtOrderCancelDate']").val(claimState.courtOrderCancelDate);
+    claimStateElem.find("[name^='CourtOrderCancelDescription']").val(claimState.courtOrderCancelDescription);
     claimStateElem.find("[name^='CourtOrderCompleteDate']").val(claimState.courtOrderCompleteDate);
     claimStateElem.find("[name^='CourtOrderCompleteReason']").val(claimState.courtOrderCompleteReason);
     claimStateElem.find("[name^='CourtOrderCompleteDescription']").val(claimState.courtOrderCompleteDescription);
@@ -326,7 +328,9 @@ function getClaimState(claimStateElem) {
         claimState.RepeatedEnforcementProceedingEndDescription = claimStateElem.find("[name^='RepeatedEnforcementProceedingEndDescription']").val();
     }
     if (claimStateTypeId === 6) {
-        claimState.CourtOrderCompleteDate = claimStateElem.find("[name^='CourtOrderCompleteDate']").val();
+        claimState.CourtOrderCancelDate = claimStateElem.find("[name^='CourtOrderCancelDate']").val();
+        claimState.CourtOrderCancelDescription = claimStateElem.find("[name^='CourtOrderCancelDescription']").val();
+        claimState.CourtOrderCompleteDescription = claimStateElem.find("[name^='CourtOrderCompleteDescription']").val();
         claimState.CourtOrderCompleteReason = claimStateElem.find("[name^='CourtOrderCompleteReason']").val();
         claimState.CourtOrderCompleteDescription = claimStateElem.find("[name^='CourtOrderCompleteDescription']").val();
     }

@@ -31,7 +31,7 @@
             <label class="mb-1">Этап</label>
             <select class="selectpicker form-control" disabled id="IdStateType_@id" name="IdStateType_@id" title="Этап"
                     data-val="true" data-val-required="Выберите этап исковой работы">
-                @{ 
+                @{
                     var actualClaimStates = claimStateTypes.Where(cst => (prevClaimState == null && cst.IsStartStateType) ||
                         (prevClaimState != null && claimStateTypeRelations.Where(r => r.IdStateFrom == prevClaimState.IdStateType)
                         .Select(r => r.IdStateTo).Contains(cst.IdStateType)));
@@ -268,6 +268,23 @@
         </div>
     </div>
 
+    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 6 ? "" : "d-none")" data-id-state-type="6">
+        <h5><u>Определение об отмене с/п</u></h5>
+    </div>
+
+    <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 6 ? "" : "d-none")" data-id-state-type="6">
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1">Дата отмены</label>
+            <input type="date" disabled class="form-control" value="@claimState.CourtOrderCancelDate?.ToString("yyyy-MM-dd")" id="CourtOrderCancelDate_@id" name="CourtOrderCancelDate_@id" title="Дата отмены">
+        </div>
+        <div class="form-group col-12 col-md-8 mb-2">
+            <label class="mb-1">Примечание</label>
+            <input type="text" disabled class="form-control" value="@claimState.CourtOrderCancelDescription" maxlength="255" id="CourtOrderCancelDescription_@id" name="CourtOrderCancelDescription_@id" title="Примечание">
+        </div>
+    </div>
+    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 6 ? "" : "d-none")" data-id-state-type="6">
+        <h5><u>Завершение исковой работы</u></h5>
+    </div>
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 6 ? "" : "d-none")" data-id-state-type="6">
         <div class="form-group col-12 col-md-4 mb-2">
             <label class="mb-1">Дата завершения</label>

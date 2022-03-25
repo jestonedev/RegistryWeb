@@ -109,6 +109,8 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 repeatedEnforcementProceedingStartDescription = claimState.RepeatedEnforcementProceedingStartDescription,
                 repeatedEnforcementProceedingEndDate = claimState.RepeatedEnforcementProceedingEndDate.HasValue ? claimState.RepeatedEnforcementProceedingEndDate.Value.ToString("yyyy-MM-dd") : null,
                 repeatedEnforcementProceedingEndDescription = claimState.RepeatedEnforcementProceedingEndDescription,
+                courtOrderCancelDate = claimState.CourtOrderCancelDate.HasValue ? claimState.CourtOrderCancelDate.Value.ToString("yyyy-MM-dd") : null,
+                courtOrderCancelDescription = claimState.CourtOrderCancelDescription,
                 courtOrderCompleteDate = claimState.CourtOrderCompleteDate.HasValue ? claimState.CourtOrderCompleteDate.Value.ToString("yyyy-MM-dd") : null,
                 courtOrderCompleteReason = claimState.CourtOrderCompleteReason,
                 courtOrderCompleteDescription = claimState.CourtOrderCompleteDescription,

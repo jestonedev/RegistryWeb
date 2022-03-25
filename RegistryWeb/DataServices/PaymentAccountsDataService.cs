@@ -19,12 +19,15 @@ namespace RegistryWeb.DataServices
     public class PaymentAccountsDataService : ListDataService<PaymentsVM, PaymentsFilter>
     {
         private readonly SecurityServices.SecurityService securityService;
+        private readonly ClaimsDataService claimsDataService;
         private readonly IConfiguration config;
 
         public PaymentAccountsDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService,
+            ClaimsDataService claimsDataService,
             AddressesDataService addressesDataService, IConfiguration config) : base(registryContext, addressesDataService)
         {
             this.securityService = securityService;
+            this.claimsDataService = claimsDataService;
             this.config = config;
         }
 
@@ -289,8 +292,7 @@ namespace RegistryWeb.DataServices
                         }
                     }
                 };
-                registryContext.Claims.Add(claim);
-                registryContext.SaveChanges();
+                claimsDataService.Create(claim, new List<Microsoft.AspNetCore.Http.IFormFile>());
             }
         }
 
