@@ -330,6 +330,7 @@ function getClaimState(claimStateElem) {
     if (claimStateTypeId === 6) {
         claimState.CourtOrderCancelDate = claimStateElem.find("[name^='CourtOrderCancelDate']").val();
         claimState.CourtOrderCancelDescription = claimStateElem.find("[name^='CourtOrderCancelDescription']").val();
+        claimState.CourtOrderCompleteDate = claimStateElem.find("[name^='CourtOrderCompleteDate']").val();
         claimState.CourtOrderCompleteDescription = claimStateElem.find("[name^='CourtOrderCompleteDescription']").val();
         claimState.CourtOrderCompleteReason = claimStateElem.find("[name^='CourtOrderCompleteReason']").val();
         claimState.CourtOrderCompleteDescription = claimStateElem.find("[name^='CourtOrderCompleteDescription']").val();
