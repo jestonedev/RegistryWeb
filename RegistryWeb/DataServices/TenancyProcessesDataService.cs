@@ -134,7 +134,7 @@ namespace RegistryWeb.DataServices
 
             return new TenancyProcessVM
             {
-                TenancyProcess = new TenancyProcess(),
+                TenancyProcess = new TenancyProcess {},
                 Kinships = registryContext.Kinships.ToList(),
                 RentTypeCategories = registryContext.RentTypeCategories.ToList(),
                 RentTypes = registryContext.RentTypes.ToList(),
@@ -146,6 +146,7 @@ namespace RegistryWeb.DataServices
                 DocumentTypes = registryContext.DocumentTypes.ToList(),
                 DocumentIssuedBy = registryContext.DocumentsIssuedBy.ToList(),
                 TenancyProlongRentReasons = registryContext.TenancyProlongRentReasons.ToList(),
+                Employers = registryContext.Employers.ToList(),
                 RentObjects = rentObjects
             };
         }
@@ -458,6 +459,17 @@ namespace RegistryWeb.DataServices
                 .Select(r => new { IdProcess = r.Key, RentObject = r.Select(v => v.RentObject) })
                 .ToDictionary(v => v.IdProcess, v => v.RentObject.ToList());
             return result;
+        }
+
+        internal void AddEmployer(Employer employer)
+        {
+            registryContext.Employers.Add(employer);
+            registryContext.SaveChanges();
+        }
+
+        internal Employer GetEmploeyerByName(string employerName)
+        {
+            return registryContext.Employers.FirstOrDefault(r => r.EmployerName == employerName);
         }
 
         internal List<PaymentHistoryViewModel> GetPaymentHistory(int id, PaymentHistoryTarget target)

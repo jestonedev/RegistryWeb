@@ -22,6 +22,7 @@ namespace RegistryWeb.Models.Entities
         public int? IdExecutor { get; set; }
         public int? IdRentType { get; set; }
         public int? IdRentTypeCategory { get; set; }
+        public int IdEmployer { get; set; }
         public int? IdWarrant { get; set; }
         public string RegistrationNum { get; set; }
         public DateTime? RegistrationDate { get; set; }
@@ -42,6 +43,7 @@ namespace RegistryWeb.Models.Entities
         public virtual RentTypeCategory IdRentTypeCategoryNavigation { get; set; }
         public virtual RentType IdRentTypeNavigation { get; set; }
         public virtual Executor IdExecutorNavigation { get; set; }
+        public virtual Employer IdEmployerNavigation { get; set; }
         public virtual IList<TenancyBuildingAssoc> TenancyBuildingsAssoc { get; set; }
         public virtual IList<TenancyPerson> TenancyPersons { get; set; }
         public virtual IList<TenancyPremiseAssoc> TenancyPremisesAssoc { get; set; }

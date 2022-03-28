@@ -101,6 +101,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<RentTypeCategory> RentTypeCategories { get; set; }
         public virtual DbSet<Kinship> Kinships { get; set; }
         public virtual DbSet<RentType> RentTypes { get; set; }
+        public virtual DbSet<Employer> Employers { get; set; }
         public virtual DbSet<TenancyBuildingAssoc> TenancyBuildingsAssoc { get; set; }
         public virtual DbSet<TenancyPremiseAssoc> TenancyPremisesAssoc { get; set; }
         public virtual DbSet<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
@@ -283,6 +284,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new TenancyFileConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyProlongRentReasonTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyPaymentHistoryConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new EmployerConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new ResettleInfoConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ResettleKindConfiguration(nameDatebase));

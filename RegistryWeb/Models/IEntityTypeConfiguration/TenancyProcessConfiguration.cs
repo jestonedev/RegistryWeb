@@ -64,6 +64,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("id_rent_type_category")
                 .HasColumnType("int(11)");
 
+            builder.Property(e => e.IdEmployer)
+                .HasColumnName("id_employer")
+                .HasColumnType("int(11)");
+
             builder.Property(e => e.IdWarrant)
                 .HasColumnName("id_warrant")
                 .HasColumnType("int(11)");

@@ -7,6 +7,9 @@ $(function () {
     var idRentTypeCategories = $("#TenancyProcess_IdRentTypeCategory option[value]").clone(true);
 
     $("#TenancyProcess_IdRentType").on("change", function (e) {
+
+        e.preventDefault();
+
         var idRentType = $(this).val();
         $("#TenancyProcess_IdRentTypeCategory option[value]").remove();
         $(idRentTypeCategories).each(function (idx, option) {
@@ -15,7 +18,25 @@ $(function () {
             }
         });
         $("#TenancyProcess_IdRentTypeCategory").selectpicker("refresh");
-        e.preventDefault();
+
+        var action = $("#TenancyProcessForm").data("action");
+
+        if (action === "Details" || action === "Delete") return;
+
+        var rentTypeWrapper = $("#TenancyProcess_IdRentTypeCategory").closest(".form-group");
+        var employerElem = $("#TenancyProcessForm .rr-tenancy-employer select");
+        var employerWrapper = $("#TenancyProcessForm .rr-tenancy-employer");
+
+        if (idRentType === "2") {
+            if (employerElem.data("reset-employer"))
+                employerElem.val("").selectpicker("refresh");
+            employerWrapper.removeClass("d-none");
+            rentTypeWrapper.addClass("mb-2").removeClass("mb-3").addClass("col-md-6").removeClass("col-md-12");
+        } else {
+            employerElem.val("1").data("reset-employer", true).selectpicker("refresh");
+            employerWrapper.addClass("d-none");
+            rentTypeWrapper.addClass("mb-3").removeClass("mb-2").addClass("col-md-12").removeClass("col-md-6");
+        }
     });
 
     var lastEndDateBeforeDismissal = undefined;
@@ -113,6 +134,52 @@ $(function () {
         tenancyCustomValidations(validator);
     });
 
+    function addCustomEmployer(validator) {
+        let tenancyProcessIdEmployerElem = $("#TenancyProcess_IdEmployer");
+        let customEmployer = $("#CustomEmployer").val();
+        if (!$("#CustomEmployer").valid()) return false;
+        let code = 0;
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/TenancyProcesses/AddEmployer',
+            data: { employerName: customEmployer },
+            async: false,
+            success: function (id) {
+                code = id;
+                if (id > 0) {
+                    tenancyProcessIdEmployerElem.append("<option value='" + id + "'>" + customEmployer + "</option>");
+                    $("#cancelEmployerBtn").click();
+                    tenancyProcessIdEmployerElem.val(id).selectpicker("refresh");
+                } else
+                    if (id === -3) {
+                        $("#cancelEmployerBtn").click();
+                        var duplicateOption = tenancyProcessIdEmployerElem.find("option").filter(function (idx, elem) {
+                            return $(elem).text() === customEmployer;
+                        });
+                        var optionId = 0;
+                        if (duplicateOption.length > 0) {
+                            optionId = duplicateOption.prop("value");
+                        } else {
+                            let error = {};
+                            error["CustomEmployer"] = "";
+                            error["TenancyProcess.IdEmployer"] = "Произошла ошибка при сохранении работодателя";
+                            validator.showErrors(error);
+                            return false;
+                        }
+                        tenancyProcessIdEmployerElem.val(optionId).selectpicker("refresh");
+                        code = optionId;
+                    } else {
+                        let error = {};
+                        error["TenancyProcess.IdEmployer"] = "";
+                        error["CustomEmployer"] = "Произошла ошибка при сохранении работодателя";
+                        validator.showErrors(error);
+                        return false;
+                    }
+            }
+        });
+        return code > 0;
+    }
+
     $("#TenancyProcessForm").on("submit", function (e) {
         var action = $("#TenancyProcessForm").data("action");
         $("button[data-id], .bootstrap-select").removeClass("input-validation-error");
@@ -140,11 +207,17 @@ $(function () {
             });
         }
 
+        var isCustomeEmployerValid = true;
+        if (isCustomEmployer) {
+            if (!addCustomEmployer(validator))
+                isCustomeEmployerValid = false;
+        }
+
         var itemsInEditMode = $("ul.list-group .yes-no-panel").filter(function (idx, elem) {
             return $(elem).css("display") !== "none";
         });
 
-        if (!isFormValid || !isReasonsValid || !isRentObjectsValid) {
+        if (!isFormValid || !isReasonsValid || !isRentObjectsValid || !isCustomeEmployerValid) {
             $("select").each(function (idx, elem) {
                 var id = $(elem).prop("id");
                 var name = $(elem).prop("name");
@@ -322,4 +395,29 @@ $(function () {
     });
 
     $("#TenancyProcess_UntilDismissal").change();
+
+    var isCustomEmployer = false;
+
+    $("#addEmployerBtn").on('click', function (e) {
+        $("#addEmployerBtn").hide();
+        $("#cancelEmployerBtn").show();
+        $("#CustomEmployer").show();
+        $("#TenancyProcessForm .rr-tenancy-employer").find(".bootstrap-select").hide();
+        isCustomEmployer = true;
+        e.preventDefault();
+    });
+
+    $("#cancelEmployerBtn").on('click', function (e) {
+        $("#addEmployerBtn").show();
+        $("#cancelEmployerBtn").hide();
+        $("#CustomEmployer").val("").hide();
+        $("#TenancyProcessForm .rr-tenancy-employer").find(".bootstrap-select").show();
+        isCustomEmployer = false;
+        var customEmployer = $("#CustomEmployer").closest(".form-group");
+        customEmployer.find(".input-validation-error").removeClass("input-validation-error").addClass("valid");
+        customEmployer.find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid").text("");
+        e.preventDefault();
+    });
+
+
 });

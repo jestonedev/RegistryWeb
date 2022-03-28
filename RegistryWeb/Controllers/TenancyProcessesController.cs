@@ -325,6 +325,24 @@ namespace RegistryWeb.Controllers
             return Json(isExist);
         }
 
+        [HttpPost]
+        public IActionResult AddEmployer(string employerName)
+        {
+            if (string.IsNullOrEmpty(employerName))
+                return Json(-1);
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+                return Json(-2);
+            var duplicate = dataService.GetEmploeyerByName(employerName);
+                          
+            if (duplicate != null)
+            {
+                return Json(-3);
+            }
+            var employer = new Employer { EmployerName = employerName };
+            dataService.AddEmployer(employer);
+            return Json(employer.IdEmployer);
+        }
+
         public IActionResult TenancyProcessesReports(PageOptions pageOptions)
         {
             if (!securityService.HasPrivilege(Privileges.TenancyRead))
