@@ -273,7 +273,7 @@
                     errorElem.closest(".form-row").removeClass("d-none");
                     errorElem.html("<span class='text-danger'>" + result.error + "</span>");
                 } else {
-                    if (action !== undefined)
+                    if (action !== undefined || $("#FilterOptions_IdAccount").val() !== "" || $("#FilterOptions_IdClaim").val() !== "")
                         location.reload();
                     else {
                         var index = $("#DistributePaymentToAccountModal").data("index");
@@ -427,7 +427,7 @@
                     errorElem.closest(".form-row").removeClass("d-none");
                     errorElem.html("<span class='text-danger'>" + result.error + "</span>");
                 } else {
-                    if (action !== undefined)
+                    if (action !== undefined || $("#FilterOptions_IdAccount").val() !== "" || $("#FilterOptions_IdClaim").val() !== "")
                         location.reload();
                     else {
                         var index = modal.data("index");

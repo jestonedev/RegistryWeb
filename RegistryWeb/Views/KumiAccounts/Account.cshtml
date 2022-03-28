@@ -304,9 +304,16 @@
                                         <td class="text-center p-1">@charge.ChargeTenancy</td>
                                         <td class="text-center p-1">@charge.ChargePenalty</td>
                                         <td class="text-center p-1">
+                                            @{ 
+                                                var tenancyOnAccount = charge.PaymentCharges?.Sum(r => r.TenancyValue) ?? 0m;
+                                                var penaltyOnAccount = charge.PaymentCharges?.Sum(r => r.PenaltyValue) ?? 0m;
+                                            }
                                             @if (charge.PaymentTenancy > 0 || charge.PaymentPenalty > 0)
                                             {
-                                                <a asp-controller="KumiPayments" asp-action="Index" asp-route-idCharge="@charge.IdCharge">@charge.PaymentTenancy</a>
+                                                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentTenancy - tenancyOnAccount) руб." asp-action="Index" 
+                                                        asp-route-filterOptions.IdAccount="@Model.IdAccount" 
+                                                        asp-route-filterOptions.StartDate="@charge.StartDate.ToString("yyyy-MM-dd")" 
+                                                        asp-route-filterOptions.EndDate="@charge.EndDate.ToString("yyyy-MM-dd")">@charge.PaymentTenancy</a>
                                             }
                                             else
                                             {
@@ -316,7 +323,10 @@
                                         <td class="text-center p-1">
                                             @if (charge.PaymentTenancy > 0 || charge.PaymentPenalty > 0)
                                             {
-                                                <a asp-controller="KumiPayments" asp-action="Index" asp-route-idCharge="@charge.IdCharge">@charge.PaymentPenalty</a>
+                                                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index" 
+                                                        asp-route-filterOptions.IdAccount="@Model.IdAccount" 
+                                                        asp-route-filterOptions.StartDate="@charge.StartDate.ToString("yyyy-MM-dd")" 
+                                                        asp-route-filterOptions.EndDate="@charge.EndDate.ToString("yyyy-MM-dd")">@charge.PaymentPenalty</a>
                                             }
                                             else
                                             {
@@ -353,45 +363,72 @@
                         <a href="#" data-for="ClaimsInfo" class="form-control btn btn-primary account-toggler" title="Развернуть панель сведений о претензионно-исковых работах" style="font-weight:bold;">∧</a>
                     </div>
                 </div>
-                <ul class="list-group list-group-flush" id="ClaimsInfo">
+
+                <div class="card-body p-0" id="ClaimsInfo">
                     @if (Model.Claims.Any())
                     {
-                        foreach (var claim in Model.Claims)
-                        {
-                            var lastState = claim.ClaimStates.OrderByDescending(r => r.IdState).FirstOrDefault();
+                        <table class="table table-bordered table-striped m-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center p-1" rowspan="2" title="Период взыскания">Период взыскания</th>
+                                    <th class="text-center p-1" rowspan="2" title="Состояние">Состояние</th>
+                                    <th class="text-center p-1" colspan="2" title="Взыскиваемая сумма">Взыскиваемая сумма</th>
+                                    <th class="text-center p-1" colspan="2" title="Взысканная сумма">Взысканная сумма</th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center p-1" title="Найм">Найм</th>
+                                    <th class="text-center p-1" title="Пени">Пени</th>
+                                    <th class="text-center p-1" title="Найм">Найм</th>
+                                    <th class="text-center p-1" title="Пени">Пени</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var claim in Model.Claims)
+                                {
+                                    var lastState = claim.ClaimStates.OrderByDescending(r => r.IdState).FirstOrDefault();
+                                    var rentPeriod = "";
+                                    if (claim.StartDeptPeriod != null)
+                                    {
+                                        rentPeriod += "с " + claim.StartDeptPeriod.Value.ToString("dd.MM.yyyy");
+                                    }
+                                    if (claim.StartDeptPeriod != null && claim.EndDeptPeriod != null)
+                                    {
+                                        rentPeriod += " ";
+                                    }
+                                    if (claim.EndDeptPeriod != null)
+                                    {
+                                        rentPeriod += "по " + claim.EndDeptPeriod.Value.ToString("dd.MM.yyyy");
+                                    }
+                                    if (rentPeriod == "")
+                                    {
+                                        rentPeriod = "н/а";
+                                    }
 
-
-                            <li class="list-group-item">
-                                <div class="row">
-                                    <div class="form-group col-12 col-lg-5 mb-lg-0 mb-2">
-                                        <label class="rr-account-label mb-1">Текущеее состояние</label>
-                                        <input class="form-control" disabled type="text" value="@(lastState != null ? lastState.IdStateTypeNavigation.StateType : "")" />
-                                    </div>
-                                    <div class="form-group col-6 col-sm-5 col-lg-3 mb-0">
-                                        <label class="rr-account-label mb-1">Предьявлен период (с)</label>
-                                        <input class="form-control" disabled type="text" value="@claim.StartDeptPeriod?.ToString("dd.MM.yyyy")" />
-                                    </div>
-                                    <div class="form-group col-6 col-sm-5 col-lg-3 mb-0">
-                                        <label class="rr-account-label mb-1">Предьявлен период (по)</label>
-                                        <input class="form-control" disabled type="text" value="@claim.EndDeptPeriod?.ToString("dd.MM.yyyy")" />
-                                    </div>
-                                    <div class="col-12 col-sm-2 col-lg-1 text-center text-sm-right">
-                                        <a class="btn btn-primary account-open-claim-btn" asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.IdClaim"
-                                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
-                                            <span class="oi oi-eye"></span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                        }
+                                    <tr>
+                                        <td class="text-center p-1">
+                                            @rentPeriod
+                                            <a class="btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn" target="_blank"
+                                                asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.IdClaim"
+                                                asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
+                                            </a>
+                                        </td>
+                                        <td class="text-center p-1">@(lastState != null ? lastState.IdStateTypeNavigation.StateType : "")</td>
+                                        <td class="text-center p-1">@((claim.AmountTenancy+claim.AmountPadun+claim.AmountDgi+claim.AmountPkk)?.ToString() ?? "0,00")</td>
+                                        <td class="text-center p-1">@(claim.AmountPenalties?.ToString() ?? "0,00")</td>
+                                        <td class="text-center p-1">@(claim.AmountTenancyRecovered?.ToString() ?? "0,00")</td>
+                                        <td class="text-center p-1">@(claim.AmountPenaltiesRecovered?.ToString() ?? "0,00")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     }
                     else
                     {
-                        <li class="list-group-item text-center rr-list-group-item-empty">
+                        <div class="text-center rr-list-group-item-empty mt-2 mb-2">
                             <i>Исковые работы отсутствуют</i>
-                        </li>
+                        </div>
                     }
-                </ul>
+                </div>
             </div>
         }
     </div>

@@ -109,6 +109,27 @@
 
                     <div>
                         <b>Сумма:</b> <span class="rr-payment-sum">@item.Sum руб.@(@sumPosted > 0 ? ", расп.: " + @sumPosted + " руб." : "")</span>
+                        @if (Model.RefAccount != null)
+                        {
+                            var chargeIds = Model.RefAccount.Charges.Where(r => r.IdAccount == Model.RefAccount.IdAccount).Select(r => r.IdCharge).ToList();
+                            var claimIds = Model.RefAccount.Claims.Where(r => r.IdAccountKumi == Model.RefAccount.IdAccount).Select(r => r.IdClaim).ToList();
+                            var charges = item.PaymentCharges.Where(r => chargeIds.Contains(r.IdCharge));
+                            <br />
+                                <span class="text-danger"><b>Из них расп. по ЛС:</b></span><br />
+                                <span class="text-danger">найм @charges.Sum(r => r.TenancyValue) руб., пени @charges.Sum(r => r.PenaltyValue) руб.</span>
+                            <br />
+                            @foreach (var claim in item.PaymentClaims.Where(r => chargeIds.Contains(r.IdClaim)).GroupBy(r => r.IdClaim))
+                            {
+                                <span class="text-danger"><b>Из них расп. по 
+                                    <a target="_blank" class="text-danger" style="text-decoration: underline"
+                                       asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.Key"
+                                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
+                                    ИР №@claim.Key</a>:</b></span>
+                                
+                                <br />
+                                <span class="text-danger">найм @claim.Sum(r => r.TenancyValue) руб., пени @claim.Sum(r => r.PenaltyValue) руб.</span>
+                            }
+                        }
                     </div>
                     @if (!string.IsNullOrEmpty(item.Kbk))
                     {

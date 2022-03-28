@@ -3,16 +3,21 @@
 
 @{
     var securityService = (SecurityService)ViewData["SecurityService"];
+    var canWrite = securityService.HasPrivilege(Privileges.AccountsWrite) && Model.RefAccount == null && Model.RefClaim == null;
 }
 
 <form asp-action="Index" method="get" class="filterForm" autocomplete="off">
+    <input type="hidden" asp-for="FilterOptions.IdAccount" />
+    <input type="hidden" asp-for="FilterOptions.IdClaim" />
+    <input type="hidden" asp-for="FilterOptions.StartDate" />
+    <input type="hidden" asp-for="FilterOptions.EndDate" />
     <input type="hidden" asp-for="OrderOptions.OrderDirection" />
     <input type="hidden" asp-for="OrderOptions.OrderField" />
     <input type="hidden" asp-for="PageOptions.CurrentPage" />
     <input type="hidden" asp-for="PageOptions.SizePage" />
     <div class="form-row">
 
-        @if (securityService.HasPrivilege(Privileges.AccountsWrite))
+        @if (canWrite)
         {
             <div class="form-group col-6 col-md-2 col-lg-3">
                 <div class="dropdown">
@@ -32,13 +37,13 @@
         }
         @if (Model.FilterOptions.CommonFilter == null)
         {
-            <div class="form-group @(securityService.HasPrivilege(Privileges.AccountsWrite) ? "col-6 col-md-5" : "col-6 col-md-9 col-lg-10")">
+            <div class="form-group @(canWrite ? "col-6 col-md-5" : "col-6 col-md-9 col-lg-10")">
                 <input type="text" class="form-control" title="@searchPlacehodler" asp-for="FilterOptions.CommonFilter" placeholder="@searchPlacehodler" />
             </div>
         }
         else
         {
-            <div class="form-group @(securityService.HasPrivilege(Privileges.AccountsWrite) ? "col-6 col-md-5" : "col-6 col-md-9 col-lg-10")">
+            <div class="form-group @(canWrite ? "col-6 col-md-5" : "col-6 col-md-9 col-lg-10")">
                 <div class="input-group">
                     <input type="text" class="form-control" title="@searchPlacehodler" asp-for="FilterOptions.CommonFilter" placeholder="@searchPlacehodler" />
                     <div class="input-group-append h-auto d-inline-block">
@@ -60,7 +65,7 @@
                 <a class="btn btn-outline-secondary" href="#" id="filterClearBtn">&#10006;</a>
             </div>
         }
-        @if (securityService.HasPrivilege(Privileges.AccountsWrite))
+        @if (canWrite)
         {
             <div class="form-group col-6 col-md-2 col-lg-2">
                 <div class="dropdown">

@@ -38,13 +38,25 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool? IsPosted { get; set; }
         public DateTime? LoadDate { get; set; }
 
+        // Filter by period refs
+        public int? IdClaim { get; set; }
+        public int? IdAccount { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
         public KumiPaymentsFilter()
         {
         }
 
         public bool IsEmpty()
         {
-            return string.IsNullOrWhiteSpace(CommonFilter) && IdParentPayment == null && IsModalEmpty();
+            return string.IsNullOrWhiteSpace(CommonFilter) && IdParentPayment == null && IsModalEmpty()
+                && IsRefEmpty();
+        }
+
+        public bool IsRefEmpty()
+        {
+            return IdAccount == null && IdClaim == null && StartDate == null && EndDate == null;
         }
 
         public bool IsModalEmpty()

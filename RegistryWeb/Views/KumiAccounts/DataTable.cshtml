@@ -158,7 +158,7 @@
                     <div>
                         <b>№ ЛС:</b> @item.Account
                         <span class="oi oi-media-record ml-1 @(item.IdState == 1 ? "text-success" :  item.IdState == 2 ? "text-danger" : "text-warning")"
-                              title="@(item.IdState == 1 ? "Действующий" : item.IdState == 2 ? "Аннулированный" : "Не начисляется")" style="font-size: 80%"></span>
+                              title="@(item.IdState == 1 ? "Действующий" : item.IdState == 2 ? "Аннулированный" : item.IdState == 3 ? "Не начисляется плата за найм" : "Не начисляется пени и плата за найм")" style="font-size: 80%"></span>
                     </div>
                     @if (!String.IsNullOrWhiteSpace(@item.AccountGisZkh))
                     {

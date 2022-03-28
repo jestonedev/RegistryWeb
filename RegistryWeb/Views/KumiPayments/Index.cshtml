@@ -4,10 +4,22 @@
     var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
         "(" + Model.PageOptions.TotalRows + ")" :
         "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
+    if (Model.RefAccount != null)
+    {
+        ViewData["Title"] += " по ЛС №" + Model.RefAccount.Account;
+    }
+    if (Model.RefClaim != null)
+    {
+        ViewData["Title"] += " по ИР №" + Model.RefClaim.IdClaim;
+    }
+    if (Model.RefClaim != null || Model.RefAccount != null)
+    {
+        text = "("+ Model.PageOptions.Rows + ")";
+    }
 }
 
 @section styles
-    {
+{
     <link rel="stylesheet" href="~/css/kumi.payments.css" runat="server" />
 }
 

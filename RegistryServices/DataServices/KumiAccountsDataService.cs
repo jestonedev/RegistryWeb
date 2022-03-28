@@ -320,15 +320,24 @@ namespace RegistryWeb.DataServices
             }
             // Если лицевой счет в статусе "Действующий", то перерасчитываем начисления
             // Не начисляем за будущие периоды
-            if (endDate < DateTime.Now.Date && account.IdState == 1)
+            if (endDate < DateTime.Now.Date)
             {
-                foreach (var tenancy in account.TenancyInfo)
+                if (account.IdState == 1)
                 {
-                    chargeTenancy += CalcChargeByTenancy(tenancy, startDate, endDate);
+                    foreach (var tenancy in account.TenancyInfo)
+                    {
+                        chargeTenancy += CalcChargeByTenancy(tenancy, startDate, endDate);
+                    }
+                    chargeTenancy = Math.Round(chargeTenancy, 2);
                 }
-                chargeTenancy = Math.Round(chargeTenancy, 2);
-
-                // TODO calculate penalty
+                if (account.IdState == 1 || account.IdState == 3)
+                {
+                    // payments - только прямые платежи по лицевому счету
+                    // claims - учитываются исковые работы, имеющие статус "Подготовка и направление судебного приказа с указанием даты вынесения или номера с/п
+                    // и не имеющие даты отмены в шаге завершения (или не имеющие шаг завершения вовсе)
+                    // chargePenalty = CalcPenalty(charges, claims, payments); 
+                    // TODO calculate penalty
+                }
             }
 
             var payments = account.Payments.Where(r =>
@@ -1468,6 +1477,11 @@ namespace RegistryWeb.DataServices
             {
                 var currentClaimState = registryContext.ClaimStates.Include(r => r.IdStateTypeNavigation).Where(r => r.IdClaim == claim.IdClaim);
                 claim.ClaimStates = currentClaimState.ToList();
+            }
+            foreach (var charge in account.Charges)
+            {
+                var paymentCharges = registryContext.KumiPaymentCharges.Where(r => r.IdCharge == charge.IdCharge);
+                charge.PaymentCharges = paymentCharges.ToList();
             }
             return account;
         }
