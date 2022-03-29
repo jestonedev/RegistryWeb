@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RegistryDb.Models.Entities.KumiAccounts;
+using System;
 
 namespace RegistryDb.Models.Entities.Tenancies
 {
@@ -32,7 +33,7 @@ namespace RegistryDb.Models.Entities.Tenancies
         public DateTime? IncludeDate { get; set; }
         public DateTime? ExcludeDate { get; set; }
         public byte Deleted { get; set; }
-
         public virtual TenancyProcess IdProcessNavigation { get; set; }
+       // public virtual KumiAccountAddress IdKumiAccountAddressNavigation { get; set; }
     }
 }

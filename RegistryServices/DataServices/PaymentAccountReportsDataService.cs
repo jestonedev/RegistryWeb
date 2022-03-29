@@ -26,6 +26,7 @@ namespace RegistryWeb.DataServices
                                       IdAccount = gs.Key,
                                       Date = gs.Max()
                                   };
+            
 
             return (from row in registryContext.Payments
                     join maxDatePaymentsRow in maxDatePayments
