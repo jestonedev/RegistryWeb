@@ -784,6 +784,22 @@ namespace RegistryWeb.DataServices
                             select row;
                 }
             }
+
+            if (filterOptions.ClaimFormStatementSSPDateFrom != null)
+            {
+                var idClaimsLogs = (from log in registryContext.LogClaimStatementInSpp
+                                    where DateComparison(
+                                        filterOptions.ClaimFormStatementSSPDateOp,
+                                        log.CreateDate,
+                                        filterOptions.ClaimFormStatementSSPDateFrom,
+                                        filterOptions.ClaimFormStatementSSPDateTo)
+                                    select log.IdClaim).ToList();
+
+                query = from row in query
+                        where idClaimsLogs.Contains(row.IdClaim)
+                        select row;
+            }
+
             return query;
         }
 
@@ -1030,6 +1046,31 @@ namespace RegistryWeb.DataServices
                 return registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
                                 e.ExecutorLogin.ToLowerInvariant() == userName);
             }
+        }
+
+        public void ClaimLogCourtOsp(int idClaim)
+        {
+            var logClaimStatementInSppOrig = registryContext.LogClaimStatementInSpp.FirstOrDefault(l => l.IdClaim == idClaim);
+
+            if (logClaimStatementInSppOrig == null)
+            {
+                LogClaimStatementInSpp logClaimStatementInSpp = new LogClaimStatementInSpp
+                {
+                    CreateDate = DateTime.Now,
+                    IdClaim = idClaim,
+                    ExecutorLogin = securityService.User.UserName
+                };
+                registryContext.LogClaimStatementInSpp.Add(logClaimStatementInSpp);
+            }
+            else
+            {
+                logClaimStatementInSppOrig.CreateDate = DateTime.Now;
+                logClaimStatementInSppOrig.ExecutorLogin = logClaimStatementInSppOrig.ExecutorLogin == securityService.User.UserName
+                                                            ? logClaimStatementInSppOrig.ExecutorLogin : securityService.User.UserName;
+
+                registryContext.LogClaimStatementInSpp.Update(logClaimStatementInSppOrig);
+            }
+            registryContext.SaveChanges();
         }
     }
 }
