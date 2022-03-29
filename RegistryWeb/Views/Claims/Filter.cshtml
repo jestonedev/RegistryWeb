@@ -112,9 +112,9 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group col-6">
-                            <label asp-for="FilterOptions.AtDate">Дата формирования</label>
+                            <label asp-for="FilterOptions.AtDate">Дата формирования исковой работы</label>
                             <div class="input-group date">
-                                <input type="date" class="form-control" asp-for="FilterOptions.AtDate" title="Дата формирования">
+                                <input type="date" class="form-control" asp-for="FilterOptions.AtDate" title="Дата формирования исковой работы">
                             </div>
                         </div>
                         <div class="form-group col-6">
@@ -251,7 +251,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                    
+                    </div>
                     <div class="form-row">
                         <div class="form-group col-12 col-lg-6" title="Дата установки состояния">
                             <label asp-for="FilterOptions.ClaimStateDateOp" class="rr-claim-filter-label">Дата установки состояния</label>
@@ -264,7 +264,7 @@
                                 <input type="date" class="form-control" asp-for="FilterOptions.ClaimStateDateTo">
                             </div>
                         </div>
-                        <div class="form-group col-12 col-lg-6 rr-id-claim-state-4" title="Дата направления искогвого заявления">
+                        <div class="form-group col-12 col-lg-6 rr-id-claim-state-4" title="Дата направления искового заявления">
                             <label asp-for="FilterOptions.ClaimDirectionDateOp" class="rr-claim-filter-label">Дата направления и/з</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -296,6 +296,19 @@
                                 </div>
                                 <input type="date" class="form-control" asp-for="FilterOptions.ObtainingCourtOrderDateFrom">
                                 <input type="date" class="form-control" asp-for="FilterOptions.ObtainingCourtOrderDateTo">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12 col-lg-6" title="Дата формирования заявления в ССП">
+                            <label asp-for="FilterOptions.ClaimFormStatementSSPDateOp" class="rr-claim-filter-label">Дата формирования заявления в ССП</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <select class="selectpicker form-control" asp-for="FilterOptions.ClaimFormStatementSSPDateOp"
+                                            data-style-base="rr-comparison-sign btn btn-outline-secondary" asp-items="@signList"></select>
+                                </div>
+                                <input type="date" class="form-control" asp-for="FilterOptions.ClaimFormStatementSSPDateFrom">
+                                <input type="date" class="form-control" asp-for="FilterOptions.ClaimFormStatementSSPDateTo">
                             </div>
                         </div>
                     </div>

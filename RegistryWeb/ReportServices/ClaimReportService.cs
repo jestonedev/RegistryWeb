@@ -204,7 +204,7 @@ namespace RegistryWeb.ReportServices
             return resultcodes.Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
         }
 
-        internal byte[] ClaimCourtOspReport(int idClaim, DateTime createDate)
+        public byte[] ClaimCourtOspReport(int idClaim, DateTime createDate)
         {
             var arguments = new Dictionary<string, object>
             {
