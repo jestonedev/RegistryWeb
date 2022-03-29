@@ -91,7 +91,19 @@ $(function () {
             e.preventDefault();
         }
         else {
-            if (action !== "Create") return true;
+            if (action !== "Create") {
+                return true;
+            }
+
+            let claimPersons = getClaimPersons();
+
+            if ($(this).data("personsSourceSelected") === 0 && claimPersons.length === 0) {
+                var personsSourceModal = $("#PersonsSourceModal");
+                personsSourceModal.find("#PeronsSource").val(0);
+                personsSourceModal.modal('show');
+                return false;
+            }
+
             var inputTemplate = "<input type='hidden' name='{0}' value='{1}'>";
             let claimStates = getClaimStates();
             for (let i = 0; i < claimStates.length; i++) {
@@ -116,8 +128,7 @@ $(function () {
                 file.attr("name", "ClaimFile[" + i + "]");
                 $(this).append(file);
             }
-
-            let claimPersons = getClaimPersons();
+            
             for (let i = 0; i < claimPersons.length; i++) {
                 let tr = "Claim.ClaimPersons[" + i + "].";
                 $(this).append(inputTemplate.replace('{0}', tr + "IdPerson").replace('{1}', claimPersons[i].IdPerson));
@@ -308,7 +319,7 @@ $(function () {
         }
     });
 
-    // IdAccountKumi
+// IdAccountKumi
     $("#Claim_IdAccountKumiNavigation_Account").on("input", function () {
         $("#Claim_IdAccountKumi").val("");
     });
@@ -343,4 +354,44 @@ $(function () {
             $("input[name='Claim.RegistryAddressKumi']").val("");
         }
     });
+
+    $("#PersonsSourceModal .rr-select-source").on('click', function (e) {
+        var form = $("#ClaimForm");
+        form.data("personsSourceSelected", 1);
+        form.find("#LoadPersonsSource").val($("#PersonsSourceModal #PeronsSource").val());
+        form.submit();
+        e.preventDefault();
+    });
+
+    $("#PersonsSourceModal #PeronsSource").on('change', function (e) {
+        var modal = $("#PersonsSourceModal");
+        var source = $(this).val();
+        var idAccountBks = $("#ClaimForm #Claim_IdAccount").val();
+        if (idAccountBks === "0") idAccountBks = null;
+        var idAccountKumi = $("#ClaimForm #Claim_IdAccountKumi").val();
+        if (idAccountKumi === "0") idAccountKumi = null;
+        var loader = modal.find(".rr-persons-loader");
+        var resultWrapper = modal.find(".rr-persons-preview");
+        if (source !== 0)
+            loader.removeClass("d-none");
+        resultWrapper.addClass("d-none").html("");
+
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/Claims/GetClaimPersonsBySource',
+            data: { loadPersonsSource: source, idAccountBks: idAccountBks, idAccountKumi: idAccountKumi },
+            success: function (data) {
+                loader.addClass("d-none");
+                resultWrapper.removeClass("d-none").html(data);
+            }
+        });
+
+        e.preventDefault();
+    });
+
+    $("#PersonsSourceModal").on("hidden.bs.modal", function () {
+        $(this).find(".rr-persons-loader").addClass("d-none");
+        $(this).find(".rr-persons-preview").addClass("d-none").html("");
+    });
+
 });

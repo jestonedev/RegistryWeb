@@ -165,8 +165,8 @@
         </div>
     </div>
     <div class="card-body pt-3 pb-3 pl-3 pr-3" id="Claim">
-        <form asp-controller="Claims" asp-action="@ViewBag.Action" autocomplete="off" id="ClaimForm" data-action="@ViewBag.Action" method="post" enctype="multipart/form-data">
-            <input type="hidden" asp-for="Claim.IdClaim" />
+        <form asp-controller="Claims" asp-action="@ViewBag.Action" id="ClaimForm" data-action="@ViewBag.Action" data-persons-source-selected="0" autocomplete="off" method="post" enctype="multipart/form-data">            <input type="hidden" asp-for="Claim.IdClaim" />
+            <input type="hidden" asp-for="LoadPersonsSource" />
             <input type="hidden" value="@ViewBag.ReturnUrl" name="ReturnUrl" />
             <div class="row">
                 <div class="col-12 text-center rr-account-common-error">

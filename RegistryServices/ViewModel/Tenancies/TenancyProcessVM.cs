@@ -16,6 +16,7 @@ namespace RegistryServices.ViewModel.Tenancies
         public IList<Kinship> Kinships { get; set; }
         public IList<TenancyReasonType> TenancyReasonTypes { get; set; }
         public IList<Executor> Executors { get; set; }
+        public IList<Employer> Employers { get; set; }
         public IList<KladrStreet> Streets { get; set; }
         public IList<DocumentType> DocumentTypes { get; set; }
         public IList<DocumentIssuedBy> DocumentIssuedBy { get; set; }

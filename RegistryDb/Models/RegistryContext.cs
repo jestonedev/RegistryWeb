@@ -139,6 +139,7 @@ namespace RegistryDb.Models
         public virtual DbSet<RentTypeCategory> RentTypeCategories { get; set; }
         public virtual DbSet<Kinship> Kinships { get; set; }
         public virtual DbSet<RentType> RentTypes { get; set; }
+        public virtual DbSet<Employer> Employers { get; set; }
         public virtual DbSet<TenancyBuildingAssoc> TenancyBuildingsAssoc { get; set; }
         public virtual DbSet<TenancyPremiseAssoc> TenancyPremisesAssoc { get; set; }
         public virtual DbSet<TenancySubPremiseAssoc> TenancySubPremisesAssoc { get; set; }
@@ -173,6 +174,7 @@ namespace RegistryDb.Models
         public virtual DbSet<Judge> Judges { get; set; }
         public virtual DbSet<JudgeBuildingAssoc> JudgeBuildingsAssoc { get; set; }
         public virtual DbSet<Lawyer> Lawyers { get; set; }
+		public virtual DbSet<LogClaimStatementInSpp> LogClaimStatementInSpp { get; set; }
 
         //Журнал изменений
         public virtual DbSet<ChangeLog> ChangeLogs { get; set; }
@@ -341,6 +343,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new TenancyFileConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyProlongRentReasonTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyPaymentHistoryConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new EmployerConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new ExecutorConfiguration(nameDatebase));
 
@@ -368,6 +371,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new JudgeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new JudgeBuildingAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LawyerConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new LogClaimStatementInSppConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new PrivAgreementConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PrivContractConfiguration(nameDatebase));

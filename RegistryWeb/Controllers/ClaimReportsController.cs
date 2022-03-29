@@ -15,6 +15,7 @@ namespace RegistryWeb.Controllers
     {
         private readonly ClaimReportService reportService;
         private readonly ClaimReportsDataService dataService;
+        private readonly ClaimsDataService claimsDataService;
         private readonly SecurityService securityService;
         private const string zipMime = "application/zip";
         private const string odtMime = "application/vnd.oasis.opendocument.text";
@@ -22,12 +23,13 @@ namespace RegistryWeb.Controllers
         private const string xlsxMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private const string docxMime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
-        public ClaimReportsController(ClaimReportService reportService, ClaimReportsDataService dataService, SecurityService securityService)
+        public ClaimReportsController(ClaimReportService reportService, ClaimReportsDataService dataService, SecurityService securityService,
+             ClaimsDataService claimsDataService)
         {
             this.reportService = reportService;
             this.dataService = dataService;
             this.securityService = securityService;
-
+            this.claimsDataService = claimsDataService;
             nameFilteredIdsDict = "filteredClaimsIdsDict";
             nameIds = "idClaims";
             nameMultimaster = "ClaimsReports";
@@ -260,6 +262,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ClaimCourtOspReport(idClaim, createDate);
+                claimsDataService.ClaimLogCourtOsp(idClaim);
                 return File(file, odtMime, string.Format("Заявление о возбуждении ИП (иск. работа № {0}).odt", idClaim));
             }
             catch (Exception ex)

@@ -17,6 +17,7 @@ using RegistryDb.Models.Entities.Claims;
 using RegistryDb.Models.Entities.Common;
 using RegistryDb.Models.Entities.Payments;
 using RegistryDb.Models.Entities.RegistryObjects.Premises;
+using RegistryServices.Enums;
 
 namespace RegistryWeb.DataServices
 {
@@ -294,9 +295,16 @@ namespace RegistryWeb.DataServices
                             DateStartState = DateTime.Now.Date,
                             Executor = CurrentExecutor?.ExecutorName
                         }
-                    }
+                    },
+                    ClaimPersons = new List<ClaimPerson>()
                 };
-                claimsDataService.Create(claim, new List<Microsoft.AspNetCore.Http.IFormFile>());
+                claim.ClaimPersons = claimsDataService.GetClaimPersonsFromTenancy(claim.IdAccount, null);
+                if (claim.ClaimPersons.Count == 0)
+                {
+                    claim.ClaimPersons = claimsDataService.GetClaimPersonsFromPrevClaim(claim.IdAccount, null);
+                }
+
+                claimsDataService.Create(claim, new List<Microsoft.AspNetCore.Http.IFormFile>(), LoadPersonsSourceEnum.None);
             }
         }
 

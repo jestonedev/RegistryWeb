@@ -1,0 +1,28 @@
+﻿ @using RegistryDb.Models.Entities.Claims
+@model List<ClaimPerson>
+
+<table class="table table-bordered text-center p-1 mb-0">
+<thead>
+    <tr>
+        <th class="p-1">ФИО</th>
+        <th class="p-1">Дата рождения</th>
+        <th class="p-1">Наниматель</th>
+    </tr>
+</thead>
+<tbody>
+    @if (Model.Count > 0)
+    {
+        @foreach (var person in Model)
+        {
+            <tr>
+                <td class="p-1">@person.Surname @person.Name @person.Patronymic</td>
+                <td class="p-1">@(person.DateOfBirth == null ? "" : person.DateOfBirth.Value.ToString("dd.MM.yyyy"))</td>
+                <td class="p-1">@(person.IsClaimer ? "Да" : "Нет")</td>
+            </tr>
+        }
+    } else
+    {
+        <tr><td class="p-1" colspan="3"><i>Члены семьи ответчика не найдены</i></td></tr>
+    }
+</tbody>
+</table>

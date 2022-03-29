@@ -1,18 +1,22 @@
-﻿using RegistryDb.Models.Entities;
-using RegistryDb.Models.Entities.Claims;
+﻿using System;
 using RegistryDb.Models.Entities.Common;
 using RegistryDb.Models.Entities.Payments;
 using RegistryServices.ViewModel.KumiAccounts;
 using RegistryWeb.ViewModel;
 using System.Collections.Generic;
+using RegistryDb.Models.Entities.Claims;
+using RegistryServices.Enums;
 
 namespace RegistryServices.ViewModel.Claims
 {
     public class ClaimVM
     {
         public Claim Claim { get; set; }
+        public IList<Address> RentObjects { get; set; }        
         public IList<Address> RentObjectsBks { get; set; }
+
         public IList<KumiAccountTenancyInfoVM> TenancyInfoKumi { get; set; }
+        public LoadPersonsSourceEnum LoadPersonsSource { get; set; }
         public Payment LastPaymentInfo { get; set; }
         public IEnumerable<ClaimStateType> StateTypes { get; set; }
         public IEnumerable<Executor> Executors { get; set; }

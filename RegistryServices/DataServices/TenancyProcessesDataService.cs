@@ -139,7 +139,7 @@ namespace RegistryWeb.DataServices
 
             return new TenancyProcessVM
             {
-                TenancyProcess = new TenancyProcess(),
+                TenancyProcess = new TenancyProcess {},
                 Kinships = registryContext.Kinships.ToList(),
                 RentTypeCategories = registryContext.RentTypeCategories.ToList(),
                 RentTypes = registryContext.RentTypes.ToList(),
@@ -151,6 +151,7 @@ namespace RegistryWeb.DataServices
                 DocumentTypes = registryContext.DocumentTypes.ToList(),
                 DocumentIssuedBy = registryContext.DocumentsIssuedBy.ToList(),
                 TenancyProlongRentReasons = registryContext.TenancyProlongRentReasons.ToList(),
+                Employers = registryContext.Employers.ToList(),
                 RentObjects = rentObjects
             };
         }
@@ -474,8 +475,18 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
-        public List<PaymentHistoryVM> GetPaymentHistory(int id, PaymentHistoryTarget target)
+		public void AddEmployer(Employer employer)
         {
+            registryContext.Employers.Add(employer);
+            registryContext.SaveChanges();
+        }
+
+        public Employer GetEmploeyerByName(string employerName)
+        {
+            return registryContext.Employers.FirstOrDefault(r => r.EmployerName == employerName);
+        }
+
+        public List<PaymentHistoryVM> GetPaymentHistory(int id, PaymentHistoryTarget target)        {
             switch(target)
             {
                 case PaymentHistoryTarget.SubPremise:

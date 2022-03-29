@@ -20,6 +20,7 @@ using RegistryDb.Models.Entities.Common;
 using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryDb.Models.Entities.Payments;
 using RegistryDb.Models.Entities.Tenancies;
+using RegistryServices.Enums;
 
 namespace RegistryWeb.DataServices
 {
@@ -126,7 +127,7 @@ namespace RegistryWeb.DataServices
             return claim;
         }
 
-        public void Create(Claim claim, List<Microsoft.AspNetCore.Http.IFormFile> files)
+        public void Create(Claim claim, List<Microsoft.AspNetCore.Http.IFormFile> files, LoadPersonsSourceEnum loadPersonsSource)
         {
             // Прикрепляем документы
             var claimFilesPath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Claims\");
@@ -146,44 +147,75 @@ namespace RegistryWeb.DataServices
                 }
             }
             if (claim.ClaimPersons == null || !claim.ClaimPersons.Any())
+            if (claim.ClaimPersons == null)
+                claim.ClaimPersons = new List<ClaimPerson>();
+            switch (loadPersonsSource)
             {
-                var addressInfix = GetPaymentAccountAddressInfix(claim.IdAccount ?? 0);
-                var tenancyPersons = GetTenancyPersonForAddressInfix(addressInfix.Infix);
-                claim.ClaimPersons = tenancyPersons.Select(r => new ClaimPerson
-                {
-                    Surname = r.Surname,
-                    Name = r.Name,
-                    Patronymic = r.Patronymic,
-                    DateOfBirth = r.DateOfBirth,
-                    IsClaimer = r.IdKinship == 1
-                }).ToList();
-            }
-
-            if (claim.ClaimPersons == null || !claim.ClaimPersons.Any())
-            {
-                var prevClaim = registryContext.Claims.Include(r => r.ClaimPersons).Where(r => r.IdAccount == claim.IdAccount).OrderByDescending(r => r.IdClaim).FirstOrDefault();
-                if (prevClaim != null)
-                {
-                    claim.ClaimPersons = prevClaim.ClaimPersons.Select(r => new ClaimPerson
-                    {
-                        Surname = r.Surname,
-                        Name = r.Name,
-                        Patronymic = r.Patronymic,
-                        DateOfBirth = r.DateOfBirth,
-                        Passport = r.Passport,
-                        PlaceOfBirth = r.PlaceOfBirth,
-                        WorkPlace = r.WorkPlace,
-                        IsClaimer = r.IsClaimer
-                    }).ToList();
-                }
+                case LoadPersonsSourceEnum.None:
+                    break;
+                case LoadPersonsSourceEnum.Tenancy:
+                    claim.ClaimPersons = claim.ClaimPersons.Union(GetClaimPersonsFromTenancy(claim.IdAccount, claim.IdAccountKumi)).ToList();
+                    break;
+                case LoadPersonsSourceEnum.PrevClaim:
+                    claim.ClaimPersons = claim.ClaimPersons.Union(GetClaimPersonsFromPrevClaim(claim.IdAccount, claim.IdAccountKumi)).ToList();           
+                    break;
             }
 
             claim.IdAccountNavigation = null;
             claim.IdAccountAdditionalNavigation = null;
-            claim.IdAccountKumiNavigation = null;
             claim = FillClaimAmount(claim);
             registryContext.Claims.Add(claim);
             registryContext.SaveChanges();
+        }
+
+        public List<ClaimPerson> GetClaimPersonsFromPrevClaim(int? idAccountBks, int? idAccountKumi)
+        {
+            var prevClaim = registryContext.Claims.Include(r => r.ClaimPersons)
+                .Where(r => idAccountKumi != null ? r.IdAccountKumi == idAccountKumi : idAccountBks != null ? r.IdAccount == idAccountBks : false)
+                .OrderByDescending(r => r.IdClaim).FirstOrDefault();
+            if (prevClaim != null)
+            {
+                return prevClaim.ClaimPersons.Select(r => new ClaimPerson {
+                    Surname = r.Surname,
+                    Name = r.Name,
+                    Patronymic = r.Patronymic,
+                    DateOfBirth = r.DateOfBirth,
+                    Passport = r.Passport,
+                    PlaceOfBirth = r.PlaceOfBirth,
+                    WorkPlace = r.WorkPlace,
+                    IsClaimer = r.IsClaimer
+                }).ToList();
+            }
+            return new List<ClaimPerson>();
+        }
+
+        public List<ClaimPerson> GetClaimPersonsFromTenancy(int? idAccountBks, int? idAccountKumi)
+        {
+            var tenancyPersons = new List<TenancyPerson>();
+            if (idAccountKumi != null)
+            {
+                var tenancyProcesses = (from tpRow in registryContext.TenancyProcesses
+                                    .Where(tp => (tp.RegistrationNum == null || !tp.RegistrationNum.Contains("н")) && tp.IdAccount == idAccountKumi)
+                                     select tpRow).ToList();
+                if (tenancyProcesses.Any())
+                {
+                    var idProcess = tenancyProcesses.OrderByDescending(tp => new { tp.RegistrationDate, tp.IdProcess }).First().IdProcess;
+                    tenancyPersons = registryContext.TenancyPersons.Where(tp => tp.IdProcess == idProcess && tp.ExcludeDate == null).ToList();
+                }
+            } else
+            if (idAccountBks != null)
+            {
+                var addressInfix = GetPaymentAccountAddressInfix(idAccountBks.Value);
+                tenancyPersons = GetTenancyPersonForAddressInfix(addressInfix.Infix);
+            }
+            return tenancyPersons.Select(r => new ClaimPerson
+            {
+                Surname = r.Surname,
+                Name = r.Name,
+                Patronymic = r.Patronymic,
+                DateOfBirth = r.DateOfBirth,
+                IsClaimer = r.IdKinship == 1
+            }).ToList();
         }
 
         private List<TenancyPerson> GetTenancyPersonForAddressInfix(string infix)
@@ -819,6 +851,22 @@ namespace RegistryWeb.DataServices
                             select row;
                 }
             }
+
+            if (filterOptions.ClaimFormStatementSSPDateFrom != null)
+            {
+                var idClaimsLogs = (from log in registryContext.LogClaimStatementInSpp
+                                    where DateComparison(
+                                        filterOptions.ClaimFormStatementSSPDateOp,
+                                        log.CreateDate,
+                                        filterOptions.ClaimFormStatementSSPDateFrom,
+                                        filterOptions.ClaimFormStatementSSPDateTo)
+                                    select log.IdClaim).ToList();
+
+                query = from row in query
+                        where idClaimsLogs.Contains(row.IdClaim)
+                        select row;
+            }
+
             return query;
         }
 
@@ -1088,6 +1136,31 @@ namespace RegistryWeb.DataServices
                 return registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
                                 e.ExecutorLogin.ToLowerInvariant() == userName);
             }
+        }
+
+        public void ClaimLogCourtOsp(int idClaim)
+        {
+            var logClaimStatementInSppOrig = registryContext.LogClaimStatementInSpp.FirstOrDefault(l => l.IdClaim == idClaim);
+
+            if (logClaimStatementInSppOrig == null)
+            {
+                LogClaimStatementInSpp logClaimStatementInSpp = new LogClaimStatementInSpp
+                {
+                    CreateDate = DateTime.Now,
+                    IdClaim = idClaim,
+                    ExecutorLogin = securityService.User.UserName
+                };
+                registryContext.LogClaimStatementInSpp.Add(logClaimStatementInSpp);
+            }
+            else
+            {
+                logClaimStatementInSppOrig.CreateDate = DateTime.Now;
+                logClaimStatementInSppOrig.ExecutorLogin = logClaimStatementInSppOrig.ExecutorLogin == securityService.User.UserName
+                                                            ? logClaimStatementInSppOrig.ExecutorLogin : securityService.User.UserName;
+
+                registryContext.LogClaimStatementInSpp.Update(logClaimStatementInSppOrig);
+            }
+            registryContext.SaveChanges();
         }
     }
 }
