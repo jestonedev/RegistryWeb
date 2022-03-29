@@ -290,9 +290,16 @@ namespace RegistryWeb.DataServices
                             DateStartState = DateTime.Now.Date,
                             Executor = CurrentExecutor?.ExecutorName
                         }
-                    }
+                    },
+                    ClaimPersons = new List<ClaimPerson>()
                 };
-                claimsDataService.Create(claim, new List<Microsoft.AspNetCore.Http.IFormFile>());
+                claim.ClaimPersons = claimsDataService.GetClaimPersonsFromTenancy(claim.IdAccount);
+                if (claim.ClaimPersons.Count == 0)
+                {
+                    claim.ClaimPersons = claimsDataService.GetClaimPersonsFromPrevClaim(claim.IdAccount);
+                }
+
+                claimsDataService.Create(claim, new List<Microsoft.AspNetCore.Http.IFormFile>(), LoadPersonsSourceEnum.None);
             }
         }
 

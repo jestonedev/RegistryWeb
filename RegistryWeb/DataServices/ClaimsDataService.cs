@@ -101,7 +101,7 @@ namespace RegistryWeb.DataServices
             return claim;
         }
 
-        internal void Create(Claim claim, List<Microsoft.AspNetCore.Http.IFormFile> files)
+        internal void Create(Claim claim, List<Microsoft.AspNetCore.Http.IFormFile> files, LoadPersonsSourceEnum loadPersonsSource)
         {
             // Прикрепляем документы
             var claimFilesPath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"Claims\");
@@ -120,37 +120,18 @@ namespace RegistryWeb.DataServices
                     fileStream.Close();
                 }
             }
-            if (claim.ClaimPersons == null || !claim.ClaimPersons.Any())
+            if (claim.ClaimPersons == null)
+                claim.ClaimPersons = new List<ClaimPerson>();
+            switch (loadPersonsSource)
             {
-                var addressInfix = GetPaymentAccountAddressInfix(claim.IdAccount);
-                var tenancyPersons = GetTenancyPersonForAddressInfix(addressInfix.Infix);
-                claim.ClaimPersons = tenancyPersons.Select(r => new ClaimPerson
-                {
-                    Surname = r.Surname,
-                    Name = r.Name,
-                    Patronymic = r.Patronymic,
-                    DateOfBirth = r.DateOfBirth,
-                    IsClaimer = r.IdKinship == 1
-                }).ToList();
-            }
-
-            if (claim.ClaimPersons == null || !claim.ClaimPersons.Any())
-            {
-                var prevClaim = registryContext.Claims.Include(r => r.ClaimPersons).Where(r => r.IdAccount == claim.IdAccount).OrderByDescending(r => r.IdClaim).FirstOrDefault();
-                if (prevClaim != null)
-                {
-                    claim.ClaimPersons = prevClaim.ClaimPersons.Select(r => new ClaimPerson
-                    {
-                        Surname = r.Surname,
-                        Name = r.Name,
-                        Patronymic = r.Patronymic,
-                        DateOfBirth = r.DateOfBirth,
-                        Passport = r.Passport,
-                        PlaceOfBirth = r.PlaceOfBirth,
-                        WorkPlace = r.WorkPlace,
-                        IsClaimer = r.IsClaimer
-                    }).ToList();
-                }
+                case LoadPersonsSourceEnum.None:
+                    break;
+                case LoadPersonsSourceEnum.Tenancy:
+                    claim.ClaimPersons = claim.ClaimPersons.Union(GetClaimPersonsFromTenancy(claim.IdAccount)).ToList();
+                    break;
+                case LoadPersonsSourceEnum.PrevClaim:
+                    claim.ClaimPersons = claim.ClaimPersons.Union(GetClaimPersonsFromPrevClaim(claim.IdAccount)).ToList();           
+                    break;
             }
 
             claim.IdAccountNavigation = null;
@@ -158,6 +139,40 @@ namespace RegistryWeb.DataServices
             claim = FillClaimAmount(claim);
             registryContext.Claims.Add(claim);
             registryContext.SaveChanges();
+        }
+
+        public List<ClaimPerson> GetClaimPersonsFromPrevClaim(int idAccount)
+        {
+            var prevClaim = registryContext.Claims.Include(r => r.ClaimPersons).Where(r => r.IdAccount == idAccount).OrderByDescending(r => r.IdClaim).FirstOrDefault();
+            if (prevClaim != null)
+            {
+                return prevClaim.ClaimPersons.Select(r => new ClaimPerson
+                {
+                    Surname = r.Surname,
+                    Name = r.Name,
+                    Patronymic = r.Patronymic,
+                    DateOfBirth = r.DateOfBirth,
+                    Passport = r.Passport,
+                    PlaceOfBirth = r.PlaceOfBirth,
+                    WorkPlace = r.WorkPlace,
+                    IsClaimer = r.IsClaimer
+                }).ToList();
+            }
+            return new List<ClaimPerson>();
+        }
+
+        public List<ClaimPerson> GetClaimPersonsFromTenancy(int idAccount)
+        {
+            var addressInfix = GetPaymentAccountAddressInfix(idAccount);
+            var tenancyPersons = GetTenancyPersonForAddressInfix(addressInfix.Infix);
+            return tenancyPersons.Select(r => new ClaimPerson
+            {
+                Surname = r.Surname,
+                Name = r.Name,
+                Patronymic = r.Patronymic,
+                DateOfBirth = r.DateOfBirth,
+                IsClaimer = r.IdKinship == 1
+            }).ToList();
         }
 
         private List<TenancyPerson> GetTenancyPersonForAddressInfix(string infix)

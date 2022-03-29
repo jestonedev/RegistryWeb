@@ -90,12 +90,27 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             if (ModelState.IsValid)
             {
-                dataService.Create(claimVM.Claim,
-                    HttpContext.Request.Form.Files.Select(f => f).ToList());
+                dataService.Create( claimVM.Claim,
+                    HttpContext.Request.Form.Files.Select(f => f).ToList(), claimVM.LoadPersonsSource);
                 return RedirectToAction("Details", new { claimVM.Claim.IdClaim });
             }
             InitializeViewBag("Create", null, true);
             return View("Claim", dataService.GetClaimViewModel(claimVM.Claim));
+        }
+
+        public ActionResult GetClaimPersonsBySource(LoadPersonsSourceEnum loadPersonsSource, int idAccount)
+        {
+            var persons = new List<ClaimPerson>();
+            switch (loadPersonsSource)
+            {
+                case LoadPersonsSourceEnum.Tenancy:
+                    persons = dataService.GetClaimPersonsFromTenancy(idAccount);
+                    break;
+                case LoadPersonsSourceEnum.PrevClaim:
+                    persons = dataService.GetClaimPersonsFromPrevClaim(idAccount);
+                    break;
+            }
+            return PartialView("ClaimPersonsPreview", persons);
         }
 
         public ActionResult Edit(int? idClaim, string returnUrl)
