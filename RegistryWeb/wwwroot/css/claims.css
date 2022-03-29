@@ -41,3 +41,21 @@
         margin-top: 22px;
     }
 }
+
+#ClaimAmount table {
+    font-size: 70%;
+}
+
+@media(min-width: 768px) {
+
+    #ClaimAmount table {
+        font-size: 80%;
+    }
+}
+
+@media(min-width: 992px) {
+
+    #ClaimAmount table {
+        font-size: 100%;
+    }
+}

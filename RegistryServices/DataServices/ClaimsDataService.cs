@@ -124,6 +124,15 @@ namespace RegistryWeb.DataServices
             claim.AmountDgi = claim.AmountDgi ?? 0;
             claim.AmountPadun = claim.AmountPadun ?? 0;
             claim.AmountPkk = claim.AmountPkk ?? 0;
+            if (claim.IdClaim != 0)
+            {
+                var claimDb = registryContext.Claims.AsNoTracking().FirstOrDefault(r => r.IdClaim == claim.IdClaim);
+                if (claimDb != null)
+                {
+                    claim.AmountTenancyRecovered = claimDb.AmountTenancyRecovered;
+                    claim.AmountPenaltiesRecovered = claimDb.AmountPenaltiesRecovered;
+                }
+            }
             return claim;
         }
 

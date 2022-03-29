@@ -20,7 +20,6 @@
                     ЛС @charge.Key.Account
                     <a class="btn oi oi-eye p-0 text-primary rr-payment-assoc-eye-btn" target="_blank"
                        asp-action="Details" asp-controller="KumiAccounts"
-                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
                        asp-route-idAccount="@charge.Key.IdAccount"></a>
                 </td>
                 <td class="text-center p-1">@charge.Select(r => r.TenancyValue).Sum()</td>
@@ -42,7 +41,6 @@
                     @claimPeriod
                     <a class="btn oi oi-eye p-0 text-primary rr-payment-assoc-eye-btn" target="_blank"
                        asp-action="Details" asp-controller="Claims"
-                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
                        asp-route-idClaim="@claim.Key.IdClaim"></a>
                 </td>
                 <td class="text-center p-1">@claim.Select(r => r.TenancyValue).Sum()</td>

@@ -346,11 +346,12 @@ namespace RegistryWeb.DataServices
                 r.DateDocument != null ? r.DateDocument >= startDate && r.DateDocument <= endDate : false);
 
             var claimIds = account.Claims.Select(r => r.IdClaim).ToList();
+            var chargeIds = account.Charges.Select(r => r.IdCharge).ToList();
 
-            var paymentPenalty = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Sum(pc => pc.PenaltyValue))
+            var paymentPenalty = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.PenaltyValue))
                 + payments.Where(r => r.PaymentClaims.Any()).Sum(r => r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Select(pc => pc.PenaltyValue).Sum());
 
-            var paymentTenancy = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Sum(pc => pc.TenancyValue))
+            var paymentTenancy = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.TenancyValue))
                 + payments.Where(r => r.PaymentClaims.Any()).Sum(r => r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Select(pc => pc.TenancyValue).Sum());
 
             if (chargeTenancy != 0 || chargePenalty != 0 || recalcTenancy != 0 || recalcPenalty != 0 || paymentPenalty != 0 || paymentTenancy != 0 ||

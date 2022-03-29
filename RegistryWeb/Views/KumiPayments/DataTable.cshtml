@@ -115,20 +115,37 @@
                             var claimIds = Model.RefAccount.Claims.Where(r => r.IdAccountKumi == Model.RefAccount.IdAccount).Select(r => r.IdClaim).ToList();
                             var charges = item.PaymentCharges.Where(r => chargeIds.Contains(r.IdCharge));
                             <br />
-                                <span class="text-danger"><b>Из них расп. по ЛС:</b></span><br />
-                                <span class="text-danger">найм @charges.Sum(r => r.TenancyValue) руб., пени @charges.Sum(r => r.PenaltyValue) руб.</span>
+                            <span class="text-danger"><b>Из них расп. по ЛС:</b></span><br />
+                            <span class="text-danger">найм @charges.Sum(r => r.TenancyValue) руб., пени @charges.Sum(r => r.PenaltyValue) руб.</span>
                             <br />
-                            @foreach (var claim in item.PaymentClaims.Where(r => chargeIds.Contains(r.IdClaim)).GroupBy(r => r.IdClaim))
+                            @foreach (var claim in item.PaymentClaims.Where(r => claimIds.Contains(r.IdClaim)).GroupBy(r => r.IdClaim))
                             {
-                                <span class="text-danger"><b>Из них расп. по 
-                                    <a target="_blank" class="text-danger" style="text-decoration: underline"
-                                       asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.Key"
-                                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
-                                    ИР №@claim.Key</a>:</b></span>
-                                
+                                <span class="text-danger">
+                                    <b>
+                                        Из них расп. по
+                                        <a target="_blank" class="text-danger" style="text-decoration: underline"
+                                           asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.Key"
+                                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
+                                            ИР №@claim.Key
+                                        </a>:
+                                    </b>
+                                </span>
+
                                 <br />
                                 <span class="text-danger">найм @claim.Sum(r => r.TenancyValue) руб., пени @claim.Sum(r => r.PenaltyValue) руб.</span>
                             }
+                        }
+                        @if (Model.RefClaim != null)
+                        {
+                            <br />
+                            var claimChargeInfo = item.PaymentClaims.Where(r => r.IdClaim == Model.RefClaim.IdClaim);
+                            <span class="text-danger">
+                                <b>
+                                    Из них расп. по ИР:
+                                </b>
+                            </span>
+                            <br />
+                            <span class="text-danger">найм @Math.Round(claimChargeInfo.Sum(r => r.TenancyValue), 2) руб., пени @Math.Round(claimChargeInfo.Sum(r => r.PenaltyValue), 2) руб.</span>
                         }
                     </div>
                     @if (!string.IsNullOrEmpty(item.Kbk))

@@ -238,13 +238,61 @@
                     <label class="rr-account-label mb-1" asp-for="LastChargeDate">Дата начисления</label>
                     <input type="date" asp-for="LastChargeDate" title="Дата последнего начисления" class="form-control" disabled />
                 </div>
+
+                @{
+                    var tenancyClaimsSum = 0.00m;
+                    var penaltyClaimsSum = 0.00m;
+                    var payedTenancyClaimsSum = 0.00m;
+                    var payedPenaltyClaimsSum = 0.00m;
+                    if (Model.Claims != null)
+                    {
+                        foreach (var claim in Model.Claims)
+                        {
+                            if (claim.ClaimStates == null) { continue; }
+                            var completeState = claim.ClaimStates.FirstOrDefault(r => r.IdStateType == 6);
+                            var prepareCourtOrderState = claim.ClaimStates.FirstOrDefault(r => r.IdStateType == 4);
+                            if (prepareCourtOrderState != null &&
+                                (prepareCourtOrderState.CourtOrderNum != null || prepareCourtOrderState.CourtOrderDate != null) &&
+                                (completeState == null || (completeState != null && completeState.CourtOrderCancelDate == null)))
+                            {
+                                tenancyClaimsSum += (claim.AmountTenancy + claim.AmountDgi + claim.AmountPadun + claim.AmountPkk) ?? 0.00m;
+                                penaltyClaimsSum += claim.AmountPenalties ?? 0.00m;
+                            }
+                        }
+                        foreach(var charge in Model.Charges)
+                        {
+                            var tenancyOnAccount = charge.PaymentCharges?.Sum(r => r.TenancyValue) ?? 0m;
+                            var penaltyOnAccount = charge.PaymentCharges?.Sum(r => r.PenaltyValue) ?? 0m;
+                            payedTenancyClaimsSum += charge.PaymentTenancy - tenancyOnAccount;
+                            payedPenaltyClaimsSum += charge.PaymentPenalty - penaltyOnAccount;
+                        }
+                    }
+                }
+
                 <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-account-label mb-1" asp-for="CurrentBalanceTenancy">Сальдо найм</label>
-                    <input type="text" asp-for="CurrentBalanceTenancy" title="Текущее сальдо найм" class="form-control" disabled />
+                    <div class="input-group">
+
+                        <input type="text" asp-for="CurrentBalanceTenancy" title="Текущее сальдо найм" class="form-control" disabled />
+
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon2" title="За вычетом суммы найма, взыскиваемой по исковым работам">
+                                @(Model.CurrentBalanceTenancy - (tenancyClaimsSum - payedTenancyClaimsSum))
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-account-label mb-1" asp-for="CurrentBalancePenalty">Сальдо пени</label>
-                    <input type="text" asp-for="CurrentBalancePenalty" title="Текущее сальдо пени" class="form-control" disabled />
+
+                    <div class="input-group">
+                        <input type="text" asp-for="CurrentBalancePenalty" title="Текущее сальдо пени" class="form-control" disabled />
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon2" title="За вычетом суммы пени, взыскиваемой по исковым работам">
+                                @(Model.CurrentBalancePenalty - (penaltyClaimsSum - payedPenaltyClaimsSum))
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-account-label mb-1" asp-for="AnnualDate">Дата аннулирования</label>
@@ -293,9 +341,23 @@
                             <tbody>
                                 @{
                                     var i = 0;
+                                    var totalChargeTenancy = 0.00m;
+                                    var totalChargePenalty = 0.00m;
+                                    var totalPaymentTenancy = 0.00m;
+                                    var totalPaymentPenalty = 0.00m;
+                                    var totalPaymentTenancyByAccount = 0.00m;
+                                    var totalPaymentPenaltyByAccount = 0.00m;
+                                    var totalRecalcTenancy = 0.00m;
+                                    var totalRecalcPenalty = 0.00m;
                                 }
                                 @foreach (var charge in Model.Charges.OrderBy(r => r.EndDate))
                                 {
+                                    totalChargeTenancy += charge.ChargeTenancy;
+                                    totalChargePenalty += charge.ChargePenalty;
+                                    totalPaymentTenancy += charge.PaymentTenancy;
+                                    totalPaymentPenalty += charge.PaymentPenalty;
+                                    totalRecalcTenancy += charge.RecalcTenancy;
+                                    totalRecalcPenalty += charge.RecalcPenalty;
                                     i++;
                                     <tr class="@(i > 12 ? "rr-charge-archive" : "")">
                                         <td class="text-center p-1"><b>@charge.EndDate.ToString("dd.MM.yyyy")</b></td>
@@ -307,6 +369,8 @@
                                             @{ 
                                                 var tenancyOnAccount = charge.PaymentCharges?.Sum(r => r.TenancyValue) ?? 0m;
                                                 var penaltyOnAccount = charge.PaymentCharges?.Sum(r => r.PenaltyValue) ?? 0m;
+                                                totalPaymentTenancyByAccount += tenancyOnAccount;
+                                                totalPaymentPenaltyByAccount += penaltyOnAccount;
                                             }
                                             @if (charge.PaymentTenancy > 0 || charge.PaymentPenalty > 0)
                                             {
@@ -339,6 +403,42 @@
                                         <td class="text-center p-1">@charge.OutputPenalty</td>
                                     </tr>
                                 }
+                                <tr>
+                                    <td class="text-center p-1"><b>Итого</b></td>
+                                    <td class="text-center p-1"><b>-</b></td>
+                                    <td class="text-center p-1"><b>-</b></td>
+                                    <td class="text-center p-1"><b>@totalChargeTenancy</b></td>
+                                    <td class="text-center p-1"><b>@totalChargePenalty</b></td>
+                                    <td class="text-center p-1">
+                                        @if (totalPaymentTenancy > 0 || totalPaymentPenalty > 0)
+                                        {
+                                            <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentTenancy - totalPaymentTenancyByAccount) руб." asp-action="Index" 
+                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentTenancy</b></a>
+                                        }
+                                        else
+                                        {
+                                            <b>@totalPaymentTenancy</b>
+                                        }
+                                          
+                                    </td>
+                                    <td class="text-center p-1">
+                                        @if (totalPaymentTenancy > 0 || totalPaymentPenalty > 0)
+                                        {
+                                            <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPenalty - totalPaymentPenaltyByAccount) руб." asp-action="Index"
+                                               asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPenalty</b></a>
+                                        }
+                                        else
+                                        {
+                                            <b>@totalPaymentPenalty</b>
+                                        }
+
+                                        
+                                    </td>
+                                    <td class="text-center p-1"><b>@totalRecalcTenancy</b></td>
+                                    <td class="text-center p-1"><b>@totalRecalcPenalty</b></td>
+                                    <td class="text-center p-1"><b>-</b></td>
+                                    <td class="text-center p-1"><b>-</b></td>
+                                </tr>
                             </tbody>
                         </table>
                         if (i > 12)
@@ -386,6 +486,11 @@
                                 @foreach (var claim in Model.Claims)
                                 {
                                     var lastState = claim.ClaimStates.OrderByDescending(r => r.IdState).FirstOrDefault();
+                                    var canceledClaim = false;
+                                    if(lastState != null && lastState.IdStateType == 6 && lastState.CourtOrderCancelDate != null)
+                                    {
+                                        canceledClaim = true;
+                                    }
                                     var rentPeriod = "";
                                     if (claim.StartDeptPeriod != null)
                                     {
@@ -404,7 +509,7 @@
                                         rentPeriod = "н/а";
                                     }
 
-                                    <tr>
+                                    <tr style="@(canceledClaim ? "background-color: #FEDCDC;" : "")" title="@(canceledClaim ? "Отмененная исковая работа" : "")">
                                         <td class="text-center p-1">
                                             @rentPeriod
                                             <a class="btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn" target="_blank"

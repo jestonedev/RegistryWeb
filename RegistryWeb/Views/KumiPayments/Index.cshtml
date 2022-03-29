@@ -7,10 +7,26 @@
     if (Model.RefAccount != null)
     {
         ViewData["Title"] += " по ЛС №" + Model.RefAccount.Account;
+        if (Model.FilterOptions.StartDate != null || Model.FilterOptions.EndDate != null)
+        {
+            ViewData["Title"] += " ";
+        }
+        if (Model.FilterOptions.StartDate != null)
+        {
+            ViewData["Title"] += "с "+ Model.FilterOptions.StartDate.Value.ToString("dd.MM.yyyy");
+        }
+        if (Model.FilterOptions.StartDate != null && Model.FilterOptions.EndDate != null)
+        {
+            ViewData["Title"] += " ";
+        }
+        if (Model.FilterOptions.EndDate != null)
+        {
+            ViewData["Title"] += "по " + Model.FilterOptions.EndDate.Value.ToString("dd.MM.yyyy");
+        }
     }
     if (Model.RefClaim != null)
     {
-        ViewData["Title"] += " по ИР №" + Model.RefClaim.IdClaim;
+        ViewData["Title"] += " по исковой работе №" + Model.RefClaim.IdClaim;
     }
     if (Model.RefClaim != null || Model.RefAccount != null)
     {
