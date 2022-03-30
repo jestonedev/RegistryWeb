@@ -3,6 +3,7 @@ using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
+using System;
 using System.Collections.Generic;
 
 namespace RegistryServices.ViewModel.KumiAccounts
@@ -15,5 +16,6 @@ namespace RegistryServices.ViewModel.KumiAccounts
         public SelectList KladrRegionsList { get; set; }
         public SelectList KladrStreetsList { get; set; }
         public SelectList AccountStates { get; set; }
+        public Dictionary<int, DateTime> MonthsList { get; set; }
     }
 }
