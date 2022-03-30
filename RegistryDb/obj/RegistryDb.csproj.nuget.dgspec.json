@@ -10,14 +10,14 @@
         "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
         "projectName": "RegistryDb",
         "projectPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
-        "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\TutGA_a\\.nuget\\packages\\",
         "outputPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\TutGA\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\TutGA_a\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

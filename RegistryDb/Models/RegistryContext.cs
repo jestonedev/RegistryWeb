@@ -235,6 +235,7 @@ namespace RegistryDb.Models
         public virtual DbSet<OwnerActiveProcess> OwnerActiveProcesses { get; set; }
         public virtual DbSet<BuildingOwnershipRightCurrent> BuildingsOwnershipRightCurrent { get; set; }
         public virtual DbSet<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
+        public virtual DbSet<KumiAccountAddress> KumiAccountAddresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -249,6 +250,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new OwnerActiveProcessConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new BuildingOwnershipRightCurrentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremiseOwnershipRightCurrentConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiAccountAddressConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new ChangeLogConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LogOwnerProcessConfiguration(nameDatebase));
