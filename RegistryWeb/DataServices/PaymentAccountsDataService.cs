@@ -1130,31 +1130,6 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
-        public PaymentsVM GetPaymentsHistory(int idAccount)
-        {
-            var viewModel = InitializeViewModel(null, null, null);
-            var lastPayment = GetQuery().Where(r => r.IdAccount == idAccount).ToList();
-            var accounts = GetAccountIdsAssocs(lastPayment);
-            var accountIds = accounts.Select(r => r.IdAccountActual);
-            viewModel.Payments = (from row in registryContext.Payments.Include(r => r.PaymentAccountNavigation)
-                   where accountIds.Contains(row.IdAccount)
-                   orderby row.Date descending
-                   select row).ToList();
-            viewModel.RentObjects = GetRentObjects(lastPayment);
-            viewModel.ClaimsByAddresses = GetClaimsByAddresses(lastPayment);
-
-            var monthsList = registryContext.Payments
-                            .Select(p => p.Date).Distinct()
-                            .OrderByDescending(p => p.Date).Take(6)
-                            .ToList();
-
-            viewModel.MonthsList = new Dictionary<int, DateTime>();
-            for (var i = 0; i < monthsList.Count(); i++)
-                viewModel.MonthsList.Add(monthsList[i].Month, monthsList[i].Date);
-
-            return viewModel;
-        }
-
         public PaymentsAccountTableVM GetPaymentHistoryTable(AclUser user, int idAccount)
         {
             var viewModel = new PaymentsAccountTableVM();
@@ -1256,7 +1231,8 @@ namespace RegistryWeb.DataServices
                              {
                                  IdClaim = claimStateRow.IdClaim,
                                  IdClaimCurrentState = claimStateTypeRow.IdStateType,
-                                 ClaimCurrentState = claimStateTypeRow.StateType
+                                 ClaimCurrentState = claimStateTypeRow.StateType,
+                                 ClaimCurrentStateDate = claimStateRow.DateStartState
                              };
 
             claimsInfo = from claimRow in claims
@@ -1273,7 +1249,9 @@ namespace RegistryWeb.DataServices
                              IdAccount = accountsAssocRow.IdAccountFiltered,
                              IdClaimCurrentState = cRow.IdClaimCurrentState,
                              ClaimCurrentState = cRow.ClaimCurrentState,
-                             EndedForFilter = claimRow.EndedForFilter
+                             EndedForFilter = claimRow.EndedForFilter,
+                             ClaimDescription = claimRow.Description,
+                             ClaimCurrentStateDate = cRow.ClaimCurrentStateDate
                          };
 
 
@@ -1281,10 +1259,12 @@ namespace RegistryWeb.DataServices
                     claimsInfo
                     .Select(c => new ClaimInfo {
                         ClaimCurrentState = c.ClaimCurrentState,
+                        ClaimCurrentStateDate = c.ClaimCurrentStateDate,
                         IdClaimCurrentState =c.IdClaimCurrentState,
                         IdClaim = c.IdClaim,
                         StartDeptPeriod = c.StartDeptPeriod,
                         EndDeptPeriod = c.EndDeptPeriod,
+                        ClaimDescription = c.ClaimDescription,
                         EndedForFilter = c.EndedForFilter,
                         IdAccount = c.IdAccount
                     })

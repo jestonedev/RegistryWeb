@@ -2,7 +2,8 @@
 @{
     var address = (Address)ViewData["Address"];
 }
-<div>
+<div class="row">
+    <div class="col-auto">
         <button class="btn btn-success oi oi-home dropdown-toggle mr-1" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="homesBtn_@ViewData["IdAccount"]_@address.Id" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
         <div class="dropdown-menu" aria-labelledby="homesBtn_@ViewData["IdAccount"]_@address.Id">
             @foreach (var addr in Model)
@@ -16,5 +17,9 @@
                     <a class="dropdown-item" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@addr.Id" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Помещение</a>
                 }
             }
-        </div>@address.Text
+        </div>
+    </div>
+    <div class="col-lg-9 col-md-8">
+        @address.Text
+    </div>
 </div>
