@@ -22,7 +22,7 @@ namespace RegistryWeb.ReportServices
             this.securityService = securityService;
         }
 
-        public byte[] CalDept(KumiCharge lastPayment, TenancyPerson person, string TotalArea,  DateTime dateFrom, DateTime dateTo, int fileFormat)
+        public byte[] CalDept(KumiCharge lastPayment, TenancyPerson person,  string totalArea, int prescribed, DateTime dateFrom, DateTime dateTo, int fileFormat)
         {
             var arguments = new Dictionary<string, object>
             {
@@ -32,8 +32,8 @@ namespace RegistryWeb.ReportServices
                 { "account", lastPayment.Account.Account },
                 { "tenant", string.Concat(person.Surname," ", person.Name, " ", person.Patronymic) },
                 { "raw_address", lastPayment.Account.KumiAccountAddressNavigation.Address },
-               // { "prescribed", lastPayment.Prescribed },
-                { "total_area", TotalArea },
+                { "prescribed", prescribed },
+                { "total_area", totalArea },
                 { "templateFileName", activityManagerPath + "templates\\registry\\kumi_report_test\\amount_debt_KUMI." + (fileFormat == 1 ? "xlsx" : "ods") },
             };
             var fileName = "registry\\kumi_report_test\\amount_debt_KUMI";

@@ -4,6 +4,7 @@ using RegistryDb.Models.Entities.Tenancies;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RegistryDb.Models.Entities.KumiAccounts
 {
@@ -32,5 +33,8 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public virtual IList<TenancyProcess> TenancyProcesses { get; set; }
         public virtual IList<Claim> Claims { get; set; }
         public virtual IList<KumiCharge> Charges { get; set; }
+       
+        [NotMapped]
+        public Dictionary<int, DateTime> MonthsList { get; set; }
     }
 }

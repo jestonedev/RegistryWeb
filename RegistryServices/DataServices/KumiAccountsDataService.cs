@@ -1491,6 +1491,14 @@ namespace RegistryWeb.DataServices
                 var paymentCharges = registryContext.KumiPaymentCharges.Where(r => r.IdCharge == charge.IdCharge);
                 charge.PaymentCharges = paymentCharges.ToList();
             }
+
+            var monthsList = account.Charges
+                .Select(c => c.EndDate).Distinct().OrderByDescending(c => c.Date).Take(6).ToList();
+
+            account.MonthsList = new Dictionary<int, DateTime>();
+            for (var i = 0; i < monthsList.Count(); i++)
+                account.MonthsList.Add(monthsList[i].Month, monthsList[i].Date);
+
             return account;
         }
 
