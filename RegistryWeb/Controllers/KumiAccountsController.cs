@@ -11,6 +11,8 @@ using RegistryDb.Models.Entities;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.KumiAccounts;
 using RegistryDb.Models.Entities.KumiAccounts;
+using RegistryServices.Enums;
+using System;
 
 namespace RegistryWeb.Controllers
 {
@@ -179,6 +181,31 @@ namespace RegistryWeb.Controllers
                 }),
                 RentObjects = rentObjects
             });
+        }
+
+        [HttpPost]
+        public IActionResult RecalcAccounts(List<int> idAccounts, KumiAccountRecalcTypeEnum recalcType, int? recalcStartYear, int? recalcStartMonth)
+        {
+            try
+            {
+                DateTime? recalcStartDate = null;
+                if (recalcStartYear != null && recalcStartMonth != null)
+                    recalcStartDate = new DateTime(recalcStartYear.Value, recalcStartMonth.Value, 1);
+                dataService.RecalculateAccounts(idAccounts, recalcType, recalcStartDate);
+
+                return Json(new
+                {
+                    State = "Success"
+                });
+            }
+            catch(Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.Message
+                });
+            }
         }
     }
 }

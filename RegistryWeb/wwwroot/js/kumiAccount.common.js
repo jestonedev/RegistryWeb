@@ -1,5 +1,6 @@
 ﻿$(function () {
     var form = $('#accountForm');
+
     var action = form.attr('data-action');
 
     if (action === 'Details' || action === 'Delete') {
@@ -399,4 +400,13 @@
     };
 
     $(".rr-charge-archive-btn").on("click", toggleChargeArchive);
+
+    $("#AccountRecalcBtn").on("click", function (e) {
+        var idAccount = $("#accountForm #IdAccount").val();
+        var modal = $("#accountRecalcModal");
+        modal.find("input[name='AccountKumiRecalc.IdAccount']").val(idAccount);
+        modal.find("select, input").prop('disabled', false);
+        modal.modal('show');
+        e.preventDefault();
+    });
 });

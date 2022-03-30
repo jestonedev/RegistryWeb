@@ -537,7 +537,7 @@ namespace RegistryWeb.DataServices
             startRewriteDate = startRewriteDate.AddDays(-startRewriteDate.Day + 1).AddMonths(-1);
             var endCalcDate = DateTime.Now.Date;
             endCalcDate = endCalcDate.AddDays(-endCalcDate.Day + 1).AddMonths(1).AddDays(-1);
-            RecalculateAccounts(accounts, startRewriteDate, endCalcDate);  
+            kumiAccountsDataService.RecalculateAccounts(accounts, startRewriteDate, endCalcDate);  
 
             return new KumiPaymentDistributionInfo
             {
@@ -546,26 +546,6 @@ namespace RegistryWeb.DataServices
                 DistrubutedToTenancySum = 0,
                 DistrubutedToPenaltySum = 0
             };
-        }
-
-        private void RecalculateAccounts(IQueryable<KumiAccount> accounts, DateTime startRewriteDate, DateTime endCalcDate)
-        {
-            var accountsPrepare = kumiAccountsDataService.GetAccountsPrepareForPaymentCalculator(accounts);
-            var accountsInfo = kumiAccountsDataService.GetAccountInfoForPaymentCalculator(accountsPrepare);
-
-            foreach (var account in accountsInfo)
-            {
-                var startCalcDate = kumiAccountsDataService.GetAccountStartCalcDate(account);
-                if (startCalcDate == null) continue;
-                var chargingInfo = kumiAccountsDataService.CalcChargesInfo(account, startCalcDate.Value, endCalcDate);
-                var recalcInsertIntoCharge = new KumiCharge();
-                if (chargingInfo.Any()) recalcInsertIntoCharge = chargingInfo.Last();
-
-                var dbChargingInfo = kumiAccountsDataService.GetDbChargingInfo(account);
-                startRewriteDate = kumiAccountsDataService.CorrectStartRewriteDate(startRewriteDate, startCalcDate.Value, dbChargingInfo);
-                kumiAccountsDataService.CalcRecalcInfo(account, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, endCalcDate, startRewriteDate);
-                kumiAccountsDataService.UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate);
-            }
         }
 
         public KumiPaymentDistributionInfo DistributePaymentToAccount(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo, decimal tenancySum, decimal penaltySum)
@@ -683,7 +663,7 @@ namespace RegistryWeb.DataServices
             startRewriteDate = startRewriteDate.AddDays(-startRewriteDate.Day + 1).AddMonths(-1);
             var endCalcDate = DateTime.Now.Date;
             endCalcDate = endCalcDate.AddDays(-endCalcDate.Day + 1).AddMonths(1).AddDays(-1);
-            RecalculateAccounts(accounts, startRewriteDate, endCalcDate);
+            kumiAccountsDataService.RecalculateAccounts(accounts, startRewriteDate, endCalcDate);
 
             return new KumiPaymentDistributionInfo
             {

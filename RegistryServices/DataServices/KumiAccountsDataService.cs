@@ -14,6 +14,7 @@ using RegistryServices.ViewModel.KumiAccounts;
 using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryDb.Models.Entities.RegistryObjects.Kladr;
 using RegistryDb.Models.Entities.Tenancies;
+using RegistryServices.Enums;
 
 namespace RegistryWeb.DataServices
 {
@@ -169,6 +170,45 @@ namespace RegistryWeb.DataServices
                 if (maxStartRewriteDate < startRewriteDate) return maxStartRewriteDate;
             }
             return startRewriteDate;
+        }
+
+        public void RecalculateAccounts(List<int> accountIds, KumiAccountRecalcTypeEnum recalcType, DateTime? recalcStartDate)
+        {
+            var accounts = registryContext.KumiAccounts.Where(r => accountIds.Contains(r.IdAccount));
+
+            DateTime? startRewriteDate = DateTime.Now.Date;
+            startRewriteDate = startRewriteDate.Value.AddDays(-startRewriteDate.Value.Day + 1).AddMonths(-1);
+            if (recalcType == KumiAccountRecalcTypeEnum.RewriteCharge)
+            {
+                startRewriteDate = recalcStartDate;
+            }
+
+            var endCalcDate = DateTime.Now.Date;
+            endCalcDate = endCalcDate.AddDays(-endCalcDate.Day + 1).AddMonths(1).AddDays(-1);
+
+            RecalculateAccounts(accounts, startRewriteDate, endCalcDate);
+        }
+
+        public void RecalculateAccounts(IQueryable<KumiAccount> accounts, DateTime? startRewriteDate, DateTime endCalcDate)
+        {
+            var accountsPrepare = GetAccountsPrepareForPaymentCalculator(accounts);
+            var accountsInfo = GetAccountInfoForPaymentCalculator(accountsPrepare);
+
+            foreach (var account in accountsInfo)
+            {
+                var startCalcDate = GetAccountStartCalcDate(account);
+                if (startCalcDate == null) continue;
+                if (startRewriteDate == null)
+                    startRewriteDate = startCalcDate;
+                var chargingInfo = CalcChargesInfo(account, startCalcDate.Value, endCalcDate);
+                var recalcInsertIntoCharge = new KumiCharge();
+                if (chargingInfo.Any()) recalcInsertIntoCharge = chargingInfo.Last();
+
+                var dbChargingInfo = GetDbChargingInfo(account);
+                startRewriteDate = CorrectStartRewriteDate(startRewriteDate.Value, startCalcDate.Value, dbChargingInfo);
+                CalcRecalcInfo(account, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, endCalcDate, startRewriteDate.Value);
+                UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate.Value);
+            }
         }
 
         public List<KumiCharge> GetDbChargingInfo(KumiAccountInfoForPaymentCalculator account)

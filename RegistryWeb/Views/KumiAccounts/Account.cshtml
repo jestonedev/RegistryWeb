@@ -13,6 +13,7 @@
 }
 @section Scripts {
     <script src="~/js/kumiAccount.common.js" asp-append-version="true"></script>
+    <script src="~/js/kumiAccount.recalc.js" asp-append-version="true"></script>
 }
 <div class="card">
     <div class="card-header d-flex flex-column flex-lg-row">
@@ -101,7 +102,7 @@
                 @{
                     var tenancyInfo = (List<KumiAccountTenancyInfoVM>)ViewBag.TenancyInfo;
                     tenancyInfo = tenancyInfo.Union(new List<KumiAccountTenancyInfoVM>() { new KumiAccountTenancyInfoVM {
-                                                RentObjects = new List<TenancyRentObject> { new TenancyRentObject {  } }} }).ToList();
+                                                        RentObjects = new List<TenancyRentObject> { new TenancyRentObject {  } }} }).ToList();
                     for (var i = 0; i < tenancyInfo.Count(); i++)
                     {
                         var idProcess = tenancyInfo[i].TenancyProcess?.IdProcess;
@@ -259,7 +260,7 @@
                                 penaltyClaimsSum += claim.AmountPenalties ?? 0.00m;
                             }
                         }
-                        foreach(var charge in Model.Charges)
+                        foreach (var charge in Model.Charges)
                         {
                             var tenancyOnAccount = charge.PaymentCharges?.Sum(r => r.TenancyValue) ?? 0m;
                             var penaltyOnAccount = charge.PaymentCharges?.Sum(r => r.PenaltyValue) ?? 0m;
@@ -316,6 +317,9 @@
                 <div class="card-header d-flex justify-content-between pt-2 pb-2">
                     <h3>Начисления</h3>
                     <div class="btn-group" role="group">
+                        <a href="#" id="AccountRecalcBtn" class="form-control btn btn-success">
+                            <span style="top: 2px;" class="oi oi-calculator"></span>
+                        </a>
                         <a href="#" data-for="Charges" class="form-control btn btn-primary account-toggler" title="Развернуть панель сведений о начислениях" style="font-weight:bold;">∧</a>
                     </div>
                 </div>
@@ -366,7 +370,7 @@
                                         <td class="text-center p-1">@charge.ChargeTenancy</td>
                                         <td class="text-center p-1">@charge.ChargePenalty</td>
                                         <td class="text-center p-1">
-                                            @{ 
+                                            @{
                                                 var tenancyOnAccount = charge.PaymentCharges?.Sum(r => r.TenancyValue) ?? 0m;
                                                 var penaltyOnAccount = charge.PaymentCharges?.Sum(r => r.PenaltyValue) ?? 0m;
                                                 totalPaymentTenancyByAccount += tenancyOnAccount;
@@ -374,10 +378,10 @@
                                             }
                                             @if (charge.PaymentTenancy > 0 || charge.PaymentPenalty > 0)
                                             {
-                                                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentTenancy - tenancyOnAccount) руб." asp-action="Index" 
-                                                        asp-route-filterOptions.IdAccount="@Model.IdAccount" 
-                                                        asp-route-filterOptions.StartDate="@charge.StartDate.ToString("yyyy-MM-dd")" 
-                                                        asp-route-filterOptions.EndDate="@charge.EndDate.ToString("yyyy-MM-dd")">@charge.PaymentTenancy</a>
+                                                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentTenancy - tenancyOnAccount) руб." asp-action="Index"
+                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"
+                                                   asp-route-filterOptions.StartDate="@charge.StartDate.ToString("yyyy-MM-dd")"
+                                                   asp-route-filterOptions.EndDate="@charge.EndDate.ToString("yyyy-MM-dd")">@charge.PaymentTenancy</a>
                                             }
                                             else
                                             {
@@ -387,10 +391,10 @@
                                         <td class="text-center p-1">
                                             @if (charge.PaymentTenancy > 0 || charge.PaymentPenalty > 0)
                                             {
-                                                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index" 
-                                                        asp-route-filterOptions.IdAccount="@Model.IdAccount" 
-                                                        asp-route-filterOptions.StartDate="@charge.StartDate.ToString("yyyy-MM-dd")" 
-                                                        asp-route-filterOptions.EndDate="@charge.EndDate.ToString("yyyy-MM-dd")">@charge.PaymentPenalty</a>
+                                                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index"
+                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"
+                                                   asp-route-filterOptions.StartDate="@charge.StartDate.ToString("yyyy-MM-dd")"
+                                                   asp-route-filterOptions.EndDate="@charge.EndDate.ToString("yyyy-MM-dd")">@charge.PaymentPenalty</a>
                                             }
                                             else
                                             {
@@ -412,14 +416,14 @@
                                     <td class="text-center p-1">
                                         @if (totalPaymentTenancy > 0 || totalPaymentPenalty > 0)
                                         {
-                                            <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentTenancy - totalPaymentTenancyByAccount) руб." asp-action="Index" 
-                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentTenancy</b></a>
+                                            <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentTenancy - totalPaymentTenancyByAccount) руб." asp-action="Index"
+                                               asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentTenancy</b></a>
                                         }
                                         else
                                         {
                                             <b>@totalPaymentTenancy</b>
                                         }
-                                          
+
                                     </td>
                                     <td class="text-center p-1">
                                         @if (totalPaymentTenancy > 0 || totalPaymentPenalty > 0)
@@ -432,7 +436,7 @@
                                             <b>@totalPaymentPenalty</b>
                                         }
 
-                                        
+
                                     </td>
                                     <td class="text-center p-1"><b>@totalRecalcTenancy</b></td>
                                     <td class="text-center p-1"><b>@totalRecalcPenalty</b></td>
@@ -487,7 +491,7 @@
                                 {
                                     var lastState = claim.ClaimStates.OrderByDescending(r => r.IdState).FirstOrDefault();
                                     var canceledClaim = false;
-                                    if(lastState != null && lastState.IdStateType == 6 && lastState.CourtOrderCancelDate != null)
+                                    if (lastState != null && lastState.IdStateType == 6 && lastState.CourtOrderCancelDate != null)
                                     {
                                         canceledClaim = true;
                                     }
@@ -513,12 +517,12 @@
                                         <td class="text-center p-1">
                                             @rentPeriod
                                             <a class="btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn" target="_blank"
-                                                asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.IdClaim"
-                                                asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
+                                               asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.IdClaim"
+                                               asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
                                             </a>
                                         </td>
                                         <td class="text-center p-1">@(lastState != null ? lastState.IdStateTypeNavigation.StateType : "")</td>
-                                        <td class="text-center p-1">@((claim.AmountTenancy+claim.AmountPadun+claim.AmountDgi+claim.AmountPkk)?.ToString() ?? "0,00")</td>
+                                        <td class="text-center p-1">@((claim.AmountTenancy + claim.AmountPadun + claim.AmountDgi + claim.AmountPkk)?.ToString() ?? "0,00")</td>
                                         <td class="text-center p-1">@(claim.AmountPenalties?.ToString() ?? "0,00")</td>
                                         <td class="text-center p-1">@(claim.AmountTenancyRecovered?.ToString() ?? "0,00")</td>
                                         <td class="text-center p-1">@(claim.AmountPenaltiesRecovered?.ToString() ?? "0,00")</td>
@@ -540,3 +544,4 @@
 </div>
 
 <partial name="AccountModals">
+    <partial name="AccountRecalcModal">
