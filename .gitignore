@@ -5,6 +5,7 @@
 *.user
 *.dll
 *.pdb
+*.cache
 .vs/
 RegistryWeb/bin/
 RegistryWeb/obj/
