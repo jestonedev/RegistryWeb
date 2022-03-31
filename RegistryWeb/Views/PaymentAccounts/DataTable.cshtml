@@ -15,34 +15,34 @@
     var securityService = (SecurityService)ViewData["SecurityService"];
 }
 
-<table class="table table-hover tp-table">
+<table class="table table-hover pa-table">
     <thead>
         <tr style="align-content: center;">
             <th class="r-table-header-cell">
             </th>
-            <th class="r-table-header-cell">
+            <th class="r-table-header-cell" style="width: 35%">
                 Адрес / ЛС
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Account")
                 {
-                    <a href="#" title="Сортировка по номеру лицевого счета" class="oi oi-sort-descending sort tp-sorted" data-order-field="Account" data-order-direction="0"></a>
+                    <a href="#" title="Сортировка по номеру лицевого счета" class="oi oi-sort-descending sort pa-sorted" data-order-field="Account" data-order-direction="0"></a>
                 }
                 else
                 {
-                    <a href="#" title="Сортировка по номеру лицевого счета" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Account" ? "tp-sorted" : "")"
+                    <a href="#" title="Сортировка по номеру лицевого счета" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Account" ? "pa-sorted" : "")"
                        data-order-field="Account" data-order-direction="@(Model.OrderOptions.OrderField == "Account" ? "1" : "0")"></a>
                 }
             </th>
-            <th class="r-table-header-cell" style="min-width: 30%">
+            <th class="r-table-header-cell">
                 Информация о ЛС
                 @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Date")
                 {
                     <a href="#" title="Сортировка по дате последнего начисления"
-                       class="oi oi-sort-descending sort tp-sorted" data-order-field="Date" data-order-direction="0"></a>
+                       class="oi oi-sort-descending sort pa-sorted" data-order-field="Date" data-order-direction="0"></a>
                 }
                 else
                 {
                     <a href="#" title="Сортировка по дате последнего начисления"
-                       class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Date" ? "tp-sorted" : "")"
+                       class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Date" ? "pa-sorted" : "")"
                        data-order-field="Date" data-order-direction="@(Model.OrderOptions.OrderField == "Date" ? "1" : "0")"></a>
                 }
             </th>
@@ -77,12 +77,12 @@
                 }
                 <td class="align-middle" style="@(hasOpenedClaims ? "background-color: #FEDCDC" : "")" title="@(hasOpenedClaims ? "По данному адресу имеются незавершенные претензионно-исковые работы" : "")"><input type="checkbox" class="idCheckbox" data-id="@item.IdAccount" @Html.Raw(check) /></td>
                 <td>
-                    <div class="mb-2">
+                    <div class="mb-1">
                         <b>Лицевой счет: </b>@item.PaymentAccountNavigation.Account
                     </div>
                     @if (Model.RentObjects.ContainsKey(item.IdAccount))
                     {
-                        <div class="mb-2">
+                        <div>
                             @foreach (var address in Model.RentObjects[item.IdAccount])
                             {
                                 @await Component.InvokeAsync("PaymentsAddressComponent", new { address = address, idAccount = item.IdAccount })
@@ -93,9 +93,9 @@
                     {
                         <div class="row">
                             <div class="col-auto">
-                                <button class="btn btn-success oi oi-home mr-1 disabled dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения"></button>
+                                <button class="btn btn-success oi oi-home mr-1 mt-2 disabled dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения"></button>
                             </div>
-                            <div class="col-lg-9 col-md-8">
+                            <div class="col-lg-9 col-md-8 mt-1">
                                 @item.PaymentAccountNavigation.Crn, @item.PaymentAccountNavigation.RawAddress
                             </div>
                         </div>

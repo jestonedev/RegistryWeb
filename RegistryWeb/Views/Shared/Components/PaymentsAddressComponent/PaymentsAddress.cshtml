@@ -4,7 +4,7 @@
 }
 <div class="row">
     <div class="col-auto">
-        <button class="btn btn-success oi oi-home dropdown-toggle mr-1" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="homesBtn_@ViewData["IdAccount"]_@address.Id" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+        <button class="btn btn-success oi oi-home dropdown-toggle mr-1 mt-2" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="homesBtn_@ViewData["IdAccount"]_@address.Id" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
         <div class="dropdown-menu" aria-labelledby="homesBtn_@ViewData["IdAccount"]_@address.Id">
             @foreach (var addr in Model)
             {
@@ -19,7 +19,13 @@
             }
         </div>
     </div>
-    <div class="col-lg-9 col-md-8">
+    <div class="col-lg-9 col-md-8 mb-2">
         @address.Text
+        @if (address.ObjectState != null)
+        {
+            <div class="dopinfo">
+                @address.ObjectState.StateNeutral
+            </div>
+        }
     </div>
 </div>

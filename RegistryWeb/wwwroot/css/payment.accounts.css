@@ -1,17 +1,21 @@
-﻿.tp-table > thead > tr > th a.sort {
+﻿.pa-table > thead > tr > th a.sort {
     color: #888;
 }
 
-.tp-table > thead > tr > th a.sort:hover {
+.pa-table > thead > tr > th a.sort:hover {
     color: black;
 }
 
-.tp-table > thead > tr > th a.sort.tp-sorted {
+.pa-table > thead > tr > th a.sort.pa-sorted {
     color: #007bff;
 }
 
-.tp-table > thead > tr > th a.sort.tp-sorted:hover {
+.pa-table > thead > tr > th a.sort.pa-sorted:hover {
     color: #0056b3;
+}
+
+.pa-table > tbody td {
+    padding: 0.4rem 0.75rem;
 }
 
 .rr-payment-filter-label {
@@ -59,6 +63,11 @@ div.vis-tooltip {
     .pa-open-claim-btn {
         margin-top: 31px;
     }
+}
+
+.dopinfo {
+    color: #888;
+    font-size: 75%;
 }
 
 .dopinfo-alt {

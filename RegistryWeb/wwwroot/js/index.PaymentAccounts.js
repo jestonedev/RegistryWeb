@@ -21,21 +21,6 @@ var filterClear = function () {
     $("form.filterForm").submit();
 };
 
-var togglePaymentDetails = function (e) {
-    var paymentsDetail = $(this).closest("td").find(".rr-payments-detail");
-    var icon = $(this).find(".oi");
-    if (icon.hasClass("oi-chevron-bottom")) {
-        icon.removeClass("oi-chevron-bottom");
-        icon.addClass("oi-chevron-top");
-        paymentsDetail.show();
-    } else {
-        icon.addClass("oi-chevron-bottom");
-        icon.removeClass("oi-chevron-top");
-        paymentsDetail.hide();
-    }
-    e.preventDefault();
-};
-
 var filterIdRegionChange = function (e) {
     var idRegion = $('#FilterOptions_IdRegion').selectpicker('val');
     $.ajax({
@@ -73,8 +58,6 @@ $(function () {
         var modal = $("#filterModal");
         modal.modal('show');
     });
-
-    $(".rr-payments-details").on("click", togglePaymentDetails);
 
     $("#AccountSumFilterCriteria").on("change", function () {
         var val = $(this).val();
