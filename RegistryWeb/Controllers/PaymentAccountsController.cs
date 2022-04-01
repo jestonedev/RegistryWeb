@@ -159,7 +159,7 @@ namespace RegistryWeb.Controllers
             ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
             ViewBag.CurrentExecutor = dataService.CurrentExecutor?.ExecutorName;
             ViewBag.CanEdit = securityService.HasPrivilege(Privileges.ClaimsWrite);
-            ViewBag.Emails = dataService.GetTenantsEmails(ids);
+            ViewBag.Emails = dataService.GetTenantsEmails(viewModel.Payments.Select(r => r.IdAccount).ToList());
             return View("AccountReports", viewModel);
         }
 

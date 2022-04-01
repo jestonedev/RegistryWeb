@@ -42,8 +42,10 @@
     });
 
     $("#accountRecalcForm .rr-report-submit").on("click", function (e) {
+        if ($(this).is)
         $(".rr-recalc-account-error").addClass("d-none");
         if (recalcAccountForm.valid()) {
+            $(this).attr("disabled", "disabled").text("Выполняется расчет...");
             var recalcType = $("#AccountKumiRecalc_RecalcType").val();
             var recalcPeriod = $("#AccountKumiRecalc_RecalcPeriod").val();
             var recalcStartYear = recalcPeriod === "0" ? null : $("#AccountKumiRecalc_RecalcPeriodYear").val();
@@ -53,16 +55,29 @@
                 initRecalcAccountsProgress(1);
                 recalcAccounts([idAccount], [], recalcType, recalcStartYear, recalcStartMonth);
             } else {
-                //TODO mass recalc
-                //get ids
-                //initRecalcAccountsProgress(1);
-                //recalcAccounts([idAccount], [], recalcType, recalcStartYear, recalcStartMonth);
+                getAccountIds(function (ids) {
+                    initRecalcAccountsProgress(ids.length);
+                    var accountIdsForRecalc = ids.slice(0, 10);
+                    var accountIdsOther = ids.slice(10);
+                    recalcAccounts(accountIdsForRecalc, accountIdsOther, recalcType, recalcStartYear, recalcStartMonth);
+                });
             }
         } else {
             fixBootstrapSelectHighlight(recalcAccountForm);
         }
         e.preventDefault();
     });
+
+    function getAccountIds(success) {
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/KumiAccounts/GetSessionIds',
+            dataType: 'json',
+            success: function (ids) {
+                success(ids);
+            }
+        });
+    }
 
     function recalcAccounts(accountIdsForRecalc, accountIdsOther, recalcType, recalcStartYear, recalcStartMonth) {
         $.ajax({
@@ -83,6 +98,7 @@
                 } else {
                     $(".rr-recalc-account-error").removeClass("d-none").text(data.error);
                     recalcAccountForm.find(".progress").addClass("d-none");
+                    $(this).removeAttr("disabled").text("Перерасчет");
                 }
             }
         });

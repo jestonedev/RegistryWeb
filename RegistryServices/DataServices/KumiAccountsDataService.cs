@@ -802,6 +802,59 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
+        public KumiAccountsVM GetAccountsViewModelForMassReports(List<int> ids, PageOptions pageOptions)
+        {
+            var viewModel = InitializeViewModel(null, pageOptions, null);
+            var accounts = GetQuery().Where(r => ids.Contains(r.IdAccount));
+            viewModel.PageOptions.TotalRows = accounts.Count();
+            var count = accounts.Count();
+            viewModel.PageOptions.Rows = count;
+            viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+
+            if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
+                viewModel.PageOptions.CurrentPage = 1;
+
+            accounts = GetQueryPage(accounts, viewModel.PageOptions);
+            viewModel.Accounts = accounts.ToList();
+            viewModel.TenancyInfo = GetTenancyInfo(viewModel.Accounts);
+
+            var monthsList = registryContext.KumiCharges
+                .Select(c => c.EndDate).Distinct().OrderByDescending(c => c.Date).Take(6).ToList();
+
+            viewModel.MonthsList = new Dictionary<int, DateTime>();
+            for (var i = 0; i < monthsList.Count(); i++)
+                viewModel.MonthsList.Add(monthsList[i].Month, monthsList[i].Date);
+
+            return viewModel;
+        }
+
+        public IQueryable<KumiAccount> GetAccountsForMassReports(List<int> ids)
+        {
+            return GetQuery().Where(p => ids.Contains(p.IdAccount)).AsNoTracking();
+        }
+
+        public Dictionary<int, List<string>> GetTenantsEmails(List<KumiAccount> accounts)
+        {
+            var emailsDic = new Dictionary<int, List<string>>();
+            foreach (var account in accounts)
+            {
+                var processes = account.TenancyProcesses;
+
+                List<string> emails = new List<string>();
+                foreach (var tp in processes)
+                {
+                    var curEmails = registryContext.TenancyPersons
+                        .Where(per => per.IdProcess == tp.IdProcess && per.Email != null)
+                        .Select(per => per.Email)
+                        .ToList();
+                    emails.AddRange(curEmails);
+                }
+                emails = emails.Distinct().ToList();
+                emailsDic.Add(account.IdAccount, emails);
+            }
+            return emailsDic;
+        }
+
         public IQueryable<KumiAccount> GetKumiAccounts(KumiAccountsFilter filterOptions)
         {
             var kumiAccounts = GetQuery();

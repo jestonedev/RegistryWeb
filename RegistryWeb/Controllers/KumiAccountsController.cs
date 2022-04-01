@@ -13,6 +13,7 @@ using RegistryServices.ViewModel.KumiAccounts;
 using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryServices.Enums;
 using System;
+using Newtonsoft.Json;
 
 namespace RegistryWeb.Controllers
 {
@@ -57,6 +58,43 @@ namespace RegistryWeb.Controllers
             AddSearchIdsToSession(vm.FilterOptions, filteredTenancyProcessesIds);
 
             return View(vm);
+        }
+
+        public IActionResult KumiAccountsReports(PageOptions pageOptions)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            var errorIds = new List<int>();
+            if (TempData.ContainsKey("ErrorAccountsIds"))
+            {
+                try
+                {
+                    errorIds = JsonConvert.DeserializeObject<List<int>>(TempData["ErrorAccountsIds"].ToString());
+                }
+                catch
+                {
+                }
+                TempData.Remove("ErrorAccountsIds");
+            }
+            if (TempData.ContainsKey("ErrorReason"))
+            {
+                ViewBag.ErrorReason = TempData["ErrorReason"];
+                TempData.Remove("ErrorReason");
+            }
+            else
+            {
+                ViewBag.ErrorReason = "неизвестно";
+            }
+
+            ViewBag.ErrorAccounts = dataService.GetAccountsForMassReports(errorIds).ToList();
+
+            var ids = GetSessionIds();
+            var viewModel = dataService.GetAccountsViewModelForMassReports(ids, pageOptions);
+            ViewBag.Count = viewModel.Accounts.Count();
+            ViewBag.CanEdit = securityService.HasPrivilege(Privileges.AccountsWrite);
+            ViewBag.Emails = dataService.GetTenantsEmails(viewModel.Accounts.ToList());
+            return View("AccountReports", viewModel);
         }
 
         private IActionResult GetView(int? idAccount, string returnUrl, ActionTypeEnum action, Privileges privilege)
