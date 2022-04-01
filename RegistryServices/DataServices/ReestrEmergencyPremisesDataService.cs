@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RegistryDb.Interfaces;
 using RegistryDb.Models;
-using RegistryDb.Models.Entities;
-using RegistryDb.Models.Entities.RegistryObjects.Buildings;
 using RegistryServices.ViewModel.RegistryObjects;
 using RegistryWeb.Enums;
 using RegistryWeb.ViewModel;
@@ -321,49 +319,55 @@ namespace RegistryWeb.DataServices
             }
         }
 
-        public List<Building> GetEmergencyMKD()
+        public List<int> GetEmergencyMKD()
         {
             var numbers = new int[] { 1, 2, 6, 7 };
-            var mkd = (
-                from b in registryContext.Buildings
-                join ttt in (
-                    from ggg in (
+
+            var owrMaxDates = from row in (
                         from oba in registryContext.OwnershipBuildingsAssoc
                         join owr in registryContext.OwnershipRights
                             on oba.IdOwnershipRight equals owr.IdOwnershipRight
-                        where numbers.Contains(owr.IdOwnershipRightType)
-                        orderby oba.IdBuilding ascending, owr.Date descending
-                        select new { oba, owr }
+                        where numbers.Contains(owr.IdOwnershipRightType) && oba.Deleted != 1 && owr.Deleted != 1
+                        select new { oba.IdBuilding, owr.Date }
                     )
-                    group ggg by ggg.oba.IdBuilding into gr
+                    group row by row.IdBuilding into gr
                     select new
                     {
-                        oba = gr.Select(g => g.oba).FirstOrDefault(),
-                        owr = gr.Select(g => g.owr).FirstOrDefault()
-                    }
-                ) on b.IdBuilding equals ttt.oba.IdBuilding
-                where ttt.owr.IdOwnershipRightType == 7
-                select b
-            );
-            return mkd.ToList();
+                        IdBuilding = gr.Key,
+                        Date = gr.Max(g => g.Date)
+                    };
+
+            var mkd = from owrMaxDateRow in owrMaxDates
+                      join oba in registryContext.OwnershipBuildingsAssoc
+                      on owrMaxDateRow.IdBuilding equals oba.IdBuilding
+
+                      join owr in registryContext.OwnershipRights
+                      on new { oba.IdOwnershipRight, owrMaxDateRow.Date } equals new { owr.IdOwnershipRight, owr.Date }
+                      where owr.IdOwnershipRightType == 7
+                      select oba.IdBuilding;
+
+            var excludeIds = (from oba in registryContext.OwnershipBuildingsAssoc
+                              join owr in registryContext.OwnershipRights
+                                  on oba.IdOwnershipRight equals owr.IdOwnershipRight
+                              where owr.IdOwnershipRightType == 5
+                              select oba.IdBuilding).ToList().Distinct();
+
+            return mkd.Where(r => !excludeIds.Contains(r)).ToList();
         }
 
-        public List<ProcessOwnership> GetTenancyProcessesReestr(List<Building> mkd)
+        public List<ProcessOwnership> GetTenancyProcessesReestr(List<int> mkd)
         {
             var tap1 =
                 from tap in registryContext.TenancyActiveProcesses
-                join tpa in registryContext.TenancyPremisesAssoc
-                    on tap.IdProcess equals tpa.IdProcess
                 join p in registryContext.Premises
-                    on tpa.IdPremise equals p.IdPremises
+                    on tap.IdPremises equals p.IdPremises
                 join premType in registryContext.PremisesTypes
                     on p.IdPremisesType equals premType.IdPremisesType
                 join b in registryContext.Buildings
                     on p.IdBuilding equals b.IdBuilding
                 join street in registryContext.KladrStreets
                     on b.IdStreet equals street.IdStreet
-                join m in mkd
-                    on b.IdBuilding equals m.IdBuilding
+                where mkd.Contains(b.IdBuilding)
                 group new
                 {
                     tap,
@@ -385,10 +389,8 @@ namespace RegistryWeb.DataServices
                 };
             var tap2 =
                 from tap in registryContext.TenancyActiveProcesses
-                join tspa in registryContext.TenancySubPremisesAssoc
-                    on tap.IdProcess equals tspa.IdProcess
                 join sp in registryContext.SubPremises
-                    on tspa.IdSubPremise equals sp.IdSubPremises
+                    on tap.IdSubPremises equals sp.IdSubPremises
                 join p in registryContext.Premises
                     on sp.IdPremises equals p.IdPremises
                 join premType in registryContext.PremisesTypes
@@ -397,8 +399,7 @@ namespace RegistryWeb.DataServices
                     on p.IdBuilding equals b.IdBuilding
                 join street in registryContext.KladrStreets
                     on b.IdStreet equals street.IdStreet
-                join m in mkd
-                    on b.IdBuilding equals m.IdBuilding
+                where mkd.Contains(b.IdBuilding)
                 group new
                 {
                     tap,
@@ -421,22 +422,19 @@ namespace RegistryWeb.DataServices
             return tap1.Union(tap2).ToList();
         }
 
-        public List<ProcessOwnership> GetOwnerProcessesReestr(List<Building> mkd)
+        public List<ProcessOwnership> GetOwnerProcessesReestr(List<int> mkd)
         {
             var oap1 =
                 from oap in registryContext.OwnerActiveProcesses
-                join opa in registryContext.OwnerPremisesAssoc
-                    on oap.IdProcess equals opa.IdProcess
                 join p in registryContext.Premises
-                    on opa.IdPremise equals p.IdPremises
+                    on oap.IdPremise equals p.IdPremises
                 join premType in registryContext.PremisesTypes
                     on p.IdPremisesType equals premType.IdPremisesType
                 join b in registryContext.Buildings
                     on p.IdBuilding equals b.IdBuilding
                 join street in registryContext.KladrStreets
                     on b.IdStreet equals street.IdStreet
-                join m in mkd
-                    on b.IdBuilding equals m.IdBuilding
+                where mkd.Contains(b.IdBuilding)
                 group new
                 {
                     oap,
@@ -458,10 +456,8 @@ namespace RegistryWeb.DataServices
                 };
             var oap2 =
                 from oap in registryContext.OwnerActiveProcesses
-                join ospa in registryContext.OwnerSubPremisesAssoc
-                    on oap.IdProcess equals ospa.IdProcess
                 join sp in registryContext.SubPremises
-                    on ospa.IdSubPremise equals sp.IdSubPremises
+                    on oap.IdSubPremise equals sp.IdSubPremises
                 join p in registryContext.Premises
                     on sp.IdPremises equals p.IdPremises
                 join premType in registryContext.PremisesTypes
@@ -470,8 +466,7 @@ namespace RegistryWeb.DataServices
                     on p.IdBuilding equals b.IdBuilding
                 join street in registryContext.KladrStreets
                     on b.IdStreet equals street.IdStreet
-                join m in mkd
-                    on b.IdBuilding equals m.IdBuilding
+                where mkd.Contains(b.IdBuilding)
                 group new
                 {
                     oap,

@@ -955,7 +955,7 @@ namespace RegistryWeb.DataServices
         public Dictionary<int, List<Address>> GetRentObjectsBks(IEnumerable<int> idAccounts)
         {
             var premises = from paRow in registryContext.PaymentAccountPremisesAssoc
-                           join premiseRow in registryContext.Premises
+                           join premiseRow in registryContext.Premises.Include(r => r.IdStateNavigation)
                            on paRow.IdPremise equals premiseRow.IdPremises
                            join buildingRow in registryContext.Buildings
                            on premiseRow.IdBuilding equals buildingRow.IdBuilding
@@ -971,6 +971,7 @@ namespace RegistryWeb.DataServices
                                {
                                    AddressType = AddressTypes.Premise,
                                    Id = premiseRow.IdPremises.ToString(),
+                                   ObjectState = premiseRow.IdStateNavigation,
                                    IdParents = new Dictionary<string, string>
                                        {
                                            { AddressTypes.Street.ToString(), buildingRow.IdStreet },
@@ -981,7 +982,7 @@ namespace RegistryWeb.DataServices
                                }
                            };
             var subPremises = from paRow in registryContext.PaymentAccountSubPremisesAssoc
-                              join subPremiseRow in registryContext.SubPremises
+                              join subPremiseRow in registryContext.SubPremises.Include(r => r.IdStateNavigation)
                               on paRow.IdSubPremise equals subPremiseRow.IdSubPremises
                               join premiseRow in registryContext.Premises
                               on subPremiseRow.IdPremises equals premiseRow.IdPremises
@@ -999,6 +1000,7 @@ namespace RegistryWeb.DataServices
                                   {
                                       AddressType = AddressTypes.SubPremise,
                                       Id = subPremiseRow.IdSubPremises.ToString(),
+                                      ObjectState = subPremiseRow.IdStateNavigation,
                                       IdParents = new Dictionary<string, string>
                                            {
                                               { AddressTypes.Street.ToString(), buildingRow.IdStreet },

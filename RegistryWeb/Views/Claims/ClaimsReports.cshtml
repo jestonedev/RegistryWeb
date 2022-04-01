@@ -1,7 +1,7 @@
-﻿@using RegistryWeb.ViewModel
-@using RegistryServices.ViewModel.Claims
+﻿@using RegistryServices.ViewModel.Claims
 @using RegistryServices.ViewModel.KumiAccounts
 @using RegistryDb.Models.Entities.Claims
+@using RegistryWeb.ViewModel
 @using RegistryWeb.Extensions;
 @model ClaimsVM;
 @{
@@ -11,6 +11,10 @@
     var text = "Количество записей: " + Model.PageOptions.TotalRows;
     var canEdit = ViewBag.CanEdit;
     var errorClaims = (List<Claim>)ViewData["ErrorClaims"];
+}
+@section styles
+    {
+    <link rel="stylesheet" href="~/css/claims.css" runat="server" />
 }
 
 @section Scripts
@@ -66,12 +70,11 @@
     </div>
 </div>
 
-<table class="table table-hover">
+<table class="table table-hover c-table">
     <thead>
         <tr>
             <th style="width:70px;">№</th>
-            <th>Лицевой счет</th>
-            <th>Адрес</th>
+            <th>Адрес / ЛС</th>
             <th width="100px"></th>
         </tr>
     </thead>
@@ -94,6 +97,7 @@
                     lastPaymentInfo = Model.LastPaymentInfo[item.IdAccount.Value];
                 }
 
+
                 <tr>
                     <td>@item.IdClaim</td>
                     <td>
@@ -109,78 +113,24 @@
                                 accountKumi = item.IdAccountKumiNavigation.Account;
                             }
                         }
-                        @if (accountKumi == accountBks && accountBks != "")
-                        {
-                            <div>
-                                <b>Лицевой счет КУМИ/БКС:</b> @accountKumi
-                            </div>
-                        }
-                        else
-                        {
-                            if (item.IdAccount != null)
+                        <div class="mb-1">
+                            @if (accountKumi == accountBks && accountBks != "")
                             {
-                                <div>
-                                    <b>Лицевой счет БКС:</b> @accountBks
-                                </div>
-                            }
-                            if (item.IdAccountKumi != null)
-                            {
-                                <div>
-                                    <b>Лицевой счет КУМИ:</b> @accountKumi
-                                </div>
-                            }
-                        }
-                        @{
-                            var tenantBks = "";
-                            var tenantKumi = "";
-                            if (lastPaymentInfo != null)
-                            {
-                                tenantBks = lastPaymentInfo.Tenant;
-                            }
-                            if (kumiTenancyInfo != null && kumiTenancyInfo.Any())
-                            {
-                                RegistryDb.Models.Entities.Tenancies.TenancyPerson tenant = null;
-                                if (activeKumiTenancyInfo.Any())
-                                {
-                                    tenant = activeKumiTenancyInfo.FirstOrDefault().Tenant;
-                                }
-                                else
-                                {
-                                    tenant = kumiTenancyInfo.FirstOrDefault().Tenant;
-                                }
-                                tenantKumi = tenant.Surname + " " + tenant.Name + (string.IsNullOrEmpty(tenant.Patronymic) ? "" : " " + tenant.Patronymic);
-                            }
-                        }
-                        @if (tenantKumi == tenantBks && tenantBks != "")
-                        {
-                            <div>
-                                <b>Наниматель КУМИ/БКС:</b> @tenantBks
-                            </div>
-                        }
-                        else
-                        {
-                            if (tenantBks != "")
-                            {
-                                <div>
-                                    <b>Наниматель БКС:</b> @tenantBks
-                                </div>
-                            }
-                            if (tenantKumi != "")
-                            {
-                                <div>
-                                    <b>Наниматель КУМИ:</b> @tenantKumi
-                                </div>
+                                <div><b>Лицевой счет КУМИ/БКС:</b> @accountKumi</div>
                             }
                             else
-                            if (item.IdAccountKumi != null)
                             {
-                                <div>
-                                    <b>Наниматель КУМИ:</b> <span class="text-danger"><i>не привязан процесс найма</i></span>
-                                </div>
+                                if (item.IdAccountKumi != null)
+                                {
+                                    <div><b>Лицевой счет КУМИ:</b> @accountKumi</div>
+                                } else
+                                if (item.IdAccount != null)
+                                {
+                                    <div><b>Лицевой счет БКС:</b> @accountBks</div>
+                                }
                             }
-                        }
-                    </td>
-                    <td>
+                        </div>
+
                         @{
                             List<Address> rentObjectsKumi = null;
                             List<Address> rentObjectsBks = null;
@@ -199,76 +149,54 @@
                             {
                                 rentObjectsBks = Model.RentObjectsBks[item.IdAccount.Value];
                             }
-                            var joinRentObjects = true;
-                            if (rentObjectsKumi != null && rentObjectsBks != null && rentObjectsKumi.Count == rentObjectsBks.Count)
-                            {
-                                foreach (var rentObjectKumi in rentObjectsKumi)
+                        }
+
+                        @if (item.IdAccountKumi != null)
+                        {
+                            <div>
+                                @if (rentObjectsKumi != null)
                                 {
-                                    if (!rentObjectsBks.Select(r => r.Text).Any(r => r == rentObjectKumi.Text))
+                                    @foreach (var rentObject in rentObjectsKumi)
                                     {
-                                        joinRentObjects = false;
+                                        @await Component.InvokeAsync("ClaimsAddressComponent", new { address = rentObject, idClaim = item.IdClaim })
                                     }
                                 }
-                            }
-                            else
-                            {
-                                joinRentObjects = false;
-                            }
-                        }
-                        @if (joinRentObjects)
-                        {
-                            <div class="mb-2">
-                                <b>По жилищному фонду (ЛС КУМИ/БКС): </b><br />
-                                @foreach (var rentObject in rentObjectsKumi)
+                                else
                                 {
-                                    @await Component.InvokeAsync("ClaimsAddressComponent", new { address = rentObject, idClaim = item.IdClaim })
+                                    <span class="text-danger"><i>не привязан процесс найма</i></span>
                                 }
                             </div>
                         }
                         else
+                       if (item.IdAccount != null)
                         {
-                            if (item.IdAccountKumi != null)
+                            @if (rentObjectsBks != null)
                             {
-                                <div class="mb-2">
-                                    <b>По жилищному фонду (ЛС КУМИ): </b><br />
-
-                                    @if (rentObjectsKumi != null)
-                                    {
-                                        @foreach (var rentObject in rentObjectsKumi)
-                                        {
-                                            @await Component.InvokeAsync("ClaimsAddressComponent", new { address = rentObject, idClaim = item.IdClaim })
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <span class="text-danger"><i>не привязан процесс найма</i></span>
-                                    }
-                                </div>
-                            }
-                            if (item.IdAccount != null && rentObjectsBks != null)
-                            {
-                                <div class="mb-2">
-                                    <b>По жилищному фонду (ЛС БКС): </b><br />
+                                <div>
                                     @foreach (var address in rentObjectsBks)
                                     {
                                         @await Component.InvokeAsync("ClaimsAddressComponent", new { address = address, idClaim = item.IdClaim })
                                     }
                                 </div>
                             }
-                        }
-
-                        @if (item.IdAccount != null)
-                        {
-                            <div>
-                                <b>По БКС: </b><br />@item.IdAccountNavigation.RawAddress<br />
-                                @item.IdAccountNavigation.Crn
-                            </div>
+                            else
+                            if (item.IdAccount != null)
+                            {
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <button class="btn btn-success oi oi-home mr-1 mt-2 disabled dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения"></button>
+                                    </div>
+                                    <div class="col-lg-9 col-md-8 mt-1">
+                                        @item.IdAccountNavigation.Crn, @item.IdAccountNavigation.RawAddress
+                                    </div>
+                                </div>
+                            }
                         }
                     </td>
                     <td>
                         <div class="btn-group" role="group" aria-label="Панель доступа">
                             <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                               asp-action="Details" asp-controller="Claims" asp-route-idClaim="@item.IdClaim"></a>
+                               asp-controller="Claims" asp-action="Details" asp-route-idClaim="@item.IdClaim" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                             <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
                                asp-action="RemoveSessionId" asp-controller="Claims" asp-route-id="@item.IdClaim"></a>
                         </div>

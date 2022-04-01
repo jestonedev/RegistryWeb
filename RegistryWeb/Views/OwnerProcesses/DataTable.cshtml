@@ -34,7 +34,7 @@
                 annulStyle = "style=\"background-color:lightpink;\" title=\"Аннулирован\"";
             }
             <tr @Html.Raw(annulStyle)>
-                <td class="align-middle">@item.IdProcess</td>
+                <td class="align-middle" style="font-weight: bold">@item.IdProcess</td>
                 <td class="align-middle">
                     @foreach (var addr in Model.Addresses[item.IdProcess])
                     {

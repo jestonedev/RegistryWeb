@@ -14,6 +14,10 @@
     color: #0056b3;
 }
 
+.c-table > tbody td {
+    padding: 0.4rem 0.75rem;
+}
+
 .rr-claim-filter-label, .rr-claim-label {
     white-space: nowrap;
     overflow: hidden;
@@ -36,7 +40,15 @@
     border-bottom-right-radius: 0 !important;
 }
 
-@media(min-width: 992px) {
+.dopinfo {
+    color: #888;
+    font-size: 75%;
+}
+
+.dopinfo-alt {
+    color: #212529;
+    font-size: 75%;
+}@media(min-width: 992px) {
     .rr-claim-end-for-filter-checkbox {
         margin-top: 22px;
     }
@@ -47,15 +59,13 @@
 }
 
 @media(min-width: 768px) {
-
     #ClaimAmount table {
         font-size: 80%;
     }
 }
 
 @media(min-width: 992px) {
-
     #ClaimAmount table {
         font-size: 100%;
     }
-}
+}}

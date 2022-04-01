@@ -57,22 +57,6 @@ namespace RegistryWeb.Controllers
             return View(vm);
         }
 
-        public IActionResult Details(int idAccount, string returnUrl)
-        {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-            if (idAccount == 0)
-                return NotFound();
-            ViewBag.SecurityService = securityService;
-            ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
-            ViewBag.IdAccount = idAccount;
-            ViewBag.ReturnUrl = returnUrl;
-            var paymentsVM = dataService.GetPaymentsHistory(idAccount);
-            if (!paymentsVM.Payments.Any())
-                return Error("Ошибка формирования списка платежей по лицевому счету");
-            return View(paymentsVM);
-        }
-
         public IActionResult PaymentAccountsTable(int idAccount, string returnUrl)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
