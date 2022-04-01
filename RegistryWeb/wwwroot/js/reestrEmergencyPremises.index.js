@@ -100,9 +100,10 @@ $(function () {
 		$('input[name="OrderOptions.OrderDirection"]').val($(this).data("order-direction"));
 		formSubmit();
 	});
-	$('.page-link').click(function () {
+	$('.page-link').click(function (e) {
 		$('input[name="PageOptions.CurrentPage"]').val($(this).data("page"));
-		formSubmit();
+        formSubmit();
+        e.preventDefault();
 	});
 	if ($('input[name="FilterOptions.Address.Id"]').val() != "") {
 		addressFilterClearBtnShow();

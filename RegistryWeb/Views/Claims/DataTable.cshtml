@@ -84,7 +84,7 @@
                 }
                 <td class="align-middle"><input type="checkbox" class="idCheckbox" data-id="@item.IdClaim" @Html.Raw(check) /></td>
 
-                <td style="@(isOpenedClaim ? "background-color: #FEDCDC" : "")" title="@(isOpenedClaim ? "Претензионно-исковая работа не завершена" : "")">
+                <td style="@(isOpenedClaim ? "background-color: #FEDCDC" : ""); font-weight: bold; vertical-align: middle" title="@(isOpenedClaim ? "Претензионно-исковая работа не завершена" : "")">
                     @item.IdClaim
                 </td>
                 <td>
