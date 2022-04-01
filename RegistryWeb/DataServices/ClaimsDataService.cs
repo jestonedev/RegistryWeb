@@ -1072,5 +1072,71 @@ namespace RegistryWeb.DataServices
             }
             registryContext.SaveChanges();
         }
+
+        public void GetUin(List<int> ids)
+        {
+            var uinIncrement = 0;
+            foreach (var id in ids)
+            {
+                var account = (from cl in registryContext.Claims
+                              join pa in registryContext.PaymentAccounts
+                              on cl.IdAccount equals pa.IdAccount
+                              where cl.IdClaim==id
+                              select pa.Account).FirstOrDefault();
+
+                // +1-8 байт - urn в десятичной системе (дополнить нулями слева до 8) равен "00009703"
+                // +9-18 байт - ЛС (account) с дополненными впереди нулями 
+                // +19-24 байт - инкремент от 000000 до 999999
+                // 25 байт - контрольная сумма
+
+                var curSec = DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString("F0"); // время UTC в секундах с 1 января 1970 года (не без первого знака)
+
+                while (account.Count() != 10)
+                    account = account.Insert(0, "0");
+
+                var promUin = "00009703"+account + String.Format("{0:D6}", uinIncrement); /*+ curSec.Substring(4)*/
+
+                int j = 1, summ = 0, checkBit = 0;
+
+                for (var i = 0; i < 24; i++)
+                {
+                    summ = summ + Convert.ToInt16(promUin.Substring(i, 1)) * j;
+
+                    if (j == 10)
+                        j = 1;
+                    else
+                        j++;
+                }
+
+                if (summ % 11 < 10)
+                    checkBit = summ % 11;
+                else
+                {
+                    j = 3;
+                    summ = 0;
+
+                    for (var i = 0; i < 24; i++)
+                    {
+                        summ = summ + Convert.ToInt16(promUin.Substring(i, 1)) * j;
+
+                        if (j == 10)
+                            j = 1;
+                        else
+                            j++;
+                    }
+
+                    if (summ % 11 < 10)
+                        checkBit = summ % 11;
+                    else
+                        checkBit = 0;
+                }
+
+                promUin += checkBit.ToString();
+
+                uinIncrement++;
+
+                //return promUin;
+            }
+        }
     }
 }
