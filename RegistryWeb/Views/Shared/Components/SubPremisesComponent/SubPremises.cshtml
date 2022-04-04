@@ -24,7 +24,7 @@
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {
-                    <a href="#" id="subPremiseAdd" class="form-control btn btn-success @((securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal)) ? "" : "disabled")" title="Добавить комнату">&#10010;</a>
+                    <a href="#" id="subPremiseAdd" class="form-control btn btn-success @(ViewBag.CanEditBaseInfo ?? false ? "" : "disabled")" title="Добавить комнату">&#10010;</a>
                 }
                 <a href="#" id="subPremisesToggle" class="form-control btn btn-primary" title="Развернуть список комнат" style="font-weight:bold;">∨</a>
             </div>

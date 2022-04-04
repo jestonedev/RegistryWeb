@@ -86,7 +86,7 @@ namespace RegistryWeb.Controllers
             return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: false));
         }
 
-        public IActionResult Create(int? idBuilding)
+        public IActionResult Create(int? idBuilding, int? idPremises)
         {
             ViewBag.Action = ActionTypeEnum.Create;
             ViewBag.SecurityService = securityService;
@@ -95,7 +95,7 @@ namespace RegistryWeb.Controllers
             ViewBag.CanEditBaseInfo = true;
             ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
             ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
-            return View("Premise", dataService.GetPremiseView(dataService.CreatePremise(idBuilding), canEditBaseInfo: true));
+            return View("Premise", dataService.GetPremiseView(dataService.CreatePremise(idBuilding, idPremises), canEditBaseInfo: true));
         }
 
         [HttpPost]

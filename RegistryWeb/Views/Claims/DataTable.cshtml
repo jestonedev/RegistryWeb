@@ -132,6 +132,10 @@
                             {
                                 period += "с " + item.StartDeptPeriod.Value.ToString("dd.MM.yyyy");
                             }
+                            if (item.StartDeptPeriod != null && item.EndDeptPeriod != null)
+                            {
+                                period += " ";
+                            }
                             if (item.EndDeptPeriod != null)
                             {
                                 period += "по " + item.EndDeptPeriod.Value.ToString("dd.MM.yyyy");
