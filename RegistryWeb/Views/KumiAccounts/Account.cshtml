@@ -253,7 +253,7 @@
                             var completeState = claim.ClaimStates.FirstOrDefault(r => r.IdStateType == 6);
                             var prepareCourtOrderState = claim.ClaimStates.FirstOrDefault(r => r.IdStateType == 4);
                             if (prepareCourtOrderState != null &&
-                                (prepareCourtOrderState.CourtOrderNum != null || prepareCourtOrderState.CourtOrderDate != null) &&
+                                prepareCourtOrderState.CourtOrderDate != null &&
                                 (completeState == null || (completeState != null && completeState.CourtOrderCancelDate == null)))
                             {
                                 tenancyClaimsSum += (claim.AmountTenancy + claim.AmountDgi + claim.AmountPadun + claim.AmountPkk) ?? 0.00m;
