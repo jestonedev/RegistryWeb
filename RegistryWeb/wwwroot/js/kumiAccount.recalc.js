@@ -98,7 +98,7 @@
                 } else {
                     $(".rr-recalc-account-error").removeClass("d-none").text(data.error);
                     recalcAccountForm.find(".progress").addClass("d-none");
-                    $(this).removeAttr("disabled").text("Перерасчет");
+                    $("#accountRecalcModal .rr-report-submit").removeAttr("disabled").text("Перерасчет");
                 }
             }
         });

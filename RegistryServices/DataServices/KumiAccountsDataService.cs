@@ -48,13 +48,14 @@ namespace RegistryWeb.DataServices
             }
             else
             {
-                var firstCharge = account.Charges.First();
-                if (firstCharge.InputTenancy + firstCharge.InputPenalty > 0)
+                var firstCharge = account.Charges.OrderBy(r => r.EndDate).First();
+                if (!account.TenancyInfo.Any())
                 {
                     result = firstCharge.StartDate;
                 } else
                 {
-                    result = StartCalcDateFromRentPeriods(account.TenancyInfo);
+                    var rentStartDate = StartCalcDateFromRentPeriods(account.TenancyInfo);
+                    result = firstCharge.StartDate < rentStartDate ? firstCharge.StartDate : rentStartDate;
                 }
             }
             if (result == null) return null;
@@ -220,7 +221,8 @@ namespace RegistryWeb.DataServices
             DateTime startCalcDate, DateTime endCalcDate, DateTime startRewriteDate)
         {
             var actualDbCharges = dbChargingInfo.ToList();
-            foreach (var dbCharge in dbChargingInfo)
+            KumiCharge firstDbRewriteCharge = null;
+            foreach (var dbCharge in dbChargingInfo.OrderBy(r => r.EndDate))
             {
 
                 var charge = chargingInfo.FirstOrDefault(r => r.StartDate == dbCharge.StartDate && r.EndDate == dbCharge.EndDate);
@@ -234,6 +236,9 @@ namespace RegistryWeb.DataServices
                 }
 
                 // Если начисление в периоде перезаписи, но не найдено соответствующее расчетное начисление, то удаляем начисление из БД
+                if (firstDbRewriteCharge == null)
+                    firstDbRewriteCharge = dbCharge;
+
                 if (charge == null)
                 {
                     foreach (var paymentCharge in dbCharge.PaymentCharges)
@@ -249,6 +254,10 @@ namespace RegistryWeb.DataServices
             var currentPenalty = 0m;
             DateTime? lastChargingDate = null;
             var sortedChargingInfo = chargingInfo.OrderBy(r => r.EndDate).ToList();
+
+            var lastDbLockedCharge = actualDbCharges.Where(r => r.Hidden == 0).OrderByDescending(r => r.EndDate)
+                .FirstOrDefault(r => r.EndDate < startRewriteDate);
+
             for (var i = 0; i < sortedChargingInfo.Count; i++)
             {
                 var charge = sortedChargingInfo[i];
@@ -261,18 +270,35 @@ namespace RegistryWeb.DataServices
 
                 var dbCharge = actualDbCharges.FirstOrDefault(r => r.StartDate == charge.StartDate && r.EndDate == charge.EndDate);
 
-                var prevCharge = sortedChargingInfo.Where(r => r.Hidden == 0).OrderByDescending(r => r.EndDate).FirstOrDefault(r => r.EndDate < charge.EndDate);
-                if (startRewriteDate == charge.StartDate)
-                    prevCharge = actualDbCharges.Where(r => r.Hidden == 0).OrderByDescending(r => r.EndDate).FirstOrDefault(r => r.EndDate < charge.EndDate);
-                
+                var prevCharge = sortedChargingInfo.Where(r => r.Hidden == 0).OrderByDescending(r => r.EndDate).FirstOrDefault(r => r.EndDate < charge.EndDate);            
                 var nextCharge = sortedChargingInfo.Where(r => r.Hidden == 0).OrderBy(r => r.EndDate).FirstOrDefault(r => r.EndDate > charge.EndDate);
 
                 charge.PaymentCharges = null;
+                if (lastDbLockedCharge == null)
+                {
+                    if (prevCharge == null)
+                    {
+                        charge.InputTenancy = firstDbRewriteCharge.InputTenancy;
+                        charge.InputPenalty = firstDbRewriteCharge.InputPenalty;
+                    } else
+                    {
+                        charge.InputTenancy = prevCharge.OutputTenancy;
+                        charge.InputPenalty = prevCharge.OutputPenalty;
+                    }
+                } else
                 if (prevCharge != null)
                 {
-                    charge.InputTenancy = prevCharge.OutputTenancy;
-                    charge.InputPenalty = prevCharge.OutputPenalty;
+                    if (lastDbLockedCharge.StartDate >= prevCharge.StartDate)
+                    {
+                        charge.InputTenancy = lastDbLockedCharge.OutputTenancy;
+                        charge.InputPenalty = lastDbLockedCharge.OutputPenalty;
+                    } else
+                    {
+                        charge.InputTenancy = prevCharge.OutputTenancy;
+                        charge.InputPenalty = prevCharge.OutputPenalty;
+                    }
                 }
+
                 if (startRewriteDate < charge.StartDate && nextCharge != null)
                 {
                     charge.RecalcTenancy = 0;
@@ -315,6 +341,8 @@ namespace RegistryWeb.DataServices
             accountDb.CurrentBalanceTenancy = currentTenancy;
             accountDb.CurrentBalancePenalty = currentPenalty;
             accountDb.LastChargeDate = lastChargingDate;
+            accountDb.RecalcMarker = 0;
+            accountDb.RecalcReason = null;
             registryContext.SaveChanges();
         }
 
@@ -557,9 +585,16 @@ namespace RegistryWeb.DataServices
         private decimal CalcChargeByTenancy(KumiTenancyInfoForPaymentCalculator tenancy, DateTime startDate, DateTime endDate)
         {
             var rentPayment = 0m;
-            if (tenancy.AnnualDate <= startDate)
+            if (tenancy.AnnualDate != null)
             {
-                return rentPayment;
+                if (tenancy.AnnualDate <= startDate)
+                {
+                    return rentPayment;
+                }
+                if (tenancy.AnnualDate < endDate)
+                {
+                    endDate = tenancy.AnnualDate.Value;
+                }
             }
             foreach(var rentPaymentInfo in tenancy.RentPayments.GroupBy(r => new { r.IdObject, r.AddressType }))
             {
@@ -578,7 +613,9 @@ namespace RegistryWeb.DataServices
                         FromDate = actualPaymentPeriod.FromDate > startDate ? actualPaymentPeriod.FromDate.Date : startDate
                     };
                     var nextPeriod = actualPaymentPeriods.OrderBy(r => r.FromDate).FirstOrDefault(r => r.FromDate > actualPaymentPeriod.FromDate);
+                    if (nextPeriod != null && nextPeriod.FromDate.Date == actualPaymentPeriod.FromDate.Date) continue;
                     paymentPeriod.ToDate = nextPeriod == null ? endDate : nextPeriod.FromDate > endDate ? endDate : nextPeriod.FromDate.Date.AddDays(-1);
+                    if (paymentPeriod.ToDate < paymentPeriod.FromDate) continue;
                     paymentPeriods.Add(paymentPeriod);
                 }
 
@@ -671,8 +708,9 @@ namespace RegistryWeb.DataServices
                 {
                     claim.ClaimStates = registryContext.ClaimStates.Where(r => r.IdClaim == claim.IdClaim).ToList();
                 }
-                if (accountInfo.TenancyInfo != null && accountInfo.TenancyInfo.Count > 0)
-                    result.Add(accountInfo);
+                if (accountInfo.TenancyInfo == null)
+                    accountInfo.TenancyInfo = new List<KumiAccountTenancyInfoVM>();
+                result.Add(accountInfo);
             }
             return result;
         }
@@ -706,6 +744,7 @@ namespace RegistryWeb.DataServices
                         Tenant = tenancy.Tenant
                     };
                     tenancyInfo.RentPeriods = BuildRentPeriodsForPaymentCalculator(tenancy.TenancyProcess);
+                    tenancyInfo.RentPeriods = JoinRentPeriodForPaymentCalculator(tenancyInfo.RentPeriods);
                     CorrectRentPeriodsForPaymentCalculator(tenancyInfo.RentPeriods, tenancy.TenancyProcess, account.Account.CreateDate);
                     CheckRentPeriodsForPaymentCalculator(tenancyInfo.RentPeriods, tenancy.TenancyProcess.IdProcess);
                     tenancyInfo.RentPeriods = JoinRentPeriodForPaymentCalculator(tenancyInfo.RentPeriods);
@@ -821,14 +860,16 @@ namespace RegistryWeb.DataServices
                 var currentPeriod = rentPeriods[i];
                 RentPeriodForPaymentCalculator prevPeriod = rentPeriods
                                 .Where(r => r != currentPeriod)
-                                .Where(r => r.ToDate <= currentPeriod.FromDate || (r.ToDate == null && r.FromDate <= currentPeriod.FromDate)
-                                    || r.ToDate <= currentPeriod.ToDate || (r.ToDate == null && r.FromDate <= currentPeriod.ToDate))
+                                .Where(r => 
+                                    r.ToDate <= currentPeriod.FromDate || (r.ToDate == null && r.FromDate <= currentPeriod.FromDate) || 
+                                    r.ToDate <= currentPeriod.ToDate || (r.ToDate == null && r.FromDate <= currentPeriod.ToDate))
                                 .OrderByDescending(r => r.ToDate == null ? r.FromDate : r.ToDate)
                                 .FirstOrDefault();
                 RentPeriodForPaymentCalculator nextPeriod = rentPeriods
                                 .Where(r => r != currentPeriod)
-                                .Where(r => r.FromDate >= currentPeriod.ToDate || (r.FromDate == null && r.ToDate >= currentPeriod.ToDate)
-                                    || r.FromDate >= currentPeriod.FromDate || (r.FromDate == null && r.FromDate >= currentPeriod.FromDate))
+                                .Where(r => 
+                                    r.FromDate >= currentPeriod.ToDate || (r.FromDate == null && r.ToDate >= currentPeriod.ToDate) || 
+                                    r.FromDate >= currentPeriod.FromDate || (r.FromDate == null && r.FromDate >= currentPeriod.FromDate))
                                 .OrderBy(r => r.FromDate == null ? r.ToDate : r.FromDate)
                                 .FirstOrDefault();
 
@@ -876,33 +917,37 @@ namespace RegistryWeb.DataServices
         private List<RentPeriodForPaymentCalculator> JoinRentPeriodForPaymentCalculator(List<RentPeriodForPaymentCalculator> rentPeriods)
         {
             var result = new List<RentPeriodForPaymentCalculator>();
-            RentPeriodForPaymentCalculator joinedPeriod = null;
+            var skipPeriods = new List<RentPeriodForPaymentCalculator>();
+
             foreach (var rentPeriod in rentPeriods.OrderByDescending(r => r.FromDate))
             {
                 var currentPeriod = rentPeriod;
-                RentPeriodForPaymentCalculator prevPeriod = rentPeriods
-                                .Where(r => r != currentPeriod)
-                                .Where(r => r.ToDate <= currentPeriod.FromDate || (r.ToDate == null && r.FromDate <= currentPeriod.FromDate)
-                                    || r.ToDate <= currentPeriod.ToDate || (r.ToDate == null && r.FromDate <= currentPeriod.ToDate))
-                                .OrderByDescending(r => r.ToDate == null ? r.FromDate : r.ToDate)
-                                .FirstOrDefault();
-                if (joinedPeriod == null)
-                    joinedPeriod = currentPeriod;
-                if (prevPeriod == null)
+                if (skipPeriods.Any(r => r == currentPeriod)) continue;
+                while (true)
                 {
-                    result.Add(joinedPeriod);
-                    return result;
+                    var joinWithPeriodsTo = rentPeriods.Except(skipPeriods).Where(r => r != currentPeriod && r.ToDate != null && r.FromDate != null)
+                        .ToList().Where(r => (r.ToDate.Value == DateTime.MaxValue ? r.ToDate : r.ToDate.Value.AddDays(1)) >= currentPeriod.FromDate && r.FromDate < currentPeriod.ToDate).ToList();
+                    var joinWithPeriodsFrom = rentPeriods.Except(skipPeriods).Where(r => r != currentPeriod && r.FromDate != null && r.ToDate != null)
+                        .ToList().Where(r => r.FromDate.Value.AddDays(-1) <= currentPeriod.ToDate && r.ToDate >= currentPeriod.FromDate).ToList();
+
+                    if (!joinWithPeriodsTo.Any() && !joinWithPeriodsFrom.Any())
+                        break;
+
+                    var maxToDate = joinWithPeriodsFrom.Max(r => r.ToDate);
+                    var minFromDate = joinWithPeriodsTo.Min(r => r.FromDate);
+                    if (currentPeriod.ToDate < maxToDate)
+                    {
+                        currentPeriod.ToDate = maxToDate;
+                    }
+                    if (currentPeriod.FromDate > minFromDate)
+                    {
+                        currentPeriod.FromDate = minFromDate;
+                    }
+                    skipPeriods.AddRange(joinWithPeriodsTo);
+                    skipPeriods.AddRange(joinWithPeriodsFrom);
                 }
-                var checkDate = prevPeriod.ToDate.Value == DateTime.MaxValue ? prevPeriod.ToDate.Value : prevPeriod.ToDate.Value.AddDays(1);
-                if (checkDate >= joinedPeriod.FromDate)
-                {
-                    joinedPeriod.FromDate = prevPeriod.FromDate;
-                    joinedPeriod.ToDate = joinedPeriod.ToDate > prevPeriod.ToDate ? joinedPeriod.ToDate : prevPeriod.ToDate;
-                } else
-                {
-                    result.Add(joinedPeriod);
-                    joinedPeriod = null;
-                }
+                skipPeriods.Add(currentPeriod);
+                result.Add(currentPeriod);
             }
             return result;
         }
