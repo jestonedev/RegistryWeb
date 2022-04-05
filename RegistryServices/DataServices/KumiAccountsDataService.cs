@@ -278,8 +278,8 @@ namespace RegistryWeb.DataServices
                 {
                     if (prevCharge == null)
                     {
-                        charge.InputTenancy = firstDbRewriteCharge.InputTenancy;
-                        charge.InputPenalty = firstDbRewriteCharge.InputPenalty;
+                        charge.InputTenancy = firstDbRewriteCharge?.InputTenancy ?? charge.InputTenancy;
+                        charge.InputPenalty = firstDbRewriteCharge?.InputPenalty ?? charge.InputTenancy;
                     } else
                     {
                         charge.InputTenancy = prevCharge.OutputTenancy;
