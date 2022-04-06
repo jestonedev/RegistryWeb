@@ -13,7 +13,7 @@ $(function () {
         var idAccountKumi = form.find("#Claim_IdAccountKumiNavigation_Account");
         if (idAccountBks.val() === "" && idAccountKumi.val() === "") {
             let error = {};
-            error["AnyAccountRequire"] = "Укажите лицевой счет БКС (осн.) или КУМИ";
+            error["AnyAccountRequire"] = "Укажите лицевой счет";
             validator.showErrors(error);
             $(".rr-account-common-error").addClass("mb-2");
             idAccountBks.addClass("input-validation-error");
@@ -394,4 +394,92 @@ $(function () {
         $(this).find(".rr-persons-preview").addClass("d-none").html("");
     });
 
+    $(".rr-claim-account-main .dropdown-item").on("click", function (e) {
+        var text = $(this).text();
+        $(this).closest(".input-group-prepend").find("button").text(text);
+        switch (text) {
+            case "ЛС КУМИ":
+                reformatClaimForKumiAccount();
+                break;
+            case "ЛС БКС":
+                reformatClaimForBksAccount();
+                break;
+            case "ЛС БКС/КУМИ":
+                reformatClaimForBksAndKumiAccount();
+                break;
+        }
+        e.preventDefault();
+    });
+
+    var accountMainWrapper = $(".rr-claim-account-main");
+    var accountKumi = $("#Claim_IdAccountKumiNavigation_Account");
+    var accountBks = $("#Claim_IdAccountNavigation_Account");
+    var accountBksAdditionaleWrapper = $(".rr-claim-account-additional");
+    var claimAtDateWrapper = $("#Claim_AtDate").closest(".form-group");
+    var claimStartDeptWrapper = $("#Claim_StartDeptPeriod").closest(".form-group");
+    var claimEndDeptWrapper = $("#Claim_EndDeptPeriod").closest(".form-group");
+    var bksAddresses = $(".rr-claim-bks-address");
+    var kumiAddress = $(".rr-claim-kumi-address");
+    var additionalAmountWrapper = $(".rr-claim-additional-amount");
+
+    if (accountMainWrapper.find(".input-group-prepend button").text() === "ЛС БКС") {
+        accountMainWrapper.append(accountBks);
+    }
+
+    function reformatClaimForKumiAccount() {
+        $("#Claim_IdAccount").val("");
+        $("#Claim_IdAccountAdditional").val("");
+        $("#Claim_IdAccountAdditionalNavigation_Account").val("");
+        accountBks.val("").addClass("d-none");
+        accountKumi.removeClass("d-none");
+        accountMainWrapper.append(accountKumi);
+        accountMainWrapper.closest(".form-group").addClass("col-md-6 col-lg-3").removeClass("col-md-8 col-lg-6");
+        accountBksAdditionaleWrapper.addClass("d-none");
+        claimAtDateWrapper.addClass("col-md-6 col-lg-3").removeClass("col-md-4 col-lg-2");
+        claimStartDeptWrapper.addClass("col-md-6 col-lg-3").removeClass("col-md-4 col-lg-2 col-lg-6");
+        claimEndDeptWrapper.addClass("col-md-6 col-lg-3").removeClass("col-md-4 col-lg-2 col-lg-6");
+        bksAddresses.addClass("d-none");
+        bksAddresses.find("input").val("");
+        $(bksAddresses[0]).find("label").text("Адрес арендуемого ЖП по БКС");
+        $(bksAddresses[1]).find("label").text("Адрес арендуемого ЖП по ЖФ");
+        kumiAddress.removeClass("d-none");
+        kumiAddress.find("label").text("Адрес арендуемого ЖП");
+        additionalAmountWrapper.addClass("d-none");
+        additionalAmountWrapper.find("input").val("0,00");
+    }
+
+    function reformatClaimForBksAccount() {
+        $("#Claim_IdAccountKumi").val("");
+        accountKumi.val("").addClass("d-none");
+        accountBks.removeClass("d-none");
+        accountMainWrapper.append(accountBks);
+        accountMainWrapper.closest(".form-group").addClass("col-md-6 col-lg-3").removeClass("col-md-8 col-lg-6");
+        accountBksAdditionaleWrapper.removeClass("d-none");
+        accountBksAdditionaleWrapper.addClass("col-md-6").removeClass("col-md-4");
+        claimAtDateWrapper.addClass("col-md-4 col-lg-2").removeClass("col-md-6 col-lg-3");
+        claimStartDeptWrapper.addClass("col-md-4 col-lg-2").removeClass("col-md-6 col-lg-3 col-lg-6");
+        claimEndDeptWrapper.addClass("col-md-4 col-lg-2").removeClass("col-md-6 col-lg-3 col-lg-6");
+        kumiAddress.addClass("d-none");
+        kumiAddress.find("input").val("");
+        bksAddresses.removeClass("d-none");
+        additionalAmountWrapper.removeClass("d-none");
+    }
+
+    function reformatClaimForBksAndKumiAccount() {
+        accountBks.removeClass("d-none");
+        accountKumi.removeClass("d-none");
+        accountMainWrapper.append(accountKumi);
+        accountMainWrapper.closest(".form-group").addClass("col-md-8 col-lg-6").removeClass("col-md-6 col-lg-3");
+        accountBksAdditionaleWrapper.removeClass("d-none");
+        accountBksAdditionaleWrapper.addClass("col-md-4").removeClass("col-md-6");
+        claimAtDateWrapper.addClass("col-md-4 col-lg-3").removeClass("col-md-6 col-lg-2");
+        claimStartDeptWrapper.addClass("col-md-4 col-lg-6").removeClass("col-md-6 col-lg-2 col-lg-3");
+        claimEndDeptWrapper.addClass("col-md-4 col-lg-6").removeClass("col-md-6 col-lg-2 col-lg-3");
+        kumiAddress.removeClass("d-none");
+        bksAddresses.removeClass("d-none");
+        $(bksAddresses[0]).find("label").text("Адрес арендуемого ЖП по БКС (ЛС БКС)");
+        $(bksAddresses[1]).find("label").text("Адрес арендуемого ЖП по ЖФ (ЛС БКС)");
+        kumiAddress.find("label").text("Адрес арендуемого ЖП (ЛС КУМИ)");
+        additionalAmountWrapper.removeClass("d-none");
+    }
 });

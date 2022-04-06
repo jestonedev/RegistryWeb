@@ -490,10 +490,16 @@
                                 @foreach (var claim in Model.Claims)
                                 {
                                     var lastState = claim.ClaimStates.OrderByDescending(r => r.IdState).FirstOrDefault();
+                                    var prepareCourtOrderState = claim.ClaimStates.Where(r => r.IdStateType == 4).FirstOrDefault();
+                                    var winOrderClaim = false;
                                     var canceledClaim = false;
                                     if (lastState != null && lastState.IdStateType == 6 && lastState.CourtOrderCancelDate != null)
                                     {
                                         canceledClaim = true;
+                                    }
+                                    if (prepareCourtOrderState != null && prepareCourtOrderState.CourtOrderDate != null && !canceledClaim)
+                                    {
+                                        winOrderClaim = true;
                                     }
                                     var rentPeriod = "";
                                     if (claim.StartDeptPeriod != null)
@@ -513,7 +519,8 @@
                                         rentPeriod = "н/а";
                                     }
 
-                                    <tr style="@(canceledClaim ? "background-color: #FEDCDC;" : "")" title="@(canceledClaim ? "Отмененная исковая работа" : "")">
+                                    <tr class="@(canceledClaim ? "table-danger" : winOrderClaim ? "table-success" : "")" title="@(canceledClaim ? "Отмененная исковая работа" : 
+                                        winOrderClaim ? "Вынесен судебный приказ №"+(prepareCourtOrderState.CourtOrderNum ?? "б/н")+" от "+prepareCourtOrderState.CourtOrderDate.Value.ToString("dd.MM.yyyy") : "")">
                                         <td class="text-center p-1">
                                             @rentPeriod
                                             <a class="btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn" target="_blank"

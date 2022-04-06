@@ -112,17 +112,16 @@
                             @if (Model.Claim.IdAccountKumi != null)
                             {
                                 <a class="dropdown-item" title="Лицевой счет КУМИ" aria-label="Лицевой счет КУМИ"
-                                   asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@Model.Claim.IdAccountKumi" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет</a>
+                                   asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@Model.Claim.IdAccountKumi" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет@(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? " КУМИ" : "")</a>
                             }
-                            else
-                            if (Model.Claim.IdAccount != null)
+                            @if (Model.Claim.IdAccount != null)
                             {
                                 <a class="dropdown-item" title="Лицевой счет БКС (основной)" aria-label="Лицевой счет БКС (основной)"
-                                   asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@Model.Claim.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет (основной)</a>
+                                   asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@Model.Claim.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет@(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? " БКС" : "")</a>
                                 @if (Model.Claim.IdAccountAdditional != null)
                                 {
-                                    <a class="dropdown-item" title="Лицевой счет БКС (дополнительный)" aria-label="Лицевой счет БКС (дополнительный)"
-                                       asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@Model.Claim.IdAccountAdditional" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет (дополнительный)</a>
+                                <a class="dropdown-item" title="Лицевой счет БКС (дополнительный)" aria-label="Лицевой счет БКС (дополнительный)"
+                                   asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@Model.Claim.IdAccountAdditional" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет@(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? " БКС" : "") (дополнительный)</a>
                                 }
                             }
                         </div>
@@ -166,41 +165,48 @@
         </div>
     </div>
     <div class="card-body pt-3 pb-3 pl-3 pr-3" id="Claim">
-        <form asp-controller="Claims" asp-action="@ViewBag.Action" id="ClaimForm" data-action="@ViewBag.Action" data-persons-source-selected="0" autocomplete="off" method="post" enctype="multipart/form-data">            <input type="hidden" asp-for="Claim.IdClaim" />
+        <form asp-controller="Claims" asp-action="@ViewBag.Action" id="ClaimForm" data-action="@ViewBag.Action" data-persons-source-selected="0" autocomplete="off" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Claim.IdClaim" />
             <input type="hidden" asp-for="LoadPersonsSource" />
             <input type="hidden" value="@ViewBag.ReturnUrl" name="ReturnUrl" />
+            <input type="hidden" name="AnyAccountRequire" />
             <div class="row">
-                <div class="col-12 text-center rr-account-common-error">
-                    <input type="hidden" name="AnyAccountRequire"/>
+                <div class="form-group col-12 @(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? "col-md-8 col-lg-6" : "col-md-6 col-lg-3") mb-2">
+                    <label class="mb-1 rr-claim-label" asp-for="Claim.IdAccount">Лицевой счет</label>
+                    <input type="hidden" asp-for="Claim.IdAccount" />
+                    <input type="hidden" asp-for="Claim.IdAccountKumi" />
+
+                    <div class="input-group rr-claim-account-main">
+                        <div class="input-group-prepend">
+                            <button class="btn btn-outline-secondary dropdown-toggle @(ViewBag.Action == "Delete" || ViewBag.Action == "Details" ? "disabled" : "")" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? "ЛС БКС/КУМИ" : Model.Claim.IdAccountKumi != null ? "ЛС КУМИ" : "ЛС БКС")</button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#">ЛС БКС</a>
+                                <a class="dropdown-item" href="#">ЛС КУМИ</a>
+                                <a class="dropdown-item d-none" href="#">ЛС БКС/КУМИ</a>
+                            </div>
+                        </div>
+                        <input type="text" class="form-control @(Model.Claim.IdAccount == null ? "d-none" : "")" asp-for="Claim.IdAccountNavigation.Account" title="Номер лицевого счета БКС">
+                        <input type="text" class="form-control @(Model.Claim.IdAccountKumi == null ? "d-none" : "")" asp-for="Claim.IdAccountKumiNavigation.Account" title="Номер лицевого счета КУМИ">
+                    </div>
                     <span class="text-danger field-validation-valid" data-valmsg-for="AnyAccountRequire" data-valmsg-replace="true"></span>
                 </div>
-                <div class="form-group col-12 col-md-4 mb-2">
-                    <label class="mb-1" asp-for="Claim.IdAccount">Лицевой счет БКС (осн.)</label>
-                    <input type="hidden" asp-for="Claim.IdAccount" />
-                    <input type="text" class="form-control" asp-for="Claim.IdAccountNavigation.Account" title="Номер лицевого счета БКС">
-                </div>
-                <div class="form-group col-12 col-md-4 mb-2">
-                    <label class="mb-1" asp-for="Claim.IdAccountAdditional">Лицевой счет БКС (доп.)</label>
+                <div class="form-group col-12 @(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? "col-md-4" : "col-md-6") col-lg-3 mb-2 rr-claim-account-additional @(Model.Claim.IdAccount == null ? "d-none" : "")">
+                    <label class="mb-1 rr-claim-label" asp-for="Claim.IdAccountAdditional">Лицевой счет (доп.)</label>
                     <input type="hidden" asp-for="Claim.IdAccountAdditional" />
                     <input type="text" class="form-control" asp-for="Claim.IdAccountAdditionalNavigation.Account" title="Номер лицевого счета БКС">
                 </div>
-                <div class="form-group col-12 col-md-4 mb-2">
-                    <label class="mb-1" asp-for="Claim.IdAccountKumi">Лицевой счет КУМИ</label>
-                    <input type="hidden" asp-for="Claim.IdAccountKumi" />
-                    <input type="text" class="form-control" asp-for="Claim.IdAccountKumiNavigation.Account" title="Номер лицевого счета КУМИ">
-                </div>
-                <div class="form-group col-12 col-md-4 mb-2">
-                    <label class="mb-1" asp-for="Claim.AtDate">Дата фомирования</label>
+                <div class="form-group col-12 @(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? "col-md-4 col-lg-3" : Model.Claim.IdAccountKumi != null ? "col-md-6 col-lg-3" : "col-md-4 col-lg-2") mb-2">
+                    <label class="mb-1 rr-claim-label" asp-for="Claim.AtDate">Дата фомирования</label>
                     <input type="date" class="form-control" asp-for="Claim.AtDate"
                            value="@(Model.Claim.AtDate.HasValue ? Model.Claim.AtDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата формирования">
                 </div>
-                <div class="form-group col-12 col-md-4 mb-2">
-                    <label class="mb-1" asp-for="Claim.StartDeptPeriod">Предъявлено с</label>
+                <div class="form-group col-12 @(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? "col-md-4 col-lg-6" : Model.Claim.IdAccountKumi != null ? "col-md-6 col-lg-3" : "col-md-4 col-lg-2") mb-2">
+                    <label class="mb-1 rr-claim-label" asp-for="Claim.StartDeptPeriod">Предъявлено с</label>
                     <input type="date" class="form-control" asp-for="Claim.StartDeptPeriod"
                            value="@(Model.Claim.StartDeptPeriod.HasValue ? Model.Claim.StartDeptPeriod.Value.ToString("yyyy-MM-dd") : "")" title="Дата начала предъявляемого периода">
                 </div>
-                <div class="form-group col-12 col-md-4 mb-2">
-                    <label class="mb-1" asp-for="Claim.EndDeptPeriod">Предъявлено по</label>
+                <div class="form-group col-12 @(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? "col-md-4 col-lg-6" : Model.Claim.IdAccountKumi != null ? "col-md-6 col-lg-3" : "col-md-4 col-lg-2") mb-2">
+                    <label class="mb-1 rr-claim-label" asp-for="Claim.EndDeptPeriod">Предъявлено по</label>
                     <input type="date" class="form-control" asp-for="Claim.EndDeptPeriod"
                            value="@(Model.Claim.EndDeptPeriod.HasValue ? Model.Claim.EndDeptPeriod.Value.ToString("yyyy-MM-dd") : "")" title="Дата окончания предъявляемого периода">
                 </div>
@@ -228,19 +234,19 @@
                         registryAddressBks = Model.RentObjectsBks.Select(r => r.Text).Aggregate((acc, v) => acc + ", " + v);
                     }
                 }
-                <div class="form-group col-12 col-lg-6 mb-2">
-                    <label class="mb-1" for="Claim.BksAddress">Адрес по БКС</label>
+                <div class="form-group col-12 col-lg-6 mb-2 rr-claim-bks-address @(Model.Claim.IdAccount == null ? "d-none" : "")">
+                    <label class="mb-1 rr-claim-label" for="Claim.BksAddress">Адрес арендуемого ЖП по БКС @(Model.Claim.IdAccountKumi != null && Model.Claim.IdAccount != null ? "(ЛС БКС)" : "")</label>
                     <input type="text" disabled name="Claim.BksAddress" value="@bksAddress" class="form-control" title="Адрес по БКС">
                 </div>
-                <div class="form-group col-12 col-lg-6 mb-2">
-                    <label class="mb-1" for="Claim.RegistryAddressBks">Адрес по жилищному фонду БКС</label>
+                <div class="form-group col-12 col-lg-6 mb-2 rr-claim-bks-address @(Model.Claim.IdAccount == null ? "d-none" : "")">
+                    <label class="mb-1 rr-claim-label" for="Claim.RegistryAddressBks">Адрес арендуемого ЖП по ЖФ @(Model.Claim.IdAccountKumi != null && Model.Claim.IdAccount != null ? "(ЛС БКС)" : "")</label>
                     <input type="text" disabled class="form-control" value="@registryAddressBks" name="Claim.RegistryAddressBks" title="Адрес по жилищному фонду БКС">
                 </div>
-                <div class="form-group col-12 col-lg-6 mb-2">
-                    <label class="mb-1" for="Claim.RegistryAddressKumi">Адрес по жилищному фонду КУМИ</label>
+                <div class="form-group col-12 mb-2 rr-claim-kumi-address @(Model.Claim.IdAccountKumi == null ? "d-none" : "")">
+                    <label class="mb-1 rr-claim-label" for="Claim.RegistryAddressKumi">Адрес арендуемого ЖП @(Model.Claim.IdAccountKumi != null && Model.Claim.IdAccount != null ? "(ЛС КУМИ)" : "")</label>
                     <input type="text" disabled class="form-control" value="@registryAddressKumi" name="Claim.RegistryAddressKumi" title="Адрес по жилищному фонду КУМИ">
                 </div>
-                <div class="form-group col-12 col-lg-6 mb-2 text-center rr-claim-end-for-filter-checkbox">
+                <div class="form-group col-12 mb-2">
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" asp-for="Claim.EndedForFilter">
                         <label class="form-check-label" asp-for="Claim.EndedForFilter" title="Не учитывать при фильтрации">Не учитывать при фильтрации</label>
@@ -259,30 +265,32 @@
                         <div id="ClaimAmount" class="card-body @(ViewBag.Action == "Delete" || ViewBag.Action == "Details" ? "p-0" : "p-3")">
                             @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
                             {
-                                    <table class="table table-bordered table-striped m-0">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-center p-1"></th>
-                                                <th class="text-center p-1" title="Найм">Найм</th>
-                                                <th class="text-center p-1" title="Пени">Пени</th>
-                                                <th class="text-center p-1" title="ДГИ">ДГИ</th>
-                                                <th class="text-center p-1" title="Падун">Падун</th>
-                                                <th class="text-center p-1" title="ПКК">ПКК</th>
-                                                <th class="text-center p-1" title="Итого">Итого</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="text-center p-1"><b>К взысканию</b></td>
-                                                <td class="text-center p-1">@(Model.Claim.AmountTenancy ?? 0.00m)</td>
-                                                <td class="text-center p-1">@(Model.Claim.AmountPenalties ?? 0.00m)</td>
-                                                <td class="text-center p-1">@(Model.Claim.AmountDgi ?? 0.00m)</td>
-                                                <td class="text-center p-1">@(Model.Claim.AmountPadun ?? 0.00m)</td>
-                                                <td class="text-center p-1">@(Model.Claim.AmountPkk ?? 0.00m)</td>
-                                                <td class="text-center p-1">
-                                                    @((Model.Claim.AmountTenancy + Model.Claim.AmountPenalties + Model.Claim.AmountDgi + Model.Claim.AmountPadun + Model.Claim.AmountPkk) ?? 0.00m)
-                                                </td>
-                                            </tr>
+                                <table class="table table-bordered table-striped m-0">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center p-1"></th>
+                                            <th class="text-center p-1" title="Найм">Найм</th>
+                                            <th class="text-center p-1" title="Пени">Пени</th>
+                                            <th class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")" title="ДГИ">ДГИ</th>
+                                            <th class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")" title="Падун">Падун</th>
+                                            <th class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")" title="ПКК">ПКК</th>
+                                            <th class="text-center p-1" title="Итого">Итого</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center p-1"><b>К взысканию</b></td>
+                                            <td class="text-center p-1">@(Model.Claim.AmountTenancy ?? 0.00m)</td>
+                                            <td class="text-center p-1">@(Model.Claim.AmountPenalties ?? 0.00m)</td>
+                                            <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@(Model.Claim.AmountDgi ?? 0.00m)</td>
+                                            <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@(Model.Claim.AmountPadun ?? 0.00m)</td>
+                                            <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@(Model.Claim.AmountPkk ?? 0.00m)</td>
+                                            <td class="text-center p-1">
+                                                @((Model.Claim.AmountTenancy + Model.Claim.AmountPenalties + Model.Claim.AmountDgi + Model.Claim.AmountPadun + Model.Claim.AmountPkk) ?? 0.00m)
+                                            </td>
+                                        </tr>
+                                        @if (Model.Claim.IdAccountKumiNavigation != null)
+                                        {
                                             <tr>
                                                 <td class="text-center p-1"><b>Взысканная</b></td>
                                                 <td class="text-center p-1">
@@ -307,9 +315,9 @@
                                                         @(Model.Claim.AmountPenaltiesRecovered ?? 0.00m)
                                                     }
                                                 </td>
-                                                <td class="text-center p-1">0,00</td>
-                                                <td class="text-center p-1">0,00</td>
-                                                <td class="text-center p-1">0,00</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
                                                 <td class="text-center p-1">
                                                     @if (Model.Claim.AmountTenancyRecovered > 0 || Model.Claim.AmountPenaltiesRecovered > 0)
                                                     {
@@ -322,45 +330,46 @@
                                                     }
                                                 </td>
                                             </tr>
-                                            @if (Model.LastPaymentInfo != null || Model.Claim.IdAccountKumiNavigation != null)
-                                            {
-                                                <tr><td colspan="7" class="text-center p-1"><b>Сальдо на текущий месяц</b></td></tr>
-                                            }
-                                            @if (Model.LastPaymentInfo != null)
-                                            {
-                                                <tr>
-                                                    <td class="text-center p-1"><b>Входящее БКС</b></td>
-                                                    <td class="text-center p-1">@Model.LastPaymentInfo.BalanceTenancy</td>
-                                                    <td class="text-center p-1">@Model.LastPaymentInfo.BalanceInputPenalties</td>
-                                                    <td class="text-center p-1">@Model.LastPaymentInfo.BalanceDgi</td>
-                                                    <td class="text-center p-1">@Model.LastPaymentInfo.BalancePadun</td>
-                                                    <td class="text-center p-1">@Model.LastPaymentInfo.BalancePkk</td>
-                                                    <td class="text-center p-1">@Model.LastPaymentInfo.BalanceInput</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-center p-1"><b>Исходящее БКС</b></td>
-                                                    <td class="text-center p-1">@Model.LastPaymentInfo.BalanceOutputTenancy</td>
-                                                    <td class="text-center p-1">@Model.LastPaymentInfo.BalanceOutputPenalties</td>
-                                                    <td class="text-center p-1">@Model.LastPaymentInfo.BalanceOutputDgi</td>
-                                                    <td class="text-center p-1">@Model.LastPaymentInfo.BalanceOutputPadun</td>
-                                                    <td class="text-center p-1">@Model.LastPaymentInfo.BalanceOutputPkk</td>
-                                                    <td class="text-center p-1">@Model.LastPaymentInfo.BalanceOutputTotal</td>
-                                                </tr>
-                                            }
-                                            @if (Model.Claim.IdAccountKumiNavigation != null)
-                                            {
-                                                <tr>
-                                                    <td class="text-center p-1"><b>Исходящее КУМИ</b></td>
-                                                    <td class="text-center p-1">@(Model.Claim.IdAccountKumiNavigation.CurrentBalanceTenancy ?? 0.00m)</td>
-                                                    <td class="text-center p-1">@(Model.Claim.IdAccountKumiNavigation.CurrentBalancePenalty ?? 0.00m)</td>
-                                                    <td class="text-center p-1">0,00</td>
-                                                    <td class="text-center p-1">0,00</td>
-                                                    <td class="text-center p-1">0,00</td>
-                                                    <td class="text-center p-1">@((Model.Claim.IdAccountKumiNavigation.CurrentBalanceTenancy + Model.Claim.IdAccountKumiNavigation.CurrentBalancePenalty) ?? 0.00m)</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                        }
+                                        @if (Model.LastPaymentInfo != null || Model.Claim.IdAccountKumiNavigation != null)
+                                        {
+                                            <tr><td colspan="@(Model.Claim.IdAccount == null ? "4" : "7")" class="text-center p-1"><b>Сальдо на текущий месяц</b></td></tr>
+                                        }
+                                        @if (Model.LastPaymentInfo != null)
+                                        {
+                                            <tr>
+                                                <td class="text-center p-1"><b>Входящее@(Model.LastPaymentInfo != null && Model.Claim.IdAccountKumiNavigation != null ? " БКС" : "")</b></td>
+                                                <td class="text-center p-1">@Model.LastPaymentInfo.BalanceTenancy</td>
+                                                <td class="text-center p-1">@Model.LastPaymentInfo.BalanceInputPenalties</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@Model.LastPaymentInfo.BalanceDgi</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@Model.LastPaymentInfo.BalancePadun</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@Model.LastPaymentInfo.BalancePkk</td>
+                                                <td class="text-center p-1">@Model.LastPaymentInfo.BalanceInput</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center p-1"><b>Исходящее@(Model.LastPaymentInfo != null && Model.Claim.IdAccountKumiNavigation != null ? " БКС" : "")</b></td>
+                                                <td class="text-center p-1">@Model.LastPaymentInfo.BalanceOutputTenancy</td>
+                                                <td class="text-center p-1">@Model.LastPaymentInfo.BalanceOutputPenalties</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@Model.LastPaymentInfo.BalanceOutputDgi</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@Model.LastPaymentInfo.BalanceOutputPadun</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@Model.LastPaymentInfo.BalanceOutputPkk</td>
+                                                <td class="text-center p-1">@Model.LastPaymentInfo.BalanceOutputTotal</td>
+                                            </tr>
+                                        }
+                                        @if (Model.Claim.IdAccountKumiNavigation != null)
+                                        {
+                                            <tr>
+                                                <td class="text-center p-1"><b>Исходящее@(Model.LastPaymentInfo != null && Model.Claim.IdAccountKumiNavigation != null ? " КУМИ" : "")</b></td>
+                                                <td class="text-center p-1">@(Model.Claim.IdAccountKumiNavigation.CurrentBalanceTenancy ?? 0.00m)</td>
+                                                <td class="text-center p-1">@(Model.Claim.IdAccountKumiNavigation.CurrentBalancePenalty ?? 0.00m)</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
+                                                <td class="text-center p-1">@((Model.Claim.IdAccountKumiNavigation.CurrentBalanceTenancy + Model.Claim.IdAccountKumiNavigation.CurrentBalancePenalty) ?? 0.00m)</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
                             }
                             else
                             {
@@ -382,7 +391,7 @@
                                                title="Сумма к взысканию (итого)">
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row rr-claim-additional-amount @(Model.Claim.IdAccount != null ? "" : "d-none")">
                                     <div class="form-group col-4 mb-0">
                                         <label class="mb-1" asp-for="Claim.AmountDgi">ДГИ</label>
                                         <input type="text" class="form-control decimal input-decimal" asp-for="Claim.AmountDgi" title="Сумма к взысканию (ДГИ)">
