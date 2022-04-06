@@ -37,7 +37,11 @@ namespace RegistryPaymentCalculator
                 }
                 
                 var startRewriteDate = DateTime.Now.Date;
-                startRewriteDate = startRewriteDate.AddDays(-startRewriteDate.Day+1).AddMonths(-1);
+                startRewriteDate = startRewriteDate.AddDays(-startRewriteDate.Day+1);
+                if (DateTime.Now.Date.Day <= 3) // Предыдущий период блокируется для перезаписи по истечении трех дней текущего периода
+                {
+                    startRewriteDate = startRewriteDate.AddMonths(-1);
+                }
                 foreach(var arg in args)
                 {
                     if (string.IsNullOrWhiteSpace(arg)) continue;
