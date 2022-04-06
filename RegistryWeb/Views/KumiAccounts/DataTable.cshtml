@@ -171,9 +171,10 @@
                     </div>
                     <hr class="m-0 mt-2 mb-1" />
                     <div>
-                        <b>Сальдо итого:</b> @(item.CurrentBalanceTenancy + item.CurrentBalancePenalty) руб.
+                        <b>Сальдо итого:</b> <span class="@(item.RecalcMarker == 1 ? "text-danger" : "")" title="@(item.RecalcMarker == 1 ? "Необходимо произвести перерасчет. "+item.RecalcReason : "")">
+                        @(item.CurrentBalanceTenancy + item.CurrentBalancePenalty) руб.</span>
                     </div>
-                    <div>
+                    <div class="@(item.RecalcMarker == 1 ? "text-danger" : "")" title="@(item.RecalcMarker == 1 ? "Необходимо произвести перерасчет. "+item.RecalcReason : "")">
                         Найм: @item.CurrentBalanceTenancy руб., пени: @item.CurrentBalancePenalty руб.
                     </div>
                     <div>

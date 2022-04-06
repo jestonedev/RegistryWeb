@@ -49,11 +49,12 @@ namespace RegistryWeb.DataServices
             else
             {
                 var firstCharge = account.Charges.OrderBy(r => r.EndDate).First();
-                if (!account.TenancyInfo.Any())
+                if (firstCharge.InputTenancy > 0 || firstCharge.InputPenalty > 0)
                 {
                     result = firstCharge.StartDate;
                 } else
                 {
+                    // TODO min_date start work registry
                     var rentStartDate = StartCalcDateFromRentPeriods(account.TenancyInfo);
                     result = firstCharge.StartDate < rentStartDate ? firstCharge.StartDate : rentStartDate;
                 }
@@ -292,6 +293,7 @@ namespace RegistryWeb.DataServices
                     {
                         charge.InputTenancy = lastDbLockedCharge.OutputTenancy;
                         charge.InputPenalty = lastDbLockedCharge.OutputPenalty;
+                        lastDbLockedCharge = null;
                     } else
                     {
                         charge.InputTenancy = prevCharge.OutputTenancy;
@@ -1433,6 +1435,11 @@ namespace RegistryWeb.DataServices
                                 where row.TenancyProcesses.Any() && row.IdState == 2 && actualAccountIds.Contains(row.IdAccount)
                                 select row;
                     }
+                    break;
+                case 8:
+                    query = from row in query
+                            where row.RecalcMarker == 1
+                            select row;
                     break;
             }
             return query;
