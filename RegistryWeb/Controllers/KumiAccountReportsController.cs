@@ -44,20 +44,16 @@ namespace RegistryWeb.Controllers
               if (!securityService.HasPrivilege(Privileges.ClaimsRead))
                 return View("NotAccess");
               try
-              { 
-                  var payment = dataService.GetLastPayment(idAccount);
-                  var person = dataService.GetPersonPayment(idAccount);
-                  var totalArea =string.Join(";", processesDataService.GetRentObjects(payment.Account.TenancyProcesses
-                  .Where(c => c.IdProcess == person.IdProcess))
-                  .Select(t => t.Value.Select(c =>  c.TotalArea).ToList()).ToList()
-                  .SelectMany(c => c).ToList());
-                var prescribed = processesDataService.GetTenancyProcess(person.IdProcess).TenancyPersons.Count; 
+              {
+                var payment = dataService.GetLastPayment(idAccount);
+                var personInfo = dataService.GetInfoForReport(idAccount);
+
                 if (payment == null)
                   {
                       return Error(string.Format("Отсутствуют начисления по лицевому счету № {0}", idAccount));
                   }
 
-                   var file = reportService.CalDept(payment, person, totalArea, prescribed, dateFrom, dateTo, fileFormat);
+                   var file = reportService.CalDept(payment, personInfo, dateFrom, dateTo, fileFormat);
                   return File(file, fileFormat == 1 ? xlsxMime : odsMime,
                       string.Format(@"Расчет суммы задолженности (лицевой счет № {0}).{1}", idAccount, fileFormat == 1 ? "xlsx" : "ods"));
               }
