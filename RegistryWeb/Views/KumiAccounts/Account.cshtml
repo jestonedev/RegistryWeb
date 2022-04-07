@@ -317,7 +317,7 @@
                 <div class="card-header d-flex justify-content-between pt-2 pb-2">
                     <h3>Начисления</h3>
                     <div class="btn-group" role="group">
-                        <a href="#" id="AccountRecalcBtn" class="form-control btn btn-success">
+                        <a href="#" id="AccountRecalcBtn" class="form-control btn btn-success @(Model.IdState == 2 ? "disabled" : "")">
                             <span style="top: 2px;" class="oi oi-calculator"></span>
                         </a>
                         <a href="#" data-for="Charges" class="form-control btn btn-primary account-toggler" title="Развернуть панель сведений о начислениях" style="font-weight:bold;">∧</a>

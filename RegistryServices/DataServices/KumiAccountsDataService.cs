@@ -176,7 +176,9 @@ namespace RegistryWeb.DataServices
 
         public void RecalculateAccounts(List<int> accountIds, KumiAccountRecalcTypeEnum recalcType, DateTime? recalcStartDate)
         {
-            var accounts = registryContext.KumiAccounts.Where(r => accountIds.Contains(r.IdAccount));
+            var accounts = registryContext.KumiAccounts.Where(r => accountIds.Contains(r.IdAccount) && r.IdState != 2);
+
+            if (accounts.Count() == 0) return;
 
             DateTime? startRewriteDate = DateTime.Now.Date;
             startRewriteDate = startRewriteDate.Value.AddDays(-startRewriteDate.Value.Day + 1);
@@ -230,7 +232,6 @@ namespace RegistryWeb.DataServices
             KumiCharge firstDbRewriteCharge = null;
             foreach (var dbCharge in dbChargingInfo.OrderBy(r => r.EndDate))
             {
-
                 var charge = chargingInfo.FirstOrDefault(r => r.StartDate == dbCharge.StartDate && r.EndDate == dbCharge.EndDate);
                 if (charge != null)
                     charge.Hidden = dbCharge.Hidden;
@@ -1772,11 +1773,13 @@ namespace RegistryWeb.DataServices
                 .Include(r => r.Charges)
                 .Include(r => r.Claims)
                 .SingleOrDefault(a => a.IdAccount == idAccount);
+            if (account == null) return null;
             foreach(var claim in account.Claims)
             {
                 var currentClaimState = registryContext.ClaimStates.Include(r => r.IdStateTypeNavigation).Where(r => r.IdClaim == claim.IdClaim);
                 claim.ClaimStates = currentClaimState.ToList();
             }
+            account.Charges = account.Charges.Where(r => r.Hidden != 1).ToList();
             foreach (var charge in account.Charges)
             {
                 var paymentCharges = registryContext.KumiPaymentCharges.Where(r => r.IdCharge == charge.IdCharge);
@@ -1804,6 +1807,11 @@ namespace RegistryWeb.DataServices
             account.Claims = null;
             account.TenancyProcesses = null;
             account.State = null;
+            if (account.IdState == 2)
+            {
+                account.RecalcMarker = 0;
+                account.RecalcReason = null;
+            }
             registryContext.KumiAccounts.Update(account);
             UpdateTenancyProcesses(tenancyProcesses, account.IdAccount);
             registryContext.SaveChanges();
