@@ -985,13 +985,6 @@ namespace RegistryWeb.DataServices
             viewModel.ClaimsInfo = GetClaimsInfo(viewModel.Accounts);
             viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "IdRegion", "Region");
             viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
-            
-            var monthsList = registryContext.KumiCharges
-                .Select(c => c.EndDate).Distinct().OrderByDescending(c=> c.Date).Take(6).ToList();
-
-            viewModel.MonthsList = new Dictionary<int, DateTime>();
-            for (var i = 0; i < monthsList.Count(); i++)
-                viewModel.MonthsList.Add(monthsList[i].Month, monthsList[i].Date);
 
             return viewModel;
         }
@@ -1011,13 +1004,6 @@ namespace RegistryWeb.DataServices
             accounts = GetQueryPage(accounts, viewModel.PageOptions);
             viewModel.Accounts = accounts.ToList();
             viewModel.TenancyInfo = GetTenancyInfo(viewModel.Accounts);
-
-            var monthsList = registryContext.KumiCharges
-                .Select(c => c.EndDate).Distinct().OrderByDescending(c => c.Date).Take(6).ToList();
-
-            viewModel.MonthsList = new Dictionary<int, DateTime>();
-            for (var i = 0; i < monthsList.Count(); i++)
-                viewModel.MonthsList.Add(monthsList[i].Month, monthsList[i].Date);
 
             return viewModel;
         }
@@ -1785,6 +1771,7 @@ namespace RegistryWeb.DataServices
                 var paymentCharges = registryContext.KumiPaymentCharges.Where(r => r.IdCharge == charge.IdCharge);
                 charge.PaymentCharges = paymentCharges.ToList();
             }
+
             return account;
         }
 
