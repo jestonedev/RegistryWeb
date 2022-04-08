@@ -84,6 +84,7 @@ namespace RegistryWeb.DataServices
                 viewModel.PageOptions.CurrentPage = 1;
             viewModel.Premises = GetQueryPage(query, viewModel.PageOptions).ToList();
             viewModel.PaymentsInfo = GetPaymentInfo(viewModel.Premises);
+            viewModel.AreaAvgCostActualDate = registryContext.TotalAreaAvgCosts.FirstOrDefault()?.Date;
             viewModel.PremisesOwnershipRightCurrent = GetPremisesOwnershipRightCurrent(viewModel.Premises);
             viewModel.ActiveTenancies = GetActiveTenancies(viewModel.Premises);
             return viewModel;
@@ -896,7 +897,8 @@ namespace RegistryWeb.DataServices
                     s.IdRecord,
                     Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
                 }), "IdRecord", "Snp"),
-                PreparersList = new SelectList(registryContext.Preparers, "IdPreparer", "PreparerName")
+                PreparersList = new SelectList(registryContext.Preparers, "IdPreparer", "PreparerName"),
+                AreaAvgCostActualDate = registryContext.TotalAreaAvgCosts.FirstOrDefault()?.Date
             };
 
         if ((action == "Details" || action == "Delete") && securityService.HasPrivilege(Privileges.TenancyRead))

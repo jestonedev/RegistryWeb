@@ -233,6 +233,7 @@ namespace RegistryWeb.DataServices
             query = GetQueryPage(query, viewModel.PageOptions);
             viewModel.TenancyProcesses = query.ToList();
             viewModel.RentObjects = GetRentObjects(viewModel.TenancyProcesses);
+            viewModel.AreaAvgCostActualDate = registryContext.TotalAreaAvgCosts.FirstOrDefault()?.Date;
             return viewModel;
         }
 
@@ -1365,6 +1366,10 @@ namespace RegistryWeb.DataServices
         public IEnumerable<Preparer> Preparers
         {
             get => registryContext.Preparers.AsNoTracking();
+        }
+        public DateTime? AreaAvgCostActualDate
+        {
+            get => registryContext.TotalAreaAvgCosts.FirstOrDefault()?.Date;
         }
     }
 }

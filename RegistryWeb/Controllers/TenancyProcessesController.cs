@@ -78,6 +78,7 @@ namespace RegistryWeb.Controllers
                 ViewBag.ReturnUrl = returnUrl;
             }
             InitializeViewBagCommonDictionaries();
+            ViewBag.AreaAvgCostActualDate = dataService.AreaAvgCostActualDate;
         }
 
         // GET: TenancyProcesses/Details/5

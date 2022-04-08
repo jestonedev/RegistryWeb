@@ -7,6 +7,7 @@ using RegistryWeb.DataServices;
 using RegistryWeb.ViewModel;
 using RegistryDb.Models.Entities.RegistryObjects.Premises;
 using RegistryDb.Models.Entities.Tenancies;
+using System;
 
 namespace RegistryServices.ViewModel.RegistryObjects
 {
@@ -46,6 +47,7 @@ namespace RegistryServices.ViewModel.RegistryObjects
         public SelectList SignersList { get; set; }
         public SelectList PreparersList { get; set; }
         public List<PaymentsInfo> PaymentsInfo { get; set; }
+        public DateTime? AreaAvgCostActualDate { get; set; }
         public List<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
         public Dictionary<int, List<TenancyProcess>> ActiveTenancies { get; set; }
     }

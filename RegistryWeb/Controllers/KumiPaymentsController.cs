@@ -17,6 +17,7 @@ using RegistryWeb.ViewOptions;
 using RegistryWeb.Enums;
 using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Enums;
+using RegistryServices.Models;
 
 namespace RegistryWeb.Controllers
 {
@@ -452,6 +453,122 @@ namespace RegistryWeb.Controllers
                     Error = e.Message
                 });
             }
+        }
+
+        public IActionResult UploadFake()
+        {
+            var paymentWithouExtract1 = new KumiPayment
+            {
+                NumDocument = "-1",
+                DateDocument = DateTime.Now.Date,
+                Sum = 0.4m
+            };
+            var paymentWithouExtract2 = new KumiPayment
+            {
+                NumDocument = "-2",
+                DateDocument = DateTime.Now.Date,
+                Sum = 0.3m
+            };
+            var mo1 = new KumiMemorialOrder
+            {
+                NumDocument = "13",
+                DateDocument = DateTime.Now.Date,
+                SumZach = 3.51m
+            };
+            return View("UploadPaymentsResult", new KumiPaymentsUploadStateModel() {
+                InsertedPayments = new List<KumiPayment> {
+                    new KumiPayment {
+                        NumDocument = "0",
+                        DateDocument = DateTime.Now.Date,
+                        Sum = 0.5m
+                    },
+                    new KumiPayment {
+                    },
+                    paymentWithouExtract1
+                },
+                UpdatedPayments = new List<KumiPayment> {
+                    new KumiPayment {
+                    },
+                    paymentWithouExtract2
+                },
+                SkipedPayments = new List<KumiPayment> {
+                    new KumiPayment {
+                        NumDocument = "1",
+                        DateDocument = DateTime.Now.Date,
+                        Sum = 1.5m
+                    },
+                    new KumiPayment {
+                        NumDocument = "2",
+                        DateDocument = DateTime.Now.Date.AddDays(-1),
+                        Sum = 2.5m
+                    },
+                    new KumiPayment {
+                        NumDocument = "3",
+                        DateDocument = DateTime.Now.Date.AddDays(-2),
+                        Sum = 3.5m
+                    }
+                },
+                PaymentsDicitionaryBindErrors = new List<Tuple<KumiPayment, string>> {
+                    new Tuple<KumiPayment, string>(new KumiPayment {
+                        NumDocument = "4",
+                        DateDocument = DateTime.Now.Date.AddDays(-3),
+                        Sum = 5.5m
+                    }, "Указан некорректный показатель основания платежа {0} в платеже {1}"),
+                    new Tuple<KumiPayment, string>(new KumiPayment {
+                        NumDocument = "5",
+                        DateDocument = DateTime.Now.Date.AddDays(-4),
+                        Sum = 4.5m
+                    }, "Неподдерживаемый источник платежа {0} - {1}"),
+                },
+                CheckExtractErrors = new List<Tuple<KumiPayment, string>> {
+                    new Tuple<KumiPayment, string>(new KumiPayment {
+                        NumDocument = "6",
+                        DateDocument = DateTime.Now.Date.AddDays(-5),
+                        Sum = 5.5m
+                    }, "Количество строк выписки по платежу {0} больше одной")
+                },
+                PaymentsWithoutExtract = new List<KumiPayment> {
+                    paymentWithouExtract1,
+                    paymentWithouExtract2
+                },
+                InsertedMemorialOrders = new List<KumiMemorialOrder> {
+                    new KumiMemorialOrder {
+                        NumDocument = "8",
+                        DateDocument = DateTime.Now.Date,
+                        SumZach = 3.5m
+                    },
+                    new KumiMemorialOrder {
+                        NumDocument = "9",
+                        DateDocument = DateTime.Now.Date,
+                        SumZach = 5.5m
+                    },
+                    mo1
+                },
+                SkipedMemorialOrders = new List<KumiMemorialOrder> {
+                    new KumiMemorialOrder {
+                        NumDocument = "10",
+                        DateDocument = DateTime.Now.Date,
+                        SumZach = 6.5m
+                    }
+                },
+                MemorialOrdersDicitionaryBindErrors = new List<Tuple<KumiMemorialOrder, string>> {
+                    new Tuple<KumiMemorialOrder, string>(new KumiMemorialOrder {
+                        NumDocument = "11",
+                        DateDocument = DateTime.Now.Date,
+                        SumZach = 3.2m
+                    }, "Указан некорректный тип КБК {0} в мемориальном ордере {1}")
+                },
+                BindedMemorialOrders = new List<Tuple<KumiMemorialOrder, KumiPayment>> {
+                    new Tuple<KumiMemorialOrder, KumiPayment>(mo1, new KumiPayment{ NumDocument = null, DateDocument = DateTime.Now.Date, Sum = 3m })
+                },
+                BindMemorialOrdersErrors = new List<Tuple<KumiMemorialOrder, string>> {
+                    new Tuple<KumiMemorialOrder, string>(new KumiMemorialOrder {
+                        NumDocument = "15",
+                        DateDocument = DateTime.Now.Date,
+                        SumZach = 7.2m
+                    }, "Несоответствие данных мемориального ордера на списание по платежу {0}")
+                }
+            });
         }
 
         public IActionResult UploadPayments(List<IFormFile> files)

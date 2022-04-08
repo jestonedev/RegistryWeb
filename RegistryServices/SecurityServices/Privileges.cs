@@ -62,6 +62,8 @@ namespace RegistryWeb.SecurityServices
         ResettleDirectoriesWrite = 67108864,
         ResettleDirectoriesReadWrite = 83886080,
         ResettleAnalize = 150994944,
+        TotalAreaAvgCostRead = 17179869184,
+        TotalAreaAvgCostWrite = 34359738368,
         ResettleAll = ResettleReadWrite | ResettleDirectoriesReadWrite | ResettleAnalize,
         OwnerAll = OwnerReadWrite | OwnerDirectoriesReadWrite | OwnerAnalize,
         All = RegistryAll | TenancyAll | ClaimsAll | PrivAll | AccountsAll | OwnerAll | ResettleAll

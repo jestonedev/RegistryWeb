@@ -17,24 +17,43 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" asp-for="Id" />
-                    <div class="form-row">
-                        <div class="form-group col-12">
-                            <label asp-for="Cost">Цена 1 м<sup>2</sup> жилья</label>
-                            @if (securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
-                            {
-                                <input type="text" class="form-control input-decimal" asp-for="Cost" title="Цена 1 кв. м. жилья">
-                            }
-                            else
-                            {
-                                <input type="text" class="form-control input-decimal" asp-for="Cost" disabled title="Цена 1 кв. м. жилья">
-                            }
-                            <span asp-validation-for="Cost" class="text-danger"></span>
+                    @if (securityService.HasPrivilege(Privileges.TotalAreaAvgCostRead))
+                    {
+                        <input type="hidden" asp-for="Id" />
+                        <div class="form-row">
+                            <div class="form-group col-12">
+                                <label asp-for="Cost">Цена 1 м<sup>2</sup> жилья</label>
+                                @if (securityService.HasPrivilege(Privileges.TotalAreaAvgCostWrite))
+                                {
+                                    <input type="text" class="form-control input-decimal" asp-for="Cost" title="Цена 1 кв. м. жилья">
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control input-decimal" asp-for="Cost" disabled title="Цена 1 кв. м. жилья">
+                                }
+                                <span asp-validation-for="Cost" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group col-12">
+                                <label asp-for="Date">Дата начала действия</label>
+                                @if (securityService.HasPrivilege(Privileges.TotalAreaAvgCostWrite))
+                                {
+                                    <input type="date" class="form-control" asp-for="Date" title="Дата начала действия">
+                                }
+                                else
+                                {
+                                    <input type="date" class="form-control" asp-for="Date" disabled title="Дата начала действия">
+                                }
+                                <span asp-validation-for="Date" class="text-danger"></span>
+                            </div>
                         </div>
-                    </div>
+                    } else
+                    {
+                        <div class="alert alert-danger text-center mb-0">У вас нет прав на просмотр и редактирование этой информации</div>
+                    }
                 </div>
                 <div class="modal-footer">
-                    @if(securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
+                    @if(securityService.HasPrivilege(Privileges.TotalAreaAvgCostWrite) && securityService.HasPrivilege(Privileges.TotalAreaAvgCostRead))
                     {
                         <button type="button" class="btn btn-primary" id="areaAvgCostFormSubmit">Изменить</button>
                     }

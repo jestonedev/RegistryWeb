@@ -428,7 +428,7 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public IActionResult UpdateAreaAvgCost(TotalAreaAvgCost avgCost)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal))
+            if (!securityService.HasPrivilege(Privileges.TotalAreaAvgCostWrite))
             {
                 return Json(-1);
             }

@@ -28,7 +28,11 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.RegistryObjects.Common
             builder.Property(e => e.Cost)
                     .HasColumnName("cost")
                     .HasColumnType("decimal(19,2)");
-            
+
+            builder.Property(e => e.Date)
+                    .HasColumnName("date")
+                    .HasColumnType("date");
+
         }
     }
 }

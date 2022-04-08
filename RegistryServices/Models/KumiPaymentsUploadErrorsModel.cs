@@ -11,7 +11,7 @@ namespace RegistryServices.Models
         public List<Tuple<KumiPayment, string>> PaymentsDicitionaryBindErrors { get; set; }
         public List<Tuple<KumiMemorialOrder, string>> MemorialOrdersDicitionaryBindErrors { get; set; }
         public List<Tuple<KumiPayment, string>> CheckExtractErrors { get; set; }
-        public List<Tuple<KumiPayment, string>> BindMemorialOrdersErrors { get; set; }
+        public List<Tuple<KumiMemorialOrder, string>> BindMemorialOrdersErrors { get; set; }
         public List<Tuple<KumiMemorialOrder, KumiPayment>> BindedMemorialOrders { get; set; }
         public List<KumiMemorialOrder> InsertedMemorialOrders { get; set; }
         public List<KumiMemorialOrder> SkipedMemorialOrders { get; set; }
@@ -28,7 +28,7 @@ namespace RegistryServices.Models
         {
             PaymentsDicitionaryBindErrors = new List<Tuple<KumiPayment, string>>();
             CheckExtractErrors = new List<Tuple<KumiPayment, string>>();
-            BindMemorialOrdersErrors = new List<Tuple<KumiPayment, string>>();
+            BindMemorialOrdersErrors = new List<Tuple<KumiMemorialOrder, string>>();
             BindedMemorialOrders = new List<Tuple<KumiMemorialOrder, KumiPayment>>();
             InsertedMemorialOrders = new List<KumiMemorialOrder>();
             SkipedMemorialOrders = new List<KumiMemorialOrder>();
@@ -40,6 +40,7 @@ namespace RegistryServices.Models
             UpdatedPayments = new List<KumiPayment>();
             BindedExtractsToDbPayments = new List<KumiPayment>();
             UnknownPaymentExtracts = new List<KumiPaymentExtract>();
+            MemorialOrdersDicitionaryBindErrors = new List<Tuple<KumiMemorialOrder, string>>();
         }
     }
 }

@@ -2,8 +2,249 @@
 @model KumiPaymentsUploadStateModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Результат загрузки платежей";
 }
 
-<h1>Index</h1>
+<h1 class="mb-3">Результат загрузки платежей</h1>
 
+@{
+    var paymentCount = Model.InsertedPayments.Count + Model.UpdatedPayments.Count + Model.SkipedPayments.Count + Model.PaymentsDicitionaryBindErrors.Count + Model.CheckExtractErrors.Count;
+}
+<div class="mb-3">
+    <div class="font-weight-bold">Всего обработано платежей: @paymentCount@(paymentCount > 0 ? ", из них:" : "")</div>
+    @if (Model.InsertedPayments.Count > 0)
+    {
+        <div class="text-success font-weight-bold">Добавлено новых: @Model.InsertedPayments.Count</div>
+    }
+    @if (Model.UpdatedPayments.Count > 0)
+    {
+        <div>
+            <span class="text-primary font-weight-bold">Обновлено существующих: @Model.UpdatedPayments.Count</span>
+            <span class="badge bg-primary text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
+                  title="К обновленным относятся платежи, ранее присутствовавшие в системе, но не разнесенные и не связанные с уведомлением об уточнении или мемориальным ордером">?</span>
+        </div>
+    }
+    @if (Model.SkipedPayments.Count > 0)
+    {
+        <div>
+            <span class="text-warning font-weight-bold">Пропущено: @Model.SkipedPayments.Count</span>
+            <span class="badge bg-warning text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
+                  title="К пропущенным относятся платежи, ранее присутствовавшие в системе, но либо разнесенные, либо связанные с уведомлением об уточнении или мемориальным ордером">?</span>
+        </div>
+    }
+    @if (Model.PaymentsDicitionaryBindErrors.Count + Model.CheckExtractErrors.Count > 0)
+    {
+        <div>
+            <span class="text-danger font-weight-bold">Оработано с ошибкой: @(Model.PaymentsDicitionaryBindErrors.Count + Model.CheckExtractErrors.Count)</span>
+            <span class="badge bg-danger text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
+                  title="Детализацию по ошибкам загрузки платежей можно посмотреть ниже">?</span>
+        </div>
+    }
+</div>
+@if (Model.PaymentsDicitionaryBindErrors.Count > 0)
+{
+    <h3 class="text-danger">Ошибки привязки словарей к платежам</h3>
+    <table class="table table-bordered mb-3">
+        <thead>
+            <tr>
+                <th>Реквизиты документа</th>
+                <th>Сумма</th>
+                <th>Ошибка</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var paymentAssoc in Model.PaymentsDicitionaryBindErrors)
+            {
+                <tr>
+                    <td>@(paymentAssoc.Item1.NumDocument != null ? paymentAssoc.Item1.NumDocument + " " : "")@(paymentAssoc.Item1.DateDocument != null ? " от " + paymentAssoc.Item1.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</td>
+                    <td>@paymentAssoc.Item1.Sum руб.</td>
+                    <td>@paymentAssoc.Item2</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@if (Model.CheckExtractErrors.Count > 0)
+{
+    <h3 class="text-danger">Ошибки проверки данных выписок</h3>
+    <table class="table table-bordered mb-3">
+        <thead>
+            <tr>
+                <th>Реквизиты документа</th>
+                <th>Сумма</th>
+                <th>Ошибка</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var paymentAssoc in Model.CheckExtractErrors)
+            {
+                <tr>
+                    <td>@(paymentAssoc.Item1.NumDocument != null ? paymentAssoc.Item1.NumDocument + " " : "")@(paymentAssoc.Item1.DateDocument != null ? " от " + paymentAssoc.Item1.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</td>
+                    <td>@paymentAssoc.Item1.Sum руб.</td>
+                    <td>@paymentAssoc.Item2</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@if (Model.PaymentsWithoutExtract.Count > 0)
+{
+    <h3 class="text-warning">Платежи, загруженные без выписок</h3>
+    <table class="table table-bordered mb-3">
+        <thead>
+            <tr>
+                <th>Реквизиты документа</th>
+                <th>Сумма</th>
+                <th>Идентификатор платежа</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var paymentAssoc in Model.PaymentsWithoutExtract)
+            {
+                <tr>
+                    <td>@(paymentAssoc.NumDocument != null ? paymentAssoc.NumDocument + " " : "")@(paymentAssoc.DateDocument != null ? " от " + paymentAssoc.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</td>
+                    <td>@paymentAssoc.Sum руб.</td>
+                    <td>@paymentAssoc.Guid</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@{
+    var moCount = Model.InsertedMemorialOrders.Count + Model.SkipedMemorialOrders.Count + Model.MemorialOrdersDicitionaryBindErrors.Count;
+}
+<div class="mb-3">
+    <div class="font-weight-bold">Всего обработано мемориальных ордеров: @moCount@(moCount > 0 ? ", из них:" : "")</div>
+    @if (Model.InsertedMemorialOrders.Count > 0)
+    {
+        <div class="text-success font-weight-bold">Добавлено новых: @Model.InsertedMemorialOrders.Count</div>
+    }
+    @if (Model.SkipedMemorialOrders.Count > 0)
+    {
+        <div>
+            <span class="text-warning font-weight-bold">Не загружено: @Model.SkipedMemorialOrders.Count</span>
+            <span class="badge bg-warning text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
+                  title="К незагруженным относятся мемориальные ордера ранее загруженные в систему">?</span>
+        </div>
+    }
+    @if (Model.MemorialOrdersDicitionaryBindErrors.Count > 0)
+    {
+        <div>
+            <span class="text-danger font-weight-bold">Оработано с ошибкой: @(Model.MemorialOrdersDicitionaryBindErrors.Count)</span>
+            <span class="badge bg-danger text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
+                  title="Детализацию по ошибкам загрузки мемориальных ордеров можно посмотреть ниже">?</span>
+        </div>
+    }
+</div>
+
+
+@if (Model.InsertedMemorialOrders.Count > 0 || Model.SkipedMemorialOrders.Count > 0)
+{
+    <h3 class="text-success">Информация о связке мемориальных ордеров с платежами</h3>
+    <table class="table table-bordered mb-3">
+        <thead>
+            <tr>
+                <th>Реквизиты уведомления об уточнении</th>
+                <th>Реквизиты платежного документа</th>
+                <th>Сумма в мемориальном ордере</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var moAssoc in Model.InsertedMemorialOrders)
+            {
+                <tr>
+                    <td>@(moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "")@(moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "")
+                        <span class="badge bg-success text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
+                              title="Новый мемориальный ордер">?</span>
+                    </td>
+                    <td>
+                        @{
+                            var bindMo = Model.BindedMemorialOrders.Where(r => r.Item1 == moAssoc).FirstOrDefault();
+                            if (bindMo != null)
+                            {
+                                var payment = bindMo.Item2;
+                                <span>@(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</span>
+                            }
+                            else
+                            {
+                                <span class="text-danger"><i>Не связан с платежом</i></span>
+                            }
+                        }
+
+                    </td>
+                    <td>@moAssoc.SumZach руб.</td>
+                </tr>
+            }
+            @foreach (var moAssoc in Model.SkipedMemorialOrders)
+            {
+                <tr>
+                    <td>@(moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "")@(moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "")
+                        <span class="badge bg-warning text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
+                              title="Присутствовавший в системе мемориальный ордер">?</span>
+                    </td>
+                    <td>
+                        @{
+                            var bindMo = Model.BindedMemorialOrders.Where(r => r.Item1 == moAssoc).FirstOrDefault();
+                            if (bindMo != null)
+                            {
+                                var payment = bindMo.Item2;
+                                <span>@(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</span>
+                            }
+                            else
+                            {
+                                <span class="text-danger"><i>Не связан с платежом</i></span>
+                            }
+                        }
+
+                    </td>
+                    <td>@moAssoc.SumZach руб.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.MemorialOrdersDicitionaryBindErrors.Count > 0)
+{
+    <h3 class="text-danger">Ошибки привязки словарей к мемориальным ордерам</h3>
+    <table class="table table-bordered mb-3">
+        <thead>
+            <tr>
+                <th>Реквизиты уведомления об уточнении</th>
+                <th>Ошибка</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var moAssoc in Model.MemorialOrdersDicitionaryBindErrors)
+            {
+                <tr>
+                    <td>@(moAssoc.Item1.NumDocument != null ? moAssoc.Item1.NumDocument + " " : "")@(moAssoc.Item1.DateDocument != null ? " от " + moAssoc.Item1.DateDocument.ToString("dd.MM.yyyy") + " " : "")</td>
+                    <td>@moAssoc.Item2</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.BindMemorialOrdersErrors.Count > 0)
+{
+    <h3 class="text-danger">Ошибки привязки мемориальных ордеров к платежам</h3>
+    <table class="table table-bordered mb-3">
+        <thead>
+            <tr>
+                <th>Реквизиты уведомления об уточнении</th>
+                <th>Ошибка</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var moAssoc in Model.BindMemorialOrdersErrors)
+            {
+                <tr>
+                    <td>@(moAssoc.Item1.NumDocument != null ? moAssoc.Item1.NumDocument + " " : "")@(moAssoc.Item1.DateDocument != null ? " от " + moAssoc.Item1.DateDocument.ToString("dd.MM.yyyy") + " " : "")</td>
+                    <td>@moAssoc.Item2</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

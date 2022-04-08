@@ -6,6 +6,7 @@ using RegistryDb.Models.Entities.Tenancies;
 using RegistryDb.Models.SqlViews;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
+using System;
 using System.Collections.Generic;
 
 namespace RegistryServices.ViewModel.Tenancies
@@ -20,5 +21,6 @@ namespace RegistryServices.ViewModel.Tenancies
         public IEnumerable<KladrStreet> Streets { get; set; }
         public IEnumerable<ObjectState> ObjectStates { get; set; }
         public IEnumerable<OwnershipRightType> OwnershipRightTypes { get; set; }
+        public DateTime? AreaAvgCostActualDate { get; set; }
     }
 }

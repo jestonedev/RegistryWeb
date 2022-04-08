@@ -30,6 +30,15 @@
     });
 }
 
+$(document).ready(
+    function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }
+);
+
 $.fn.inputFilter = function (inputFilter) {
     return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function () {
         if (inputFilter(this.value)) {
@@ -265,6 +274,10 @@ $(function () {
         return /^[0-9а-яА-Я]*$/.test(value);
     });
 
+
+    var minDate = undefined;
+    var currentCost = undefined;
+
     $("#areaAvgCostModalBtn").on("click", function (e) {
         if ($("#areaAvgCostForm").length > 0) {
             $("#areaAvgCostForm").remove();
@@ -277,7 +290,8 @@ $(function () {
                 $("body").append(modal);
                 $("#areaAvgCostForm [data-val-number]").attr("data-val-number", "Введите числовое значение");
                 refreshValidationForm($("#areaAvgCostForm"));
-
+                minDate = $("#areaAvgCostForm").find("#Date").val();
+                currentCost = $("#areaAvgCostForm").find("#Cost").val();
                 $("#areaAvgCostModal").modal("show");
             }
         });
@@ -287,12 +301,27 @@ $(function () {
     $("body").on("click", "#areaAvgCostFormSubmit", function (e) {
         var form = $(this).closest("form");
         var isValid = form.valid();
+
+        var validator = form.validate();
+        if (new Date($("#areaAvgCostForm #Date").val()) <= new Date(minDate)) {
+            let error = {};
+            error["Date"] = "Дата должна быть больше ранее внесенной";
+            validator.showErrors(error);
+            isValid = false;
+        }
+        if ($("#areaAvgCostForm #Cost").val() === currentCost) {
+            let error = {};
+            error["Cost"] = "Стоимость квадратного метра не изменена";
+            validator.showErrors(error);
+            isValid = false;
+        }
+
         if (isValid) {
             $.ajax({
                 async: false,
                 type: 'POST',
                 url: window.location.origin + '/Premises/UpdateAreaAvgCost',
-                data: { id: $("#areaAvgCostForm #Id").val(), cost: $("#areaAvgCostForm #Cost").val() },
+                data: { id: $("#areaAvgCostForm #Id").val(), cost: $("#areaAvgCostForm #Cost").val(), date: $("#areaAvgCostForm #Date").val() },
                 success: function (result) {
                     if (result === 1) {
                         $("#areaAvgCostModal").modal("hide");

@@ -710,6 +710,7 @@ namespace RegistryWeb.DataServices
                 {
                     var localMo = BindDictionariesToMemorialOrder(mo);
                     localMo.PaymentGroup = group;
+                    ClearMemorialOrderFieldsValues(mo);
 
                     var dbMo = registryContext.KumiMemorialOrders.Include(r => r.MemorialOrderPaymentAssocs).FirstOrDefault(
                         r => r.Guid == mo.Guid &&
@@ -738,12 +739,12 @@ namespace RegistryWeb.DataServices
                 catch (KumiPaymentBindDictionaryException e)
                 {
                     loadState.MemorialOrdersDicitionaryBindErrors.Add(new Tuple<KumiMemorialOrder, string>(mo, e.Message));
+                    continue;
                 }
 
                 // Если ордер уже подвязан, то пропускаем
                 if (mo.MemorialOrderPaymentAssocs != null && mo.MemorialOrderPaymentAssocs.Any()) continue;
 
-                ClearMemorialOrderFieldsValues(mo);
                 // Если сумма ордера отрицательная, то производим списание с платежа, соответствующего всем критериям
                 // Если сумма положительная, то создаем новый платеж на основании имеющегося и обновляем целевые строки
                 var dbPayments = registryContext.KumiPayments
@@ -806,14 +807,13 @@ namespace RegistryWeb.DataServices
                 }
                 catch (KumiPaymentCheckVtOperException e)
                 {
-                    loadState.BindMemorialOrdersErrors.Add(new Tuple<KumiPayment, string>(dbPayment, e.Message));
+                    loadState.BindMemorialOrdersErrors.Add(new Tuple<KumiMemorialOrder, string>(mo, e.Message));
                 }
             }
         }
 
         private void UploadPayments(IEnumerable<KumiPayment> payments, KumiPaymentGroup group, List<KumiPaymentExtract> extracts, KumiPaymentsUploadStateModel loadState)
         {
-            var resultPayments = new List<KumiPayment>();
             var appliedExtracts = new List<KumiPaymentExtract>();
 
             foreach (var payment in payments)
@@ -838,7 +838,6 @@ namespace RegistryWeb.DataServices
                     }
                     else
                     {
-                        resultPayments.Add(paymentLocal);
                         loadState.PaymentsWithoutExtract.Add(paymentLocal);
                     }
 
