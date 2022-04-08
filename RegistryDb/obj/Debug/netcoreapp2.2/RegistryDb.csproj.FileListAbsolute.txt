@@ -17,3 +17,13 @@ D:\Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.dll
 D:\Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.pdb
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csprojAssemblyReference.cache
 D:\Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csproj.AssemblyReference.cache
+D:\RegistryWeb\RegistryDb\bin\Debug\netcoreapp2.2\RegistryDb.deps.json
+D:\RegistryWeb\RegistryDb\bin\Debug\netcoreapp2.2\RegistryDb.dll
+D:\RegistryWeb\RegistryDb\bin\Debug\netcoreapp2.2\RegistryDb.pdb
+D:\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csproj.AssemblyReference.cache
+D:\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.GeneratedMSBuildEditorConfig.editorconfig
+D:\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.AssemblyInfoInputs.cache
+D:\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.AssemblyInfo.cs
+D:\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csproj.CoreCompileInputs.cache
+D:\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.dll
+D:\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.pdb

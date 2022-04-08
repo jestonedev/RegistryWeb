@@ -1,11 +1,4 @@
-﻿@using RegistryDb.Models.Entities
-
-@{ 
-    var myKeys = new List<DateTime>(Model.MonthsList.Values);
-}
-
-
-<form id="accountKumiCalcDeptForm">
+﻿<form id="accountKumiCalcDeptForm">
     <div class="modal fade" id="accountKumiCalcDeptModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -34,11 +27,11 @@
                     <div class="form-row">
                         <div class="col-auto pr-3">Выберите формат:</div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="AccountKumi.FormatFile1" checked id="AccountKumi_FormatFile1" value="1">
+                            <input class="form-check-input" type="radio" name="AccountKumi.FormatFile" checked id="AccountKumi_FormatFile1" value="1">
                             <label class="form-check-label" for="AccountKumi_FormatFile1">xlsx</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="AccountKumi.FormatFile2" id="AccountKumi_FormatFile2" value="2">
+                            <input class="form-check-input" type="radio" name="AccountKumi.FormatFile" id="AccountKumi_FormatFile2" value="2">
                             <label class="form-check-label" for="AccountKumi_FormatFile2">ods</label>
                         </div>
                     </div>
@@ -75,16 +68,10 @@
                                             data-val="true" data-val-required="Укажите месяц">
                                         <option></option>
                                         @{
-                                            @foreach (KeyValuePair<int, DateTime> m in Model.MonthsList)
+                                            @for (int i = 1; i <= 12; i++)
                                             {
-                                                if (m.Key == (myKeys[0]).Month)
-                                                {
-                                                    <option selected value="@m.Key">@m.Value.ToString("MMMM")</option>
-                                                }
-                                                else
-                                                {
-                                                    <option value="@m.Key">@m.Value.ToString("MMMM")</option>
-                                                }
+                                                var date = new DateTime(DateTime.Now.Year, i, 1);
+                                                <option value="@i">@date.ToString("MMMM")</option>
                                             }
                                         }
                                     </select>
@@ -96,14 +83,7 @@
                                         <option></option>
                                         @for (int i = DateTime.Now.Year; i > DateTime.Now.Year - 5; i--)
                                         {
-                                            if (i == (myKeys[0]).Year)
-                                            {
-                                                <option selected value="@i">@i</option>
-                                            }
-                                            else
-                                            {
-                                                <option value="@i">@i</option>
-                                            }
+                                            <option value="@i">@i</option>
                                         }
                                     </select>
                                     <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumi.OnDate_Year" data-valmsg-replace="true"></span>

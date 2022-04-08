@@ -57,6 +57,8 @@ namespace RegistryWeb.Controllers
 
             AddSearchIdsToSession(vm.FilterOptions, filteredTenancyProcessesIds);
 
+            ViewBag.LastChargeDate = (DateTime?)null;
+
             return View(vm);
         }
 
@@ -94,6 +96,7 @@ namespace RegistryWeb.Controllers
             ViewBag.Count = viewModel.Accounts.Count();
             ViewBag.CanEdit = securityService.HasPrivilege(Privileges.AccountsWrite);
             ViewBag.Emails = dataService.GetTenantsEmails(viewModel.Accounts.ToList());
+            ViewBag.LastChargeDate = (DateTime?)null;
             return View("AccountReports", viewModel);
         }
 

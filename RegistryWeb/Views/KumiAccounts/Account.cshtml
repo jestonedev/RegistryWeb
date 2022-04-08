@@ -14,7 +14,7 @@
 @section Scripts {
     <script src="~/js/kumiAccount.common.js" asp-append-version="true"></script>
     <script src="~/js/kumiAccount.recalc.js" asp-append-version="true"></script>
-}
+    <script src="~/js/kumiAccount.reports.js" asp-append-version="true"></script>}
 <div class="card">
     <div class="card-header d-flex flex-column flex-lg-row">
         <label class="form-check-label h2 col-sm-12 col-lg-6 col-xl-7 pl-0" title="@ViewData["Title"]"
@@ -56,8 +56,16 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@Model.IdAccount">
                             <a class="dropdown-item rr-report-calc-debt" href="#" title="Расчет суммы задолженности" aria-label="Расчет суммы задолженности" data-id-account="@Model.IdAccount">Расчет суммы задолженности</a>
-                            <a class="dropdown-item rr-report-rig-send" href="#" title="Отправить счёт-извещение" aria-label="Отправить счёт-извещение" data-id-account="@Model.IdAccount">Отправить счёт-извещение</a>
-                            <a class="dropdown-item rr-report-rig-export" href="#" title="Сформировать счёт-извещение" aria-label="Сформировать счёт-извещение" data-id-account="@Model.IdAccount">Сформировать счёт-извещение</a>
+                            @{
+                                var lastCharge = Model.Charges.OrderByDescending(r => r.EndDate).FirstOrDefault();
+                                DateTime? lastChargeDate = null;
+                                if (lastCharge != null)
+                                {
+                                    lastChargeDate = lastCharge.EndDate;
+                                }
+                            }
+                            <a class="dropdown-item rr-report-rig-send" href="#" title="Отправить счёт-извещение" aria-label="Отправить счёт-извещение" data-id-account="@Model.IdAccount" data-last-charge-year="@(lastChargeDate != null ? lastChargeDate.Value.Year.ToString() : "")" data-last-charge-month="@(lastChargeDate != null ? lastChargeDate.Value.Month.ToString() : "")">Отправить счёт-извещение</a>
+                            <a class="dropdown-item rr-report-rig-export" href="#" title="Сформировать счёт-извещение" aria-label="Сформировать счёт-извещение" data-id-account="@Model.IdAccount" data-last-charge-year="@(lastChargeDate != null ? lastChargeDate.Value.Year.ToString() : "")" data-last-charge-month="@(lastChargeDate != null ? lastChargeDate.Value.Month.ToString() : "")">Сформировать счёт-извещение</a>
                         </div>
                     </div>
                 }
@@ -551,4 +559,5 @@
 </div>
 
 <partial name="AccountModals">
-    <partial name="AccountRecalcModal">
+<partial name="ReportsModals">
+<partial name="AccountRecalcModal">

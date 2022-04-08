@@ -68,8 +68,8 @@
             </button>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="operationsButton">
                 <button class="dropdown-item" @(canEdit && Model.Accounts.Any() ? "" : "disabled") href="#" id="addClaim">Создать претензионно-исковую работу</button>
-                <button class="dropdown-item rr-report-rig-send" @(Model.Accounts.Any() ? "" : "disabled") href="#" data-id-account="0">Отправить счёт-извещение</button>
-                <button class="dropdown-item rr-report-rig-export" @(Model.Accounts.Any() ? "" : "disabled") href="#" data-id-account="0">Сформировать счёт-извещение</button>
+                <button class="dropdown-item rr-report-rig-send" @(Model.Accounts.Any() ? "" : "disabled") href="#" data-id-account="0" data-last-charge-year="@DateTime.Now.Year" data-last-charge-month="@DateTime.Now.Month">Отправить счёт-извещение</button>
+                <button class="dropdown-item rr-report-rig-export" @(Model.Accounts.Any() ? "" : "disabled") href="#" data-id-account="0" data-last-charge-year="@DateTime.Now.Year" data-last-charge-month="@DateTime.Now.Month">Сформировать счёт-извещение</button>
                 <button class="dropdown-item rr-report-recalc" @(Model.Accounts.Any() ? "" : "disabled") href="#" data-id-account="0">Выполнить перерасчет</button>
             </div>
         </div>
