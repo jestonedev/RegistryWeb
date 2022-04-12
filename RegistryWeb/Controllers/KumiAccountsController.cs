@@ -248,5 +248,48 @@ namespace RegistryWeb.Controllers
                 });
             }
         }
+
+        public IActionResult CreateClaimMass(DateTime atDate)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
+                return Error("У вас нет прав на выполнение данной операции");
+
+            var ids = GetSessionIds();
+
+            if (!ids.Any())
+                return NotFound();
+
+            var accountsVM = dataService.GetAccountsViewModelForMassReports(ids, new PageOptions { SizePage = int.MaxValue });
+            var processingIds = new List<int>();
+            var errorIds = new List<int>();
+            foreach (var account in accountsVM.Accounts)
+            {
+                var hasOpenedClaims = false;
+                if (accountsVM.ClaimsInfo.ContainsKey(account.IdAccount))
+                {
+                    var lastClaimInfo = accountsVM.ClaimsInfo[account.IdAccount].First();
+                    if (accountsVM.ClaimsInfo[account.IdAccount].Any(r => r.IdClaimCurrentState != 6 && !r.EndedForFilter))
+                    {
+                        lastClaimInfo = accountsVM.ClaimsInfo[account.IdAccount].FirstOrDefault(r => r.IdClaimCurrentState != 6 && !r.EndedForFilter);
+                    }
+                    hasOpenedClaims = lastClaimInfo.IdClaimCurrentState != 6 && !lastClaimInfo.EndedForFilter;
+                }
+
+                if (hasOpenedClaims)
+                {
+                    errorIds.Add(account.IdAccount);
+                }
+                else
+                {
+                    processingIds.Add(account.IdAccount);
+                }
+            }
+
+            dataService.CreateClaimMass(processingIds, atDate);
+
+            TempData["ErrorAccountsIds"] = JsonConvert.SerializeObject(errorIds);
+            TempData["ErrorReason"] = "по указанным лицевым счетам уже имеются незавершенные исковые работы";
+            return RedirectToAction("KumiAccountsReports");
+        }
     }
 }

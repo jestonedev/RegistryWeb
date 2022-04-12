@@ -258,8 +258,9 @@
 
                     var account = tenancy.account;
                     var accountInfo = "";
+                    var tenancyLink = "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn' href='/KumiAccounts/Details?idAccount=" + tenancy.idAccount + "' target='_blank'></a>";
                     if (account !== null)
-                        accountInfo = "<br/><span class='text-danger'><i>Привязан к ЛС № " + account + "</i></span><a class='btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn' href='/KumiAccounts/Details?idAccount=" + tenancy.idAccount + "' target='_blank'></a>";
+                        accountInfo = "<br/><span class='text-danger'><i>Привязан к ЛС № " + account + "</i></span>";
 
                     var rentObjects = result.rentObjects[tenancy.idProcess];
                     if (rentObjects === undefined || rentObjects.length === 0) {
@@ -284,7 +285,7 @@
                         table += "<tr data-id-process='" + idProcess + "' data-id-building='" + idBuilding + "' data-id-premise='" + idPremises + "'>";
 
                         table += "<td style='vertical-align: middle'>" + (j === 0 ? radioButton : "") + "</td>";
-                        table += "<td>" + (j === 0 ? tenancyRequisits : "") + (j === 0 ? accountInfo : "") + "</td><td>" + rentObjects[j].address.text + "</td>";
+                        table += "<td>" + (j === 0 ? tenancyRequisits + tenancyLink : "") + (j === 0 ? accountInfo : "") + "</td><td>" + rentObjects[j].address.text + "</td>";
                         table += "</tr>";
                     }
                 }

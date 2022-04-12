@@ -17,7 +17,7 @@ namespace RegistryPaymentCalculator
 
             using (var db = new RegistryContext(connectionString, Configuration.DbName))
             {
-                var service = new KumiAccountsDataService(db, new AddressesDataService(db));
+                var service = new KumiAccountsDataService(db, new AddressesDataService(db), new RegistryWeb.SecurityServices.SecurityService(db, null));
                 var accountsInfo = new List<KumiAccountInfoForPaymentCalculator>();
                 try
                 {

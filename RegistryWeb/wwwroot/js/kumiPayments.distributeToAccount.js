@@ -238,8 +238,8 @@
                     currentPenalty -= parseFloat($(row.find("td")[6]).text().replace(",", "."));
                     break;
             }
-            var distributionPenalty = Math.max(Math.min(sumForDistribution, currentPenalty), 0);
-            var distributionTenancy = sumForDistribution - distributionPenalty;
+            var distributionPenalty = Math.round(Math.max(Math.min(sumForDistribution, currentPenalty), 0)*100)/100;
+            var distributionTenancy = Math.round((sumForDistribution - distributionPenalty)*100)/100;
             $("#DistributePaymentToAccount_TenancySum").val((distributionTenancy + "").replace(".", ","));
             $("#DistributePaymentToAccount_PenaltySum").val((distributionPenalty + "").replace(".", ","));
         }

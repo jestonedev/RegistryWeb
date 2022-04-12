@@ -17,13 +17,18 @@ using RegistryDb.Models.Entities.Tenancies;
 using RegistryServices.Enums;
 using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Models;
+using RegistryDb.Models.Entities.Common;
 
 namespace RegistryWeb.DataServices
 {
     public class KumiAccountsDataService : ListDataService<KumiAccountsVM, KumiAccountsFilter>
     {
-        public KumiAccountsDataService(RegistryContext registryContext, AddressesDataService addressesDataService) : base(registryContext, addressesDataService)
+        private readonly SecurityServices.SecurityService securityService;
+
+        public KumiAccountsDataService(RegistryContext registryContext, AddressesDataService addressesDataService,
+            SecurityServices.SecurityService securityService) : base(registryContext, addressesDataService)
         {
+            this.securityService = securityService;
         }
 
         public override KumiAccountsVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, KumiAccountsFilter filterOptions)
@@ -354,6 +359,87 @@ namespace RegistryWeb.DataServices
             registryContext.SaveChanges();
         }
 
+        public void CreateClaimMass(List<int> accountIds, DateTime atDate)
+        {
+            var accounts = GetAccountsForMassReports(accountIds).ToList();
+            foreach (var account in accounts)
+            {
+                var claim = new Claim
+                {
+                    AtDate = atDate,
+                    IdAccountKumi = account.IdAccount,
+                    AmountTenancy = account.CurrentBalanceTenancy,
+                    AmountPenalties = account.CurrentBalancePenalty,
+                    AmountDgi = 0,
+                    AmountPadun = 0,
+                    AmountPkk = 0,
+                    ClaimStates = new List<ClaimState> {
+                        new ClaimState {
+                            IdStateType = registryContext.ClaimStateTypes.Where(r => r.IsStartStateType).First().IdStateType,
+                            BksRequester = CurrentExecutor?.ExecutorName,
+                            DateStartState = DateTime.Now.Date,
+                            Executor = CurrentExecutor?.ExecutorName
+                        }
+                    },
+                    ClaimPersons = new List<ClaimPerson>()
+                };
+                claim.ClaimPersons = GetClaimPersonsFromTenancy(claim.IdAccountKumi);
+                if (claim.ClaimPersons.Count == 0)
+                {
+                    claim.ClaimPersons = GetClaimPersonsFromPrevClaim(claim.IdAccountKumi);
+                }
+                
+                registryContext.Claims.Add(claim);
+                registryContext.SaveChanges();
+            }
+        }
+
+        private List<ClaimPerson> GetClaimPersonsFromPrevClaim(int? idAccount)
+        {
+            var prevClaim = registryContext.Claims.Include(r => r.ClaimPersons)
+                .Where(r => idAccount != null ? r.IdAccountKumi == idAccount : false)
+                .OrderByDescending(r => r.IdClaim).FirstOrDefault();
+            if (prevClaim != null)
+            {
+                return prevClaim.ClaimPersons.Select(r => new ClaimPerson
+                {
+                    Surname = r.Surname,
+                    Name = r.Name,
+                    Patronymic = r.Patronymic,
+                    DateOfBirth = r.DateOfBirth,
+                    Passport = r.Passport,
+                    PlaceOfBirth = r.PlaceOfBirth,
+                    WorkPlace = r.WorkPlace,
+                    IsClaimer = r.IsClaimer
+                }).ToList();
+            }
+            return new List<ClaimPerson>();
+        }
+
+        private List<ClaimPerson> GetClaimPersonsFromTenancy(int? idAccount)
+        {
+            var tenancyPersons = new List<TenancyPerson>();
+            if (idAccount != null)
+            {
+                var tenancyProcesses = (from tpRow in registryContext.TenancyProcesses
+                                    .Where(tp => (tp.RegistrationNum == null || !tp.RegistrationNum.Contains("н")) && tp.IdAccount == idAccount)
+                                        select tpRow).ToList();
+                if (tenancyProcesses.Any())
+                {
+                    var idProcess = tenancyProcesses.OrderByDescending(tp => new { tp.RegistrationDate, tp.IdProcess }).First().IdProcess;
+                    tenancyPersons = registryContext.TenancyPersons.Where(tp => tp.IdProcess == idProcess && tp.ExcludeDate == null).ToList();
+                }
+            }
+            return tenancyPersons.Select(r => new ClaimPerson
+            {
+                Surname = r.Surname,
+                Name = r.Name,
+                Patronymic = r.Patronymic,
+                DateOfBirth = r.DateOfBirth,
+                IsClaimer = r.IdKinship == 1
+            }).ToList();
+        }
+
         public KumiCharge CalcChargeInfo(KumiAccountInfoForPaymentCalculator account, DateTime startDate, DateTime endDate,
             List<KumiCharge> prevCharges, out bool outOfBound)
         {
@@ -575,7 +661,7 @@ namespace RegistryWeb.DataServices
                 }
                 foreach(var keyRate in inPeriodKeyRates.OrderBy(r => r.StartDate))
                 {
-                    var nextKeyRate = inPeriodKeyRates.Where(r => r.StartDate > keyRate.StartDate).OrderByDescending(r => r.StartDate).FirstOrDefault();
+                    var nextKeyRate = inPeriodKeyRates.Where(r => r.StartDate > keyRate.StartDate).OrderBy(r => r.StartDate).FirstOrDefault();
                     result.Add(new KumiPenaltyCalcInfo
                     {
                         StartDate = penaltyInfo.StartDate >= keyRate.StartDate ? penaltyInfo.StartDate : keyRate.StartDate,
@@ -1004,6 +1090,7 @@ namespace RegistryWeb.DataServices
             accounts = GetQueryPage(accounts, viewModel.PageOptions);
             viewModel.Accounts = accounts.ToList();
             viewModel.TenancyInfo = GetTenancyInfo(viewModel.Accounts);
+            viewModel.ClaimsInfo = GetClaimsInfo(viewModel.Accounts);
 
             return viewModel;
         }
@@ -1688,7 +1775,7 @@ namespace RegistryWeb.DataServices
         private Dictionary<int, List<ClaimInfo>> GetClaimsInfo(IEnumerable<KumiAccount> accounts)
         {
             var accountsIds = accounts.Select(r => r.IdAccount);
-            var claims = registryContext.Claims.Where(c => c.IdAccount != null && accountsIds.Contains(c.IdAccount.Value));
+            var claims = registryContext.Claims.Where(c => c.IdAccountKumi != null && accountsIds.Contains(c.IdAccountKumi.Value));
             var claimIds = claims.Select(r => r.IdClaim);
 
             var claimLastStatesIds = from row in registryContext.ClaimStates
@@ -1714,7 +1801,7 @@ namespace RegistryWeb.DataServices
 
             claimsInfo = from claimRow in claims
                          join accountId in accountsIds
-                         on claimRow.IdAccount equals accountId
+                         on claimRow.IdAccountKumi equals accountId
                          join claimsInfoRow in claimsInfo
                          on claimRow.IdClaim equals claimsInfoRow.IdClaim into c
                          from cRow in c.DefaultIfEmpty()
@@ -1845,5 +1932,15 @@ namespace RegistryWeb.DataServices
         public List<KumiAccountState> States { get => registryContext.KumiAccountStates.ToList(); }
         public List<KladrStreet> Streets { get => addressesDataService.KladrStreets.ToList(); }
         public List<KladrRegion> Regions { get => addressesDataService.KladrRegions.ToList(); }
+
+        public Executor CurrentExecutor
+        {
+            get
+            {
+                var userName = securityService.User.UserName.ToLowerInvariant();
+                return registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
+                                e.ExecutorLogin.ToLowerInvariant() == userName);
+            }
+        }
     }
 }
