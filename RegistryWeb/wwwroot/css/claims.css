@@ -14,6 +14,10 @@
     color: #0056b3;
 }
 
+.c-table > tbody td {
+    padding: 0.4rem 0.75rem;
+}
+
 .rr-claim-filter-label, .rr-claim-label {
     white-space: nowrap;
     overflow: hidden;
@@ -34,4 +38,14 @@
 .rr-comparison-sign {
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
+}
+
+.dopinfo {
+    color: #888;
+    font-size: 75%;
+}
+
+.dopinfo-alt {
+    color: #212529;
+    font-size: 75%;
 }

@@ -10,9 +10,13 @@
     var canEdit = ViewBag.CanEdit;
     var errorClaims = (List<Claim>)ViewData["ErrorClaims"];
 }
+@section styles
+{
+    <link rel="stylesheet" href="~/css/claims.css" runat="server" />
+}
 
 @section Scripts
-    {
+{
     <script src="~/js/claim.reports.js" asp-append-version="true"></script>
 }
 
@@ -65,11 +69,11 @@
     </div>
 </div>
 
-<table class="table table-hover">
+<table class="table table-hover c-table">
     <thead>
         <tr>
-            <th>№ по реестру</th>
-            <th>Адрес</th>
+            <th style="width:70px;">№</th>
+            <th>Адрес / ЛС</th>
             <th width="100px"></th>
         </tr>
     </thead>
@@ -81,25 +85,34 @@
                 <tr>
                     <td>@item.IdClaim</td>
                     <td>
+                        <div class="mb-1">
+                            <b>Лицевой счет: </b>@item.IdAccountNavigation.Account
+                        </div>
                         @if (Model.RentObjects.ContainsKey(item.IdAccount))
                         {
-                            <div class="mb-2">
-                                <b>По жилищному фонду: </b><br />
+                            <div>
                                 @foreach (var address in Model.RentObjects[item.IdAccount])
                                 {
                                     @await Component.InvokeAsync("ClaimsAddressComponent", new { address = address, idClaim = item.IdClaim })
                                 }
                             </div>
                         }
-                        <div>
-                            <b>По БКС: </b><br />@item.IdAccountNavigation.RawAddress<br />
-                            @item.IdAccountNavigation.Crn
-                        </div>
+                        else
+                        {
+                            <div class="row">
+                                <div class="col-auto">
+                                    <button class="btn btn-success oi oi-home mr-1 mt-2 disabled dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения"></button>
+                                </div>
+                                <div class="col-lg-9 col-md-8 mt-1">
+                                    @item.IdAccountNavigation.Crn, @item.IdAccountNavigation.RawAddress
+                                </div>
+                            </div>
+                        }
                     </td>
                     <td>
                         <div class="btn-group" role="group" aria-label="Панель доступа">
                             <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
-                               asp-action="Details" asp-controller="Claims" asp-route-idClaim="@item.IdClaim"></a>
+                               asp-controller="Claims" asp-action="Details" asp-route-idClaim="@item.IdClaim" asp-route-action="Details" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                             <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
                                asp-action="RemoveSessionId" asp-controller="Claims" asp-route-id="@item.IdClaim"></a>
                         </div>

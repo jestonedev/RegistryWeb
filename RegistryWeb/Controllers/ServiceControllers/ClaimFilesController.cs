@@ -66,7 +66,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
         {
             if (idFile == null)
                 return Json(-1);
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
                 return Json(-2);
             var file = registryContext.ClaimFiles
                 .FirstOrDefault(op => op.IdFile == idFile);
@@ -86,7 +86,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             {
                 return Json(new { Error = -2 });
             }
-            return File(System.IO.File.ReadAllBytes(filePath), file.MimeType, file.DisplayName);
+            return File(System.IO.File.ReadAllBytes(filePath), file.MimeType ?? "application/octet-stream", file.DisplayName);
         }
 
         [HttpPost]

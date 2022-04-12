@@ -41,35 +41,10 @@ var filterIdRegionChange = function (e) {
                 select.append('<option value="' + d.idStreet + '">' + d.streetName + '</option>');
             });
             select.selectpicker();
-            select.val(value); 
+            select.val(value);
             select.selectpicker('refresh');
         }
     });
-}
-
-
-var toggleDetails = function (self, selector) {
-    var claimDetail = $(self).closest("td").find(selector);
-    var icon = $(self).find(".oi");
-    if (icon.hasClass("oi-chevron-bottom")) {
-        icon.removeClass("oi-chevron-bottom");
-        icon.addClass("oi-chevron-top");
-        claimDetail.show();
-    } else {
-        icon.addClass("oi-chevron-bottom");
-        icon.removeClass("oi-chevron-top");
-        claimDetail.hide();
-    }
-};
-
-var toggleClaimDetails = function (e) {
-    toggleDetails(this, ".rr-claim-detail");
-    e.preventDefault();
-};
-
-var toggleAmountDetails = function (e) {
-    toggleDetails(this, ".rr-amount-detail");
-    e.preventDefault();
 };
 
 $(function () {
@@ -99,9 +74,6 @@ $(function () {
         }
         modal.modal('show');
     });
-
-    $(".rr-claim-details").on("click", toggleClaimDetails);
-    $(".rr-amount-details").on("click", toggleAmountDetails);
 
     $(".c-arithmetic-op").each(function (idx, elem) {
         var op = $(elem).val();

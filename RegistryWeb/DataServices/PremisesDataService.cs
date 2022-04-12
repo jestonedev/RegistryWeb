@@ -809,7 +809,7 @@ namespace RegistryWeb.DataServices
             registryContext.SaveChanges();            
         }
 
-        internal Premise CreatePremise(int ?idBuilding)
+        internal Premise CreatePremise(int ?idBuilding, int? idPremises)
         {
             var premise = new Premise {
                 RegDate = new DateTime(1999, 10, 29),
@@ -818,6 +818,24 @@ namespace RegistryWeb.DataServices
                 IdPremisesComment = 1,
                 IdBuildingNavigation = idBuilding != null ? registryContext.Buildings.FirstOrDefault(b => b.IdBuilding == idBuilding.Value)  : null
             };
+
+            if (idPremises != null)
+            {
+                premise = registryContext.Premises.Include(r => r.IdBuildingNavigation).FirstOrDefault(r => r.IdPremises == idPremises);
+                if (premise == null) throw new ApplicationException("Ошибка копирования помещения");
+                var canInsert = (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal)) ||
+                        (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && 
+                        ObjectStateHelper.IsMunicipal(premise.IdState) && !premise.SubPremises.Any(sp => !ObjectStateHelper.IsMunicipal(sp.IdState))) ||
+                        (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && 
+                        !ObjectStateHelper.IsMunicipal(premise.IdState) && !premise.SubPremises.Any(sp => ObjectStateHelper.IsMunicipal(sp.IdState)));
+
+                if (!canInsert)
+                {
+                    throw new ApplicationException("Нет прав на копирование этого помещения");
+                }
+                premise.IdPremises = 0;
+            }
+
             premise.FundsPremisesAssoc = new List<FundPremiseAssoc>() { new FundPremiseAssoc() };
             premise.OwnerPremisesAssoc = new List<OwnerPremiseAssoc>() { new OwnerPremiseAssoc() };
             premise.TenancyPremisesAssoc = new List<TenancyPremiseAssoc>() { new TenancyPremiseAssoc() };

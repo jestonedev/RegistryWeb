@@ -112,7 +112,7 @@
                 <input type="checkbox" class="idCheckbox" data-id="@item.IdPremises" @Html.Raw(check) />
             </td>
 
-            <td style="background-color: @backgroundColor; font-weight: bold;" title="@title">
+            <td style="background-color: @backgroundColor; font-weight: bold; vertical-align: middle" title="@title">
                 @item.IdPremises
             </td>
             <td>
@@ -195,12 +195,16 @@
                     var canEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
                 }
                 <div class="btn-group rr-opacity-item-menu" role="group" aria-label="Панель доступа">
-                    @if (securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || canEditResettleInfo || canEditLitigationInfo)
+                    @if ((securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && ObjectStateHelper.IsMunicipal(item.IdState)) ||
+                         (securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !ObjectStateHelper.IsMunicipal(item.IdState)) || 
+                         canEditResettleInfo || canEditLitigationInfo)
                     {
                         <a class="btn btn-primary oi oi-eye" id="premisedetail" title="Подробнее" aria-label="Подробнее"
                            asp-controller="Premises" asp-action="Details" asp-route-idPremises="@item.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                         <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить"
                            asp-controller="Premises" asp-action="Edit" asp-route-idPremises="@item.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                        <a class="btn btn-primary oi oi-layers @(canDeleteBaseInfo ? "" : "disabled")" title="Копировать" aria-label="Копировать"
+                           asp-controller="Premises" asp-action="Create" asp-route-idPremises="@item.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                         <a class="btn btn-danger oi oi-x @(canDeleteBaseInfo ? "" : "disabled")" title="Удалить" aria-label="Удалить"
                            asp-controller="Premises" asp-action="Delete" asp-route-idPremises="@item.IdPremises" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
                     }
