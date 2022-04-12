@@ -76,5 +76,43 @@ namespace RegistryWeb.ReportServices
             return GenerateInvoices(parametrs);
         }
 
+        public byte[] ExportAccounts(List<int> idAccounts)
+        {
+            string columnHeaders;
+            string columnPatterns;
+
+            columnHeaders = "[{\"columnHeader\":\"Состояние на дату\"},{\"columnHeader\":\"Дата последнего начисления\"}," +
+                "{\"columnHeader\":\"Адрес\"}," +
+                "{\"columnHeader\":\"Лицевой счет\"},{\"columnHeader\":\"Наниматель\"}," +
+                "{\"columnHeader\":\"Текущее состояние посл. иск. работы\"},{\"columnHeader\":\"Период посл. иск. работы с\"},{\"columnHeader\":\"Период посл. иск. работы по\"}," +
+                "{\"columnHeader\":\"Общая площадь\"},{\"columnHeader\":\"Прописано\"}," +
+                "{\"columnHeader\":\"Сальдо вх.\"},{\"columnHeader\":\"Сальдо вх. найм\"},{\"columnHeader\":\"Пени (вх.)\"}," +
+                "{\"columnHeader\":\"Начисление итого\"},{\"columnHeader\":\"Начисление найм\"},{\"columnHeader\":\"Начисление пени\"}," +
+                "{\"columnHeader\":\"Перерасчет найм\"},{\"columnHeader\":\"Перерасчет пени\"}," +
+                "{\"columnHeader\":\"Оплата найм\"},{\"columnHeader\":\"Оплата пени\"},{\"columnHeader\":\"Сальдо исх.\"}," +
+                "{\"columnHeader\":\"Сальдо исх. найм\"},{\"columnHeader\":\"Пени исх.\"}]";
+            columnPatterns = "[{\"columnPattern\":\"$column0$\"},{\"columnPattern\":\"$column1$\"},{\"columnPattern\":\"$column2$\"}," +
+                "{\"columnPattern\":\"$column3$\"},{\"columnPattern\":\"$column4$\"},{\"columnPattern\":\"$column5$\"},{\"columnPattern\":\"$column6$\"}," +
+                "{\"columnPattern\":\"$column7$\"},{\"columnPattern\":\"$column8$\"},{\"columnPattern\":\"$column9$\"},{\"columnPattern\":\"$column10$\"}," +
+                "{\"columnPattern\":\"$column11$\"},{\"columnPattern\":\"$column12$\"},{\"columnPattern\":\"$column13$\"},{\"columnPattern\":\"$column14$\"}," +
+                "{\"columnPattern\":\"$column15$\"},{\"columnPattern\":\"$column16$\"},{\"columnPattern\":\"$column17$\"},{\"columnPattern\":\"$column18$\"}," +
+                "{\"columnPattern\":\"$column19$\"},{\"columnPattern\":\"$column20$\"},{\"columnPattern\":\"$column21$\"},{\"columnPattern\":\"$column22$\"}]";
+
+            var fileName = Path.GetTempFileName();
+            using (var sw = new StreamWriter(fileName))
+                sw.Write(string.Format("(id_account IN ({0}))", idAccounts.Select(r => r.ToString()).Aggregate((v, acc) => v + "," + acc)));
+
+            var arguments = new Dictionary<string, object>
+            {
+                { "filterTmpFile", fileName },
+                { "type", "6"},
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
+                { "columnHeaders", columnHeaders },
+                { "columnPatterns", columnPatterns },
+                { "orderColumn", "id_account" }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\export");
+            return DownloadFile(fileNameReport);
+        }
     }
 }

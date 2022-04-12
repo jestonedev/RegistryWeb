@@ -13,12 +13,13 @@
 }
 
 @section styles
-{
+    {
     <link rel="stylesheet" href="~/css/kumi.accounts.css" runat="server" />
 }
 
 @section Scripts
     {
+    <script src="~/js/index.kumi.accounts.js" asp-append-version="true"></script>
     <script src="~/js/kumiAccount.reports.js" asp-append-version="true"></script>
     <script src="~/js/kumiAccount.recalc.js" asp-append-version="true"></script>
 }
@@ -170,7 +171,7 @@
                                     <div>
                                         <b>Период найма:</b>
                                         @if (((tenancyInfo.TenancyProcess.BeginDate != null || tenancyInfo.TenancyProcess.EndDate != null) &&
-                               tenancyInfo.TenancyProcess.TenancyRentPeriods.Any()) || tenancyInfo.TenancyProcess.TenancyRentPeriods.Count() > 1)
+                              tenancyInfo.TenancyProcess.TenancyRentPeriods.Any()) || tenancyInfo.TenancyProcess.TenancyRentPeriods.Count() > 1)
                                         {
                                             <br />
                                         }
@@ -278,7 +279,7 @@
                                asp-route-action="Details"
                                asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
 
-                            
+
                             <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить"
                                asp-action="RemoveSessionId" asp-controller="KumiAccounts" asp-route-id="@item.IdAccount"></a>
                         </div>
@@ -297,4 +298,4 @@
 <page-link page-model="Model.PageOptions" page-action="Index"></page-link>
 
 <partial name="ReportsModals" model="@Model">
-<partial name="AccountRecalcModal" model="@Model">
+    <partial name="AccountRecalcModal" model="@Model">

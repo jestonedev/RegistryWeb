@@ -237,5 +237,26 @@ namespace RegistryWeb.Controllers
             }
             return Error(error);
         }
+
+        public IActionResult GetAccountsExport()
+        {
+            List<int> ids = GetSessionIds();
+
+            if (!ids.Any())
+                return NotFound();
+
+            if (!securityService.HasPrivilege(Privileges.AccountsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.ExportAccounts(ids);
+                return File(file, odsMime, "Экспорт данных.ods");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
     }
 }
