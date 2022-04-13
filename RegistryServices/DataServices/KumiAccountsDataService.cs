@@ -1546,7 +1546,7 @@ namespace RegistryWeb.DataServices
                 .Include(r => r.TenancyPersons).Where(r => tenancyIds.Contains(r.IdProcess)).ToList();
 
             var buildings = from tbaRow in registryContext.TenancyBuildingsAssoc
-                            join buildingRow in registryContext.Buildings
+                            join buildingRow in registryContext.Buildings.Include(r => r.IdStateNavigation)
                             on tbaRow.IdBuilding equals buildingRow.IdBuilding
                             join streetRow in registryContext.KladrStreets
                             on buildingRow.IdStreet equals streetRow.IdStreet
@@ -1560,6 +1560,7 @@ namespace RegistryWeb.DataServices
                                     {
                                         AddressType = AddressTypes.Building,
                                         Id = buildingRow.IdBuilding.ToString(),
+                                        ObjectState = buildingRow.IdStateNavigation,
                                         IdParents = new Dictionary<string, string> {
                                             { AddressTypes.Street.ToString(), buildingRow.IdStreet }
                                         },
@@ -1571,7 +1572,7 @@ namespace RegistryWeb.DataServices
                                 }
                             };
             var premises = from tpaRow in registryContext.TenancyPremisesAssoc
-                           join premiseRow in registryContext.Premises
+                           join premiseRow in registryContext.Premises.Include(r => r.IdStateNavigation)
                            on tpaRow.IdPremise equals premiseRow.IdPremises
                            join buildingRow in registryContext.Buildings
                            on premiseRow.IdBuilding equals buildingRow.IdBuilding
@@ -1589,6 +1590,7 @@ namespace RegistryWeb.DataServices
                                    {
                                        AddressType = AddressTypes.Premise,
                                        Id = premiseRow.IdPremises.ToString(),
+                                       ObjectState = premiseRow.IdStateNavigation,
                                        IdParents = new Dictionary<string, string>
                                        {
                                            { AddressTypes.Street.ToString(), buildingRow.IdStreet },
@@ -1603,7 +1605,7 @@ namespace RegistryWeb.DataServices
                                }
                            };
             var subPremises = from tspaRow in registryContext.TenancySubPremisesAssoc
-                              join subPremiseRow in registryContext.SubPremises
+                              join subPremiseRow in registryContext.SubPremises.Include(r => r.IdStateNavigation)
                               on tspaRow.IdSubPremise equals subPremiseRow.IdSubPremises
                               join premiseRow in registryContext.Premises
                               on subPremiseRow.IdPremises equals premiseRow.IdPremises
@@ -1623,6 +1625,7 @@ namespace RegistryWeb.DataServices
                                       {
                                           AddressType = AddressTypes.SubPremise,
                                           Id = subPremiseRow.IdSubPremises.ToString(),
+                                          ObjectState = subPremiseRow.IdStateNavigation,
                                           IdParents = new Dictionary<string, string>
                                            {
                                               { AddressTypes.Street.ToString(), buildingRow.IdStreet },
