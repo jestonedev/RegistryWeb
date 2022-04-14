@@ -47,10 +47,10 @@ namespace RegistryWeb.SecurityServices
 
         private AclUser GetUser()
         {
-            var userName = httpContextAccessor.HttpContext.User.Identity.Name.ToLowerInvariant();
+            var userName = httpContextAccessor?.HttpContext.User.Identity.Name.ToLowerInvariant();
             return registryContext.AclUsers
                 .AsNoTracking()
-                .SingleOrDefault(u => u.UserName.ToLowerInvariant() == userName);
+                .SingleOrDefault(u => u.UserName.ToLowerInvariant() == userName) ?? new AclUser();
         }
 
         private List<AclPrivilege> GetUserPriveleges()

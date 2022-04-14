@@ -1940,7 +1940,7 @@ namespace RegistryWeb.DataServices
         {
             get
             {
-                var userName = securityService.User.UserName.ToLowerInvariant();
+                var userName = securityService.User?.UserName?.ToLowerInvariant();
                 return registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
                                 e.ExecutorLogin.ToLowerInvariant() == userName);
             }

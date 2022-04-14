@@ -14,3 +14,5 @@ D:\Projects\Visual Studio Projects\RegistryWeb\RegistryServices\obj\Release\netc
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryServices\obj\Release\netcoreapp2.2\RegistryServices.csproj.CopyComplete
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryServices\obj\Release\netcoreapp2.2\RegistryServices.dll
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryServices\obj\Release\netcoreapp2.2\RegistryServices.pdb
+D:\Projects\Visual Studio Projects\RegistryWeb\RegistryServices\bin\Release\netcoreapp2.2\RegistryPaymentsLoader.dll
+D:\Projects\Visual Studio Projects\RegistryWeb\RegistryServices\bin\Release\netcoreapp2.2\RegistryPaymentsLoader.pdb
