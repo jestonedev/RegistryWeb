@@ -34,9 +34,9 @@ namespace RegistryWeb.ReportServices
                 { "raw_address",personInfo.Where(c => c.Key.Contains("totalArea")).Select(c => c.Value).FirstOrDefault().ToString().Replace(',', '.')},
                 { "prescribed", (int)personInfo.Where(c => c.Key.Contains("prescribed")).Select(c => c.Value).FirstOrDefault() },
                 { "total_area", personInfo.Where(c => c.Key.Contains("totalArea")).Select(c => c.Value).FirstOrDefault().ToString().Replace(',', '.') },
-                { "templateFileName", activityManagerPath + "templates\\registry\\kumi_report_test\\amount_debt_KUMI." + (fileFormat == 1 ? "xlsx" : "ods") },
+                { "templateFileName", activityManagerPath + "templates\\registry\\kumi_accounts\\amount_debt_KUMI." + (fileFormat == 1 ? "xlsx" : "ods") },
             };
-            var fileName = "registry\\kumi_report_test\\amount_debt_KUMI";
+            var fileName = "registry\\kumi_accounts\\amount_debt_KUMI";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }

@@ -24,9 +24,9 @@ namespace RegistryWeb.ReportServices
         {
             var arguments = new Dictionary<string, object>
             {
-                { "idPayment", idPayment }
+                { "id_payment", idPayment }
             };
-            var fileName = "registry\\kumi_payments\\payment_order";
+            var fileName = "registry\\kumi_accounts\\payment_order";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }

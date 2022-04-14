@@ -35,7 +35,7 @@ namespace RegistryWeb.ReportServices
             {
                 var configXml = activityManagerPath + "templates\\" + config + ".xml";
                 var configParts = config.Split('\\');
-                var fileNameReport = configParts[configParts.Length - 1] + Guid.NewGuid().ToString() + ".docx";
+                var fileNameReport = configParts[configParts.Length - 1] + Guid.NewGuid().ToString();
                 var destFileName = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", fileNameReport);
                 arguments.Add("config", configXml);
                 arguments.Add("destFileName", destFileName);

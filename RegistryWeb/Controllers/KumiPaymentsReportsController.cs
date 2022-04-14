@@ -31,7 +31,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.GetPaymentOrder(idPayment);
-                return File(file, xlsxMime, string.Format(@"Платежное поручение № {0}.odt", idPayment));
+                return File(file, xlsxMime, string.Format(@"Платежное поручение № {0}.xlsx", idPayment));
             }
             catch (Exception ex)
             {

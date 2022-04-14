@@ -106,6 +106,7 @@
                                 stateClass = "text-danger";
                                 break;
                             case 3:
+                            case 4:
                                 stateClass = "text-warning";
                                 break;
                         }
@@ -186,6 +187,7 @@
                                 stateClass = "text-danger";
                                 break;
                             case 3:
+                            case 4:
                                 stateClass = "text-warning";
                                 break;
                         }
