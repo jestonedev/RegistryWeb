@@ -60,15 +60,11 @@
 
             @if (Model.ChildPayments.Any())
             {
-                <a asp-action="Index" asp-route-filterOptions.IdParentPayment="@Model.IdPayment" title="Платеж был разбит при применении мемориального ордера. Для отображения связных платежей кликните по этой иконке">
-                    <span class="oi oi-link-intact text-primary" style="font-size: 80%; text-decoration: none"></span>
-                </a>
+                <a asp-action="Index" asp-route-filterOptions.IdParentPayment="@Model.IdPayment" title="Платеж был разбит при применении мемориального ордера. Для отображения связных платежей кликните по этой иконке"><span class="oi oi-link-intact text-primary" style="font-size: 80%; text-decoration: none"></span></a>
             }
             @if (Model.IdParentPayment != null)
             {
-                <a asp-action="Details" asp-route-IdPayment="@Model.IdParentPayment" title="Платеж был создан при применении мемориального ордера. Для отображения родительского платежа кликните по этой иконке">
-                    <span class="oi oi-arrow-top text-primary" style="font-size: 80%; text-decoration: none"></span>
-                </a>
+                <a asp-action="Details" asp-route-IdPayment="@Model.IdParentPayment" title="Платеж был создан при применении мемориального ордера. Для отображения родительского платежа кликните по этой иконке"><span class="oi oi-arrow-top text-primary" style="font-size: 80%; text-decoration: none"></span></a>
             }
         </label>
         <div class="col-sm-12 col-lg-5 text-lg-right pl-0 pr-0 mt-2 mt-lg-0">

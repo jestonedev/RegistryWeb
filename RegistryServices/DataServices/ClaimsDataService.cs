@@ -1065,15 +1065,18 @@ namespace RegistryWeb.DataServices
 
         public Dictionary<int, List<KumiAccountTenancyInfoVM>> GetTenancyInfoKumi(IEnumerable<int> idAccounts)
         {
-            var accounts = idAccounts.Select(r => new KumiAccount {
+            var accounts = idAccounts.Select(r => new KumiAccount
+            {
                 IdAccount = r
-            } ).Distinct();
+            }).Distinct();
             return kumiAccountsDataService.GetTenancyInfo(accounts);
         }
 
         public Dictionary<int, Payment> GetLastPaymentsInfo(IEnumerable<Claim> claims)
         {
-            var ids = claims.Where(r => r.IdAccount != null).Select(r => r.IdAccount.Value).Distinct();
+            var ids = claims.Where(r => r.IdAccount != null).Select(r => r.IdAccount.Value).Union(
+                claims.Where(r => r.IdAccountAdditional != null).Select(r => r.IdAccountAdditional.Value)
+                ).Distinct();
             return GetLastPaymentsInfo(ids);
         }
 

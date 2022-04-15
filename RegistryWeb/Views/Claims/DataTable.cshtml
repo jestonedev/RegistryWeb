@@ -60,7 +60,7 @@
                        data-order-field="AtDate" data-order-direction="@(Model.OrderOptions.OrderField == "AtDate" ? "1" : "0")"></a>
                 }
             </th>
-            <th class="r-table-header-cell" style="min-width: 210px">
+            <th class="r-table-header-cell d-none d-lg-table-cell" style="min-width: 250px">
                 Суммы к взысканию
             </th>
         </tr>
@@ -76,11 +76,18 @@
                 activeKumiTenancyInfo = kumiTenancyInfo.Where(r => r.TenancyProcess.TenancyPersons.Any(p => p.ExcludeDate == null || p.ExcludeDate > DateTime.Now)
                 && (r.TenancyProcess.RegistrationNum == null || !r.TenancyProcess.RegistrationNum.EndsWith("н"))).ToList();
             }
+
             RegistryDb.Models.Entities.Payments.Payment lastPaymentInfo = null;
             if (item.IdAccount != null && Model.LastPaymentInfo.ContainsKey(item.IdAccount.Value))
             {
                 lastPaymentInfo = Model.LastPaymentInfo[item.IdAccount.Value];
             }
+            RegistryDb.Models.Entities.Payments.Payment lastPaymentInfoAdditional = null;
+            if (item.IdAccountAdditional != null && Model.LastPaymentInfo.ContainsKey(item.IdAccountAdditional.Value))
+            {
+                lastPaymentInfoAdditional = Model.LastPaymentInfo[item.IdAccountAdditional.Value];
+            }
+
             var lastClaimState = item.ClaimStates.OrderByDescending(cs => cs.IdState).FirstOrDefault();
             var isOpenedClaim = (lastClaimState == null || lastClaimState.IdStateType != 6);
 
@@ -127,8 +134,7 @@
                             {
                                 <b>Лицевой счет БКС:</b> @accountBks
                             }
-                        }
-                    </div>
+                        }                    </div>
 
                     @{
                         List<Address> rentObjectsKumi = null;
@@ -261,7 +267,7 @@
                         }
                     </div>
                 </td>
-                <td>
+                <td class="d-none d-lg-table-cell">
                     <div class="dopinfo-alt">
                         <div>
                             <b>ПИР:</b><br />
@@ -275,18 +281,42 @@
                                 ДГИ: @(item.AmountDgi ?? 0) руб.
                             </div>
                         </div>
+
                         @if (lastPaymentInfo != null)
                         {
                             <div class="mt-2">
                                 <b>Текущая задолженность:</b><br />
-                                <div>
-                                    Найм: @lastPaymentInfo.BalanceOutputTenancy руб.
-                                </div>
-                                <div>
-                                    Пени: @lastPaymentInfo.BalanceOutputPenalties руб.
-                                </div>
-                                <div>
-                                    ДГИ: @lastPaymentInfo.BalanceOutputDgi руб.
+                                <div class="row ml-0 mr-0">
+                                    <div class="@(lastPaymentInfoAdditional != null ? "col-6 pl-0 pr-1" : "")">
+                                        @if (lastPaymentInfoAdditional != null)
+                                        {
+                                            <b>Осн. ЛС:</b><br />
+                                        }
+                                        <div>
+                                            Найм: @lastPaymentInfo.BalanceOutputTenancy руб.
+                                        </div>
+                                        <div>
+                                            Пени: @lastPaymentInfo.BalanceOutputPenalties руб.
+                                        </div>
+                                        <div>
+                                            ДГИ: @lastPaymentInfo.BalanceOutputDgi руб.
+                                        </div>
+                                    </div>
+                                    @if(lastPaymentInfoAdditional != null)
+                                    {
+                                        <div class="col-6 pl-1 pr-0">
+                                            <b>Доп. ЛС:</b><br />
+                                            <div>
+                                                Найм: @lastPaymentInfoAdditional.BalanceOutputTenancy руб.
+                                            </div>
+                                            <div>
+                                                Пени: @lastPaymentInfoAdditional.BalanceOutputPenalties руб.
+                                            </div>
+                                            <div>
+                                                ДГИ: @lastPaymentInfoAdditional.BalanceOutputDgi руб.
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         }
