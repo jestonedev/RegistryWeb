@@ -137,6 +137,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<JudgeBuildingAssoc> JudgeBuildingsAssoc { get; set; }
         public virtual DbSet<Lawyer> Lawyers { get; set; }
 		public virtual DbSet<LogClaimStatementInSpp> LogClaimStatementInSpp { get; set; }
+		public virtual DbSet<UinForClaimStatementInSsp> UinForClaimStatementInSsp { get; set; }
 
         //Журнал изменений
         public virtual DbSet<ChangeLog> ChangeLogs { get; set; }
@@ -312,6 +313,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new JudgeBuildingAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LawyerConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new LogClaimStatementInSppConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new UinForClaimStatementInSspConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new PrivAgreementConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PrivContractConfiguration(nameDatebase));

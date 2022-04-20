@@ -52,6 +52,7 @@
                 <button class="dropdown-item rr-report-request-to-bsk" @(Model.Claims.Any() ? "" : "disabled") href="#" data-id-claim="0">Запрос в БКС</button>
                 <button class="dropdown-item rr-report-memo-to-lawyers" @(Model.Claims.Any() ? "" : "disabled") href="#" data-id-claim="0">СЗ в юридический отдел</button>
                 <button class="dropdown-item" id="exportBtn" @(Model.Claims.Any() ? "" : "disabled") href="#">Экспорт</button>
+                <button class="dropdown-item" id="doverieBtn" @(Model.Claims.Any() ? "" : "disabled") href="#">Сформировать обменный файл АИС "Доверие"</button>
             </div>
         </div>
     </div>

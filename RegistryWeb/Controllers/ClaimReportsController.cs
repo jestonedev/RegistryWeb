@@ -174,6 +174,27 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult GetClaimsForDoverie()
+        {
+            List<int> ids = GetSessionIds();
+
+            if (!ids.Any())
+                return NotFound();
+
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.ClaimsForDoverie(ids);
+                return File(file, odsMime, "обменный файл АИС 'Доверие'.ods");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
         public IActionResult GetSplitAccountsReport()
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))

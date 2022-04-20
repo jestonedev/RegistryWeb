@@ -215,5 +215,20 @@ namespace RegistryWeb.ReportServices
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
+
+        public byte[] ClaimsForDoverie(List<int> idClaims)
+        {
+            var tmpFileName = Path.GetTempFileName();
+            var idClaimsStr = idClaims.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
+            using (var sw = new StreamWriter(tmpFileName))
+                sw.Write(idClaimsStr);
+            var arguments = new Dictionary<string, object>
+            {
+                { "filterTmpFile", tmpFileName }
+            };
+            var fileName = "registry\\claims\\claim_statements_for_doverie";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
     }
 }
