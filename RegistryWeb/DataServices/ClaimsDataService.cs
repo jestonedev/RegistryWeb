@@ -954,7 +954,7 @@ namespace RegistryWeb.DataServices
 
         internal Dictionary<int, Payment> GetLastPaymentsInfo(IEnumerable<Claim> claims)
         {
-            var ids = claims.Select(r => r.IdAccount).Distinct();
+            var ids = claims.Select(r => r.IdAccount).Union(claims.Where(r => r.IdAccountAdditional != null).Select(r => r.IdAccountAdditional.Value)).Distinct();
             return GetLastPaymentsInfo(ids);
         }
 
