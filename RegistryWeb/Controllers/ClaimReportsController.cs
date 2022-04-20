@@ -186,7 +186,6 @@ namespace RegistryWeb.Controllers
 
             try
             {
-                claimsDataService.GetUin(ids);
                 var file = reportService.ClaimsForDoverie(ids);
                 return File(file, odsMime, "обменный файл АИС 'Доверие'.ods");
             }

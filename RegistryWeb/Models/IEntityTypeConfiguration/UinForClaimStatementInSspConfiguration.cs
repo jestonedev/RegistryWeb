@@ -4,34 +4,31 @@ using RegistryWeb.Models.Entities;
 
 namespace RegistryWeb.Models.IEntityTypeConfiguration
 {
-    public class LogClaimStatementInSppConfiguration : IEntityTypeConfiguration<LogClaimStatementInSpp>
+    public class UinForClaimStatementInSspConfiguration : IEntityTypeConfiguration<UinForClaimStatementInSsp>
     {
         private string nameDatebase;
 
-        public LogClaimStatementInSppConfiguration(string nameDatebase)
+        public UinForClaimStatementInSspConfiguration(string nameDatebase)
         {
             this.nameDatebase = nameDatebase;
         }
 
-        public void Configure(EntityTypeBuilder<LogClaimStatementInSpp> builder)
+        public void Configure(EntityTypeBuilder<UinForClaimStatementInSsp> builder)
         {
-            builder.ToTable("log_claim_statement_in_ssp", nameDatebase);
-
+            builder.ToTable("uin_for_claim_statement_in_ssp", nameDatebase);
+            
             builder.Property(e => e.Id)
                 .HasColumnName("id")
                 .HasColumnType("int(11)");
-
+            
             builder.Property(e => e.IdClaim)
                 .HasColumnName("id_claim")
                 .HasColumnType("int(11)");
 
-            builder.Property(e => e.CreateDate)
-                .HasColumnName("create_date");
-
-            builder.Property(e => e.ExecutorLogin)
-                .HasColumnName("executor_login")
-                .HasMaxLength(255)
+            builder.Property(e => e.Uin)
+                .HasColumnName("uin")
+                .HasMaxLength(25)
                 .IsUnicode(false);
-        }            
+        }
     }
 }

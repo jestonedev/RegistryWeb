@@ -84,8 +84,32 @@
                 }
                 <td class="align-middle"><input type="checkbox" class="idCheckbox" data-id="@item.IdClaim" @Html.Raw(check) /></td>
 
-                <td style="@(isOpenedClaim ? "background-color: #FEDCDC" : ""); font-weight: bold; vertical-align: middle" title="@(isOpenedClaim ? "Претензионно-исковая работа не завершена" : "")">
+                <td class="text-center" style="@(isOpenedClaim ? "background-color: #FEDCDC" : ""); font-weight: bold; vertical-align: middle" title="@(isOpenedClaim ? "Претензионно-исковая работа не завершена" : "")">
                     @item.IdClaim
+
+                    @if (item.ClaimPersons.Count() != 0)
+                    {
+                        var IsClaimer = item.ClaimPersons.FirstOrDefault(c => c.IsClaimer) != null ? true : false;
+
+                        @if (IsClaimer)
+                        {
+                            var hasPass = item.ClaimPersons.FirstOrDefault(c => c.IsClaimer).Passport != null ? true : false;
+
+                            @if (!hasPass)
+                            {
+                                <br><span class="oi oi-bell text-danger mt-2" title="У ответчика отсутствуют паспортные данные" style="font-size: 80%"></span>
+                            }
+                        }
+                        else
+                        {
+                            <br><span class="oi oi-bell text-danger mt-2" title="Среди членов семьи отсутствуют наниматель" style="font-size: 80%"></span>
+                        }
+
+                    }
+                    else
+                    {
+                        <br><span class="oi oi-bell text-danger mt-2" title="Члены семьи ответчика отсутствуют" style="font-size: 80%"></span>
+                    }
                 </td>
                 <td>
                     <div class="mb-1">
@@ -175,7 +199,7 @@
                             @if (lastClaimState.Description != null)
                             {
                                 <div>
-                                    Примечание к состоянию: @lastClaimState.Description)
+                                    Примечание к состоянию: @lastClaimState.Description
                                 </div>
                             }
                         }
