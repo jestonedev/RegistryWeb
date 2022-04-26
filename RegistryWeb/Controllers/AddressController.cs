@@ -139,7 +139,9 @@ namespace RegistryWeb.Controllers
 
             if (addressList.Count() > 1)
                 return Json(-2);
-            return Json(addressList[0]);
+            if (addressList.Count() > 0)
+                return Json(addressList[0]);
+            return Json(-1);
         }
     }
 }
