@@ -125,11 +125,21 @@ namespace RegistryWeb.Controllers
         public JsonResult GetAddressRegistryModal(PartsAddress parts)
         {
             var addressList = addressesDataService.GetAddressesFromHisParts(parts);
+            
             if (addressList == null || addressList.Count() == 0)
                 return Json(-1);
+
+            if (addressList.Count() > 1)
+            {
+                addressList = addressList.Where(r => r.Item2.DemolishedDate == null &&
+                    (r.Item2.EmergencyDate == null || (r.Item2.ExcludeEmergencyDate != null && r.Item2.EmergencyDate < r.Item2.ExcludeEmergencyDate))).ToList();
+            }
+
             if (addressList.Count() > 1)
                 return Json(-2);
-            return Json(addressList[0]);
+            if (addressList.Count() > 0)
+                return Json(addressList[0]);
+            return Json(-1);
         }
     }
 }

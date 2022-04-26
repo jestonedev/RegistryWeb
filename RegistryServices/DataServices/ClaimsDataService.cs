@@ -101,6 +101,7 @@ namespace RegistryWeb.DataServices
         {
             return query
                 .Include(c => c.ClaimStates)
+                .Include(c => c.ClaimPersons)
                 .Include(c => c.IdAccountNavigation)
                 .Include(c => c.IdAccountAdditionalNavigation)
                 .Include(c => c.IdAccountKumiNavigation);
@@ -1184,9 +1185,9 @@ namespace RegistryWeb.DataServices
 
         public void ClaimLogCourtOsp(int idClaim)
         {
-            var logClaimStatementInSppOrig = registryContext.LogClaimStatementInSpp.FirstOrDefault(l => l.IdClaim == idClaim);
+            var logClaimStatementInSppOrigs = registryContext.LogClaimStatementInSpp.Where(l => l.IdClaim == idClaim).ToList();
 
-            if (logClaimStatementInSppOrig == null)
+            if (logClaimStatementInSppOrigs.Count()==0)
             {
                 LogClaimStatementInSpp logClaimStatementInSpp = new LogClaimStatementInSpp
                 {
@@ -1194,17 +1195,126 @@ namespace RegistryWeb.DataServices
                     IdClaim = idClaim,
                     ExecutorLogin = securityService.User.UserName
                 };
+                UinForClaimStatementInSsp uinForClaim = new UinForClaimStatementInSsp
+                {
+                    IdClaim = idClaim,
+                    Uin = GetUinForClaim(idClaim)
+                };
+
                 registryContext.LogClaimStatementInSpp.Add(logClaimStatementInSpp);
+                registryContext.UinForClaimStatementInSsp.Add(uinForClaim);
             }
             else
             {
-                logClaimStatementInSppOrig.CreateDate = DateTime.Now;
-                logClaimStatementInSppOrig.ExecutorLogin = logClaimStatementInSppOrig.ExecutorLogin == securityService.User.UserName
-                                                            ? logClaimStatementInSppOrig.ExecutorLogin : securityService.User.UserName;
+                List<DateTime> statement_crdate;
+                statement_crdate = registryContext.LogClaimStatementInSpp
+                                                  .Where(l => l.IdClaim == idClaim)
+                                                  .GroupBy(l=>l.IdClaim)
+                                                  .Select(r => new { IdClaim = r.Key, Dates = r.Select(l=>l.CreateDate) })
+                                                  .ToDictionary(v => v.IdClaim, v => v.Dates.ToList())[idClaim];
 
-                registryContext.LogClaimStatementInSpp.Update(logClaimStatementInSppOrig);
+                if (!statement_crdate.Contains(DateTime.Now.Date))
+                {
+                    LogClaimStatementInSpp logClaimStatementInSpp = new LogClaimStatementInSpp
+                    {
+                        CreateDate = DateTime.Now,
+                        IdClaim = idClaim,
+                        ExecutorLogin = securityService.User.UserName
+                    };
+                    registryContext.LogClaimStatementInSpp.Add(logClaimStatementInSpp);
+
+                    var uinForClaim = registryContext.UinForClaimStatementInSsp
+                                        .FirstOrDefault(c => c.IdClaim == logClaimStatementInSpp.IdClaim);
+
+                    if (uinForClaim != null)
+                    {
+                        uinForClaim.Uin = GetUinForClaim(uinForClaim.IdClaim);
+                        registryContext.UinForClaimStatementInSsp.Update(uinForClaim);
+                    }
+                    else
+                    {
+                        UinForClaimStatementInSsp uinForClaimNew = new UinForClaimStatementInSsp
+                        {
+                            IdClaim = idClaim,
+                            Uin = GetUinForClaim(idClaim)
+                        };
+                        registryContext.UinForClaimStatementInSsp.Add(uinForClaimNew);
+                    }
+                }
+                else
+                {
+                    var logClaimStatementInSppOrig = logClaimStatementInSppOrigs.FirstOrDefault(l=>l.CreateDate==DateTime.Now.Date);
+
+                    logClaimStatementInSppOrig.ExecutorLogin = logClaimStatementInSppOrig.ExecutorLogin == securityService.User.UserName
+                                                                ? logClaimStatementInSppOrig.ExecutorLogin : securityService.User.UserName;
+                    registryContext.LogClaimStatementInSpp.Update(logClaimStatementInSppOrig);
+                }
             }
             registryContext.SaveChanges();
+        }
+
+        public string GetUinForClaim(int idClaim)
+        {
+            // +1-8 байт - urn в десятичной системе (дополнить нулями слева до 8) равен "00009703"
+            // +9-18 байт - ЛС (account) с дополненными впереди нулями 
+            // +19-24 байт - инкремент от 000000 до 999999  / время UTC в секундах с 1 января 1970 года без первого знака
+            // 25 байт - контрольная сумма
+            
+            //var uinIncrement = 0;
+
+            var account = (from cl in registryContext.Claims
+                            join pa in registryContext.PaymentAccounts
+                            on cl.IdAccount equals pa.IdAccount
+                            where cl.IdClaim==idClaim
+                            select pa.Account).FirstOrDefault();
+
+            var curSec = DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString("F0"); // время UTC в секундах с 1 января 1970 года (не без первого знака, т.е. 10 символов)
+
+            while (account.Count() != 10)
+                account = account.Insert(0, "0");
+
+            var promUin = "00009703"+ account + curSec.Substring(4); /*+ String.Format("{0:D6}", uinIncrement)*/
+
+            int j = 1, summ = 0, checkBit = 0;
+
+            for (var i = 0; i < 24; i++)
+            {
+                summ = summ + Convert.ToInt16(promUin.Substring(i, 1)) * j;
+
+                if (j == 10)
+                    j = 1;
+                else
+                    j++;
+            }
+
+            if (summ % 11 < 10)
+                checkBit = summ % 11;
+            else
+            {
+                j = 3;
+                summ = 0;
+
+                for (var i = 0; i < 24; i++)
+                {
+                    summ = summ + Convert.ToInt16(promUin.Substring(i, 1)) * j;
+
+                    if (j == 10)
+                        j = 1;
+                    else
+                        j++;
+                }
+
+                if (summ % 11 < 10)
+                    checkBit = summ % 11;
+                else
+                    checkBit = 0;
+            }
+
+            promUin += checkBit.ToString();
+
+            //uinIncrement++;
+
+            return promUin;
         }
     }
 }

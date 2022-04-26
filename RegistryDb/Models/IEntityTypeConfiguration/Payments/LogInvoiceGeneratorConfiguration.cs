@@ -34,6 +34,7 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Payments
 
             builder.Property(e => e.Emails)
                 .HasColumnName("emails")
+                .HasMaxLength(255)
                 .IsUnicode(false);
 
             builder.Property(e => e.ResultCode)

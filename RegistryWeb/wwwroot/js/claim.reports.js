@@ -111,6 +111,12 @@
         e.preventDefault();
     });
 
+    $("#doverieBtn").on('click', function (e) {
+        url = "/ClaimReports/GetClaimsForDoverie";
+        downloadFile(url);
+        e.preventDefault();
+    });
+
     $("#addClaimState").on('click', function (e) {
         var modal = $("#claimAddStateModal");
         modal.find("input, textarea, select").filter(function (idx, elem) {

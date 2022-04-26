@@ -30,6 +30,7 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Claims
 
             builder.Property(e => e.ExecutorLogin)
                 .HasColumnName("executor_login")
+                .HasMaxLength(255)
                 .IsUnicode(false);
         }            
     }
