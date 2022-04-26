@@ -39,6 +39,8 @@ using RegistryDb.Models.Entities.RegistryObjects.Common;
 using RegistryDb.Models.Entities.RegistryObjects.Common.Restrictions;
 using RegistryDb.Models.Entities.Tenancies;
 using System.Linq;
+using RegistryWeb.Models.Entities;
+using RegistryWeb.Models.IEntityTypeConfiguration;
 
 namespace RegistryDb.Models
 {

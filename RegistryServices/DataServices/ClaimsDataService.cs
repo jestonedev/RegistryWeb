@@ -21,6 +21,7 @@ using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryDb.Models.Entities.Payments;
 using RegistryDb.Models.Entities.Tenancies;
 using RegistryServices.Enums;
+using RegistryWeb.Models.Entities;
 
 namespace RegistryWeb.DataServices
 {
