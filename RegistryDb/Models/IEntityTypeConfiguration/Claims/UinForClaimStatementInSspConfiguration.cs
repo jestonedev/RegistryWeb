@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models.Entities.Claims;
 
-namespace RegistryWeb.Models.IEntityTypeConfiguration
+namespace RegistryDb.Models.IEntityTypeConfiguration.Claims
 {
     public class UinForClaimStatementInSspConfiguration : IEntityTypeConfiguration<UinForClaimStatementInSsp>
     {
