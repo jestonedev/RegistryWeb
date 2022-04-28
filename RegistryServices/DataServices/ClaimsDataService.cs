@@ -21,7 +21,6 @@ using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryDb.Models.Entities.Payments;
 using RegistryDb.Models.Entities.Tenancies;
 using RegistryServices.Enums;
-using RegistryWeb.Models.Entities;
 
 namespace RegistryWeb.DataServices
 {
@@ -1207,14 +1206,14 @@ namespace RegistryWeb.DataServices
             }
             else
             {
-                List<DateTime> statement_crdate;
-                statement_crdate = registryContext.LogClaimStatementInSpp
+                List<DateTime> statementCrDate;
+                statementCrDate = registryContext.LogClaimStatementInSpp
                                                   .Where(l => l.IdClaim == idClaim)
                                                   .GroupBy(l=>l.IdClaim)
                                                   .Select(r => new { IdClaim = r.Key, Dates = r.Select(l=>l.CreateDate) })
                                                   .ToDictionary(v => v.IdClaim, v => v.Dates.ToList())[idClaim];
 
-                if (!statement_crdate.Contains(DateTime.Now.Date))
+                if (!statementCrDate.Contains(DateTime.Now.Date))
                 {
                     LogClaimStatementInSpp logClaimStatementInSpp = new LogClaimStatementInSpp
                     {
@@ -1260,14 +1259,22 @@ namespace RegistryWeb.DataServices
             // +9-18 байт - ЛС (account) с дополненными впереди нулями 
             // +19-24 байт - инкремент от 000000 до 999999  / время UTC в секундах с 1 января 1970 года без первого знака
             // 25 байт - контрольная сумма
-            
+
             //var uinIncrement = 0;
 
-            var account = (from cl in registryContext.Claims
-                            join pa in registryContext.PaymentAccounts
-                            on cl.IdAccount equals pa.IdAccount
-                            where cl.IdClaim==idClaim
-                            select pa.Account).FirstOrDefault();
+            var claim = registryContext.Claims.FirstOrDefault(c => c.IdClaim == idClaim);
+
+            var account = claim.IdAccount != null ?
+                                            (from cl in registryContext.Claims
+                                            join pa in registryContext.PaymentAccounts
+                                            on cl.IdAccount equals pa.IdAccount
+                                            where cl.IdClaim==idClaim
+                                            select pa.Account).FirstOrDefault() 
+                                        : (from cl in registryContext.Claims
+                                            join ka in registryContext.KumiAccounts
+                                            on cl.IdAccountKumi equals ka.IdAccount
+                                            where cl.IdClaim == idClaim
+                                            select ka.Account).FirstOrDefault();
 
             var curSec = DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString("F0"); // время UTC в секундах с 1 января 1970 года (не без первого знака, т.е. 10 символов)
 

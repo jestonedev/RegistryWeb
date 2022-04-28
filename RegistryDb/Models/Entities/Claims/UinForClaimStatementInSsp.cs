@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace RegistryWeb.Models.Entities
+namespace RegistryDb.Models.Entities.Claims
 {
     public class UinForClaimStatementInSsp
     {
