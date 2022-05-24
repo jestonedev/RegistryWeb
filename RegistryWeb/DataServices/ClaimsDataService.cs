@@ -213,7 +213,7 @@ namespace RegistryWeb.DataServices
             if (!tenancyProcesses.Any())
                 return new List<TenancyPerson>();
 
-            var idProcess = tenancyProcesses.OrderByDescending(tp => new { tp.RegistrationDate, tp.IdProcess }).First().IdProcess;
+            var idProcess = tenancyProcesses.OrderByDescending(tp => tp.RegistrationDate).ThenByDescending(tp => tp.IdProcess ).First().IdProcess;
             return registryContext.TenancyPersons.Where(tp => tp.IdProcess == idProcess && tp.ExcludeDate == null).ToList();
         }
 

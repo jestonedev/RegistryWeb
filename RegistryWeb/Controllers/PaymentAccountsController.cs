@@ -163,6 +163,12 @@ namespace RegistryWeb.Controllers
             return View("AccountReports", viewModel);
         }
 
+        /*public IActionResult CreateClaimMassCustom()
+        {
+            dataService.CreateClaimMassCustom();
+            return Content("Complete");
+        }*/
+
         public IActionResult CreateClaimMass(DateTime atDate)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
