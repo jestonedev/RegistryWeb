@@ -173,6 +173,7 @@ namespace RegistryWeb.DataServices
 
             claim.IdAccountNavigation = null;
             claim.IdAccountAdditionalNavigation = null;
+            claim.IdAccountKumiNavigation = null;
             claim = FillClaimAmount(claim);
             registryContext.Claims.Add(claim);
             registryContext.SaveChanges();
@@ -1117,9 +1118,9 @@ namespace RegistryWeb.DataServices
             {
                 Claim = new Claim
                 {
-                    IdAccount = idAccountBks ?? 0,
+                    IdAccount = idAccountBks ?? null,
                     IdAccountNavigation = idAccountBks != null ? GetAccountBks(idAccountBks.Value) : null,
-                    IdAccountKumi = idAccountKumi ?? 0,
+                    IdAccountKumi = idAccountKumi ?? (idAccountBks == null ? 0 : (int?)null),
                     IdAccountKumiNavigation = kumiAccount,
                     AmountTenancy = kumiAccount != null ? kumiAccount.CurrentBalanceTenancy : lastPaymentInfo?.BalanceOutputTenancy,
                     AmountPenalties = kumiAccount != null ? kumiAccount.CurrentBalancePenalty : lastPaymentInfo?.BalanceOutputPenalties,

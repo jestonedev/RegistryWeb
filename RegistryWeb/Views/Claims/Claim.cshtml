@@ -330,6 +330,21 @@
                                                     }
                                                 </td>
                                             </tr>
+                                            <tr>
+                                                <td class="text-center p-1"><b>Остаток задолженности</b></td>
+                                                <td class="text-center p-1">
+                                                    @((Model.Claim.AmountTenancy ?? 0.00m) - (Model.Claim.AmountTenancyRecovered ?? 0.00m))
+                                                </td>
+                                                <td class="text-center p-1">
+                                                    @((Model.Claim.AmountPenalties ?? 0.00m) - (Model.Claim.AmountPenaltiesRecovered ?? 0.00m))
+                                                </td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
+                                                <td class="text-center p-1">
+                                                    @(((Model.Claim.AmountTenancy + Model.Claim.AmountPenalties) ?? 0.00m) - ((Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered) ?? 0.00m))
+                                                </td>
+                                            </tr>
                                         }
                                         @if (Model.LastPaymentInfo != null || Model.Claim.IdAccountKumiNavigation != null)
                                         {
