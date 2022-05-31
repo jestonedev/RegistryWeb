@@ -50,6 +50,7 @@ namespace RegistryWeb.DataServices
         {
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
             var payments = GetQuery();
+
             viewModel.PageOptions.TotalRows = payments.Count();
             var query = GetQueryFilter(payments, viewModel.FilterOptions);
             query = GetQueryOrder(query, viewModel.OrderOptions);
@@ -275,8 +276,7 @@ namespace RegistryWeb.DataServices
             return emailsDic;
         }
 
-        public void CreateClaimMass(List<int> accountIds, DateTime atDate)
-        {
+        public void CreateClaimMass(List<int> accountIds, DateTime atDate)        {
             var payments = GetPaymentsForMassReports(accountIds).ToList();
             foreach(var payment in payments)
             {

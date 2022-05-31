@@ -226,7 +226,7 @@
                                     accounts = data.results[code];
                                 else {
                                     for (var i = 0; i < 8; i++)
-                                        accounts.push(data.results[accounts][i]);
+                                        accounts.push(data.results[code][i]);
                                 }
 
                                 switch (code) {
