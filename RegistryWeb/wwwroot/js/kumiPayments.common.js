@@ -2,12 +2,17 @@
     var form = $('#paymentsForm');
     var action = form.attr('data-action');
 
-    if (action === 'Details' || action === 'Delete') {
+    var canEditAll = form.data("canEditAll") === "True";
+    var canEditDescription = form.data("canEditDescription") === "True";
+    if (action === 'Details' || action === 'Delete' || !canEditAll) {
         $('select').prop('disabled', true);
         $('input').prop('disabled', true);
         $('textarea').prop('disabled', true);
         $('input[type="hidden"]').prop('disabled', false);
         $('input[type="submit"]').prop('disabled', false);
+    }
+    if (action === 'Edit' && canEditDescription) {
+        $("#Description").prop("disabled", false);
     }
 
     $('#paymentCreate, #paymentEdit').click(function (e) {

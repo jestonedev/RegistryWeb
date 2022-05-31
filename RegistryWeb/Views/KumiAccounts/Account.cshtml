@@ -262,7 +262,8 @@
                             var prepareCourtOrderState = claim.ClaimStates.FirstOrDefault(r => r.IdStateType == 4);
                             if (prepareCourtOrderState != null &&
                                 prepareCourtOrderState.CourtOrderDate != null &&
-                                (completeState == null || (completeState != null && completeState.CourtOrderCancelDate == null)))
+                                (completeState == null || (completeState != null && completeState.CourtOrderCancelDate == null))
+                                && claim.EndDeptPeriod != null)
                             {
                                 tenancyClaimsSum += (claim.AmountTenancy + claim.AmountDgi + claim.AmountPadun + claim.AmountPkk) ?? 0.00m;
                                 penaltyClaimsSum += claim.AmountPenalties ?? 0.00m;
@@ -285,7 +286,7 @@
                         <input type="text" asp-for="CurrentBalanceTenancy" title="Текущее сальдо найм" class="form-control" disabled />
 
                         <div class="input-group-append">
-                            <span class="input-group-text" id="basic-addon2" title="За вычетом суммы найма, взыскиваемой по исковым работам">
+                            <span class="input-group-text" id="basic-addon2" title="За вычетом суммы найма, взыскиваемой по исковым работам. Учитываются только неотмененные исковые работы с вынесеным судебным приказом (дата и номер) и с указанным периодом взыскания">
                                 @(Model.CurrentBalanceTenancy - (tenancyClaimsSum - payedTenancyClaimsSum))
                             </span>
                         </div>
@@ -297,7 +298,7 @@
                     <div class="input-group">
                         <input type="text" asp-for="CurrentBalancePenalty" title="Текущее сальдо пени" class="form-control" disabled />
                         <div class="input-group-append">
-                            <span class="input-group-text" id="basic-addon2" title="За вычетом суммы пени, взыскиваемой по исковым работам">
+                            <span class="input-group-text" id="basic-addon2" title="За вычетом суммы пени, взыскиваемой по исковым работам. Учитываются только неотмененные исковые работы с вынесеным судебным приказом (дата и номер) и с указанным периодом взыскания">
                                 @(Model.CurrentBalancePenalty - (penaltyClaimsSum - payedPenaltyClaimsSum))
                             </span>
                         </div>
@@ -505,7 +506,7 @@
                                     {
                                         canceledClaim = true;
                                     }
-                                    if (prepareCourtOrderState != null && prepareCourtOrderState.CourtOrderDate != null && !canceledClaim)
+                                    if (prepareCourtOrderState != null && prepareCourtOrderState.CourtOrderDate != null && !canceledClaim && claim.EndDeptPeriod != null)
                                     {
                                         winOrderClaim = true;
                                     }

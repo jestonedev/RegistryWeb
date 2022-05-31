@@ -200,6 +200,13 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        public void UpdateDescription(int idPayment, string description)
+        {
+            var payment = registryContext.KumiPayments.FirstOrDefault(r => r.IdPayment == idPayment);
+            payment.Description = description;
+            registryContext.SaveChanges();
+        }
+
         private IQueryable<KumiPayment> RecipientFilter(IQueryable<KumiPayment> query, KumiPaymentsFilter filterOptions)
         {
             if (!string.IsNullOrEmpty(filterOptions.RecipientAccount))

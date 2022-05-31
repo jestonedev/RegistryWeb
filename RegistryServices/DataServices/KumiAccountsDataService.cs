@@ -550,11 +550,12 @@ namespace RegistryWeb.DataServices
                 r.DateDocument != null ? r.DateDocument <= endDate : false).Where(r => r.PaymentCharges.Any(pc => chargeIds.Contains(pc.IdCharge)));
 
             var preparedClaims = claims.Where(r =>
+                    r.EndDeptPeriod <= endDate &&
                     r.ClaimStates.Any(s => s.IdStateType == 4 && s.CourtOrderDate != null) &&
                     !r.ClaimStates.Any(s => s.IdStateType == 6 && s.CourtOrderCancelDate != null))
                 .Select(r => new KumiSumDateInfo
                 {
-                    Date = r.ClaimStates.FirstOrDefault(s => s.IdStateType == 4).CourtOrderDate.Value,
+                    Date = r.EndDeptPeriod.Value, //r.ClaimStates.FirstOrDefault(s => s.IdStateType == 4).CourtOrderDate.Value,
                     Value = (r.AmountTenancy + r.AmountPkk + r.AmountPadun + r.AmountDgi) ?? 0
                 });
 

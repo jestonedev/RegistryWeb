@@ -170,18 +170,18 @@ namespace RegistryWeb.Controllers
         public IActionResult Edit(KumiPayment kumiPayment)
         {
             var dbPayment = dataService.GetKumiPayment(kumiPayment.IdPayment);
-            var canEdit = securityService.HasPrivilege(Privileges.AccountsReadWrite) && dbPayment.IdSource == 1;
-            if (!canEdit)
-                return View("NotAccess");
+            var canEditAll = securityService.HasPrivilege(Privileges.AccountsReadWrite) && dbPayment.IdSource == 1;
             if (kumiPayment == null)
                 return NotFound();
-
-            if (dbPayment.PaymentClaims.Any() || dbPayment.PaymentCharges.Any())
-                return Error("Нельзя изменить распределенный платеж");
-
+            var canEditDescription = securityService.HasPrivilege(Privileges.AccountsReadWrite);
+            if (!(canEditDescription || canEditAll))
+                return View("NotAccess");
             if (ModelState.IsValid)
             {
-                dataService.Edit(kumiPayment);
+                if (canEditAll && !(dbPayment.PaymentClaims.Any() || dbPayment.PaymentCharges.Any()))
+                    dataService.Edit(kumiPayment);
+                else
+                    dataService.UpdateDescription(dbPayment.IdPayment, kumiPayment.Description);
                 return RedirectToAction("Details", new { kumiPayment.IdPayment });
             }
             return RedirectToAction("Index");
