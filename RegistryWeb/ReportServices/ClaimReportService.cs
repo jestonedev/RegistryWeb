@@ -37,20 +37,35 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
-        public byte[] RequestToBks(List<int> idAccounts, int idSigner, DateTime dateValue)
+        public byte[] RequestToBks(List<int> idAccounts, List<int> processingIds, int idSigner, DateTime dateValue, int idReportBKSType)
         {
             var tmpFileName = Path.GetTempFileName();
-            var idAccountsStr = idAccounts.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
-            using (var sw = new StreamWriter(tmpFileName))
-                sw.Write(idAccountsStr);
+            var fileconfigname="";
+
+            switch (idReportBKSType)
+            {
+                case 1:
+                    var idAccountsStr = idAccounts.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
+                    fileconfigname = "request_BKS";
+                    using (var sw = new StreamWriter(tmpFileName))
+                        sw.Write(idAccountsStr);
+                    break;
+                case 2:
+                    var idClaimsStr = processingIds.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
+                    fileconfigname = "request_BKS_copy";
+                    using (var sw = new StreamWriter(tmpFileName))
+                        sw.Write(idClaimsStr);
+                    break;
+            }
             var arguments = new Dictionary<string, object>
             {
                 { "filterTmpFile", tmpFileName },
                 { "request_date_from", dateValue.ToString("dd.MM.yyyy") },
                 { "signer", idSigner },
+                { "idReportBKSType", idReportBKSType },
                 { "executor", securityService.Executor?.ExecutorLogin?.Split("\\")[1] }
             };
-            var fileName = "registry\\claims\\request_BKS";
+            var fileName = "registry\\claims\\"+ fileconfigname;
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }

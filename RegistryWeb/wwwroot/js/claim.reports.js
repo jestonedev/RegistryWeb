@@ -10,7 +10,18 @@
         var dateRequire = "Укажите дату передачи";
         modal.find("[name='Claim.IdReport']").val(1);
         if ($(this).hasClass("rr-report-request-to-bsk")) {
-            title = "Запрос в БКС";
+            var idReportBKSType = $(this).data("id-reportbkstype");
+            switch (idReportBKSType)
+            {
+                case 1:
+                    title = "Запрос в БКС";
+                    modal.find("[name='Claim.IdReportBKSType']").val(1);
+                    break;
+                case 2:
+                    title = "Запрос в БКС (с периодом расчета)";
+                    modal.find("[name='Claim.IdReportBKSType']").val(2);
+                    break;
+            }
             dateTitle = "Дата запроса";
             dateRequire = "Укажите дату запроса";
             modal.find("[name='Claim.IdReport']").val(2);
@@ -35,6 +46,7 @@
 
         var idClaim = $("#claimBksAndTransToLegalModal").find("[name='Claim.IdClaim']").val();
         var idReport = $("#claimBksAndTransToLegalModal").find("[name='Claim.IdReport']").val();
+        var idReportBKSType = $("#claimBksAndTransToLegalModal").find("[name='Claim.IdReportBKSType']").val();
         var idSigner = $("#claimBksAndTransToLegalModal").find("[name='Claim.IdSigner']").val();
         var date = $("#claimBksAndTransToLegalModal").find("[name='Claim.Date']").val();
         if ($("#claimBksAndTransToLegalModal").find(".input-validation-error").length > 0) {
@@ -46,7 +58,7 @@
                 url = "/ClaimReports/GetTransferToLegal?idClaim=" + idClaim + "&idSigner=" + idSigner + "&dateValue=" + date;
                 break;
             case "2":
-                url = "/ClaimReports/GetRequestToBks?idClaim=" + idClaim + "&idSigner=" + idSigner + "&dateValue=" + date;
+                url = "/ClaimReports/GetRequestToBks?idClaim=" + idClaim + "&idSigner=" + idSigner + "&dateValue=" + date + "&idReportBKSType=" + idReportBKSType;
                 break;
         }
 

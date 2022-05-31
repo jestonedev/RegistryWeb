@@ -92,7 +92,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult GetRequestToBks(int idClaim, int idSigner, DateTime dateValue)
+        public IActionResult GetRequestToBks(int idClaim, int idSigner, DateTime dateValue, int idReportBKSType)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
                 return View("NotAccess");
@@ -129,7 +129,7 @@ namespace RegistryWeb.Controllers
                     processingIds.Add(idClaim);
                 }
                 var idAccounts = dataService.GetAccountIds(processingIds);
-                var file = reportService.RequestToBks(idAccounts, idSigner, dateValue);
+                var file = reportService.RequestToBks(idAccounts, processingIds, idSigner, dateValue, idReportBKSType);
                 return File(file, odtMime, string.Format(@"Запрос в БКС{0}.odt", idClaim == 0 ? "" : string.Format(" (иск. работа № {0})", idClaim)));
             }
             catch (Exception ex)
