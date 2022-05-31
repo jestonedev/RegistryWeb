@@ -52,7 +52,7 @@ namespace RegistryWeb.ReportServices
                     break;
                 case 2:
                     var idClaimsStr = processingIds.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
-                    fileconfigname = "request_BKS_copy";
+                    fileconfigname = "request_BKS_with_period";
                     using (var sw = new StreamWriter(tmpFileName))
                         sw.Write(idClaimsStr);
                     break;
