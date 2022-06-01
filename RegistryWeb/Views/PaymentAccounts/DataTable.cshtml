@@ -130,7 +130,7 @@
                 <td style="position: relative">
                     <div class="dopinfo-alt">
                         <div>
-                            Начислено: @item.ChargingTotal руб.
+                            Начислено: @(item.ChargingTenancy+item.ChargingPenalties+item.ChargingPkk+item.ChargingPadun+item.ChargingDgi) руб.
                         </div>
                         <div>
                             Оплачено: @(item.PaymentTenancy+item.PaymentPenalties+item.PaymentDgi+item.PaymentPkk+item.PaymentPadun) руб.
