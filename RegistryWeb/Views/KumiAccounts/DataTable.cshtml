@@ -203,7 +203,7 @@
                                         <b>Рег. №: </b><span>@tenancyInfo.TenancyProcess.IdProcess</span>
                                     }
                                     <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn"
-                                       asp-action="Details" asp-controller="TenancyProcesses"
+                                       asp-action="Details" asp-controller="TenancyProcesses" target="_blank"
                                        asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
                                        asp-route-idProcess="@tenancyInfo.TenancyProcess.IdProcess"></a>
                                 </div>
@@ -275,7 +275,7 @@
                                         {
                                             <span>@rentObject.Address.Text</span>
                                             <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn"
-                                               asp-action="Details" asp-controller="Premises"
+                                               asp-action="Details" asp-controller="Premises" target="_blank"
                                                asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
                                                asp-route-idPremises="@rentObject.Address.Id"></a>
                                         }
@@ -284,7 +284,7 @@
                                         {
                                             <span>@rentObject.Address.Text</span>
                                             <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn"
-                                               asp-action="Details" asp-controller="Buildings"
+                                               asp-action="Details" asp-controller="Buildings" target="_blank"
                                                asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
                                                asp-route-idBuilding="@rentObject.Address.Id"></a>
                                         }
@@ -336,7 +336,7 @@
                                     <span>Найм:</span> @claimInfo.AmountTenancy руб.<br />
                                     <span>Пени:</span> @claimInfo.AmountPenalty руб.
                                     <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn"
-                                       asp-action="Details" asp-controller="Claims"
+                                       asp-action="Details" asp-controller="Claims" target="_blank"
                                        asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"
                                        asp-route-idClaim="@claimInfo.IdClaim"></a>
                                 </div>

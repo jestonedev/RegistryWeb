@@ -432,11 +432,11 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult CancelDistributePaymentToAccount(int idPayment)
+        public IActionResult CancelDistributePaymentToAccount(int idPayment, List<int> idClaims, List<int> idAccounts)
         {
             try
             {
-                var paymentDistributionInfo = dataService.CancelDistributePaymentToAccount(idPayment);
+                var paymentDistributionInfo = dataService.CancelDistributePaymentToAccount(idPayment, idClaims, idAccounts);
                 return Json(new
                 {
                     State = "Success",

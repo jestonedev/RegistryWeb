@@ -398,6 +398,7 @@
             success: function (result) {
                 modal.find(".rr-payment-distribution-details").html(result).removeClass("d-none");
                 modal.find(".rr-payment-distribution-details-loader").addClass("d-none");
+                modal.find(".rr-distribute-check-td").removeClass("d-none");
             }
         });
     });
@@ -414,7 +415,9 @@
         var modal = $("#CancelDistributePaymentToAccountModal");
         $('#cancelDistributePaymentToAccountModalBtn').text('Отменяем...').attr('disabled', true);
         var data = {
-            "IdPayment": modal.find("#CancelDistributePaymentToAccount_IdPayment").val()
+            "IdPayment": modal.find("#CancelDistributePaymentToAccount_IdPayment").val(),
+            "IdClaims": modal.find("[name='Distrubution.IdClaim']:checked").map(function (idx, elem) { return $(elem).val() | 0; }).toArray(),
+            "IdAccounts": modal.find("[name='Distrubution.IdAccount']:checked").map(function (idx, elem) { return $(elem).val() | 0; }).toArray()
         };
         var url = window.location.origin + '/KumiPayments/CancelDistributePaymentToAccount';
 
@@ -429,16 +432,7 @@
                     errorElem.closest(".form-row").removeClass("d-none");
                     errorElem.html("<span class='text-danger'>" + result.error + "</span>");
                 } else {
-                    if (action !== undefined || $("#FilterOptions_IdAccount").val() !== "" || $("#FilterOptions_IdClaim").val() !== "")
-                        location.reload();
-                    else {
-                        var index = modal.data("index");
-                        var tr = $($(".rr-payments-table tbody tr")[index]);
-                        var bell = tr.find(".rr-payment-bell");
-                        var sumPosted = result.distrubutedToTenancySum + result.distrubutedToPenaltySum;
-                        updatePaymentBell(bell, sumPosted, result.sum);
-                        updatePaymentTrState(tr, sumPosted, result.sum);
-                    }
+                    location.reload();
                     modal.modal('hide');
                 }
                 $('#cancelDistributePaymentToAccountModalBtn').text("Отменить распределение").attr('disabled', false);
