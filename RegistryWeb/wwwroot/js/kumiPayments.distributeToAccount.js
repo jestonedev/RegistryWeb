@@ -476,4 +476,20 @@
         var paymentSumElem = tr.find(".rr-payment-sum");
         paymentSumElem.text(distributePaymentFormatSum(sumPayment) + " руб." + (sumPosted > 0 ? ", расп.: " + distributePaymentFormatSum(sumPosted) + " руб": ""));
     }
+
+    $("#DistributePaymentToAccountTenancyLeftovers").on("click", function (e) {
+        var sumForDistribute = parseFloat($("#DistributePaymentToAccount_SumForDistribution").val().replace(",", "."));
+        var penaltySum = parseFloat($("#DistributePaymentToAccount_PenaltySum").val().replace(",", "."));
+        var tenancySum = Math.round(Math.max(0, sumForDistribute - penaltySum)*100)/100;
+        $("#DistributePaymentToAccount_TenancySum").val((tenancySum + "").replace(".", ","));
+        e.preventDefault();
+    });
+
+    $("#DistributePaymentToAccountPenaltyLeftovers").on("click", function (e) {
+        var sumForDistribute = parseFloat($("#DistributePaymentToAccount_SumForDistribution").val().replace(",", "."));
+        var tenancySum = parseFloat($("#DistributePaymentToAccount_TenancySum").val().replace(",", "."));
+        var penaltySum = Math.round(Math.max(0, sumForDistribute - tenancySum) * 100) / 100;
+        $("#DistributePaymentToAccount_PenaltySum").val((penaltySum + "").replace(".", ","));
+        e.preventDefault();
+    });
 });
