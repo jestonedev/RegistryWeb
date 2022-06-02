@@ -37,7 +37,7 @@ namespace RegistryPaymentsLoader.TffStrings
                 Uin = tffStringParts[11],
                 IdPurpose = null,
                 Purpose = tffStringParts[9],
-                Kbk = tffStringParts[37],
+                Kbk = tffStringParts[36],
                 KbkType = paymentST == null ? null : new KumiKbkType
                 {
                     Code = paymentST.KbkType
