@@ -36,11 +36,25 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
-        public byte[] RequestToBks(List<int> idClaims, int idSigner, DateTime dateValue)        {
+        public byte[] RequestToBks(List<int> idClaims, int idSigner, DateTime dateValue, int idReportBKSType)
+        {
             var tmpFileName = Path.GetTempFileName();
+            var fileconfigname = "";
             var idClaimsStr = idClaims.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
             using (var sw = new StreamWriter(tmpFileName))
-                sw.Write(idClaimsStr);            var arguments = new Dictionary<string, object>
+                sw.Write(idClaimsStr);
+
+            switch (idReportBKSType)
+            {
+                case 1:
+                    fileconfigname = "request_BKS";
+                    break;
+                case 2:
+                    fileconfigname = "request_BKS_with_period";
+                    break;
+            }
+
+            var arguments = new Dictionary<string, object>
             {
                 { "filterTmpFile", tmpFileName },
                 { "request_date_from", dateValue.ToString("dd.MM.yyyy") },
@@ -48,7 +62,8 @@ namespace RegistryWeb.ReportServices
                 { "executor", securityService.Executor?.ExecutorLogin?.Split("\\")[1] }
             };
 
-            var fileName = "registry\\claims_correction\\request_BKS";            var fileNameReport = GenerateReport(arguments, fileName);
+            var fileName = "registry\\claims_correction\\" + fileconfigname;
+            var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
 
