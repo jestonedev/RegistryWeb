@@ -1,9 +1,9 @@
 ﻿@using RegistryWeb.SecurityServices;
-@using RegistryWeb.ViewModel;
-@using RegistryServices.ViewModel.KumiAccounts;
+@using RegistryDb.Models.Entities.KumiAccounts;
 @using RegistryWeb.Enums;
 @model RegistryDb.Models.Entities.KumiAccounts.KumiPayment;
 @{
+    var kbkDescriptions = (List<KumiKbkDescription>)ViewBag.KbkDescriptions;
     var subTitle = "";
     if (Model.IdPayment == 0)
     {
@@ -95,7 +95,7 @@
                         </div>
                     }
                     else
-                    if (canEditDescription)
+                   if (canEditDescription)
                     {
                         <a class="btn btn-outline-dark" title="Изменить" aria-label="Изменить"
                            asp-action="Edit" asp-route-idPayment="@Model.IdPayment" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
@@ -113,7 +113,7 @@
                                 <a class="dropdown-item rr-apply-memorial-order @(sumPosted == 0 ? "" : "d-none")" href="#" title="Привязать мемориальный ордер" aria-label="Привязать мемориальный ордер" data-id-payment="@Model.IdPayment">Привязать мемориальный ордер</a>
                                 <a class="dropdown-item rr-distribute-payment @(Model.Sum > sumPosted ? "" : "d-none")" href="#" title="Распределить платеж" aria-label="Распределить платеж" data-id-payment="@Model.IdPayment" data-payment-sum="@Model.Sum" data-payment-sum-posted="@sumPosted">Распределить платеж</a>
                                 <a class="dropdown-item rr-cancel-distribute-payment @(sumPosted > 0 ? "" : "d-none")" href="#" title="Отменить распределение платежа" aria-label="Отменить распределение платежа" data-id-payment="@Model.IdPayment"
-                                    data-payment-sum="@Model.Sum" data-payment-sum-posted="@sumPosted" data-payment-title="@subTitle">Отменить распределение платежа</a>
+                                   data-payment-sum="@Model.Sum" data-payment-sum-posted="@sumPosted" data-payment-title="@subTitle">Отменить распределение платежа</a>
                             </div>
                         </div>
                     }
@@ -261,9 +261,9 @@
             }
         }
 
-        <form autocomplete="off" asp-action="@ViewBag.Action" id="paymentsForm" data-action="@ViewBag.Action" 
-            data-can-edit-all="@(canEditAll && (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create) && !(Model.PaymentCharges.Any() || Model.PaymentClaims.Any()))" 
-            data-can-edit-description="@canEditDescription" method="post">
+        <form autocomplete="off" asp-action="@ViewBag.Action" id="paymentsForm" data-action="@ViewBag.Action"
+              data-can-edit-all="@(canEditAll && (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create) && !(Model.PaymentCharges.Any() || Model.PaymentClaims.Any()))"
+              data-can-edit-description="@canEditDescription" method="post">
             <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
             <input type="hidden" asp-for="IdPayment" />
             <input type="hidden" asp-for="IdParentPayment" />
@@ -435,8 +435,13 @@
 
             <div class="form-row">
                 <div class="form-group col-6 col-lg-3 mb-2">
+                    @{
+                        var description = kbkDescriptions.FirstOrDefault(r => r.Kbk == Model.Kbk);
+                    }
+
                     <label class="rr-payment-label mb-1" asp-for="Kbk">КБК</label>
-                    <input type="text" asp-for="Kbk" data-val="true" title="Код бюджетной классификации" class="form-control input-numbers" maxlength="20" />
+                    <input type="text" asp-for="Kbk" title="@(Model.Kbk == null ? "" : description == null ? "Неизвестный КБК" : description.Description)" data-val="true" class="form-control" maxlength="20" />
+                    <span class="text-danger" asp-validation-for="Kbk"></span>
                 </div>
                 <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-payment-label mb-1">Тип КБК</label>

@@ -1230,6 +1230,7 @@ namespace RegistryWeb.DataServices
         public List<KumiPaymentKind> PaymentKinds { get => registryContext.KumiPaymentKinds.ToList(); }
         public List<KumiOperationType> OperationTypes { get => registryContext.KumiOperationTypes.ToList(); }
         public List<KumiKbkType> KbkTypes { get => registryContext.KumiKbkTypes.ToList(); }
+        public List<KumiKbkDescription> KbkDescriptions { get => registryContext.KumiKbkDescriptions.ToList(); }
         public List<KumiPaymentReason> PaymentReasons { get => registryContext.KumiPaymentReasons.ToList(); }
         public List<KumiPayerStatus> PayerStatuses { get => registryContext.KumiPayerStatuses.ToList(); }
         public List<SelectableSigner> PaymentUfSigners { get => registryContext.SelectableSigners.Where(r => r.IdSignerGroup == 5).ToList(); }
