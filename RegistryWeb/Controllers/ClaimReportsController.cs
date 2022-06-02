@@ -127,7 +127,8 @@ namespace RegistryWeb.Controllers
                     processingIds.Add(idClaim);
                 }
 
-                var file = reportService.RequestToBks(processingIds, idSigner, dateValue);                return File(file, odtMime, string.Format(@"Запрос в БКС{0}.odt", idClaim == 0 ? "" : string.Format(" (иск. работа № {0})", idClaim)));
+                var file = reportService.RequestToBks(processingIds, idSigner, dateValue, idReportBKSType);
+                return File(file, odtMime, string.Format(@"Запрос в БКС{0}.odt", idClaim == 0 ? "" : string.Format(" (иск. работа № {0})", idClaim)));
             }
             catch (Exception ex)
             {
