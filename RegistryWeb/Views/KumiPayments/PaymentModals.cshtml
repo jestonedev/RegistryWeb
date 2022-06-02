@@ -271,11 +271,28 @@
                         </div>
                         <div class="form-group col-3 mb-2">
                             <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_TenancySum">Найм</label>
-                            <input type="text" class="form-control input-decimal" id="DistributePaymentToAccount_TenancySum" title="Распределение на найм">
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary" id="DistributePaymentToAccountTenancyLeftovers" type="button">
+                                        <span class="oi oi-action-redo"></span>
+                                    </button>
+                                </div>
+                                <input type="text" class="form-control input-decimal" id="DistributePaymentToAccount_TenancySum" title="Распределение на найм">
+                            </div>
                         </div>
                         <div class="form-group col-3 mb-2">
                             <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_PenaltySum">Пени</label>
-                            <input type="text" class="form-control input-decimal" id="DistributePaymentToAccount_PenaltySum" title="Распределение на пени">
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary" id="DistributePaymentToAccountPenaltyLeftovers" type="button">
+                                        <span class="oi oi-action-redo""></span>
+                                    </button>
+                                </div>
+                                <input type="text" class="form-control input-decimal" id="DistributePaymentToAccount_PenaltySum" title="Распределение на пени">
+                            </div>
+
                         </div>
                     </div>
                     <div class="form-row d-none mt-2">
@@ -310,7 +327,7 @@
                     <div class="rr-payment-distribution-details d-none">
                     </div>
                     <div class="rr-payment-distribution-details-loader text-center">
-                        <img src="~/image/spinner.gif" /> Загрузка детализации
+                        <img src="/image/spinner.gif" /> Загрузка детализации
                     </div>
                     <div class="form-row d-none mt-2">
                         <div id="errorCanceDistributePaymentToAccountModal" class="form-group col-12 text-center mb-0"></div>

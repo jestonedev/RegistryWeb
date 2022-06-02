@@ -60,6 +60,7 @@ namespace RegistryWeb.Controllers
                 HttpContext.Session.Remove("FilterOptions");
             }
             ViewBag.SecurityService = securityService;
+            ViewBag.KbkDescriptions = dataService.KbkDescriptions;
             ViewBag.PaymentUfSigners = dataService.PaymentUfSigners.Select(r => new { r.IdRecord, Snp = (r.Surname + " " + r.Name + " " + r.Patronymic).Trim() });
             ViewBag.Regions = dataService.Regions;
             ViewBag.Streets = dataService.Streets;
@@ -98,6 +99,7 @@ namespace RegistryWeb.Controllers
             ViewBag.PaymentKinds = dataService.PaymentKinds.Select(r => new { r.IdPaymentKind, Name = "(" + r.Code + ") " + r.Name });
             ViewBag.OperationTypes = dataService.OperationTypes.Select(r => new { r.IdOperationType, Name = "(" + r.Code + ") " + r.Name });
             ViewBag.KbkTypes = dataService.KbkTypes.Select(r => new { r.IdKbkType, Name = "(" + r.Code + ") " + r.Name });
+            ViewBag.KbkDescriptions = dataService.KbkDescriptions;
             ViewBag.PaymentReasons = dataService.PaymentReasons.Select(r => new { r.IdPaymentReason, Name = "(" + r.Code + ") " + r.Name });
             ViewBag.PayerStatuses = dataService.PayerStatuses.Select(r => new { r.IdPayerStatus, Name = "(" + r.Code + ") " + r.Name });
             ViewBag.PaymentUfSigners = dataService.PaymentUfSigners.Select(r => new { r.IdRecord, Snp = (r.Surname + " " + r.Name + " " + r.Patronymic).Trim() });
@@ -215,6 +217,7 @@ namespace RegistryWeb.Controllers
                 RecipientAccount = dbPayment.RecipientAccount
             };
             ViewBag.CanEditUfs = true;
+            ViewBag.KbkDescriptions = dataService.KbkDescriptions;
 
             return PartialView("PaymentUf", paymentUf);
         }
@@ -432,11 +435,11 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult CancelDistributePaymentToAccount(int idPayment)
+        public IActionResult CancelDistributePaymentToAccount(int idPayment, List<int> idClaims, List<int> idAccounts)
         {
             try
             {
-                var paymentDistributionInfo = dataService.CancelDistributePaymentToAccount(idPayment);
+                var paymentDistributionInfo = dataService.CancelDistributePaymentToAccount(idPayment, idClaims, idAccounts);
                 return Json(new
                 {
                     State = "Success",
@@ -648,6 +651,15 @@ namespace RegistryWeb.Controllers
         {
             var payment = dataService.GetKumiPayment(idPayment);
             return PartialView("PaymentDistribution", payment);
+        }
+
+        public JsonResult KbkSearch(string kbk)
+        {
+            if (string.IsNullOrEmpty(kbk)) return Json(new { kbkInfo = new List<KumiKbkDescription>() });
+            var kbkInfo = dataService.KbkDescriptions.Where(r => r.Kbk.Contains(kbk) || r.Description.ToLowerInvariant().Contains(kbk.ToLowerInvariant()));
+            return Json(new {
+                kbkInfo = kbkInfo.ToList()
+            });
         }
     }
 }

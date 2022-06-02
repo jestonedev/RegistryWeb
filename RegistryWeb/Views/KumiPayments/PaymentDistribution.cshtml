@@ -4,6 +4,7 @@
 <table class="table table-bordered table-striped m-0">
     <thead>
         <tr>
+            <th class="rr-distribute-check-td d-none" rowspan="2"></th>
             <th class="text-center p-1" rowspan="2">Назначение (ЛС/ИР)</th>
             <th class="text-center p-1" colspan="2">Сумма распределена</th>
         </tr>
@@ -16,6 +17,7 @@
         @foreach (var charge in Model.PaymentCharges.GroupBy(r => new { r.Charge.IdAccount, r.Charge.Account.Account }))
         {
             <tr>
+                <td class="text-center rr-distribute-check-td d-none"><input type="checkbox" name="Distrubution.IdAccount" checked value="@charge.Key.IdAccount" /></td>
                 <td class="text-center p-1">
                     ЛС @charge.Key.Account
                     <a class="btn oi oi-eye p-0 text-primary rr-payment-assoc-eye-btn" target="_blank"
@@ -29,9 +31,10 @@
         @foreach (var claim in Model.PaymentClaims.GroupBy(r => new { r.Claim.IdClaim, r.Claim.StartDeptPeriod, r.Claim.EndDeptPeriod, r.Claim.IdAccountKumiNavigation.Account }))
         {
             <tr>
+                <td class="text-center rr-distribute-check-td d-none"><input type="checkbox" name="Distrubution.IdClaim" checked value="@claim.Key.IdClaim" /></td>
                 <td class="text-center p-1">
                     ИР №@claim.Key.IdClaim
-                    @{ 
+                    @{
                         var claimPeriod = (claim.Key.StartDeptPeriod != null || claim.Key.EndDeptPeriod != null ? "(" : "");
                         claimPeriod += (claim.Key.StartDeptPeriod != null ? "с " + @claim.Key.StartDeptPeriod.Value.ToString("dd.MM.yyyy") : "");
                         claimPeriod += (claim.Key.StartDeptPeriod != null && claim.Key.EndDeptPeriod != null ? " " : "");

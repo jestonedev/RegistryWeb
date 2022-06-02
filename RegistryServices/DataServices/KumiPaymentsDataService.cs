@@ -500,22 +500,22 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
-        public KumiPaymentDistributionInfo CancelDistributePaymentToAccount(int idPayment)
+        public KumiPaymentDistributionInfo CancelDistributePaymentToAccount(int idPayment, List<int> idClaims, List<int> idAccounts)
         {
             var payment = registryContext.KumiPayments.Include(r => r.PaymentClaims).Include(r => r.PaymentCharges).FirstOrDefault(r => r.IdPayment == idPayment);
             if (payment == null)
                 throw new ApplicationException("Не найдена платеж в базе данных");
 
-            var idClaims = payment.PaymentClaims.Select(r => r.IdClaim);
-            var idCharges = payment.PaymentCharges.Select(r => r.IdCharge);
-            List<int> idAccounts =
-                registryContext.KumiCharges.Where(r => idCharges.Contains(r.IdCharge)).Select(r => r.IdAccount).Union(
-                registryContext.Claims.Where(r => r.IdAccountKumi != null && idClaims.Contains(r.IdClaim)).Select(r => r.IdAccountKumi.Value)).Distinct().ToList();
+            var idClaimsLocal = idClaims.ToList();
+            List<int> idAccountsLocal =
+                idAccounts.Union(
+                registryContext.Claims.Where(r => r.IdAccountKumi != null && idClaimsLocal.Contains(r.IdClaim)).Select(r => r.IdAccountKumi.Value)).Distinct().ToList();
 
-            IQueryable<KumiAccount> accounts = registryContext.KumiAccounts.Where(r => idAccounts.Contains(r.IdAccount));
+            IQueryable<KumiAccount> accounts = registryContext.KumiAccounts.Where(r => idAccountsLocal.Contains(r.IdAccount));
 
             foreach(var paymentClaim in payment.PaymentClaims.GroupBy(r => r.IdClaim))
             {
+                if (!idClaims.Contains(paymentClaim.Key)) continue;
                 var claim = registryContext.Claims.FirstOrDefault(r => r.IdClaim == paymentClaim.Key);
                 if (claim == null)
                     throw new ApplicationException(
@@ -528,11 +528,14 @@ namespace RegistryWeb.DataServices
 
             foreach(var paymentClaim in payment.PaymentClaims)
             {
+                if (!idClaims.Contains(paymentClaim.IdClaim)) continue;
                 registryContext.KumiPaymentClaims.Remove(paymentClaim);
             }
 
             foreach (var paymentCharge in payment.PaymentCharges)
             {
+                var charge = registryContext.KumiCharges.Where(r => r.IdCharge == paymentCharge.IdCharge).FirstOrDefault();
+                if (charge == null || !idAccounts.Contains(charge.IdAccount)) continue;
                 registryContext.KumiPaymentCharges.Remove(paymentCharge);
             }
 
@@ -1227,6 +1230,7 @@ namespace RegistryWeb.DataServices
         public List<KumiPaymentKind> PaymentKinds { get => registryContext.KumiPaymentKinds.ToList(); }
         public List<KumiOperationType> OperationTypes { get => registryContext.KumiOperationTypes.ToList(); }
         public List<KumiKbkType> KbkTypes { get => registryContext.KumiKbkTypes.ToList(); }
+        public List<KumiKbkDescription> KbkDescriptions { get => registryContext.KumiKbkDescriptions.ToList(); }
         public List<KumiPaymentReason> PaymentReasons { get => registryContext.KumiPaymentReasons.ToList(); }
         public List<KumiPayerStatus> PayerStatuses { get => registryContext.KumiPayerStatuses.ToList(); }
         public List<SelectableSigner> PaymentUfSigners { get => registryContext.SelectableSigners.Where(r => r.IdSignerGroup == 5).ToList(); }

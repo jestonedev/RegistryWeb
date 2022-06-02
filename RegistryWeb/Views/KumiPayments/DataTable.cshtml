@@ -1,6 +1,7 @@
 ﻿@using RegistryWeb.Extensions;
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.SecurityServices;
+@using RegistryDb.Models.Entities.KumiAccounts;
 @model RegistryServices.ViewModel.KumiAccounts.KumiPaymentsVM;
 @{
     Context.Session.Set("Controller", "KumiPayments");
@@ -9,6 +10,7 @@
     Context.Session.Set("FilterOptions", Model.FilterOptions);
     Context.Session.Set("PageOptions", Model.PageOptions);
     var securityService = (SecurityService)ViewData["SecurityService"];
+    var kbkDescriptions = (List<KumiKbkDescription>)ViewBag.KbkDescriptions;
 }
 
 <table class="table table-hover rr-payments-table">
@@ -150,7 +152,8 @@
                     </div>
                     @if (!string.IsNullOrEmpty(item.Kbk))
                     {
-                        <div>
+                        var description = kbkDescriptions.FirstOrDefault(r => r.Kbk == item.Kbk);
+                        <div title="@(description == null ? "Неизвестный КБК" : description.Description)">
                             <b>КБК:</b> @item.Kbk
                         </div>
                     }

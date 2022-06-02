@@ -8,6 +8,9 @@
         fields.each(function (idx, elem) {
             var name = $(elem).attr("name").split("_")[0];
             modal.find("[name='KumiPaymentUf." + name + "']").val($(elem).val());
+            if (name === "Kbk") {
+                modal.find("[name='KumiPaymentUf." + name + "']").attr("title", $(elem).attr("title"));
+            }
         });
         if (canEdit) {
             modalFields.prop("disabled", "");
@@ -26,6 +29,9 @@
             if (name === "IdPaymentUf") {
                 var downloadBtn = paymentUfElem.find(".payment-uf-download-btn");
                 downloadBtn.attr("data-id-payment-uf", value);
+            }
+            if (name === "Kbk") {
+                $(elem).attr("title", modal.find("[name='KumiPaymentUf." + name + "']").attr("title"));
             }
         });
     }
@@ -106,6 +112,10 @@
 
         var form = $("#PaymentUfsModalForm");
         var isValid = form.valid();
+        var validator = form.validate();
+        if (!kbkCustomValidations(validator, $("#KumiPaymentUf_Kbk"))) {
+            isValid = false;
+        }
 
         if (isValid) {
             let paymentUf = paymentUfToFormData(getPaymentUf(form));

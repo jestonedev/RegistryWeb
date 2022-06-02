@@ -1,4 +1,18 @@
-﻿$(function () {
+﻿function kbkCustomValidations(validator, kbk) {
+    isValid = true;
+    if (/[0-9]{20}/.test(kbk.val()) || kbk.val() === "" || kbk.val() === undefined) {
+        clearValidationError(kbk);
+        removeErrorFromValidator(validator, kbk);
+    } else {
+        let error = {};
+        error[kbk.attr("name")] = "Некорректное значение КБК";
+        validator.showErrors(error);
+        isValid = false;
+    }
+    return isValid;
+}
+
+$(function () {
     var form = $('#paymentsForm');
     var action = form.attr('data-action');
 
@@ -23,6 +37,10 @@
         });
 
         var isValid = form.valid();
+        var validator = form.validate();
+        if (!kbkCustomValidations(validator, $("#Kbk"))) {
+            isValid = false;
+        }
 
         if (isValid) {
             form.find('input, select, textarea').attr('disabled', false);
@@ -121,5 +139,41 @@
         var modal = $("#PaymentDistributionDetailsModal");
         modal.modal('show');
         e.preventDefault();
+    });
+
+    $('#Kbk, #KumiPaymentUf_Kbk').autocomplete({
+        source: function (request, response) {
+            var self = $(this.element);
+            var kbk = self.val();
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + '/KumiPayments/KbkSearch',
+                dataType: 'json',
+                data: { kbk: kbk },
+                success: function (data) {
+                    if (data !== "0" && data !== undefined) {
+                        response($.map(data.kbkInfo, function (kbkInfo) {
+                            return { label: kbkInfo.kbk + ", " + kbkInfo.description, value: kbkInfo.kbk, description: kbkInfo.description };
+                        }));
+                    }
+                }
+            });
+        },
+        select: function (event, ui) {
+            var self = $(event.target);
+            self.val(ui.item.value);
+            self.attr("title", ui.item.description);
+        },
+        change: function (event, ui) {
+            var self = $(event.target);
+            if (ui.item === null) {
+                self.attr("title", self.val() === "" ? "" : "Неизвестный КБК");
+            }
+
+            var validator = $(self).closest("form").validate();
+            kbkCustomValidations(validator, self);
+        },
+        delay: 300,
+        minLength: 3
     });
 });
