@@ -11,6 +11,5 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public string Address { get; set; }
         public int IdProcess { get; set; }
         public virtual KumiAccount KumiAccountNavigation { get; set; }
-       // public virtual IList<TenancyPerson> TenancyPersons { get; set; }
     }
 }

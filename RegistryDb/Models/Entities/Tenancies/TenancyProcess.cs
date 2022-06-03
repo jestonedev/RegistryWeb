@@ -42,7 +42,8 @@ namespace RegistryDb.Models.Entities.Tenancies
         public string SubTenancyNum { get; set; }
         public byte Deleted { get; set; }
 
-        public virtual KumiAccount IdAccountNavigation { get; set; }
+        public virtual KumiAccount IdAccountNavigation { get; set; } // DELETE
+        public virtual IList<KumiAccountsTenancyProcessesAssoc> AccountsTenancyProcessesAssoc { get; set; }
         public virtual TenancyActiveProcess TenancyActiveContractNavigation { get; set; }
         public virtual RentTypeCategory IdRentTypeCategoryNavigation { get; set; }
         public virtual RentType IdRentTypeNavigation { get; set; }

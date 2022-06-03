@@ -207,6 +207,7 @@ namespace RegistryDb.Models
 
         //Платежи
         public virtual DbSet<KumiAccount> KumiAccounts { get; set; }
+        public virtual DbSet<KumiAccountsTenancyProcessesAssoc> KumiAccountsTenancyProcessesAssocs { get; set; }
         public virtual DbSet<KumiAccountState> KumiAccountStates { get; set; }
         public virtual DbSet<KumiCharge> KumiCharges { get; set; }
         public virtual DbSet<KumiPayment> KumiPayments { get; set; }
@@ -389,6 +390,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new PrivContractorWarrantTemplateConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new KumiAccountConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiAccountsTenancyProcessesAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiAccountStateConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiChargeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentConfiguration(nameDatebase));

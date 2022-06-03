@@ -30,7 +30,8 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public byte Deleted { get; set; }
         public virtual KumiAccountState State { get; set; }
         public virtual KumiAccountAddress KumiAccountAddressNavigation { get; set; }
-        public virtual IList<TenancyProcess> TenancyProcesses { get; set; }
+        public virtual IList<TenancyProcess> TenancyProcesses { get; set; } // DELETE
+        public virtual IList<KumiAccountsTenancyProcessesAssoc> AccountsTenancyProcessesAssoc { get; set; }
         public virtual IList<Claim> Claims { get; set; }
         public virtual IList<KumiCharge> Charges { get; set; }
     }
