@@ -247,7 +247,7 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<TenancyProcess> GetQuery()
         {
-            return registryContext.TenancyProcesses;
+            return registryContext.TenancyProcesses.Include(r => r.AccountsTenancyProcessesAssoc);
         }
 
         private IQueryable<TenancyProcess> GetQueryIncludes(IQueryable<TenancyProcess> query)

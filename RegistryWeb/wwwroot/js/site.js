@@ -262,6 +262,10 @@ $(function () {
         return /^-?\d*[.,]?\d{0,2}$/.test(value);
     });
 
+    $('.input-fraction').inputFilter(function (value) {
+        return /^[0-1]?[.,]?\d{0,4}$/.test(value);
+    });
+
     $('.input-filter-premise-num, .input-premise-num').inputFilter(function (value) {
         return /^[0-9\\/а-яА-Я,-]*$/.test(value);
     });

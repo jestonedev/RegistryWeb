@@ -48,13 +48,6 @@
     $('#accountCreate, #accountEdit').click(function (e) {
         e.preventDefault();
 
-        var tenancyInfo = $('.rr-tenancy-info');
-        tenancyInfo.each(function (ind, elem) {
-            var idProcessElem = $(elem).find('input[id^="IdProcess"]');
-            idProcessElem.attr('name', "TenancyProcesses[" + ind + "].IdProcess");
-            if (idProcessElem.val() === "") idProcessElem.remove();
-        });
-
         var isValid = form.valid();
         var validator = form.validate();
 
@@ -63,6 +56,18 @@
         }
 
         if (isValid) {
+
+            var tenancyInfo = $('.rr-tenancy-info');
+            tenancyInfo.each(function (ind, elem) {
+                var idProcessElem = $(elem).find('input[id^="IdProcess"]');
+                idProcessElem.attr('name', "AccountsTenancyProcessesAssoc[" + ind + "].IdProcess");
+                var fractionElem = $(elem).find('input[id^="Fraction"]');
+                fractionElem.attr('name', "AccountsTenancyProcessesAssoc[" + ind + "].Fraction");
+                var assocElem = $(elem).find('input[id^="IdAssoc"]');
+                assocElem.attr('name', "AccountsTenancyProcessesAssoc[" + ind + "].IdAssoc");
+                if (idProcessElem.val() === "") $(elem).remove();
+            });
+
             form.find('input, select, textarea').attr('disabled', false);
             form.submit();
         } else {
@@ -255,13 +260,19 @@
                     }
 
                     var radioButton = "<div class='form-check'><input style='margin-top: -7px' name='tenancySelected' value='" + idProcess + "' type='radio' class='form-check-input'></div>";
+                    var tenancyLink = "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn' href='/TenancyProcesses/Details?idProcess=" + idProcess + "' target='_blank'></a>";
 
-                    var account = tenancy.account;
+                    var accountsInfo = tenancy.accountsInfo;
                     var accountInfo = "";
-                    var tenancyLink = "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn' href='/KumiAccounts/Details?idAccount=" + tenancy.idAccount + "' target='_blank'></a>";
-                    if (account !== null)
-                        accountInfo = "<br/><span class='text-danger'><i>Привязан к ЛС № " + account + "</i></span>";
-
+                    if (accountsInfo.length > 0)
+                        accountInfo += "<br/><span class='text-danger'><i>Привязан к ЛС № ";
+                    for (var k = 0; k < accountsInfo.length; k++) {
+                        var account = accountsInfo[k].account;
+                        if (account !== null)
+                            accountInfo += (k === 0 ? "" : ", ") + account;
+                    }
+                    if (accountsInfo.length > 0)
+                        accountInfo += "</i></span>";
                     var rentObjects = result.rentObjects[tenancy.idProcess];
                     if (rentObjects === undefined || rentObjects.length === 0) {
                         rentObjects = [{ address: { text: '' } }];
@@ -283,9 +294,11 @@
                                 break;
                         }
                         table += "<tr data-id-process='" + idProcess + "' data-id-building='" + idBuilding + "' data-id-premise='" + idPremises + "'>";
-
-                        table += "<td style='vertical-align: middle'>" + (j === 0 ? radioButton : "") + "</td>";
-                        table += "<td>" + (j === 0 ? tenancyRequisits + tenancyLink : "") + (j === 0 ? accountInfo : "") + "</td><td>" + rentObjects[j].address.text + "</td>";
+                        if (j === 0) {
+                            table += "<td rowspan='" + rentObjects.length + "' style='vertical-align: middle'>" + radioButton + "</td>";
+                            table += "<td rowspan='" + rentObjects.length + "' style='vertical-align: middle'><span class='rr-tenancy-requisits'>" + tenancyRequisits + "</span>" + tenancyLink + accountInfo + "</td>";
+                        }
+                        table += "<td style='vertical-align: middle'>" + rentObjects[j].address.text + "</td>";
                         table += "</tr>";
                     }
                 }
@@ -337,7 +350,7 @@
                 if (i > 0) {
                     tenancyElem.append(firstRentAddressElem.clone(true));
                     currentRentElem = tenancyElem.find(".rr-tenancy-address").last();
-                    currentRentElem.addClass("offset-4");
+                    currentRentElem.addClass("offset-5");
                     currentRentElem.find(".input-group-append").remove();
                 }
 
@@ -373,11 +386,11 @@
         for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
             if (i === 0) {
-                result.tenancyRequisits = $($(row).find("td")[1]).text();
+                result.tenancyRequisits = $($(row).find("td")[1]).find(".rr-tenancy-requisits").text();
                 result.idProcess = idProcess;
             }
             result.rentObjects.push({
-                addressText: $($(row).find("td")[2]).text(),
+                addressText: $($(row).find("td")[i === 0 ? 2 : 0]).text(),
                 idBuilding: $(row).data("idBuilding"),
                 idPremises: $(row).data("idPremise")
            });
@@ -409,5 +422,24 @@
         modal.find("select, input").prop('disabled', false);
         modal.modal('show');
         e.preventDefault();
+    });
+
+    $("#accountForm").on("change", "[id^='Fraction_']", function () {
+        var val = $(this).val();
+        if (val === "" || val === undefined) {
+            $(this).val("0,0000");
+            return;
+        }
+        var valDecimal = parseFloat(val.replace(",", "."));
+        if (valDecimal > 1) {
+            $(this).val("1,0000");
+            return;
+        }
+        val = valDecimal.toString().replace(".", ",");
+        if (val.indexOf(",") === -1) val += ",";
+        while (val.length < 6) {
+            val += "0";
+        }
+        $(this).val(val);
     });
 });

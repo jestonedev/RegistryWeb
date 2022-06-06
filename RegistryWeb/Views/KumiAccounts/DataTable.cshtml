@@ -47,7 +47,7 @@
             var tenancyOutOfPeriod = true;
             var hasActiveTenanciesAndAnul = false;
             var hasNoActiveTenanciesAndActive = false;
-            if (Model.TenancyInfo.ContainsKey(item.IdAccount))
+            if (Model.TenancyInfo.ContainsKey(item.IdAccount) && Model.TenancyInfo[item.IdAccount].Any())
             {
                 var tenancyInfos = Model.TenancyInfo[item.IdAccount];
                 var activeTenancies = tenancyInfos.Where(r => r.TenancyProcess.TenancyPersons.Any(p => p.ExcludeDate == null || p.ExcludeDate > DateTime.Now)
@@ -182,7 +182,7 @@
                     </div>
                 </td>
                 <td>
-                    @if (Model.TenancyInfo.ContainsKey(item.IdAccount))
+                    @if (Model.TenancyInfo.ContainsKey(item.IdAccount) && Model.TenancyInfo[item.IdAccount].Any())
                     {
                         var tenancyInfos = Model.TenancyInfo[item.IdAccount].OrderByDescending(r => r.TenancyProcess.IdProcess);
                         @for (var i = 0; i < tenancyInfos.Count(); i++)

@@ -1,6 +1,7 @@
 ﻿@using RegistryWeb.SecurityServices;
 @using RegistryWeb.ViewModel;
 @using RegistryServices.ViewModel.KumiAccounts;
+@using RegistryDb.Models.Entities.KumiAccounts;
 @using RegistryWeb.Enums;
 @model RegistryDb.Models.Entities.KumiAccounts.KumiAccount;
 @{
@@ -110,6 +111,7 @@
                 @{
                     var tenancyInfo = (List<KumiAccountTenancyInfoVM>)ViewBag.TenancyInfo;
                     tenancyInfo = tenancyInfo.Union(new List<KumiAccountTenancyInfoVM>() { new KumiAccountTenancyInfoVM {
+                                                        AccountAssoc = new KumiAccountsTenancyProcessesAssoc { Fraction = 1.0000m },
                                                         RentObjects = new List<TenancyRentObject> { new TenancyRentObject {  } }} }).ToList();
                     for (var i = 0; i < tenancyInfo.Count(); i++)
                     {
@@ -133,7 +135,8 @@
                         }
 
                         <div class="form-row rr-tenancy-info @(((i + 1) == tenancyInfo.Count()) && hideLastString ? "d-none" : "")">
-                            <input type="hidden" value="@idProcess" id="IdProcess_@i" name="TenancyProcesses[@i].IdProcess" />
+                            <input type="hidden" value="@(tenancyInfo[i].AccountAssoc != null ? tenancyInfo[i].AccountAssoc.IdAssoc : 0)" id="IdAssoc_@i" name="AccountsTenancyProcessesAssoc[@i].IdAssoc" />
+                            <input type="hidden" value="@idProcess" id="IdProcess_@i" name="AccountsTenancyProcessesAssoc[@i].IdProcess" />
                             <div class="form-group col-4">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
@@ -146,6 +149,9 @@
                                     </div>
                                     <input name="TenancyRequisits[@i]" id="TenancyRequisits_@i" type="text" value="@tenancyRequisits" class="form-control" title="Реквизиты процесса найма" disabled />
                                 </div>
+                            </div>
+                            <div class="form-group col-1">
+                                <input type="text" maxlength="6" value="@(tenancyInfo[i].AccountAssoc != null ? tenancyInfo[i].AccountAssoc.Fraction : 0.0000m)" class="form-control input-fraction" id="Fraction_@i" name="AccountsTenancyProcessesAssoc[@i].Fraction"  title="Доля"  />
                             </div>
                             @{
                                 if (tenancyInfo[i].RentObjects == null || !tenancyInfo[i].RentObjects.Any())
@@ -178,7 +184,7 @@
                                 }
                                 var address = rentObject?.Text;
 
-                                <div class="form-group rr-tenancy-address col-8 @(j > 0 ? "offset-4" : "")">
+                                <div class="form-group rr-tenancy-address col-7 @(j > 0 ? "offset-5" : "")">
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <button class="btn btn-success dropdown-toggle @(idBuilding != null ? "" : "disabled")" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="HomesBtn_@i" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

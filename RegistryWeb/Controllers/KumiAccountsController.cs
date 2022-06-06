@@ -211,14 +211,18 @@ namespace RegistryWeb.Controllers
             var count = tenancies.Count();
             var tenanciesLimit = tenancies.Take(5).ToList();
             var rentObjects = tenancyProcessesDataService.GetRentObjects(tenanciesLimit);
+            var accounts = dataService.GetAccountsForTenancies(tenanciesLimit);
             return Json(new {
                 Count = count,
                 Tenancies = tenanciesLimit.Select(r => new {
                     r.IdProcess,
                     r.RegistrationDate,
                     r.RegistrationNum,
-                    r.IdAccount,
-                    r.IdAccountNavigation?.Account
+                    AccountsInfo = accounts.Where(a => a.AccountsTenancyProcessesAssoc.Any(assoc => assoc.IdProcess == r.IdProcess))
+                    .Select(a => new {
+                        a.IdAccount,
+                        a.Account
+                    })
                 }),
                 RentObjects = rentObjects
             });
