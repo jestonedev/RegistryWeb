@@ -139,7 +139,7 @@ namespace RegistryWeb.DataServices
 
             return new TenancyProcessVM
             {
-                TenancyProcess = new TenancyProcess {},
+                TenancyProcess = new TenancyProcess(),
                 Kinships = registryContext.Kinships.ToList(),
                 RentTypeCategories = registryContext.RentTypeCategories.ToList(),
                 RentTypes = registryContext.RentTypes.ToList(),
@@ -181,6 +181,11 @@ namespace RegistryWeb.DataServices
             {
                 subPremise.IdProcess = 0;
             }
+
+            foreach (var accountAssoc in tenancyProcess.AccountsTenancyProcessesAssoc)
+            {
+                accountAssoc.IdAssoc = 0;
+            }
             tenancyProcess.TenancyReasons = null;
             tenancyProcess.TenancyAgreements = null;
             tenancyProcess.TenancyFiles = null;
@@ -198,7 +203,7 @@ namespace RegistryWeb.DataServices
 
         public TenancyProcess GetTenancyProcess(int idProcess)
         {
-            return registryContext.TenancyProcesses
+            var tenancyProcess = registryContext.TenancyProcesses
                  .Include(tp => tp.TenancyPersons)
                  .Include(tp => tp.TenancyReasons)
                  .Include(tp => tp.TenancyBuildingsAssoc)
@@ -207,8 +212,13 @@ namespace RegistryWeb.DataServices
                  .Include(tp => tp.TenancyRentPeriods)
                  .Include(tp => tp.TenancyAgreements)
                  .Include(tp => tp.TenancyFiles)
-                 .Include(tp => tp.IdAccountNavigation)
+                 .Include(tp => tp.AccountsTenancyProcessesAssoc)
                  .FirstOrDefault(tp => tp.IdProcess == idProcess);
+            foreach(var assoc in tenancyProcess.AccountsTenancyProcessesAssoc)
+            {
+                assoc.AccountNavigation = registryContext.KumiAccounts.FirstOrDefault(r => r.IdAccount == assoc.IdAccount);
+            }
+            return tenancyProcess;
         }
 
         public TenancyProcessesVM GetViewModel(
@@ -688,43 +698,79 @@ namespace RegistryWeb.DataServices
                     fileStream.Close();
                 }
             }
-
-            AddAndBindAccount(tenancyProcess);
-
+            var assocs = tenancyProcess.AccountsTenancyProcessesAssoc;
+            tenancyProcess.AccountsTenancyProcessesAssoc = null;
             registryContext.TenancyProcesses.Add(tenancyProcess);
+            registryContext.SaveChanges();
+
+            AddAndBindAccounts(assocs, tenancyProcess.IdProcess);
             registryContext.SaveChanges();
         }
 
         public void Edit(TenancyProcess tenancyProcess)
         {
-            AddAndBindAccount(tenancyProcess);
+            AddAndBindAccounts(tenancyProcess.AccountsTenancyProcessesAssoc, tenancyProcess.IdProcess);
+            tenancyProcess.AccountsTenancyProcessesAssoc = null;
             registryContext.TenancyProcesses.Update(tenancyProcess);
             registryContext.SaveChanges();
         }
 
-        public void AddAndBindAccount(TenancyProcess tenancyProcess)
+        public void AddAndBindAccounts(IList<KumiAccountsTenancyProcessesAssoc> accountsAssoc, int idProcess)
         {
-            var account = tenancyProcess.IdAccountNavigation?.Account;
-            tenancyProcess.IdAccountNavigation = null;
-            if (!string.IsNullOrEmpty(account))
+            var assocsForUpdate = new List<KumiAccountsTenancyProcessesAssoc>();
+            foreach (var assoc in accountsAssoc)
             {
-                account = account.Trim();
-                var kumiAccount = registryContext.KumiAccounts.FirstOrDefault(r => r.Account == account);
-                if (kumiAccount == null)
+                var account = assoc.AccountNavigation.Account;
+                assoc.AccountNavigation = null;
+                if (assoc.IdAccount != 0)
                 {
-                    kumiAccount = new KumiAccount
-                    {
-                        Account = account,
-                        IdState = 1,
-                        CurrentBalanceTenancy = 0,
-                        CurrentBalancePenalty = 0,
-                        CreateDate = DateTime.Now.Date,
-                        RecalcMarker = 0
-                    };
-                    registryContext.KumiAccounts.Add(kumiAccount);
-                    registryContext.SaveChanges();
+                    assocsForUpdate.Add(assoc);
+                    continue;
                 }
-                tenancyProcess.IdAccount = kumiAccount.IdAccount;
+                if (!string.IsNullOrEmpty(account))
+                {
+                    account = account.Trim();
+                    var kumiAccount = registryContext.KumiAccounts.FirstOrDefault(r => r.Account == account);
+                    if (kumiAccount == null)
+                    {
+                        kumiAccount = new KumiAccount
+                        {
+                            Account = account,
+                            IdState = 1,
+                            CurrentBalanceTenancy = 0,
+                            CurrentBalancePenalty = 0,
+                            CreateDate = DateTime.Now.Date,
+                            RecalcMarker = 0
+                        };
+                        registryContext.KumiAccounts.Add(kumiAccount);
+                        registryContext.SaveChanges();
+                    }
+                    assoc.IdAccount = kumiAccount.IdAccount;
+                    assocsForUpdate.Add(assoc);
+                }
+            }
+
+            var oldAccountTenancyAssocs = registryContext.KumiAccountsTenancyProcessesAssocs.Where(r => r.IdProcess == idProcess);
+            foreach (var oldAssoc in oldAccountTenancyAssocs)
+            {
+                if (assocsForUpdate.Count(r => r.IdAssoc == oldAssoc.IdAssoc) > 0) continue;
+                oldAssoc.Deleted = 1;
+            }
+            foreach (var newAssoc in assocsForUpdate)
+            {
+                if (newAssoc.IdAssoc != 0)
+                {
+                    var assocDb = registryContext.KumiAccountsTenancyProcessesAssocs.FirstOrDefault(r => r.IdAssoc == newAssoc.IdAssoc);
+                    assocDb.Fraction = newAssoc.Fraction;
+                    assocDb.IdProcess = idProcess;
+                    assocDb.IdAccount = newAssoc.IdAccount;
+                    registryContext.KumiAccountsTenancyProcessesAssocs.Update(assocDb);
+                }
+                else
+                {
+                    newAssoc.IdProcess = idProcess;
+                    registryContext.KumiAccountsTenancyProcessesAssocs.Add(newAssoc);
+                }
             }
         }
 

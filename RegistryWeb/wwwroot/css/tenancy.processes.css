@@ -42,6 +42,16 @@
     }
 }
 
+.rr-account-append-span {
+    width: 37px;
+}
+
+@media(min-width: 768px) {
+    .rr-account-append-span {
+        width: 42px;
+    }
+}
+
 .rr-tenancy-filter-label, .rr-tenancy-label {
     white-space: nowrap;
     overflow: hidden;
