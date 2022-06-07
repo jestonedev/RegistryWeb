@@ -324,5 +324,21 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
+
+        public IActionResult GetClaimDateReferralCcoBailiffs(DateTime startDate, DateTime endDate)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.ClaimDateReferralCcoBailiffs(startDate, endDate);
+                return File(file, odsMime, "Отчет по дате направления с/п приставам.ods");
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
     }
 }
