@@ -212,6 +212,9 @@
             case "ClaimFactMailing":
                 factMailingWrapper.show();
                 break;
+            case "ClaimDateReferralCcoBailiffs":
+                standartWrapper.show();
+                break;
         }
 
         modal.modal("show");
