@@ -796,7 +796,8 @@ namespace RegistryWeb.DataServices
                                     break;
                             }
                         }
-                        accountInfo.TenancyPaymentHistories.Add(tenancy.TenancyProcess.IdProcess, paymentsHistory);
+                        if (!accountInfo.TenancyPaymentHistories.ContainsKey(tenancy.TenancyProcess.IdProcess))
+                            accountInfo.TenancyPaymentHistories.Add(tenancy.TenancyProcess.IdProcess, paymentsHistory);
                     }
                 }
                 var chargesIds = account.Charges.Select(r => r.IdCharge).ToList();
@@ -890,7 +891,7 @@ namespace RegistryWeb.DataServices
                     }
                     payment.FromDate = historyInfo.Date;
                     payment.Payment = Math.Round((historyInfo.K1 + historyInfo.K2 + historyInfo.K3) / 3
-                        * historyInfo.Kc * (decimal)historyInfo.RentArea * historyInfo.Hb, 2);
+                        * historyInfo.Kc * (decimal)historyInfo.RentArea * historyInfo.Hb * tenancyInfo.AccountAssoc.Fraction, 2);
                     result.Add(payment);
                 }
             }
@@ -910,7 +911,7 @@ namespace RegistryWeb.DataServices
                         payment.FromDate = firstRentPeriod.FromDate.Value;
                     else
                         payment.FromDate = DateTime.Now.Date.AddDays(-DateTime.Now.Date.Day+1).AddMonths(-1);
-                    payment.Payment = rentObject.Payment;
+                    payment.Payment = rentObject.Payment * tenancyInfo.AccountAssoc.Fraction;
                     result.Add(payment);
                 }
             return result;
