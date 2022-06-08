@@ -25,7 +25,6 @@ namespace RegistryDb.Models.Entities.Tenancies
         public int? IdRentTypeCategory { get; set; }
         public int IdEmployer { get; set; }
         public int? IdWarrant { get; set; }
-        public int? IdAccount { get; set; }
         public string RegistrationNum { get; set; }
         public DateTime? RegistrationDate { get; set; }
         public DateTime? IssueDate { get; set; }
@@ -41,8 +40,6 @@ namespace RegistryDb.Models.Entities.Tenancies
         public DateTime? SubTenancyDate { get; set; }
         public string SubTenancyNum { get; set; }
         public byte Deleted { get; set; }
-
-        public virtual KumiAccount IdAccountNavigation { get; set; } // DELETE
         public virtual IList<KumiAccountsTenancyProcessesAssoc> AccountsTenancyProcessesAssoc { get; set; }
         public virtual TenancyActiveProcess TenancyActiveContractNavigation { get; set; }
         public virtual RentTypeCategory IdRentTypeCategoryNavigation { get; set; }

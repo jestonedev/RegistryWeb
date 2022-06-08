@@ -205,12 +205,13 @@ namespace RegistryWeb.DataServices
             var tenancyPersons = new List<TenancyPerson>();
             if (idAccountKumi != null)
             {
-                var tenancyProcesses = (from tpRow in registryContext.TenancyProcesses
-                                    .Where(tp => (tp.RegistrationNum == null || !tp.RegistrationNum.Contains("н")) && tp.IdAccount == idAccountKumi)
+                var tenancyProcesses = (from tpRow in registryContext.TenancyProcesses.Include(tp => tp.AccountsTenancyProcessesAssoc)
+                                    .Where(tp => (tp.RegistrationNum == null || !tp.RegistrationNum.Contains("н")) &&
+                                        tp.AccountsTenancyProcessesAssoc.Count(atpa => atpa.IdAccount == idAccountKumi) > 0)
                                      select tpRow).ToList();
                 if (tenancyProcesses.Any())
                 {
-                    var idProcess = tenancyProcesses.OrderByDescending(tp => new { tp.RegistrationDate, tp.IdProcess }).First().IdProcess;
+                    var idProcess = tenancyProcesses.OrderByDescending(tp => tp.RegistrationDate).ThenByDescending(tp => tp.IdProcess) .First().IdProcess;
                     tenancyPersons = registryContext.TenancyPersons.Where(tp => tp.IdProcess == idProcess && tp.ExcludeDate == null).ToList();
                 }
             } else

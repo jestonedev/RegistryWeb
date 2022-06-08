@@ -267,7 +267,8 @@ namespace RegistryWeb.Controllers
             if (!filterOptions.IsTenancyEmpty())
             {
                 var tenancies = tenancyProcessesDataService.GetTenancyProcesses(filterOptions);
-                accountsResult = tenancies.Where(r => r.IdAccount != null).Select(r => r.IdAccountNavigation);
+                accountsResult = tenancies.Where(r => r.AccountsTenancyProcessesAssoc.Count() > 0)
+                    .SelectMany(r => r.AccountsTenancyProcessesAssoc.Select(atpa => atpa.AccountNavigation));
             }
 
             if(!filterOptions.IsAccountEmpty())

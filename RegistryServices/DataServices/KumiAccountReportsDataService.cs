@@ -37,7 +37,7 @@ namespace RegistryWeb.DataServices
                     equals new { maxDatePaymentsRow.IdAccount, maxDatePaymentsRow.EndDate }
                     where row.IdAccount == idAccount
                     select  row).Include(c=> c.Account)
-                    .Include(c=> c.Account.TenancyProcesses)
+                    .Include(c=> c.Account.AccountsTenancyProcessesAssoc)
                     .FirstOrDefault();
         }
         public TenancyPerson  GetPersonPayment(List<TenancyProcess> processes)
@@ -51,8 +51,8 @@ namespace RegistryWeb.DataServices
 
         public Dictionary<string, object> GetInfoForReport(int idAccount)
         {
-            var processes = registryContext.TenancyProcesses
-                .Include(r => r.TenancyPersons).Where(r => r.IdAccount == idAccount).ToList();
+            var processes = registryContext.TenancyProcesses.Include(r => r.AccountsTenancyProcessesAssoc)
+                .Include(r => r.TenancyPersons).Where(r => r.AccountsTenancyProcessesAssoc.Count(atpa => atpa.IdAccount == idAccount) > 0).ToList();
             var activeProcesses = processes
                 .Where(r => r.TenancyPersons.Any(p => p.ExcludeDate == null || p.ExcludeDate > DateTime.Now)
                 && (r.RegistrationNum == null || !r.RegistrationNum.EndsWith("н")));

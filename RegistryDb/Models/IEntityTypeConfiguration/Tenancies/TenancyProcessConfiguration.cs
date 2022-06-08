@@ -73,10 +73,6 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Tenancies
                 .HasColumnName("id_warrant")
                 .HasColumnType("int(11)");
 
-            builder.Property(e => e.IdAccount)
-                .HasColumnName("id_account")
-                .HasColumnType("int(11)");
-
             builder.Property(e => e.IssueDate)
                 .HasColumnName("issue_date")
                 .HasColumnType("date");
@@ -140,11 +136,6 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Tenancies
                 .WithMany(p => p.TenancyProcesses)
                 .HasForeignKey(d => d.IdExecutor)
                 .HasConstraintName("FK_tenancy_contracts_executors_id_executor");
-
-            builder.HasOne(d => d.IdAccountNavigation)
-                .WithMany(p => p.TenancyProcesses)
-                .HasForeignKey(d => d.IdAccount)
-                .HasConstraintName("FK_tenancy_processes_id_account");
 
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);

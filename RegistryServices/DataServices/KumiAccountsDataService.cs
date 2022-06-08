@@ -430,8 +430,9 @@ namespace RegistryWeb.DataServices
             var tenancyPersons = new List<TenancyPerson>();
             if (idAccount != null)
             {
-                var tenancyProcesses = (from tpRow in registryContext.TenancyProcesses
-                                    .Where(tp => (tp.RegistrationNum == null || !tp.RegistrationNum.Contains("н")) && tp.IdAccount == idAccount)
+                var tenancyProcesses = (from tpRow in registryContext.TenancyProcesses.Include(tp => tp.AccountsTenancyProcessesAssoc)
+                                    .Where(tp => (tp.RegistrationNum == null || !tp.RegistrationNum.Contains("н")) && 
+                                         tp.AccountsTenancyProcessesAssoc.Count(atpa => atpa.IdAccount == idAccount) > 0)
                                         select tpRow).ToList();
                 if (tenancyProcesses.Any())
                 {
@@ -1116,13 +1117,13 @@ namespace RegistryWeb.DataServices
             var emailsDic = new Dictionary<int, List<string>>();
             foreach (var account in accounts)
             {
-                var processes = account.TenancyProcesses;
+                var processes = account.AccountsTenancyProcessesAssoc.Select(r => r.IdProcess);
 
                 List<string> emails = new List<string>();
                 foreach (var tp in processes)
                 {
                     var curEmails = registryContext.TenancyPersons
-                        .Where(per => per.IdProcess == tp.IdProcess && per.Email != null)
+                        .Where(per => per.IdProcess == tp && per.Email != null)
                         .Select(per => per.Email)
                         .ToList();
                     emails.AddRange(curEmails);
@@ -1162,7 +1163,7 @@ namespace RegistryWeb.DataServices
         private IQueryable<KumiAccount> GetQuery()
         {
             return registryContext.KumiAccounts
-                .Include(r => r.TenancyProcesses)
+                .Include(r => r.AccountsTenancyProcessesAssoc)
                 .Include(r => r.Claims)
                 .Include(r => r.Charges)
                 .Include(r => r.State);
@@ -1170,7 +1171,7 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<KumiAccount> GetQueryIncludes(IQueryable<KumiAccount> query)
         {
-            return query.Include(r => r.TenancyProcesses)
+            return query.Include(r => r.AccountsTenancyProcessesAssoc)
                 .Include(r => r.Claims)
                 .Include(r => r.Charges);
         }
@@ -1205,18 +1206,21 @@ namespace RegistryWeb.DataServices
 
             var buildingsAssoc = registryContext.TenancyBuildingsAssoc
                 .Include(b => b.BuildingNavigation)
-                .Include(t => t.ProcessNavigation);
+                .Include(t => t.ProcessNavigation)
+                .ThenInclude(p => p.AccountsTenancyProcessesAssoc);
 
             var premisesAssoc = registryContext.TenancyPremisesAssoc
                 .Include(p => p.PremiseNavigation)
                 .ThenInclude(b => b.IdBuildingNavigation)
-                .Include(t => t.ProcessNavigation);
+                .Include(t => t.ProcessNavigation)
+                .ThenInclude(p => p.AccountsTenancyProcessesAssoc);
 
             var subPremisesAssoc = registryContext.TenancySubPremisesAssoc
                 .Include(sp => sp.SubPremiseNavigation)
                 .ThenInclude(p => p.IdPremisesNavigation)
                 .ThenInclude(b => b.IdBuildingNavigation)
-                .Include(t => t.ProcessNavigation);
+                .Include(t => t.ProcessNavigation)
+                .ThenInclude(p => p.AccountsTenancyProcessesAssoc);
 
             IEnumerable<int> idAccounts = new List<int>();
             var filtered = false;
@@ -1225,29 +1229,35 @@ namespace RegistryWeb.DataServices
             {
                 var streets = filterOptions.Address.AddressType == AddressTypes.Street ? addresses : new List<string> { filterOptions.IdStreet };
                 var idBuildingAccounts = buildingsAssoc
-                    .Where(oba => streets.Contains(oba.BuildingNavigation.IdStreet) && oba.ProcessNavigation.IdAccount != null)
-                    .Select(oba => oba.ProcessNavigation.IdAccount.Value);
+                    .Where(oba => streets.Contains(oba.BuildingNavigation.IdStreet) && 
+                        oba.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(oba => oba.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 var idPremiseAccounts = premisesAssoc
-                    .Where(opa => streets.Contains(opa.PremiseNavigation.IdBuildingNavigation.IdStreet) && opa.ProcessNavigation.IdAccount != null)
-                    .Select(opa => opa.ProcessNavigation.IdAccount.Value);
+                    .Where(opa => streets.Contains(opa.PremiseNavigation.IdBuildingNavigation.IdStreet) && 
+                        opa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(opa => opa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 var idSubPremiseAccounts = subPremisesAssoc
-                    .Where(ospa => streets.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet) && ospa.ProcessNavigation.IdAccount != null)
-                    .Select(ospa => ospa.ProcessNavigation.IdAccount.Value);
+                    .Where(ospa => streets.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet) && 
+                        ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 idAccounts = idBuildingAccounts.Union(idPremiseAccounts.Union(idSubPremiseAccounts));
                 filtered = true;
             } else
             if (!string.IsNullOrEmpty(filterOptions.IdRegion))
             {
                 var idBuildingAccounts = buildingsAssoc
-                    .Where(oba => oba.BuildingNavigation.IdStreet.StartsWith(filterOptions.IdRegion) && oba.ProcessNavigation.IdAccount != null)
-                    .Select(oba => oba.ProcessNavigation.IdAccount.Value);
+                    .Where(oba => oba.BuildingNavigation.IdStreet.StartsWith(filterOptions.IdRegion) && 
+                        oba.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(oba => oba.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 var idPremiseAccounts = premisesAssoc
-                    .Where(opa => opa.PremiseNavigation.IdBuildingNavigation.IdStreet.StartsWith(filterOptions.IdRegion) && opa.ProcessNavigation.IdAccount != null)
-                    .Select(opa => opa.ProcessNavigation.IdAccount.Value);
+                    .Where(opa => opa.PremiseNavigation.IdBuildingNavigation.IdStreet.StartsWith(filterOptions.IdRegion) && 
+                        opa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(opa => opa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 var idSubPremiseAccounts = subPremisesAssoc
                     .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation
-                    .IdBuildingNavigation.IdStreet.StartsWith(filterOptions.IdRegion) && ospa.ProcessNavigation.IdAccount != null)
-                    .Select(ospa => ospa.ProcessNavigation.IdAccount.Value);
+                    .IdBuildingNavigation.IdStreet.StartsWith(filterOptions.IdRegion) && 
+                        ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 idAccounts = idBuildingAccounts.Union(idPremiseAccounts.Union(idSubPremiseAccounts));
                 filtered = true;
             }
@@ -1260,14 +1270,14 @@ namespace RegistryWeb.DataServices
                     addressesInt = new List<int> { filterOptions.IdBuilding.Value };
                 }
                 var idBuildingAccounts = buildingsAssoc
-                    .Where(oba => addressesInt.Contains(oba.IdBuilding) && oba.ProcessNavigation.IdAccount != null)
-                    .Select(oba => oba.ProcessNavigation.IdAccount.Value);
+                    .Where(oba => addressesInt.Contains(oba.IdBuilding) && oba.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(oba => oba.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 var idPremiseAccounts = premisesAssoc
-                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdBuilding) && opa.ProcessNavigation.IdAccount != null)
-                    .Select(opa => opa.ProcessNavigation.IdAccount.Value);
+                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdBuilding) && opa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(opa => opa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 var idSubPremiseAccounts = subPremisesAssoc
-                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuilding) && ospa.ProcessNavigation.IdAccount != null)
-                    .Select(ospa => ospa.ProcessNavigation.IdAccount.Value);
+                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuilding) && ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 idAccounts = idBuildingAccounts.Union(idPremiseAccounts.Union(idSubPremiseAccounts));
                 filtered = true;
             }
@@ -1278,11 +1288,11 @@ namespace RegistryWeb.DataServices
                     addressesInt = new List<int> { filterOptions.IdPremises.Value };
                 }
                 var idPremiseAccounts = premisesAssoc
-                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdPremises) && opa.ProcessNavigation.IdAccount != null)
-                    .Select(opa => opa.ProcessNavigation.IdAccount.Value);
+                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdPremises) && opa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(opa => opa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 var idSubPremiseAccounts = subPremisesAssoc
-                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdPremises) && ospa.ProcessNavigation.IdAccount != null)
-                    .Select(ospa => ospa.ProcessNavigation.IdAccount.Value);
+                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdPremises) && ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
                 filtered = true;
             }
@@ -1293,8 +1303,8 @@ namespace RegistryWeb.DataServices
                     addressesInt = new List<int> { filterOptions.IdSubPremises.Value };
                 }
                 idAccounts = subPremisesAssoc
-                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdSubPremises) && ospa.ProcessNavigation.IdAccount != null)
-                    .Select(ospa => ospa.ProcessNavigation.IdAccount.Value);
+                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdSubPremises) && ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 filtered = true;
             }
             if (filtered)
@@ -1306,16 +1316,17 @@ namespace RegistryWeb.DataServices
             if (!string.IsNullOrEmpty(filterOptions.House))
             {
                 var idBuildingAccounts = buildingsAssoc
-                   .Where(oba => oba.BuildingNavigation.House.ToLowerInvariant().Equals(filterOptions.House.ToLowerInvariant()) && oba.ProcessNavigation.IdAccount != null)
-                   .Select(oba => oba.ProcessNavigation.IdAccount.Value);
+                   .Where(oba => oba.BuildingNavigation.House.ToLowerInvariant().Equals(filterOptions.House.ToLowerInvariant()) 
+                        && oba.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                   .SelectMany(oba => oba.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 var idPremiseAccounts = premisesAssoc
                     .Where(opa => opa.PremiseNavigation.IdBuildingNavigation.House.ToLowerInvariant().Equals(filterOptions.House.ToLowerInvariant())
-                        && opa.ProcessNavigation.IdAccount != null)
-                    .Select(opa => opa.ProcessNavigation.IdAccount.Value);
+                        && opa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(opa => opa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 var idSubPremiseAccounts = subPremisesAssoc
                     .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.House.ToLowerInvariant().Equals(filterOptions.House.ToLowerInvariant())
-                        && ospa.ProcessNavigation.IdAccount != null)
-                    .Select(ospa => ospa.ProcessNavigation.IdAccount.Value);
+                        && ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 query = from q in query
                         join idAccount in idBuildingAccounts.Union(idPremiseAccounts.Union(idSubPremiseAccounts)) on q.IdAccount equals idAccount
                         select q;
@@ -1324,12 +1335,12 @@ namespace RegistryWeb.DataServices
             {
                 var idPremiseAccounts = premisesAssoc
                     .Where(opa => opa.PremiseNavigation.PremisesNum.ToLowerInvariant().Equals(filterOptions.PremisesNum.ToLowerInvariant())
-                        && opa.ProcessNavigation.IdAccount != null)
-                    .Select(opa => opa.ProcessNavigation.IdAccount.Value);
+                        && opa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(opa => opa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 var idSubPremiseAccounts = subPremisesAssoc
                     .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.PremisesNum.ToLowerInvariant().Equals(filterOptions.PremisesNum.ToLowerInvariant())
-                        && ospa.ProcessNavigation.IdAccount != null)
-                    .Select(ospa => ospa.ProcessNavigation.IdAccount.Value);
+                        && ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
+                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
                 query = from q in query
                         join idAccount in idPremiseAccounts.Union(idSubPremiseAccounts) on q.IdAccount equals idAccount
                         select q;
@@ -1359,8 +1370,9 @@ namespace RegistryWeb.DataServices
             {
                 var tenantParts = filterOptions.Tenant.Split(' ', 3);
                 var surname = tenantParts[0].ToLowerInvariant();
-                var tenancyPersons = registryContext.TenancyPersons.Include(tp => tp.IdProcessNavigation)
-                    .Where(tp => tp.IdProcessNavigation.IdAccount != null && tp.Surname.Contains(surname));
+                var tenancyPersons = registryContext.TenancyPersons.Include(tp => tp.IdProcessNavigation).ThenInclude(tp => tp.AccountsTenancyProcessesAssoc)
+                    .Where(tp => tp.IdProcessNavigation.AccountsTenancyProcessesAssoc != null && 
+                    tp.IdProcessNavigation.AccountsTenancyProcessesAssoc.Count() > 0 && tp.Surname.Contains(surname));
                 if (tenantParts.Length > 1)
                 {
                     var name = tenantParts[1].ToLowerInvariant();
@@ -1372,7 +1384,7 @@ namespace RegistryWeb.DataServices
                     tenancyPersons = tenancyPersons.Where(tp => tp.Patronymic.Contains(patronymic));
                 }
 
-                var idAccounts = tenancyPersons.Select(tp => tp.IdProcessNavigation.IdAccount.Value).Distinct().ToList();
+                var idAccounts = tenancyPersons.SelectMany(tp => tp.IdProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount)).Distinct().ToList();
 
                 query = query.Where(a => idAccounts.Contains(a.IdAccount));
             }
@@ -1427,8 +1439,9 @@ namespace RegistryWeb.DataServices
             {
                 return query;
             }
-            var idAccounts = registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons)
-                    .Where(r => r.TenancyPersons.Any(p => p.Email != null) && r.IdAccount != null).Select(r => r.IdAccount.Value);
+            var idAccounts = registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons).Include(tp => tp.AccountsTenancyProcessesAssoc)
+                    .Where(r => r.TenancyPersons.Count(p => p.Email != null) > 0 && r.AccountsTenancyProcessesAssoc.Count() > 0)
+                    .SelectMany(r => r.AccountsTenancyProcessesAssoc.Select(atpa => atpa.IdAccount));
 
             query = query.Where(r => idAccounts.Contains(r.IdAccount));
             return query;
@@ -1498,7 +1511,7 @@ namespace RegistryWeb.DataServices
                 case 5:
                     // Лицевые счета без привязки к найму
                     query = from row in query
-                            where !row.TenancyProcesses.Any()
+                            where !row.AccountsTenancyProcessesAssoc.Any()
                             select row;
                     break;
                 case 6:
@@ -1507,22 +1520,22 @@ namespace RegistryWeb.DataServices
                                                where row.ExcludeDate == null || row.ExcludeDate > DateTime.Now
                                                select row.IdProcess).Distinct();
 
-                    var actualAccountIds = (from row in registryContext.TenancyProcesses
+                    var actualAccountIds = (from row in registryContext.TenancyProcesses.Include(r => r.AccountsTenancyProcessesAssoc)
                                             join idProcess in idProcessWithTenants
                                             on row.IdProcess equals idProcess
-                                            where (row.RegistrationNum == null || !row.RegistrationNum.EndsWith("н")) && row.IdAccount != null
-                                            select row.IdAccount).ToList();
+                                            where (row.RegistrationNum == null || !row.RegistrationNum.EndsWith("н")) && row.AccountsTenancyProcessesAssoc.Count() > 0
+                                            select row).SelectMany(r => r.AccountsTenancyProcessesAssoc.Select(atpa => atpa.IdAccount)).ToList();
                     if (filterOptions.IdPreset == 6)
                     {
                         // Действующие лицевые счета без действующих наймов
                         query = from row in query
-                                where row.TenancyProcesses.Any() && row.IdState == 1 && !actualAccountIds.Contains(row.IdAccount)
+                                where row.AccountsTenancyProcessesAssoc.Any() && row.IdState == 1 && !actualAccountIds.Contains(row.IdAccount)
                                 select row;
                     } else
                     {
                         // Аннулированные лицевые счета с действующими наймами
                         query = from row in query
-                                where row.TenancyProcesses.Any() && row.IdState == 2 && actualAccountIds.Contains(row.IdAccount)
+                                where row.AccountsTenancyProcessesAssoc.Any() && row.IdState == 2 && actualAccountIds.Contains(row.IdAccount)
                                 select row;
                     }
                     break;
@@ -1858,7 +1871,7 @@ namespace RegistryWeb.DataServices
         public KumiAccount GetKumiAccount(int idAccount)
         {
             var account = registryContext.KumiAccounts
-                .Include(r => r.TenancyProcesses)
+                .Include(r => r.AccountsTenancyProcessesAssoc)
                 .Include(r => r.Charges)
                 .Include(r => r.Claims)
                 .SingleOrDefault(a => a.IdAccount == idAccount);
@@ -1883,7 +1896,6 @@ namespace RegistryWeb.DataServices
             var accountTenancyAssocs = account.AccountsTenancyProcessesAssoc;
             account.Charges = null;
             account.Claims = null;
-            account.TenancyProcesses = null;
             account.AccountsTenancyProcessesAssoc = null;
             account.State = null;
             registryContext.KumiAccounts.Add(account);
@@ -1896,7 +1908,6 @@ namespace RegistryWeb.DataServices
             var accountTenancyAssocs = account.AccountsTenancyProcessesAssoc;
             account.Charges = null;
             account.Claims = null;
-            account.TenancyProcesses = null;
             account.AccountsTenancyProcessesAssoc = null;
             account.State = null;
             if (account.IdState == 2)
