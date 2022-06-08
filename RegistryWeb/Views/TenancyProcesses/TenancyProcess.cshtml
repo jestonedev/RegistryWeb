@@ -1,5 +1,6 @@
 ﻿@using RegistryWeb.Extensions
 @using RegistryWeb.Enums;
+@using RegistryDb.Models.Entities.KumiAccounts;
 @model RegistryServices.ViewModel.Tenancies.TenancyProcessVM;
 @{
 
@@ -180,7 +181,7 @@
             </div>
 
             <div class="row">
-                <div class="form-group col-md-4 mb-2">
+                <div class="form-group col-md-3 mb-2">
                     <label class="mb-1" asp-for="TenancyProcess.IdRentType">Тип найма жилья</label>
                     <select class="selectpicker form-control" asp-for="TenancyProcess.IdRentType" asp-items="@(new SelectList(Model.RentTypes, "IdRentType", "RentTypeName"))"
                             title="Тип найма жилья" data-val="true" data-val-required="Выберите тип найма жилья">
@@ -188,7 +189,7 @@
                     </select>
                     <span asp-validation-for="TenancyProcess.IdRentType" class="text-danger"></span>
                 </div>
-                <div class="form-group col-md-4 mb-2">
+                <div class="form-group col-md-3 mb-2">
                     <label class="mb-1" asp-for="TenancyProcess.IdExecutor">Исполнитель/составитель</label>
                     <select class="selectpicker form-control" asp-for="TenancyProcess.IdExecutor" title="Исполнитель/составитель"
                             data-val="true" data-val-required="Выберите исполнителя/составителя">
@@ -213,24 +214,72 @@
                     </select>
                     <span asp-validation-for="TenancyProcess.IdExecutor" class="text-danger"></span>
                 </div>
-                <div class="form-group col-md-4 mb-2">
-                    <input type="hidden" asp-for="TenancyProcess.IdAccount" />
-                    <label class="mb-1" asp-for="TenancyProcess.IdAccount">Лицевой счет</label>
-                    @if ((ViewBag.Action == "Details" || ViewBag.Action == "Delete") && Model.TenancyProcess.IdAccount != null)
+                @{
+                    if(Model.TenancyProcess.AccountsTenancyProcessesAssoc == null)
                     {
-                        <div class="input-group">
-                            <input class="form-control" type="text" asp-for="TenancyProcess.IdAccountNavigation.Account" title="Номер лицевого счета" />
-                            <a class="btn btn-outline-secondary rr-tenancy-account-btn" title="Карточка лицевого счета" target="_blank" asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@Model.TenancyProcess.IdAccount">
-                                <span class="oi oi-eye"></span>
-                            </a>
-                        </div>
+                        Model.TenancyProcess.AccountsTenancyProcessesAssoc = new List<KumiAccountsTenancyProcessesAssoc>();
                     }
-                    else
+                    Model.TenancyProcess.AccountsTenancyProcessesAssoc.Add(new KumiAccountsTenancyProcessesAssoc
                     {
-                        <input type="text" class="form-control" asp-for="TenancyProcess.IdAccountNavigation.Account" title="Номер лицевого счета">
+                        Fraction = 1.0000m
+                    });
+                    if (Model.TenancyProcess.AccountsTenancyProcessesAssoc.Count < 2)
+                    {
+                        Model.TenancyProcess.AccountsTenancyProcessesAssoc.Add(new KumiAccountsTenancyProcessesAssoc
+                        {
+                            Fraction = 1.0000m
+                        });
                     }
-
-                </div>
+                }
+                
+                @for (var i = 0; i < Model.TenancyProcess.AccountsTenancyProcessesAssoc.Count; i++)
+                {
+                    <div class="form-group rr-account col-md-6 mb-2 @(i > 0 ? "offset-md-6" : "") @(Model.TenancyProcess.AccountsTenancyProcessesAssoc.Count - 1 == i ? "d-none" : "")">
+                        <input type="hidden" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].IdAssoc" />
+                        <input type="hidden" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].IdAccount" />
+                        <label class="mb-1 @(i > 0 ? "d-none" : "")" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].IdAccount">Лицевой счет / Доля</label>
+                        @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+                        {
+                            @if(Model.TenancyProcess.AccountsTenancyProcessesAssoc[i].IdAccount != 0)
+                            { 
+                                <div class="input-group">
+                                    <input class="form-control" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].AccountNavigation.Account" title="Номер лицевого счета" />
+                                    <input class="form-control input-fraction" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].Fraction" title="Доля" />
+                                    <div class="input-group-append">
+                                        <a class="btn btn-outline-secondary rr-tenancy-account-view-btn" title="Карточка лицевого счета" target="_blank" asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@Model.TenancyProcess.AccountsTenancyProcessesAssoc[i].IdAccount">
+                                            <span class="oi oi-eye"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            } else
+                            {
+                                <div class="input-group">
+                                    <input class="form-control" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].AccountNavigation.Account" title="Номер лицевого счета" />
+                                    <input class="form-control input-fraction" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].Fraction" value="" title="Доля" />
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="input-group">
+                                <input class="form-control" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].AccountNavigation.Account" title="Номер лицевого счета" />
+                                <input class="form-control input-fraction" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].Fraction" title="Доля" />
+                                <div class="input-group-append">
+                                    <button title="Удалить лицевой счет" class="btn btn-danger rr-tenancy-account-delete-btn" type="button">
+                                        <span class="oi oi-trash"></span>
+                                    </button>
+                                    <button title="Добавить лицевой счет" class="btn btn-success rr-tenancy-account-add-btn @(i == 0 ? "" : "d-none")" type="button">
+                                        <span class="oi oi-plus"></span>
+                                    </button>
+                                    @if (i > 0)
+                                    {
+                                        <span class="input-group-text rr-account-append-span"></span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
             <div class="row">
                 @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
@@ -376,6 +425,7 @@
 @section Scripts {
     <script src="~/js/tenancyProcess.common.js" asp-append-version="true"></script>
     <script src="~/js/tenancyProcess.reports.js" asp-append-version="true"></script>
+    <script src="~/js/tenancyProcess.accounts.js" asp-append-version="true"></script>
     <script src="~/lib/bootstrap4-toggle/js/bootstrap4-toggle.min.js"></script>
     @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete" || (ViewBag.Action == "Edit" && !(ViewBag.CanEditBaseInfo ?? false)))
     {

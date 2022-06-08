@@ -35,7 +35,6 @@ namespace RegistryWeb.SecurityServices
 
         public bool HasPrivilege(Privileges privilege)
         {
-            //return Privileges.Any(p => p.PrivilegeMask == (uint)privilege);
             return (PrivelegesFlagValue & (long)privilege) == (long)privilege;
         }
 
