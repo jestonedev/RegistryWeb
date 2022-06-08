@@ -245,5 +245,16 @@ namespace RegistryWeb.ReportServices
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
+
+        internal byte[] ClaimDateReferralCcoBailiffs(DateTime startDate, DateTime endDate)
+        {
+            var arguments = new Dictionary<string, object> {
+                { "date_from", startDate.ToString("dd.MM.yyyy") },
+                { "date_to", endDate.ToString("dd.MM.yyyy") }
+            };
+            var fileName = "registry\\claims\\date_referral_cco_bailiffs";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
     }
 }
