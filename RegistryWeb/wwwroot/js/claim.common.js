@@ -155,8 +155,14 @@ $(function () {
         }
     });
 
-    $("#createBtn, #editBtn, #deleteBtn").on("click", function () {
+    $("#createBtn, #editBtn").on("click", function () {
         form.submit();
+    });
+
+    $("#deleteBtn").on("click", function (e) {
+        if (!$(this).hasClass("disabled"))
+            form.submit();
+        e.preventDefault();
     });
 
     $("#ClaimAmount .decimal").on("focusout", function () {

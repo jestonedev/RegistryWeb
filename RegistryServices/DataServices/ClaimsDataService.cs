@@ -326,11 +326,13 @@ namespace RegistryWeb.DataServices
 
         public void Delete(int idClaim)
         {
-            var claims = registryContext.Claims
+            var claim = registryContext.Claims
+                    .Include(r => r.PaymentClaims)
                     .FirstOrDefault(op => op.IdClaim == idClaim);
-            if (claims != null)
+            if (claim != null)
             {
-                claims.Deleted = 1;
+                if (claim.PaymentClaims.Any()) throw new Exception("Нельзя удалить претензионно-исковую работу, на которую распределены платежи");
+                claim.Deleted = 1;
                 registryContext.SaveChanges();
             }
         }
@@ -1161,6 +1163,7 @@ namespace RegistryWeb.DataServices
                 .Include(r => r.ClaimPersons)
                 .Include(r => r.ClaimFiles)
                 .Include(r => r.ClaimCourtOrders)
+                .Include(r => r.PaymentClaims)
                 .FirstOrDefault(r => r.IdClaim == idClaim);
         }
 

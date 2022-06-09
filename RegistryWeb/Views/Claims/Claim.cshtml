@@ -158,7 +158,7 @@
                 }
                 @if (ViewBag.Action == "Delete")
                 {
-                    <input type="submit" value="Удалить" id="deleteBtn" class="form-control btn btn-danger" />
+                    <input type="submit" value="Удалить" id="deleteBtn" style="@(Model.Claim.PaymentClaims.Any() ? "cursor: initial" : "")" class="form-control btn btn-danger @(Model.Claim.PaymentClaims.Any() ? "disabled" : "")" />
                 }
 
                 <a href="#" data-for="Claim" class="form-control btn btn-primary claim-toggler" title="Развернуть исковую работу" style="font-weight:bold;">∧</a>
@@ -166,6 +166,11 @@
         </div>
     </div>
     <div class="card-body pt-3 pb-3 pl-3 pr-3" id="Claim">
+        @if (ViewBag.Action == "Delete" && (Model.Claim.PaymentClaims.Any()))
+        {
+            <div class="alert alert-danger text-center">Нельзя удалить претензионно-исковую работу, на которую распределены платежи.</div>
+        }
+
         <form asp-controller="Claims" asp-action="@ViewBag.Action" id="ClaimForm" data-action="@ViewBag.Action" data-persons-source-selected="0" autocomplete="off" method="post" enctype="multipart/form-data">
             <input type="hidden" asp-for="Claim.IdClaim" />
             <input type="hidden" asp-for="LoadPersonsSource" />
