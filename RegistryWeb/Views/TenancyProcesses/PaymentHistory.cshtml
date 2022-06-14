@@ -3,13 +3,14 @@
 @model List<PaymentHistoryVM>
 
 @{
-    ViewData["Title"] = "История изменения платы " + ViewBag.Title;
+    ViewData["Title"] = "История изменения коэффициентов оплаты " + ViewBag.Title;
     var history = Model.Where(r => r.TenancyPaymentHistory != null);
     var warningDescription = Model.FirstOrDefault(r => r.TenancyPaymentHistory == null)?.ObjectDescription;  // Уведомление об отсутствии платы за найм на текущий момент (по процессу найма)
     var target = (PaymentHistoryTarget)ViewBag.Target;
 }
 
 <h2>@ViewData["Title"]</h2>
+<p class="text-secondary">В расчете размера платы не учтена частичная аренда помещения (сдача в найм койко-места).<br />Указанный размер платы рассчитан исходя из фактической общей площади помещения.</p>
 
 @if (!string.IsNullOrEmpty(warningDescription))
 {

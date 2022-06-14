@@ -73,15 +73,16 @@ namespace RegistryPaymentCalculator
                         ConsoleLogger.Log(string.Format("Выставление начисления по ЛС {0}", account.Account));
                         var startCalcDate = service.GetAccountStartCalcDate(account);
                         if (startCalcDate == null) continue;
-                        var chargingInfo = service.CalcChargesInfo(account, startCalcDate.Value, endCalcDate);
+                        var dbChargingInfo = service.GetDbChargingInfo(account);
+                        startRewriteDate = service.CorrectStartRewriteDate(startRewriteDate, startCalcDate.Value, dbChargingInfo);
+
+                        var chargingInfo = service.CalcChargesInfo(account, startCalcDate.Value, endCalcDate, startRewriteDate);
                         var recalcInsertIntoCharge = new KumiCharge();
                         if (chargingInfo.Any())
                         {
                             recalcInsertIntoCharge = chargingInfo.Last();
                         }
                         
-                        var dbChargingInfo = service.GetDbChargingInfo(account);
-                        startRewriteDate = service.CorrectStartRewriteDate(startRewriteDate, startCalcDate.Value, dbChargingInfo);
                         service.CalcRecalcInfo(account, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, endCalcDate, startRewriteDate);
                         service.UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate);
                     } catch(Exception e)

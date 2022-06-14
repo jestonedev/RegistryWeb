@@ -938,7 +938,7 @@ namespace RegistryWeb.DataServices
                                                         paymentRow.K2,
                                                         paymentRow.K3,
                                                         paymentRow.KC,
-                                                        paymentRow.RentArea
+                                                        RentArea = tpaRow.RentTotalArea == null ? paymentRow.RentArea : tpaRow.RentTotalArea
                                                     };
 
             var paymentsAfter28082019Premises = (from paymentRow in prePaymentsAfter28082019Premises
@@ -946,7 +946,7 @@ namespace RegistryWeb.DataServices
                                                      on paymentRow.IdProcess equals tpRow.IdProcess
                                                  where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
                                                    tpRow.TenancyPersons.Any()
-                                                 select paymentRow).Distinct().ToList();
+                                                 select paymentRow).ToList();
 
             var prePaymentsAfter28082019SubPremises = from tspaRow in registryContext.TenancySubPremisesAssoc
                                                        join paymentRow in registryContext.TenancyPaymentsAfter28082019
@@ -961,7 +961,7 @@ namespace RegistryWeb.DataServices
                                                            paymentRow.K2,
                                                            paymentRow.K3,
                                                            paymentRow.KC,
-                                                           paymentRow.RentArea
+                                                           RentArea = tspaRow.RentTotalArea == null ? paymentRow.RentArea : tspaRow.RentTotalArea
                                                        };
 
             var paymentsAfter28082019SubPremises = (from paymentRow in prePaymentsAfter28082019SubPremises
@@ -969,7 +969,7 @@ namespace RegistryWeb.DataServices
                                                         on paymentRow.IdProcess equals tpRow.IdProcess
                                                     where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
                                                       tpRow.TenancyPersons.Any()
-                                                    select paymentRow).Distinct().ToList();
+                                                    select paymentRow).ToList();
 
             foreach(var payment in payments)
             {
@@ -993,13 +993,14 @@ namespace RegistryWeb.DataServices
                         IdObject = payment.IdPremises.Value,
                         AddresType = AddressTypes.Premise
                     };
+                    paymentsInfo.Add(paymentItem);
                 }
                 paymentItem.Nb = payment.Hb;
                 paymentItem.KC = payment.KC;
                 paymentItem.K1 = payment.K1;
                 paymentItem.K2 = payment.K2;
                 paymentItem.K3 = payment.K3;
-                paymentItem.PaymentAfter28082019 = Math.Round((payment.K1 + payment.K2 + payment.K3) / 3 * payment.KC * payment.Hb * (decimal)payment.RentArea, 2);
+                paymentItem.PaymentAfter28082019 += Math.Round((payment.K1 + payment.K2 + payment.K3) / 3 * payment.KC * payment.Hb * (decimal)payment.RentArea, 2);
             }
             foreach (var payment in paymentsAfter28082019SubPremises)
             {
@@ -1012,13 +1013,14 @@ namespace RegistryWeb.DataServices
                         IdObject = payment.IdSubPremises.Value,
                         AddresType = AddressTypes.SubPremise
                     };
+                    paymentsInfo.Add(paymentItem);
                 }
                 paymentItem.Nb = payment.Hb;
                 paymentItem.KC = payment.KC;
                 paymentItem.K1 = payment.K1;
                 paymentItem.K2 = payment.K2;
                 paymentItem.K3 = payment.K3;
-                paymentItem.PaymentAfter28082019 = Math.Round((payment.K1 + payment.K2 + payment.K3) / 3 * payment.KC * payment.Hb * (decimal)payment.RentArea, 2);
+                paymentItem.PaymentAfter28082019 += Math.Round((payment.K1 + payment.K2 + payment.K3) / 3 * payment.KC * payment.Hb * (decimal)payment.RentArea, 2);
             }
             return paymentsInfo;
         }

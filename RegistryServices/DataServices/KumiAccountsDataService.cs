@@ -76,7 +76,7 @@ namespace RegistryWeb.DataServices
             return startRentDate.Value.AddDays(-startRentDate.Value.Day + 1);
         }
 
-        public List<KumiCharge> CalcChargesInfo(KumiAccountInfoForPaymentCalculator account, DateTime startDate, DateTime endDate)
+        public List<KumiCharge> CalcChargesInfo(KumiAccountInfoForPaymentCalculator account, DateTime startDate, DateTime endDate, DateTime startRewriteDate)
         {
             if (startDate > endDate) throw new ApplicationException(
                 string.Format("Дата начала расчета {0} превышает дату окончания завершенного периода {1}",
@@ -87,7 +87,7 @@ namespace RegistryWeb.DataServices
             while(startDate < endDate)
             {
                 var subEndDate = startDate.AddMonths(1).AddDays(-1);
-                var charge = CalcChargeInfo(account, startDate, subEndDate, charges, out bool outOfBound);
+                var charge = CalcChargeInfo(account, startDate, subEndDate, charges, startRewriteDate, out bool outOfBound);
                 if (!outOfBound)
                     charges.Add(charge);
                 startDate = startDate.AddMonths(1);
@@ -226,7 +226,7 @@ namespace RegistryWeb.DataServices
                 if (startCalcDate == null) continue;
                 if (startRewriteDate == null)
                     startRewriteDate = startCalcDate;
-                var chargingInfo = CalcChargesInfo(account, startCalcDate.Value, endCalcDate);
+                var chargingInfo = CalcChargesInfo(account, startCalcDate.Value, endCalcDate, startRewriteDate.Value);
                 var recalcInsertIntoCharge = new KumiCharge();
                 if (chargingInfo.Any()) recalcInsertIntoCharge = chargingInfo.Last();
 
@@ -509,7 +509,7 @@ namespace RegistryWeb.DataServices
         }
 
         public KumiCharge CalcChargeInfo(KumiAccountInfoForPaymentCalculator account, DateTime startDate, DateTime endDate,
-            List<KumiCharge> prevCharges, out bool outOfBound)
+            List<KumiCharge> prevCharges, DateTime startRewriteDate, out bool outOfBound)
         {
             var inputBalanceTenancy = account.CurrentBalanceTenancy;
             var inputBalancePenalty = account.CurrentBalancePenalty;
@@ -567,7 +567,7 @@ namespace RegistryWeb.DataServices
 
                 if (account.IdState == 1 || account.IdState == 3)
                 {
-                    chargePenalty = Math.Round(CalcPenalty(account.Charges, prevCharges, account.Claims, account.Payments, endDate), 2);
+                    chargePenalty = Math.Round(CalcPenalty(account.Charges, prevCharges, account.Claims, account.Payments, endDate, startRewriteDate), 2);
                 }
             }
 
@@ -608,7 +608,8 @@ namespace RegistryWeb.DataServices
             };
         }
 
-        private decimal CalcPenalty(List<KumiCharge> dbCharges, List<KumiCharge> charges, List<Claim> claims, List<KumiPayment> payments, DateTime? endDate)
+        private decimal CalcPenalty(List<KumiCharge> dbCharges, List<KumiCharge> charges, List<Claim> claims, 
+            List<KumiPayment> payments, DateTime? endDate, DateTime startRewriteDate)
         {
             var chargeIds = dbCharges.Select(r => r.IdCharge).ToList();
 
@@ -635,11 +636,13 @@ namespace RegistryWeb.DataServices
 
             var resultPayments = preparedClaims.Union(preparedPayments).ToList();
 
-            var resultCharges = charges.Where(r => r.EndDate <= endDate).Select(r => new KumiSumDateInfo
-            {
-                Date = r.EndDate,
-                Value = r.ChargeTenancy + r.RecalcTenancy
-            }).ToList();
+            var resultCharges =
+                dbCharges.Where(r => r.StartDate < startRewriteDate && r.EndDate <= endDate)
+                .Union(charges.Where(r => r.StartDate >= startRewriteDate && r.EndDate <= endDate)).Select(r => new KumiSumDateInfo
+                {
+                    Date = r.EndDate,
+                    Value = r.ChargeTenancy + r.RecalcTenancy
+                }).ToList();
 
             var penalty = 0m;
 
@@ -931,26 +934,41 @@ namespace RegistryWeb.DataServices
             {
                 foreach (var historyInfo in tenancyPaymentHistories[tenancyInfo.TenancyProcess.IdProcess])
                 {
+                    var rentArea = historyInfo.RentArea;
                     var payment = new RentPaymentForPaymentCalculator();
                     if (historyInfo.IdSubPremises != null)
                     {
                         payment.AddressType = AddressTypes.SubPremise;
                         payment.IdObject = historyInfo.IdSubPremises.Value;
+                        var rentObject = 
+                            tenancyInfo.RentObjects.FirstOrDefault(r => r.Address.AddressType == AddressTypes.SubPremise && r.Address.Id == payment.IdObject.ToString());
+                        if (rentObject != null && rentObject.RentArea != null)
+                            rentArea = rentObject.RentArea.Value;
                     }
                     else
                     if (historyInfo.IdPremises != null)
                     {
                         payment.AddressType = AddressTypes.Premise;
                         payment.IdObject = historyInfo.IdPremises.Value;
+                        var rentObject =
+                             tenancyInfo.RentObjects.FirstOrDefault(r => r.Address.AddressType == AddressTypes.Premise && r.Address.Id == payment.IdObject.ToString());
+                        if (rentObject != null && rentObject.RentArea != null)
+                            rentArea = rentObject.RentArea.Value;
                     }
                     else
                     {
                         payment.AddressType = AddressTypes.Building;
                         payment.IdObject = historyInfo.IdBuilding;
+                        var rentObject =
+                            tenancyInfo.RentObjects.FirstOrDefault(r => r.Address.AddressType == AddressTypes.Building && r.Address.Id == payment.IdObject.ToString());
+                        if (rentObject != null && rentObject.RentArea != null)
+                            rentArea = rentObject.RentArea.Value;
                     }
                     payment.FromDate = historyInfo.Date;
+
+                    
                     payment.Payment = Math.Round((historyInfo.K1 + historyInfo.K2 + historyInfo.K3) / 3
-                        * historyInfo.Kc * (decimal)historyInfo.RentArea * historyInfo.Hb * tenancyInfo.AccountAssoc.Fraction, 2);
+                        * historyInfo.Kc * (decimal)rentArea * historyInfo.Hb * tenancyInfo.AccountAssoc.Fraction, 2);
                     result.Add(payment);
                 }
             }
@@ -1747,7 +1765,7 @@ namespace RegistryWeb.DataServices
                                                          paymentRow.K2,
                                                          paymentRow.K3,
                                                          paymentRow.KC,
-                                                         paymentRow.RentArea
+                                                         RentArea = tbaRow.RentTotalArea == null ? paymentRow.RentArea : tbaRow.RentTotalArea
                                                      }).Distinct().ToList();
 
             var paymentsAfter28082019Buildings = (from paymentRow in prePaymentsAfter28082019Buildings
@@ -1770,7 +1788,7 @@ namespace RegistryWeb.DataServices
                                                         paymentRow.K2,
                                                         paymentRow.K3,
                                                         paymentRow.KC,
-                                                        paymentRow.RentArea
+                                                        RentArea = tpaRow.RentTotalArea == null ? paymentRow.RentArea : tpaRow.RentTotalArea
                                                     }).Distinct().ToList();
 
             var paymentsAfter28082019Premises = (from paymentRow in prePaymentsAfter28082019Premises
@@ -1793,7 +1811,7 @@ namespace RegistryWeb.DataServices
                                                            paymentRow.K2,
                                                            paymentRow.K3,
                                                            paymentRow.KC,
-                                                           paymentRow.RentArea
+                                                           RentArea = tspaRow.RentTotalArea == null ? paymentRow.RentArea : tspaRow.RentTotalArea
                                                        }).Distinct().ToList();
 
 
@@ -1810,28 +1828,28 @@ namespace RegistryWeb.DataServices
                 if (obj.RentObject.Address.AddressType == AddressTypes.Building)
                 {
                     obj.RentObject.Payment =
-                        payments.Where(r => r.IdBuilding.ToString() == obj.RentObject.Address.Id && r.IdPremises == null).Sum(r => r.Payment);
+                        payments.Where(r => r.IdProcess == obj.IdProcess && r.IdBuilding.ToString() == obj.RentObject.Address.Id && r.IdPremises == null).Sum(r => r.Payment);
                     obj.RentObject.PaymentAfter28082019 =
                        Math.Round(paymentsAfter28082019Buildings.Where(
-                            r => r.IdBuilding.ToString() == obj.RentObject.Address.Id
+                            r => r.IdProcess == obj.IdProcess && r.IdBuilding.ToString() == obj.RentObject.Address.Id
                             ).Sum(r => (r.K1 + r.K2 + r.K3) / 3 * r.KC * r.Hb * (decimal)r.RentArea), 2);
                 }
                 if (obj.RentObject.Address.AddressType == AddressTypes.Premise)
                 {
                     obj.RentObject.Payment =
-                        payments.Where(r => r.IdPremises.ToString() == obj.RentObject.Address.Id && r.IdSubPremises == null).Sum(r => r.Payment);
+                        payments.Where(r => r.IdProcess == obj.IdProcess && r.IdPremises.ToString() == obj.RentObject.Address.Id && r.IdSubPremises == null).Sum(r => r.Payment);
                     obj.RentObject.PaymentAfter28082019 =
                         Math.Round(paymentsAfter28082019Premises.Where(
-                            r => r.IdPremises.ToString() == obj.RentObject.Address.Id
+                            r => r.IdProcess == obj.IdProcess && r.IdPremises.ToString() == obj.RentObject.Address.Id
                             ).Sum(r => (r.K1 + r.K2 + r.K3) / 3 * r.KC * r.Hb * (decimal)r.RentArea), 2);
                 }
                 if (obj.RentObject.Address.AddressType == AddressTypes.SubPremise)
                 {
                     obj.RentObject.Payment =
-                        payments.Where(r => r.IdSubPremises.ToString() == obj.RentObject.Address.Id).Sum(r => r.Payment);
+                        payments.Where(r => r.IdProcess == obj.IdProcess && r.IdSubPremises.ToString() == obj.RentObject.Address.Id).Sum(r => r.Payment);
                     obj.RentObject.PaymentAfter28082019 =
                         Math.Round(paymentsAfter28082019SubPremises.Where(
-                            r => r.IdSubPremises.ToString() == obj.RentObject.Address.Id
+                            r => r.IdProcess == obj.IdProcess && r.IdSubPremises.ToString() == obj.RentObject.Address.Id
                             ).Sum(r => (r.K1 + r.K2 + r.K3) / 3 * r.KC * r.Hb * (decimal)r.RentArea), 2);
                 }
             }
