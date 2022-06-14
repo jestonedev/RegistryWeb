@@ -114,13 +114,13 @@
                         @if (Model.RefAccount != null)
                         {
                             var chargeIds = Model.RefAccount.Charges.Where(r => r.IdAccount == Model.RefAccount.IdAccount).Select(r => r.IdCharge).ToList();
-                            var claimIds = Model.RefAccount.Claims.Where(r => r.IdAccountKumi == Model.RefAccount.IdAccount).Select(r => r.IdClaim).ToList();
-                            var charges = item.PaymentCharges.Where(r => chargeIds.Contains(r.IdCharge));
+                            var charges = item.PaymentCharges.Where(r => Model.FilterOptions.IdCharge == null ? chargeIds.Contains(r.IdCharge) : r.IdDisplayCharge == Model.FilterOptions.IdCharge);
                             <br />
                             <span class="text-danger"><b>Из них расп. по ЛС:</b></span><br />
                             <span class="text-danger">найм @charges.Sum(r => r.TenancyValue) руб., пени @charges.Sum(r => r.PenaltyValue) руб.</span>
                             <br />
-                            @foreach (var claim in item.PaymentClaims.Where(r => claimIds.Contains(r.IdClaim)).GroupBy(r => r.IdClaim))
+                            var claimIds = Model.RefAccount.Claims.Where(r => r.IdAccountKumi == Model.RefAccount.IdAccount).Select(r => r.IdClaim).ToList();
+                            @foreach (var claim in item.PaymentClaims.Where(r => Model.FilterOptions.IdCharge == null ? claimIds.Contains(r.IdClaim) : r.IdDisplayCharge == Model.FilterOptions.IdCharge).GroupBy(r => r.IdClaim))
                             {
                                 <span class="text-danger">
                                     <b>

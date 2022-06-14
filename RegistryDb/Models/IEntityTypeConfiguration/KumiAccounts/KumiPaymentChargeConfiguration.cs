@@ -50,11 +50,18 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("decimal(12,2)")
                 .IsRequired();
 
+            builder.Property(e => e.IdDisplayCharge)
+                .HasColumnName("id_display_charge")
+                .HasColumnType("int(11)");
+
             builder.HasOne(e => e.Payment).WithMany(e => e.PaymentCharges)
                 .HasForeignKey(e => e.IdPayment);
 
             builder.HasOne(e => e.Charge).WithMany(e => e.PaymentCharges)
                 .HasForeignKey(e => e.IdCharge);
+
+            builder.HasOne(e => e.DisplayCharge).WithMany(e => e.DisplayPaymentCharges)
+                .HasForeignKey(e => e.IdDisplayCharge);
         }
     }
 }

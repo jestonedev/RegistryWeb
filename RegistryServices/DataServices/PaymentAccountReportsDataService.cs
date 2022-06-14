@@ -120,6 +120,7 @@ namespace RegistryWeb.DataServices
             return new LogInvoiceGenerator
             {
                 IdAccount = param.IdAcconut,
+                AccountType = 1,
                 CreateDate = DateTime.Now,
                 OnDate = param.OnData,
                 Emails = string.Join(", ", param.Emails).ToString(),

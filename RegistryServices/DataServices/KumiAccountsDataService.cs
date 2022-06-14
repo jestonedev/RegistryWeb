@@ -101,6 +101,8 @@ namespace RegistryWeb.DataServices
         {
             var accRecalcTenancy = 0m;
             var accRecalcPenalty = 0m;
+            var accPaymentTenancy = 0m;
+            var accPaymentPenalty = 0m;
             foreach (var dbCharge in dbChargingInfo)
             {
                 // Если начисление в периоде перезаписи или вне периода расчета, то пропускаем
@@ -144,18 +146,18 @@ namespace RegistryWeb.DataServices
                 // Такие лицевые счета надо перерасчитывать полностью, чтобы отобразить платеж. В противном случае платеж пойдет в перерасчет
                 if (dbCharge != null && dbCharge.Hidden == 1 && startRewriteDate != charge.StartDate)
                 {
-                    accRecalcTenancy -= charge.PaymentTenancy;
-                    accRecalcPenalty -= charge.PaymentPenalty;
+                    accPaymentTenancy += charge.PaymentTenancy;
+                    accPaymentPenalty += charge.PaymentPenalty;
                 }
                 else
                 if (dbCharge != null && nextCharge != null)
                 {
                     if (startRewriteDate != charge.StartDate)
                     {
-                        accRecalcTenancy += charge.ChargeTenancy - dbCharge.ChargeTenancy -
-                            (charge.PaymentTenancy - dbCharge.PaymentTenancy);
-                        accRecalcPenalty += charge.ChargePenalty - dbCharge.ChargePenalty -
-                            (charge.PaymentPenalty - dbCharge.PaymentPenalty);
+                        accRecalcTenancy += charge.ChargeTenancy - dbCharge.ChargeTenancy;
+                        accRecalcPenalty += charge.ChargePenalty - dbCharge.ChargePenalty;
+                        accPaymentTenancy += charge.PaymentTenancy - dbCharge.PaymentTenancy;
+                        accPaymentPenalty += charge.PaymentPenalty - dbCharge.PaymentPenalty;
                     }
                     accRecalcTenancy -= dbCharge.RecalcTenancy;
                     accRecalcPenalty -= dbCharge.RecalcPenalty;
@@ -164,6 +166,8 @@ namespace RegistryWeb.DataServices
 
             recalcInsertIntoCharge.RecalcTenancy = accRecalcTenancy;
             recalcInsertIntoCharge.RecalcPenalty = accRecalcPenalty;
+            recalcInsertIntoCharge.PaymentTenancy += accPaymentTenancy;
+            recalcInsertIntoCharge.PaymentPenalty += accPaymentPenalty;
         }
 
         public DateTime CorrectStartRewriteDate(DateTime startRewriteDate, DateTime startDate, List<KumiCharge> dbChargingInfo)
@@ -365,6 +369,60 @@ namespace RegistryWeb.DataServices
             accountDb.LastChargeDate = lastChargingDate;
             accountDb.RecalcMarker = 0;
             accountDb.RecalcReason = null;
+            registryContext.SaveChanges();
+            UpdateChargeDisplayInfo(accountDb.IdAccount, startRewriteDate);
+        }
+
+        private void UpdateChargeDisplayInfo(int idAccount, DateTime startRewriteDate)
+        {
+            var charges = registryContext.KumiCharges.Include(r => r.PaymentCharges).Where(r => r.IdAccount == idAccount);
+            // Если строк начисления нет в БД, то нечего обновлять
+            if (charges.Count() == 0) return;
+            var lastCharge = charges.OrderByDescending(r => r.EndDate).First();
+            var claims = registryContext.Claims.Include(r => r.PaymentClaims).Where(r => r.IdAccountKumi == idAccount);
+            foreach(var charge in charges)
+            {
+                foreach(var paymentCharge in charge.PaymentCharges)
+                {
+                    // Если начисление до даты перезаписи и указан IdDisplayCharge, то оставляем как есть
+                    // Если начисление до даты перезаписи и IdDisplayCharge == null, то ставим идентификатор последнего начисления
+                    if (paymentCharge.IdDisplayCharge == null && charge.StartDate < startRewriteDate)
+                    {
+                        paymentCharge.IdDisplayCharge = lastCharge.IdCharge;
+                    } else
+                    // Если начисление после даты перезаписи, то ставим идентификатор текущего начисления
+                    if (charge.StartDate >= startRewriteDate)
+                    {
+                        paymentCharge.IdDisplayCharge = paymentCharge.IdCharge;
+                    }
+
+                }
+            }
+            var paymentIds = claims.SelectMany(r => r.PaymentClaims).Select(r => r.IdPayment).Distinct();
+            var payments = registryContext.KumiPayments.Where(r => paymentIds.Contains(r.IdPayment));
+            foreach(var claim in claims)
+            {
+                foreach(var paymentClaim in claim.PaymentClaims)
+                {
+                    var payment = payments.First(r => r.IdPayment == paymentClaim.IdPayment);
+                    var date = payment.DateExecute ?? payment.DateIn ?? payment.DateDocument;
+                    if (date == null) continue;
+                    var charge = charges.FirstOrDefault(r => r.StartDate <= date && r.EndDate >= date);
+                    if (charge == null) continue;
+                    // Если начисление до даты перезаписи и указан IdDisplayCharge, то оставляем как есть
+                    // Если начисление до даты перезаписи и IdDisplayCharge == null, то ставим идентификатор последнего начисления
+                    if (paymentClaim.IdDisplayCharge == null && charge.StartDate < startRewriteDate)
+                    {
+                        paymentClaim.IdDisplayCharge = lastCharge.IdCharge;
+                    }
+                    else
+                    // Если начисление после даты перезаписи, то ставим идентификатор текущего начисления
+                    if (charge.StartDate >= startRewriteDate)
+                    {
+                        paymentClaim.IdDisplayCharge = charge.IdCharge;
+                    }
+                }
+            }
             registryContext.SaveChanges();
         }
 

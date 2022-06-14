@@ -28,6 +28,8 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public byte Hidden { get; set; }
         public virtual KumiAccount Account { get; set; }
         public virtual IList<KumiPaymentCharge> PaymentCharges { get; set; }
+        public virtual IList<KumiPaymentCharge> DisplayPaymentCharges { get; set; }
+        public virtual IList<KumiPaymentClaim> DisplayPaymentClaims { get; set; }
 
         public static bool operator==(KumiCharge first, KumiCharge second)
         {

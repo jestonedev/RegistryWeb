@@ -155,7 +155,7 @@ namespace RegistryWeb.ReportServices
                 { "claim_state_type", idStateType },
                 { "only_current_claim_state", isCurrentState ? "1" : "0" }
             };
-            var fileName = "registry\\claims\\claim_states_all_dates";
+            var fileName = "registry\\claims_correction\\claim_states_all_dates";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
@@ -205,7 +205,7 @@ namespace RegistryWeb.ReportServices
                 { "date_from", startDate.ToString("yyyy-MM-dd") },
                 { "date_to", endDate.ToString("yyyy-MM-dd") }
             };
-            var fileNameReport = GenerateReport(arguments, "registry\\claims\\claim_fact_mailing");
+            var fileNameReport = GenerateReport(arguments, "registry\\claims_correction\\claim_fact_mailing");
             return DownloadFile(fileNameReport);
         }
 

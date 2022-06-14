@@ -25,6 +25,10 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Payments
                 .HasColumnName("id_account")
                 .HasColumnType("int(11)");
 
+            builder.Property(e => e.AccountType)
+                .HasColumnName("account_type")
+                .HasColumnType("int(11)");
+
             builder.Property(e => e.CreateDate)
                 .HasColumnName("create_date");
 

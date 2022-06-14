@@ -142,6 +142,7 @@ namespace RegistryWeb.Controllers
                                     var log = new LogInvoiceGenerator
                                     {
                                         IdAccount = Convert.ToInt32(invoiceArguments[i]["id_account"]),
+                                        AccountType = 2,
                                         CreateDate = DateTime.Now,
                                         OnDate = Convert.ToDateTime(invoiceArguments[i]["--on-date"]),
                                         Emails = invoiceArguments[i]["--email"].ToString(),

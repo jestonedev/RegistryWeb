@@ -106,6 +106,16 @@ namespace RegistryWeb.DataServices
                 viewModel.RefClaim = registryContext.Claims.Include(r => r.IdAccountKumiNavigation)
                     .FirstOrDefault(r => r.IdClaim == filterOptions.IdClaim);
             }
+            if (filterOptions?.IdCharge != null)
+            {
+                var charge = registryContext.KumiCharges.FirstOrDefault(r => r.IdCharge == filterOptions.IdCharge);
+                if (charge != null)
+                {
+                    viewModel.RefAccount = registryContext.KumiAccounts.Include(r => r.Claims).Include(r => r.Charges).FirstOrDefault(r => r.IdAccount == charge.IdAccount);
+                    viewModel.StartDate = charge.StartDate;
+                    viewModel.EndDate = charge.EndDate;
+                }
+            }
 
             return viewModel;
         }
@@ -168,6 +178,19 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<KumiPayment> RefFilter(IQueryable<KumiPayment> query, KumiPaymentsFilter filterOptions)
         {
+            if (filterOptions.IdClaim != null)
+            {
+                var ids = registryContext.KumiPaymentClaims
+                           .Where(r => r.IdClaim == filterOptions.IdClaim).Select(r => r.IdPayment);
+
+                query = query.Where(r => ids.Contains(r.IdPayment));
+            }
+            if (filterOptions.IdCharge != null)
+            {
+                var ids = registryContext.KumiPaymentCharges.Where(r => r.IdDisplayCharge == filterOptions.IdCharge).Select(r => r.IdPayment)
+                    .Union(registryContext.KumiPaymentClaims.Where(r => r.IdDisplayCharge == filterOptions.IdCharge).Select(r => r.IdPayment));
+                query = query.Where(r => ids.Contains(r.IdPayment));
+            }
             if (filterOptions.IdAccount != null)
             {
                 var ids = registryContext.KumiPaymentCharges.Include(r => r.Charge).Where(r => r.Charge.IdAccount == filterOptions.IdAccount).Select(r => r.IdPayment)
@@ -177,25 +200,6 @@ namespace RegistryWeb.DataServices
                     ).Distinct().ToList();
 
                 query = query.Where(r => ids.Contains(r.IdPayment));
-            }
-            if (filterOptions.IdClaim != null)
-            {
-                var ids = registryContext.KumiPaymentClaims
-                           .Where(r => r.IdClaim == filterOptions.IdClaim).Select(r => r.IdPayment);
-
-                query = query.Where(r => ids.Contains(r.IdPayment));
-            }
-            if (filterOptions.StartDate != null)
-            {
-                query = query.Where(r => r.DateExecute != null ? r.DateExecute >= filterOptions.StartDate : 
-                                        r.DateIn != null ? r.DateIn >= filterOptions.StartDate :
-                                        r.DateDocument != null ? r.DateDocument >= filterOptions.StartDate : false);
-            }
-            if (filterOptions.EndDate != null)
-            {
-                query = query.Where(r => r.DateExecute != null ? r.DateExecute <= filterOptions.EndDate :
-                                        r.DateIn != null ? r.DateIn <= filterOptions.EndDate :
-                                        r.DateDocument != null ? r.DateDocument <= filterOptions.EndDate : false);
             }
             return query;
         }

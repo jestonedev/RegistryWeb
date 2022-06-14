@@ -4,6 +4,7 @@ using RegistryDb.Models.Entities.Claims;
 using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
+using System;
 using System.Collections.Generic;
 
 namespace RegistryServices.ViewModel.KumiAccounts
@@ -14,5 +15,7 @@ namespace RegistryServices.ViewModel.KumiAccounts
         public SelectList PaymentSourcesList { get; set; }
         public KumiAccount RefAccount { get; set; }
         public Claim RefClaim { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }

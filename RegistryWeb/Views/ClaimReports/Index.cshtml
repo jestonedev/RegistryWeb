@@ -4,6 +4,7 @@
 @{
     ViewData["Title"] = "Отчеты по претензионно-исковой работе";
     var myKeys = new List<DateTime>(Model.MonthsList.Values);
+    var allMonthes = new List<string> { "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь" };
 }
 
 @section styles
@@ -57,7 +58,7 @@
              data-action="ClaimEmergencyTariffReport">
             <div class="media cardreport align-items-center p-2">
                 <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
-                <div class="media-body pl-2 pr-2">Отчет по тарифам аварийных помещений</div>
+                <div class="media-body pl-2 pr-2">Отчет по тарифам аварийных помещений (БКС)</div>
             </div>
         </div>
         <div class="col-12 col-md-6 col-lg-4 mb-3 rr-claim-common-modal-report" title="Отчет по факту рассылки квитанций"
@@ -148,15 +149,15 @@
                                     data-val="true" data-val-required="Укажите месяц">
                                 <option></option>
                                 @{
-                                    @foreach (KeyValuePair<int, DateTime> m in Model.MonthsList)
+                                    @for (var i = 0; i < allMonthes.Count; i++)
                                     {
-                                        if (m.Key == (myKeys[0]).Month)
+                                        if (i + 1 == DateTime.Now.Month)
                                         {
-                                            <option selected value="@m.Key">@m.Value.ToString("MMMM")</option>
+                                            <option selected value="@(i+1)">@allMonthes[i]</option>
                                         }
                                         else
                                         {
-                                            <option value="@m.Key">@m.Value.ToString("MMMM")</option>
+                                            <option value="@(i+1)">@allMonthes[i]</option>
                                         }
                                     }
                                 }
@@ -170,7 +171,7 @@
                                 <option></option>
                                 @for (int i = DateTime.Now.Year; i > DateTime.Now.Year - 5; i--)
                                 {
-                                    if (i == (myKeys[0]).Year)
+                                    if (i == DateTime.Now.Year)
                                     {
                                         <option selected value="@i">@i</option>
                                     }
@@ -188,15 +189,16 @@
                                     data-val="true" data-val-required="Укажите месяц">
                                 <option></option>
                                 @{
-                                    @foreach (KeyValuePair<int, DateTime> m in Model.MonthsList)
+
+                                    @for(var i = 0; i < allMonthes.Count; i++)
                                     {
-                                        if (m.Key == (myKeys[0]).Month)
+                                        if (i + 1 == DateTime.Now.Month)
                                         {
-                                            <option selected value="@m.Key">@m.Value.ToString("MMMM")</option>
+                                            <option selected value="@(i+1)">@allMonthes[i]</option>
                                         }
                                         else
                                         {
-                                            <option value="@m.Key">@m.Value.ToString("MMMM")</option>
+                                            <option value="@(i+1)">@allMonthes[i]</option>
                                         }
                                     }
                                 }
@@ -210,7 +212,7 @@
                                 <option></option>
                                 @for (int i = DateTime.Now.Year; i > DateTime.Now.Year - 5; i--)
                                 {
-                                    if (i == (myKeys[0]).Year)
+                                    if (i == DateTime.Now.Year)
                                     {
                                         <option selected value="@i">@i</option>
                                     }

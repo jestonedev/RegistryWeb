@@ -88,7 +88,7 @@ namespace RegistryWeb.DataServices
                 ["address"] = address,
                 ["prescribed"] = prescribed,
                 ["emails"] = emails,
-                ["tenant"] = string.Concat(tenant.Surname, " ", tenant.Name, " ", tenant.Patronymic)
+                ["tenant"] = string.Concat(tenant?.Surname, " ", tenant?.Name, " ", tenant?.Patronymic)
 
             };
             return infoForReport;
@@ -156,6 +156,7 @@ namespace RegistryWeb.DataServices
             return new LogInvoiceGenerator
             {
                 IdAccount = param.IdAcconut,
+                AccountType = 2,
                 CreateDate = DateTime.Now,
                 OnDate = param.OnData,
                 Emails = string.Join(", ", param.Emails).ToString(),

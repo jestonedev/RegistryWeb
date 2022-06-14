@@ -39,7 +39,10 @@ namespace RegistryWeb.ViewOptions.Filter
         public DateTime? LoadDate { get; set; }
 
         // Filter by period refs
+        public int? IdCharge { get; set; }
         public int? IdClaim { get; set; }
+
+        // Not actual
         public int? IdAccount { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
@@ -56,7 +59,7 @@ namespace RegistryWeb.ViewOptions.Filter
 
         public bool IsRefEmpty()
         {
-            return IdAccount == null && IdClaim == null && StartDate == null && EndDate == null;
+            return IdAccount == null && StartDate == null && EndDate == null && IdCharge == null && IdClaim == null;
         }
 
         public bool IsModalEmpty()

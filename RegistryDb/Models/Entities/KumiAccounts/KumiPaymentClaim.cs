@@ -18,5 +18,7 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public decimal PenaltyValue { get; set; }
         public virtual KumiPayment Payment { get; set; }
         public virtual Claim Claim { get; set; }
+        public int? IdDisplayCharge { get; set; }
+        public virtual KumiCharge DisplayCharge { get; set; }
     }
 }

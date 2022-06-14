@@ -391,12 +391,10 @@
                                                 totalPaymentTenancyByAccount += tenancyOnAccount;
                                                 totalPaymentPenaltyByAccount += penaltyOnAccount;
                                             }
-                                            @if (charge.PaymentTenancy > 0 || charge.PaymentPenalty > 0)
+                                            @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentTenancy - tenancyOnAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"
-                                                   asp-route-filterOptions.StartDate="@charge.StartDate.ToString("yyyy-MM-dd")"
-                                                   asp-route-filterOptions.EndDate="@charge.EndDate.ToString("yyyy-MM-dd")">@charge.PaymentTenancy</a>
+                                                   asp-route-filterOptions.IdCharge ="@charge.IdCharge">@charge.PaymentTenancy</a>
                                             }
                                             else
                                             {
@@ -404,12 +402,10 @@
                                             }
                                         </td>
                                         <td class="text-center p-1">
-                                            @if (charge.PaymentTenancy > 0 || charge.PaymentPenalty > 0)
+                                            @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"
-                                                   asp-route-filterOptions.StartDate="@charge.StartDate.ToString("yyyy-MM-dd")"
-                                                   asp-route-filterOptions.EndDate="@charge.EndDate.ToString("yyyy-MM-dd")">@charge.PaymentPenalty</a>
+                                                   asp-route-filterOptions.IdCharge ="@charge.IdCharge">@charge.PaymentPenalty</a>
                                             }
                                             else
                                             {
