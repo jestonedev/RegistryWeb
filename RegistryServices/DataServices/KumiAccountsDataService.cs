@@ -242,6 +242,160 @@ namespace RegistryWeb.DataServices
             return registryContext.KumiCharges.AsNoTracking().Where(r => r.IdAccount == account.IdAccount).ToList();
         }
 
+        public List<KumiActChargeVM> GetActChargeVMs(int idAccount, DateTime atDate)
+        {
+            var charges = registryContext.KumiCharges.Include(r => r.PaymentCharges).Where(r => r.IdAccount == idAccount && r.EndDate <= atDate).ToList();
+            var chargeIds = charges.Select(r => r.IdCharge);
+
+            var paymentIds = charges.SelectMany(r => r.PaymentCharges).Select(r => r.IdPayment);
+            // Оригиналы платежей и ПИР для добавления в акт
+            var payments = registryContext.KumiPayments.Include(r => r.PaymentCharges).Where(r => paymentIds.Contains(r.IdPayment)).ToList();
+            var resultPayments = payments.Select(r => new KumiActPaymentEventVM
+            {
+                Date = (r.DateExecute ?? r.DateIn ?? r.DateDocument).Value,
+                Tenancy = r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.TenancyValue),
+                Penalty = r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.PenaltyValue),
+                IdPayment = r.IdPayment,
+                NumDocument = r.NumDocument,
+                DateDocument = r.DateDocument
+            }).Where(r => r.Date <= atDate);
+
+            var claims = registryContext.Claims.Include(r => r.PaymentClaims).Include(r => r.ClaimStates).Where(r => r.IdAccountKumi == idAccount).ToList();
+            var resultClaims = claims.Where(r =>
+                    r.EndDeptPeriod <= atDate &&
+                    r.ClaimStates.Any(s => s.IdStateType == 4 && s.CourtOrderDate != null) &&
+                    !r.ClaimStates.Any(s => s.IdStateType == 6 && s.CourtOrderCancelDate != null))
+                .Select(r => new KumiActClaimEventVM
+                {
+                    Date = r.EndDeptPeriod.Value, 
+                    Tenancy = (r.AmountTenancy + r.AmountPkk + r.AmountPadun + r.AmountDgi) ?? 0,
+                    Penalty = r.AmountPenalties ?? 0,
+                    IdClaim = r.IdClaim,
+                    StartDeptPeriod = r.StartDeptPeriod,
+                    EndDeptPeriod = r.EndDeptPeriod
+                });
+            // Копии платежей и ПИР для вычитания сумм
+            var paymentsForCalc = resultPayments.Select(r => new KumiActPaymentEventVM
+            {
+                IdPayment = r.IdPayment,
+                Date = r.Date,
+                Tenancy = r.Tenancy,
+                Penalty = r.Penalty
+            }).ToList();
+            var claimsForCalc = resultClaims.Select(r => new KumiActClaimEventVM
+            {
+                IdClaim = r.IdClaim,
+                Date = r.Date,
+                Tenancy = r.Tenancy,
+                Penalty = r.Penalty
+            }).ToList();
+            // Расчет акта
+            var result = new List<KumiActChargeVM>();
+            foreach(var charge in charges.OrderBy(r => r.StartDate))  // Исключить начисления после atDate
+            {
+                var chargeValue = charge.ChargeTenancy + charge.RecalcTenancy;
+                var chargeVM = new KumiActChargeVM
+                {
+                    Value = charge.ChargeTenancy + charge.RecalcTenancy,
+                    Date = charge.EndDate,
+                    Events = new List<IChargeEventVM>()
+                };
+                var allPenaltiesCalcEvents = new List<KumiActPeniCalcEventVM>();
+                while (true)
+                {
+                    var firstPayment = paymentsForCalc.Where(r => r.Tenancy > 0).OrderByDescending(r => r.Date).FirstOrDefault();
+                    KumiActPaymentEventVM eventPayment = null;
+                    if (firstPayment != null)
+                    {
+                        eventPayment = resultPayments.Where(r => r.IdPayment == firstPayment.IdPayment)
+                            .Select(r => new KumiActPaymentEventVM
+                            {
+                                IdPayment = r.IdPayment,
+                                NumDocument = r.NumDocument,
+                                DateDocument = r.DateDocument,
+                                Tenancy = r.Tenancy,
+                                TenancyTail = firstPayment.Tenancy,
+                                Penalty = r.Penalty,
+                                PenaltyTail = firstPayment.Penalty,
+                                Date = r.Date
+                            }).First();
+                    }
+
+                    var firstClaim = claimsForCalc.Where(r => r.Tenancy > 0).OrderByDescending(r => r.Date).FirstOrDefault();
+                    KumiActClaimEventVM eventClaim = null;
+                    if (firstClaim != null)
+                    {
+                        eventClaim = resultClaims.Where(r => r.IdClaim == firstClaim.IdClaim)
+                            .Select(r => new KumiActClaimEventVM
+                            {
+                                IdClaim = r.IdClaim,
+                                StartDeptPeriod = r.StartDeptPeriod,
+                                EndDeptPeriod = r.EndDeptPeriod,
+                                Tenancy = r.Tenancy,
+                                TenancyTail = firstClaim.Tenancy,
+                                PenaltyTail = firstClaim.Penalty,
+                                Penalty = r.Penalty,
+                                Date = r.Date
+                            }).First();
+                    }
+
+
+                    IChargeEventVM currentPaymentEvent = null;
+                    if (firstPayment == null && firstClaim == null)
+                    {
+                        // Платежей и ПИР нет, расчитать начисление до atDate
+                        CalcPenalty(chargeVM.Date, atDate, chargeValue, out List<KumiActPeniCalcEventVM> lastPeniCalcEvents);
+                        chargeVM.Events.AddRange(lastPeniCalcEvents);
+                        break;
+                    } else
+                    if (firstPayment != null && firstClaim == null)
+                    {
+                        chargeVM.Events.Add(eventPayment);
+                        currentPaymentEvent = firstPayment;
+                    } else
+                    if (firstPayment == null && firstClaim != null)
+                    {
+                        chargeVM.Events.Add(eventClaim);
+                        currentPaymentEvent = firstClaim;
+                    } else
+                    if (firstPayment != null && firstClaim != null)
+                    {
+                        if (firstPayment.Date > firstClaim.Date)
+                        {
+                            currentPaymentEvent = firstClaim;
+                            chargeVM.Events.Add(eventClaim);
+                        } else
+                        {
+                            currentPaymentEvent = firstPayment;
+                            chargeVM.Events.Add(eventPayment);
+                        }
+                    }
+
+                    var sum = Math.Min(currentPaymentEvent.Tenancy, chargeValue);
+                    currentPaymentEvent.Tenancy -= sum;
+                    currentPaymentEvent.Penalty = 0;
+                    chargeValue -= sum;
+                    CalcPenalty(chargeVM.Date, currentPaymentEvent.Date, sum, out List<KumiActPeniCalcEventVM> peniCalcEvents);
+                    allPenaltiesCalcEvents.AddRange(peniCalcEvents);
+
+                    if (chargeValue == 0)
+                        break;
+                }
+                chargeVM.Events.AddRange(allPenaltiesCalcEvents.GroupBy(r => new { r.StartDate, r.EndDate, r.KeyRate, r.KeyRateCoef })
+                    .Select(r => new KumiActPeniCalcEventVM {
+                        StartDate = r.Key.StartDate,
+                        EndDate = r.Key.EndDate,
+                        KeyRate = r.Key.KeyRate,
+                        KeyRateCoef = r.Key.KeyRateCoef,
+                        Tenancy = r.Select(t => t.Tenancy).Sum(),
+                        Penalty = r.Select(p => p.Penalty).Sum()
+                    }));
+                result.Add(chargeVM);
+            }
+
+            return result;
+        }
+
         public void UpdateChargesIntoDb(KumiAccountInfoForPaymentCalculator account, List<KumiCharge> chargingInfo,
             List<KumiCharge> dbChargingInfo,
             DateTime startCalcDate, DateTime endCalcDate, DateTime startRewriteDate)
@@ -664,13 +818,13 @@ namespace RegistryWeb.DataServices
                         calcSum = firstCharge.Value;
                         firstCharge.Value = 0;
                     }
-                    penalty += CalcPenalty(firstCharge.Date, firstPayment.Date, calcSum);
+                    penalty += CalcPenalty(firstCharge.Date, firstPayment.Date, calcSum, out List<KumiActPeniCalcEventVM> peniCalcEvents);
                 }
             }
 
             foreach(var charge in resultCharges.Where(r => r.Value > 0))
             {
-                penalty += CalcPenalty(charge.Date, endDate.Value, charge.Value);
+                penalty += CalcPenalty(charge.Date, endDate.Value, charge.Value, out List<KumiActPeniCalcEventVM> peniCalcEvents);
             }
 
             var prevPenalty = charges.Where(r => r.EndDate < endDate).Sum(r => r.ChargePenalty + r.RecalcPenalty);
@@ -678,8 +832,9 @@ namespace RegistryWeb.DataServices
             return penalty- prevPenalty;
         }
 
-        private decimal CalcPenalty(DateTime chargeDate, DateTime paymentDate, decimal sum)
+        private decimal CalcPenalty(DateTime chargeDate, DateTime paymentDate, decimal sum, out List<KumiActPeniCalcEventVM> peniCalcEvents)
         {
+            peniCalcEvents = new List<KumiActPeniCalcEventVM>();
             var endPaymentDate = chargeDate.AddDays(10);
             var startPenalty300Date = endPaymentDate.AddDays(31);
             var startPenalty130Date = endPaymentDate.AddDays(91);
@@ -712,7 +867,16 @@ namespace RegistryWeb.DataServices
 
             foreach(var penaltyInfo in penaltyCalcInfo)
             {
-                penalty += ((penaltyInfo.EndDate - penaltyInfo.StartDate).Days + 1) * (penaltyInfo.KeyRate/100m) * penaltyInfo.KeyRateCoef * penaltyInfo.Sum;
+                var currentPenalty = ((penaltyInfo.EndDate - penaltyInfo.StartDate).Days + 1) * (penaltyInfo.KeyRate / 100m) * penaltyInfo.KeyRateCoef * penaltyInfo.Sum;
+                peniCalcEvents.Add(new KumiActPeniCalcEventVM {
+                    StartDate = penaltyInfo.StartDate,
+                    EndDate = penaltyInfo.EndDate,
+                    KeyRate = penaltyInfo.KeyRate,
+                    KeyRateCoef = penaltyInfo.KeyRateCoef,
+                    Tenancy = penaltyInfo.Sum,
+                    Penalty = currentPenalty
+                });
+                penalty += currentPenalty;
             }
 
             return penalty;

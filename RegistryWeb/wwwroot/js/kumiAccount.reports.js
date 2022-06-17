@@ -226,4 +226,27 @@
 
         form.submit();
     });
+
+    $(".rr-get-act-charge").on('click', function (e) {
+
+        var idAccount = $(this).data("id-account");
+        var modal = $("#actChargeModal");
+        modal.find("[name='IdAccount']").val(idAccount);
+
+        modal.find("input, textarea, select").prop("disabled", false);
+        modal.modal("show");
+        e.preventDefault();
+    });
+
+    $("#actChargeModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("#actChargeForm");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return false;
+        }
+
+        form.submit();
+    });
 });

@@ -295,5 +295,23 @@ namespace RegistryWeb.Controllers
             TempData["ErrorReason"] = "по указанным лицевым счетам уже имеются незавершенные исковые работы";
             return RedirectToAction("KumiAccountsReports");
         }
+
+        // Сформировать акт по лицевому счету на дату
+        public IActionResult GetActCharge(int idAccount, DateTime atDate, string returnUrl)
+        {
+            var actChargeVMs = dataService.GetActChargeVMs(idAccount, atDate);
+            ViewBag.Account = dataService.GetKumiAccount(idAccount);
+            ViewBag.AtDate = atDate;
+            ViewBag.ReturnUrl = returnUrl;
+            return View("ActCharge", actChargeVMs);
+        }
+
+        public IActionResult ActToExcel(int idAccount, DateTime atDate)
+        {
+            var actChargeVMs = dataService.GetActChargeVMs(idAccount, atDate);
+            var account = dataService.GetKumiAccount(idAccount);
+            //TODO
+            return Json("Еще не реализовано");
+        }
     }
 }

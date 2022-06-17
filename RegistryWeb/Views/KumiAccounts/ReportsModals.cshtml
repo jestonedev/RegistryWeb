@@ -134,3 +134,34 @@
         </div>
     </div>
 </form>
+
+<form id="actChargeForm" method="get" asp-controller="KumiAccounts" asp-action="GetActCharge">
+    <div class="modal fade" id="actChargeModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Сформировать акт</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="IdAccount" />
+                    <input type="hidden" name="ReturnUrl" value="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"/>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="AtDate">На дату</label>
+                            <input type="date" class="form-control" title="На дату" name="AtDate"
+                                   data-val="true" data-val-required="Укажите дату" id="Act_AtDate" value="@DateTime.Now.Date.ToString("yyyy-MM-dd")" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="AtDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

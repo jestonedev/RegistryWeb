@@ -1,0 +1,14 @@
+﻿.rr-account-act-table tbody td, .rr-account-act-table thead th, .rr-account-act-table tfoot td {
+    padding: 3pt 5pt;
+    vertical-align: middle;
+}
+
+.rr-act-button-group button span {
+    top: 2px;
+}
+
+@media print {
+    .rr-act-button-group, .rr-account-list-eye-btn, .alert.alert-danger {
+        display: none;
+    }
+}

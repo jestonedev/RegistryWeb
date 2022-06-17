@@ -1,0 +1,229 @@
+﻿@using RegistryServices.ViewModel.KumiAccounts;
+@using RegistryDb.Models.Entities.KumiAccounts;
+@using System.Globalization;
+
+@model List<KumiActChargeVM>
+
+@{
+    var account = (KumiAccount)ViewBag.Account;
+    var atDate = (DateTime)ViewBag.AtDate;
+    ViewData["Title"] = string.Format("Акт по лицевому счету № {0} на {1}", account.Account, atDate.ToString("dd.MM.yyyy"));
+}
+
+@section styles
+    {
+    <link rel="stylesheet" href="~/css/kumi.accounts.css" runat="server" />
+    <link rel="stylesheet" href="~/css/kumi.accounts.act.css" runat="server" />
+}
+
+
+<h1>@ViewData["Title"]</h1>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning text-center">По лицевому счету отсутствуют начисления</div>
+}
+else
+{
+    <div class="text-right mb-3 rr-act-button-group">
+        <div class="btn-group">
+            <button class="btn btn-outline-dark" onclick="window.print()"><span class="oi oi-print pr-2"></span>Печать</button>
+            <a class="btn btn-success" asp-action="ActToExcel" asp-route-idAcctoun="@account.IdAccount" asp-route-atDate="@atDate.ToString("yyyy-MM-dd")"><span class="oi oi-document pr-2"></span>Экспорт</a>
+        </div>
+        @if (ViewBag.ReturnUrl != null)
+        {
+            <a class="btn btn-primary" href="@ViewBag.ReturnUrl">Назад</a>
+        }
+        else
+        {
+            <a class="btn btn-primary" asp-action="Index">Назад</a>
+        }
+    </div>
+    <table class="table table-bordered rr-account-act-table">
+        <thead>
+            <tr>
+                <th rowspan="2" class="text-center">Месяц</th>
+                <th rowspan="2" class="text-center">Начислено</th>
+                <th rowspan="2" class="text-center">Долг</th>
+                <th colspan="3" class="text-center">Период просрочки</th>
+                <th rowspan="2" class="text-center">Ставка</th>
+                <th rowspan="2" class="text-center">Доля<br />ставки</th>
+                <th rowspan="2" class="text-center">Формула</th>
+                <th rowspan="2" class="text-center">Пени</th>
+            </tr>
+            <tr>
+                <th class="text-center">с</th>
+                <th class="text-center">по</th>
+                <th class="text-center">дней</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var penaltyAcc = 0.0m;
+                var paymentsSum = 0.0m;
+                var totalPenalty = 0.0m;
+            }
+            @foreach (var charge in Model.OrderBy(r => r.Date))
+            {
+                var monthStr = charge.Date.ToString("MMM.yyyy");
+                var chargeStr = charge.Value.ToString(CultureInfo.GetCultureInfo("ru-RU"));
+                @if (!charge.Events.Any())
+                {
+                    <tr>
+                        <td class="text-center">@monthStr</td>
+                        <td class="text-right">@chargeStr руб.</td>
+                        <td colspan="8" class="text-center text-danger"><i>Периоды просрочки, платежи и исковые работы отсутствуют</i></td>
+                    </tr>
+                }
+                else
+                {
+                    var sortedEvents = charge.Events.OrderBy(r => r.Date).ToList();
+                    var hasDeptPeriods = true;
+
+                    if (!sortedEvents.Where(r => r is KumiActPeniCalcEventVM).Any())
+                    {
+                        hasDeptPeriods = false;
+                    }
+                    @for (var i = 0; i < sortedEvents.Count; i++)
+                    {
+                        <tr>
+                            @if (i == 0)
+                            {
+                                <td rowspan="@(charge.Events.Count + (hasDeptPeriods ? 0 : 1))" class="text-center">@monthStr</td>
+                                <td rowspan="@(charge.Events.Count + (hasDeptPeriods ? 0 : 1))" class="text-right text-nowrap">@chargeStr руб.</td>
+                            }
+
+                            @{
+                                var e = sortedEvents[i];
+                                switch (e)
+                                {
+                                    case KumiActPeniCalcEventVM peni:
+                                        var peniTaxStr = peni.Tenancy.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                        var days = (peni.EndDate - peni.StartDate).TotalDays + 1;
+                                        var keyRateCoef = peni.KeyRateCoef == 1 / 300m ? "1/300" : peni.KeyRateCoef == 1 / 130m ? "1/130" : "0";
+                                        var penaltyRound = Math.Round(peni.Penalty + penaltyAcc, 2);
+                                        totalPenalty += penaltyRound;
+                                        penaltyAcc += peni.Penalty - penaltyRound;
+                                        <td class="text-right text-nowrap">@peniTaxStr</td>
+                                        <td class="text-center">@peni.StartDate.ToString("dd.MM.yyyy")</td>
+                                        <td class="text-center">@peni.EndDate.ToString("dd.MM.yyyy")</td>
+                                        <td class="text-center">@days</td>
+                                        <td class="text-right text-nowrap">@peni.KeyRate.ToString(CultureInfo.GetCultureInfo("ru-RU")) %</td>
+                                        <td class="text-right text-nowrap">@keyRateCoef</td>
+                                        <td class="text-right text-nowrap">@peniTaxStr x @days x @keyRateCoef x @peni.KeyRate.ToString(CultureInfo.GetCultureInfo("ru-RU")) %</td>
+                                        <td class="text-right text-nowrap">@penaltyRound.ToString(CultureInfo.GetCultureInfo("ru-RU")) руб.</td>
+                                        break;
+                                    case KumiActPaymentEventVM payment:
+                                        var paymentDiff = -Math.Min(payment.TenancyTail, charge.Value);
+                                        paymentsSum += paymentDiff;
+                                        var paymentRequsits = "Платеж: ";
+                                        if (!string.IsNullOrEmpty(payment.NumDocument))
+                                        {
+                                            paymentRequsits += "№ ПД " + payment.NumDocument + " ";
+                                        }
+                                        else
+                                        {
+                                            paymentRequsits += "Id " + payment.IdPayment + " ";
+                                        }
+                                        paymentRequsits += " на сумму найм " + payment.Tenancy.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб. и пени " +
+                                            payment.Penalty.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                        if (payment.Tenancy > payment.TenancyTail)
+                                        {
+                                            paymentRequsits += ", неучтеный остаток найм " + payment.TenancyTail.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                        }
+                                        <td class="table-success text-right text-nowrap">@paymentDiff.ToString(CultureInfo.GetCultureInfo("ru-RU")) руб.</td>
+                                        <td class="table-success text-center">@payment.Date.ToString("dd.MM.yyyy")</td>
+                                        <td class="table-success" colspan="5">
+                                            <span>@paymentRequsits</span>
+                                            <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn" target="_blank"
+                                               asp-controller="KumiPayments" asp-action="Details" asp-route-idPayment="@payment.IdPayment"></a>
+                                        </td>
+                                        @if (payment.PenaltyTail > 0)
+                                        {
+                                            <td class="table-success text-right text-nowrap">-@payment.PenaltyTail.ToString(CultureInfo.GetCultureInfo("ru-RU")) руб.</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="table-success text-center">-</td>
+                                        }
+                                        break;
+                                    case KumiActClaimEventVM claim:
+                                        var claimDiff = -Math.Min(claim.TenancyTail, charge.Value);
+                                        paymentsSum += claimDiff;
+                                        var claimRequsits = "ПИР: период взыскания ";
+                                        if (claim.StartDeptPeriod != null)
+                                        {
+                                            claimRequsits += "с " + claim.StartDeptPeriod.Value.ToString("dd.MM.yyyy") + " ";
+                                        }
+                                        claimRequsits += "по " + claim.EndDeptPeriod.Value.ToString("dd.MM.yyyy") + ", ";
+                                        claimRequsits += "предъявленный долг найм " + claim.Tenancy.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб. и пени " +
+                                            claim.Penalty.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                        if (claim.Tenancy > claim.TenancyTail)
+                                        {
+                                            claimRequsits += ", неучтеный остаток " + claim.TenancyTail.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                        }
+                                        <td class="table-success text-right text-nowrap">@claimDiff.ToString(CultureInfo.GetCultureInfo("ru-RU")) руб.</td>
+                                        <td class="table-success text-center">@claim.Date.ToString("dd.MM.yyyy")</td>
+                                        <td class="table-success" colspan="5">
+                                            <span>@claimRequsits</span>
+                                            <a class="btn oi oi-eye p-0 text-primary rr-account-list-eye-btn" target="_blank"
+                                               asp-controller="Claims" asp-action="Details" asp-route-idClaim="@claim.IdClaim"></a>
+                                        </td>
+                                        @if (claim.PenaltyTail > 0)
+                                        {
+                                            <td class="table-success text-right text-nowrap">-@claim.PenaltyTail.ToString(CultureInfo.GetCultureInfo("ru-RU")) руб.</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="table-success text-center">-</td>
+                                        }
+                                        break;
+                                }
+                            }
+                        </tr>
+                    }
+                    @if (!hasDeptPeriods)
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-danger"><i>Периоды просрочки отсутствуют</i></td>
+                        </tr>
+                    }
+                }
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td rowspan="4"><b>Итого</b></td>
+                <td colspan="8" class="text-right text-nowrap">Сумма основного долга начислено</td>
+                <td class="text-right text-nowrap">@Model.Select(r => r.Value).Sum().ToString(CultureInfo.GetCultureInfo("ru-RU")) руб.</td>
+            </tr>
+            <tr>
+                <td colspan="8" class="text-right text-nowrap">Сумма основного долга оплачено</td>
+                <td class="text-right text-nowrap">
+                    @{
+                        var claimsTenancySum = Model.SelectMany(r => r.Events).Where(r => r is KumiActClaimEventVM)
+                            .Select(r => (KumiActClaimEventVM)r).GroupBy(r => r.IdClaim).Select(r => r.FirstOrDefault()?.Tenancy ?? 0.0m).Sum();
+
+                        var paymentsTenancySum = Model.SelectMany(r => r.Events).Where(r => r is KumiActPaymentEventVM)
+                            .Select(r => (KumiActPaymentEventVM)r).GroupBy(r => r.IdPayment).Select(r => r.FirstOrDefault()?.Tenancy ?? 0.0m).Sum();
+                    }
+                    @((claimsTenancySum + paymentsTenancySum).ToString(CultureInfo.GetCultureInfo("ru-RU"))) руб.
+                </td>
+            </tr>
+            <tr>
+                <td colspan="8" class="text-right text-nowrap">Пени начислено</td>
+                <td class="text-right text-nowrap">@totalPenalty.ToString(CultureInfo.GetCultureInfo("ru-RU")) руб.</td>
+            </tr>
+            <tr>
+                <td colspan="8" class="text-right text-nowrap">Пени оплачено</td>
+                <td class="text-right text-nowrap">
+                    @{
+                        var totalPenaltyPayed = Model.SelectMany(r => r.Events).Where(r => r is IChargePaymentEventVM)
+                            .Select(r => (IChargePaymentEventVM)r).Select(r => r.PenaltyTail).Sum();
+                    }
+                    @totalPenaltyPayed.ToString(CultureInfo.GetCultureInfo("ru-RU")) руб.
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+}

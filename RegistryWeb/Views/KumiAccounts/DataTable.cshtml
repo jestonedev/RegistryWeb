@@ -396,6 +396,7 @@
                         <div class="btn-group" role="group" aria-label="Отчеты">
                             <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@item.IdAccount" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdAccount">
+                                <a class="dropdown-item rr-get-act-charge" href="#" title="Сформировать акт" aria-label="Сформировать акт" data-id-account="@item.IdAccount">Сформировать акт</a>
                                 <a class="dropdown-item rr-report-calc-debt" href="#" title="Расчет суммы задолженности" aria-label="Расчет суммы задолженности" data-id-account="@item.IdAccount">Расчет суммы задолженности</a>
                                 @{ 
                                     var lastCharge = item.Charges.OrderByDescending(r => r.EndDate).FirstOrDefault();
