@@ -1,12 +1,18 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.SS.Util;
 using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryDb.Models.Entities.Tenancies;
+using RegistryServices.DataHelpers;
+using RegistryServices.ViewModel.KumiAccounts;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -114,5 +120,212 @@ namespace RegistryWeb.ReportServices
             var fileNameReport = GenerateReport(arguments, "registry\\export");
             return DownloadFile(fileNameReport);
         }
+
+        public byte[] KumiAccountAct(KumiAccount account, List<KumiActChargeVM> actChargeVMs, DateTime atDate)
+        {
+            var workbook = new HSSFWorkbook();
+            var sheet = workbook.CreateSheet("Акт");
+            sheet.SetColumnWidth(0, 3575);
+            sheet.SetColumnWidth(1, 4150);
+            sheet.SetColumnWidth(2, 3575);
+            sheet.SetColumnWidth(3, 2700);
+            sheet.SetColumnWidth(4, 2700);
+            sheet.SetColumnWidth(5, 1620);
+            sheet.SetColumnWidth(6, 2100);
+            sheet.SetColumnWidth(7, 2100);
+            sheet.SetColumnWidth(8, 9850);
+            sheet.SetColumnWidth(9, 4150);
+
+            var headerStyle = NPOIHelper.GetActHeaderCellStyle(workbook);
+            
+            NPOIHelper.CreateActSpanedCell(sheet, 0, 0, 1, 10, 
+                string.Format("Акт по лицевому счету № {0} на {1}", account.Account, atDate.ToString("dd.MM.yyyy")), headerStyle);
+            
+            NPOIHelper.CreateActSpanedCell(sheet, 1, 0, 2, 1, "Месяц", headerStyle);
+            NPOIHelper.CreateActSpanedCell(sheet, 1, 1, 2, 1, "Начислено", headerStyle);
+            NPOIHelper.CreateActSpanedCell(sheet, 1, 2, 2, 1, "Долг", headerStyle);
+            NPOIHelper.CreateActSpanedCell(sheet, 1, 3, 1, 3, "Период просрочки", headerStyle);
+            NPOIHelper.CreateActSpanedCell(sheet, 1, 6, 2, 1, "Ставка", headerStyle);
+            NPOIHelper.CreateActSpanedCell(sheet, 1, 7, 2, 1, "Доля ставки", headerStyle);
+            NPOIHelper.CreateActSpanedCell(sheet, 1, 8, 2, 1, "Формула", headerStyle);
+            NPOIHelper.CreateActSpanedCell(sheet, 1, 9, 2, 1, "Пени", headerStyle);
+            
+            NPOIHelper.CreateActCell(sheet, 2, 3, "с", headerStyle);
+            NPOIHelper.CreateActCell(sheet, 2, 4, "по", headerStyle);
+            NPOIHelper.CreateActCell(sheet, 2, 5, "дней", headerStyle);
+            
+            var rowIndex = 3;
+            var penaltyAcc = 0.0m;
+            var paymentsSum = 0.0m;
+            var totalPenalty = 0.0m;
+
+            foreach (var charge in actChargeVMs.OrderBy(r => r.Date))
+            {
+                var monthStr = charge.Date.ToString("MMM.yyyy");
+                var chargeStr = charge.Value.ToString(CultureInfo.GetCultureInfo("ru-RU"))+" руб.";
+                if (!charge.Events.Any())
+                {
+                    NPOIHelper.CreateActCell(sheet, rowIndex, 0, monthStr, NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center));
+                    NPOIHelper.CreateActCell(sheet, rowIndex, 1, chargeStr, NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+                    NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 2, 1, 8, "Периоды просрочки, платежи и исковые работы отсутствуют", 
+                        NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Left, true));
+                    rowIndex++;
+                } else
+                {
+                    var sortedEvents = charge.Events.OrderBy(r => r.Date).ToList();
+                    var hasDeptPeriods = true;
+
+                    if (!sortedEvents.Where(r => r is KumiActPeniCalcEventVM).Any())
+                    {
+                        hasDeptPeriods = false;
+                    }
+
+                    for(var i = 0; i < sortedEvents.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+                            NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 0, sortedEvents.Count + (hasDeptPeriods ? 0 : 1), 1,  monthStr, 
+                                NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center));
+                            NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 1, sortedEvents.Count + (hasDeptPeriods ? 0 : 1), 1, chargeStr, 
+                                NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+                        }
+
+                        var e = sortedEvents[i];
+                        switch(e)
+                        {
+                            case KumiActPeniCalcEventVM peni:
+                                var peniTaxStr = peni.Tenancy.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                var days = (peni.EndDate - peni.StartDate).TotalDays + 1;
+                                var keyRateCoef = peni.KeyRateCoef == 1 / 300m ? "1/300" : peni.KeyRateCoef == 1 / 130m ? "1/130" : "0";
+                                var penaltyRound = Math.Round(peni.Penalty + penaltyAcc, 2);
+                                totalPenalty += penaltyRound;
+                                penaltyAcc += peni.Penalty - penaltyRound;
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 2, peniTaxStr, NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 3, peni.StartDate.ToString("dd.MM.yyyy"), 
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center));
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 4, peni.EndDate.ToString("dd.MM.yyyy"),
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center));
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 5, days,
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center), CellType.Numeric);
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 6, (double)peni.KeyRate, 
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right), CellType.Numeric);
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 7, keyRateCoef,
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 8, 
+                                    string.Format("{0} x {1} x {2} x {3} %", peniTaxStr, days, keyRateCoef, peni.KeyRate.ToString(CultureInfo.GetCultureInfo("ru-RU"))),
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 9, penaltyRound.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.",
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+                                break;
+                            case KumiActPaymentEventVM payment:
+                                var paymentDiff = -Math.Min(payment.TenancyTail, charge.Value);
+                                paymentsSum += paymentDiff;
+                                var paymentRequsits = "Платеж: ";
+                                if (!string.IsNullOrEmpty(payment.NumDocument))
+                                {
+                                    paymentRequsits += "№ ПД " + payment.NumDocument + " ";
+                                }
+                                else
+                                {
+                                    paymentRequsits += "Id " + payment.IdPayment + " ";
+                                }
+                                paymentRequsits += " на сумму найм " + payment.Tenancy.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб. и пени " +
+                                    payment.Penalty.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                if (payment.Tenancy > payment.TenancyTail)
+                                {
+                                    paymentRequsits += ", неучтеный остаток найм " + payment.TenancyTail.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                }
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 2, paymentDiff.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.",
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 3, payment.Date.ToString("dd.MM.yyyy"),
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center));
+                                NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 4, 1, 5, paymentRequsits,
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Left));
+                                var paymentPenatlyTail = "-";
+                                if (payment.PenaltyTail > 0)
+                                {
+                                    paymentPenatlyTail = "-" + payment.PenaltyTail.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                }
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 9, paymentPenatlyTail,
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+                                break;
+                            case KumiActClaimEventVM claim:
+                                var claimDiff = -Math.Min(claim.TenancyTail, charge.Value);
+                                paymentsSum += claimDiff;
+                                var claimRequsits = "ПИР: период взыскания ";
+                                if (claim.StartDeptPeriod != null)
+                                {
+                                    claimRequsits += "с " + claim.StartDeptPeriod.Value.ToString("dd.MM.yyyy") + " ";
+                                }
+                                claimRequsits += "по " + claim.EndDeptPeriod.Value.ToString("dd.MM.yyyy") + ", ";
+                                claimRequsits += "предъявленный долг найм " + claim.Tenancy.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб. и пени " +
+                                    claim.Penalty.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                if (claim.Tenancy > claim.TenancyTail)
+                                {
+                                    claimRequsits += ", неучтеный остаток " + claim.TenancyTail.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                }
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 2, claimDiff.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.",
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 3, claim.Date.ToString("dd.MM.yyyy"),
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center));
+                                NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 4, 1, 5, claimRequsits,
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Left));
+                                var claimPenatlyTail = "-";
+                                if (claim.PenaltyTail > 0)
+                                {
+                                    claimPenatlyTail = "-" + claim.PenaltyTail.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                }
+                                NPOIHelper.CreateActCell(sheet, rowIndex, 9, claimPenatlyTail,
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+                                break;
+                        }
+                        rowIndex++;
+                    }
+                    if (!hasDeptPeriods)
+                    {
+                        NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 2, 1, 8, "Периоды просрочки отсутствуют",
+                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center, true));
+                        rowIndex++;
+                    }
+                }
+            }
+
+            NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 0, 4, 1, "Итого",
+                                NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Left, false, true));
+            NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 1, 1, 8, "Сумма основного долга начислено",
+                                NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+            NPOIHelper.CreateActCell(sheet, rowIndex, 9, actChargeVMs.Select(r => r.Value).Sum().ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.",
+                                NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+            rowIndex++;
+            NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 1, 1, 8, "Сумма основного долга оплачено",
+                                NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+            var claimsTenancySum = actChargeVMs.SelectMany(r => r.Events).Where(r => r is KumiActClaimEventVM)
+                        .Select(r => (KumiActClaimEventVM)r).GroupBy(r => r.IdClaim).Select(r => r.FirstOrDefault()?.Tenancy ?? 0.0m).Sum();
+            var paymentsTenancySum = actChargeVMs.SelectMany(r => r.Events).Where(r => r is KumiActPaymentEventVM)
+                .Select(r => (KumiActPaymentEventVM)r).GroupBy(r => r.IdPayment).Select(r => r.FirstOrDefault()?.Tenancy ?? 0.0m).Sum();
+            NPOIHelper.CreateActCell(sheet, rowIndex, 9, (claimsTenancySum + paymentsTenancySum).ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.",
+                                NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+            rowIndex++;
+            NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 1, 1, 8, "Пени начислено",
+                NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+            NPOIHelper.CreateActCell(sheet, rowIndex, 9, totalPenalty.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.",
+                                NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+            rowIndex++;
+
+            NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 1, 1, 8, "Пени оплачено",
+                NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+            var totalPenaltyPayed = actChargeVMs.SelectMany(r => r.Events).Where(r => r is IChargePaymentEventVM)
+                        .Select(r => (IChargePaymentEventVM)r).Select(r => r.PenaltyTail).Sum();
+            NPOIHelper.CreateActCell(sheet, rowIndex, 9, totalPenaltyPayed.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.",
+                                NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+
+            using (var exportData = new MemoryStream())
+            {
+                workbook.Write(exportData);
+                return exportData.GetBuffer();
+            }
+        }
+
+        
     }
 }

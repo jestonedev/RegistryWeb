@@ -4,6 +4,7 @@ using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryDb.Models.Entities.Payments;
 using RegistryDb.Models.Entities.Tenancies;
+using RegistryServices.ViewModel.KumiAccounts;
 using RegistryWeb.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,14 @@ namespace RegistryWeb.DataServices
     {
         private readonly RegistryContext registryContext;
         private readonly TenancyProcessesDataService tenancyProcessesData;
-        public KumiAccountReportsDataService(RegistryContext registryContext, TenancyProcessesDataService tenancyProcessesData)
+        private readonly KumiAccountsDataService accountDataService;
+
+        public KumiAccountReportsDataService(RegistryContext registryContext, TenancyProcessesDataService tenancyProcessesData,
+            KumiAccountsDataService accountDataService)
         {
             this.registryContext = registryContext;
             this.tenancyProcessesData = tenancyProcessesData;
+            this.accountDataService = accountDataService;
         }
         public KumiCharge GetLastPayment(int idAccount)
         {
@@ -168,6 +173,16 @@ namespace RegistryWeb.DataServices
         {
             registryContext.LogInvoiceGenerator.Add(lig);
             registryContext.SaveChanges();
+        }
+
+        public KumiAccount GetKumiAccount(int idAccount)
+        {
+            return accountDataService.GetKumiAccount(idAccount);
+        }
+
+        public List<KumiActChargeVM> GetActChargeVMs(int idAccount, DateTime atDate)
+        {
+            return accountDataService.GetActChargeVMs(idAccount, atDate);
         }
     }
 }

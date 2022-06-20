@@ -259,5 +259,13 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
+
+        public IActionResult ActToExcel(int idAccount, DateTime atDate)
+        {
+            var actChargeVMs = dataService.GetActChargeVMs(idAccount, atDate);
+            var account = dataService.GetKumiAccount(idAccount);
+            var file = reportService.KumiAccountAct(account, actChargeVMs, atDate);
+            return File(file, "application/vnd.ms-excel", string.Format("Акт по лицевому счету № {0} на {1}.xls", account.Account, atDate.ToString("dd.MM.yyyy")));
+        }
     }
 }

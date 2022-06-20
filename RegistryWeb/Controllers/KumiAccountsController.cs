@@ -305,13 +305,5 @@ namespace RegistryWeb.Controllers
             ViewBag.ReturnUrl = returnUrl;
             return View("ActCharge", actChargeVMs);
         }
-
-        public IActionResult ActToExcel(int idAccount, DateTime atDate)
-        {
-            var actChargeVMs = dataService.GetActChargeVMs(idAccount, atDate);
-            var account = dataService.GetKumiAccount(idAccount);
-            //TODO
-            return Json("Еще не реализовано");
-        }
     }
 }

@@ -28,7 +28,7 @@ else
     <div class="text-right mb-3 rr-act-button-group">
         <div class="btn-group">
             <button class="btn btn-outline-dark" onclick="window.print()"><span class="oi oi-print pr-2"></span>Печать</button>
-            <a class="btn btn-success" asp-action="ActToExcel" asp-route-idAcctoun="@account.IdAccount" asp-route-atDate="@atDate.ToString("yyyy-MM-dd")"><span class="oi oi-document pr-2"></span>Экспорт</a>
+            <a class="btn btn-success" asp-controller="KumiAccountReports" asp-action="ActToExcel" asp-route-idAccount="@account.IdAccount" asp-route-atDate="@atDate.ToString("yyyy-MM-dd")"><span class="oi oi-document pr-2"></span>Экспорт</a>
         </div>
         @if (ViewBag.ReturnUrl != null)
         {
