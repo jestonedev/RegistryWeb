@@ -1,6 +1,7 @@
 ﻿$(function () {
     $('body').on('keydown', 'input,a,select,button', function (e) {
         var self = $(this);
+        if (self.attr("id") === "FilterOptions_FrontSideRegNumber") return true;
         if (e.key === " " && this.tagName === "A") {
             self.click();
             return false;

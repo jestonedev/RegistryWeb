@@ -223,6 +223,7 @@
                             <div>
                                 ДГИ: @(item.AmountDgi ?? 0) руб.
                             </div>
+                            <div><b>Итого:</b> @((item.AmountTenancy ?? 0) + (item.AmountPenalties ?? 0) + (item.AmountDgi ?? 0)) руб.</div>
                         </div>
 
                         @if (lastPaymentInfo != null)
