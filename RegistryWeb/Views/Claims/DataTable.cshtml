@@ -223,7 +223,19 @@
                             <div>
                                 ДГИ: @(item.AmountDgi ?? 0) руб.
                             </div>
-                            <div><b>Итого:</b> @((item.AmountTenancy ?? 0) + (item.AmountPenalties ?? 0) + (item.AmountDgi ?? 0)) руб.</div>
+                            @if (item.AmountPadun != null && item.AmountPadun != 0)
+                            {
+                                <div>
+                                    Падун: @(item.AmountPadun ?? 0) руб.
+                                </div>
+                            }
+                            @if (item.AmountPkk != null && item.AmountPkk != 0)
+                            {
+                                <div>
+                                    ПКК: @(item.AmountPkk ?? 0) руб.
+                                </div>
+                            }
+                            <div><b>Итого:</b> @((item.AmountTenancy ?? 0) + (item.AmountPenalties ?? 0) + (item.AmountDgi ?? 0) + (item.AmountPadun ?? 0) + (item.AmountPkk ?? 0)) руб.</div>
                         </div>
 
                         @if (lastPaymentInfo != null)
