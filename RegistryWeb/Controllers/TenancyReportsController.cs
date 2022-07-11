@@ -501,5 +501,20 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
+
+        public IActionResult GetNoticeToBks(int idProcess, string actionText, int paymentType, int signer)
+        {
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.NoticeToBks(idProcess, actionText, paymentType, signer);
+                return File(file, odtMime, string.Format(@"Извещение в БКС по найму № {0}.odt", idProcess));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
     }
 }

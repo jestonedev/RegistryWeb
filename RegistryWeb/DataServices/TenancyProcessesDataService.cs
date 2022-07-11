@@ -13,6 +13,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.Models.SqlViews;
 using RegistryWeb.SecurityServices;
+using System.Text.RegularExpressions;
 
 namespace RegistryWeb.DataServices
 {
@@ -131,10 +132,20 @@ namespace RegistryWeb.DataServices
                     });
                     break;
             }
-
+            var registryNums = registryContext.TenancyProcesses.Where(r => r.RegistrationNum != null)
+                .Select(r => r.RegistrationNum).ToList().Where(r => Regex.IsMatch(r, "^[0-9]+/[0-9]{1,2}/" + (DateTime.Now.Year % 100) + "н?$"));
+            var registryNumLast = 0;
+            if (registryNums.Any())
+                registryNumLast = registryNums.Select(r => int.Parse(r.Split("/")[0])).Max();
             return new TenancyProcessVM
             {
-                TenancyProcess = new TenancyProcess {},
+                TenancyProcess = new TenancyProcess {
+                    RegistrationNum = string.Format("{0}/{1}/{2}", 
+                        registryNumLast+1, 
+                        DateTime.Now.Month.ToString().PadLeft(2, '0'), 
+                        (DateTime.Now.Year%100).ToString().PadLeft(2, '0')
+                    )
+                },
                 Kinships = registryContext.Kinships.ToList(),
                 RentTypeCategories = registryContext.RentTypeCategories.ToList(),
                 RentTypes = registryContext.RentTypes.ToList(),
@@ -1311,6 +1322,11 @@ namespace RegistryWeb.DataServices
         public IEnumerable<Preparer> Preparers
         {
             get => registryContext.Preparers.AsNoTracking();
+        }
+
+        public IEnumerable<SelectableSigner> BksSigners
+        {
+            get => registryContext.SelectableSigners.Where(s => s.IdSignerGroup == 1).AsNoTracking();
         }
     }
 }

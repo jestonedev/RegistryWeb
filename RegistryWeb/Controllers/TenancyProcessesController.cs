@@ -66,6 +66,10 @@ namespace RegistryWeb.Controllers
             ViewBag.DistrictCommittees = new SelectList(dataService.DistrictCommittees, "IdCommittee", "NameNominative");
             ViewBag.DistrictCommitteesPreambles = new SelectList(dataService.DistrictCommitteesPreContractPreambles, "IdPreamble", "Name");
             ViewBag.PreparersSelectList = new SelectList(dataService.Preparers, "IdPreparer", "PreparerName");
+            ViewBag.BksSignersSelectList = new SelectList(dataService.BksSigners.Where(s => s.IdSignerGroup == 1).ToList().Select(s => new {
+                s.IdRecord,
+                Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
+            }), "IdRecord", "Snp");
         }
 
         private void InitializeViewBag(string action, string returnUrl, bool canEditBaseInfo, bool canEditEmailsOnly)

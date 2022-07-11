@@ -46,6 +46,10 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnName("agreement_content")
                 .IsUnicode(false);
 
+            builder.Property(e => e.IssuedDate)
+                .HasColumnName("issued_date")
+                .HasColumnType("date");
+
             builder.Property(e => e.IdExecutor)
                 .HasColumnName("id_executor")
                 .HasColumnType("int(11)");
