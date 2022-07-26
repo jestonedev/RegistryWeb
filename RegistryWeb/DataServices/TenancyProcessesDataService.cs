@@ -899,6 +899,12 @@ namespace RegistryWeb.DataServices
                     case 4:
                         // В MunObjectFilter
                         break;
+                    case 5:
+                        filterEndDate = DateTime.Now.Date;
+                        query = from tRow in query
+                                where tRow.EndDate < filterEndDate && (!tRow.RegistrationNum.Contains('н'))
+                                select tRow;
+                        break;
                 }
             }
 
@@ -1129,6 +1135,7 @@ namespace RegistryWeb.DataServices
                     case 1:
                     case 2:
                     case 3:
+                    case 5:
                         //В TenancyFilter
                         break;
                     case 4:
