@@ -207,7 +207,7 @@ $(function () {
             badge.css("display", "inline-block");
         }
         else {
-            badge.find(".rr-count-badge").text('');
+            badge.text('');
             badge.css("display", "none");
         }
     }

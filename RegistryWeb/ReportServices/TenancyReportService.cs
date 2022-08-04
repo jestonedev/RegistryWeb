@@ -253,6 +253,21 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
+        public byte[] NoticeToBks(int idProcess, string actionText, int paymentType, int signer)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "id", idProcess },
+                { "notice_type", 1 },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
+                { "text", actionText },
+                { "payment_type", paymentType },
+                { "signer", signer }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\notice_BKS");
+            return DownloadFile(fileNameReport);
+        }
+
         private string ProcessesIdsToString(List<int> idProcesses)
         {
             return idProcesses.Select(r => r.ToString()).Aggregate((v, acc) => v + "," + acc);

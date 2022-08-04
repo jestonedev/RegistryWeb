@@ -443,6 +443,24 @@ $(function () {
         executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
     }
 
+    function updateCountAgreementsBadge() {
+        var form = $('#TenancyProcessAgreementsForm');
+        var badge = form.find(".rr-count-badge");
+        var count = $('#TenancyProcessAgreementsForm').find('.list-group-item').length - 1;
+        var issuedCount = $('#TenancyProcessAgreementsForm').find('.list-group-item').filter(function (idx, elem) {
+            var issuedDate = $(elem).find('input[id^="IssuedDate_"]').val();
+            return issuedDate !== "" && issuedDate !== undefined;
+        }).length;
+        if (count > 0) {
+            badge.text(count + " / " + issuedCount);
+            badge.css("display", "inline-block");
+        }
+        else {
+            badge.text('');
+            badge.css("display", "none");
+        }
+    }
+
     $("#agreementModal").on("click", "#saveAgreementModalBtn", function (e) {
         e.preventDefault();
         $("#saveAgreementModalBtn").prop("disabled", "disabled");
@@ -468,9 +486,7 @@ $(function () {
                         if (tenancyAgreementReturn.idAgreement > 0) {
                             form.find("[name='Agreement.IdAgreement']").val(tenancyAgreementReturn.idAgreement);
                             updateInsertTenancyAgreementElem();
-
-                            var flag = $("#TenancyProcessAgreementsForm").find("rr-list-group-item-empty") != null ? true : false;
-                            countBadges('#TenancyProcessAgreementsForm', flag);
+                            updateCountAgreementsBadge();
 
                         } else {
                             alert('Произошла ошибка при сохранении');
@@ -523,9 +539,7 @@ $(function () {
                             if ($("#TenancyProcessAgreements .list-group-item").length === 1) {
                                 $("#TenancyProcessAgreements .rr-list-group-item-empty").show();
                             }
-
-                            var flag = $("#TenancyProcessAgreementsForm").find("rr-list-group-item-empty") != null != 0 ? true : false;
-                            countBadges('#TenancyProcessAgreementsForm', flag);
+                            updateCountAgreementsBadge();
 
                         }
                         else {
