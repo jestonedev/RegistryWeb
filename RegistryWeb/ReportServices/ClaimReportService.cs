@@ -257,5 +257,16 @@ namespace RegistryWeb.ReportServices
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
+
+        internal byte[] ClaimExecutedWork(DateTime startDate, DateTime endDate)
+        {
+            var arguments = new Dictionary<string, object> {
+                { "from_date", startDate.ToString("dd.MM.yyyy") },
+                { "to_date", endDate.ToString("dd.MM.yyyy") }
+            };
+            var fileName = "registry\\claims\\cnt_statistic_claim";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
     }
 }
