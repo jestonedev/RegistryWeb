@@ -35,13 +35,13 @@ namespace RegistryWeb.Controllers
             nameMultimaster = "PremiseReports";
         }
 
-        public IActionResult GetExcerptPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer)
+        public IActionResult GetExcerptPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
             try
             {
-                var file = reportService.ExcerptPremise(idPremise, excerptNumber, excerptDateFrom, signer);
+                var file = reportService.ExcerptPremise(idPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
                 return File(file, odtMime, string.Format(@"Выписка на помещение № {0}.odt", idPremise));
             }
             catch (Exception ex)
@@ -50,13 +50,13 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult GetExcerptSubPremise(int idSubPremise, string excerptNumber, DateTime excerptDateFrom, int signer)
+        public IActionResult GetExcerptSubPremise(int idSubPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
             try
             {
-                var file = reportService.ExcerptSubPremise(idSubPremise, excerptNumber, excerptDateFrom, signer);
+                var file = reportService.ExcerptSubPremise(idSubPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
                 return File(file, odtMime, string.Format(@"Выписка на комнату № {0}.odt", idSubPremise));
             }
             catch (Exception ex)
@@ -65,7 +65,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult GetExcerptMunSubPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer)
+        public IActionResult GetExcerptMunSubPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
@@ -75,7 +75,7 @@ namespace RegistryWeb.Controllers
                 {
                     return Error(string.Format("В помещении № {0} отсутствуют муниципальные комнаты", idPremise));
                 }
-                var file = reportService.ExcerptMunSubPremises(idPremise, excerptNumber, excerptDateFrom, signer);
+                var file = reportService.ExcerptMunSubPremises(idPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
                 return File(file, odtMime, string.Format(@"Выписка на мун. комнаты помещения № {0}.odt", idPremise));
             }
             catch (Exception ex)
@@ -151,7 +151,7 @@ namespace RegistryWeb.Controllers
         }
 
         //_________________Для массовых____________________ 
-        public IActionResult GetMassExcerptPremise(string excerptNumber, DateTime excerptDateFrom, int signer)
+        public IActionResult GetMassExcerptPremise(string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
             List<int> ids = GetSessionIds();
 
@@ -163,7 +163,7 @@ namespace RegistryWeb.Controllers
 
             try
             {
-                var file = reportService.ExcerptPremises(ids, excerptNumber, excerptDateFrom, signer);
+                var file = reportService.ExcerptPremises(ids, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
                 return File(file, odtMime, string.Format(@"Массовая выписка.odt"));
             }
             catch (Exception ex)

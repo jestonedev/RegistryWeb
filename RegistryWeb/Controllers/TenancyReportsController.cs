@@ -457,7 +457,7 @@ namespace RegistryWeb.Controllers
             {
                 var ids = GetSessionIds();
                 var file = reportService.ExportReasonsForGisZkh(ids);
-                return File(file, zipMime, "Документ-оснвоания для ГИС \"ЖКХ\".zip");
+                return File(file, zipMime, "Документ-основания для ГИС \"ЖКХ\".zip");
             }
             catch (Exception ex)
             {
@@ -473,7 +473,7 @@ namespace RegistryWeb.Controllers
             {
                 var ids = GetSessionIds();
                 var file = reportService.GisZkhExport(ids);
-                return File(file, xlsxMime, "Экспорт для ГИС \"ЖКХ\""); 
+                return File(file, xlsxMime, "Экспорт для ГИС \"ЖКХ\".xlsx"); 
             }
             catch (Exception ex)
             {
@@ -494,7 +494,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.TenanciesExport(ids);
-                return File(file, odsMime, string.Format(@"Экспорт данных"));
+                return File(file, odsMime, string.Format(@"Экспорт данных.ods"));
             }
             catch (Exception ex)
             {
