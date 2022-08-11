@@ -214,6 +214,9 @@
             case "ClaimDateReferralCcoBailiffs":
                 standartWrapper.show();
                 break;
+            case "ClaimExecutedWork":
+                standartWrapper.show();
+                break;
         }
 
         modal.modal("show");
