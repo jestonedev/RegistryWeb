@@ -871,6 +871,10 @@ namespace RegistryWeb.DataServices
                                  string.Concat(tpRow.Surname.Trim(), " ", tpRow.Name.Trim(), " ", tpRow.Patronymic == null ? "" : tpRow.Patronymic.Trim()).ToLowerInvariant().Contains(tenancyParticipantSnp)))
                          select tRow).Distinct();
             }
+            if (filterOptions.TenantBirthDate.HasValue)
+            {
+                query = query.Where(p => p.TenancyPersons.Any(tr => tr.DateOfBirth == filterOptions.TenantBirthDate && tr.IdKinship==1));
+            }
             if (filterOptions.IdPreset != null)
             {
                 switch (filterOptions.IdPreset)

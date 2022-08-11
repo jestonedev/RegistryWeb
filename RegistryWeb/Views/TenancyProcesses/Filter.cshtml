@@ -170,7 +170,7 @@
                             <input type="text" class="form-control" asp-for="FilterOptions.ReasonDocNum" title="Номер документа-основания найма">
                         </div>
                         <div class="form-group col-md-6 col-lg-3">
-                            <label class="rr-tenancy-filter-label" asp-for="FilterOptions.ReasonDocDate">Дата документа-оснвоания</label>
+                            <label class="rr-tenancy-filter-label" asp-for="FilterOptions.ReasonDocDate">Дата документа-основания</label>
                             <div class="input-group date">
                                 <input type="date" class="form-control" asp-for="FilterOptions.ReasonDocDate" title="Дата документа-оснвоания найма">
                             </div>
@@ -181,11 +181,15 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-12 col-lg-6">
+                        <div class="form-group col-md-12 col-lg-4">
                             <label asp-for="FilterOptions.TenantSnp">ФИО нанимателя</label>
                             <input type="text" class="form-control input-filter-snp" asp-for="FilterOptions.TenantSnp" title="ФИО нанимателя">
                         </div>
-                        <div class="form-group col-md-12 col-lg-6">
+                        <div class="form-group col-md-12 col-lg-4">
+                            <label asp-for="FilterOptions.TenantBirthDate">Дата рождения нанимателя</label>
+                            <input type="date" class="form-control" asp-for="FilterOptions.TenantBirthDate" title="Дата рождения нанимателя">
+                        </div>
+                        <div class="form-group col-md-12 col-lg-4">
                             <label asp-for="FilterOptions.TenancyParticipantSnp">ФИО участника найма</label>
                             <input type="text" class="form-control input-filter-snp" asp-for="FilterOptions.TenancyParticipantSnp" title="ФИО участника найма">
                         </div>

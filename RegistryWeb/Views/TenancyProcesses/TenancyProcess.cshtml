@@ -260,7 +260,7 @@
                         <span class="text-danger field-validation-valid" data-valmsg-for="CustomEmployer" data-valmsg-replace="true"></span>
                     }
 
-                    <select class="selectpicker form-control" asp-for="TenancyProcess.IdEmployer" title="Работодатель"
+                    <select class="selectpicker form-control" data-live-search="true" asp-for="TenancyProcess.IdEmployer" title="Работодатель"
                             data-val="true" data-val-required="Выберите работодателя">
                         <option></option>
                         @foreach (var employer in Model.Employers)

@@ -174,6 +174,13 @@
         
         var idObject = $("#excerptModal").find("[name='Excerpt.IdObject']").val();
         var excerptType = $("#excerptModal").find("[name='Excerpt.ExcerptType']").val();
+
+        var excerptHaveLiveSpace = null;
+        if ($("#excerptModal").find("[name='Excerpt.ExcerptHaveLiveSpace']").is(':checked'))
+            excerptHaveLiveSpace = 1;
+         else 
+            excerptHaveLiveSpace = 0;
+
         var excerptNumber = $("#excerptModal").find("[name='Excerpt.ExcerptNumber']").val();
         var excerptDate = $("#excerptModal").find("[name='Excerpt.ExcerptDate']").val();
         var signer = $("#excerptModal").find("[name='Excerpt.Signer']").val();
@@ -184,19 +191,19 @@
         switch (excerptType) {
             case "1":
                 var url = "/PremiseReports/GetExcerptPremise?idPremise=" + idObject + "&excerptNumber=" + encodeURIComponent(excerptNumber)
-                    + "&excerptDateFrom=" + excerptDate + "&signer=" + signer;
+                    + "&excerptDateFrom=" + excerptDate + "&signer=" + signer + "&excerptHaveLiveSpace=" + excerptHaveLiveSpace;
                 break;
             case "2":
                 url = "/PremiseReports/GetExcerptSubPremise?idSubPremise=" + idObject + "&excerptNumber=" + encodeURIComponent(excerptNumber)
-                    + "&excerptDateFrom=" + excerptDate + "&signer=" + signer;
+                    + "&excerptDateFrom=" + excerptDate + "&signer=" + signer + "&excerptHaveLiveSpace=" + excerptHaveLiveSpace;
                 break;
             case "3":
                 url = "/PremiseReports/GetExcerptMunSubPremise?idPremise=" + idObject + "&excerptNumber=" + encodeURIComponent(excerptNumber)
-                    + "&excerptDateFrom=" + excerptDate + "&signer=" + signer;
+                    + "&excerptDateFrom=" + excerptDate + "&signer=" + signer + "&excerptHaveLiveSpace=" + excerptHaveLiveSpace;
                 break;
             case "4":
                 url = "/PremiseReports/GetMassExcerptPremise?excerptNumber=" + encodeURIComponent(excerptNumber)
-                    + "&excerptDateFrom=" + excerptDate + "&signer=" + signer;
+                    + "&excerptDateFrom=" + excerptDate + "&signer=" + signer + "&excerptHaveLiveSpace=" + excerptHaveLiveSpace;
                 break;
         }
         if (url !== undefined) {
