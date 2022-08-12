@@ -22,6 +22,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public string TenantSnp { get; set; }
         public DateTime? TenantBirthDate { get; set; }
         public string TenancyParticipantSnp { get; set; }
+        public DateTime? TenancyParticipantBirthDate { get; set; }
         public List<int> IdsRentType { get; set; }
         public string IdRegion { get; set; }
         public string IdStreet { get; set; }
@@ -43,7 +44,8 @@ namespace RegistryWeb.ViewOptions.Filter
             return (IdProcess == null || IdProcess == 0) &&
                 RegistrationNum == null && RegistrationDate == null &&
                 IssuedDate == null && BeginDate == null && EndDate == null &&
-                ReasonDocNum == null && ReasonDocDate == null && TenantBirthDate == null &&
+                ReasonDocNum == null && ReasonDocDate == null &&
+                TenantBirthDate == null && TenancyParticipantBirthDate == null &&
                 (IdsReasonType == null || IdsReasonType.Count == 0) &&
                 TenantSnp == null && TenancyParticipantSnp == null &&
                 (IdsRentType == null || IdsRentType.Count == 0) &&

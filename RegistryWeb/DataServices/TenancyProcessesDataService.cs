@@ -875,6 +875,10 @@ namespace RegistryWeb.DataServices
             {
                 query = query.Where(p => p.TenancyPersons.Any(tr => tr.DateOfBirth == filterOptions.TenantBirthDate && tr.IdKinship==1));
             }
+            if (filterOptions.TenancyParticipantBirthDate.HasValue)
+            {
+                query = query.Where(p => p.TenancyPersons.Any(tr => tr.DateOfBirth == filterOptions.TenancyParticipantBirthDate && tr.IdKinship!=1));
+            }
             if (filterOptions.IdPreset != null)
             {
                 switch (filterOptions.IdPreset)
