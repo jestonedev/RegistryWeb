@@ -1021,13 +1021,18 @@ namespace RegistryWeb.DataServices
 
         public Claim GetClaim(int idClaim)
         {
-            return registryContext.Claims.Include(r => r.IdAccountNavigation)
+            var claim = registryContext.Claims.Include(r => r.IdAccountNavigation)
                 .Include(r => r.IdAccountAdditionalNavigation)
                 .Include(r => r.ClaimStates)
                 .Include(r => r.ClaimPersons)
                 .Include(r => r.ClaimFiles)
                 .Include(r => r.ClaimCourtOrders)
                 .FirstOrDefault(r => r.IdClaim == idClaim);
+            foreach(var state in claim.ClaimStates)
+            {
+                state.ClaimStateFiles = registryContext.ClaimStateFiles.Where(r => r.IdState == state.IdState).ToList();
+            }
+            return claim;
         }
 
         public List<ClaimState> GetClaimStates(int idClaim)
