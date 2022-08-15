@@ -16,6 +16,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public string Patronymic { get; set; }
         public DateTime? BirthDate { get; set; }
         public bool IsRefusenik { get; set; }
+        public string FrontSideRegNumber { get; set; }
 
         public bool IsModalEmpty()
         {
@@ -26,7 +27,7 @@ namespace RegistryWeb.ViewOptions.Filter
 
         public bool IsEmpty()
         {
-            return IsAddressEmpty() && IsModalEmpty();
+            return IsAddressEmpty() && IsModalEmpty() && FrontSideRegNumber == null;
         }
     }
 }

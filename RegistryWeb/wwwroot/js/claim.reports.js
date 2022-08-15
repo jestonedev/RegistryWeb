@@ -208,14 +208,15 @@
             case "ClaimEmergencyTariffReport":
                 standartWrapper.show();
                 break;
-
             case "ClaimFactMailing":
                 factMailingWrapper.show();
                 break;
             case "ClaimDateReferralCcoBailiffs":
                 standartWrapper.show();
                 break;
-        }
+            case "ClaimExecutedWork":
+                standartWrapper.show();
+                break;        }
 
         modal.modal("show");
         e.preventDefault();

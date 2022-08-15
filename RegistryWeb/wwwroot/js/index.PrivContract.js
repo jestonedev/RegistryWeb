@@ -1,11 +1,15 @@
 ﻿var searchModal = function () {
     addressClear();
+    $("#FilterOptions_FrontSideRegNumber").val("");
     $("form.filterForm").submit();
 };
 
 var filterClearModal = function () {
-    resetModalForm($("form.filterForm"));
+    $("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal input[type='hidden'], #filterModal select").val("");
+    $('#FilterOptions_IdStreet, #FilterOptions_IdRegion').selectpicker('render');
+    $("#filterModal input[type='checkbox']").prop("checked", false);
     filterIdRegionChange();
+    $("form.filterForm").valid();
 };
 var filterClear = function () {
     filterClearModal();
@@ -44,4 +48,19 @@ $(function () {
         var modal = $("#filterModal");
         modal.modal('show');
     });
+
+    $("#FilterOptions_FrontSideRegNumber").keyup(function (event) {
+        if (event.keyCode == 13) {
+            event.preventDefault();
+            filterClear();
+        }
+    });
+
+    $("#regNumberFilterClearBtn").click(function (event) {
+        event.preventDefault();
+        $("#FilterOptions_FrontSideRegNumber").val("");
+        filterIdRegionChange();
+        $("form.filterForm").submit();
+    });
+
 });

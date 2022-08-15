@@ -1155,7 +1155,7 @@ namespace RegistryWeb.DataServices
 
         public Claim GetClaim(int idClaim)
         {
-            return registryContext.Claims
+            var claim = registryContext.Claims
                 .Include(r => r.IdAccountNavigation)
                 .Include(r => r.IdAccountAdditionalNavigation)
                 .Include(r => r.IdAccountKumiNavigation)
@@ -1165,6 +1165,11 @@ namespace RegistryWeb.DataServices
                 .Include(r => r.ClaimCourtOrders)
                 .Include(r => r.PaymentClaims)
                 .FirstOrDefault(r => r.IdClaim == idClaim);
+            foreach(var state in claim.ClaimStates)
+            {
+                state.ClaimStateFiles = registryContext.ClaimStateFiles.Where(r => r.IdState == state.IdState).ToList();
+            }
+            return claim;
         }
 
         public List<ClaimState> GetClaimStates(int idClaim)

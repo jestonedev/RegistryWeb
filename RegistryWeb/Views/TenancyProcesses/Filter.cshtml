@@ -171,7 +171,7 @@
                             <input type="text" class="form-control" asp-for="FilterOptions.ReasonDocNum" title="Номер документа-основания найма">
                         </div>
                         <div class="form-group col-md-6 col-lg-3">
-                            <label class="rr-tenancy-filter-label" asp-for="FilterOptions.ReasonDocDate">Дата документа-оснвоания</label>
+                            <label class="rr-tenancy-filter-label" asp-for="FilterOptions.ReasonDocDate">Дата документа-основания</label>
                             <div class="input-group date">
                                 <input type="date" class="form-control" asp-for="FilterOptions.ReasonDocDate" title="Дата документа-оснвоания найма">
                             </div>
@@ -182,13 +182,21 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-12 col-lg-6">
+                        <div class="form-group col-md-12 col-lg-3">
                             <label asp-for="FilterOptions.TenantSnp">ФИО нанимателя</label>
                             <input type="text" class="form-control input-filter-snp" asp-for="FilterOptions.TenantSnp" title="ФИО нанимателя">
                         </div>
-                        <div class="form-group col-md-12 col-lg-6">
+                        <div class="form-group col-md-12 col-lg-3">
+                            <label asp-for="FilterOptions.TenantBirthDate">Дата рождения нанимателя</label>
+                            <input type="date" class="form-control" asp-for="FilterOptions.TenantBirthDate" title="Дата рождения нанимателя">
+                        </div>
+                        <div class="form-group col-md-12 col-lg-3">
                             <label asp-for="FilterOptions.TenancyParticipantSnp">ФИО участника найма</label>
                             <input type="text" class="form-control input-filter-snp" asp-for="FilterOptions.TenancyParticipantSnp" title="ФИО участника найма">
+                        </div>
+                        <div class="form-group col-md-12 col-lg-3">
+                            <label asp-for="FilterOptions.TenancyParticipantBirthDate">Дата рождения участника найма</label>
+                            <input type="date" class="form-control" asp-for="FilterOptions.TenancyParticipantBirthDate" title="Дата рождения участника найма">
                         </div>
                     </div>
                     <div class="form-row">
@@ -230,6 +238,7 @@
                                 <option></option>
                                 <option value="1">Наймы с заканчивающимся через 4 месяца сроком действия</option>
                                 <option value="2">Наймы с уже закончившимся сроком действия</option>
+                                <option value="5">Наймы с уже закончившимся сроком действия, но не отмеченным № договора</option>
                                 <option value="3">Наймы с продлением</option>
                                 <option value="4">Наймы для аварийного жилья</option>
                             </select>

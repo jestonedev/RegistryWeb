@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace RegistryDb.Models.Entities.Claims
 {
@@ -43,5 +44,6 @@ namespace RegistryDb.Models.Entities.Claims
         public byte Deleted { get; set; }
         public virtual Claim IdClaimNavigation { get; set; }
         public virtual ClaimStateType IdStateTypeNavigation { get; set; }
+        public virtual IList<ClaimStateFile> ClaimStateFiles { get; set; }
     }
 }

@@ -56,7 +56,20 @@ namespace RegistryWeb.DataServices
             {
                 query = AddressFilter(query, filterOptions);
                 query = ModalFilter(query, filterOptions);
+                query = FrontSideRegNumberFilter(query, filterOptions);
                 query = OldAddressFilter(query, filterOptions);
+            }
+            return query;
+        }
+
+        private IQueryable<PrivContract> FrontSideRegNumberFilter(IQueryable<PrivContract> query, PrivatizationFilter filterOptions)
+        {
+            if (!string.IsNullOrEmpty(filterOptions.FrontSideRegNumber))
+            {
+                var regNum = filterOptions.FrontSideRegNumber.Trim();
+                query = from row in query
+                        where row.RegNumber.Contains(regNum)
+                        select row;
             }
             return query;
         }

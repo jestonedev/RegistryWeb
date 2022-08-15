@@ -11,9 +11,11 @@ namespace RegistryWeb.ViewModel
         public string Tenant { get; set; }
         public DateTime OnData { get; set; }
         public string BalanceInput { get; set; }
-        public string Charging { get; set; }
+        public string ChargingTenancy { get; set; }
+        public string ChargingPenalty { get; set; }
         public string Payed { get; set; }
-        public string Recalc { get; set; }
+        public string RecalcTenancy { get; set; }
+        public string RecalcPenalty { get; set; }
         public string BalanceOutput { get; set; }
         public string TotalArea { get; set; }
         public string TextMessage { get; set; }

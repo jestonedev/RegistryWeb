@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -49,6 +52,22 @@ namespace RegistryWeb.Controllers.ServiceControllers
                     {
                         courtOrder.Deleted = 1;
                     }
+
+                    var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"ClaimStates\");
+                    var files = registryContext.ClaimStateFiles.Where(r => r.IdState == idState).ToList();
+                    foreach(var file in files)
+                    {
+                        var fileOriginName = file.FileName;
+                        if (!string.IsNullOrEmpty(fileOriginName))
+                        {
+                            var filePath = Path.Combine(path, fileOriginName);
+                            if (System.IO.File.Exists(filePath))
+                            {
+                                System.IO.File.Delete(filePath);
+                            }
+                        }
+                        registryContext.ClaimStateFiles.Remove(file);
+                    }
                 }
 
                 registryContext.SaveChanges();
@@ -74,6 +93,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             var courtOrders = claimState.IdStateType == 4 ? registryContext.ClaimCourtOrders.Where(r => r.IdClaim == claimState.IdClaim).ToList()
                 : new List<ClaimCourtOrder>();
             return Json(new {
+                idState = claimState.IdState,
                 idStateType = claimState.IdStateType,
                 dateStartState = claimState.DateStartState.HasValue ? claimState.DateStartState.Value.ToString("yyyy-MM-dd") : null,
                 description = claimState.Description,
@@ -123,17 +143,49 @@ namespace RegistryWeb.Controllers.ServiceControllers
                     endDeptPeriod = r.EndDeptPeriod.HasValue ? r.EndDeptPeriod.Value.ToString("yyyy-MM-dd") : null,
                     createDate = r.CreateDate.HasValue ? r.CreateDate.Value.ToString("yyyy-MM-dd") : null,
                     orderDate = r.OrderDate.ToString("yyyy-MM-dd")
-                })
+                }),
+                claimStateFiles = registryContext.ClaimStateFiles.Where(r => r.IdState == idState).Select(r => new {
+                    r.IdState,
+                    r.FileName,
+                    r.DisplayName,
+                    r.MimeType,
+                    r.IdFile
+                }).ToList()
             });
         }
 
-        [HttpPost]
-        public IActionResult SaveClaimState(ClaimState claimState, List<ClaimCourtOrder> courtOrders)
+        public IActionResult DownloadFile(int idFile)
         {
+            var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"ClaimStates\");
+            var file = registryContext.ClaimStateFiles.Where(r => r.IdFile == idFile).AsNoTracking().FirstOrDefault();
+            if (file == null) return Json(new { Error = -1 });
+            var filePath = Path.Combine(path, file.FileName);
+            if (!System.IO.File.Exists(filePath))
+            {
+                return Json(new { Error = -2 });
+            }
+            return File(System.IO.File.ReadAllBytes(filePath), file.MimeType ?? "application/octet-stream", file.DisplayName);
+        }
+
+        [HttpPost]
+        public IActionResult SaveClaimState(ClaimState claimState, IFormFile attachmentFile, bool attachmentFileRemove, List<ClaimCourtOrder> courtOrders)
+        {
+            var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"ClaimStates\");
             if (claimState == null)
                 return Json(new { Error = -1 });
             if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
                 return Json(new { Error = -2 });
+            // Сохраняем прикрепленный файл
+            if (attachmentFile != null && !attachmentFileRemove && claimState.ClaimStateFiles.Count > 0)
+            {
+                claimState.ClaimStateFiles[0].DisplayName = attachmentFile.FileName;
+                claimState.ClaimStateFiles[0].FileName = Guid.NewGuid().ToString() + "." + new FileInfo(attachmentFile.FileName).Extension;
+                claimState.ClaimStateFiles[0].MimeType = attachmentFile.ContentType;
+                claimState.ClaimStateFiles[0].IdState = claimState.IdState;
+                var fileStream = new FileStream(Path.Combine(path, claimState.ClaimStateFiles[0].FileName), FileMode.CreateNew);
+                attachmentFile.OpenReadStream().CopyTo(fileStream);
+                fileStream.Close();
+            }
 
             var claimStates = registryContext.ClaimStates.Where(cs => cs.IdClaim == claimState.IdClaim).AsNoTracking().ToList();
             var claimStateTypeRelations = registryContext.ClaimStateTypeRelations.AsNoTracking().ToList();
@@ -156,12 +208,18 @@ namespace RegistryWeb.Controllers.ServiceControllers
                     return Json(new { Error = -3 });
                 }
 
+                if (claimState.ClaimStateFiles == null || (claimState.ClaimStateFiles.Count > 0 && attachmentFile == null))
+                {
+                    claimState.ClaimStateFiles = new List<ClaimStateFile>();
+                }
+
                 registryContext.ClaimStates.Add(claimState);
                 if (claimState.IdStateType == 4)
                     UpdateCourtOrders(courtOrders, claimState.IdClaim);
 
                 registryContext.SaveChanges();
-
+                if (claimState.ClaimStateFiles.Count > 0)
+                    claimState.ClaimStateFiles[0].IdClaimStateNavigation = null;
                 return Json(new { claimState });
             }
             //Обновить    
@@ -192,12 +250,61 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 return Json(new { Error = -3 });
             }
 
+            var claimStateFiles = claimState.ClaimStateFiles;
+            claimState.ClaimStateFiles = new List<ClaimStateFile>();
             registryContext.ClaimStates.Update(claimState);
             if (claimState.IdStateType == 4)
+            {
                 UpdateCourtOrders(courtOrders, claimState.IdClaim);
+                UpdateAttachmentFiles(claimStateFiles, claimState.IdState, attachmentFileRemove);
+            }
 
             registryContext.SaveChanges();
+            if (claimState.ClaimStateFiles != null && claimState.ClaimStateFiles.Count > 0)
+                claimState.ClaimStateFiles[0].IdClaimStateNavigation = null;
             return Json(new { claimState });
+        }
+
+        private void UpdateAttachmentFiles(IList<ClaimStateFile> newFiles, int idState, bool attachmentFileRemove)
+        {
+            var path = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"ClaimStates\");
+            var oldFiles = registryContext.ClaimStateFiles.Where(r => r.IdState == idState);
+            foreach (var oldFile in oldFiles)
+            {
+                if (attachmentFileRemove)
+                {
+                    registryContext.ClaimStateFiles.Remove(oldFile);
+                    var fileName = Path.Combine(path, oldFile.FileName);
+                    if (System.IO.File.Exists(fileName))
+                    {
+                        System.IO.File.Delete(fileName);
+                    }
+                }
+            }
+            foreach (var newFile in newFiles)
+            {
+                if (newFile.FileName == null) continue;
+
+                var oldFile = oldFiles.FirstOrDefault(r => r.IdFile == newFile.IdFile);
+                if (oldFile != null)
+                {
+                    var fileName = Path.Combine(path, oldFile.FileName);
+                    if (System.IO.File.Exists(fileName))
+                    {
+                        System.IO.File.Delete(fileName);
+                    }
+
+                    oldFile.FileName = newFile.FileName;
+                    oldFile.DisplayName = newFile.DisplayName;
+                    oldFile.MimeType = newFile.MimeType;
+
+                    registryContext.ClaimStateFiles.Update(oldFile);
+                }
+                else
+                {
+                    registryContext.ClaimStateFiles.Add(newFile);
+                }
+            }
         }
 
         private void UpdateCourtOrders(List<ClaimCourtOrder> newCourtOrders, int idClaim)

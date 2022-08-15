@@ -72,7 +72,36 @@ function editClaimState(e) {
         courtOrderTemplateForCancelation = undefined;
     }
 
+    showClaimStateFileEditFileBtns(claimStateElem,
+        claimStateElem.find(".rr-claim-state-file-download").length > 0 &&
+        !claimStateElem.find(".rr-claim-state-file-download").hasClass("disabled"));
+
     e.preventDefault();
+}
+
+function showClaimStateFileEditFileBtns(claimStateElem, fileExists) {
+    let attachmentFileBtns = claimStateElem.find(".rr-claim-state-file-buttons");
+    claimStateElem.find(".rr-claim-state-file-download").hide();
+    if (fileExists) {
+        attachmentFileBtns.append(claimStateElem.find(".rr-claim-state-file-remove").show());
+        claimStateElem.find(".rr-claim-state-file-attach").hide();
+    } else {
+        claimStateElem.find(".rr-claim-state-file-remove").hide();
+        attachmentFileBtns.append(claimStateElem.find(".rr-claim-state-file-attach").show());
+    }
+}
+
+
+function showClaimStateFileDownloadFileBtn(claimStateElem, fileExists) {
+    let attachmentFileBtns = claimStateElem.find(".rr-claim-state-file-buttons");
+    attachmentFileBtns.append(claimStateElem.find(".rr-claim-state-file-download").show());
+    if (fileExists) {
+        claimStateElem.find(".rr-claim-state-file-download").removeClass("disabled");
+    } else {
+        claimStateElem.find(".rr-claim-state-file-download").addClass("disabled");
+    }
+    claimStateElem.find(".rr-claim-state-file-remove").hide();
+    claimStateElem.find(".rr-claim-state-file-attach").hide();
 }
 
 function cancelEditClaimState(e) {
@@ -87,6 +116,14 @@ function cancelEditClaimState(e) {
             success: function (claimState) {
                 refreshClaimState(claimStateElem, claimState);
                 showEditDelPanelClaimState(claimStateElem);
+                var file = (claimState.claimStateFiles !== undefined && claimState.claimStateFiles.length > 0) ?
+                    claimState.claimStateFiles[0] : null;
+                if (file !== null) {
+                    claimStateElem.find("input[name^='IdFile']").val(file.idFile);
+                    claimStateElem.find(".rr-claim-state-file-download")
+                        .prop("href", "/ClaimStates/DownloadFile/?idFile=" + file.idFile);
+                }
+                showClaimStateFileDownloadFileBtn(claimStateElem, file !== null && file.fileOriginName !== "" && file.fileOriginName !== null);
                 clearValidationError(claimStateElem);
                 claimStateElem.find("[id^='claimCourtOrderAdd']").addClass("disabled");
                 claimStateElem.find(".edit-del-court-order-panel a").addClass("disabled");
@@ -163,6 +200,9 @@ function refreshClaimState(claimStateElem, claimState) {
     claimStateElem.find("[name^='CourtOrderCompleteReason']").val(claimState.courtOrderCompleteReason);
     claimStateElem.find("[name^='CourtOrderCompleteDescription']").val(claimState.courtOrderCompleteDescription);
 
+    claimStateElem.find("[name^='ClaimStateFile_']").val("");
+    claimStateElem.find("[name^='ClaimStateFileRemove']").val(false);
+
     var courtOrderListElem = claimStateElem.find("[id^='ClaimCourtOrders_']");
     courtOrderListElem.empty();
     if (courtOrderTemplateForCancelation !== undefined) {
@@ -222,6 +262,14 @@ function saveClaimState(e) {
             success: function (claimState) {
                 if (claimState.claimState.idState > 0) {
                     showEditDelPanelClaimState(claimStateElem);
+                    var file = (claimState.claimState.claimStateFiles !== undefined && claimState.claimState.claimStateFiles.length > 0) ?
+                        claimState.claimState.claimStateFiles[0] : null;
+                    if (file !== null) {
+                        claimStateElem.find("input[name^='IdFile']").val(file.idFile);
+                        claimStateElem.find(".rr-claim-state-file-download")
+                            .prop("href", "/ClaimStates/DownloadFile/?idFile=" + file.idFile);
+                    }
+                    showClaimStateFileDownloadFileBtn(claimStateElem, file !== null && file.fileOriginName !== "" && file.fileOriginName !== null);
                     claimStateElem.find("input[name^='IdState']").val(claimState.claimState.idState);
                     claimStateElem.find("[id^='claimCourtOrderAdd']").addClass("disabled");
                     claimStateElem.find(".edit-del-court-order-panel a").addClass("disabled");
@@ -308,6 +356,12 @@ function getClaimState(claimStateElem) {
         claimState.CourtOrderNum = claimStateElem.find("[name^='CourtOrderNum']").val();
         claimState.ObtainingCourtOrderDate = claimStateElem.find("[name^='ObtainingCourtOrderDate']").val();
         claimState.ObtainingCourtOrderDescription = claimStateElem.find("[name^='ObtainingCourtOrderDescription']").val();
+        claimState.ClaimStateFile = {
+            IdFile: claimStateElem.find("[name^='IdFile']").val(),
+            IdState: claimState.IdState,
+            AttachmentFile: claimStateElem.find("[name^='ClaimStateFile_']")[0],
+            AttachmentFileRemove: claimStateElem.find("[name^='ClaimStateFileRemove']").val()
+        };
     }
     if (claimStateTypeId === 5) {
         claimState.DirectionCourtOrderBailiffsDate = claimStateElem.find("[name^='DirectionCourtOrderBailiffsDate']").val();
@@ -347,7 +401,13 @@ function getClaimStates() {
 function claimStateToFormData(claimState, courtOrders) {
     var formData = new FormData();
     for (let field in claimState) {
-        formData.append("ClaimState." + field, claimState[field]);
+        if (field === "ClaimStateFile") {
+            formData.append("ClaimState.ClaimStateFiles[0].IdFile", claimState[field].IdFile);
+            formData.append("ClaimState.ClaimStateFiles[0].IdState", claimState[field].IdState);
+            formData.append("AttachmentFile", claimState[field].AttachmentFile.files[0]);
+            formData.append("AttachmentFileRemove", claimState[field].AttachmentFileRemove);
+        } else
+            formData.append("ClaimState." + field, claimState[field]);
     }
     for (let i = 0; i < courtOrders.length; i++) {
         for (let field in courtOrders[i]) {
@@ -423,6 +483,36 @@ function openModalForOspStatement(e)
     e.preventDefault();
 }
 
+function attachClaimStateFile(e) {
+    var claimStateElem = $(this).closest(".list-group-item");
+    claimStateElem.find("input[name^='ClaimStateFile_']").click();
+    claimStateElem.find("input[name^='ClaimStateFileRemove']").val(false);
+    e.preventDefault();
+}
+
+function changeClaimStateFileAttachment() {
+    var claimStateElem = $(this).closest(".list-group-item");
+    if ($(this).val() !== "") {
+        let attachmentFileBtns = claimStateElem.find(".rr-claim-state-file-buttons");
+        claimStateElem.find(".rr-claim-state-file-attach").hide();
+        attachmentFileBtns.append(claimStateElem.find(".rr-claim-state-file-remove").show());
+        var courtOrderNumElem = claimStateElem.find("input[name^='CourtOrderNum_']");
+        if (courtOrderNumElem.val() === "") {
+            courtOrderNumElem.val($(this)[0].files[0].name);
+        }
+    }
+}
+
+function removeClaimStateFile(e) {
+    var claimStateElem = $(this).closest(".list-group-item");
+    claimStateElem.find("input[name^='ClaimStateFile_']").val("");
+    claimStateElem.find("input[name^='ClaimStateFileRemove']").val(true);
+    let attachmentFileBtns = claimStateElem.find(".rr-claim-state-file-buttons");
+    claimStateElem.find(".rr-claim-state-file-remove").hide();
+    attachmentFileBtns.append(claimStateElem.find(".rr-claim-state-file-attach").show());
+    e.preventDefault();
+}
+
 $(function (){
     $("#ClaimStatesForm").on("click", "#claimStateAdd", addClaimState);
     $('#ClaimStatesForm').on('click', '.claim-state-edit-btn', editClaimState);
@@ -431,6 +521,10 @@ $(function (){
     $('#ClaimStatesForm').on('click', '.claim-state-delete-btn', deleteClaimState);
     $('#ClaimStatesForm').on('click', '.rr-claim-state-details', showClaimStateDetails);
     $('#ClaimStatesForm').on('change', 'select[name^="IdStateType"]', changeClaimStateType);
+
+    $('#ClaimStatesForm').on('click', '.rr-claim-state-file-attach', attachClaimStateFile);
+    $('#ClaimStatesForm').on('click', '.rr-claim-state-file-remove', removeClaimStateFile);
+    $('#ClaimStatesForm').on('change', "input[name^='ClaimStateFile_']", changeClaimStateFileAttachment);
 
     $("#ClaimStatesForm").on("click", ".rr-claim-osp-btn", openModalForOspStatement);
 

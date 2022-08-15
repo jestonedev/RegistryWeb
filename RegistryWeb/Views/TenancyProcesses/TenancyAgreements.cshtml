@@ -3,17 +3,18 @@
 
 <link rel="stylesheet" href="~/css/tenancy.agreements.css" />
 <script src="~/js/tenancyProcess.agreements.js"></script>
-<form id="TenancyProcessAgreementsForm">
+<form id="TenancyProcessAgreementsForm" autocomplete="off">
     <div class="card rr-tenancy-card mb-2">
         <div class="card-header d-flex justify-content-between pt-2 pb-2">
             <h4 class="mt-1">
                 Дополнительные соглашения
                 @{
                     var count = Model != null && Model.Any() ? Model.Count().ToString() : "";
+                    var issuedCount = Model != null && Model.Any() ? Model.Where(r => r.IssuedDate != null).Count().ToString() : "";
                     var visible = Model != null && Model.Any() ? "" : "style='display: none;'";
                 }
                 <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visible)>
-                    @count
+                    @count / @issuedCount
                 </span>
             </h4>
             <div class="btn-group" role="group">
@@ -61,7 +62,13 @@
                             <span class="text-danger field-validation-valid" data-valmsg-for="Agreement.AgreementDate" data-valmsg-replace="true">
                             </span>
                         </div>
-                        <div class="form-group col-md-6 col-lg-9">
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label for="Agreement_IssuedDate">Дата выдачи</label>
+                            <div class="input-group date">
+                                <input type="date" id="Agreement_IssuedDate" name="Agreement.IssuedDate" class="form-control" title="Дата выдачи соглашения">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 col-lg-6">
                             <label for="Agreement_IdExecutor">Исполнитель/составитель</label>
                             <select class="selectpicker form-control" data-actions-box="true" id="Agreement_IdExecutor" name="Agreement.IdExecutor" title="Исполнитель/составитель" asp-items="@(new SelectList(ViewBag.Executors, "IdExecutor", "ExecutorName"))"
                                     data-val="true" data-val-required="Выберите исполнителя">
@@ -222,8 +229,7 @@
                             </div>
                             <div class="form-group col-lg-6 col-md-12 rr-agreement-type-field" data-agreement-types="7">
                                 <label for="Agreement_Type_TenancyPersonsChangeKinship">Наниматель</label>
-                                <select class="selectpicker form-control" id="Agreement_Type_TenancyPersonsChangeKinship" name="Agreement_Type_TenancyPersonsChangeKinship" title="Наниматель">
-                                </select>
+                                <select class="selectpicker form-control" id="Agreement_Type_TenancyPersonsChangeKinship" name="Agreement_Type_TenancyPersonsChangeKinship" title="Наниматель"></select>
                             </div>
                             <div class="form-group col-lg-3 col-md-6 rr-agreement-type-field" data-agreement-types="7">
                                 <label for="Agreement_Type_OldKinship">Текущая род. связь</label>

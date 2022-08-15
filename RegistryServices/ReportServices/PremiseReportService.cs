@@ -18,7 +18,7 @@ namespace RegistryWeb.ReportServices
             this.securityService = securityService;
         }
 
-        public byte[] ExcerptPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer)
+        public byte[] ExcerptPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
             var arguments = new Dictionary<string, object>
             {
@@ -26,6 +26,7 @@ namespace RegistryWeb.ReportServices
                 { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 { "excerpt_type", 1 },
                 { "excerpt_number", excerptNumber },
+                { "excerpt_have_live_space", excerptHaveLiveSpace },
                 { "excerpt_date_from", excerptDateFrom.ToString("dd.MM.yyyy") },
                 { "signer", signer }
             };
@@ -33,7 +34,7 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
-        public byte[] ExcerptSubPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer)
+        public byte[] ExcerptSubPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
             var arguments = new Dictionary<string, object>
             {
@@ -41,6 +42,7 @@ namespace RegistryWeb.ReportServices
                 { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 { "excerpt_type", 2 },
                 { "excerpt_number", excerptNumber },
+                { "excerpt_have_live_space", excerptHaveLiveSpace },
                 { "excerpt_date_from", excerptDateFrom.ToString("dd.MM.yyyy") },
                 { "signer", signer }
             };
@@ -48,7 +50,7 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
-        public byte[] ExcerptMunSubPremises(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer)
+        public byte[] ExcerptMunSubPremises(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
             var arguments = new Dictionary<string, object>
             {
@@ -56,6 +58,7 @@ namespace RegistryWeb.ReportServices
                 { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 { "excerpt_type", 3 },
                 { "excerpt_number", excerptNumber },
+                { "excerpt_have_live_space", excerptHaveLiveSpace },
                 { "excerpt_date_from", excerptDateFrom.ToString("dd.MM.yyyy") },
                 { "signer", signer }
             };
@@ -112,7 +115,7 @@ namespace RegistryWeb.ReportServices
         }
 
         //___________для массовых______________
-        public byte[] ExcerptPremises(List<int> idPremises, string excerptNumber, DateTime excerptDateFrom, int signer)
+        public byte[] ExcerptPremises(List<int> idPremises, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
             var fileName = Path.GetTempFileName();
             using (var sw = new StreamWriter(fileName))
@@ -123,6 +126,7 @@ namespace RegistryWeb.ReportServices
                 { "excerpt_type", 4 },
                 { "excerpt_date_from", excerptDateFrom.ToString("dd.MM.yyyy") },
                 { "excerpt_number", excerptNumber },
+                { "excerpt_have_live_space", excerptHaveLiveSpace },
                 { "executor", securityService.User.UserName.Replace("PWR\\", "") },
                 { "signer", signer }
             };

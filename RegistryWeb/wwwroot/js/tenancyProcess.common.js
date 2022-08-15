@@ -60,7 +60,7 @@ $(function () {
 
     function tenancyCustomValidations(validator) {
         var isValid = true;
-
+        var action = $("#TenancyProcessForm").data("action");
         var regDate = $("#TenancyProcess_RegistrationDate");
         var regNum = $("#TenancyProcess_RegistrationNum");
 
@@ -71,7 +71,15 @@ $(function () {
             error[regNum.attr("name")] = "Введите номер договора найма";
             validator.showErrors(error);
             isValid = false;
-        } else {
+        } else
+        if (action === "Create" && $.trim(regNum.val()) !== "" && !/^[0-9]+\/[0-9]{2}\/[0-9]{2}н?$/.test(regNum.val()) && regNum.val() !== "н") {
+            let error = {};
+            error[regNum.attr("name")] = "Задан некорректный формат номера договора";
+            validator.showErrors(error);
+            isValid = false;
+        } else
+        if (regNum.val() !== "н")
+        {
             var regNumExist = false;
             var idProcess = $('#TenancyProcess_IdProcess').val();
             $.ajax({
