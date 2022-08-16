@@ -224,6 +224,12 @@
             <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.EnforcementProceedingTerminateDescription" maxlength="255" id="EnforcementProceedingTerminateDescription_@id" name="EnforcementProceedingTerminateDescription_@id" title="Примечание">
         </div>
+        @if (ViewBag.Action != "Create")
+        {
+            <div class="form-group col-12 col-md-12 mb-12 d-none">
+                <a href="#" class="rr-claim-spi-btn">Заявление о прекращении исполнительного производства</a>
+            </div>
+        }
     </div>
 
     <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 5 ? "" : "d-none")" data-id-state-type="5">

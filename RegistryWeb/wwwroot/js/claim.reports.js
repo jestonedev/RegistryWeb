@@ -86,6 +86,13 @@
         e.preventDefault();
     });
 
+    $("body").on('click', ".rr-claim-spi-btn", function (e) {
+        var idClaim = $("#Claim_IdClaim").val();
+        url = "/ClaimReports/GetCourtSpiStatement?idClaim=" + idClaim;
+        downloadFile(url);
+        e.preventDefault();
+    });
+
     $("#claimBksAndTransToLegalModal, #claimAddStateModal, #ClaimCommonReportModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });

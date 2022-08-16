@@ -227,6 +227,7 @@ function saveClaimState(e) {
                     claimStateElem.find(".edit-del-court-order-panel a").addClass("disabled");
 
                     claimStateElem.find(".rr-claim-osp-btn").closest("div.form-group").removeClass("d-none");
+                    claimStateElem.find(".rr-claim-spi-btn").closest("div.form-group").removeClass("d-none");
 
                 } else {
                     alert("Произошла ошибка при изменении этапа исковой работы");
@@ -435,4 +436,5 @@ $(function (){
     $("#ClaimStatesForm").on("click", ".rr-claim-osp-btn", openModalForOspStatement);
 
     $(".rr-claim-osp-btn").closest("div.form-group").removeClass("d-none");
+    $(".rr-claim-spi-btn").closest("div.form-group").removeClass("d-none");
 });
