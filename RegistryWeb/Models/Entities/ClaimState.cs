@@ -46,5 +46,6 @@ namespace RegistryWeb.Models.Entities
         public byte Deleted { get; set; }
         public virtual Claim IdClaimNavigation { get; set; }
         public virtual ClaimStateType IdStateTypeNavigation { get; set; }
+        public virtual IList<ClaimStateFile> ClaimStateFiles { get; set; }
     }
 }

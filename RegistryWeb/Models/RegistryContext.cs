@@ -131,6 +131,7 @@ namespace RegistryWeb.Models
         public virtual DbSet<ClaimStateType> ClaimStateTypes { get; set; }
         public virtual DbSet<ClaimStateTypeRelation> ClaimStateTypeRelations { get; set; }
         public virtual DbSet<ClaimFile> ClaimFiles { get; set; }
+        public virtual DbSet<ClaimStateFile> ClaimStateFiles { get; set; }
         public virtual DbSet<ClaimPerson> ClaimPersons { get; set; }
         public virtual DbSet<ClaimCourtOrder> ClaimCourtOrders { get; set; }
         public virtual DbSet<Judge> Judges { get; set; }
@@ -307,6 +308,7 @@ namespace RegistryWeb.Models
             modelBuilder.ApplyConfiguration(new ClaimStateTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ClaimStateTypeRelationConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ClaimFileConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new ClaimStateFileConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ClaimPersonConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ClaimCourtOrderConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new JudgeConfiguration(nameDatebase));
