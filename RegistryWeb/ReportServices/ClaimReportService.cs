@@ -236,7 +236,8 @@ namespace RegistryWeb.ReportServices
         {
             var arguments = new Dictionary<string, object>
             {
-                { "id_claim", idClaim }
+                { "id_claim", idClaim },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") }
             };
             var fileName = "registry\\claims\\statement_in_spi";
             var fileNameReport = GenerateReport(arguments, fileName);
