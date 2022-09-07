@@ -248,5 +248,7 @@
         }
 
         form.submit();
+        $("#actChargeModal").modal("hide");
+
     });
 });

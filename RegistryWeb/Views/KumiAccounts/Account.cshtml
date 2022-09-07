@@ -387,8 +387,8 @@
                                         <td class="text-center p-1">@charge.ChargePenalty</td>
                                         <td class="text-center p-1">
                                             @{
-                                                var tenancyOnAccount = charge.PaymentCharges?.Sum(r => r.TenancyValue) ?? 0m;
-                                                var penaltyOnAccount = charge.PaymentCharges?.Sum(r => r.PenaltyValue) ?? 0m;
+                                                var tenancyOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.TenancyValue) ?? 0m;
+                                                var penaltyOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.PenaltyValue) ?? 0m;
                                                 totalPaymentTenancyByAccount += tenancyOnAccount;
                                                 totalPaymentPenaltyByAccount += penaltyOnAccount;
                                             }
