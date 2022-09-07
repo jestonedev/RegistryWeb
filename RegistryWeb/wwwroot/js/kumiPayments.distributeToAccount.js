@@ -351,11 +351,54 @@
         var sumForDistribution = parseFloat(paymentSum.replace(",", ".")) - parseFloat(paymentSumPosted.replace(",", "."));
         $("#DistributePaymentToAccountModalForm").find("#DistributePaymentToAccount_SumForDistribution").val(sumForDistribution);
 
+        var purpose = undefined;
+        if (action === undefined)
+            purpose = $(this).closest("tr").find(".rr-payment-purpose").text();
+        else
+            purpose = $("#Purpose").text();
+        var purposeInfo = parsePurpose(purpose);
+
         var modal = $("#DistributePaymentToAccountModal");
         modal.find("input[type='text'], input[type='date'], select").prop("disabled", false);
+        var purposeElem = modal.find("#DistrubutePaymentModalPurpose");
+        purposeElem.text(purpose);
+        purposeElem.attr("title", purpose);
+        if (purposeInfo.account !== null) {
+            modal.find("#DistributePaymentToAccount_Account").val(purposeInfo.account);
+        }
+        if (purposeInfo.contract_num !== null) {
+            modal.find("#DistributePaymentToAccount_RegNumber").val(purposeInfo.contract_num);
+        }
+        if (purposeInfo.court_order !== null) {
+            modal.find("#DistributePaymentToAccount_DistributeTo").val(1).change();
+            modal.find("#DistributePaymentToAccount_ClaimCourtOrderNum").val(purposeInfo.court_order);
+        }
         modal.modal('show');
         e.preventDefault();
     });
+
+    function parsePurpose(purpose) {
+        var purposeInfo = {
+            account: null,
+            contract_num: null,
+            court_order: null
+        };
+        var match = null;
+
+        var courtOrderRegex = /(ИД)[ ]*([0-9][-][0-9]{1,6}[ ]?[\/][ ]?([0-9]{4}|[0-9]{2}))/gmiu;
+        var courtOrderMatches = purpose.matchAll(courtOrderRegex);
+        while ((match = courtOrderMatches.next()).done !== true)
+        {
+            purposeInfo.court_order = match.value[2];
+        }
+        var accountRegex = /ЛИЦ(\.?|ЕВОЙ)?[ ]+СЧЕТ[ ]*[:]?[ ]*([0-9]{6,})/gmiu;
+        var accountMatches = purpose.matchAll(accountRegex);
+        while ((match = accountMatches.next()).done !== true) {
+            purposeInfo.account = match.value[2];
+        }
+
+        return purposeInfo;
+    }
 
     $("#DistributePaymentToAccountModal").on("hide.bs.modal", function (e) {
         distributePaymentToAccountModalClear(e);
