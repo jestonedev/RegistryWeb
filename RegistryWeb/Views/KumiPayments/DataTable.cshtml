@@ -178,13 +178,13 @@
                     @if (item.DateIn != null && !isPl)
                     {
                         <div>
-                            <b>Дата поступления в банк:</b><br />@item.DateIn.Value.ToString("dd.MM.yyyy")
+                            <b>Дата поступления:</b> @item.DateIn.Value.ToString("dd.MM.yyyy")
                         </div>
                     }
                     @if (item.DateExecute != null)
                     {
                         <div>
-                            <b>@(isPl ? "Дата исполнения" : "Дата списания со счета"):</b><br />@item.DateExecute.Value.ToString("dd.MM.yyyy")
+                            <b>@(isPl ? "Дата исполнения" : "Дата списания"):</b> @item.DateExecute.Value.ToString("dd.MM.yyyy")
                         </div>
                     }
                 </td>

@@ -582,6 +582,10 @@ namespace RegistryWeb.DataServices
             var payment = registryContext.KumiPayments.Include(r => r.PaymentClaims).Include(r => r.PaymentCharges).FirstOrDefault(r => r.IdPayment == idPayment);
             if (payment == null)
                 throw new ApplicationException("Не найдена платеж в базе данных");
+
+            if (!new[] { "90111109044041000120" }.Contains(payment.Kbk))
+                throw new ApplicationException(string.Format("Нельзя распределить платеж с КБК {0}. Допускаются только платежи с КБК 90111109044041000120 (плата за наем)", payment.Kbk));
+
             var distributedTenancySum = payment.PaymentCharges.Select(r => r.TenancyValue).Sum() +
                 payment.PaymentClaims.Select(r => r.TenancyValue).Sum();
             var distributedPenaltySum = payment.PaymentCharges.Select(r => r.PenaltyValue).Sum() +

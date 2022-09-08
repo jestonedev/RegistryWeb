@@ -78,149 +78,167 @@
             },
             success: function (result) {
                 
-                var table = "<table class='table table-bordered mb-0 text-center'>";
+                var table = "";
                 if (result.accounts !== undefined) {
-                    table += "<thead><tr><th rowspan='2'></th><th rowspan='2'>ЛС</th><th rowspan='2'>Посл. начисление</th><th colspan='2'>Текущее сальдо</th></tr>" +
-                        "<tr><th>Найм</th><th>Пени</th></tr></thead><tbody>";
-                    for (var i = 0; i < result.accounts.length; i++) {
-                        var account = result.accounts[i];
-                        var idObject = account.idAccount;
-                        var accountNum = account.account;
-                        var state = account.state;
-                        var lastChargeDateStr = null;
-                        if (account.lastChargeDate !== null) {
-                            var lastChargeDate = new Date(account.lastChargeDate);
-                            var year = lastChargeDate.getFullYear();
-                            var month = lastChargeDate.getMonth() + 1;
-                            var day = lastChargeDate.getDate();
-                            lastChargeDateStr = (day < 10 ? "0" + day : day) + "." + (month < 10 ? "0" + month : month) + "." + year;
-                        } else {
-                            lastChargeDateStr = "н/а";
-                        }
-                        var stateClass = "";
-                        switch (account.idState) {
-                            case 1:
-                                stateClass = "text-success";
-                                break;
-                            case 2:
-                                stateClass = "text-danger";
-                                break;
-                            case 3:
-                            case 4:
-                                stateClass = "text-warning";
-                                break;
-                        }
-                        var tenancy = account.currentBalanceTenancy;
-                        var penalty = account.currentBalancePenalty;
-
-                        var radioButton = "<div class='form-check'><input style='margin-top: -7px' name='DistributePaymentToAccount_IdObject' data-object-type='0' value='" + idObject + "' type='radio' class='form-check-input'></div>";
-
-
-                        table += "<tr>";
-
-                        table += "<td style='vertical-align: middle'>" + radioButton + "</td>";
-                        table += "<td>" + accountNum
-                            + " <sup><span title='" + state + "' class='" + stateClass + "'><b>" + state.substr(0, 1) + "</b></span></sup>"
-                            + "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-payment-list-eye-btn' href='/KumiAccounts/Details?idAccount=" + account.idAccount + "' target='_blank'></a>"
-                            + "</td><td>" + lastChargeDateStr + "</td><td>" + distributePaymentFormatSum(tenancy) + "</td><td>" + distributePaymentFormatSum(penalty) + "</td>";
-                        table += "</tr>";
-                    }
-                    if (result.accounts.length < result.count) {
-                        table += "<tr><td colspan='5' class='text-center'><i class='text-danger'>Всего найдено " + result.count + " совпадений. Уточните запрос</i></td></tr>";
-                    }
-                    if (result.count === 0) {
-                        table += "<tr><td colspan='5' class='text-center'><i class='text-danger'>Лицевые счета не найдены</i></td></tr>";
-                    }
-                    table += "</tbody></table>";
+                    table = buildAccountForDistribTable(result.accounts, result.count);
                 } else
                 if (result.claims !== undefined)
                 {
-                    table += "<thead><tr><th rowspan='2'></th><th rowspan='2'>ЛС</th><th rowspan='2'>Период взыскания</th><th colspan='2'>Взыскиваемая сумма</th><th colspan='2'>Взысканная сумма</th></tr>" +
-                        "<tr><th>Найм</th><th>Пени</th><th>Найм</th><th>Пени</th></tr></thead><tbody>";
-                    for (var j = 0; j < result.claims.length; j++) {
-                        var claim = result.claims[j];
-                        idObject = claim.idClaim;
-                        accountNum = claim.account;
-                        var amountTenancy = claim.amountTenancy;
-                        if (amountTenancy === null) amountTenancy = 0;
-                        var amountPenalties = claim.amountPenalties;
-                        if (amountPenalties === null) amountPenalties = 0;
-                        var amountTenancyRecovered = claim.amountTenancyRecovered;
-                        if (amountTenancyRecovered === null) amountTenancyRecovered = 0;
-                        var amountPenaltiesRecovered = claim.amountPenaltiesRecovered;
-                        if (amountPenaltiesRecovered === null) amountPenaltiesRecovered = 0;
-                        var startDeptPeriodStr = null;
-                        if (claim.startDeptPeriod !== null) {
-                            var startDeptPeriod = new Date(claim.startDeptPeriod);
-                            year = startDeptPeriod.getFullYear();
-                            month = startDeptPeriod.getMonth() + 1;
-                            day = startDeptPeriod.getDate();
-                            startDeptPeriodStr = (day < 10 ? "0" + day : day) + "." + (month < 10 ? "0" + month : month) + "." + year;
-                        }
-
-                        var endDeptPeriodStr = null;
-                        if (claim.endDeptPeriod !== null) {
-                            var endDeptPeriod = new Date(claim.endDeptPeriod);
-                            year = endDeptPeriod.getFullYear();
-                            month = endDeptPeriod.getMonth() + 1;
-                            day = endDeptPeriod.getDate();
-                            endDeptPeriodStr = (day < 10 ? "0" + day : day) + "." + (month < 10 ? "0" + month : month) + "." + year;
-                        }
-
-                        var deptPeriod = "";
-                        if (startDeptPeriodStr !== null) {
-                            deptPeriod = "с " + startDeptPeriodStr;
-                        }
-                        if (startDeptPeriodStr !== null && endDeptPeriodStr !== null) {
-                            deptPeriod += " ";
-                        }
-                        if (endDeptPeriodStr !== null) {
-                            deptPeriod += "по " + endDeptPeriodStr;
-                        }
-
-                        stateClass = "";
-                        switch (claim.idAccountState) {
-                            case 1:
-                                stateClass = "text-success";
-                                break;
-                            case 2:
-                                stateClass = "text-danger";
-                                break;
-                            case 3:
-                            case 4:
-                                stateClass = "text-warning";
-                                break;
-                        }
-
-                        radioButton = "<div class='form-check'><input style='margin-top: -7px' name='DistributePaymentToAccount_IdObject' data-object-type='1' value='" + idObject + "' type='radio' class='form-check-input'></div>";
-
-                        table += "<tr>";
-
-                        table += "<td style='vertical-align: middle'>" + radioButton + "</td>";
-                        table += "<td>" + accountNum
-                            + " <sup><span title='" + claim.accountState + "' class='" + stateClass + "'><b>" + claim.accountState.substr(0, 1) + "</b></span></sup>"
-                            + "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-payment-list-eye-btn' href='/KumiAccounts/Details?idAccount=" + claim.idAccount + "' target='_blank'></a>"
-                            + "</td><td>" + deptPeriod
-                            + "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-payment-list-eye-btn' href='/Claims/Details?idClaim=" + claim.idClaim + "' target='_blank'></a>"
-                            + "</td><td>" + distributePaymentFormatSum(amountTenancy) + "</td><td>" + distributePaymentFormatSum(amountPenalties)
-                            + "</td><td>" + distributePaymentFormatSum(amountTenancyRecovered) + "</td><td>" + distributePaymentFormatSum(amountPenaltiesRecovered) + "</td>";
-                        table += "</tr>";
-                    }
-                    if (result.claims.length < result.count) {
-                        table += "<tr><td colspan='7' class='text-center'><i class='text-danger'>Всего найдено " + result.count + " совпадений. Уточните запрос</i></td></tr>";
-                    }
-                    if (result.count === 0) {
-                        table += "<tr><td colspan='7' class='text-center'><i class='text-danger'>Исковые работы не найдены</i></td></tr>";
-                    }
-                    table += "</tbody></table>";
+                    table = buildClaimForDistribTable(result.claims, result.count);
                 }
                 div.html(table).closest('.form-row').removeClass("d-none");
+
+                if (result.count === 1) {
+                    var radio = $("#resultDistributePaymentToAccountModal table tbody td input[type='radio']");
+                    radio.prop("checked", true);
+                    radio.click();
+                }
+
                 $('#searchDistributePaymentToAccountModalBtn').text('Найти').attr('disabled', false);
             }
         });
         e.preventDefault();
     }
 
+    function buildAccountForDistribTable(accounts, factCount) {
+        var table = "<table class='table table-bordered mb-0 text-center'>";
+        table += "<thead><tr><th rowspan='2'></th><th rowspan='2'>ЛС</th><th rowspan='2'>Посл. начисление</th><th colspan='2'>Текущее сальдо</th></tr>" +
+            "<tr><th>Найм</th><th>Пени</th></tr></thead><tbody>";
+        for (var i = 0; i < accounts.length; i++) {
+            var account = accounts[i];
+            var idObject = account.idAccount;
+            var accountNum = account.account;
+            var state = account.state;
+            var lastChargeDateStr = null;
+            if (account.lastChargeDate !== null) {
+                var lastChargeDate = new Date(account.lastChargeDate);
+                var year = lastChargeDate.getFullYear();
+                var month = lastChargeDate.getMonth() + 1;
+                var day = lastChargeDate.getDate();
+                lastChargeDateStr = (day < 10 ? "0" + day : day) + "." + (month < 10 ? "0" + month : month) + "." + year;
+            } else {
+                lastChargeDateStr = "н/а";
+            }
+            var stateClass = "";
+            switch (account.idState) {
+                case 1:
+                    stateClass = "text-success";
+                    break;
+                case 2:
+                    stateClass = "text-danger";
+                    break;
+                case 3:
+                case 4:
+                    stateClass = "text-warning";
+                    break;
+            }
+            var tenancy = account.currentBalanceTenancy;
+            var penalty = account.currentBalancePenalty;
+
+            var radioButton = "<div class='form-check'><input style='margin-top: -7px' name='DistributePaymentToAccount_IdObject' data-object-type='0' value='" + idObject + "' type='radio' class='form-check-input'></div>";
+
+
+            table += "<tr>";
+
+            table += "<td style='vertical-align: middle'>" + radioButton + "</td>";
+            table += "<td>" + accountNum
+                + " <sup><span title='" + state + "' class='" + stateClass + "'><b>" + state.substr(0, 1) + "</b></span></sup>"
+                + "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-payment-list-eye-btn' href='/KumiAccounts/Details?idAccount=" + account.idAccount + "' target='_blank'></a>"
+                + "</td><td>" + lastChargeDateStr + "</td><td>" + distributePaymentFormatSum(tenancy) + "</td><td>" + distributePaymentFormatSum(penalty) + "</td>";
+            table += "</tr>";
+        }
+        if (accounts.length < factCount) {
+            table += "<tr><td colspan='5' class='text-center'><i class='text-danger'>Всего найдено " + factCount + " совпадений. Уточните запрос</i></td></tr>";
+        }
+        if (factCount === 0) {
+            table += "<tr><td colspan='5' class='text-center'><i class='text-danger'>Лицевые счета не найдены</i></td></tr>";
+        }
+        table += "</tbody></table>";
+        return table;
+    }
+
+    function buildClaimForDistribTable(claims, factCount) {
+        var table = "<table class='table table-bordered mb-0 text-center'>";
+        table += "<thead><tr><th rowspan='2'></th><th rowspan='2'>ЛС</th><th rowspan='2'>Период взыскания</th><th colspan='2'>Взыскиваемая сумма</th><th colspan='2'>Взысканная сумма</th></tr>" +
+            "<tr><th>Найм</th><th>Пени</th><th>Найм</th><th>Пени</th></tr></thead><tbody>";
+        for (var j = 0; j < claims.length; j++) {
+            var claim = claims[j];
+            idObject = claim.idClaim;
+            accountNum = claim.account;
+            var amountTenancy = claim.amountTenancy;
+            if (amountTenancy === null) amountTenancy = 0;
+            var amountPenalties = claim.amountPenalties;
+            if (amountPenalties === null) amountPenalties = 0;
+            var amountTenancyRecovered = claim.amountTenancyRecovered;
+            if (amountTenancyRecovered === null) amountTenancyRecovered = 0;
+            var amountPenaltiesRecovered = claim.amountPenaltiesRecovered;
+            if (amountPenaltiesRecovered === null) amountPenaltiesRecovered = 0;
+            var startDeptPeriodStr = null;
+            if (claim.startDeptPeriod !== null) {
+                var startDeptPeriod = new Date(claim.startDeptPeriod);
+                year = startDeptPeriod.getFullYear();
+                month = startDeptPeriod.getMonth() + 1;
+                day = startDeptPeriod.getDate();
+                startDeptPeriodStr = (day < 10 ? "0" + day : day) + "." + (month < 10 ? "0" + month : month) + "." + year;
+            }
+
+            var endDeptPeriodStr = null;
+            if (claim.endDeptPeriod !== null) {
+                var endDeptPeriod = new Date(claim.endDeptPeriod);
+                year = endDeptPeriod.getFullYear();
+                month = endDeptPeriod.getMonth() + 1;
+                day = endDeptPeriod.getDate();
+                endDeptPeriodStr = (day < 10 ? "0" + day : day) + "." + (month < 10 ? "0" + month : month) + "." + year;
+            }
+
+            var deptPeriod = "";
+            if (startDeptPeriodStr !== null) {
+                deptPeriod = "с " + startDeptPeriodStr;
+            }
+            if (startDeptPeriodStr !== null && endDeptPeriodStr !== null) {
+                deptPeriod += " ";
+            }
+            if (endDeptPeriodStr !== null) {
+                deptPeriod += "по " + endDeptPeriodStr;
+            }
+
+            stateClass = "";
+            switch (claim.idAccountState) {
+                case 1:
+                    stateClass = "text-success";
+                    break;
+                case 2:
+                    stateClass = "text-danger";
+                    break;
+                case 3:
+                case 4:
+                    stateClass = "text-warning";
+                    break;
+            }
+
+            radioButton = "<div class='form-check'><input style='margin-top: -7px' name='DistributePaymentToAccount_IdObject' data-object-type='1' value='" + idObject + "' type='radio' class='form-check-input'></div>";
+
+            table += "<tr>";
+
+            table += "<td style='vertical-align: middle'>" + radioButton + "</td>";
+            table += "<td>" + accountNum
+                + " <sup><span title='" + claim.accountState + "' class='" + stateClass + "'><b>" + claim.accountState.substr(0, 1) + "</b></span></sup>"
+                + "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-payment-list-eye-btn' href='/KumiAccounts/Details?idAccount=" + claim.idAccount + "' target='_blank'></a>"
+                + "</td><td>" + deptPeriod
+                + "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-payment-list-eye-btn' href='/Claims/Details?idClaim=" + claim.idClaim + "' target='_blank'></a>"
+                + "</td><td>" + distributePaymentFormatSum(amountTenancy) + "</td><td>" + distributePaymentFormatSum(amountPenalties)
+                + "</td><td>" + distributePaymentFormatSum(amountTenancyRecovered) + "</td><td>" + distributePaymentFormatSum(amountPenaltiesRecovered) + "</td>";
+            table += "</tr>";
+        }
+        if (claims.length < factCount) {
+            table += "<tr><td colspan='7' class='text-center'><i class='text-danger'>Всего найдено " + factCount + " совпадений. Уточните запрос</i></td></tr>";
+        }
+        if (factCount === 0) {
+            table += "<tr><td colspan='7' class='text-center'><i class='text-danger'>Исковые работы не найдены</i></td></tr>";
+        }
+        table += "</tbody></table>";
+        return table;
+    }
 
     $("#resultDistributePaymentToAccountModal").on('click', "[name='DistributePaymentToAccount_IdObject'][type='radio']", function (e) {
         if ($(this).is(":checked")) {
@@ -374,8 +392,15 @@
             modal.find("#DistributePaymentToAccount_ClaimCourtOrderNum").val(purposeInfo.court_order);
         }
         modal.modal('show');
+        if (!isEmptyPurpose(purposeInfo)) {
+            modal.find("#searchDistributePaymentToAccountModalBtn").click();
+        }
         e.preventDefault();
     });
+
+    function isEmptyPurpose(purpose) {
+        return purpose.account === null && purpose.contract_num === null && purpose.court_order === null;
+    }
 
     function parsePurpose(purpose) {
         var purposeInfo = {
@@ -499,6 +524,9 @@
                     bellElem.removeClass("d-none")
                         .addClass("text-warning").attr("title", "Платеж не распределен");
                 }
+        if (sumPosted === sumPayment) {
+            bellElem.closest("td").addClass("table-success").attr("title", "Платеж полностью распределен");
+        }
     }
 
     function updatePaymentTrState(tr, sumPosted, sumPayment) {
@@ -509,7 +537,7 @@
             tr.find(".rr-distribute-payment").removeClass("d-none");
         }
         if (sumPosted > 0) {
-            tr.find(".rr-cancel-distribute-payment").removeClass("d-none");
+            tr.find(".rr-cancel-distribute-payment").removeClass("d-none").data("paymentSumPosted", distributePaymentFormatSum(sumPosted));
             tr.find(".rr-apply-memorial-order").addClass("d-none");
         } else {
             tr.find(".rr-cancel-distribute-payment").addClass("d-none");
