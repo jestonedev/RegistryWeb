@@ -252,7 +252,7 @@
         {
             if (Model.IdSource != 1)
             {
-                <div class="alert alert-danger text-center">Нельзя изменить платеж, загруженный из СУФД (за исключением примечания)</div>
+                <div class="alert alert-danger text-center">Нельзя изменить платеж, загруженный из СУФД или файла БКС (за исключением примечания)</div>
             }
             else
            if (Model.PaymentCharges.Any() || Model.PaymentClaims.Any())

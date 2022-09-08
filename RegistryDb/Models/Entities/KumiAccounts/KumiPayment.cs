@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.Json.Serialization;
 
 namespace RegistryDb.Models.Entities.KumiAccounts
 {
@@ -115,6 +116,19 @@ namespace RegistryDb.Models.Entities.KumiAccounts
                 }
                 return copyPayment;
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            if (!(obj is KumiPayment)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return Guid == ((KumiPayment)obj).Guid;
+        }
+
+        public override int GetHashCode()
+        {
+            return Guid?.GetHashCode() ?? 0;
         }
     }
 }

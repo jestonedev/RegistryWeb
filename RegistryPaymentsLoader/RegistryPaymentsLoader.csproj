@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NPOI" Version="2.5.5" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\RegistryDb\RegistryDb.csproj" />
   </ItemGroup>
 

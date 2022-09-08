@@ -8,8 +8,13 @@ namespace RegistryPaymentsLoader.TffFileLoaders
 {
     public static class TffFileLoaderFactory
     {
-        public static TffFileLoader CreateFileLoader(Stream dataStream)
+        public static TffFileLoader CreateFileLoader(Stream dataStream, FileInfo fileInfo)
         {
+            if (fileInfo.Extension == ".xlsx")
+            {
+                return new BKSV1FileLoader();
+            }
+
             var streamReader = new StreamReader(dataStream, Encoding.GetEncoding(1251));
             if (streamReader.EndOfStream) return null;
             var str = streamReader.ReadLine();

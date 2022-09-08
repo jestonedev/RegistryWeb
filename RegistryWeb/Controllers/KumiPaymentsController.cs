@@ -618,7 +618,8 @@ namespace RegistryWeb.Controllers
                 try
                 {
                     var stream = file.Item1;
-                    var tffFileLoader = TffFileLoaderFactory.CreateFileLoader(stream);
+                    var fileName = file.Item2;
+                    var tffFileLoader = TffFileLoaderFactory.CreateFileLoader(stream, new FileInfo(fileName));
                     if (tffFileLoader == null) continue;
                     stream.Seek(0, System.IO.SeekOrigin.Begin);
                     tffStrings.AddRange(tffFileLoader.Load(stream));

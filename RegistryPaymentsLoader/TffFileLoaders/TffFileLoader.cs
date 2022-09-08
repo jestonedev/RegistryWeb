@@ -10,7 +10,7 @@ namespace RegistryPaymentsLoader.TffFileLoaders
     public abstract class TffFileLoader
     {
         public abstract string Version { get; }
-        public List<TffString> Load(Stream dataStream)
+        public virtual List<TffString> Load(Stream dataStream)
         {
             var result = new List<TffString>();
             var streamReader = new StreamReader(dataStream, Encoding.GetEncoding(1251));

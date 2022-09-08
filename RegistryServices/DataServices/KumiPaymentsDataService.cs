@@ -56,7 +56,7 @@ namespace RegistryWeb.DataServices
 
             var unknownPayments = tffStrings.Where(r => r is TffStringZF).Select(r => ((TffStringZF)r).ToPayment()).ToList();
 
-            var payments = knownPayments.Union(unknownPayments);
+            var payments = knownPayments.Union(unknownPayments).Distinct();
 
             var group = new KumiPaymentGroup {
                 Date = DateTime.Now,
@@ -867,6 +867,7 @@ namespace RegistryWeb.DataServices
                             break;
                         case 2:
                         case 3:
+                        case 6:
                             loadState.KnownPayments.Add(paymentLocal);
                             break;
                         default:
