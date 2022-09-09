@@ -63,11 +63,15 @@ namespace RegistryWeb.DataServices
                 var processes = registryContext.TenancyActiveProcesses
                     .Where(tap => tap.IdPremises == idPremise && tap.IdSubPremises == idSubPremise);
 
+                var paymentTenant = registryContext.Payments.Where(r => r.IdAccount == idAccount).OrderByDescending(r => r.Date)
+                    .Select(r => r.Tenant).FirstOrDefault();
+
                 List<string> emails = new List<string>();
                 foreach (var tp in processes)
                 {
                     var curEmails = registryContext.TenancyPersons
-                        .Where(per => per.IdProcess == tp.IdProcess && per.Email != null)
+                        .Where(per => per.IdProcess == tp.IdProcess && per.Email != null &&
+                        (per.Surname + " " + per.Name + " " + per.Patronymic).Trim() == paymentTenant)
                         .Select(per => per.Email)
                         .ToList();
                     emails.AddRange(curEmails);
