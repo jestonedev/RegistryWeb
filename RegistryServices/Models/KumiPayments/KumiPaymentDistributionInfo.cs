@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RegistryWeb.ViewModel
+namespace RegistryServices.Models.KumiPayments
 {
     public class KumiPaymentDistributionInfo
     {

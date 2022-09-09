@@ -4,7 +4,7 @@ using System.Text;
 using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryPaymentsLoader.Models;
 
-namespace RegistryServices.Models
+namespace RegistryServices.Models.KumiPayments
 {
     public class KumiPaymentsUploadStateModel
     {

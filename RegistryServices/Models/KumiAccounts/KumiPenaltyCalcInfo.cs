@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace RegistryServices.Models
+namespace RegistryServices.Models.KumiAccounts
 {
     public class KumiPenaltyCalcInfo
     {

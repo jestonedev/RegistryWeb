@@ -2,6 +2,7 @@
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.SecurityServices;
 @using RegistryDb.Models.Entities.KumiAccounts;
+@using RegistryServices.Models.KumiPayments;
 @model RegistryServices.ViewModel.KumiAccounts.KumiPaymentsVM;
 @{
     Context.Session.Set("Controller", "KumiPayments");
@@ -106,48 +107,95 @@
                 </td>
                 <td>
                     @{
-                            var isPl = item.IdSource == 3 || item.IdSource == 5;
+                        var isPl = item.IdSource == 3 || item.IdSource == 5;
                     }
 
                     <div>
                         <b>Сумма:</b> <span class="rr-payment-sum">@item.Sum руб.@(@sumPosted > 0 ? ", расп.: " + @sumPosted + " руб." : "")</span>
-                        @if (Model.RefAccount != null)
+                        @{
+                            var accounts = Model.DistributionInfoToObjects.Where(r =>
+                                r.ObjectType == RegistryServices.Enums.KumiPaymentDistributeToEnum.ToKumiAccount &&
+                                r.IdPayment == item.IdPayment).Select(r => (KumiPaymentDistributionInfoToAccount)r).ToList();
+                            var claims = Model.DistributionInfoToObjects.Where(r =>
+                                r.ObjectType == RegistryServices.Enums.KumiPaymentDistributeToEnum.ToClaim &&
+                                r.IdPayment == item.IdPayment).Select(r => (KumiPaymentDistributionInfoToClaim)r).ToList();
+                        }
+                        @if (Model.FilterOptions.IdAccount != null || Model.FilterOptions.IdCharge != null)
                         {
-                            var chargeIds = Model.RefAccount.Charges.Where(r => r.IdAccount == Model.RefAccount.IdAccount).Select(r => r.IdCharge).ToList();
-                            var charges = item.PaymentCharges.Where(r => Model.FilterOptions.IdCharge == null ? chargeIds.Contains(r.IdCharge) : r.IdDisplayCharge == Model.FilterOptions.IdCharge);
+                            var accountChargeInfo = accounts.Where(r => r.IdPayment == item.IdPayment &&
+                                ((Model.FilterOptions.IdAccount != null && Model.FilterOptions.IdAccount == r.IdAccount) ||
+                                 (Model.FilterOptions.IdCharge != null && Model.FilterOptions.IdCharge == r.IdCharge)))
+                                 .GroupBy(r => r.IdAccount).Select(r => new { TenancyValue = r.Sum(v => v.DistrubutedToTenancySum), PenaltyValue = r.Sum(v => v.DistrubutedToPenaltySum) })
+                                 .FirstOrDefault();
+
+
+                            var claimChargeInfo = claims.Where(r => r.IdPayment == item.IdPayment &&
+                                ((Model.FilterOptions.IdAccount != null && Model.FilterOptions.IdAccount == r.IdAccountKumi) ||
+                                 (Model.FilterOptions.IdCharge != null && Model.FilterOptions.IdCharge == r.IdCharge)))
+                                .GroupBy(r => r.IdClaim).Select(r => new { IdClaim = r.Key, TenancyValue = r.Sum(v => v.DistrubutedToTenancySum), PenaltyValue = r.Sum(v => v.DistrubutedToPenaltySum) });
                             <br />
                             <span class="text-danger"><b>Из них расп. по ЛС:</b></span><br />
-                            <span class="text-danger">найм @charges.Sum(r => r.TenancyValue) руб., пени @charges.Sum(r => r.PenaltyValue) руб.</span>
+                            <span class="text-danger">найм @Math.Round(accountChargeInfo?.TenancyValue ?? 0, 2) руб., пени @Math.Round(accountChargeInfo?.PenaltyValue ?? 0, 2) руб.</span>
                             <br />
-                            var claimIds = Model.RefAccount.Claims.Where(r => r.IdAccountKumi == Model.RefAccount.IdAccount).Select(r => r.IdClaim).ToList();
-                            @foreach (var claim in item.PaymentClaims.Where(r => Model.FilterOptions.IdCharge == null ? claimIds.Contains(r.IdClaim) : r.IdDisplayCharge == Model.FilterOptions.IdCharge).GroupBy(r => r.IdClaim))
+                            @foreach (var claim in claimChargeInfo)
                             {
                                 <span class="text-danger">
                                     <b>
                                         Из них расп. по
                                         <a target="_blank" class="text-danger" style="text-decoration: underline"
-                                           asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.Key"
+                                           asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.IdClaim"
                                            asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
-                                            ИР №@claim.Key
+                                            ИР №@claim.IdClaim
                                         </a>:
                                     </b>
                                 </span>
 
                                 <br />
-                                <span class="text-danger">найм @claim.Sum(r => r.TenancyValue) руб., пени @claim.Sum(r => r.PenaltyValue) руб.</span>
+                                <span class="text-danger">найм @Math.Round(claim.TenancyValue, 2) руб., пени @Math.Round(claim.PenaltyValue, 2) руб.</span>
                             }
                         }
-                        @if (Model.RefClaim != null)
+                        else
+                        if (Model.FilterOptions.IdClaim != null)
                         {
                             <br />
-                            var claimChargeInfo = item.PaymentClaims.Where(r => r.IdClaim == Model.RefClaim.IdClaim);
+                            var claimChargeInfo = claims.Where(r => r.IdPayment == item.IdPayment && r.IdClaim == Model.FilterOptions.IdClaim)
+                                .GroupBy(r => r.IdClaim).Select(r => new { TenancyValue = r.Sum(v => v.DistrubutedToTenancySum), PenaltyValue = r.Sum(v => v.DistrubutedToPenaltySum) })
+                                .FirstOrDefault();
                             <span class="text-danger">
                                 <b>
                                     Из них расп. по ИР:
                                 </b>
                             </span>
                             <br />
-                            <span class="text-danger">найм @Math.Round(claimChargeInfo.Sum(r => r.TenancyValue), 2) руб., пени @Math.Round(claimChargeInfo.Sum(r => r.PenaltyValue), 2) руб.</span>
+                            <span class="text-danger">найм @Math.Round(claimChargeInfo?.TenancyValue ?? 0, 2) руб., пени @Math.Round(claimChargeInfo?.PenaltyValue ?? 0, 2) руб.</span>
+                        }
+                        else
+                        {
+                            <div class="rr-payment-distribution-sum-details">
+                                @foreach (var account in accounts.GroupBy(r => new { r.IdAccount, r.Account })
+                                  .Select(r => new { r.Key.Account, r.Key.IdAccount,
+                                      DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
+                                      DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum) }))
+                                {
+                                    <div class="text-danger">
+                                        <u>ЛС №@account.Account:</u>
+                                        <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@account.IdAccount"></a>
+                                        <br />найм @account.DistrubutedToTenancySum руб., пени @account.DistrubutedToPenaltySum руб.
+                                    </div>
+                                }
+
+                                @foreach (var claim in claims.GroupBy(r => r.IdClaim)
+                                    .Select(r => new { IdClaim = r.Key,
+                                      DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
+                                      DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum) }))
+                                {
+                                    <div class="text-danger">
+                                        <u>ИР №@claim.IdClaim:</u>
+                                        <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="Claims" asp-action="Details" asp-route-idClaim="@claim.IdClaim"></a>
+                                        <br />найм @claim.DistrubutedToTenancySum руб., пени @claim.DistrubutedToPenaltySum руб.
+                                    </div>
+                                }
+                            </div>
                         }
                     </div>
                     @if (!string.IsNullOrEmpty(item.Kbk))

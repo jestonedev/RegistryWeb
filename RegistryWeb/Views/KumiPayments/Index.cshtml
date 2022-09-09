@@ -1,19 +1,22 @@
 ﻿@model RegistryServices.ViewModel.KumiAccounts.KumiPaymentsVM;
+@using RegistryServices.Models.KumiPayments;
 @{
     ViewData["Title"] = "Платежи";
     var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
         "(" + Model.PageOptions.TotalRows + ")" :
         "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
-    if (Model.RefAccount != null)
+    if (Model.FilterOptions.IdAccount != null)
     {
-        ViewData["Title"] += " по ЛС №" + Model.RefAccount.Account;
+        var account = Model.DistributionInfoToObjects.Where(r => r.ObjectType == RegistryServices.Enums.KumiPaymentDistributeToEnum.ToKumiAccount)
+           .Select(r => (KumiPaymentDistributionInfoToAccount)r).Where(r => r.IdAccount == Model.FilterOptions.IdAccount).FirstOrDefault();
+        ViewData["Title"] += " по ЛС №" + account?.Account;
         if (Model.StartDate != null || Model.EndDate != null)
         {
             ViewData["Title"] += " ";
         }
         if (Model.StartDate != null)
         {
-            ViewData["Title"] += "с "+ Model.StartDate.Value.ToString("dd.MM.yyyy");
+            ViewData["Title"] += "с " + Model.StartDate.Value.ToString("dd.MM.yyyy");
         }
         if (Model.StartDate != null && Model.EndDate != null)
         {
@@ -24,18 +27,18 @@
             ViewData["Title"] += "по " + Model.EndDate.Value.ToString("dd.MM.yyyy");
         }
     }
-    if (Model.RefClaim != null)
+    if (Model.FilterOptions.IdClaim != null)
     {
-        ViewData["Title"] += " по исковой работе №" + Model.RefClaim.IdClaim;
+        ViewData["Title"] += " по исковой работе №" + Model.FilterOptions.IdClaim;
     }
-    if (Model.RefClaim != null || Model.RefAccount != null)
+    if (Model.FilterOptions.IdClaim != null || Model.FilterOptions.IdAccount != null || Model.FilterOptions.IdCharge != null)
     {
-        text = "("+ Model.PageOptions.Rows + ")";
+        text = "(" + Model.PageOptions.Rows + ")";
     }
 }
 
 @section styles
-{
+    {
     <link rel="stylesheet" href="~/css/kumi.payments.css" runat="server" />
 }
 

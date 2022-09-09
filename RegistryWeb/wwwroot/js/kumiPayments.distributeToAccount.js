@@ -293,18 +293,7 @@
                     errorElem.closest(".form-row").removeClass("d-none");
                     errorElem.html("<span class='text-danger'>" + result.error + "</span>");
                 } else {
-                    if (action !== undefined || $("#FilterOptions_IdAccount").val() !== "" || $("#FilterOptions_IdClaim").val() !== "")
-                        location.reload();
-                    else {
-                        var index = $("#DistributePaymentToAccountModal").data("index");
-                        var tr = $($(".rr-payments-table tbody tr")[index]);
-                        var bell = tr.find(".rr-payment-bell");
-                        var sumPosted = result.distrubutedToTenancySum + result.distrubutedToPenaltySum;
-
-                        updatePaymentBell(bell, sumPosted, result.sum);
-                        updatePaymentTrState(tr, sumPosted, result.sum);
-                    }
-                    $("#DistributePaymentToAccountModal").modal('hide');
+                    location.reload();
                 }
                 $('#setDistributePaymentToAccountModalBtn').text("Распределить").attr('disabled', false);
             }
@@ -508,44 +497,6 @@
         });
 
         e.preventDefault();
-    }
-
-    function updatePaymentBell(bellElem, sumPosted, sumPayment) {
-        bellElem.removeClass("text-danger").removeClass("text-warning").addClass("d-none");
-        if (sumPosted > sumPayment) {
-            bellElem.removeClass("d-none")
-                .addClass("text-danger").attr("title", "Распределеная сумма превышает фактическую по платежу");
-        } else
-            if (sumPosted > 0 && sumPayment > sumPosted) {
-                bellElem.removeClass("d-none")
-                    .addClass("text-warning").attr("title", "Платеж распределен не полностью");
-            } else
-                if (sumPosted === 0 && sumPayment !== 0) {
-                    bellElem.removeClass("d-none")
-                        .addClass("text-warning").attr("title", "Платеж не распределен");
-                }
-        if (sumPosted === sumPayment) {
-            bellElem.closest("td").addClass("table-success").attr("title", "Платеж полностью распределен");
-        }
-    }
-
-    function updatePaymentTrState(tr, sumPosted, sumPayment) {
-        tr.find(".rr-distribute-payment").data("paymentSumPosted", distributePaymentFormatSum(sumPosted));
-        if (sumPayment <= sumPosted) {
-            tr.find(".rr-distribute-payment").addClass("d-none");
-        } else {
-            tr.find(".rr-distribute-payment").removeClass("d-none");
-        }
-        if (sumPosted > 0) {
-            tr.find(".rr-cancel-distribute-payment").removeClass("d-none").data("paymentSumPosted", distributePaymentFormatSum(sumPosted));
-            tr.find(".rr-apply-memorial-order").addClass("d-none");
-        } else {
-            tr.find(".rr-cancel-distribute-payment").addClass("d-none");
-            tr.find(".rr-apply-memorial-order").removeClass("d-none");
-        }
-
-        var paymentSumElem = tr.find(".rr-payment-sum");
-        paymentSumElem.text(distributePaymentFormatSum(sumPayment) + " руб." + (sumPosted > 0 ? ", расп.: " + distributePaymentFormatSum(sumPosted) + " руб": ""));
     }
 
     $("#DistributePaymentToAccountTenancyLeftovers").on("click", function (e) {

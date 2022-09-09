@@ -22,6 +22,7 @@ using RegistryDb.Models.SqlViews;
 using RegistryDb.Models.Entities.RegistryObjects.Kladr;
 using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Enums;
+using RegistryServices.Models.KumiPayments;
 
 namespace RegistryWeb.DataServices
 {
@@ -96,28 +97,41 @@ namespace RegistryWeb.DataServices
                 viewModel.PageOptions.CurrentPage = 1;
             query = GetQueryPage(query, viewModel.PageOptions);
             viewModel.Payments = query.ToList();
-
-            if (filterOptions?.IdAccount != null)
-            {
-                viewModel.RefAccount = registryContext.KumiAccounts.Include(r => r.Claims).Include(r => r.Charges).FirstOrDefault(r => r.IdAccount == filterOptions.IdAccount);
-            }
-            if (filterOptions?.IdClaim != null)
-            {
-                viewModel.RefClaim = registryContext.Claims.Include(r => r.IdAccountKumiNavigation)
-                    .FirstOrDefault(r => r.IdClaim == filterOptions.IdClaim);
-            }
-            if (filterOptions?.IdCharge != null)
-            {
-                var charge = registryContext.KumiCharges.FirstOrDefault(r => r.IdCharge == filterOptions.IdCharge);
-                if (charge != null)
-                {
-                    viewModel.RefAccount = registryContext.KumiAccounts.Include(r => r.Claims).Include(r => r.Charges).FirstOrDefault(r => r.IdAccount == charge.IdAccount);
-                    viewModel.StartDate = charge.StartDate;
-                    viewModel.EndDate = charge.EndDate;
-                }
-            }
-
+            viewModel.DistributionInfoToObjects = GetDistributionInfoToObjects(viewModel.Payments.Select(r => r.IdPayment).ToList());
             return viewModel;
+        }
+
+        private IEnumerable<KumiPaymentDistributionInfoToObject> GetDistributionInfoToObjects(List<int> idPayments)
+        {
+            IEnumerable<KumiPaymentDistributionInfoToObject> paymentChargesInfo = registryContext.KumiPaymentCharges.Where(r => idPayments.Contains(r.IdPayment))
+                .Include(r => r.Charge).ThenInclude(r => r.Account).ToList()
+                .Select(r => new KumiPaymentDistributionInfoToAccount
+                {
+                    ObjectType =  KumiPaymentDistributeToEnum.ToKumiAccount,
+                    IdPayment = r.IdPayment,
+                    IdAccount = r.Charge.IdAccount,
+                    IdCharge = r.IdDisplayCharge ?? r.IdCharge,
+                    Account = r.Charge.Account.Account,
+                    DistrubutedToPenaltySum = r.PenaltyValue,
+                    DistrubutedToTenancySum = r.TenancyValue,
+                    Sum = r.PenaltyValue + r.TenancyValue
+                });
+            IEnumerable<KumiPaymentDistributionInfoToObject> paymentClaimsInfo = registryContext.KumiPaymentClaims.Where(r => idPayments.Contains(r.IdPayment))
+                .Include(r => r.Claim).ThenInclude(r => r.IdAccountKumiNavigation)
+                .ToList()
+                .Select(r => new KumiPaymentDistributionInfoToClaim
+                {
+                    ObjectType = KumiPaymentDistributeToEnum.ToClaim,
+                    IdPayment = r.IdPayment,
+                    IdClaim = r.Claim.IdClaim,
+                    IdCharge = r.IdDisplayCharge ?? 0,
+                    IdAccountKumi = r.Claim.IdAccountKumi,
+                    DistrubutedToPenaltySum = r.PenaltyValue,
+                    DistrubutedToTenancySum = r.TenancyValue,
+                    Sum = r.PenaltyValue + r.TenancyValue
+                });
+
+            return paymentChargesInfo.Union(paymentClaimsInfo);
         }
 
         private IQueryable<KumiPayment> GetQueryOrder(IQueryable<KumiPayment> query, OrderOptions orderOptions)
@@ -542,6 +556,8 @@ namespace RegistryWeb.DataServices
                 if (charge == null || !idAccounts.Contains(charge.IdAccount)) continue;
                 registryContext.KumiPaymentCharges.Remove(paymentCharge);
             }
+
+            payment.IsPosted = 0;
 
             registryContext.SaveChanges();
             registryContext.DetachAllEntities();

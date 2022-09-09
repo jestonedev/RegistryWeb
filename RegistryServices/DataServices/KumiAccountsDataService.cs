@@ -18,6 +18,7 @@ using RegistryServices.Enums;
 using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Models;
 using RegistryDb.Models.Entities.Common;
+using RegistryServices.Models.KumiAccounts;
 
 namespace RegistryWeb.DataServices
 {

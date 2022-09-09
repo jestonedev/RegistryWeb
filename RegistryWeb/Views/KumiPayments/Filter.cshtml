@@ -3,7 +3,8 @@
 
 @{
     var securityService = (SecurityService)ViewData["SecurityService"];
-    var canWrite = securityService.HasPrivilege(Privileges.AccountsWrite) && Model.RefAccount == null && Model.RefClaim == null;
+    var canWrite = securityService.HasPrivilege(Privileges.AccountsWrite) && Model.FilterOptions.IdAccount == null && Model.FilterOptions.IdClaim == null &&
+        Model.FilterOptions.IdCharge == null;
 }
 
 <form asp-action="Index" method="get" class="filterForm" autocomplete="off">

@@ -18,6 +18,7 @@ using RegistryWeb.Enums;
 using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Enums;
 using RegistryServices.Models;
+using RegistryServices.Models.KumiPayments;
 
 namespace RegistryWeb.Controllers
 {
