@@ -77,7 +77,7 @@ namespace RegistryWeb.DataServices
             return startRentDate.Value.AddDays(-startRentDate.Value.Day + 1);
         }
 
-        public List<KumiCharge> CalcChargesInfo(KumiAccountInfoForPaymentCalculator account, DateTime startDate, DateTime endDate, DateTime startRewriteDate)
+        public List<KumiCharge> CalcChargesInfo(KumiAccountInfoForPaymentCalculator account, DateTime startDate, DateTime endDate, DateTime startRewriteDate, bool forceCalcChargeOnFutureDate = false)
         {
             if (startDate > endDate) throw new ApplicationException(
                 string.Format("Дата начала расчета {0} превышает дату окончания завершенного периода {1}",
@@ -88,7 +88,7 @@ namespace RegistryWeb.DataServices
             while(startDate < endDate)
             {
                 var subEndDate = startDate.AddMonths(1).AddDays(-1);
-                var charge = CalcChargeInfo(account, startDate, subEndDate, charges, startRewriteDate, out bool outOfBound);
+                var charge = CalcChargeInfo(account, startDate, subEndDate, charges, startRewriteDate, out bool outOfBound, forceCalcChargeOnFutureDate);
                 if (!outOfBound)
                     charges.Add(charge);
                 startDate = startDate.AddMonths(1);
@@ -214,6 +214,31 @@ namespace RegistryWeb.DataServices
             endCalcDate = endCalcDate.AddDays(-endCalcDate.Day + 1).AddMonths(1).AddDays(-1);
 
             RecalculateAccounts(accounts, startRewriteDate, endCalcDate);
+        }
+
+        public KumiCharge CalcForecastChargeInfo(int idAccount, DateTime calcToDate)
+        {
+            DateTime? startRewriteDate = DateTime.Now.Date;
+            startRewriteDate = startRewriteDate.Value.AddDays(-startRewriteDate.Value.Day + 1);
+
+            var accounts = registryContext.KumiAccounts.Where(r => r.IdAccount == idAccount);
+            var accountsPrepare = GetAccountsPrepareForPaymentCalculator(accounts);
+            var accountsInfo = GetAccountInfoForPaymentCalculator(accountsPrepare).ToList();
+            var account = accountsInfo.FirstOrDefault();
+            if (account == null) return new KumiCharge();
+
+            var startCalcDate = GetAccountStartCalcDate(account);
+            if (startCalcDate == null) return new KumiCharge();
+            if (startRewriteDate == null)
+                startRewriteDate = startCalcDate;
+            var chargingInfo = CalcChargesInfo(account, startCalcDate.Value, calcToDate, startRewriteDate.Value, true);
+            var recalcInsertIntoCharge = new KumiCharge();
+            if (chargingInfo.Any()) recalcInsertIntoCharge = chargingInfo.Last();
+
+            var dbChargingInfo = GetDbChargingInfo(account);
+            startRewriteDate = CorrectStartRewriteDate(startRewriteDate.Value, startCalcDate.Value, dbChargingInfo);
+            CalcRecalcInfo(account, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, calcToDate, startRewriteDate.Value);
+            return chargingInfo.FirstOrDefault(r => r.EndDate == calcToDate) ?? new KumiCharge();
         }
 
         public void RecalculateAccounts(IQueryable<KumiAccount> accounts, DateTime? startRewriteDate, DateTime endCalcDate)
@@ -664,7 +689,7 @@ namespace RegistryWeb.DataServices
         }
 
         public KumiCharge CalcChargeInfo(KumiAccountInfoForPaymentCalculator account, DateTime startDate, DateTime endDate,
-            List<KumiCharge> prevCharges, DateTime startRewriteDate, out bool outOfBound)
+            List<KumiCharge> prevCharges, DateTime startRewriteDate, out bool outOfBound, bool forceCalcChargeOnFutureDate)
         {
             var inputBalanceTenancy = account.CurrentBalanceTenancy;
             var inputBalancePenalty = account.CurrentBalancePenalty;
@@ -701,7 +726,7 @@ namespace RegistryWeb.DataServices
                 recalcPenalty = currentSavedCharge.RecalcPenalty;
                 // Если лицевой счет не находится в статусе "Действующий", то переносим начисления, которые были сохранены в БД
                 // Игнорируем будущие периоды
-                if (endDate < DateTime.Now.Date && account.IdState != 1)
+                if ((endDate < DateTime.Now.Date || forceCalcChargeOnFutureDate) && account.IdState != 1)
                 {
                     chargeTenancy = currentSavedCharge.ChargeTenancy;
                     chargePenalty = currentSavedCharge.ChargePenalty;
@@ -709,7 +734,7 @@ namespace RegistryWeb.DataServices
             }
             // Если лицевой счет в статусе "Действующий", то перерасчитываем начисления
             // Не начисляем за будущие периоды
-            if (endDate < DateTime.Now.Date)
+            if ((endDate < DateTime.Now.Date || forceCalcChargeOnFutureDate))
             {
                 if (account.IdState == 1)
                 {

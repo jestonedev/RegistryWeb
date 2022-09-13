@@ -135,4 +135,50 @@
     });
 
     $("#AccountKumiRecalc_RecalcType").change();
+
+    var chargeCurrentMonthElem = $(".rr-charge-current-month-row");
+    if (chargeCurrentMonthElem.length === 1) {
+        var endDate = chargeCurrentMonthElem.data("chargeEndDate");
+        var cellClasses = [".rr-charge-period-input-tenancy", ".rr-charge-period-input-penalty",
+            ".rr-charge-period-payment-tenancy", ".rr-charge-period-payment-penalty",
+            ".rr-charge-period-tenancy", ".rr-charge-period-penalty",
+            ".rr-charge-period-recalc-tenancy", ".rr-charge-period-recalc-penalty",
+            ".rr-charge-period-output-tenancy", ".rr-charge-period-output-penalty"];
+        var values = [];
+        var updatedValues = [];
+        for (var i = 0; i < cellClasses.length; i++) {
+            var elem = chargeCurrentMonthElem.find(cellClasses[i]);
+            values[i] = parseFloat(elem.text().replace(",", "."));
+            updatedValues[i] = values[i];
+            if (i >= 4)
+                elem.html("<img width=\"15\" height=\"15\" style=\"margin-top: -2px;\" src=\"/image/spinner.gif\" />");
+        }
+        $.post("/KumiAccounts/CalcForecastPeriod", { idAccount: $("#IdAccount").val(), calcToDate: endDate }).done(function (resultCharge) {
+            var props = ["chargeTenancy", "chargePenalty", "recalcTenancy", "recalcPenalty"];
+            var chargeTotalElem = $(".rr-charge-total-row");
+            for (var i = 0; i < props.length; i++) {
+                var value = resultCharge[props[i]];
+                var elem = chargeCurrentMonthElem.find(cellClasses[i+4]);
+                elem.html("").text(value.toFixed(2).replace(".", ","));
+                elem.css("color", "#ff5400").attr("title", "Значение предварительно расчитано и может измениться по окончании незавершенного периода");
+                updatedValues[i + 4] = value;
+                var totalElem = chargeTotalElem.find(cellClasses[i+4].replace("-period", "-total")+" b");
+                if (totalElem.length === 1) {
+                    var totalValue = parseFloat(totalElem.text().replace(",", "."));
+                    totalElem.text((Math.round((totalValue + updatedValues[i + 4] - values[i + 4]) * 100) / 100).toFixed(2).replace(".", ","))
+                        .css("color", "#ff5400")
+                        .attr("title", "Значение с учетом незавершенного периода.\r\nБез учета незавершенного периода - " +
+                            totalValue.toFixed(2).replace(".", ",") + " руб.");
+                }
+            }
+
+            for (var j = 0; j <= 1; j++) {
+                chargeCurrentMonthElem.find(cellClasses[j+8]).html("")
+                    .text((Math.round((updatedValues[j + 0] - updatedValues[j + 2] + updatedValues[j + 4] + updatedValues[j +6]) * 100) / 100).toFixed(2).replace(".", ","))
+                    .css("color", "#ff5400")
+                    .attr("title", "Значение расчитано с учетом начисления за незавершенный период и может измениться по окончании периода." +
+                        "\r\nБез учета начисления за незавершенный период - " + values[j +8].toFixed(2).replace(".", ",") + " руб.");
+            }
+        });
+    }
 });

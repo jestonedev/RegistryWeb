@@ -361,6 +361,8 @@
                             <tbody>
                                 @{
                                     var i = 0;
+                                    var count = Model.Charges.Count;
+                                    var currMonthEndDate = DateTime.Now.Date.AddDays(-DateTime.Now.Date.Day).AddMonths(1);
                                     var totalChargeTenancy = 0.00m;
                                     var totalChargePenalty = 0.00m;
                                     var totalPaymentTenancy = 0.00m;
@@ -379,13 +381,13 @@
                                     totalRecalcTenancy += charge.RecalcTenancy;
                                     totalRecalcPenalty += charge.RecalcPenalty;
                                     i++;
-                                    <tr class="@(i > 12 ? "rr-charge-archive" : "")">
+                                    <tr class="@(count - i + 1 > 12 ? "rr-charge-archive" : "") @(charge.EndDate == currMonthEndDate ? "rr-charge-current-month-row" : "")" data-charge-end-date="@charge.EndDate.ToString("yyyy-MM-dd")">
                                         <td class="text-center p-1"><b>@charge.EndDate.ToString("dd.MM.yyyy")</b></td>
-                                        <td class="text-center p-1">@charge.InputTenancy</td>
-                                        <td class="text-center p-1">@charge.InputPenalty</td>
-                                        <td class="text-center p-1">@charge.ChargeTenancy</td>
-                                        <td class="text-center p-1">@charge.ChargePenalty</td>
-                                        <td class="text-center p-1">
+                                        <td class="text-center p-1 rr-charge-period-input-tenancy">@charge.InputTenancy</td>
+                                        <td class="text-center p-1 rr-charge-period-input-penalty">@charge.InputPenalty</td>
+                                        <td class="text-center p-1 rr-charge-period-tenancy">@charge.ChargeTenancy</td>
+                                        <td class="text-center p-1 rr-charge-period-penalty">@charge.ChargePenalty</td>
+                                        <td class="text-center p-1 rr-charge-period-payment-tenancy">
                                             @{
                                                 var tenancyOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.TenancyValue) ?? 0m;
                                                 var penaltyOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.PenaltyValue) ?? 0m;
@@ -402,7 +404,7 @@
                                                 @charge.PaymentTenancy
                                             }
                                         </td>
-                                        <td class="text-center p-1">
+                                        <td class="text-center p-1 rr-charge-period-payment-penalty">
                                             @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index"
@@ -413,18 +415,18 @@
                                                 @charge.PaymentPenalty
                                             }
                                         </td>
-                                        <td class="text-center p-1">@charge.RecalcTenancy</td>
-                                        <td class="text-center p-1">@charge.RecalcPenalty</td>
-                                        <td class="text-center p-1">@charge.OutputTenancy</td>
-                                        <td class="text-center p-1">@charge.OutputPenalty</td>
+                                        <td class="text-center p-1 rr-charge-period-recalc-tenancy">@charge.RecalcTenancy</td>
+                                        <td class="text-center p-1 rr-charge-period-recalc-penalty">@charge.RecalcPenalty</td>
+                                        <td class="text-center p-1 rr-charge-period-output-tenancy">@charge.OutputTenancy</td>
+                                        <td class="text-center p-1 rr-charge-period-output-penalty">@charge.OutputPenalty</td>
                                     </tr>
                                 }
-                                <tr>
+                                <tr class="rr-charge-total-row">
                                     <td class="text-center p-1"><b>Итого</b></td>
                                     <td class="text-center p-1"><b>-</b></td>
                                     <td class="text-center p-1"><b>-</b></td>
-                                    <td class="text-center p-1"><b>@totalChargeTenancy</b></td>
-                                    <td class="text-center p-1"><b>@totalChargePenalty</b></td>
+                                    <td class="text-center p-1 rr-charge-total-tenancy"><b>@totalChargeTenancy</b></td>
+                                    <td class="text-center p-1 rr-charge-total-penalty"><b>@totalChargePenalty</b></td>
                                     <td class="text-center p-1">
                                         @if (totalPaymentTenancy > 0 || totalPaymentPenalty > 0)
                                         {
@@ -450,14 +452,14 @@
 
 
                                     </td>
-                                    <td class="text-center p-1"><b>@totalRecalcTenancy</b></td>
-                                    <td class="text-center p-1"><b>@totalRecalcPenalty</b></td>
+                                    <td class="text-center p-1 rr-charge-total-recalc-tenancy"><b>@totalRecalcTenancy</b></td>
+                                    <td class="text-center p-1 rr-charge-total-recalc-penalty"><b>@totalRecalcPenalty</b></td>
                                     <td class="text-center p-1"><b>-</b></td>
                                     <td class="text-center p-1"><b>-</b></td>
                                 </tr>
                             </tbody>
                         </table>
-                        if (i > 12)
+                        if (count > 12)
                         {
                             <div class="text-center mt-1 mb-1">
                                 <a class="text-dark rr-charge-archive-btn" title="Архив начислений" href="#"><span class="oi oi-chevron-bottom"></span></a>

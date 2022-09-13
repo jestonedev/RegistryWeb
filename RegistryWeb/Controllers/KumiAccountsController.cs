@@ -253,6 +253,12 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HttpPost]
+        public IActionResult CalcForecastPeriod(int idAccount, DateTime calcToDate) {
+            var charge = dataService.CalcForecastChargeInfo(idAccount, calcToDate);
+            return Json(charge);
+        }
+
         public IActionResult CreateClaimMass(DateTime atDate)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
