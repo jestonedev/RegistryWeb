@@ -45,9 +45,9 @@ $(function () {
         var endDateElem = $("#TenancyProcess_EndDate");
         if ($(this).is(":checked"))
         {
-            if (lastEndDateBeforeDismissal === undefined)
+            $(this).closest(".row").find("input:checkbox").not(this).prop('checked', false);
+            if (endDateElem.prop("disabled") !== true)
                 lastEndDateBeforeDismissal = endDateElem.val();
-
             endDateElem.val("");
             endDateElem.prop("disabled", "disabled");
         } else {
@@ -59,10 +59,6 @@ $(function () {
         e.preventDefault();
     });
 
-    $('#TenancyProcessForm input:checkbox').click(function () {
-        if ($(this).is(":checked"))
-            $(this).closest(".row").find("input:checkbox").not(this).prop('checked', false);
-    });
 
     $("#TenancyProcess_IdRentType").change();
 
