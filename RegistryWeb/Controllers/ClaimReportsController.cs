@@ -291,6 +291,22 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult GetCourtSpiStatement(int idClaim)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.ClaimCourtSpiReport(idClaim);
+                return File(file, odtMime, string.Format("Заявление о прекращении ИП (иск. работа № {0}).odt", idClaim));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
         public IActionResult GetClaimEmergencyTariffReport(DateTime startDate, DateTime endDate)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))

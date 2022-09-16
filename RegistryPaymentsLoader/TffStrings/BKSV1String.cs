@@ -27,8 +27,7 @@ namespace RegistryPaymentsLoader.TffStrings
             var account = tffStringParts[0].Trim();
             var snp = tffStringParts[2];
             var address = tffStringParts[1];
-            var uo = tffStringParts[4];
-            return string.Format("ЛИЦЕВОЙ СЧЕТ: {0};{1};{2};{3}", account, snp, address, uo);
+            return string.Format("ЛИЦЕВОЙ СЧЕТ: {0};{1};{2}", account, snp, address);
         }
 
         public override KumiPayment ToPayment()

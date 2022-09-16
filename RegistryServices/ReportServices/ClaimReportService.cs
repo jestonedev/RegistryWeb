@@ -227,6 +227,18 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
+        public byte[] ClaimCourtSpiReport(int idClaim)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "id_claim", idClaim },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") }
+            };
+            var fileName = "registry\\claims\\statement_in_spi";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+
         public byte[] ClaimsForDoverie(List<int> idClaims)
         {
             var tmpFileName = Path.GetTempFileName();

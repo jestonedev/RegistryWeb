@@ -15,6 +15,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public DateTime? DateIn { get; set; }
         public DateTime? DateExecute { get; set; }
         public string Uin { get; set; }
+        public decimal? Sum { get; set; }
         public string Purpose { get; set; }
         public string Kbk { get; set; }
         public string Okato { get; set; }
@@ -66,7 +67,7 @@ namespace RegistryWeb.ViewOptions.Filter
         {
             return (IdsSource == null || IdsSource.Count == 0) 
                  && NumDocument == null && DateDocument == null && DateIn == null && DateExecute == null &&
-                 Uin == null && Purpose == null && Kbk == null && Okato == null && PayerInn == null &&
+                 Uin == null && Sum == null && Purpose == null && Kbk == null && Okato == null && PayerInn == null &&
                  PayerKpp == null && PayerName == null && PayerAccount == null && PayerBankName == null &&
                  PayerBankBik == null && PayerBankAccount == null && RecipientInn == null && RecipientKpp == null &&
                  RecipientName == null && RecipientAccount == null && RecipientBankAccount == null &&

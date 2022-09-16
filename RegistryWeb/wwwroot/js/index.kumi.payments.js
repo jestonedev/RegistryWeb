@@ -1,5 +1,8 @@
 ﻿var searchModal = function () {
     $('input[name="FilterOptions.CommonFilter"]').val("");
+
+    $("#FilterOptions_Sum").val($("#FilterOptions_Sum").val().replace(",", "."));
+
     if ($("form.filterForm").valid()) {
         $("form.filterForm").submit();
         $("#filterModal").modal("hide");

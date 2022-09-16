@@ -340,6 +340,24 @@
                     </div>
                 </div>
                 <div class="card-body p-0" id="Charges">
+                    @{
+                        var currMonthEndDate = DateTime.Now.Date.AddDays(-DateTime.Now.Date.Day).AddMonths(1);
+                        var prevMonthEndDate = currMonthEndDate.AddDays(1).AddMonths(-1).AddDays(-1);
+
+                        if (!Model.Charges.Any(r => r.EndDate == currMonthEndDate))
+                        {
+                            KumiCharge prevCharge = Model.Charges.FirstOrDefault(r => r.EndDate == prevMonthEndDate);
+                            Model.Charges.Add(new KumiCharge
+                            {
+                                StartDate = currMonthEndDate.AddDays(1).AddMonths(-1),
+                                EndDate = currMonthEndDate,
+                                InputTenancy = prevCharge?.OutputTenancy ?? 0.00m,
+                                InputPenalty = prevCharge?.OutputPenalty ?? 0.00m,
+                                PaymentTenancy = 0.00m,
+                                PaymentPenalty = 0.00m
+                            });
+                        }
+                    }
                     @if (Model.Charges.Any())
                     {
                         <table class="table table-bordered table-striped m-0">
@@ -362,7 +380,6 @@
                                 @{
                                     var i = 0;
                                     var count = Model.Charges.Count;
-                                    var currMonthEndDate = DateTime.Now.Date.AddDays(-DateTime.Now.Date.Day).AddMonths(1);
                                     var totalChargeTenancy = 0.00m;
                                     var totalChargePenalty = 0.00m;
                                     var totalPaymentTenancy = 0.00m;
@@ -397,7 +414,7 @@
                                             @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentTenancy - tenancyOnAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdCharge ="@charge.IdCharge">@charge.PaymentTenancy</a>
+                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge">@charge.PaymentTenancy</a>
                                             }
                                             else
                                             {
@@ -408,7 +425,7 @@
                                             @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdCharge ="@charge.IdCharge">@charge.PaymentPenalty</a>
+                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge">@charge.PaymentPenalty</a>
                                             }
                                             else
                                             {

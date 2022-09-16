@@ -248,18 +248,23 @@
             sumForDistribution = parseFloat(sumForDistribution);
             var objectType = $(this).data("objectType");
             var currentPenalty = 0;
+            var currentTenancy = 0;
             var row = $(this).closest("tr");
             switch (objectType) {
                 case 0:
                     currentPenalty = parseFloat($(row.find("td")[4]).text().replace(",", "."));
+                    currentTenancy = parseFloat($(row.find("td")[3]).text().replace(",", "."));
                     break;
                 case 1:
                     currentPenalty = parseFloat($(row.find("td")[4]).text().replace(",", "."));
                     currentPenalty -= parseFloat($(row.find("td")[6]).text().replace(",", "."));
+                    currentTenancy = parseFloat($(row.find("td")[3]).text().replace(",", "."));
+                    currentTenancy -= parseFloat($(row.find("td")[5]).text().replace(",", "."));
                     break;
             }
-            var distributionPenalty = Math.round(Math.max(Math.min(sumForDistribution, currentPenalty), 0)*100)/100;
-            var distributionTenancy = Math.round((sumForDistribution - distributionPenalty)*100)/100;
+            var distributionTenancy = Math.round(Math.max(Math.min(sumForDistribution, currentTenancy), 0) * 100) / 100;
+            var distributionPenalty = Math.min(Math.round((sumForDistribution - distributionTenancy) * 100) / 100, currentPenalty);
+            distributionTenancy = sumForDistribution - distributionPenalty;
             $("#DistributePaymentToAccount_TenancySum").val((distributionTenancy + "").replace(".", ","));
             $("#DistributePaymentToAccount_PenaltySum").val((distributionPenalty + "").replace(".", ","));
         }

@@ -136,7 +136,7 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<KumiPayment> GetQueryOrder(IQueryable<KumiPayment> query, OrderOptions orderOptions)
         {
-            if (string.IsNullOrEmpty(orderOptions.OrderField))
+            if (!string.IsNullOrEmpty(orderOptions.OrderField))
             {
                 if (orderOptions.OrderDirection == OrderDirection.Ascending)
                     return query.OrderBy(p => p.IdPayment);
@@ -502,6 +502,10 @@ namespace RegistryWeb.DataServices
             if (!string.IsNullOrEmpty(filterOptions.Uin))
             {
                 query = query.Where(r => r.Uin != null && r.Uin.Contains(filterOptions.Uin));
+            }
+            if (filterOptions.Sum != null)
+            {
+                query = query.Where(r => r.Sum == filterOptions.Sum);
             }
             if (!string.IsNullOrEmpty(filterOptions.Purpose))
             {

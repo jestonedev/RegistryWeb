@@ -262,8 +262,16 @@ namespace RegistryWeb.DataServices
                     .Where(tap => tap.IdPremises == idPremise && tap.IdSubPremises == idSubPremise);
 
                 List<string> emails = new List<string>();
+
+                var paymentTenant = registryContext.Payments.Where(r => r.IdAccount == id).OrderByDescending(r => r.Date)
+                    .Select(r => r.Tenant).FirstOrDefault();
+
                 foreach (var tp in processes)
                 {
+                    var hasPerson = registryContext.TenancyPersons.Count(r => tp.IdProcess == r.IdProcess && 
+                        (r.Surname + " " + r.Name+" "+r.Patronymic).Trim() == paymentTenant) > 0;
+                    if (!hasPerson)
+                        continue;
                     var curEmails = registryContext.TenancyPersons
                         .Where(per => per.IdProcess == tp.IdProcess && per.Email != null)
                         .Select(per => per.Email)
@@ -891,6 +899,8 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<Payment> EmailsFilter(IQueryable<Payment> query, PaymentsFilter filterOptions)
         {
+            var idsAccountEmails = new List<int>();
+
             var anyEmails = registryContext.TenancyPersons
                 .Where(per => per.Email != null)
                 .Select(per => per.IdProcess)
@@ -914,7 +924,23 @@ namespace RegistryWeb.DataServices
                                 .Select(p => p.IdAccount))
                             .ToList();
 
-                query = query.Where(q => idAccounts.Contains(q.IdAccount));
+                foreach (var id in idAccounts)
+                {
+                    var paymentTenant = registryContext.Payments.Where(r => r.IdAccount==id).OrderByDescending(r => r.Date)
+                        .Select(r => r.Tenant).FirstOrDefault();
+
+                    foreach (var tp in anyEmails)
+                    {
+                        var hasPerson = registryContext.TenancyPersons.Count(r => tp == r.IdProcess &&
+                            (r.Surname + " " + r.Name + " " + r.Patronymic).Trim() == paymentTenant) > 0;
+                        if (!hasPerson)
+                            continue;
+
+                        idsAccountEmails.Add(id);
+                    }
+                }
+
+                query = query.Where(q => idsAccountEmails.Contains(q.IdAccount));
             }
             return query;
         }
