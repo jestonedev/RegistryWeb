@@ -43,8 +43,11 @@ $(function () {
 
     $("#TenancyProcess_UntilDismissal, #TenancyProcess_UntilCalculationsCompleted").on("change", function (e) {
         var endDateElem = $("#TenancyProcess_EndDate");
-        if ($(this).is(":checked")) {
-            lastEndDateBeforeDismissal = endDateElem.val();
+        if ($(this).is(":checked"))
+        {
+            if (lastEndDateBeforeDismissal === undefined)
+                lastEndDateBeforeDismissal = endDateElem.val();
+
             endDateElem.val("");
             endDateElem.prop("disabled", "disabled");
         } else {
@@ -54,6 +57,11 @@ $(function () {
             }
         }
         e.preventDefault();
+    });
+
+    $('#TenancyProcessForm input:checkbox').click(function () {
+        if ($(this).is(":checked"))
+            $(this).closest(".row").find("input:checkbox").not(this).prop('checked', false);
     });
 
     $("#TenancyProcess_IdRentType").change();
