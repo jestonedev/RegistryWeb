@@ -41,7 +41,7 @@ $(function () {
 
     var lastEndDateBeforeDismissal = undefined;
 
-    $("#TenancyProcess_UntilDismissal").on("change", function (e) {
+    $("#TenancyProcess_UntilDismissal, #TenancyProcess_UntilCalculationsCompleted").on("change", function (e) {
         var endDateElem = $("#TenancyProcess_EndDate");
         if ($(this).is(":checked")) {
             lastEndDateBeforeDismissal = endDateElem.val();
@@ -402,7 +402,7 @@ $(function () {
         });
     });
 
-    $("#TenancyProcess_UntilDismissal").change();
+    $("#TenancyProcess_UntilDismissal, #TenancyProcess_UntilCalculationsCompleted").change();
 
     var isCustomEmployer = false;
 

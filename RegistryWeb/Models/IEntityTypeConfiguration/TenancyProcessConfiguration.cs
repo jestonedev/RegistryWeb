@@ -117,6 +117,11 @@ namespace RegistryWeb.Models.IEntityTypeConfiguration
                 .HasColumnType("tinyint(1)")
                 .HasDefaultValueSql("0");
 
+            builder.Property(e => e.UntilCalculationsCompleted)
+                .HasColumnName("until_calculations_completed")
+                .HasColumnType("tinyint(1)")
+                .HasDefaultValueSql("0");
+
             builder.HasOne(d => d.IdRentTypeNavigation)
                 .WithMany(p => p.TenancyProcesses)
                 .HasForeignKey(d => d.IdRentType)

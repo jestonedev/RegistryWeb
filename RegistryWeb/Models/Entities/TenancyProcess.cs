@@ -30,6 +30,7 @@ namespace RegistryWeb.Models.Entities
         public DateTime? BeginDate { get; set; }
         public DateTime? EndDate { get; set; }
         public bool UntilDismissal { get; set; }
+        public bool UntilCalculationsCompleted { get; set; }
         public string ResidenceWarrantNum { get; set; }
         public DateTime? ResidenceWarrantDate { get; set; }
         public string ProtocolNum { get; set; }

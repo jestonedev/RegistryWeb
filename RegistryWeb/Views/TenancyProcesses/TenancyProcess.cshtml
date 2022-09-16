@@ -171,9 +171,21 @@
                         </div>
                     </div>
                 }
-                <div class="form-check col-lg-4 col-md-6 offset-md-6  offset-lg-0 rr-until-dismissal-checkbox mb-1">
+                <div class="form-check col-md-6 col-lg-4 rr-until-dismissal-checkbox mb-1">
                     <input type="checkbox" class="form-check-input" asp-for="TenancyProcess.UntilDismissal">
                     <label class="form-check-label" asp-for="TenancyProcess.UntilDismissal" title="На период трудовых отношений / пролонгирован">На период ТО / пролонгирован</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-check col-md-12 col-lg-12 mb-2 rr-until-calculations-completed-checkbox">
+                    <input type="checkbox" class="form-check-input" asp-for="TenancyProcess.UntilCalculationsCompleted">
+                    <label class="form-check-label" asp-for="TenancyProcess.UntilCalculationsCompleted"
+                           title="До завершения расчетов с гражданами, единственное жилое помещение которых стало непригодным для проживания в результате чрезвычайных обстоятельств,
+                           либо до предоставления им жилых помещений государственного или муниципального жилищного фонда">
+                        До завершения расчетов с гражданами, единственное жилое помещение которых стало непригодным для проживания в результате чрезвычайных обстоятельств,
+                        либо до предоставления им жилых помещений государственного или муниципального жилищного фонда
+                    </label>
                 </div>
             </div>
 
@@ -230,7 +242,7 @@
                     </div>
 
                 }
-                <div class="form-group @(Model.TenancyProcess.IdRentType == 2 ? "mb-2" : "mb-3") @(ViewBag.Action == "Details" || ViewBag.Action == "Delete" || 
+                <div class="form-group @(Model.TenancyProcess.IdRentType == 2 ? "mb-2" : "mb-3") @(ViewBag.Action == "Details" || ViewBag.Action == "Delete" ||
                                 Model.TenancyProcess.IdRentType == 2 ? "col-md-6" : "col-md-12" )">
                     <label class="mb-1" asp-for="TenancyProcess.IdRentTypeCategory">Категория права</label>
                     <select class="selectpicker form-control" asp-for="TenancyProcess.IdRentTypeCategory" title="Категория права"
@@ -246,7 +258,7 @@
                 <div class="form-group rr-tenancy-employer mb-3 @(ViewBag.Action == "Details" || ViewBag.Action == "Delete" ? "col-md-12" : "col-md-6" )
                      @(Model.TenancyProcess.IdRentType == 2 ? "" : "d-none")">
                     <label class="mb-1" asp-for="TenancyProcess.IdEmployer">Работодатель</label>
-                    
+
                     @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
                     {
                         <button id="addEmployerBtn" class="btn pt-0 pb-0 pl-1 pr-1 text-success" title="Добавить нового работодателя">

@@ -40,6 +40,10 @@
     .tp-table-low-width-hide-cell {
         display: table-cell;
     }
+
+    .rr-until-dismissal-checkbox {
+        padding-top: 34px;
+    }
 }
 
 .rr-tenancy-filter-label, .rr-tenancy-label {
@@ -51,15 +55,10 @@
     vertical-align: bottom;
 }
 
-.rr-until-dismissal-checkbox {
+.rr-until-dismissal-checkbox, .rr-until-calculations-completed-checkbox {
     padding-left: 2.2rem;
 }
 
-@media(min-width: 992px) {
-    .rr-until-dismissal-checkbox {
-        padding-top: 34px;
-    }
-}
 
 .rr-tenancy-card {
     margin-top: 0;
