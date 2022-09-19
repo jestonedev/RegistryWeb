@@ -300,6 +300,7 @@ namespace RegistryWeb.DataServices
                     StartDeptPeriod = r.StartDeptPeriod,
                     EndDeptPeriod = r.EndDeptPeriod
                 });
+
             // Копии платежей и ПИР для вычитания сумм
             var paymentsForCalc = resultPayments.Select(r => new KumiActPaymentEventVM
             {
@@ -317,12 +318,13 @@ namespace RegistryWeb.DataServices
             }).ToList();
             // Расчет акта
             var result = new List<KumiActChargeVM>();
+            var isFirstCharge = true;
             foreach(var charge in charges.OrderBy(r => r.StartDate))  // Исключить начисления после atDate
             {
-                var chargeValue = charge.ChargeTenancy + charge.RecalcTenancy;
+                var chargeValue = charge.ChargeTenancy + charge.RecalcTenancy + (isFirstCharge ? charge.InputTenancy : 0);
                 var chargeVM = new KumiActChargeVM
                 {
-                    Value = charge.ChargeTenancy + charge.RecalcTenancy,
+                    Value = chargeValue,
                     Date = charge.EndDate,
                     Events = new List<IChargeEventVM>()
                 };
@@ -407,6 +409,16 @@ namespace RegistryWeb.DataServices
                     if (chargeValue == 0)
                         break;
                 }
+                if (isFirstCharge && charge.InputPenalty != 0)
+                {
+                    allPenaltiesCalcEvents.Add(new KumiActPeniCalcEventVM
+                    {
+                        EndDate = charge.EndDate,
+                        Tenancy = charge.InputTenancy,
+                        Penalty = charge.InputPenalty
+                    });
+                }
+
                 chargeVM.Events.AddRange(allPenaltiesCalcEvents.GroupBy(r => new { r.StartDate, r.EndDate, r.KeyRate, r.KeyRateCoef })
                     .Select(r => new KumiActPeniCalcEventVM {
                         StartDate = r.Key.StartDate,
@@ -417,6 +429,8 @@ namespace RegistryWeb.DataServices
                         Penalty = r.Select(p => p.Penalty).Sum()
                     }));
                 result.Add(chargeVM);
+
+                isFirstCharge = false;
             }
 
             return result;

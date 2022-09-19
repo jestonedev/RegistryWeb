@@ -188,7 +188,8 @@ namespace RegistryWeb.ReportServices
                         {
                             NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 0, sortedEvents.Count + (hasDeptPeriods ? 0 : 1), 1,  monthStr, 
                                 NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center));
-                            NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 1, sortedEvents.Count + (hasDeptPeriods ? 0 : 1), 1, chargeStr, 
+                            NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 1, sortedEvents.Count + (hasDeptPeriods ? 0 : 1), 1, 
+                                sortedEvents[i].Date == DateTime.MinValue ? (charge.Value - sortedEvents[i].Tenancy).ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб." : chargeStr, 
                                 NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
                         }
 
@@ -203,19 +204,26 @@ namespace RegistryWeb.ReportServices
                                 totalPenalty += penaltyRound;
                                 penaltyAcc += peni.Penalty - penaltyRound;
                                 NPOIHelper.CreateActCell(sheet, rowIndex, 2, peniTaxStr, NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
-                                NPOIHelper.CreateActCell(sheet, rowIndex, 3, peni.StartDate.ToString("dd.MM.yyyy"), 
-                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center));
-                                NPOIHelper.CreateActCell(sheet, rowIndex, 4, peni.EndDate.ToString("dd.MM.yyyy"),
-                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center));
-                                NPOIHelper.CreateActCell(sheet, rowIndex, 5, days,
-                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center), CellType.Numeric);
-                                NPOIHelper.CreateActCell(sheet, rowIndex, 6, (double)peni.KeyRate, 
-                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right), CellType.Numeric);
-                                NPOIHelper.CreateActCell(sheet, rowIndex, 7, keyRateCoef,
-                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
-                                NPOIHelper.CreateActCell(sheet, rowIndex, 8, 
-                                    string.Format("{0} x {1} x {2} x {3} %", peniTaxStr, days, keyRateCoef, peni.KeyRate.ToString(CultureInfo.GetCultureInfo("ru-RU"))),
-                                    NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+                                if (peni.Date != DateTime.MinValue)
+                                {
+                                    NPOIHelper.CreateActCell(sheet, rowIndex, 3, peni.StartDate.ToString("dd.MM.yyyy"),
+                                        NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center));
+                                    NPOIHelper.CreateActCell(sheet, rowIndex, 4, peni.EndDate.ToString("dd.MM.yyyy"),
+                                        NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center));
+                                    NPOIHelper.CreateActCell(sheet, rowIndex, 5, days,
+                                        NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center), CellType.Numeric);
+                                    NPOIHelper.CreateActCell(sheet, rowIndex, 6, (double)peni.KeyRate,
+                                        NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right), CellType.Numeric);
+                                    NPOIHelper.CreateActCell(sheet, rowIndex, 7, keyRateCoef,
+                                        NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+                                    NPOIHelper.CreateActCell(sheet, rowIndex, 8,
+                                        string.Format("{0} x {1} x {2} x {3} %", peniTaxStr, days, keyRateCoef, peni.KeyRate.ToString(CultureInfo.GetCultureInfo("ru-RU"))),
+                                        NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
+                                } else
+                                {
+                                    NPOIHelper.CreateActSpanedCell(sheet, rowIndex, 3, 1, 6, "Перенесенный долг",
+                                     NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Center, true));
+                                }
                                 NPOIHelper.CreateActCell(sheet, rowIndex, 9, penaltyRound.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.",
                                     NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
                                 break;

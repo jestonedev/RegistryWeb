@@ -90,7 +90,8 @@ else
                             @if (i == 0)
                             {
                                 <td rowspan="@(charge.Events.Count + (hasDeptPeriods ? 0 : 1))" class="text-center">@monthStr</td>
-                                <td rowspan="@(charge.Events.Count + (hasDeptPeriods ? 0 : 1))" class="text-right text-nowrap">@chargeStr руб.</td>
+                                <td rowspan="@(charge.Events.Count + (hasDeptPeriods ? 0 : 1))" class="text-right text-nowrap">
+                                        @(sortedEvents[i].Date == DateTime.MinValue ? (charge.Value - sortedEvents[i].Tenancy).ToString(CultureInfo.GetCultureInfo("ru-RU")) : chargeStr) руб.</td>
                             }
 
                             @{
@@ -105,12 +106,18 @@ else
                                         totalPenalty += penaltyRound;
                                         penaltyAcc += peni.Penalty - penaltyRound;
                                         <td class="text-right text-nowrap">@peniTaxStr</td>
-                                        <td class="text-center">@peni.StartDate.ToString("dd.MM.yyyy")</td>
-                                        <td class="text-center">@peni.EndDate.ToString("dd.MM.yyyy")</td>
-                                        <td class="text-center">@days</td>
-                                        <td class="text-right text-nowrap">@peni.KeyRate.ToString(CultureInfo.GetCultureInfo("ru-RU")) %</td>
-                                        <td class="text-right text-nowrap">@keyRateCoef</td>
-                                        <td class="text-right text-nowrap">@peniTaxStr x @days x @keyRateCoef x @peni.KeyRate.ToString(CultureInfo.GetCultureInfo("ru-RU")) %</td>
+                                        @if (peni.Date != DateTime.MinValue)
+                                        {
+                                            <td class="text-center">@peni.StartDate.ToString("dd.MM.yyyy")</td>
+                                            <td class="text-center">@peni.EndDate.ToString("dd.MM.yyyy")</td>
+                                            <td class="text-center">@days</td>
+                                            <td class="text-right text-nowrap">@peni.KeyRate.ToString(CultureInfo.GetCultureInfo("ru-RU")) %</td>
+                                            <td class="text-right text-nowrap">@keyRateCoef</td>
+                                            <td class="text-right text-nowrap">@peniTaxStr x @days x @keyRateCoef x @peni.KeyRate.ToString(CultureInfo.GetCultureInfo("ru-RU")) %</td>
+                                        } else
+                                        {
+                                            <td colspan="6" class="text-center text-danger"><i>Перенесенный долг</i></td>
+                                        }
                                         <td class="text-right text-nowrap">@penaltyRound.ToString(CultureInfo.GetCultureInfo("ru-RU")) руб.</td>
                                         break;
                                     case KumiActPaymentEventVM payment:
