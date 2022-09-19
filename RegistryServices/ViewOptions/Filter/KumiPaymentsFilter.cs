@@ -45,8 +45,6 @@ namespace RegistryWeb.ViewOptions.Filter
 
         // Not actual
         public int? IdAccount { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
 
         public KumiPaymentsFilter()
         {
@@ -60,7 +58,7 @@ namespace RegistryWeb.ViewOptions.Filter
 
         public bool IsRefEmpty()
         {
-            return IdAccount == null && StartDate == null && EndDate == null && IdCharge == null && IdClaim == null;
+            return IdAccount == null && IdCharge == null && IdClaim == null;
         }
 
         public bool IsModalEmpty()

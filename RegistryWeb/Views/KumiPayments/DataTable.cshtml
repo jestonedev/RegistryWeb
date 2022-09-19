@@ -148,8 +148,9 @@
                             <span class="text-danger"><b>Из них расп. по ЛС:</b></span><br />
                             <span class="text-danger">найм @Math.Round(accountChargeInfo?.TenancyValue ?? 0, 2) руб., пени @Math.Round(accountChargeInfo?.PenaltyValue ?? 0, 2) руб.</span>
                             <br />
-                            @foreach (var claim in claimChargeInfo)
-                            {
+                            @for (var i = 0; i < claimChargeInfo.Count(); i++)
+                                {
+                                    var claim = claimChargeInfo.ElementAt(i);
                                 <span class="text-danger">
                                     <b>
                                         Из них расп. по
@@ -163,6 +164,9 @@
 
                                 <br />
                                 <span class="text-danger">найм @Math.Round(claim.TenancyValue, 2) руб., пени @Math.Round(claim.PenaltyValue, 2) руб.</span>
+                                @if (i < claimChargeInfo.Count() - 1) {
+                                    <br/>
+                                }
                             }
                         }
                         else

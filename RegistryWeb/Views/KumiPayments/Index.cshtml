@@ -10,6 +10,12 @@
         var account = Model.DistributionInfoToObjects.Where(r => r.ObjectType == RegistryServices.Enums.KumiPaymentDistributeToEnum.ToKumiAccount)
            .Select(r => (KumiPaymentDistributionInfoToAccount)r).Where(r => r.IdAccount == Model.FilterOptions.IdAccount).FirstOrDefault();
         ViewData["Title"] += " по ЛС №" + account?.Account;
+    }
+    if (Model.FilterOptions.IdCharge != null)
+    {
+        var account = Model.DistributionInfoToObjects.Where(r => r.ObjectType == RegistryServices.Enums.KumiPaymentDistributeToEnum.ToKumiAccount)
+           .Select(r => (KumiPaymentDistributionInfoToAccount)r).Where(r => r.IdCharge == Model.FilterOptions.IdCharge).FirstOrDefault();
+        ViewData["Title"] += " по ЛС №" + account?.Account;
         if (Model.StartDate != null || Model.EndDate != null)
         {
             ViewData["Title"] += " ";

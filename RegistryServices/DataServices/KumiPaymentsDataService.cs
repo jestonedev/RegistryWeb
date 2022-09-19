@@ -98,6 +98,15 @@ namespace RegistryWeb.DataServices
             query = GetQueryPage(query, viewModel.PageOptions);
             viewModel.Payments = query.ToList();
             viewModel.DistributionInfoToObjects = GetDistributionInfoToObjects(viewModel.Payments.Select(r => r.IdPayment).ToList());
+            if (filterOptions?.IdCharge != null)
+            {
+                var charge = registryContext.KumiCharges.Where(r => r.IdCharge == filterOptions.IdCharge).FirstOrDefault();
+                if (charge != null)
+                {
+                    viewModel.StartDate = charge.StartDate;
+                    viewModel.EndDate = charge.EndDate;
+                }
+            }
             return viewModel;
         }
 
@@ -202,7 +211,7 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IdCharge != null)
             {
                 var ids = registryContext.KumiPaymentCharges.Where(r => r.IdDisplayCharge == filterOptions.IdCharge).Select(r => r.IdPayment)
-                    .Union(registryContext.KumiPaymentClaims.Where(r => r.IdDisplayCharge == filterOptions.IdCharge).Select(r => r.IdPayment));
+                    .Union(registryContext.KumiPaymentClaims.Where(r => r.IdDisplayCharge == filterOptions.IdCharge).Select(r => r.IdPayment)).ToList();
                 query = query.Where(r => ids.Contains(r.IdPayment));
             }
             if (filterOptions.IdAccount != null)

@@ -414,7 +414,7 @@
                                             @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentTenancy - tenancyOnAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge">@charge.PaymentTenancy</a>
+                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge")">@charge.PaymentTenancy</a>
                                             }
                                             else
                                             {
@@ -509,8 +509,11 @@
                                     <th class="text-center p-1" rowspan="2" title="Состояние">Состояние</th>
                                     <th class="text-center p-1" colspan="2" title="Взыскиваемая сумма">Взыскиваемая сумма</th>
                                     <th class="text-center p-1" colspan="2" title="Взысканная сумма">Взысканная сумма</th>
+                                    <th class="text-center p-1" colspan="2" title="Остаток">Остаток</th>
                                 </tr>
                                 <tr>
+                                    <th class="text-center p-1" title="Найм">Найм</th>
+                                    <th class="text-center p-1" title="Пени">Пени</th>
                                     <th class="text-center p-1" title="Найм">Найм</th>
                                     <th class="text-center p-1" title="Пени">Пени</th>
                                     <th class="text-center p-1" title="Найм">Найм</th>
@@ -518,6 +521,9 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @{ 
+                                    var totals = new decimal[6];
+                                }
                                 @foreach (var claim in Model.Claims)
                                 {
                                     var lastState = claim.ClaimStates.OrderByDescending(r => r.IdState).FirstOrDefault();
@@ -549,6 +555,12 @@
                                     {
                                         rentPeriod = "н/а";
                                     }
+                                    totals[0] += (claim.AmountTenancy + claim.AmountPadun + claim.AmountDgi + claim.AmountPkk) ?? 0m;
+                                    totals[1] += claim.AmountPenalties ?? 0m;
+                                    totals[2] += claim.AmountTenancyRecovered ?? 0m;
+                                    totals[3] += claim.AmountPenaltiesRecovered ?? 0m;
+                                    totals[4] += (claim.AmountTenancy + claim.AmountPadun + claim.AmountDgi + claim.AmountPkk - claim.AmountTenancyRecovered) ?? 0m;
+                                    totals[5] += (claim.AmountPenalties - claim.AmountPenaltiesRecovered) ?? 0m;
 
                                     <tr class="@(canceledClaim ? "table-danger" : winOrderClaim ? "table-success" : "")" title="@(canceledClaim ? "Отмененная исковая работа" : 
                                         winOrderClaim ? "Вынесен судебный приказ №"+(prepareCourtOrderState.CourtOrderNum ?? "б/н")+" от "+prepareCourtOrderState.CourtOrderDate.Value.ToString("dd.MM.yyyy") : "")">
@@ -564,9 +576,22 @@
                                         <td class="text-center p-1">@(claim.AmountPenalties?.ToString() ?? "0,00")</td>
                                         <td class="text-center p-1">@(claim.AmountTenancyRecovered?.ToString() ?? "0,00")</td>
                                         <td class="text-center p-1">@(claim.AmountPenaltiesRecovered?.ToString() ?? "0,00")</td>
+                                        <td class="text-center p-1">@((claim.AmountTenancy + claim.AmountPadun + claim.AmountDgi + claim.AmountPkk - claim.AmountTenancyRecovered)?.ToString() ?? "0,00")</td>
+                                        <td class="text-center p-1">@((claim.AmountPenalties - claim.AmountPenaltiesRecovered)?.ToString() ?? "0,00")</td>
                                     </tr>
                                 }
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-right p-1" colspan="2">Итого</th>
+                                    <th class="text-center p-1">@totals[0]</th>
+                                    <th class="text-center p-1">@totals[1]</th>
+                                    <th class="text-center p-1">@totals[2]</th>
+                                    <th class="text-center p-1">@totals[3]</th>
+                                    <th class="text-center p-1">@totals[4]</th>
+                                    <th class="text-center p-1">@totals[5]</th>
+                                </tr>
+                            </tfoot>
                         </table>
                     }
                     else

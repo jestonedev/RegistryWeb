@@ -62,8 +62,12 @@
 }
 
 @media(min-width: 768px) {
-    #Charges, #ClaimsInfo {
+    #Charges {
         font-size: 70%;
+    }
+
+     #ClaimsInfo {
+        font-size: 65%;
     }
 }
 
