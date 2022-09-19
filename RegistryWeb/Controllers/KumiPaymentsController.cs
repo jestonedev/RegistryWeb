@@ -379,7 +379,7 @@ namespace RegistryWeb.Controllers
                 return Json(new
                 {
                     State = "Error",
-                    Error = e.Message
+                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
                 });
             }
 
@@ -408,7 +408,7 @@ namespace RegistryWeb.Controllers
                 return Json(new
                 {
                     State = "Error",
-                    Error = e.Message
+                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
                 });
             }
         }
@@ -432,7 +432,7 @@ namespace RegistryWeb.Controllers
                 return Json(new
                 {
                     State = "Error",
-                    Error = e.Message
+                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
                 });
             }
         }
@@ -455,7 +455,7 @@ namespace RegistryWeb.Controllers
                 return Json(new
                 {
                     State = "Error",
-                    Error = e.Message
+                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
                 });
             }
         }
