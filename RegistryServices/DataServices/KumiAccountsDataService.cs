@@ -818,17 +818,21 @@ namespace RegistryWeb.DataServices
 
             var resultCharges =
                 dbCharges.Where(r => r.StartDate < startRewriteDate && r.EndDate <= endDate)
-                .Union(charges.Where(r => r.StartDate >= startRewriteDate && r.EndDate <= endDate)).Select(r => new KumiSumDateInfo
+                .Union(charges.Where(r => r.StartDate >= startRewriteDate && r.EndDate <= endDate));
+            var firstChargeInputInfo = resultCharges.OrderBy(r => r.EndDate).FirstOrDefault();
+            var resultChargesInfo = resultCharges
+                .Select(r => new KumiSumDateInfo
                 {
                     Date = r.EndDate,
-                    Value = r.ChargeTenancy + r.RecalcTenancy
+                    Value = firstChargeInputInfo != null && firstChargeInputInfo.EndDate == r.EndDate ? 
+                        r.ChargeTenancy + r.RecalcTenancy + firstChargeInputInfo.InputTenancy : r.ChargeTenancy + r.RecalcTenancy
                 }).ToList();
 
             var penalty = 0m;
 
-            while(resultCharges.Where(r => r.Value > 0).Any() && resultPayments.Where(r => r.Value > 0).Any())
+            while(resultChargesInfo.Where(r => r.Value > 0).Any() && resultPayments.Where(r => r.Value > 0).Any())
             {
-                var firstCharge = resultCharges.Where(r => r.Value > 0).OrderBy(r => r.Date).First();
+                var firstCharge = resultChargesInfo.Where(r => r.Value > 0).OrderBy(r => r.Date).First();
                 while (firstCharge.Value > 0 && resultPayments.Where(r => r.Value > 0).Any())
                 {
                     var firstPayment = resultPayments.Where(r => r.Value > 0).OrderBy(r => r.Date).First();
@@ -848,7 +852,7 @@ namespace RegistryWeb.DataServices
                 }
             }
 
-            foreach(var charge in resultCharges.Where(r => r.Value > 0))
+            foreach(var charge in resultChargesInfo.Where(r => r.Value > 0))
             {
                 penalty += CalcPenalty(charge.Date, endDate.Value, charge.Value, out List<KumiActPeniCalcEventVM> peniCalcEvents);
             }
