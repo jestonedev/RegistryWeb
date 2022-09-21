@@ -207,6 +207,12 @@
                                     Примечание к состоянию: @lastClaimState.Description
                                 </div>
                             }
+                            @if (lastClaimState.CourtOrderCompleteReason != null)
+                            {
+                                <div>
+                                    Причина завершения: @lastClaimState.CourtOrderCompleteReason
+                                </div>
+                            }
                         }
                     </div>
                 </td>

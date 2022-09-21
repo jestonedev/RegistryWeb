@@ -469,7 +469,7 @@ function changeClaimStateType(e) {
     var extInfo = $(this).closest(".list-group-item").find(".rr-claim-ext-info");
     extInfo.each(function (idx, elem) {
         var elemIdStateType = $(elem).data("id-state-type");
-        if (idStateType === elemIdStateType) {
+        if (idStateType === elemIdStateType || elemIdStateType === undefined) {
             $(elem).removeClass("d-none");
         } else if (!$(elem).hasClass("d-none")) {
             $(elem).addClass("d-none");

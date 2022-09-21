@@ -1028,6 +1028,7 @@ namespace RegistryWeb.DataServices
                 .Include(r => r.ClaimFiles)
                 .Include(r => r.ClaimCourtOrders)
                 .FirstOrDefault(r => r.IdClaim == idClaim);
+            if (claim == null) return claim;
             foreach(var state in claim.ClaimStates)
             {
                 state.ClaimStateFiles = registryContext.ClaimStateFiles.Where(r => r.IdState == state.IdState).ToList();
