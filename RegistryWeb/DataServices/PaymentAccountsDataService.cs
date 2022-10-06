@@ -256,11 +256,10 @@ namespace RegistryWeb.DataServices
                 var processes = registryContext.TenancyActiveProcesses
                     .Where(tap => tap.IdPremises == idPremise && tap.IdSubPremises == idSubPremise);
 
-                List<string> emails = new List<string>();
-
                 var paymentTenant = registryContext.Payments.Where(r => r.IdAccount == id).OrderByDescending(r => r.Date)
                     .Select(r => r.Tenant).FirstOrDefault();
 
+                List<string> emails = new List<string>();
                 foreach (var tp in processes)
                 {
                     var hasPerson = registryContext.TenancyPersons.Count(r => tp.IdProcess == r.IdProcess && 
@@ -529,6 +528,11 @@ namespace RegistryWeb.DataServices
             if (filterOptions.Emails)
             {
                 query = EmailsFilter(query, filterOptions);
+            }
+            if (filterOptions.HasPayPrevPeriod)
+            {
+                var prevMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddDays(-1);
+                query = query.Where(q=>q.Date==prevMonth);
             }
             if (!string.IsNullOrEmpty(filterOptions.RawAddress))
             {
