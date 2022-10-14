@@ -40,6 +40,10 @@
     .tp-table-low-width-hide-cell {
         display: table-cell;
     }
+
+    .rr-until-dismissal-checkbox {
+        padding-top: 34px;
+    }
 }
 
 .rr-account-append-span {
@@ -59,6 +63,10 @@
     max-width: 100%;
     margin-bottom: 0.24rem;
     vertical-align: bottom;
+}
+
+.rr-until-dismissal-checkbox, .rr-until-calculations-completed-checkbox {
+    padding-left: 2.2rem;
 }
 
 @media(min-width: 992px) {

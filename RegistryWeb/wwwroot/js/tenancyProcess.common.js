@@ -41,10 +41,13 @@ $(function () {
 
     var lastEndDateBeforeDismissal = undefined;
 
-    $("#TenancyProcess_UntilDismissal").on("change", function (e) {
+    $("#TenancyProcess_UntilDismissal, #TenancyProcess_UntilCalculationsCompleted").on("change", function (e) {
         var endDateElem = $("#TenancyProcess_EndDate");
-        if ($(this).is(":checked")) {
-            lastEndDateBeforeDismissal = endDateElem.val();
+        if ($(this).is(":checked"))
+        {
+            $(this).closest(".row").find("input:checkbox").not(this).prop('checked', false);
+            if (endDateElem.prop("disabled") !== true)
+                lastEndDateBeforeDismissal = endDateElem.val();
             endDateElem.val("");
             endDateElem.prop("disabled", "disabled");
         } else {
@@ -55,6 +58,7 @@ $(function () {
         }
         e.preventDefault();
     });
+
 
     $("#TenancyProcess_IdRentType").change();
 
@@ -427,7 +431,7 @@ function addCustomEmployer(validator) {
         });
     });
 
-    $("#TenancyProcess_UntilDismissal").change();
+    $("#TenancyProcess_UntilDismissal, #TenancyProcess_UntilCalculationsCompleted").change();
 
     var isCustomEmployer = false;
 

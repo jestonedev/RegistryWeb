@@ -116,10 +116,10 @@
         </div>
     </div>
 
-    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
-        <h5><u>Направлено исковое заявление в суд</u></h5>
+    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 4 || claimState.IdStateType == 8 ? "" : "d-none")" data-id-state-type="4,8">
+        <h5><u>Направлено в суд</u></h5>
     </div>
-    <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
+    <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 4 || claimState.IdStateType == 8 ? "" : "d-none")" data-id-state-type="4,8">
         <div class="form-group col-12 col-md-4 mb-2">
             <label class="mb-1">Дата направления</label>
             <input type="date" disabled class="form-control" value="@claimState.ClaimDirectionDate?.ToString("yyyy-MM-dd")" id="ClaimDirectionDate_@id" name="ClaimDirectionDate_@id" title="Дата направления">
@@ -133,9 +133,12 @@
     <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
         <h5><u>Вынесение судебного приказа</u></h5>
     </div>
-    <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
+    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 8 ? "" : "d-none")" data-id-state-type="8">
+        <h5><u>Вынесение искового заявления</u></h5>
+    </div>
+    <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 4 || claimState.IdStateType == 8 ? "" : "d-none")" data-id-state-type="4,8">
         <div class="form-group col-12 col-md-4 mb-3 col-md-2">
-            <label class="mb-1">Дата вынесения с/п</label>
+            <label class="mb-1">Дата вынесения</label>
             <input type="date" disabled class="form-control" value="@claimState.CourtOrderDate?.ToString("yyyy-MM-dd")" id="CourtOrderDate_@id" name="CourtOrderDate_@id" title="Дата вынесения с/п">
         </div>
         <div class="form-group col-12 col-md-8 mb-3">
@@ -143,10 +146,10 @@
                 var file = claimState.ClaimStateFiles?.FirstOrDefault();
             }
 
-            <label class="mb-1">Номер с/п</label>
+            <label class="mb-1">Номер</label>
             <input type="hidden" value="@(file?.IdFile ?? 0)" name="IdFile_@id" />
             <div class="input-group">
-                <input type="text" disabled class="form-control" value="@claimState.CourtOrderNum" id="CourtOrderNum_@id" maxlength="255" name="CourtOrderNum_@id" title="Номер с/п">
+                <input type="text" disabled class="form-control" value="@claimState.CourtOrderNum" id="CourtOrderNum_@id" maxlength="255" name="CourtOrderNum_@id" title="Номер">
                 <input type="file" name="ClaimStateFile_@id" style="position: absolute; left: -9999px; width: 1px; height: 1px" />
                 <input type="hidden" name="ClaimStateFileRemove_@id" value="false" />
                 @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
@@ -180,16 +183,19 @@
     <div class="rr-claim-ext-info mt-1 @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
         <h5><u>Получение судебного приказа</u></h5>
     </div>
-    <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 4 ? "" : "d-none")" data-id-state-type="4">
+    <div class="rr-claim-ext-info mt-1 @(claimState.IdStateType == 8 ? "" : "d-none")" data-id-state-type="8">
+        <h5><u>Получение искового заявления</u></h5>
+    </div>
+    <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 4 || claimState.IdStateType == 8 ? "" : "d-none")" data-id-state-type="4,8">
         <div class="form-group col-12 col-md-4 mb-2">
-            <label class="mb-1">Дата получения с/п</label>
+            <label class="mb-1">Дата получения</label>
             <input type="date" disabled class="form-control" value="@claimState.ObtainingCourtOrderDate?.ToString("yyyy-MM-dd")" id="ObtainingCourtOrderDate_@id" name="ObtainingCourtOrderDate_@id" title="Дата получения с/п">
         </div>
         <div class="form-group col-12 col-md-8 mb-2">
             <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.ObtainingCourtOrderDescription" maxlength="255" id="ObtainingCourtOrderDescription_@id" name="ObtainingCourtOrderDescription_@id" title="Примечание">
         </div>
-        @if (ViewBag.Action != "Create")
+        @if (ViewBag.Action != "Create" && claimState.IdStateType == 4)
         {
             <div class="form-group col-12 col-md-12 mb-12 d-none">
                 <a href="#" class="rr-claim-osp-btn">Заявление о возбуждении исполнительного производства</a>
@@ -301,11 +307,7 @@
         </div>
     </div>
 
-    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 6 ? "" : "d-none")" data-id-state-type="6">
-        <h5><u>Определение об отмене с/п</u></h5>
-    </div>
-
-    <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 6 ? "" : "d-none")" data-id-state-type="6">
+    <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 7 ? "" : "d-none")" data-id-state-type="7">
         <div class="form-group col-12 col-md-4 mb-2">
             <label class="mb-1">Дата отмены</label>
             <input type="date" disabled class="form-control" value="@claimState.CourtOrderCancelDate?.ToString("yyyy-MM-dd")" id="CourtOrderCancelDate_@id" name="CourtOrderCancelDate_@id" title="Дата отмены">
@@ -314,9 +316,6 @@
             <label class="mb-1">Примечание</label>
             <input type="text" disabled class="form-control" value="@claimState.CourtOrderCancelDescription" maxlength="255" id="CourtOrderCancelDescription_@id" name="CourtOrderCancelDescription_@id" title="Примечание">
         </div>
-    </div>
-    <div class="rr-claim-ext-info mt-2 @(claimState.IdStateType == 6 ? "" : "d-none")" data-id-state-type="6">
-        <h5><u>Завершение исковой работы</u></h5>
     </div>
     <div class="form-row rr-claim-ext-info @(claimState.IdStateType == 6 ? "" : "d-none")" data-id-state-type="6">
         <div class="form-group col-12 col-md-4 mb-2">

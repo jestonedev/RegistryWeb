@@ -179,7 +179,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             if (attachmentFile != null && !attachmentFileRemove && claimState.ClaimStateFiles.Count > 0)
             {
                 claimState.ClaimStateFiles[0].DisplayName = attachmentFile.FileName;
-                claimState.ClaimStateFiles[0].FileName = Guid.NewGuid().ToString() + "." + new FileInfo(attachmentFile.FileName).Extension;
+                claimState.ClaimStateFiles[0].FileName = Guid.NewGuid().ToString() + new FileInfo(attachmentFile.FileName).Extension;
                 claimState.ClaimStateFiles[0].MimeType = attachmentFile.ContentType;
                 claimState.ClaimStateFiles[0].IdState = claimState.IdState;
                 var fileStream = new FileStream(Path.Combine(path, claimState.ClaimStateFiles[0].FileName), FileMode.CreateNew);
@@ -256,6 +256,10 @@ namespace RegistryWeb.Controllers.ServiceControllers
             if (claimState.IdStateType == 4)
             {
                 UpdateCourtOrders(courtOrders, claimState.IdClaim);
+                UpdateAttachmentFiles(claimStateFiles, claimState.IdState, attachmentFileRemove);
+            }
+            if (claimState.IdStateType == 8)
+            {
                 UpdateAttachmentFiles(claimStateFiles, claimState.IdState, attachmentFileRemove);
             }
 

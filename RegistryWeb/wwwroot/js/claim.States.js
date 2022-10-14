@@ -381,12 +381,28 @@ function getClaimState(claimStateElem) {
         claimState.RepeatedEnforcementProceedingEndDescription = claimStateElem.find("[name^='RepeatedEnforcementProceedingEndDescription']").val();
     }
     if (claimStateTypeId === 6) {
-        claimState.CourtOrderCancelDate = claimStateElem.find("[name^='CourtOrderCancelDate']").val();
-        claimState.CourtOrderCancelDescription = claimStateElem.find("[name^='CourtOrderCancelDescription']").val();
         claimState.CourtOrderCompleteDate = claimStateElem.find("[name^='CourtOrderCompleteDate']").val();
         claimState.CourtOrderCompleteDescription = claimStateElem.find("[name^='CourtOrderCompleteDescription']").val();
         claimState.CourtOrderCompleteReason = claimStateElem.find("[name^='CourtOrderCompleteReason']").val();
         claimState.CourtOrderCompleteDescription = claimStateElem.find("[name^='CourtOrderCompleteDescription']").val();
+    }
+    if (claimStateTypeId === 7) {
+        claimState.CourtOrderCancelDate = claimStateElem.find("[name^='CourtOrderCancelDate']").val();
+        claimState.CourtOrderCancelDescription = claimStateElem.find("[name^='CourtOrderCancelDescription']").val();
+    }
+    if (claimStateTypeId === 8) {
+        claimState.ClaimDirectionDate = claimStateElem.find("[name^='ClaimDirectionDate']").val();
+        claimState.ClaimDirectionDescription = claimStateElem.find("[name^='ClaimDirectionDescription']").val();
+        claimState.CourtOrderDate = claimStateElem.find("[name^='CourtOrderDate']").val();
+        claimState.CourtOrderNum = claimStateElem.find("[name^='CourtOrderNum']").val();
+        claimState.ObtainingCourtOrderDate = claimStateElem.find("[name^='ObtainingCourtOrderDate']").val();
+        claimState.ObtainingCourtOrderDescription = claimStateElem.find("[name^='ObtainingCourtOrderDescription']").val();
+        claimState.ClaimStateFile = {
+            IdFile: claimStateElem.find("[name^='IdFile']").val(),
+            IdState: claimState.IdState,
+            AttachmentFile: claimStateElem.find("[name^='ClaimStateFile_']")[0],
+            AttachmentFileRemove: claimStateElem.find("[name^='ClaimStateFileRemove']").val()
+        };
     }
 
     return claimState;
@@ -465,11 +481,13 @@ function showClaimStateDetails(e) {
 }
 
 function changeClaimStateType(e) {
-    var idStateType = $(this).val() | 0;
+    var idStateType = $(this).val() + "";
     var extInfo = $(this).closest(".list-group-item").find(".rr-claim-ext-info");
     extInfo.each(function (idx, elem) {
         var elemIdStateType = $(elem).data("id-state-type");
-        if (idStateType === elemIdStateType) {
+        if (elemIdStateType !== undefined)
+            elemIdStateType = (elemIdStateType+"").split(',');
+        if (elemIdStateType === undefined || elemIdStateType.indexOf(idStateType) !== -1) {
             $(elem).removeClass("d-none");
         } else if (!$(elem).hasClass("d-none")) {
             $(elem).addClass("d-none");

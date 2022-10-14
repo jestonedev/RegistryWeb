@@ -125,32 +125,37 @@
             }
 
             <div class="row">
-                <div class="form-group col-md-4 mb-2">
-                    <label class="mb-1" asp-for="TenancyProcess.RegistrationNum">Номер договора найма</label>
+                <div class="form-group col-md-3 mb-2">
+                    <label class="rr-tenancy-label mb-1" asp-for="TenancyProcess.RegistrationNum">Номер договора найма</label>
                     <input type="text" class="form-control" maxlength="255" asp-for="TenancyProcess.RegistrationNum" title="Номер договора найма">
                     <span asp-validation-for="TenancyProcess.RegistrationNum" class="text-danger"></span>
                 </div>
-                <div class="form-group col-md-4 mb-2">
+                <div class="form-group col-md-3 mb-2">
                     <label class="rr-tenancy-label mb-1" asp-for="TenancyProcess.RegistrationDate">Дата регистрации договора</label>
                     <input type="date" class="form-control" asp-for="TenancyProcess.RegistrationDate"
                             value="@(Model.TenancyProcess.RegistrationDate.HasValue ? Model.TenancyProcess.RegistrationDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата регистрации договора">
                     <span asp-validation-for="TenancyProcess.RegistrationDate" class="text-danger"></span>
                 </div>
-                <div class="form-group col-md-4 mb-2">
-                    <label class="mb-1" asp-for="TenancyProcess.IssueDate">Дата выдачи договора</label>
+                <div class="form-group col-md-3 mb-2">
+                    <label class="rr-tenancy-label mb-1" asp-for="TenancyProcess.IssueDate">Дата выдачи договора</label>
                     <input type="date" class="form-control" asp-for="TenancyProcess.IssueDate"
                             value="@(Model.TenancyProcess.IssueDate.HasValue ? Model.TenancyProcess.IssueDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата выдачи договора">
+                </div>
+                <div class="form-group col-md-3 mb-2">
+                    <label class="rr-tenancy-label mb-1 rr-tenancy-label" asp-for="TenancyProcess.AnnualDate">Дата аннулирования договора</label>
+                    <input type="date" class="form-control" asp-for="TenancyProcess.AnnualDate"
+                           value="@(Model.TenancyProcess.AnnualDate.HasValue ? Model.TenancyProcess.AnnualDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата аннулирования договора">
                 </div>
             </div>
 
 
             <div class="row">
-                <div class="form-group col-md-4 mb-2">
+                <div class="form-group col-lg-4 col-md-6 mb-2">
                     <label class="mb-1 rr-tenancy-label" asp-for="TenancyProcess.BeginDate">Дата начала найма жилья</label>
                     <input type="date" class="form-control" asp-for="TenancyProcess.BeginDate"
                            value="@(Model.TenancyProcess.BeginDate.HasValue ? Model.TenancyProcess.BeginDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата начала найма жилья">
                 </div>
-                <div class="form-group col-md-4 mb-2">
+                <div class="form-group col-lg-4 col-md-6 mb-2">
                     <label class="mb-1 rr-tenancy-label" asp-for="TenancyProcess.EndDate">Дата окончания найма жилья</label>
                     @if (ViewBag.Action != "Edit" || !(ViewBag.CanEditBaseInfo ?? false))
                     {
@@ -169,15 +174,21 @@
                             </div>
                         </div>
                     }
-                    <div class="form-check rr-until-dismissal-checkbox mt-1">
-                        <input type="checkbox" class="form-check-input rr-tenancy-label" asp-for="TenancyProcess.UntilDismissal">
-                        <label class="form-check-label rr-tenancy-label" asp-for="TenancyProcess.UntilDismissal" title="На период трудовых отношений / пролонгирован">На период ТО / пролонгирован</label>
-                    </div>
                 </div>
-                <div class="form-group col-md-4 mb-2">
-                    <label class="mb-1 rr-tenancy-label" asp-for="TenancyProcess.AnnualDate">Дата аннулирования договора</label>
-                    <input type="date" class="form-control" asp-for="TenancyProcess.AnnualDate"
-                           value="@(Model.TenancyProcess.AnnualDate.HasValue ? Model.TenancyProcess.AnnualDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата аннулирования договора">
+                <div class="form-check col-md-6 col-lg-4 rr-until-dismissal-checkbox mb-1">
+                    <input type="checkbox" class="form-check-input rr-tenancy-label" asp-for="TenancyProcess.UntilDismissal">
+                    <label class="form-check-label rr-tenancy-label" asp-for="TenancyProcess.UntilDismissal" title="На период трудовых отношений / пролонгирован">На период ТО / пролонгирован</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-check col-md-12 col-lg-12 mb-2 rr-until-calculations-completed-checkbox">
+                    <input type="checkbox" class="form-check-input" asp-for="TenancyProcess.UntilCalculationsCompleted">
+                    <label class="form-check-label" asp-for="TenancyProcess.UntilCalculationsCompleted"
+                            title="До завершения расчетов с гражданами, единственное жилое помещение которых стало непригодным для проживания в результате чрезвычайных обстоятельств,
+                        либо до предоставления им жилых помещений государственного или муниципального жилищного фонда">
+                        До завершения расчетов с гражданами, единственное жилое помещение которых стало непригодным для проживания в результате чрезвычайных обстоятельств,
+                        либо до предоставления им жилых помещений государственного или муниципального жилищного фонда
+                    </label>
                 </div>
             </div>
 
@@ -302,7 +313,7 @@
                     </div>
 
                 }
-                <div class="form-group @(Model.TenancyProcess.IdRentType == 2 ? "mb-2" : "mb-3") @(ViewBag.Action == "Details" || ViewBag.Action == "Delete" || 
+                <div class="form-group @(Model.TenancyProcess.IdRentType == 2 ? "mb-2" : "mb-3") @(ViewBag.Action == "Details" || ViewBag.Action == "Delete" ||
                                 Model.TenancyProcess.IdRentType == 2 ? "col-md-6" : "col-md-12" )">
                     <label class="mb-1" asp-for="TenancyProcess.IdRentTypeCategory">Категория права</label>
                     <select class="selectpicker form-control" asp-for="TenancyProcess.IdRentTypeCategory" title="Категория права"
@@ -318,7 +329,7 @@
                 <div class="form-group rr-tenancy-employer mb-3 @(ViewBag.Action == "Details" || ViewBag.Action == "Delete" ? "col-md-12" : "col-md-6" )
                      @(Model.TenancyProcess.IdRentType == 2 ? "" : "d-none")">
                     <label class="mb-1" asp-for="TenancyProcess.IdEmployer">Работодатель</label>
-                    
+
                     @if (ViewBag.Action == "Create" || ViewBag.Action == "Edit")
                     {
                         <button id="addEmployerBtn" class="btn pt-0 pb-0 pl-1 pr-1 text-success" title="Добавить нового работодателя">

@@ -32,6 +32,7 @@ namespace RegistryDb.Models.Entities.Tenancies
         public DateTime? EndDate { get; set; }
         public DateTime? AnnualDate { get; set; }
         public bool UntilDismissal { get; set; }
+        public bool UntilCalculationsCompleted { get; set; }
         public string ResidenceWarrantNum { get; set; }
         public DateTime? ResidenceWarrantDate { get; set; }
         public string ProtocolNum { get; set; }

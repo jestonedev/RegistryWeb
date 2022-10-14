@@ -120,7 +120,27 @@
                     @if (item.BeginDate != null || item.EndDate != null)
                     {
                         <div>
-                            Период действия: @(item.BeginDate.HasValue ? "с " + item.BeginDate.Value.ToString("dd.MM.yyyy") : "") @(item.EndDate.HasValue ? "по " + item.EndDate.Value.ToString("dd.MM.yyyy") : "на период ТО")
+                            @{
+                                var textEndPeriod = "";
+
+                                if (item.EndDate.HasValue)
+                                {
+                                    textEndPeriod = "по " + item.EndDate.Value.ToString("dd.MM.yyyy");
+                                }
+                                else
+                                {
+                                    if(item.UntilDismissal)
+                                    {
+                                        textEndPeriod = "на период ТО";
+                                    }
+                                    if (item.UntilCalculationsCompleted)
+                                    {
+                                        textEndPeriod = "до завершения расчетов";
+                                    }
+                                }
+                             }
+
+                            Период действия: @(item.BeginDate.HasValue ? "с " + item.BeginDate.Value.ToString("dd.MM.yyyy") : "") @textEndPeriod
                         </div>
                     }
                     @if (item.TenancyReasons != null && item.TenancyReasons.Any())
