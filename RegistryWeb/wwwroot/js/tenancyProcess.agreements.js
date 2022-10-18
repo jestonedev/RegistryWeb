@@ -843,6 +843,9 @@ $(function () {
                 addChangeKinshipTenantsInfoToContent(changeKinshipsInfo);
                 addChangeKinshipTenantsInfoToModifications(changeKinshipsInfo);
                 break;
+            case "8":
+                addNewTerminateChapterToContent();
+                break;
         }
     });
 
@@ -1338,6 +1341,31 @@ $(function () {
                 elem.TenantPatronymic + " - " + elem.NewKinship + ", " + elem.TenantBirthDate + " г.р.»";
             contentLines.push(pointContent);
         });
+        contentElem.val(contentLines.join("\n"));
+    }
+
+    function addNewTerminateChapterToContent() {
+        var contentElem = $("#agreementModal #Agreement_AgreementContent");
+        var agreementDefaultText = getDefaultAgreementText();
+        agreementDefaultText = agreementDefaultText.replace("договорились:", "договорились изложить раздел IV договора в новой редакции:");
+        var contentLines = [];
+        contentLines.push(agreementDefaultText);
+        contentLines.push("\"");
+        contentLines.push("4.1. Наниматель в любое время может расторгнуть настоящий Договор.");
+        contentLines.push("4.2. Настоящий Договор может быть расторгнут в любое время по соглашению сторон.");
+        contentLines.push("4.3. Настоящий Договор подлежит расторжению в случае выявления Наймодателем у Нанимателя или членов его семьи в собственности жилых помещений (долей в них) на территории города Братска в размере учетной нормы и более площади жилого помещения на территории города Братска.");
+        contentLines.push("4.4. Расторжение настоящего Договора по требованию Наймодателя допускается в судебном порядке в случае:");
+        contentLines.push("1) невнесения Нанимателем платы за жилое помещение и (или) коммунальные услуги в течение более 6 месяцев;");
+        contentLines.push("2) разрушения или повреждения жилого помещения Нанимателем или членами его семьи;");
+        contentLines.push("3) систематического нарушения прав и законных интересов соседей;");
+        contentLines.push("4) использования жилого помещения не по назначению.");
+        contentLines.push("4.5. Настоящий Договор прекращается в связи:");
+        contentLines.push("1) с утратой (разрушением) жилого помещения;");
+        contentLines.push("2) со смертью Нанимателя;");
+        contentLines.push("3) с истечением срока трудового договора;");
+        contentLines.push("4) с окончанием срока службы;");
+        contentLines.push("5) с окончанием срока обучения.");
+        contentLines.push("4.6. В случае расторжения или прекращения настоящего Договора Наниматель и члены его семьи должны освободить жилое помещение. В случае отказа освободить жилое помещение граждане подлежат выселению без предоставления другого жилого помещения, за исключением случаев, предусмотренных Жилищным кодексом Российской Федерации.\"");
         contentElem.val(contentLines.join("\n"));
     }
 
