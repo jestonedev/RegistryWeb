@@ -69,6 +69,12 @@
         e.preventDefault();
     });
 
+    $("body").on('click', "#massPkBksBtn", function (e) {
+        $("#pkBksModal").find("input, textarea, select").prop("disabled", false);
+        $('#pkBksModal').modal('toggle');
+        e.preventDefault();
+    });
+
     function attachFileForPaste(e) {
         var fileWrapper = $(this).closest(".form-group");
         fileWrapper.find('input[type="file"]').click();
@@ -160,7 +166,7 @@
         e.preventDefault();
     });
 
-    $("#excerptForm, #noticeToBksForm, #massActForm, #restrictionForm, #ownershipRightForm, #updatePremiseForm").on("change", "select", function () {
+    $("#excerptForm, #noticeToBksForm, #massActForm, #restrictionForm, #ownershipRightForm, #updatePremiseForm, #pkBksForm").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
     
@@ -211,6 +217,26 @@
         }
 
         $("#excerptModal").modal("hide"); 
+    });
+
+    $("#pkBksModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var isValid = $(this).closest("#pkBksForm").valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight($(this).closest("#pkBksForm"));
+            return false;
+        }
+        var signer = $("#pkBksModal").find("[name='PkBks.Signer']").val();
+        if ($("#pkBksModal").find(".input-validation-error").length > 0) {
+            return false;
+        }
+
+        var url = "/PremiseReports/GetMassPkBks?signer=" + signer;
+        if (url !== undefined) {
+            downloadFile(url);
+        }
+
+        $("#pkBksModal").modal("hide");
     });
 
     $("#noticeToBksModal .rr-report-submit").on("click", function (e) {

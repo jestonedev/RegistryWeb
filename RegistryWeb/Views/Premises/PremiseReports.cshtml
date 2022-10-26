@@ -48,6 +48,7 @@
             </button>
             <div class="dropdown-menu" aria-labelledby="reportButton">
                 <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="massExcerptBtn">Выписка</button>
+                <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="massPkBksBtn">Запрос ПК в БКС</button>
                 <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="massReferenceBtn">Справки о площади помещений</button>
                 <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="massActBtn">Акт проверки факта о проживании</button>
                 <button class="dropdown-item" @(Model.Premises.Any() ? "" : "disabled") href="#" id="exportBtn">Экспорт</button>

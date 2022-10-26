@@ -55,6 +55,35 @@
     </div>
 </form>
 
+<form id="pkBksForm">
+    <div class="modal fade" id="pkBksModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Запрос ПК в БКС</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="PkBks.Signer">Подписывающий</label>
+                            <select class="selectpicker form-control" title="Подписывающий" name="PkBks.Signer"
+                                    data-val="true" data-val-required="Подписывающий обязателен для заполнения" id="PkBks.Signer" asp-items="@Model.SignersList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="PkBks.Signer" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
 <form id="noticeToBksForm">
     <div class="modal fade" id="noticeToBksModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">

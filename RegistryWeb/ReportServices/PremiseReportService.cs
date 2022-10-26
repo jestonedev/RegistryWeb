@@ -137,6 +137,21 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
+        public byte[] PkBksPremises(List<int> idPremises, int signer)
+        {
+            var fileName = Path.GetTempFileName();
+            using (var sw = new StreamWriter(fileName))
+                sw.Write(PremisesIdsToString(idPremises));
+            var arguments = new Dictionary<string, object>
+            {
+                { "filterTmpFile", fileName },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
+                { "signer", signer }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\registry\\pk_bks");
+            return DownloadFile(fileNameReport);
+        }
+
         public byte[] MassActPremises(List<int> idPremises, DateTime actDate, string isNotResides, string commision, int clerk)
         {
             var arguments = new Dictionary<string, object>

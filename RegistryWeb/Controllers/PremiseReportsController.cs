@@ -172,6 +172,27 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult GetMassPkBks(int signer)
+        {
+            List<int> ids = GetSessionIds();
+
+            if (!ids.Any())
+                return NotFound();
+
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.PkBksPremises(ids, signer);
+                return File(file, odtMime, string.Format(@"Запрос ПК в БКС.odt"));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
         public IActionResult GetPremisesAct(DateTime actDate, string isNotResides, string commision, int clerk)
         {
             List<int> ids = GetSessionIds();
