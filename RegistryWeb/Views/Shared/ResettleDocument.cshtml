@@ -63,7 +63,7 @@
         <div class="form-group mb-2 @resettleDocumentTypeClass">
             <label class="mb-1">Тип документа</label>
             <select disabled class="form-control field-resettle selectpicker" title="Тип документа"
-                    asp-items="@{new SelectList(ViewBag.ResettleDocumentTypes, "IdDocumentType", "DocumentTypeName",Model.IdDocumentType)}" name="IdDocumentType">
+                    asp-items="@(new SelectList(ViewBag.ResettleDocumentTypes, "IdDocumentType", "DocumentTypeName",Model.IdDocumentType))" name="IdDocumentType">
                 <option></option>
             </select>   
         </div>

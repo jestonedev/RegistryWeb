@@ -95,7 +95,7 @@
         <div class="form-group mb-2 @restrictionTypeClass">
             <label class="mb-1">Тип документа</label>
             <select disabled class="form-control field-restriction selectpicker" title="Тип документа"
-                    asp-items="@{new SelectList(ViewBag.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName",Model.IdRestrictionType)}" name="IdRestrictionType">
+                    asp-items="@(new SelectList(ViewBag.RestrictionTypes, "IdRestrictionType", "RestrictionTypeName",Model.IdRestrictionType))" name="IdRestrictionType">
                 <option></option>
             </select>
         </div>

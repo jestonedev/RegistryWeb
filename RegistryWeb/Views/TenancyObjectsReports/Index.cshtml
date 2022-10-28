@@ -267,6 +267,8 @@
                                 <option value="4">По решению суда</option>
                                 <option value="5">Переселение 2013-2017</option>
                                 <option value="7">Переселение 2019-2025</option>
+                                <option value="8">Оформить ДСН по решению суда</option>
+                                <option value="9">Предоставить по ДСН по решению суда</option>
                             </select>
                             <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.OrderTypes" data-valmsg-replace="true"></span>
                         </div>
@@ -363,6 +365,84 @@
                                 <input type="date" data-actions-box="true" class="form-control" title="Дата сводного списка" name="TenancyOrder.SummaryListDate"
                                        data-val="true" data-val-required="Дата не указана" id="TenancyOrder__SummaryListDate" />
                                 <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.SummaryListDate" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="r-scheduler-border" data-selected-id="8">
+                        <legend class="r-scheduler-border">Гражданское дело</legend>
+                        <div class="form-row">
+                            <div class="form-group col-6">
+                                <label for="TenancyOrder__CourtNum" style="color:white;">.</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">№</div>
+                                    </div>
+                                    <input type="text" data-actions-box="true" class="form-control" title="Номер гражданского дела" name="TenancyOrder.CourtNum"
+                                           data-val="true" data-val-required="Не указан номер гражданского дела" id="TenancyOrder__CourtNum" />
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtNum" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="TenancyOrder__EntryDate" style="color:white;">.</label>
+                                <input type="date" data-actions-box="true" class="form-control" title="Дата вступления" name="TenancyOrder.EntryDate"
+                                       data-val="true" data-val-required="Дата не указана" id="TenancyOrder__EntryDate" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.EntryDate" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-8">
+                                <label for="TenancyOrder__CourtType">Во исполнение решения</label>
+                                <select data-actions-box="true" class="selectpicker form-control" title="Во исполнение решения" name="TenancyOrder.CourtType"
+                                        data-val="true" data-val-required="Не указан орган" id="TenancyOrder__CourtType">
+                                    <option value="1">Братского городского суда Иркутской области</option>
+                                    <option value="2">Падунского районного суда Иркутской области</option>
+                                </select>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtType" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group col-4">
+                                <label for="TenancyOrder__CourtDate" style="color:white;">.</label>
+                                <input type="date" data-actions-box="true" class="form-control" title="Дата решения" name="TenancyOrder.CourtDate"
+                                       data-val="true" data-val-required="Дата не указана" id="TenancyOrder__CourtDate" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtDate" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="r-scheduler-border" data-selected-id="9">
+                        <legend class="r-scheduler-border">Гражданское дело</legend>
+                        <div class="form-row">
+                            <div class="form-group col-6">
+                                <label for="TenancyOrder__CourtNum" style="color:white;">.</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">№</div>
+                                    </div>
+                                    <input type="text" data-actions-box="true" class="form-control" title="Номер гражданского дела" name="TenancyOrder.CourtNum"
+                                           data-val="true" data-val-required="Не указан номер гражданского дела" id="TenancyOrder__CourtNum" />
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtNum" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="TenancyOrder__EntryDate" style="color:white;">.</label>
+                                <input type="date" data-actions-box="true" class="form-control" title="Дата вступления" name="TenancyOrder.EntryDate"
+                                       data-val="true" data-val-required="Дата не указана" id="TenancyOrder__EntryDate" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.EntryDate" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-8">
+                                <label for="TenancyOrder__CourtType">Во исполнение решения</label>
+                                <select data-actions-box="true" class="selectpicker form-control" title="Во исполнение решения" name="TenancyOrder.CourtType"
+                                        data-val="true" data-val-required="Не указан орган" id="TenancyOrder__CourtType">
+                                    <option value="1">Братского городского суда Иркутской области</option>
+                                    <option value="2">Падунского районного суда Иркутской области</option>
+                                </select>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtType" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group col-4">
+                                <label for="TenancyOrder__CourtDate" style="color:white;">.</label>
+                                <input type="date" data-actions-box="true" class="form-control" title="Дата решения" name="TenancyOrder.CourtDate"
+                                       data-val="true" data-val-required="Дата не указана" id="TenancyOrder__CourtDate" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="TenancyOrder.CourtDate" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                     </fieldset>

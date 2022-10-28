@@ -704,7 +704,7 @@ namespace RegistryWeb.DataServices
 
             if (filterOptions.ClaimStateDateFrom != null)
             {
-                query = from row in query
+                query = (from row in query
                         join claimsStatesRow in registryContext.ClaimStates
                         on row.IdClaim equals claimsStatesRow.IdClaim
                         where DateComparison(
@@ -712,7 +712,7 @@ namespace RegistryWeb.DataServices
                             claimsStatesRow.DateStartState,
                             filterOptions.ClaimStateDateFrom,
                             filterOptions.ClaimStateDateTo)
-                        select row;
+                        select row).Distinct();
             }
 
             if (filterOptions.BalanceOutputTotal != null || filterOptions.BalanceOutputTenancy != null ||

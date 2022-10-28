@@ -18,7 +18,7 @@
         <div class="form-group col-lg-4 col-9">
             <label>Тип документа</label>
             <select class="form-control selectpicker" name="Owners[@i].OwnerReasons[@j].IdReasonType"
-                    asp-items="@{new SelectList(ViewBag.OwnerReasonTypes, "IdReasonType", "ReasonName", Model.OwnerReason.IdReasonType);}"></select>
+                    asp-items="@(new SelectList(ViewBag.OwnerReasonTypes, "IdReasonType", "ReasonName", Model.OwnerReason.IdReasonType))"></select>
         </div>
         @{
             var numberCol = canEdit ? "col-lg-4 col-5" : "col-lg-5 col-6";

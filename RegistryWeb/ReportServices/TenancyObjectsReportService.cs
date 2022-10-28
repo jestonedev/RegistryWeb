@@ -188,12 +188,22 @@ namespace RegistryWeb.ReportServices
         {
             switch (idCourt)
             {
+                /*
                 case 1:
                     return "По свободным спискам(изменения)";
                 case 2:
                     return "Перераспределение";
                 case 3:
                     return "Основное распоряжение";
+                default:
+                    return "";
+                */
+                case 1:
+                    return "Братского городского суда Иркутской области";
+                case 2:
+                    return "Падунского районного суда Иркутской области";
+                case 3:
+                    return "Иркутского областного суда";
                 default:
                     return "";
             }
@@ -212,6 +222,7 @@ namespace RegistryWeb.ReportServices
                 {"resettle_num", modalFilter.ResettleNum ?? ""},
                 {"resettle_date", modalFilter.ResettleDate?.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture)},
                 {"resettle_type", modalFilter.IdResettleType ?? 0},
+                {"entry_date" , modalFilter.EntryDate?.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture )},
                 {"court_num", modalFilter.CourtNum ?? ""},
                 {"court_date", modalFilter.CourtDate?.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture)},
                 {"court", getCourt(modalFilter.IdCourt)},

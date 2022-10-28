@@ -73,7 +73,7 @@
                         </td>
                         <td class="align-middle">
                             <select class="form-control field-building-demolition-act-file" title="@item.ActTypeDocument.Name"
-                                    asp-items="@{new SelectList(ViewBag.ActTypeDocuments, "Id", "Name", item.IdActTypeDocument)}"></select>
+                                    asp-items="@(new SelectList(ViewBag.ActTypeDocuments, "Id", "Name", item.IdActTypeDocument))"></select>
                         </td>
                         <td>
                             @{

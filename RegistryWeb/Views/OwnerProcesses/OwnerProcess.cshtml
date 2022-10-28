@@ -135,7 +135,7 @@
                     {
                         @for (var i = 0; i < Model.OwnerBuildingsAssoc.Count(); i++)
                         {
-                            <partial name="OwnerProcessAddress" model="@{new OwnerProcessAddressVM() {
+                            <partial name="OwnerProcessAddress" model="@(new OwnerProcessAddressVM() {
                     IdProcess = Model.OwnerBuildingsAssoc[i].IdProcess,
                     IdAssoc = Model.OwnerBuildingsAssoc[i].IdAssoc,
                     Id = Model.OwnerBuildingsAssoc[i].IdBuilding,
@@ -143,14 +143,14 @@
                     Action = ViewBag.Action,
                     AddressType = AddressTypes.Building,
                     Text = Model.OwnerBuildingsAssoc[i].BuildingNavigation.GetAddress(),
-                    Href = "/Buildings/Details?idBuilding=" + Model.OwnerBuildingsAssoc[i].IdBuilding}}" />
+                    Href = "/Buildings/Details?idBuilding=" + Model.OwnerBuildingsAssoc[i].IdBuilding})" />
                         }
                     }
                     @if (Model.OwnerPremisesAssoc != null)
                     {
                         @for (var i = 0; i < Model.OwnerPremisesAssoc.Count(); i++)
                         {
-                            <partial name="OwnerProcessAddress" model="@{new OwnerProcessAddressVM() {
+                            <partial name="OwnerProcessAddress" model="@(new OwnerProcessAddressVM() {
                     IdProcess = Model.OwnerPremisesAssoc[i].IdProcess,
                     IdAssoc = Model.OwnerPremisesAssoc[i].IdAssoc,
                     Id = Model.OwnerPremisesAssoc[i].IdPremise,
@@ -158,14 +158,14 @@
                     Action = ViewBag.Action,
                     AddressType = AddressTypes.Premise,
                     Text = Model.OwnerPremisesAssoc[i].PremiseNavigation.GetAddress(),
-                    Href = "/Premises/Details?idPremises=" + Model.OwnerPremisesAssoc[i].IdPremise}}" />
+                    Href = "/Premises/Details?idPremises=" + Model.OwnerPremisesAssoc[i].IdPremise})" />
                         }
                     }
                     @if (Model.OwnerSubPremisesAssoc != null)
                     {
                         @for (var i = 0; i < Model.OwnerSubPremisesAssoc.Count(); i++)
                         {
-                            <partial name="OwnerProcessAddress" model="@{new OwnerProcessAddressVM() {
+                            <partial name="OwnerProcessAddress" model="@(new OwnerProcessAddressVM() {
                     IdProcess = Model.OwnerSubPremisesAssoc[i].IdProcess,
                     IdAssoc = Model.OwnerSubPremisesAssoc[i].IdAssoc,
                     Id = Model.OwnerSubPremisesAssoc[i].IdSubPremise,
@@ -173,7 +173,7 @@
                     Action = ViewBag.Action,
                     AddressType = AddressTypes.SubPremise,
                     Text = Model.OwnerSubPremisesAssoc[i].SubPremiseNavigation.GetAddress(),
-                    Href = "/Premises/Details?idPremises=" + Model.OwnerSubPremisesAssoc[i].SubPremiseNavigation.IdPremises}}" />
+                    Href = "/Premises/Details?idPremises=" + Model.OwnerSubPremisesAssoc[i].SubPremiseNavigation.IdPremises})" />
                         }
                     }
                 </ul>
@@ -208,10 +208,10 @@
                     {
                         @for (var i = 0; i < Model.Owners.Count(); i++)
                         {
-                            <partial name="Owner" model="@{new OwnerVM() {
+                            <partial name="Owner" model="@(new OwnerVM() {
                     Owner = Model.Owners[i],
                     I = i,
-                    Action = ViewBag.Action}}" />
+                    Action = ViewBag.Action})" />
                         }
                     }
                 </ul>
@@ -256,10 +256,10 @@
                     {
                         @for (var i = 0; i < Model.OwnerFiles.Count(); i++)
                         {
-                            <partial name="OwnerFile" model="@{new OwnerFileVM() {
+                            <partial name="OwnerFile" model="@(new OwnerFileVM() {
                     OwnerFile = Model.OwnerFiles[i],
                     I = i,
-                    Action = ViewBag.Action}}" />
+                    Action = ViewBag.Action})" />
                         }
                     }
                 </ul>

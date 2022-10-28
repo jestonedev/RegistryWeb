@@ -21,6 +21,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public string OrphansNum { get; set; }
         public DateTime? OrphansDate { get; set; }
         public string CourtNum { get; set; }
+        public DateTime? EntryDate { get; set; }
         public DateTime? CourtDate { get; set; }
         public int? IdCourt { get; set; }
         public string ResettleNum { get; set; }

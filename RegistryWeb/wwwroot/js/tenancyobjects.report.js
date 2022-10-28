@@ -75,6 +75,7 @@
             fixBootstrapSelectHighlight(form);
             return false;
         }
+        var idOrder = $("#TenancyOrder__OrderTypes").val();
         var idPreparer = $("#tenancyOrderModal").find("[name='TenancyOrder.Preparer']").val();
         var idLawyer = $("#tenancyOrderModal").find("[name='TenancyOrder.Lawyer']").val();
         var idStreet = $("#tenancyOrderModal").find("[name='TenancyOrder.Streets']").val();
@@ -88,9 +89,10 @@
         var idOrderType = $("#tenancyOrderModal").find("[name='TenancyOrder.OrderTypes']").val();
         var orphansNum = $("#tenancyOrderModal").find("[name='TenancyOrder.OrphansNum']").val();
         var orphansDate = $("#tenancyOrderModal").find("[name='TenancyOrder.OrphansDate']").val();
-        var courtNum = $("#tenancyOrderModal").find("[name='TenancyOrder.CourtNum']").val();
-        var courtDate = $("#tenancyOrderModal").find("[name='TenancyOrder.CourtDate']").val();
-        var idCourt = $("#tenancyOrderModal").find("[name='TenancyOrder.CourtType']").val();
+        var courtNum = $("#tenancyOrderModal fieldset[data-selected-id='" + idOrder + "']").find("[name='TenancyOrder.CourtNum']").val();
+        var entryDate = $("#tenancyOrderModal fieldset[data-selected-id='" + idOrder + "']").find("[name='TenancyOrder.EntryDate']").val();
+        var courtDate = $("#tenancyOrderModal fieldset[data-selected-id='" + idOrder + "']").find("[name='TenancyOrder.CourtDate']").val();
+        var idCourt = $("#tenancyOrderModal fieldset[data-selected-id='" + idOrder + "']").find("[name='TenancyOrder.CourtType']").val();
         var resettleNum = $("#tenancyOrderModal").find("[name='TenancyOrder.ResettleNum']").val();
         var resettleDate = $("#tenancyOrderModal").find("[name='TenancyOrder.ResettleDate']").val();
         var idResettleType = $("#tenancyOrderModal").find("[name='TenancyOrder.ResettleType']").val();
@@ -99,7 +101,7 @@
             "&House=" + house + "&PremiseNum=" + premiseNum + "&SubPremiseNum=" + subPremiseNum + "&OrderDateFrom=" + orderDateFrom +
             "&RegistrationDateFrom=" + registrationDateFrom + "&RegistrationDateTo=" + registrationDateTo +
             "&IdRentType=" + idRentType + "&IdOrderType=" + idOrderType + "&OrphansNum=" + orphansNum + "&OrphansDate=" + orphansDate +
-            "&CourtNum=" + courtNum + "&CourtDate=" + courtDate + "&IdCourt=" + idCourt + "&ResettleNum=" + resettleNum +
+            "&CourtNum=" + courtNum + "&EntryDate=" + entryDate + "&CourtDate=" + courtDate + "&IdCourt=" + idCourt + "&ResettleNum=" + resettleNum +
             "&ResettleDate=" + resettleDate + "&IdResettleType=" + idResettleType + "&SummaryListDate=" + summarylistDate;
         downloadFile(url);
         $("#tenancyOrderModal").modal("hide");
