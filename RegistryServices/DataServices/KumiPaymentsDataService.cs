@@ -145,12 +145,12 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<KumiPayment> GetQueryOrder(IQueryable<KumiPayment> query, OrderOptions orderOptions)
         {
-            if (!string.IsNullOrEmpty(orderOptions.OrderField))
+            if (!string.IsNullOrEmpty(orderOptions.OrderField) && orderOptions.OrderField == "Date")
             {
                 if (orderOptions.OrderDirection == OrderDirection.Ascending)
-                    return query.OrderBy(p => p.IdPayment);
+                    return query.OrderBy(p => p.DateDocument ?? p.DateIn ?? p.DateExecute);
                 else
-                    return query.OrderByDescending(p => p.IdPayment);
+                    return query.OrderByDescending(p => p.DateDocument ?? p.DateIn ?? p.DateExecute);
             }
             return query;
         }
