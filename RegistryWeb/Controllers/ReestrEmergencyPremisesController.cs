@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using RegistryServices.ViewModel.RegistryObjects;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
-using RegistryWeb.Models;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;

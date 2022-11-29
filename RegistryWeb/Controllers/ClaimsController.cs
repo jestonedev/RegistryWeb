@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
-using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
+using RegistryServices.ViewModel.Claims;
+using RegistryServices.ViewModel.KumiAccounts;
+using RegistryDb.Models.Entities.Claims;
+using RegistryServices.Enums;
 
 namespace RegistryWeb.Controllers
 {
@@ -73,12 +74,12 @@ namespace RegistryWeb.Controllers
             return View("Claim", claimVM);
         }
 
-        public ActionResult Create(int? idAccount)
+        public ActionResult Create(int? idAccountBks, int? idAccountKumi)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
                 return View("NotAccess");
             InitializeViewBag("Create", null, true);
-            return View("Claim", dataService.CreateClaimEmptyViewModel(idAccount));
+            return View("Claim", dataService.CreateClaimEmptyViewModel(idAccountBks, idAccountKumi));
         }
 
         [HttpPost]
@@ -98,16 +99,16 @@ namespace RegistryWeb.Controllers
             return View("Claim", dataService.GetClaimViewModel(claimVM.Claim));
         }
 
-        public ActionResult GetClaimPersonsBySource(LoadPersonsSourceEnum loadPersonsSource, int idAccount)
+        public ActionResult GetClaimPersonsBySource(LoadPersonsSourceEnum loadPersonsSource, int? idAccountBks, int? idAccountKumi)
         {
             var persons = new List<ClaimPerson>();
             switch (loadPersonsSource)
             {
                 case LoadPersonsSourceEnum.Tenancy:
-                    persons = dataService.GetClaimPersonsFromTenancy(idAccount);
+                    persons = dataService.GetClaimPersonsFromTenancy(idAccountBks, idAccountKumi);
                     break;
                 case LoadPersonsSourceEnum.PrevClaim:
-                    persons = dataService.GetClaimPersonsFromPrevClaim(idAccount);
+                    persons = dataService.GetClaimPersonsFromPrevClaim(idAccountBks, idAccountKumi);
                     break;
             }
             return PartialView("ClaimPersonsPreview", persons);
@@ -194,9 +195,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetAccounts(string text)
+        public JsonResult GetAccounts(string text, string type)
         {
-            var accounts = dataService.GetAccounts(text);
+            var accounts = dataService.GetAccounts(text, type);
             return Json(accounts.Select(pa => new {
                 pa.IdAccount,
                 pa.Account
@@ -204,20 +205,55 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetAccountInfo(int idAccount)
+        public JsonResult GetAccountInfo(int idAccount, string type)
         {
-            var account = dataService.GetAccount(idAccount);
-            var rentObjects = dataService.GetRentObjects(new List<int> { idAccount });
-            var lastPaymentInfo = dataService.GetLastPaymentsInfo(new List<int> { idAccount }).Select(v => v.Value).FirstOrDefault();
-            return Json(new {
-                BksAddress = account?.RawAddress,
-                RegistryAddress = rentObjects.ContainsKey(idAccount) ? rentObjects[idAccount].Select(r => r.Text).Aggregate((acc, v) => acc + ", " + v) : "",
-                AmountTenancy = lastPaymentInfo?.BalanceOutputTenancy,
-                AmountPenalties = lastPaymentInfo?.BalanceOutputPenalties,
-                AmountDgi = lastPaymentInfo?.BalanceOutputDgi,
-                AmountPadun = lastPaymentInfo?.BalanceOutputPadun,
-                AmountPkk = lastPaymentInfo?.BalanceOutputPkk
-            });
+            if (type == "BKS")
+            {
+                var account = dataService.GetAccountBks(idAccount);
+                var rentObjects = dataService.GetRentObjectsBks(new List<int> { idAccount });
+                var lastPaymentInfo = dataService.GetLastPaymentsInfo(new List<int> { idAccount }).Select(v => v.Value).FirstOrDefault();
+                return Json(new
+                {
+                    BksAddress = account?.RawAddress,
+                    RegistryAddress = rentObjects.ContainsKey(idAccount) ? rentObjects[idAccount].Select(r => r.Text).Aggregate((acc, v) => acc + ", " + v) : "",
+                    AmountTenancy = lastPaymentInfo?.BalanceOutputTenancy,
+                    AmountPenalties = lastPaymentInfo?.BalanceOutputPenalties,
+                    AmountDgi = lastPaymentInfo?.BalanceOutputDgi,
+                    AmountPadun = lastPaymentInfo?.BalanceOutputPadun,
+                    AmountPkk = lastPaymentInfo?.BalanceOutputPkk
+                });
+            } else
+            if (type == "KUMI")
+            {
+                var account = dataService.GetAccountKumi(idAccount);
+                var tenancyInfoDict = dataService.GetTenancyInfoKumi(new List<int> { idAccount }).FirstOrDefault();
+                List<KumiAccountTenancyInfoVM> kumiTenancyInfo = null;
+                List<KumiAccountTenancyInfoVM> activeKumiTenancyInfo = null;
+                List<TenancyRentObject> rentObjects = null;
+                if (tenancyInfoDict.Value != null && tenancyInfoDict.Value.Any())
+                {
+                    kumiTenancyInfo = tenancyInfoDict.Value;
+                    activeKumiTenancyInfo = kumiTenancyInfo.Where(r => r.TenancyProcess.TenancyPersons.Any(p => p.ExcludeDate == null || p.ExcludeDate > DateTime.Now)
+                        && (r.TenancyProcess.RegistrationNum == null || !r.TenancyProcess.RegistrationNum.EndsWith("н"))).ToList();
+                }
+                if (activeKumiTenancyInfo != null && activeKumiTenancyInfo.Any())
+                {
+                    kumiTenancyInfo = activeKumiTenancyInfo;
+                }
+                if (kumiTenancyInfo != null && kumiTenancyInfo.Any())
+                {
+                    rentObjects = kumiTenancyInfo.First().RentObjects;
+                }
+
+                return Json(new
+                {
+                    RegistryAddress = rentObjects != null && rentObjects.Any() ? rentObjects.Where(r => r.Address != null)
+                        .Select(r => r.Address.Text).Aggregate((acc, v) => acc + ", " + v) : "",
+                    AmountTenancy = account.CurrentBalanceTenancy,
+                    AmountPenalties = account.CurrentBalancePenalty
+                });
+            }
+            return Json(null);
         }
 
         [HttpPost]

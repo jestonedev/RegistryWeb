@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
-using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
-using System;
+using RegistryWeb.Enums;
+using RegistryServices.ViewModel.Privatization;
+using RegistryDb.Models.Entities.Privatization;
 
 namespace RegistryWeb.Controllers
 {

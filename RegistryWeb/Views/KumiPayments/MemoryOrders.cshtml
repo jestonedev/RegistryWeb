@@ -1,0 +1,33 @@
+﻿@using RegistryDb.Models.Entities.KumiAccounts
+@model IList<KumiMemorialOrder>
+
+
+<div class="card rr-payment-mo-card mb-2">
+    <div class="card-header d-flex justify-content-between pt-2 pb-2">
+        <h4 class="mt-1">
+            <span>Мемориальные ордеры</span>
+            @{
+                var count = Model != null && Model.Any() ? Model.Count().ToString() : "";
+                var visible = Model != null && Model.Any() ? "" : "style='display: none;'";
+            }
+            <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visible)>
+                @count
+            </span>
+        </h4>
+        <div class="btn-group" role="group">
+            <a href="#" id="MemoryOrdersToggler" class="form-control btn btn-primary payment-ufs-toggler" title="Развернуть панель мемориальных ордеров" style="font-weight:bold;">∨</a>
+        </div>
+    </div>
+    <ul class="list-group list-group-flush toggle-hide" id="MemoryOrders">
+        <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
+            <i>Ордеры отсутствуют</i>
+        </li>
+        @if (Model != null && Model.Any())
+        {
+            for (var i = 0; i < Model.Count; i++)
+            {
+                <partial name="MemoryOrder" model="Model[i]" />
+            }
+        }
+    </ul>
+</div>

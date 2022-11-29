@@ -1,5 +1,7 @@
 ﻿@using RegistryWeb.Extensions
-@model RegistryWeb.ViewModel.TenancyProcessVM;
+@using RegistryWeb.Enums;
+@using RegistryDb.Models.Entities.KumiAccounts;
+@model RegistryServices.ViewModel.Tenancies.TenancyProcessVM;
 @{
 
     if (ViewBag.Action == "Create")
@@ -114,7 +116,7 @@
         </div>
     </div>
     <div class="card-body pt-3 pb-3 pl-3 pr-3" id="TenancyProcess">
-        <form asp-controller="TenancyProcesses" asp-action="@ViewBag.Action" id="TenancyProcessForm" data-action="@ViewBag.Action" method="post" enctype="multipart/form-data">
+        <form asp-controller="TenancyProcesses" asp-action="@ViewBag.Action" id="TenancyProcessForm" autocomplete="off" data-action="@ViewBag.Action" method="post" enctype="multipart/form-data">
             <input type="hidden" asp-for="TenancyProcess.IdProcess" />
             <input type="hidden" value="@ViewBag.ReturnUrl" name="ReturnUrl" />
             @foreach (var rentType in Model.RentTypes)
@@ -123,21 +125,26 @@
             }
 
             <div class="row">
-                <div class="form-group col-md-4 mb-2">
-                    <label class="mb-1" asp-for="TenancyProcess.RegistrationNum">Номер договора найма</label>
+                <div class="form-group col-md-3 mb-2">
+                    <label class="rr-tenancy-label mb-1" asp-for="TenancyProcess.RegistrationNum">Номер договора найма</label>
                     <input type="text" class="form-control" maxlength="255" asp-for="TenancyProcess.RegistrationNum" title="Номер договора найма">
                     <span asp-validation-for="TenancyProcess.RegistrationNum" class="text-danger"></span>
                 </div>
-                <div class="form-group col-md-4 mb-2">
+                <div class="form-group col-md-3 mb-2">
                     <label class="rr-tenancy-label mb-1" asp-for="TenancyProcess.RegistrationDate">Дата регистрации договора</label>
                     <input type="date" class="form-control" asp-for="TenancyProcess.RegistrationDate"
                             value="@(Model.TenancyProcess.RegistrationDate.HasValue ? Model.TenancyProcess.RegistrationDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата регистрации договора">
                     <span asp-validation-for="TenancyProcess.RegistrationDate" class="text-danger"></span>
                 </div>
-                <div class="form-group col-md-4 mb-2">
-                    <label class="mb-1" asp-for="TenancyProcess.IssueDate">Дата выдачи договора</label>
+                <div class="form-group col-md-3 mb-2">
+                    <label class="rr-tenancy-label mb-1" asp-for="TenancyProcess.IssueDate">Дата выдачи договора</label>
                     <input type="date" class="form-control" asp-for="TenancyProcess.IssueDate"
                             value="@(Model.TenancyProcess.IssueDate.HasValue ? Model.TenancyProcess.IssueDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата выдачи договора">
+                </div>
+                <div class="form-group col-md-3 mb-2">
+                    <label class="rr-tenancy-label mb-1 rr-tenancy-label" asp-for="TenancyProcess.AnnualDate">Дата аннулирования договора</label>
+                    <input type="date" class="form-control" asp-for="TenancyProcess.AnnualDate"
+                           value="@(Model.TenancyProcess.AnnualDate.HasValue ? Model.TenancyProcess.AnnualDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата аннулирования договора">
                 </div>
             </div>
 
@@ -148,18 +155,15 @@
                     <input type="date" class="form-control" asp-for="TenancyProcess.BeginDate"
                            value="@(Model.TenancyProcess.BeginDate.HasValue ? Model.TenancyProcess.BeginDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата начала найма жилья">
                 </div>
-                @if (ViewBag.Action != "Edit" || !(ViewBag.CanEditBaseInfo ?? false))
-                {
-                    <div class="form-group col-lg-4 col-md-6 mb-2">
-                        <label class="mb-1 rr-tenancy-label" asp-for="TenancyProcess.EndDate">Дата окончания найма жилья</label>
+                <div class="form-group col-lg-4 col-md-6 mb-2">
+                    <label class="mb-1 rr-tenancy-label" asp-for="TenancyProcess.EndDate">Дата окончания найма жилья</label>
+                    @if (ViewBag.Action != "Edit" || !(ViewBag.CanEditBaseInfo ?? false))
+                    {
                         <input type="date" class="form-control" asp-for="TenancyProcess.EndDate"
                                value="@(Model.TenancyProcess.EndDate.HasValue ? Model.TenancyProcess.EndDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата окончания найма жилья">
-                    </div>
-                }
-                else
-                {
-                    <div class="form-group col-lg-4 col-md-6 mb-2">
-                        <label class="mb-1" asp-for="TenancyProcess.IdRentTypeCategory">Дата окончания найма жилья</label>
+                    }
+                    else
+                    {
                         <div class="input-group">
                             <input type="date" class="form-control" asp-for="TenancyProcess.EndDate"
                                    value="@(Model.TenancyProcess.EndDate.HasValue ? Model.TenancyProcess.EndDate.Value.ToString("yyyy-MM-dd") : "")" title="Дата окончания найма жилья">
@@ -169,18 +173,19 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
-                }
-                <div class="form-check col-md-6 col-lg-4 rr-until-dismissal-checkbox mb-1">
-                    <input type="checkbox" class="form-check-input" asp-for="TenancyProcess.UntilDismissal">
-                    <label class="form-check-label" asp-for="TenancyProcess.UntilDismissal" title="На период трудовых отношений / пролонгирован">На период ТО / пролонгирован</label>
+                    }
                 </div>
-
+                <div class="form-check col-md-6 col-lg-4 rr-until-dismissal-checkbox mb-1">
+                    <input type="checkbox" class="form-check-input rr-tenancy-label" asp-for="TenancyProcess.UntilDismissal">
+                    <label class="form-check-label rr-tenancy-label" asp-for="TenancyProcess.UntilDismissal" title="На период трудовых отношений / пролонгирован">На период ТО / пролонгирован</label>
+                </div>
+            </div>
+            <div class="row">
                 <div class="form-check col-md-12 col-lg-12 mb-2 rr-until-calculations-completed-checkbox">
                     <input type="checkbox" class="form-check-input" asp-for="TenancyProcess.UntilCalculationsCompleted">
                     <label class="form-check-label" asp-for="TenancyProcess.UntilCalculationsCompleted"
-                           title="До завершения расчетов с гражданами, единственное жилое помещение которых стало непригодным для проживания в результате чрезвычайных обстоятельств,
-                           либо до предоставления им жилых помещений государственного или муниципального жилищного фонда">
+                            title="До завершения расчетов с гражданами, единственное жилое помещение которых стало непригодным для проживания в результате чрезвычайных обстоятельств,
+                        либо до предоставления им жилых помещений государственного или муниципального жилищного фонда">
                         До завершения расчетов с гражданами, единственное жилое помещение которых стало непригодным для проживания в результате чрезвычайных обстоятельств,
                         либо до предоставления им жилых помещений государственного или муниципального жилищного фонда
                     </label>
@@ -188,7 +193,7 @@
             </div>
 
             <div class="row">
-                <div class="form-group col-md-6 mb-2">
+                <div class="form-group col-md-3 mb-2">
                     <label class="mb-1" asp-for="TenancyProcess.IdRentType">Тип найма жилья</label>
                     <select class="selectpicker form-control" asp-for="TenancyProcess.IdRentType" asp-items="@(new SelectList(Model.RentTypes, "IdRentType", "RentTypeName"))"
                             title="Тип найма жилья" data-val="true" data-val-required="Выберите тип найма жилья">
@@ -196,8 +201,8 @@
                     </select>
                     <span asp-validation-for="TenancyProcess.IdRentType" class="text-danger"></span>
                 </div>
-                <div class="form-group col-md-6 mb-2">
-                    <label class="mb-1" asp-for="TenancyProcess.IdExecutor">Исполнитель/составитель</label>
+                <div class="form-group col-md-3 mb-2">
+                    <label class="rr-tenancy-label mb-1" asp-for="TenancyProcess.IdExecutor">Исполнитель/составитель</label>
                     <select class="selectpicker form-control" asp-for="TenancyProcess.IdExecutor" title="Исполнитель/составитель"
                             data-val="true" data-val-required="Выберите исполнителя/составителя">
                         <option></option>
@@ -221,19 +226,87 @@
                     </select>
                     <span asp-validation-for="TenancyProcess.IdExecutor" class="text-danger"></span>
                 </div>
+                @{
+                    if(Model.TenancyProcess.AccountsTenancyProcessesAssoc == null)
+                    {
+                        Model.TenancyProcess.AccountsTenancyProcessesAssoc = new List<KumiAccountsTenancyProcessesAssoc>();
+                    }
+                    Model.TenancyProcess.AccountsTenancyProcessesAssoc.Add(new KumiAccountsTenancyProcessesAssoc
+                    {
+                        Fraction = 1.0000m
+                    });
+                    if (Model.TenancyProcess.AccountsTenancyProcessesAssoc.Count < 2)
+                    {
+                        Model.TenancyProcess.AccountsTenancyProcessesAssoc.Add(new KumiAccountsTenancyProcessesAssoc
+                        {
+                            Fraction = 1.0000m
+                        });
+                    }
+                }
+                
+                @for (var i = 0; i < Model.TenancyProcess.AccountsTenancyProcessesAssoc.Count; i++)
+                {
+                    <div class="form-group rr-account col-md-6 mb-2 @(i > 0 ? "offset-md-6" : "") @(Model.TenancyProcess.AccountsTenancyProcessesAssoc.Count - 1 == i ? "d-none" : "")">
+                        <input type="hidden" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].IdAssoc" />
+                        <input type="hidden" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].IdAccount" />
+                        <label class="mb-1 @(i > 0 ? "d-none" : "")" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].IdAccount">Лицевой счет / Доля</label>
+                        @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
+                        {
+                            @if(Model.TenancyProcess.AccountsTenancyProcessesAssoc[i].IdAccount != 0)
+                            { 
+                                <div class="input-group">
+                                    <input class="form-control" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].AccountNavigation.Account" title="Номер лицевого счета" />
+                                    <input class="form-control input-fraction" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].Fraction" title="Доля" />
+                                    <div class="input-group-append">
+                                        <a class="btn btn-outline-secondary rr-tenancy-account-view-btn" title="Карточка лицевого счета" target="_blank" asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@Model.TenancyProcess.AccountsTenancyProcessesAssoc[i].IdAccount">
+                                            <span class="oi oi-eye"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            } else
+                            {
+                                <div class="input-group">
+                                    <input class="form-control" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].AccountNavigation.Account" title="Номер лицевого счета" />
+                                    <input class="form-control input-fraction" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].Fraction" value="" title="Доля" />
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="input-group">
+                                <input class="form-control" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].AccountNavigation.Account" title="Номер лицевого счета" />
+                                <input class="form-control input-fraction" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].Fraction" title="Доля" />
+                                <div class="input-group-append">
+                                    <button title="Удалить лицевой счет" class="btn btn-danger rr-tenancy-account-delete-btn" type="button">
+                                        <span class="oi oi-trash"></span>
+                                    </button>
+                                    <button title="Добавить лицевой счет" class="btn btn-success rr-tenancy-account-add-btn @(i == 0 ? "" : "d-none")" type="button">
+                                        <span class="oi oi-plus"></span>
+                                    </button>
+                                    @if (i > 0)
+                                    {
+                                        <span class="input-group-text rr-account-append-span"></span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
             <div class="row">
                 @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
                 {
                     <div class="form-group col-md-3 mb-0">
-                        <label class="rr-tenancy-label mb-1">Размер платы (до 28.08.19)</label>
+                        <label class="rr-tenancy-label mb-1" title="Плата за найм (№1824 от 12.08.2014)">Плата за найм (№1824 от 12.08.2014)</label>
                         <input class="form-control" type="text" value="@Model.RentObjects.Select(ro => ro.Payment).Sum()" />
                     </div>
                     <div class="form-group col-md-3 mb-0">
-                        <label class="rr-tenancy-label mb-1">Размер платы (после 28.08.19)</label>
+                        <label class="rr-tenancy-label mb-1" title="Плата за найм (№1558 от 28.08.2019)">Плата за найм (№1558 от 28.08.2019)</label>
                         <div class="input-group mb-2">
-                            <input class="form-control" type="text" value="@Model.RentObjects.Select(ro => ro.PaymentAfter28082019).Sum()" />
-                            <a class="btn btn-outline-secondary rr-payment-history-btn" title="История изменения платы за найм" target="_blank" asp-action="PaymentHistory" asp-route-id="@Model.TenancyProcess.IdProcess" asp-route-target="@PaymentHistoryTarget.Tenancy" id="button-addon2">
+                            <input class="form-control @(ViewBag.AreaAvgCostActualDate != null && ViewBag.AreaAvgCostActualDate > DateTime.Now.Date ? "text-danger" : "")" 
+                                   title="@(ViewBag.AreaAvgCostActualDate != null && ViewBag.AreaAvgCostActualDate > DateTime.Now.Date ? "Действительна с "+((DateTime?)ViewBag.AreaAvgCostActualDate).Value.ToString("dd.MM.yyyy") : "")"
+                                   type="text" value="@Model.RentObjects.Select(ro => ro.PaymentAfter28082019).Sum()" />
+                            <a class="btn btn-outline-secondary rr-payment-history-btn" title="История изменения коэффициентов оплаты" target="_blank" asp-action="PaymentHistory" asp-route-id="@Model.TenancyProcess.IdProcess" asp-route-target="@PaymentHistoryTarget.Tenancy" id="button-addon2">
                                 <span class="oi oi-eye"></span>
                             </a>
                         </div>
@@ -364,6 +437,7 @@
 @section Scripts {
     <script src="~/js/tenancyProcess.common.js" asp-append-version="true"></script>
     <script src="~/js/tenancyProcess.reports.js" asp-append-version="true"></script>
+    <script src="~/js/tenancyProcess.accounts.js" asp-append-version="true"></script>
     <script src="~/lib/bootstrap4-toggle/js/bootstrap4-toggle.min.js"></script>
     @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete" || (ViewBag.Action == "Edit" && !(ViewBag.CanEditBaseInfo ?? false)))
     {

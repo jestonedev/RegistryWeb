@@ -46,6 +46,16 @@
     }
 }
 
+.rr-account-append-span {
+    width: 37px;
+}
+
+@media(min-width: 768px) {
+    .rr-account-append-span {
+        width: 42px;
+    }
+}
+
 .rr-tenancy-filter-label, .rr-tenancy-label {
     white-space: nowrap;
     overflow: hidden;
@@ -59,6 +69,11 @@
     padding-left: 2.2rem;
 }
 
+@media(min-width: 992px) {
+    .rr-until-dismissal-checkbox {
+        padding-left: 2.2rem;
+    }
+}
 
 .rr-tenancy-card {
     margin-top: 0;
@@ -83,4 +98,8 @@
 
 button[id^="homesBtn_"] {
     margin-bottom: 5px;
+}
+
+.rr-tenancy-account-btn {
+    border-radius: 0 .25rem .25rem 0;
 }

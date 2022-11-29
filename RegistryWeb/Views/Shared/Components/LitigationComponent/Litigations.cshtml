@@ -1,4 +1,5 @@
-﻿@model IEnumerable<RegistryWeb.ViewModel.LitigationVM>;
+﻿@using RegistryWeb.Enums;
+@model IEnumerable<RegistryServices.ViewModel.RegistryObjects.LitigationVM>;
 <form id="litigationsForm">
     <script src="~/js/litigations.common.js" asp-append-version="true"></script>
     <div class="card">
@@ -20,11 +21,11 @@
                 }
                 <a href="#" id="litigationsToggle" class="form-control btn btn-primary" title="Развернуть список судебных разбирательств" style="font-weight:bold;">∨</a>
             </div>
-        </div>        
+        </div>
         <ul class="list-group list-group-flush toggle-hide" id="litigationsList" data-addresstype="@ViewBag.AddressType" data-id="@ViewBag.Id" data-action="@ViewBag.Action">
             @foreach (var item in Model)
             {
-                <partial name="Litigation" model="item" />                
+                <partial name="Litigation" model="item" />
             }
         </ul>
     </div>

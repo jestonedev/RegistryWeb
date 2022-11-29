@@ -2,7 +2,7 @@
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.ViewModel;
-@model RegistryWeb.ViewModel.PaymentsVM;
+@model RegistryServices.ViewModel.Payments.PaymentsVM;
 @{
     var ids = Context.Session.Get<List<int>>("idAccounts") ?? new List<int>();
     var check = "";
@@ -165,7 +165,7 @@
                             <button class="btn btn-dark oi oi-grid-two-up dropdown-toggle" type="button" title="Связанные объекты" aria-label="Связанные объекты" id="objectsBtn_@item.IdAccount" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@item.IdAccount">
                                 <a class="dropdown-item" title="Претензионно-исковые работы" aria-label="Претензионно-исковые работы"
-                                   asp-controller="Claims" asp-action="Index" asp-route-filterOptions.IdAccount="@item.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Претензионно-исковые работы</a>
+                                   asp-controller="Claims" asp-action="Index" asp-route-filterOptions.IdAccountBks="@item.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Претензионно-исковые работы</a>
                             </div>
                         </div>
                         <div class="btn-group" role="group" aria-label="Отчеты">

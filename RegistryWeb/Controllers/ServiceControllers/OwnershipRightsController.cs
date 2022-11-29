@@ -1,13 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models;
+using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Ownerships;
+using RegistryServices.ViewModel.RegistryObjects;
+using RegistryWeb.Enums;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 

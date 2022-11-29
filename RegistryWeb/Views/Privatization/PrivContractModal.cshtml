@@ -22,7 +22,7 @@
                             <label for="PrivContract_IdOwnerSigner">Доверенное лицо</label>
                             <select class="selectpicker form-control" data-live-search="true" title="Доверенное лицо" id="PrivContract_IdOwnerSigner">
                                 <option selected></option>
-                                @foreach (RegistryWeb.Models.Entities.SelectableSigner item in ViewBag.PrivEstateOwnerSigners)
+                                @foreach (RegistryDb.Models.Entities.Common.SelectableSigner item in ViewBag.PrivEstateOwnerSigners)
                                 {
                                     var snp = item.Surname + " " + item.Name + (item.Patronymic != null ? " " + item.Patronymic : "");
                                     <option value="@item.IdRecord" data-id-owner="@item.IdOwner">@snp</option>

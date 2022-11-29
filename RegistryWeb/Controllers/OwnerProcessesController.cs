@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
-using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
+using RegistryWeb.Enums;
+using RegistryServices.ViewModel.Owners;
+using RegistryDb.Models.Entities.Owners;
 
 namespace RegistryWeb.Controllers
 {

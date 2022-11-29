@@ -1,7 +1,7 @@
 ﻿@using RegistryWeb.Extensions;
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.SecurityServices;
-@model RegistryWeb.ViewModel.OwnerProcessesVM;
+@model RegistryServices.ViewModel.Owners.OwnerProcessesVM;
 @{
     var securityService = (SecurityService)ViewData["SecurityService"];
     var canEdit = securityService.HasPrivilege(Privileges.OwnerWrite);

@@ -223,8 +223,7 @@
                 break;
             case "ClaimExecutedWork":
                 standartWrapper.show();
-                break;
-        }
+                break;        }
 
         modal.modal("show");
         e.preventDefault();

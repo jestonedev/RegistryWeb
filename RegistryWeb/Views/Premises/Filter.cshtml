@@ -1,9 +1,9 @@
 ﻿@using RegistryWeb.ViewOptions;
-@using RegistryWeb.Models.Entities;
+@using RegistryDb.Models.Entities.RegistryObjects.Premises;
 @using RegistryWeb.Extensions;
 @using RegistryWeb.SecurityServices;
 
-@model RegistryWeb.ViewModel.PremisesVM<Premise>;
+@model RegistryServices.ViewModel.RegistryObjects.PremisesVM<Premise>;
 
 @{
     var securityService = (SecurityService)ViewData["SecurityService"];

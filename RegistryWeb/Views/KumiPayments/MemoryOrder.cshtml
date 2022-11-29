@@ -1,0 +1,34 @@
+﻿@using RegistryDb.Models.Entities.KumiAccounts
+@model KumiMemorialOrder
+
+<li class="list-group-item pl-3 pr-3 pb-3 pt-3">
+    <div class="form-row">
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1 rr-payment-label">Номер документа / уведомления</label>
+            <input type="text" class="form-control" disabled asp-for="NumDocument" title="Номер документа / уведомления">
+        </div>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1 rr-payment-label">Дата документа / уведомления</label>
+            <input type="date" class="form-control" disabled asp-for="DateDocument" value="@Model.DateDocument.ToString("yyyy-MM-dd")"
+                   title="Дата документа / уведомления">
+        </div>
+        <div class="form-group col-12 col-md-4 mb-2">
+            <label class="mb-1 rr-payment-label">Сумма</label>
+            <input type="text" class="form-control" disabled asp-for="SumZach"
+                   title="Сумма">
+        </div>
+
+        <div class="form-group col-12 col-md-4 mb-2 mb-md-0">
+            <label class="mb-1 rr-payment-label">КБК</label>
+            <input type="text" class="form-control" disabled asp-for="Kbk" title="КБК">
+        </div>
+        <div class="form-group col-12 col-md-4 mb-2 mb-md-0">
+            <label class="mb-1 rr-payment-label">Код ОКТМО</label>
+            <input type="text" class="form-control" disabled asp-for="Okato" title="Код ОКТМО">
+        </div>
+        <div class="form-group col-12 col-md-4 mb-0">
+            <label class="mb-1 rr-payment-label">Код цели</label>
+            <input type="text" class="form-control" disabled asp-for="TargetCode" title="Код цели">
+        </div>
+    </div>
+</li>

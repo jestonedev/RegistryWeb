@@ -1,4 +1,6 @@
-﻿@model RegistryWeb.ViewModel.PaymentsAccountTableVM;
+﻿@using RegistryWeb.Enums;
+@using RegistryWeb.ViewModel;
+@model RegistryServices.ViewModel.Payments.PaymentsAccountTableVM;
 @{
     var paymentByAddress = ViewBag.PaymentsByAddress ?? false;
     if (paymentByAddress)

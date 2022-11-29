@@ -1,4 +1,5 @@
-﻿@using RegistryWeb.Models.Entities
+﻿@using RegistryDb.Models.Entities.Common
+@using RegistryDb.Models.Entities.Claims
 @{
     var signers = (List<SelectableSigner>)ViewBag.SignersReports;
     SelectList signersList = null;
@@ -378,7 +379,7 @@
                 <div class="form-row">
                     <div class="form-group col-12 mb-0">
                         <select class="selectpicker form-control" id="PeronsSource" title="Источник загрузки членов семьи ответчика" 
-                            asp-items="@Html.GetEnumSelectList(typeof(RegistryWeb.ViewOptions.LoadPersonsSourceEnum))">
+                            asp-items="@Html.GetEnumSelectList(typeof(RegistryServices.Enums.LoadPersonsSourceEnum))">
                         </select>
                     </div>
                 </div>

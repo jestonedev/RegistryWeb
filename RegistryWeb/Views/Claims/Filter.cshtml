@@ -1,6 +1,7 @@
-﻿@model RegistryWeb.ViewModel.ClaimsVM;
+﻿@model RegistryServices.ViewModel.Claims.ClaimsVM;
 @using RegistryWeb.SecurityServices;
-@using RegistryWeb.Extensions;
+@using RegistryWeb.Enums;
+
 @{
     var securityService = (SecurityService)ViewData["SecurityService"];
     var signList = Html.GetEnumSelectList<ComparisonSignEnum>();
@@ -18,7 +19,7 @@
         @if (securityService.HasPrivilege(Privileges.ClaimsWrite))
         {
             <div class="form-group col-2 col-md-1 col-lg-1">
-                <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="Claims" asp-action="Create" asp-route-idAccount="@Model.FilterOptions.IdAccount">&#10010;</a>
+                <a class="btn btn-success" title="Добавить" aria-label="Добавить" asp-controller="Claims" asp-action="Create" asp-route-idAccountBks="@Model.FilterOptions.IdAccountBks" asp-route-idAccountKumi="@Model.FilterOptions.IdAccountKumi">&#10010;</a>
             </div>
         }
         @if (Model.FilterOptions.IsAddressEmpty())

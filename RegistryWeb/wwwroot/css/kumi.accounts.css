@@ -1,0 +1,78 @@
+﻿.tp-table > thead > tr > th a.sort {
+    color: #888;
+}
+
+.tp-table > thead > tr > th a.sort:hover {
+    color: black;
+}
+
+.tp-table > thead > tr > th a.sort.tp-sorted {
+    color: #007bff;
+}
+
+.tp-table > thead > tr > th a.sort.tp-sorted:hover {
+    color: #0056b3;
+}
+
+.rr-account-filter-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 0.24rem;
+}
+
+.account-open-claim-btn {
+    margin-top: 12px;
+}
+
+@media(min-width: 576px) {
+    .account-open-claim-btn {
+        margin-top: 23px;
+    }
+}
+
+@media(min-width: 768px) {
+    .account-open-claim-btn {
+        margin-top: 27px;
+    }
+}
+
+.rr-account-list-eye-btn {
+    margin-top: -5px;
+    font-size: 80%;
+}
+
+.rr-account-list-eye-btn:focus  {
+    box-shadow: none;
+}
+
+.rr-account-additional-info, .rr-charge-archive {
+    display: none;
+}
+
+.rr-account-recalc-reason:disabled {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+#Charges, #ClaimsInfo {
+    font-size: 50%;
+}
+
+@media(min-width: 768px) {
+    #Charges {
+        font-size: 70%;
+    }
+
+     #ClaimsInfo {
+        font-size: 65%;
+    }
+}
+
+@media(min-width: 992px) {
+    #Charges, #ClaimsInfo {
+        font-size: 80%;
+    }
+}

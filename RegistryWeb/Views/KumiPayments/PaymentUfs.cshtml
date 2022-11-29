@@ -1,0 +1,159 @@
+﻿@using RegistryDb.Models.Entities.KumiAccounts
+@model IList<KumiPaymentUf>
+
+@{ 
+    var canEdit = ((bool?)ViewBag.CanEditUfs) ?? true;
+}
+
+<link rel="stylesheet" href="~/css/kumi.payment.ufs.css" />
+<script src="~/js/kumiPayments.ufs.js"></script>
+<form id="PaymentsUfsForm">
+    <div class="card rr-payment-uf-card mb-2">
+        <div class="card-header d-flex justify-content-between pt-2 pb-2">
+            <h4 class="mt-1">
+                <span class="d-none d-lg-inline">Уведомления об уточнении вида и принадлежности платежа</span>
+                <span class="d-none d-md-inline d-lg-none">Уведомления об уточнении платежа</span>
+                <span class="d-inline d-md-none">Уведомления об уточнении</span>
+                @{
+                            var count = Model != null && Model.Any() ? Model.Count().ToString() : "";
+                    var visible = Model != null && Model.Any() ? "" : "style='display: none;'";
+                }
+                <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visible)>
+                    @count
+                </span>
+            </h4>
+            <div class="btn-group" role="group">
+                @if (canEdit)
+                {
+                    <a href="#" id="paymentUfAdd" class="form-control btn btn-success" title="Добавить уведомление">&#10010;</a>
+                }
+                <a href="#" id="PaymentsUfsToggler" class="form-control btn btn-primary payment-ufs-toggler" title="Развернуть панель уведомлений" style="font-weight:bold;">∨</a>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush toggle-hide" id="PaymentsUfs" data-can-edit="@canEdit" data-id="@ViewBag.Id">
+            <li class="list-group-item text-center rr-list-group-item-empty" style="@((Model != null && Model.Any()) ? "display: none" : "")">
+                <i>Уведомления отсутствуют</i>
+                @if(!(((bool?)ViewBag.PaymentHasGuid) ?? true))
+                {
+                    <br />
+                    <i class="text-danger">Невозможно добавить уведомление, т.к. у платежа отсутствует глобальный идентификатор платежного документа, присваиваемый Федеральным казначейством. Для присвоения данного идентификатора необходимо привязать к платежу мемориальный ордер</i>
+                }
+            </li>
+            @if (Model != null && Model.Any())
+            {
+                for (var i = 0; i < Model.Count; i++)
+                {
+                    <partial name="PaymentUf" model="Model[i]" />
+                }
+            }
+        </ul>
+    </div>
+</form>
+
+<form id="PaymentUfsModalForm">
+    <div class="modal fade bd-example-modal-xl" id="paymentUfsModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Уведомление об уточнении вида и принадлежности платежа</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="KumiPaymentUf_IdPaymentUf" name="KumiPaymentUf.IdPaymentUf" />
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="KumiPaymentUf_NumUf">Номер уведомления</label>
+                            <input type="text" id="KumiPaymentUf_NumUf" maxlength="15" name="KumiPaymentUf.NumUf" class="form-control input-numbers" title="Номер уведомления"
+                                   data-val="true" data-val-required="Укажите номер уведомления" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="KumiPaymentUf.NumUf" data-valmsg-replace="true"></span>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="KumiPaymentUf_DateUf">Дата уведомления</label>
+                            <div class="input-group date">
+                                <input type="date" id="KumiPaymentUf_DateUf" name="KumiPaymentUf.DateUf" class="form-control" title="Дата уведомления"
+                                       data-val="true" data-val-required="Укажите дату уведомления">
+                            </div>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="KumiPaymentUf.DateUf" data-valmsg-replace="true"></span>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="KumiPaymentUf_Sum">Сумма</label>
+                            <input type="text" id="KumiPaymentUf_Sum" name="KumiPaymentUf.Sum" class="form-control input-decimal" title="Сумма"
+                                   data-val="true" data-val-required="Укажите сумму" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="KumiPaymentUf.Sum" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="KumiPaymentUf_Purpose">Назначение платежа</label>
+                            <textarea rows="2" maxlength="500" id="KumiPaymentUf_Purpose" name="KumiPaymentUf.Purpose" class="form-control"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label for="KumiPaymentUf_Kbk">КБК</label>
+                            <input type="text" id="KumiPaymentUf_Kbk" maxlength="20" name="KumiPaymentUf.Kbk" class="form-control" title="Код бюджетной классификации" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="KumiPaymentUf.Kbk" data-valmsg-replace="true"></span>
+                        </div>
+
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label for="KumiPaymentUf_IdKbkType">Тип КБК</label>
+                            <select class="selectpicker form-control" id="KumiPaymentUf_IdKbkType" name="KumiPaymentUf.IdKbkType" title="Тип КБК"
+                                    asp-items="@(new SelectList(ViewBag.KbkTypes, "IdKbkType", "Name"))"></select>
+                        </div>
+
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label for="KumiPaymentUf_TargetCode">Код цели</label>
+                            <input type="text" id="KumiPaymentUf_TargetCode" maxlength="25" name="KumiPaymentUf.TargetCode" class="form-control input-numbers" title="Код цели" />
+                        </div>
+
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label for="KumiPaymentUf_Okato">Код ОКТМО</label>
+                            <input type="text" id="KumiPaymentUf_Okato" maxlength="20" name="KumiPaymentUf.Okato" class="form-control input-numbers" title="Код по Общероссийскому классификатору территорий муниципальных образований получателя" />
+                        </div>
+                    </div>
+                    <div class="col-md-12 pl-0 pr-0">
+                        <h5>Получатель</h5>
+                        <hr />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label for="KumiPaymentUf_RecipientInn">ИНН</label>
+                            <input type="text" id="KumiPaymentUf_RecipientInn" maxlength="12" name="KumiPaymentUf.RecipientInn" class="form-control input-numbers" title="ИНН" />
+                        </div>
+
+                        <div class="form-group col-md-6 col-lg-3">
+                            <label for="KumiPaymentUf_RecipientKpp">КПП</label>
+                            <input type="text" id="KumiPaymentUf_RecipientInn" maxlength="12" name="KumiPaymentUf.RecipientKpp" class="form-control input-numbers" title="КПП" />
+                        </div>
+
+                        <div class="form-group col-md-12 col-lg-6">
+                            <label for="KumiPaymentUf_RecipientAccount">Лицевой счет</label>
+                            <input type="text" id="KumiPaymentUf_RecipientAccount" maxlength="20" name="KumiPaymentUf.RecipientAccount" class="form-control input-numbers" title="Лицевой счет" />
+                        </div>
+
+                        <div class="form-group col-12">
+                            <label for="KumiPaymentUf_RecipientName">Наименование получателя</label>
+                            <input type="text" id="KumiPaymentUf_RecipientName" maxlength="160" name="KumiPaymentUf.RecipientName" class="form-control" title="Наименование получателя" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @if (canEdit)
+                    {
+                        <button id="savePaymentUfModalBtn" type="button" class="btn btn-secondary">Сохранить</button>
+                        <button id="cancelPaymentUfModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                    } else
+                    {
+                        <button id="closePaymentUfModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

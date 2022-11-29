@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using RegistryWeb.DataHelpers;
-using RegistryWeb.Models;
-using RegistryWeb.Models.Entities;
+using RegistryDb.Models;
+using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
+using RegistryWeb.Enums;
+using RegistryServices.ViewModel.RegistryObjects;
+using RegistryDb.Models.Entities.RegistryObjects.Common.Resettle;
 
 namespace RegistryWeb.Controllers.ServiceControllers
 {
@@ -300,7 +300,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             if (!int.TryParse(address.Id, out id))
                 return Json(new { Error = -4 });
 
-            var resettleInfo = new ResettleInfo { };
+            ResettleInfo resettleInfo = new ResettleInfo { };
             var resettleInfoVM = new ResettleInfoVM(resettleInfo, new Address { AddressType = address.AddressType }, registryContext);
             ViewBag.SecurityService = securityService;
             ViewBag.Action = action;

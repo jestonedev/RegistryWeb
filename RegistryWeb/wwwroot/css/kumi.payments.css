@@ -1,0 +1,108 @@
+﻿.tp-table > thead > tr > th a.sort {
+    color: #888;
+}
+
+.tp-table > thead > tr > th a.sort:hover {
+    color: black;
+}
+
+.tp-table > thead > tr > th a.sort.tp-sorted {
+    color: #007bff;
+}
+
+.tp-table > thead > tr > th a.sort.tp-sorted:hover {
+    color: #0056b3;
+}
+
+.rr-payment-filter-label,
+.rr-payment-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 0.24rem;
+}
+
+.rr-payment-purpose {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media(min-width: 768px) {
+    .rr-payment-purpose {
+        width: 200px;
+    }
+}
+
+@media(min-width: 992px) {
+    .rr-payment-purpose {
+        width: 300px;
+    }
+}
+
+.rr-payment-list-eye-btn {
+    margin-top: -5px;
+    font-size: 80%;
+}
+
+.rr-payment-list-eye-btn:focus {
+    box-shadow: none;
+}
+
+#resultDistributePaymentToAccountModal td {
+    padding: 5px;
+}
+
+#resultDistributePaymentToAccountModal {
+    font-size: 50%;
+}
+
+#PaymentDistributionDetailsModal, #CancelDistributePaymentToAccountModal {
+    font-size: 70%;
+}
+
+#DistributePaymentToAccountModalForm .rr-payment-distribute-title {
+    margin-top: 33px;
+}
+
+@media(min-width: 768px) {
+    #resultDistributePaymentToAccountModal {
+        font-size: 70%;
+    }
+
+    #PaymentDistributionDetailsModal, #CancelDistributePaymentToAccountModal {
+        font-size: 80%;
+    }
+
+    #DistributePaymentToAccountModalForm .rr-payment-distribute-title {
+        margin-top: 38px;
+    }
+}
+
+@media(min-width: 992px) {
+
+    #resultDistributePaymentToAccountModal {
+        font-size: 100%;
+    }
+
+    #PaymentDistributionDetailsModal, #CancelDistributePaymentToAccountModal {
+        font-size: 100%;
+    }
+}
+
+.rr-payment-distribution-details-eye-btn {
+    font-size: 80%;
+}
+
+.rr-payment-distribution-details-eye-btn:focus, .rr-payment-assoc-eye-btn:focus {
+    box-shadow: none;
+}
+
+.rr-payment-assoc-eye-btn {
+    font-size: 80%;
+    margin-top: -5px;
+}
+
+#PaymentDistributionDetailsModal td, #PaymentDistributionDetailsModal th, #CancelDistributePaymentToAccountModal td, #CancelDistributePaymentToAccountModal th {
+    vertical-align: middle;
+}

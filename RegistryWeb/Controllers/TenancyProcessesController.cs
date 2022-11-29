@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -11,10 +10,11 @@ using RegistryWeb.ViewModel;
 using RegistryWeb.Extensions;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
-using RegistryWeb.Models.Entities;
-using RegistryWeb.Models;
+using RegistryDb.Models.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
+using RegistryWeb.Enums;
+using RegistryServices.ViewModel.Tenancies;
+using RegistryDb.Models.Entities.Tenancies;
 
 namespace RegistryWeb.Controllers
 {
@@ -82,6 +82,7 @@ namespace RegistryWeb.Controllers
                 ViewBag.ReturnUrl = returnUrl;
             }
             InitializeViewBagCommonDictionaries();
+            ViewBag.AreaAvgCostActualDate = dataService.AreaAvgCostActualDate;
         }
 
         // GET: TenancyProcesses/Details/5

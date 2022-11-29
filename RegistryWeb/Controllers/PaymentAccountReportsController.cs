@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using RegistryWeb.DataServices;
-using RegistryWeb.Models;
+using RegistryDb.Models;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;
+using RegistryWeb.ViewModel;
+using RegistryDb.Models.Entities.Payments;
 
 namespace RegistryWeb.Controllers
 {
@@ -163,6 +162,7 @@ namespace RegistryWeb.Controllers
                                     var log = new LogInvoiceGenerator
                                     {
                                         IdAccount = Convert.ToInt32(invoiceArguments[i]["id_account"]),
+                                        AccountType = 1,
                                         CreateDate = DateTime.Now,
                                         OnDate = Convert.ToDateTime(invoiceArguments[i]["--on-date"]),
                                         Emails = invoiceArguments[i]["--email"].ToString(),

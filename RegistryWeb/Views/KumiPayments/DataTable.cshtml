@@ -1,0 +1,317 @@
+﻿@using RegistryWeb.Extensions;
+@using RegistryWeb.ViewOptions;
+@using RegistryWeb.SecurityServices;
+@using RegistryDb.Models.Entities.KumiAccounts;
+@using RegistryServices.Models.KumiPayments;
+@model RegistryServices.ViewModel.KumiAccounts.KumiPaymentsVM;
+@{
+    Context.Session.Set("Controller", "KumiPayments");
+    Context.Session.Set("Action", "Index");
+    Context.Session.Set("OrderOptions", Model.OrderOptions);
+    Context.Session.Set("FilterOptions", Model.FilterOptions);
+    Context.Session.Set("PageOptions", Model.PageOptions);
+    var securityService = (SecurityService)ViewData["SecurityService"];
+    var kbkDescriptions = (List<KumiKbkDescription>)ViewBag.KbkDescriptions;
+}
+
+<table class="table table-hover rr-payments-table">
+    <thead>
+        <tr style="align-content: center;">
+            <th class="r-table-header-cell" style="width: 38px">
+            </th>
+            <th class="r-table-header-cell" style="min-width: 30%">
+                Платеж
+                @if (Model.OrderOptions.OrderDirection == OrderDirection.Descending && Model.OrderOptions.OrderField == "Date")
+                {
+                    <a href="#" title="Сортировка по дате платежа" class="oi oi-sort-descending sort tp-sorted" data-order-field="Date" data-order-direction="0"></a>
+                }
+                else
+                {
+                    <a href="#" title="Сортировка по дате платежа" class="oi oi-sort-ascending sort @(Model.OrderOptions.OrderField == "Date" ? "tp-sorted" : "")"
+                       data-order-field="Date" data-order-direction="@(Model.OrderOptions.OrderField == "Date" ? "1" : "0")"></a>
+                }
+            </th>
+            <th class="r-table-header-cell d-none d-lg-table-cell">
+                Назначение платежа
+            </th>
+            <th class="r-table-header-cell">
+                Плательщик
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Payments)
+        {
+            var paymentRequisits = "";
+            if (!string.IsNullOrEmpty(item.NumDocument) || item.DateDocument != null)
+            {
+                if (!string.IsNullOrEmpty(item.NumDocument))
+                {
+                    paymentRequisits += "№ " + item.NumDocument;
+                }
+                if (item.DateDocument != null)
+                {
+                    paymentRequisits += " от " + item.DateDocument.Value.ToString("dd.MM.yyyy");
+                }
+            }
+            else
+            if (string.IsNullOrEmpty(item.NumDocument) && item.DateDocument == null && !string.IsNullOrEmpty(item.Uin))
+            {
+                paymentRequisits += "УИН " + item.Uin;
+            }
+            else
+            {
+                paymentRequisits += "ID " + item.IdPayment;
+            }
+
+            var sum = item.Sum;
+            var sumPosted = item.PaymentCharges.Select(r => r.TenancyValue + r.PenaltyValue).Sum() + item.PaymentClaims.Select(r => r.TenancyValue + r.PenaltyValue).Sum();
+            <tr style="position: relative" class="@(item.IdPayment == Model.FilterOptions.IdParentPayment ? "text-success" : "")" title="@(item.IdPayment == Model.FilterOptions.IdParentPayment ? "Родительский платеж" : "")">
+                <td style="vertical-align: middle; text-align: center" class="@(sumPosted == sum ? "table-success" : "")" title="@(sumPosted == sum ? "Платеж полностью распределен" : "")">
+
+                    @if (item.IdSource == 6)
+                    {
+                        <span class="badge badge-danger">БКС</span>
+                    }
+                    else
+                    if (new int[] { 2, 3, 4, 5 }.Contains(item.IdSource))
+                    {
+                        <span class="badge badge-success">УФК</span>
+                    }
+
+                    @{
+                        var warning = "";
+                        var cssClass = "";
+                        if (sumPosted > sum)
+                        {
+                            warning = "Распределеная сумма превышает фактическую по платежу";
+                            cssClass = "text-danger";
+                        }
+                        else
+                        if (sumPosted > 0 && sum > sumPosted)
+                        {
+                            warning = "Платеж распределен не полностью";
+                            cssClass = "text-warning";
+                        }
+                        else
+                        if (sumPosted == 0 && sum != 0)
+                        {
+                            warning = "Платеж не распределен";
+                            cssClass = "text-warning";
+                        }
+                    }
+
+                    <span class="oi oi-bell rr-payment-bell @cssClass @(string.IsNullOrEmpty(warning) ? "d-none" : "")" style="font-size: 80%" title="@warning"></span>
+
+                    @if (item.ChildPayments.Any() && item.IdPayment != Model.FilterOptions.IdParentPayment)
+                    {
+                        <a asp-action="Index" asp-route-filterOptions.IdParentPayment="@item.IdPayment" title="Платеж был разбит при применении мемориального ордера. Для отображения связных платежей кликните по этой иконке">
+                            <span class="oi oi-link-intact text-primary" style="font-size: 80%"></span>
+                        </a>
+                    }
+                    @if (item.IdPayment == Model.FilterOptions.IdParentPayment && item.IdParentPayment != null)
+                    {
+                        <a asp-action="Index" asp-route-filterOptions.IdParentPayment="@item.IdParentPayment" title="К родительскому платежу">
+                            <span class="oi oi-arrow-top text-primary" style="font-size: 80%"></span>
+                        </a>
+                    }
+                </td>
+                <td>
+                    @{
+                        var isPl = item.IdSource == 3 || item.IdSource == 5;
+                    }
+
+                    <div>
+                        <b>Сумма:</b> <span class="rr-payment-sum">@item.Sum руб.@(@sumPosted > 0 ? ", расп.: " + @sumPosted + " руб." : "")</span>
+                        @{
+                            var accounts = Model.DistributionInfoToObjects.Where(r =>
+                                r.ObjectType == RegistryServices.Enums.KumiPaymentDistributeToEnum.ToKumiAccount &&
+                                r.IdPayment == item.IdPayment).Select(r => (KumiPaymentDistributionInfoToAccount)r).ToList();
+                            var claims = Model.DistributionInfoToObjects.Where(r =>
+                                r.ObjectType == RegistryServices.Enums.KumiPaymentDistributeToEnum.ToClaim &&
+                                r.IdPayment == item.IdPayment).Select(r => (KumiPaymentDistributionInfoToClaim)r).ToList();
+                        }
+                        @if (Model.FilterOptions.IdAccount != null || Model.FilterOptions.IdCharge != null)
+                        {
+                            var accountChargeInfo = accounts.Where(r => r.IdPayment == item.IdPayment &&
+                                ((Model.FilterOptions.IdAccount != null && Model.FilterOptions.IdAccount == r.IdAccount) ||
+                                 (Model.FilterOptions.IdCharge != null && Model.FilterOptions.IdCharge == r.IdCharge)))
+                                 .GroupBy(r => r.IdAccount).Select(r => new { TenancyValue = r.Sum(v => v.DistrubutedToTenancySum), PenaltyValue = r.Sum(v => v.DistrubutedToPenaltySum) })
+                                 .FirstOrDefault();
+
+
+                            var claimChargeInfo = claims.Where(r => r.IdPayment == item.IdPayment &&
+                                ((Model.FilterOptions.IdAccount != null && Model.FilterOptions.IdAccount == r.IdAccountKumi) ||
+                                 (Model.FilterOptions.IdCharge != null && Model.FilterOptions.IdCharge == r.IdCharge)))
+                                .GroupBy(r => r.IdClaim).Select(r => new { IdClaim = r.Key, TenancyValue = r.Sum(v => v.DistrubutedToTenancySum), PenaltyValue = r.Sum(v => v.DistrubutedToPenaltySum) });
+                            <br />
+                            <span class="text-danger"><b>Из них расп. по ЛС:</b></span><br />
+                            <span class="text-danger">найм @Math.Round(accountChargeInfo?.TenancyValue ?? 0, 2) руб., пени @Math.Round(accountChargeInfo?.PenaltyValue ?? 0, 2) руб.</span>
+                            <br />
+                            @for (var i = 0; i < claimChargeInfo.Count(); i++)
+                                {
+                                    var claim = claimChargeInfo.ElementAt(i);
+                                <span class="text-danger">
+                                    <b>
+                                        Из них расп. по
+                                        <a target="_blank" class="text-danger" style="text-decoration: underline"
+                                           asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.IdClaim"
+                                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
+                                            ИР №@claim.IdClaim
+                                        </a>:
+                                    </b>
+                                </span>
+
+                                <br />
+                                <span class="text-danger">найм @Math.Round(claim.TenancyValue, 2) руб., пени @Math.Round(claim.PenaltyValue, 2) руб.</span>
+                                @if (i < claimChargeInfo.Count() - 1) {
+                                    <br/>
+                                }
+                            }
+                        }
+                        else
+                        if (Model.FilterOptions.IdClaim != null)
+                        {
+                            <br />
+                            var claimChargeInfo = claims.Where(r => r.IdPayment == item.IdPayment && r.IdClaim == Model.FilterOptions.IdClaim)
+                                .GroupBy(r => r.IdClaim).Select(r => new { TenancyValue = r.Sum(v => v.DistrubutedToTenancySum), PenaltyValue = r.Sum(v => v.DistrubutedToPenaltySum) })
+                                .FirstOrDefault();
+                            <span class="text-danger">
+                                <b>
+                                    Из них расп. по ИР:
+                                </b>
+                            </span>
+                            <br />
+                            <span class="text-danger">найм @Math.Round(claimChargeInfo?.TenancyValue ?? 0, 2) руб., пени @Math.Round(claimChargeInfo?.PenaltyValue ?? 0, 2) руб.</span>
+                        }
+                        else
+                        {
+                            <div class="rr-payment-distribution-sum-details">
+                                @foreach (var account in accounts.GroupBy(r => new { r.IdAccount, r.Account })
+                                  .Select(r => new { r.Key.Account, r.Key.IdAccount,
+                                      DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
+                                      DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum) }))
+                                {
+                                    <div class="text-danger">
+                                        <u>ЛС №@account.Account:</u>
+                                        <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@account.IdAccount"></a>
+                                        <br />найм @account.DistrubutedToTenancySum руб., пени @account.DistrubutedToPenaltySum руб.
+                                    </div>
+                                }
+
+                                @foreach (var claim in claims.GroupBy(r => r.IdClaim)
+                                    .Select(r => new { IdClaim = r.Key,
+                                      DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
+                                      DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum) }))
+                                {
+                                    <div class="text-danger">
+                                        <u>ИР №@claim.IdClaim:</u>
+                                        <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="Claims" asp-action="Details" asp-route-idClaim="@claim.IdClaim"></a>
+                                        <br />найм @claim.DistrubutedToTenancySum руб., пени @claim.DistrubutedToPenaltySum руб.
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(item.Kbk))
+                    {
+                        var description = kbkDescriptions.FirstOrDefault(r => r.Kbk == item.Kbk);
+                        <div title="@(description == null ? "Неизвестный КБК" : description.Description)">
+                            <b>КБК:</b> @item.Kbk
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(item.NumDocument) || item.DateDocument != null)
+                    {
+                        <div>
+                            <b>@(isPl ? "Распоряжение" : "Платежный документ"):</b><br />
+                            @if (!string.IsNullOrEmpty(item.NumDocument))
+                            {
+                                <span>№ @item.NumDocument</span>
+                            }
+                            @if (!string.IsNullOrEmpty(item.NumDocument) && item.DateDocument != null)
+                            {
+                                <span> </span>
+                            }
+                            @if (item.DateDocument != null)
+                            {
+                                <span>от @item.DateDocument.Value.ToString("dd.MM.yyyy")</span>
+                            }
+                        </div>
+                    }
+                    @if (item.DateIn != null && !isPl)
+                    {
+                        <div>
+                            <b>Дата поступления:</b> @item.DateIn.Value.ToString("dd.MM.yyyy")
+                        </div>
+                    }
+                    @if (item.DateExecute != null)
+                    {
+                        <div>
+                            <b>@(isPl ? "Дата исполнения" : "Дата списания"):</b> @item.DateExecute.Value.ToString("dd.MM.yyyy")
+                        </div>
+                    }
+                </td>
+                <td class="d-none d-lg-table-cell">
+                    <div title="@item.Purpose" class="rr-payment-purpose">@item.Purpose</div>
+                </td>
+                <td style="position: relative">
+                    @if (item.PayerInn != null && item.PayerInn != "0")
+                    {
+                        <div>
+                            <b>ИНН:</b> @item.PayerInn
+                        </div>
+                    }
+                    @if (item.PayerKpp != null && item.PayerKpp != "0")
+                    {
+                        <div>
+                            <b>КПП:</b> @item.PayerKpp
+                        </div>
+                    }
+                    @if (item.PayerName != null)
+                    {
+                        <div>
+                            <b>Наименование:</b> @item.PayerName
+                        </div>
+                    }
+
+                    <div class="btn-group rr-opacity-item-menu" role="group" aria-label="Панель доступа">
+                        <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее" target="_blank"
+                           asp-action="Details"
+                           asp-route-idPayment="@item.IdPayment"
+                           asp-route-action="Details"
+                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>                       
+                        @if (securityService.HasPrivilege(Privileges.AccountsWrite))
+                        {
+                            <a class="btn btn-outline-dark oi oi-pencil" title="Изменить" aria-label="Изменить" target="_blank"
+                                asp-action="Edit"
+                                asp-route-idPayment="@item.IdPayment"
+                                asp-route-action="Edit"
+                                asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            @if (item.IdSource == 1)
+                            {
+                                <a class="btn btn-danger oi oi-x" title="Удалить" aria-label="Удалить" target="_blank"
+                                   asp-action="Delete"
+                                   asp-route-idPayment="@item.IdPayment"
+                                   asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")"></a>
+                            }
+                            <div class="btn-group" role="group" aria-label="Панель доступа">
+                                <button class="btn btn-dark oi oi-grid-two-up dropdown-toggle" type="button" title="Операции" aria-label="Операции" id="objectsBtn_@item.IdPayment" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@item.IdPayment">
+                                        <a class="dropdown-item rr-apply-memorial-order @(sumPosted == 0 ? "" : "d-none")" href="#" title="Привязать мемориальный ордер" aria-label="Привязать мемориальный ордер" data-id-payment="@item.IdPayment">Привязать мемориальный ордер</a>
+                                        <a class="dropdown-item rr-distribute-payment @(item.Sum > sumPosted ? "" : "d-none")" href="#" title="Распределить платеж" aria-label="Распределить платеж" data-id-payment="@item.IdPayment" data-payment-sum="@item.Sum" data-payment-sum-posted="@sumPosted">Распределить платеж</a>
+                                        <a class="dropdown-item rr-cancel-distribute-payment @(sumPosted > 0 ? "" : "d-none")" href="#" title="Отменить распределение платежа" aria-label="Отменить распределение платежа" data-id-payment="@item.IdPayment" data-payment-sum="@item.Sum" data-payment-sum-posted="@sumPosted" data-payment-title="@paymentRequisits">Отменить распределение платежа</a>
+                                </div>
+                            </div>
+                        }
+                        <div class="btn-group" role="group" aria-label="Отчеты">
+                            <button class="btn btn-success oi oi-document dropdown-toggle" type="button" title="Отчеты" aria-label="Отчеты" id="reportsBtn_@item.IdPayment" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="reportsBtn_@item.IdPayment">
+                                <a class="dropdown-item" asp-controller="KumiPaymentsReports" asp-action="GetPaymentOrder" title="Платежное поручение" aria-label="Платежное поручение" asp-route-idPayment="@item.IdPayment">Платежное поручение</a>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
+    <PackageReference Include="NPOI" Version="2.5.5" />
+    <PackageReference Include="System.Text.Json" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RegistryDb\RegistryDb.csproj" />
+    <ProjectReference Include="..\RegistryPaymentsLoader\RegistryPaymentsLoader.csproj" />
+    <ProjectReference Include="..\RegistryReformaGKH\RegistryReformaGKH.csproj" />
+  </ItemGroup>
+
+</Project>

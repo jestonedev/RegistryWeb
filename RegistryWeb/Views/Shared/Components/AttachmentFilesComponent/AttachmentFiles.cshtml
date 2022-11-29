@@ -1,5 +1,6 @@
-﻿@model IEnumerable<RegistryWeb.ViewModel.AttachmentFileVM>;
-<form id="attachmentFilesForm" autocomplete="off" >
+﻿@using RegistryWeb.Enums;
+@model IEnumerable<RegistryServices.ViewModel.RegistryObjects.AttachmentFileVM>;
+<form id="attachmentFilesForm" autocomplete="off">
     <script src="~/js/attachment-files.common.js" asp-append-version="true"></script>
     <div class="card mb-2">
         <div class="card-header d-flex justify-content-between pt-2 pb-2">
@@ -12,7 +13,7 @@
                 <span class="badge badge-secondary rr-count-badge ml-1" @Html.Raw(visible)>
                     @count
                 </span>
-            </h4> 
+            </h4>
             <div class="btn-group" role="group">
                 @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
                 {

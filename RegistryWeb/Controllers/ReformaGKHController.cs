@@ -1,12 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using RegistryWeb.SecurityServices;
-using System.Xml.Linq;
-using System.Linq;
+﻿using RegistryWeb.SecurityServices;
 using RegistryWeb.DataServices;
-using RegistryWeb.ViewModel;
-using System;
-using RegistryWeb.Models.Api;
-using RegistryWeb.Models;
+using RegistryReformaGKH;
 using Microsoft.AspNetCore.Authorization;
 
 namespace RegistryWeb.Controllers

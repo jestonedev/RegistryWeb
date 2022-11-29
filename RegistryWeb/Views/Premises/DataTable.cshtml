@@ -1,10 +1,11 @@
 ﻿@using RegistryWeb.ViewOptions;
-@using RegistryWeb.Models.Entities;
+@using RegistryWeb.Enums;
+@using RegistryDb.Models.Entities.RegistryObjects.Premises;
 @using RegistryWeb.Extensions;
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.DataServices;
 @using RegistryWeb.DataHelpers;
-@model RegistryWeb.ViewModel.PremisesVM<Premise>;
+@model RegistryServices.ViewModel.RegistryObjects.PremisesVM<Premise>;
 @{
     var ids = Context.Session.Get<List<int>>("idPremises") ?? new List<int>();
     Context.Session.Set("Controller", "Premises");
@@ -157,6 +158,11 @@
                             <div class="text-primary"><b>Плата за найм</b></div>
                             <span>№1827 от 12.08.2014:</span> @paymentInfo.Select(p => p.Payment).Sum() <span>руб.</span><br />
                             <span>№1517 от 22.08.2022:</span> @paymentInfo.Select(p => p.PaymentAfter28082019).Sum() <span>руб.</span>
+                            @if (Model.AreaAvgCostActualDate != null && Model.AreaAvgCostActualDate > DateTime.Now.Date)
+                            {
+                                <br />
+                                <span class="text-danger"><i>Действительна с @Model.AreaAvgCostActualDate.Value.ToString("dd.MM.yyyy")</i></span>
+                            }
                         }
 
                         @if (Model.ActiveTenancies.Any(t => t.Key == item.IdPremises))
@@ -236,8 +242,8 @@
 
                                 @if (paymentInfo.Any())
                                 {
-                                    <a class="dropdown-item" target="_blank" title="История изменения платы за найм" asp-controller="TenancyProcesses" asp-action="PaymentHistory" asp-route-id="@item.IdPremises" asp-route-target="@PaymentHistoryTarget.Premise" id="button-addon2">
-                                        История изменения платы за найм
+                                    <a class="dropdown-item" target="_blank" title="История изменения коэффициентво оплаты" asp-controller="TenancyProcesses" asp-action="PaymentHistory" asp-route-id="@item.IdPremises" asp-route-target="@PaymentHistoryTarget.Premise" id="button-addon2">
+                                        История изменения коэффициентво оплаты
                                     </a>
                                 }
                             }

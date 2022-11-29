@@ -2,7 +2,9 @@
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.ViewModel;
-@model RegistryWeb.ViewModel.ClaimsVM;
+@using RegistryServices.ViewModel.KumiAccounts;
+@model RegistryServices.ViewModel.Claims.ClaimsVM;
+
 @{
     var ids = Context.Session.Get<List<int>>("idClaims") ?? new List<int>();
     var check = "";
@@ -66,18 +68,29 @@
     <tbody>
         @foreach (var item in Model.Claims)
         {
-            RegistryWeb.Models.Entities.Payment lastPaymentInfo = null;
-            RegistryWeb.Models.Entities.Payment lastPaymentInfoAdditional = null;
-            if (Model.LastPaymentInfo.ContainsKey(item.IdAccount))
+            List<KumiAccountTenancyInfoVM> kumiTenancyInfo = null;
+            List<KumiAccountTenancyInfoVM> activeKumiTenancyInfo = null;
+            if (item.IdAccountKumi != null && Model.TenancyInfoKumi.ContainsKey(item.IdAccountKumi.Value))
             {
-                lastPaymentInfo = Model.LastPaymentInfo[item.IdAccount];
+                kumiTenancyInfo = Model.TenancyInfoKumi[item.IdAccountKumi.Value];
+                activeKumiTenancyInfo = kumiTenancyInfo.Where(r => r.TenancyProcess.TenancyPersons.Any(p => p.ExcludeDate == null || p.ExcludeDate > DateTime.Now)
+                && (r.TenancyProcess.RegistrationNum == null || !r.TenancyProcess.RegistrationNum.EndsWith("н"))).ToList();
             }
+
+            RegistryDb.Models.Entities.Payments.Payment lastPaymentInfo = null;
+            if (item.IdAccount != null && Model.LastPaymentInfo.ContainsKey(item.IdAccount.Value))
+            {
+                lastPaymentInfo = Model.LastPaymentInfo[item.IdAccount.Value];
+            }
+            RegistryDb.Models.Entities.Payments.Payment lastPaymentInfoAdditional = null;
             if (item.IdAccountAdditional != null && Model.LastPaymentInfo.ContainsKey(item.IdAccountAdditional.Value))
             {
                 lastPaymentInfoAdditional = Model.LastPaymentInfo[item.IdAccountAdditional.Value];
             }
+
             var lastClaimState = item.ClaimStates.OrderByDescending(cs => cs.IdState).FirstOrDefault();
             var isOpenedClaim = (lastClaimState == null || lastClaimState.IdStateType != 6);
+
             <tr style="position: relative">
                 @if (ids.Contains(item.IdClaim))
                 {
@@ -117,28 +130,96 @@
                     }
                 </td>
                 <td>
+                    @{
+                        var accountBks = "";
+                        var accountKumi = "";
+                        if (item.IdAccount != null)
+                        {
+                            accountBks = item.IdAccountNavigation.Account + (item.IdAccountAdditionalNavigation == null ? "" : " / " + item.IdAccountAdditionalNavigation.Account);
+                        }
+                        if (item.IdAccountKumi != null)
+                        {
+                            accountKumi = item.IdAccountKumiNavigation.Account;
+                        }
+                    }
                     <div class="mb-1">
-                        <b>Лицевой счет: </b>@item.IdAccountNavigation.Account @(item.IdAccountAdditionalNavigation != null ? "/ "+item.IdAccountAdditionalNavigation.Account : "")
-                    </div>
-                    @if (Model.RentObjects.ContainsKey(item.IdAccount))
+                        @if (accountKumi == accountBks && accountBks != "")
+                        {
+                            <b>Лицевой счет КУМИ/БКС:</b> @accountKumi
+                        }
+                        else
+                        {
+                            if (item.IdAccountKumi != null)
+                            {
+                                <b>Лицевой счет КУМИ:</b> @accountKumi
+
+                            } else
+                            if (item.IdAccount != null)
+                            {
+                                <b>Лицевой счет БКС:</b> @accountBks
+                            }
+                        }                    </div>
+
+                    @{
+                        List<Address> rentObjectsKumi = null;
+                        List<Address> rentObjectsBks = null;
+                        if (item.IdAccountKumi != null)
+                        {
+                            if (kumiTenancyInfo != null && kumiTenancyInfo.Any())
+                            {
+                                rentObjectsKumi = kumiTenancyInfo.FirstOrDefault().RentObjects.Select(r => r.Address).ToList();
+                                if (activeKumiTenancyInfo.Any())
+                                {
+                                    rentObjectsKumi = activeKumiTenancyInfo.FirstOrDefault().RentObjects.Select(r => r.Address).ToList();
+                                }
+                            }
+                        }
+                        if (item.IdAccount != null && Model.RentObjectsBks.ContainsKey(item.IdAccount.Value))
+                        {
+                            rentObjectsBks = Model.RentObjectsBks[item.IdAccount.Value];
+                        }
+                    }
+
+                    @if (item.IdAccountKumi != null)
                     {
                         <div>
-                            @foreach (var address in Model.RentObjects[item.IdAccount])
+                            @if (rentObjectsKumi != null)
                             {
-                                @await Component.InvokeAsync("ClaimsAddressComponent", new { address = address, idClaim = item.IdClaim })
+                                @foreach (var rentObject in rentObjectsKumi)
+                                {
+                                    @await Component.InvokeAsync("ClaimsAddressComponent", new { address = rentObject, idClaim = item.IdClaim })
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-danger"><i>не привязан процесс найма</i></span>
                             }
                         </div>
                     }
                     else
+                    if (item.IdAccount != null)
                     {
-                        <div class="row">
-                            <div class="col-auto">
-                                <button class="btn btn-success oi oi-home mr-1 mt-2 disabled dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения"></button>
+                        @if (rentObjectsBks != null)
+                        {
+                            <div>
+                                @foreach (var address in rentObjectsBks)
+                                {
+                                    @await Component.InvokeAsync("ClaimsAddressComponent", new { address = address, idClaim = item.IdClaim })
+                                }
                             </div>
-                            <div class="col-lg-9 col-md-8 mt-1">
-                                @item.IdAccountNavigation.Crn, @item.IdAccountNavigation.RawAddress
+                        }
+                        else
+                       if (item.IdAccount != null)
+                        {
+                            <div class="row">
+                                <div class="col-auto">
+                                    <button class="btn btn-success oi oi-home mr-1 mt-2 disabled dropdown-toggle" type="button" title="Здания и помещения" aria-label="Здания и помещения"></button>
+                                </div>
+                                <div class="col-lg-9 col-md-8 mt-1">
+                                    @item.IdAccountNavigation.Crn, @item.IdAccountNavigation.RawAddress
+                                </div>
                             </div>
-                        </div>
+                        }
                     }
                 </td>
                 <td>
@@ -305,12 +386,20 @@
 
                             <button class="btn btn-dark oi oi-grid-two-up dropdown-toggle" type="button" title="Связанные объекты" aria-label="Связанные объекты" id="objectsBtn_@item.IdClaim" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@item.IdClaim">
-                                <a class="dropdown-item" title="Лицевой счет БКС (основной)" target="_blank" aria-label="Лицевой счет БКС (основной)"
-                                   asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@item.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет БКС (основной)</a>
-                                @if (item.IdAccountAdditional != null)
+                                @if (item.IdAccountKumi != null)
                                 {
-                                    <a class="dropdown-item" title="Лицевой счет БКС (дополнительный)" target="_blank" aria-label="Лицевой счет БКС (дополнительный)"
-                                       asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@item.IdAccountAdditional" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет БКС (дополнительный)</a>
+                                    <a class="dropdown-item" title="Лицевой счет КУМИ" aria-label="Лицевой счет КУМИ"
+                                       asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@item.IdAccountKumi" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет</a>
+                                } else
+                                if (item.IdAccount != null)
+                                {
+                                    <a class="dropdown-item" title="Лицевой счет БКС (основной)" aria-label="Лицевой счет БКС (основной)"
+                                       asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@item.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет (основной)</a>
+                                    @if (item.IdAccountAdditional != null)
+                                    {
+                                        <a class="dropdown-item" title="Лицевой счет БКС (дополнительный)" aria-label="Лицевой счет БКС (дополнительный)"
+                                           asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@item.IdAccountAdditional" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет (дополнительный)</a>
+                                    }
                                 }
                             </div>
                         </div>

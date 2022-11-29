@@ -1,5 +1,6 @@
-﻿@model RegistryWeb.ViewModel.TenancyProcessesVM;
+﻿@model RegistryServices.ViewModel.Tenancies.TenancyProcessesVM;
 @using RegistryWeb.SecurityServices;
+@using RegistryWeb.Enums;
 
 @{
     var securityService = (SecurityService)ViewData["SecurityService"];
@@ -201,7 +202,7 @@
                     <div class="form-row">
                         <div class="form-group col-md-6 col-lg-4">
                             <label asp-for="FilterOptions.IdRegion">Район</label>
-                            <select class="selectpicker form-control" data-live-search="true" title="Район" asp-for="FilterOptions.IdRegion" asp-items="@(new SelectList(Model.Regions, "id_region", "region"))">
+                            <select class="selectpicker form-control" data-live-search="true" title="Район" asp-for="FilterOptions.IdRegion" asp-items="@(new SelectList(Model.Regions, "IdRegion", "Region"))">
                                 <option selected></option>
                             </select>
                         </div>

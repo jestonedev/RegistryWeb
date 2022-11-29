@@ -1,4 +1,5 @@
-﻿@model RegistryWeb.ViewModel.AttachmentFileVM;
+﻿@model RegistryServices.ViewModel.RegistryObjects.AttachmentFileVM;
+@using RegistryWeb.Enums;
 
 @{ 
     var canEdit = ((bool?)ViewBag.CanAttachAdditionalFiles) ?? true;

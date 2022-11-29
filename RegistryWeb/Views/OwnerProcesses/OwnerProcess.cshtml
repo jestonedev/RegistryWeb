@@ -1,6 +1,7 @@
 ﻿@using RegistryWeb.Extensions;
-@using RegistryWeb.ViewModel;
-@model RegistryWeb.Models.Entities.OwnerProcess;
+@using RegistryWeb.Enums;
+@using RegistryServices.ViewModel.Owners;
+@model RegistryDb.Models.Entities.Owners.OwnerProcess;
 @section Styles {
     <link rel="stylesheet" href="~/css/owner.processes.css" asp-append-version="true" />
 }
@@ -158,8 +159,7 @@
                     Action = ViewBag.Action,
                     AddressType = AddressTypes.Premise,
                     Text = Model.OwnerPremisesAssoc[i].PremiseNavigation.GetAddress(),
-                    Href = "/Premises/Details?idPremises=" + Model.OwnerPremisesAssoc[i].IdPremise})" />
-                        }
+                    Href = "/Premises/Details?idPremises=" + Model.OwnerPremisesAssoc[i].IdPremise})" />                        }
                     }
                     @if (Model.OwnerSubPremisesAssoc != null)
                     {

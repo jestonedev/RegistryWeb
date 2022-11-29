@@ -1,0 +1,30 @@
+﻿@model RegistryServices.ViewModel.KumiAccounts.KumiAccountsVM;
+@{
+    ViewData["Title"] = "Лицевые счета КУМИ";
+    var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
+        "(" + Model.PageOptions.TotalRows + ")" :
+        "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
+}
+
+@section styles
+    {
+    <link rel="stylesheet" href="~/css/kumi.accounts.css" runat="server" />
+}
+
+<div class="col info text-center" data-controller="KumiAccounts"></div>
+
+<h2>@ViewData["Title"] @text</h2>
+
+<partial name="Filter" model="Model" />
+<partial name="DataTable" model="Model" />
+<partial name="ReportsModals" />
+
+<page-link page-model="Model.PageOptions" page-action="Index"></page-link>
+
+@section Scripts {
+    <script src="~/js/kumiAccount.reports.js" asp-append-version="true"></script>
+    <script src="~/js/address.filter.js" asp-append-version="true"></script>
+    <script src="~/js/index.common.js" asp-append-version="true"></script>
+    <script src="~/js/index.kumi.accounts.js" asp-append-version="true"></script>
+    <script src="~/js/multimaster.js" asp-append-version="true"></script>
+}

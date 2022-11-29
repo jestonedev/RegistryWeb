@@ -48,4 +48,24 @@
 .dopinfo-alt {
     color: #212529;
     font-size: 75%;
+}@media(min-width: 992px) {
+    .rr-claim-end-for-filter-checkbox {
+        margin-top: 22px;
+    }
 }
+
+#ClaimAmount table {
+    font-size: 70%;
+}
+
+@media(min-width: 768px) {
+    #ClaimAmount table {
+        font-size: 80%;
+    }
+}
+
+@media(min-width: 992px) {
+    #ClaimAmount table {
+        font-size: 100%;
+    }
+}}

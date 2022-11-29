@@ -1,4 +1,4 @@
-﻿using RegistryWeb.Models;
+﻿using RegistryWeb.Enums;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;

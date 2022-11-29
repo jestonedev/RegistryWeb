@@ -1,0 +1,14 @@
+﻿using RegistryDb.Models.Entities;
+using RegistryDb.Models.Entities.Tenancies;
+using RegistryWeb.ViewOptions;
+using System.Collections.Generic;
+
+namespace RegistryServices.ViewModel.Tenancies
+{
+    public class DocumentIssueVM<T>
+    {
+        public List<DocumentIssuedBy> DocumentIssues { get; set; }
+        public DocumentIssuedBy DocumentIssue { get; set; }
+        public PageOptions PageOptions { get; set; }
+    }
+}

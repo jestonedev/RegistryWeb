@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.ReportServices;
@@ -128,8 +126,8 @@ namespace RegistryWeb.Controllers
                     }
                     processingIds.Add(idClaim);
                 }
-                var idAccounts = dataService.GetAccountIds(processingIds);
-                var file = reportService.RequestToBks(idAccounts, processingIds, idSigner, dateValue, idReportBKSType);
+
+                var file = reportService.RequestToBks(processingIds, idSigner, dateValue, idReportBKSType);
                 return File(file, odtMime, string.Format(@"Запрос в БКС{0}.odt", idClaim == 0 ? "" : string.Format(" (иск. работа № {0})", idClaim)));
             }
             catch (Exception ex)
@@ -371,6 +369,5 @@ namespace RegistryWeb.Controllers
             {
                 return Error(ex.Message);
             }
-        }
-    }
+        }    }
 }

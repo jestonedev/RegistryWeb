@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
-using RegistryWeb.Models;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
+using RegistryWeb.Enums;
+using RegistryServices.ViewModel.Payments;
 
 namespace RegistryWeb.Controllers
 {
@@ -159,7 +159,7 @@ namespace RegistryWeb.Controllers
             ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
             ViewBag.CurrentExecutor = dataService.CurrentExecutor?.ExecutorName;
             ViewBag.CanEdit = securityService.HasPrivilege(Privileges.ClaimsWrite);
-            ViewBag.Emails = dataService.GetTenantsEmails(ids);
+            ViewBag.Emails = dataService.GetTenantsEmails(viewModel.Payments.Select(r => r.IdAccount).ToList());
             return View("AccountReports", viewModel);
         }
 

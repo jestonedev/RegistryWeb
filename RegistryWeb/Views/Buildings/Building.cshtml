@@ -1,7 +1,9 @@
-﻿@model RegistryWeb.Models.Entities.Building;
+﻿@model RegistryDb.Models.Entities.RegistryObjects.Buildings.Building;
 @using RegistryWeb.Extensions;
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.DataHelpers;
+@using RegistryWeb.Enums;
+@using RegistryWeb.ViewModel;
 
 @{
     var controller = Context.Session.Get<string>("Controller");

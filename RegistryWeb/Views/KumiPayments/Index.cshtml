@@ -1,0 +1,72 @@
+﻿@model RegistryServices.ViewModel.KumiAccounts.KumiPaymentsVM;
+@using RegistryServices.Models.KumiPayments;
+@{
+    ViewData["Title"] = "Платежи";
+    var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
+        "(" + Model.PageOptions.TotalRows + ")" :
+        "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
+    if (Model.FilterOptions.IdAccount != null)
+    {
+        var account = Model.DistributionInfoToObjects.Where(r => r.ObjectType == RegistryServices.Enums.KumiPaymentDistributeToEnum.ToKumiAccount)
+           .Select(r => (KumiPaymentDistributionInfoToAccount)r).Where(r => r.IdAccount == Model.FilterOptions.IdAccount).FirstOrDefault();
+        ViewData["Title"] += " по ЛС №" + account?.Account;
+    }
+    if (Model.FilterOptions.IdCharge != null)
+    {
+        var account = Model.DistributionInfoToObjects.Where(r => r.ObjectType == RegistryServices.Enums.KumiPaymentDistributeToEnum.ToKumiAccount)
+           .Select(r => (KumiPaymentDistributionInfoToAccount)r).Where(r => r.IdCharge == Model.FilterOptions.IdCharge).FirstOrDefault();
+        ViewData["Title"] += " по ЛС №" + account?.Account;
+        if (Model.StartDate != null || Model.EndDate != null)
+        {
+            ViewData["Title"] += " ";
+        }
+        if (Model.StartDate != null)
+        {
+            ViewData["Title"] += "с " + Model.StartDate.Value.ToString("dd.MM.yyyy");
+        }
+        if (Model.StartDate != null && Model.EndDate != null)
+        {
+            ViewData["Title"] += " ";
+        }
+        if (Model.EndDate != null)
+        {
+            ViewData["Title"] += "по " + Model.EndDate.Value.ToString("dd.MM.yyyy");
+        }
+    }
+    if (Model.FilterOptions.IdClaim != null)
+    {
+        ViewData["Title"] += " по исковой работе №" + Model.FilterOptions.IdClaim;
+    }
+    if (Model.FilterOptions.IdClaim != null || Model.FilterOptions.IdAccount != null || Model.FilterOptions.IdCharge != null)
+    {
+        text = "(" + Model.PageOptions.Rows + ")";
+    }
+}
+
+@section styles
+    {
+    <link rel="stylesheet" href="~/css/kumi.payments.css" runat="server" />
+}
+
+<div class="col info text-center" data-controller="KumiPayments"></div>
+
+<h2>@ViewData["Title"] @text</h2>
+
+<partial name="Filter" model="Model" />
+<partial name="DataTable" model="Model" />
+
+<page-link page-model="Model.PageOptions" page-action="Index"></page-link>
+
+<partial name="PaymentModals" />
+
+@section Scripts {
+    <script src="~/js/index.common.js" asp-append-version="true"></script>
+    <script src="~/js/address.filter.js" asp-append-version="true"></script>
+    <script src="~/js/index.common.js" asp-append-version="true"></script>
+    <script src="~/js/index.kumi.payments.js" asp-append-version="true"></script>
+    <script src="~/js/kumiPayments.memorialOrders.js" asp-append-version="true"></script>
+    <script src="~/js/kumiPayments.distributeToAccount.js" asp-append-version="true"></script>
+}
+
+
+

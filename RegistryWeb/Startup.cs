@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RegistryWeb.DataServices;
-using RegistryWeb.Models;
 using System.Globalization;
 using System.Collections.Generic;
 using RegistryWeb.SecurityServices;
@@ -14,6 +13,9 @@ using Microsoft.AspNetCore.Authorization;
 using System;
 using RegistryWeb.ReportServices;
 using Microsoft.AspNetCore.Http.Features;
+using RegistryDb.Interfaces;
+using RegistryDb.Models;
+using RegistryReformaGKH;
 
 namespace RegistryWeb
 {
@@ -102,6 +104,13 @@ namespace RegistryWeb
             services.AddTransient<PrivatizationReportsDataService>();
             services.AddTransient<PrivatizationReportService>();
             services.AddTransient<PrivRealtorService>();
+            services.AddTransient<KumiAccountsDataService>();
+            services.AddTransient<KumiAccountReportService>();
+            services.AddTransient<KumiAccountReportsDataService>();
+            services.AddTransient<KumiPaymentsDataService>();
+            services.AddTransient<KumiPaymentsReportService>();
+            services.AddTransient<ZipArchiveDataService>();
+            services.AddTransient<IDbConnectionSettings, DbConnectionSettings>();
             services.AddHttpContextAccessor();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<TokenApiStorage>();

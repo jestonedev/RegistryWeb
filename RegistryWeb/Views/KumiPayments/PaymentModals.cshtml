@@ -1,0 +1,350 @@
+﻿<form id="PaymentUfDownloadModalForm">
+    <div class="modal fade" id="PaymentUfDownloadModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Сформировать уведомление</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="PaymentUfDownload_IdPayemntUf" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label class="rr-account-filter-label" for="PaymentUfDownload_IdSigner">Подписывающий</label>
+                            <select class="selectpicker form-control" title="Подписывающий" id="PaymentUfDownload_IdSigner" name="PaymentUfDownload_IdSigner"
+                                    data-val="true" data-val-required="Укажите подписывающего" asp-items="@(new SelectList(ViewBag.PaymentUfSigners, "IdRecord", "Snp"))"></select>
+                            <span class="text-danger" data-valmsg-for="PaymentUfDownload_IdSigner" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-12">
+                            <label class="rr-account-filter-label" for="PaymentUfDownload_SignDate">Дата подписания</label>
+                            <input type="date" class="form-control" id="PaymentUfDownload_SignDate" name="PaymentUfDownload_SignDate" title="Дата подписания"
+                                   data-val="true" data-val-required="Введите дату подписания" value="@(DateTime.Now.ToString("yyyy-MM-dd"))">
+                            <span class="text-danger" data-valmsg-for="PaymentUfDownload_SignDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="PaymentUfsDownloadModalForm">
+    <div class="modal fade" id="PaymentUfsDownloadModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Сформировать файл с уведомлениями</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="PaymentUfDownload_IdPayemntUf" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label class="rr-account-filter-label" for="PaymentUfsDownload_IdSigner">Подписывающий</label>
+                            <select class="selectpicker form-control" title="Подписывающий" id="PaymentUfsDownload_IdSigner" name="PaymentUfsDownload_IdSigner"
+                                    data-val="true" data-val-required="Укажите подписывающего" asp-items="@(new SelectList(ViewBag.PaymentUfSigners, "IdRecord", "Snp"))"></select>
+                            <span class="text-danger" data-valmsg-for="PaymentUfsDownload_IdSigner" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-12">
+                            <label class="rr-account-filter-label" for="PaymentUfsDownload_SignDate">Дата подписания</label>
+                            <input type="date" class="form-control" id="PaymentUfsDownload_SignDate" name="PaymentUfsDownload_SignDate" title="Дата подписания"
+                                   data-val="true" data-val-required="Введите дату подписания" value="@(DateTime.Now.ToString("yyyy-MM-dd"))">
+                            <span class="text-danger" data-valmsg-for="PaymentUfsDownload_SignDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 pl-0 pr-0">
+                        <h5>Критерий отбора уведомлений</h5>
+                        <hr>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label class="rr-account-filter-label" for="PaymentUfsDownload_DateUf">Дата уведомления</label>
+                            <input type="date" class="form-control" id="PaymentUfsDownload_DateUf" name="PaymentUfsDownload_DateUf" title="Дата уведомления"
+                                   data-val="true" data-val-required="Введите дату уведомления" value="@(DateTime.Now.ToString("yyyy-MM-dd"))">
+                            <span class="text-danger" data-valmsg-for="PaymentUfsDownload_DateUf" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="MemorialOrderModalForm">
+    <div class="modal fade" id="MemorialOrderModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Поиск ордера</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input id="MemorialOrder_IdPayment" type="hidden" name="IdPayment" />
+                    @{
+                        var returnUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
+                        if (ViewBag.Action != null)
+                        {
+                            if (ViewBag.ReturnUrl != null)
+                            {
+                                returnUrl = ViewBag.ReturnUrl;
+                            }
+                            else
+                            {
+                                returnUrl = Url.Action("Index");
+                            }
+                        }
+                    }
+                    <input id="MemorialOrder_ReturnUrl" type="hidden" name="ReturnUrl" value="@returnUrl" />
+                    <div class="form-row">
+                        <div class="form-group col-12 col-md-4 mb-2">
+                            <label class="rr-payment-label mb-1" for="MemorialOrder_NumDocument">№ документа/уведомления</label>
+                            <input type="text" class="form-control input-filter-numbers" maxlength="15" id="MemorialOrder_NumDocument" title="№ документа/уведомления">
+                        </div>
+                        <div class="form-group col-12 col-md-4 mb-2">
+                            <label class="rr-payment-label mb-1" for="MemorialOrder_DateDocument">Дата документа/уведомления</label>
+                            <input type="date" class="form-control" id="MemorialOrder_DateDocument" title="Дата документа/уведомления">
+                        </div>
+                        <div class="form-group col-12 col-md-4 mb-2">
+                            <label class="rr-account-filter-label" for="MemorialOrder_Sum">Сумма</label>
+                            <input type="text" class="form-control input-filter-decimal" id="MemorialOrder_Sum" title="Сумма">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12 col-md-4 mb-2">
+                            <label class="rr-payment-label mb-1" for="MemorialOrder_Kbk">КБК</label>
+                            <input type="text" class="form-control input-filter-numbers" maxlength="20" id="MemorialOrder_Kbk" title="КБК">
+                        </div>
+                        <div class="form-group col-8 col-md-4 mb-2">
+                            <label class="rr-payment-label mb-1" for="MemorialOrder_Okato">Код ОКТМО</label>
+                            <input type="text" class="form-control input-filter-numbers" maxlength="20" id="MemorialOrder_Okato" title="Код ОКТМО">
+                        </div>
+                        <div class="form-group d-flex align-items-end justify-content-end col-4 col-md-4 mb-2">
+                            <button id="searchMemorialOrderModalBtn" type="button" class="btn btn-secondary">Найти</button>
+                        </div>
+                    </div>
+                    <div class="form-row d-none mt-3">
+                        <div id="resultMemorialOrderModal" class="form-group col-12"></div>
+                    </div>
+                    <div class="form-row d-none">
+                        <div id="errorMemorialOrderModal" class="form-group col-12 mb-0 text-center"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="clearMemorialOrderModalBtn" type="button" class="btn btn-secondary">Очистить</button>
+                    <button id="setMemorialOrderModalBtn" type="button" class="btn btn-success" disabled>Привязать</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="DistributePaymentToAccountModalForm">
+    <div class="modal fade" id="DistributePaymentToAccountModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Поиск лицевого счета</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input id="DistributePaymentToAccount_IdPayment" type="hidden" name="IdPayment" />
+                    <input id="DistributePaymentToAccount_SumForDistribution" type="hidden" name="SumForDistribution" />
+
+                    <div class="form-row">
+                        <div class="form-group col-12 mb-2">
+                            <select class="selectpicker form-control" title="Распределить на" id="DistributePaymentToAccount_DistributeTo">
+                                <option value="0" selected>Распределить на лицевой счет</option>
+                                <option value="1">Распределить на претензионно-исковую работу</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row rr-distrib-modal-claims-filter">
+                        <div class="form-group col-3 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_ClaimCourtOrderNum">№ судебного приказа</label>
+                            <input type="text" class="form-control" id="DistributePaymentToAccount_ClaimCourtOrderNum" title="№ судебного приказа">
+                        </div>
+                        <div class="form-group col-3 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_ClaimAtDate">Дата формирования ИР</label>
+                            <input type="date" class="form-control" id="DistributePaymentToAccount_ClaimAtDate" title="Дата формирования исковой работы">
+                        </div>
+                        <div class="form-group col-6 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_ClaimIdStateType">Текущее состояние ИР</label>
+                            <select class="selectpicker form-control" title="Текущее состояние исковой работы" id="DistributePaymentToAccount_ClaimIdStateType" asp-items="@(new SelectList(ViewBag.ClaimStateTypes, "IdStateType", "StateType"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-3 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_AccountGisZkh">ЕЛС</label>
+                            <input type="text" class="form-control input-filter-account-zkh" id="DistributePaymentToAccount_AccountGisZkh" title="Единый лицевой счет для ГИС ЖКХ">
+                        </div>
+                        <div class="form-group col-3 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_Account">Лицевой счет</label>
+                            <input type="text" class="form-control input-filter-numbers" id="DistributePaymentToAccount_Account" title="Лицевой счет">
+                        </div>
+                        <div class="form-group col-6 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_IdAccountState">Состояние ЛС</label>
+                            <select class="selectpicker form-control" title="Состояние лицевого счета" id="DistributePaymentToAccount_IdAccountState" asp-items="@(new SelectList(ViewBag.AccountStates, "IdState", "State"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-3 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_IdProcess">Реестровый номер</label>
+                            <input type="text" class="form-control input-filter-numbers" id="DistributePaymentToAccount_IdProcess" title="Реестровый номер">
+                        </div>
+                        <div class="form-group col-3 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_RegNumber">Номер договора</label>
+                            <input type="text" class="form-control" id="DistributePaymentToAccount_RegNumber" title="Номер договора">
+                        </div>
+                        <div class="form-group col-3 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_RegDate">Дата регистрации</label>
+                            <input type="date" class="form-control" id="DistributePaymentToAccount_RegDate" title="Дата регистрации">
+                        </div>
+                        <div class="form-group col-3 mb-2">
+                            <label class="rr-payment-label mb-1" l for="DistributePaymentToAccount_IssueDate">Дата выдачи</label>
+                            <input type="date" class="form-control" id="DistributePaymentToAccount_IssueDate" title="Дата выдачи">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_IdRegion">Район</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Район" id="DistributePaymentToAccount_IdRegion" asp-items="@(new SelectList(ViewBag.Regions, "IdRegion", "Region"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col-6 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_IdStreet">Улица</label>
+                            <select class="selectpicker form-control" data-live-search="true" title="Улица" id="DistributePaymentToAccount_IdStreet" asp-items="@(new SelectList(ViewBag.Streets, "IdStreet", "StreetName"))">
+                                <option selected></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-3 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_House">Дом</label>
+                            <input type="text" class="form-control input-filter-house" id="DistributePaymentToAccount_House" title="Номер дома">
+                        </div>
+                        <div class="form-group col-3 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_PremisesNum">Помещение</label>
+                            <input type="text" class="form-control input-filter-premise-num" id="DistributePaymentToAccount_PremisesNum" title="Номер помещения">
+                        </div>
+                        <div class="form-group col-3 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_SubPremisesNum">Комната</label>
+                            <input type="text" class="form-control input-filter-numbers" id="DistributePaymentToAccount_SubPremisesNum" title="Комната">
+                        </div>
+                        <div class="form-group d-flex align-items-end justify-content-end col-3 mb-2">
+                            <button id="searchDistributePaymentToAccountModalBtn" type="button" class="btn btn-secondary">Найти</button>
+                        </div>
+                    </div>
+
+                    <div class="form-row d-none mt-3">
+                        <div id="resultDistributePaymentToAccountModal" class="form-group col-12 mb-2"></div>
+                    </div>
+                    <div class="form-row d-none rr-payment-distribute-sum">
+                        <div class="col-6 rr-payment-distribute-title text-center">
+                            <h5>Распределяемая сумма</h5>
+                        </div>
+                        <div class="form-group col-3 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_TenancySum">Найм</label>
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary" id="DistributePaymentToAccountTenancyLeftovers" type="button">
+                                        <span class="oi oi-action-redo"></span>
+                                    </button>
+                                </div>
+                                <input type="text" class="form-control input-decimal" id="DistributePaymentToAccount_TenancySum" title="Распределение на найм">
+                            </div>
+                        </div>
+                        <div class="form-group col-3 mb-2">
+                            <label class="rr-payment-label mb-1" for="DistributePaymentToAccount_PenaltySum">Пени</label>
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary" id="DistributePaymentToAccountPenaltyLeftovers" type="button">
+                                        <span class="oi oi-action-redo" "></span>
+                                    </button>
+                                </div>
+                                <input type="text" class="form-control input-decimal" id="DistributePaymentToAccount_PenaltySum" title="Распределение на пени">
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-row d-none mt-2">
+                        <div id="errorDistributePaymentToAccountModal" class="form-group col-12 text-center mb-0"></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="text-success text-center mt-2 col-12" style="overflow: hidden;text-overflow: ellipsis;">
+                            <span id="DistrubutePaymentModalPurpose" title=""></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="clearDistributePaymentToAccountModalBtn" type="button" class="btn btn-secondary">Очистить</button>
+                    <button id="setDistributePaymentToAccountModalBtn" type="button" class="btn btn-success" disabled>Распределить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="CancelDistributePaymentToAccountModalForm">
+    <div class="modal fade" id="CancelDistributePaymentToAccountModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Отмена распределения платежа</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input id="CancelDistributePaymentToAccount_IdPayment" type="hidden" name="IdPayment" />
+                    <div class="text-danger mb-2 text-center">
+                        Вы уверенеы, что хотите отменить распределение платежа <span class="rr-payment-requisits"></span> на сумму <span class="rr-payment-sum"></span> руб.?<br />
+                        Распределенная сумма <span class="rr-payment-sum-posted"></span> руб.
+                    </div>
+                    <div class="rr-payment-distribution-details d-none">
+                    </div>
+                    <div class="rr-payment-distribution-details-loader text-center">
+                        <img src="/image/spinner.gif" /> Загрузка детализации
+                    </div>
+                    <div class="form-row d-none mt-2">
+                        <div id="errorCanceDistributePaymentToAccountModal" class="form-group col-12 text-center mb-0"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    <button id="cancelDistributePaymentToAccountModalBtn" type="button" class="btn btn-success">Отменить распределение</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>

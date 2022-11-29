@@ -1,9 +1,5 @@
-﻿@model RegistryWeb.Models.Entities.ResettleDocument;
-@using RegistryWeb.Extensions;
-@using RegistryWeb.ViewOptions;
-@using RegistryWeb.Models.Entities;
-@using RegistryWeb.SecurityServices;
-@using RegistryWeb.DataHelpers;
+﻿@model RegistryDb.Models.Entities.RegistryObjects.Common.Resettle.ResettleDocument;
+@using RegistryWeb.Enums;
 
 @{ 
     var canEdit = ((bool?)ViewBag.CanEditExtInfo) ?? false;
