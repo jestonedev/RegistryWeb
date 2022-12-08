@@ -10,14 +10,14 @@
         "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
         "projectName": "RegistryDb",
         "projectPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
-        "packagesPath": "C:\\Users\\TutGA_a\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
         "outputPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\TutGA_a\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\TutGA\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -68,7 +68,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -78,14 +78,14 @@
         "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj",
         "projectName": "RegistryPaymentsLoader",
         "projectPath": "D:\\Projects\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj",
-        "packagesPath": "C:\\Users\\TutGA_a\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
         "outputPath": "D:\\Projects\\RegistryWeb\\RegistryPaymentsLoader\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\TutGA_a\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\TutGA\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -120,6 +120,10 @@
               "target": "Package",
               "version": "[2.2.0, )",
               "autoReferenced": true
+            },
+            "NPOI": {
+              "target": "Package",
+              "version": "[2.5.5, )"
             }
           },
           "imports": [
@@ -132,7 +136,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -142,14 +146,14 @@
         "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
         "projectName": "RegistryReformaGKH",
         "projectPath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
-        "packagesPath": "C:\\Users\\TutGA_a\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
         "outputPath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\TutGA_a\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\TutGA\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -192,7 +196,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -202,14 +206,14 @@
         "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryServices\\RegistryServices.csproj",
         "projectName": "RegistryServices",
         "projectPath": "D:\\Projects\\RegistryWeb\\RegistryServices\\RegistryServices.csproj",
-        "packagesPath": "C:\\Users\\TutGA_a\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
         "outputPath": "D:\\Projects\\RegistryWeb\\RegistryServices\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\TutGA_a\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\TutGA\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -255,6 +259,10 @@
               "version": "[2.2.0, )",
               "autoReferenced": true
             },
+            "NPOI": {
+              "target": "Package",
+              "version": "[2.5.5, )"
+            },
             "System.Text.Json": {
               "target": "Package",
               "version": "[5.0.0, )"
@@ -270,7 +278,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -226,12 +226,24 @@ namespace RegistryWeb.ReportServices
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
-
-        public byte[] ClaimCourtSpiReport(int idClaim)
+        private string getCourt(int? idCourt)
+        {
+            switch (idCourt)
+            {
+                case 1:
+                    return "Падунское ОСП ГУ ФССП по Иркутской области";
+                case 2:
+                    return "ОСП по г. Братску и Братскому району ГУ ФССП по Иркутской области";
+                default:
+                    return "";
+            }
+        }
+        public byte[] ClaimCourtSpiReport(int idClaim, int idCourtType)
         {
             var arguments = new Dictionary<string, object>
             {
                 { "id_claim", idClaim },
+                { "id_court_type",getCourt(idCourtType)},
                 { "executor", securityService.User.UserName.Replace("PWR\\", "") }
             };
             var fileName = "registry\\claims\\statement_in_spi";

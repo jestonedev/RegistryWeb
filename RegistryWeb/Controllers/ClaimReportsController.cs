@@ -291,14 +291,14 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult GetCourtSpiStatement(int idClaim)
+        public IActionResult GetCourtSpiStatement(int idClaim, int idCourtType)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
                 return View("NotAccess");
 
             try
             {
-                var file = reportService.ClaimCourtSpiReport(idClaim);
+                var file = reportService.ClaimCourtSpiReport(idClaim, idCourtType);
                 return File(file, odtMime, string.Format("Заявление о прекращении ИП (иск. работа № {0}).odt", idClaim));
             }
             catch (Exception ex)

@@ -398,3 +398,34 @@
         </div>
     </div>
 </div>
+
+<form id="courtSpiStatementForm" >
+    <div class="modal fade" id="courtSpiStatementModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" style="width:50%" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Заявление о прекращении исполнительного производства</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Claim.IdClaim" />
+                    <div class="form-group col-12">
+                        <label for="ClaimState__CourtType">Во исполнение решения</label>
+                        <select data-actions-box="true" class="selectpicker form-control" title="Во исполнение решения" name="ClaimState.CourtType"
+                                data-val="true" data-val-required="Не указан орган" id="ClaimState__CourtType">
+                            <option value="1">Падунское ОСП ГУ ФССП по Иркутской области</option>
+                            <option value="2">ОСП по г. Братску и Братскому району ГУ ФССП по Иркутской области</option>
+                        </select>
+                        <span class="text-danger field-validation-valid" data-valmsg-for="ClaimState.CourtType" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-spi-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

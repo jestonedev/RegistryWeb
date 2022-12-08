@@ -58,6 +58,8 @@
     font-size: 70%;
 }
 
+
+
 @media(min-width: 768px) {
     #ClaimAmount table {
         font-size: 80%;

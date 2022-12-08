@@ -86,12 +86,27 @@
         e.preventDefault();
     });
 
+
     $("body").on('click', ".rr-claim-spi-btn", function (e) {
+        var modal = $("#courtSpiStatementModal");
+        modal.find("input, textarea, select").prop("disabled", false);
+        modal.modal("show");
+        e.preventDefault();
+    });
+
+
+    $("body").on('click', ".rr-spi-report-submit", function (e) {
         var idClaim = $("#Claim_IdClaim").val();
-        url = "/ClaimReports/GetCourtSpiStatement?idClaim=" + idClaim;
+        var idCourtType = $("#courtSpiStatementModal").find("[name='ClaimState.CourtType']").val();
+        url = "/ClaimReports/GetCourtSpiStatement?idClaim=" + idClaim + "&idCourtType=" +idCourtType;
         downloadFile(url);
         e.preventDefault();
     });
+
+
+
+
+
 
     $("#claimBksAndTransToLegalModal, #claimAddStateModal, #ClaimCommonReportModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
