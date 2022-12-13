@@ -112,16 +112,19 @@
                             @if (Model.Claim.IdAccountKumi != null)
                             {
                                 <a class="dropdown-item" title="Лицевой счет КУМИ" aria-label="Лицевой счет КУМИ"
-                                   asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@Model.Claim.IdAccountKumi" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет@(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? " КУМИ" : "")</a>
+                                   asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@Model.Claim.IdAccountKumi" 
+                                   asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет@(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? " КУМИ" : "")</a>
                             }
                             @if (Model.Claim.IdAccount != null)
                             {
-                                <a class="dropdown-item" title="Лицевой счет БКС (основной)" aria-label="Лицевой счет БКС (основной)"
-                                   asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@Model.Claim.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет@(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? " БКС" : "")</a>
+                        <a class="dropdown-item" title="Лицевой счет БКС (основной)" aria-label="Лицевой счет БКС (основной)"
+                           asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable"
+                           asp-route-idAccount="@Model.Claim.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет@(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? " БКС" : "") @(Model.Claim.IdAccountAdditional != null ? "(основной)":"")</a>
                                 @if (Model.Claim.IdAccountAdditional != null)
                                 {
                                 <a class="dropdown-item" title="Лицевой счет БКС (дополнительный)" aria-label="Лицевой счет БКС (дополнительный)"
-                                   asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@Model.Claim.IdAccountAdditional" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет@(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? " БКС" : "") (дополнительный)</a>
+                                   asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@Model.Claim.IdAccountAdditional"
+                                   asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет@(Model.Claim.IdAccount != null && Model.Claim.IdAccountKumi != null ? " БКС" : "") (дополнительный)</a>
                                 }
                             }
                         </div>

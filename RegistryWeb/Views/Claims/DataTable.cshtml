@@ -153,12 +153,15 @@
                             {
                                 <b>Лицевой счет КУМИ:</b> @accountKumi
 
-                            } else
+                            } 
                             if (item.IdAccount != null)
                             {
+                                <br>
                                 <b>Лицевой счет БКС:</b> @accountBks
+                        
                             }
-                        }                    </div>
+                        }
+                    </div>
 
                     @{
                         List<Address> rentObjectsKumi = null;
@@ -388,18 +391,18 @@
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@item.IdClaim">
                                 @if (item.IdAccountKumi != null)
                                 {
-                                    <a class="dropdown-item" title="Лицевой счет КУМИ" aria-label="Лицевой счет КУМИ"
-                                       asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@item.IdAccountKumi" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет</a>
-                                } else
-                                if (item.IdAccount != null)
+                                <a class="dropdown-item" title="Лицевой счет КУМИ" aria-label="Лицевой счет КУМИ"
+                                   asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@item.IdAccountKumi" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет@(item.IdAccount != null && item.IdAccountKumi != null ? " КУМИ" : "")</a>
+                                } 
+                                @if (item.IdAccount != null)
                                 {
-                                    <a class="dropdown-item" title="Лицевой счет БКС (основной)" aria-label="Лицевой счет БКС (основной)"
-                                       asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@item.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет (основной)</a>
-                                    @if (item.IdAccountAdditional != null)
-                                    {
-                                        <a class="dropdown-item" title="Лицевой счет БКС (дополнительный)" aria-label="Лицевой счет БКС (дополнительный)"
-                                           asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@item.IdAccountAdditional" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет (дополнительный)</a>
-                                    }
+                            <a class="dropdown-item" title="Лицевой счет БКС (основной)" aria-label="Лицевой счет БКС (основной)"
+                               asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@item.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет БКС @( item.IdAccountAdditional != null ? "(основной)":"")</a>
+                                @if (item.IdAccountAdditional != null)
+                                {
+                            <a class="dropdown-item" title="Лицевой счет БКС (дополнительный)" aria-label="Лицевой счет БКС (дополнительный)"
+                               asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@item.IdAccountAdditional" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет БКС (дополнительный)</a>
+                                }
                                 }
                             </div>
                         </div>
