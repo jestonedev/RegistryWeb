@@ -221,7 +221,7 @@ namespace RegistryWeb.DataServices
                     .Include(sp => sp.IdPremisesNavigation)
                         .ThenInclude(p => p.IdPremisesTypeNavigation)
                     .AsNoTracking()
-                    .Where(sp => sp.SubPremisesNum.ToLowerInvariant() == parts.SubPremisesNum
+                    .Where(sp => sp.SubPremisesNum != null && sp.SubPremisesNum.ToLowerInvariant() == parts.SubPremisesNum
                         && sp.IdPremisesNavigation.PremisesNum.ToLowerInvariant() == parts.PremisesNum
                         && sp.IdPremisesNavigation.IdBuildingNavigation.House.ToLowerInvariant() == parts.House
                         && sp.IdPremisesNavigation.IdBuildingNavigation.IdStreet == parts.IdStreet).ToList()
