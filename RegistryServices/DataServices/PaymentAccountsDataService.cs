@@ -48,19 +48,35 @@ namespace RegistryWeb.DataServices
             PageOptions pageOptions,
             PaymentsFilter filterOptions, out List<int> filteredIds)
         {
+            
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
-            var payments = GetQuery();
+            if (viewModel.FilterOptions.IsEmpty())
+            {
+                var countEmpty  = 0;
+                viewModel.PageOptions.Rows = countEmpty;
+                viewModel.PageOptions.TotalPages = (int)Math.Ceiling(countEmpty / (double)viewModel.PageOptions.SizePage);
+                filteredIds = null;
+                viewModel.Payments = new List<Payment>();
+                var months = registryContext.Payments
+                                .Select(p => p.Date).Distinct()
+                                .OrderByDescending(p => p.Date).Take(6)
+                                .ToList();
+                viewModel.MonthsList = new Dictionary<int, DateTime>();
+                for (var i = 0; i < months.Count(); i++)
+                    viewModel.MonthsList.Add(months[i].Month, months[i].Date);
+                return viewModel;
+            }
 
+            var payments = GetQuery();
             viewModel.PageOptions.TotalRows = payments.Count();
             var query = GetQueryFilter(payments, viewModel.FilterOptions);
+            
             query = GetQueryOrder(query, viewModel.OrderOptions);
             query = GetQueryIncludes(query);
             var count = query.Count();
             viewModel.PageOptions.Rows = count;
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
-
             filteredIds = query.Select(c => c.IdAccount).ToList();
-
             if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
                 viewModel.PageOptions.CurrentPage = 1;
             query = GetQueryPage(query, viewModel.PageOptions);
@@ -71,14 +87,12 @@ namespace RegistryWeb.DataServices
             viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
 
             var monthsList = registryContext.Payments
-                            .Select(p => p.Date).Distinct()
-                            .OrderByDescending(p => p.Date).Take(6)
-                            .ToList();
-
-            viewModel.MonthsList =  new Dictionary<int, DateTime>();
-            for (var i=0;i<monthsList.Count();i++)            
+                                .Select(p => p.Date).Distinct()
+                                .OrderByDescending(p => p.Date).Take(6)
+                                .ToList();
+            viewModel.MonthsList = new Dictionary<int, DateTime>();
+            for (var i = 0; i < monthsList.Count(); i++)
                 viewModel.MonthsList.Add(monthsList[i].Month, monthsList[i].Date);
-
             return viewModel;
         }
 

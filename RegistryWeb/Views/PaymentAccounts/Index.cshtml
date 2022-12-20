@@ -1,9 +1,11 @@
 ﻿@model RegistryServices.ViewModel.Payments.PaymentsVM;
 @{
     ViewData["Title"] = "Лицевые счета БКС";
+    var filterText = "(Воспользуйтесь фильтром)";
+
     var text = Model.PageOptions.TotalRows == Model.PageOptions.Rows ?
-        "(" + Model.PageOptions.TotalRows + ")" :
-        "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
+      "(" + Model.PageOptions.TotalRows + ")" :
+    "(" + Model.PageOptions.Rows + " из " + Model.PageOptions.TotalRows + ")";
 }
 
 @section styles
@@ -13,7 +15,15 @@
 
 <div class="col info text-center" data-controller="PaymentAccounts"></div>
 
-<h2>@ViewData["Title"] @text</h2>
+@if (Model.FilterOptions.IsEmpty())
+{
+    <h2>@ViewData["Title"] <span style="color:red;">@filterText</span> </h2>
+}
+else
+{
+    <h2>@ViewData["Title"] @text </h2>
+}
+
 
 <partial name="Filter" model="Model" />
 <partial name="DataTable" model="Model" />

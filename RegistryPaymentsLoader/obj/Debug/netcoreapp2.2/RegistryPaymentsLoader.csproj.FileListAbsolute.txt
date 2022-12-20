@@ -23,3 +23,16 @@ D:\Projects\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryP
 D:\Projects\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.csproj.CopyComplete
 D:\Projects\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.dll
 D:\Projects\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.pdb
+D:\RegistryWeb\RegistryPaymentsLoader\bin\Debug\netcoreapp2.2\RegistryPaymentsLoader.deps.json
+D:\RegistryWeb\RegistryPaymentsLoader\bin\Debug\netcoreapp2.2\RegistryPaymentsLoader.dll
+D:\RegistryWeb\RegistryPaymentsLoader\bin\Debug\netcoreapp2.2\RegistryPaymentsLoader.pdb
+D:\RegistryWeb\RegistryPaymentsLoader\bin\Debug\netcoreapp2.2\RegistryDb.dll
+D:\RegistryWeb\RegistryPaymentsLoader\bin\Debug\netcoreapp2.2\RegistryDb.pdb
+D:\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.csproj.AssemblyReference.cache
+D:\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.GeneratedMSBuildEditorConfig.editorconfig
+D:\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.AssemblyInfoInputs.cache
+D:\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.AssemblyInfo.cs
+D:\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.csproj.CoreCompileInputs.cache
+D:\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.csproj.CopyComplete
+D:\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.dll
+D:\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.pdb
