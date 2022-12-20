@@ -171,15 +171,18 @@
                                     <select id="Account_OnDate_Year" name="Account.OnDate_Year" class="form-control selectpicker" data-title="Выберите год"
                                             data-val="true" data-val-required="Укажите год">
                                         <option></option>
-                                        @for (int i = DateTime.Now.Year; i > DateTime.Now.Year - 5; i--)
+                                        @if (myKeys.Any())
                                         {
-                                            if (i == (myKeys[0]).Year)
+                                            for (int i = DateTime.Now.Year; i > DateTime.Now.Year - 5; i--)
                                             {
+                                                if (i == (myKeys[0]).Year)
+                                                {
                                                 <option selected value="@i">@i</option>
-                                            }
-                                            else
-                                            {
+                                                }
+                                                else
+                                                {
                                                 <option value="@i">@i</option>
+                                                }
                                             }
                                         }
                                     </select>

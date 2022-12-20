@@ -13235,11 +13235,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\RegistryWeb\\RegistryPaymentCalculator\\RegistryPaymentCalculator.csproj",
+      "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryPaymentCalculator\\RegistryPaymentCalculator.csproj",
       "projectName": "RegistryPaymentCalculator",
-      "projectPath": "D:\\RegistryWeb\\RegistryPaymentCalculator\\RegistryPaymentCalculator.csproj",
+      "projectPath": "D:\\Projects\\RegistryWeb\\RegistryPaymentCalculator\\RegistryPaymentCalculator.csproj",
       "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
-      "outputPath": "D:\\RegistryWeb\\RegistryPaymentCalculator\\obj\\",
+      "outputPath": "D:\\Projects\\RegistryWeb\\RegistryPaymentCalculator\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -13259,11 +13259,11 @@
         "netcoreapp2.2": {
           "targetAlias": "netcoreapp2.2",
           "projectReferences": {
-            "D:\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {
-              "projectPath": "D:\\RegistryWeb\\RegistryDb\\RegistryDb.csproj"
+            "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {
+              "projectPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj"
             },
-            "D:\\RegistryWeb\\RegistryServices\\RegistryServices.csproj": {
-              "projectPath": "D:\\RegistryWeb\\RegistryServices\\RegistryServices.csproj"
+            "D:\\Projects\\RegistryWeb\\RegistryServices\\RegistryServices.csproj": {
+              "projectPath": "D:\\Projects\\RegistryWeb\\RegistryServices\\RegistryServices.csproj"
             }
           }
         }

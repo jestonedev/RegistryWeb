@@ -50,20 +50,16 @@ namespace RegistryWeb.DataServices
         {
             
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
+            viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "IdRegion", "Region");
+            viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
+            
             if (viewModel.FilterOptions.IsEmpty())
             {
-                var countEmpty  = 0;
-                viewModel.PageOptions.Rows = countEmpty;
-                viewModel.PageOptions.TotalPages = (int)Math.Ceiling(countEmpty / (double)viewModel.PageOptions.SizePage);
+                viewModel.PageOptions.Rows = 0;
+                viewModel.PageOptions.TotalPages = 0;
                 filteredIds = null;
                 viewModel.Payments = new List<Payment>();
-                var months = registryContext.Payments
-                                .Select(p => p.Date).Distinct()
-                                .OrderByDescending(p => p.Date).Take(6)
-                                .ToList();
                 viewModel.MonthsList = new Dictionary<int, DateTime>();
-                for (var i = 0; i < months.Count(); i++)
-                    viewModel.MonthsList.Add(months[i].Month, months[i].Date);
                 return viewModel;
             }
 
@@ -83,8 +79,6 @@ namespace RegistryWeb.DataServices
             viewModel.Payments = query.ToList();
             viewModel.RentObjects = GetRentObjects(viewModel.Payments);
             viewModel.ClaimsByAddresses = GetClaimsByAddresses(viewModel.Payments);
-            viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "IdRegion", "Region");
-            viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
 
             var monthsList = registryContext.Payments
                                 .Select(p => p.Date).Distinct()

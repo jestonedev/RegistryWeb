@@ -5629,11 +5629,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
+      "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
       "projectName": "RegistryDb",
-      "projectPath": "D:\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
+      "projectPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
       "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
-      "outputPath": "D:\\RegistryWeb\\RegistryDb\\obj\\",
+      "outputPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

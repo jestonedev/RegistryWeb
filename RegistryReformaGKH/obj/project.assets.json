@@ -692,11 +692,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
+      "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
       "projectName": "RegistryReformaGKH",
-      "projectPath": "D:\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
+      "projectPath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
       "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
-      "outputPath": "D:\\RegistryWeb\\RegistryReformaGKH\\obj\\",
+      "outputPath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
