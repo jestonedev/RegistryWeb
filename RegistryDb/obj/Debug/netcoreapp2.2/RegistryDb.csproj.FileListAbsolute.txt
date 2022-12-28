@@ -26,3 +26,4 @@ D:\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.AssemblyInfo.cs
 D:\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csproj.CoreCompileInputs.cache
 D:\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.dll
 D:\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.pdb
+D:\Projects\Visual Studio Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csprojAssemblyReference.cache

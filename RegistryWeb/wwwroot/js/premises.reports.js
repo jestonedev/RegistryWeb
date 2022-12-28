@@ -69,6 +69,14 @@
         e.preventDefault();
     });
 
+    $("body").on('click', ".rr-report-pk-bks", function (e) {
+        var idPremise = $(this).data("id-premise");
+        $("#pkBksModal").find("[name='PkBks.IdPremise']").val(idPremise);
+        $("#pkBksModal").find("input, textarea, select").prop("disabled", false);
+        $("#pkBksModal").modal("show");
+        e.preventDefault();
+    });
+
     $("body").on('click', "#massPkBksBtn", function (e) {
         $("#pkBksModal").find("input, textarea, select").prop("disabled", false);
         $('#pkBksModal').modal('toggle');
@@ -231,7 +239,13 @@
             return false;
         }
 
-        var url = "/PremiseReports/GetMassPkBks?signer=" + signer;
+        var url = "/PremiseReports/GetPkBks?signer=" + signer;
+
+        var idPremise = $("#pkBksModal").find("[name='PkBks.IdPremise']").val();
+        if (idPremise !== null && idPremise !== undefined) {
+            url += "&idPremise=" + idPremise;
+        }
+
         if (url !== undefined) {
             downloadFile(url);
         }
