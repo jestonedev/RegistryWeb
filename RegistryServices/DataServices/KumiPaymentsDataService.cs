@@ -1119,10 +1119,10 @@ namespace RegistryWeb.DataServices
             if (payment.PaymentKind != null)
             {
                 var paymentKind = kumiPaymentKinds.FirstOrDefault(r => r.Code == payment.PaymentKind.Code);
-                if (paymentKind == null)
-                    throw new KumiPaymentBindDictionaryException(string.Format("Указан некорректный вид платежа {0} в платеже {1}", payment.OperationType.Code, payment.Guid));
+                if (paymentKind == null && payment.PaymentKind.Code != "")
+                    throw new KumiPaymentBindDictionaryException(string.Format("Указан некорректный вид платежа {0} в платеже {1}", payment.PaymentKind.Code, payment.Guid));
                 payment.PaymentKind = null;
-                payment.IdPaymentKind = paymentKind.IdPaymentKind;
+                payment.IdPaymentKind = paymentKind?.IdPaymentKind;
             }
 
             if (kumiOperationTypes == null)

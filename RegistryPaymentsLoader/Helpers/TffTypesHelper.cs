@@ -10,11 +10,22 @@ namespace RegistryPaymentsLoader.Helpers
         {
             if (string.IsNullOrWhiteSpace(value)) return null;
             var valueParts = value.Split(".");
-            if (valueParts.Length != 3) return null;
-            if (!int.TryParse(valueParts[0], out int day)) return null;
-            if (!int.TryParse(valueParts[1], out int month)) return null;
-            if (!int.TryParse(valueParts[2], out int year)) return null;
-            return new DateTime(year, month, day);
+            if (valueParts.Length == 3)
+            {
+                if (!int.TryParse(valueParts[0], out int day)) return null;
+                if (!int.TryParse(valueParts[1], out int month)) return null;
+                if (!int.TryParse(valueParts[2], out int year)) return null;
+                return new DateTime(year, month, day);
+            }
+            valueParts = value.Split("/");
+            if (valueParts.Length == 3)
+            {
+                if (!int.TryParse(valueParts[0].Length == 4 ? valueParts[2] : valueParts[0], out int day)) return null;
+                if (!int.TryParse(valueParts[1], out int month)) return null;
+                if (!int.TryParse(valueParts[0].Length == 4 ? valueParts[0] : valueParts[2], out int year)) return null;
+                return new DateTime(year, month, day);
+            }
+            return null;
         }
 
         internal static int? StringToInt(string value)

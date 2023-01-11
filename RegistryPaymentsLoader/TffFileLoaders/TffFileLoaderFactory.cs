@@ -31,8 +31,12 @@ namespace RegistryPaymentsLoader.TffFileLoaders
                     return new TXBD210101FileLoader();
                 case "TXBD220401":
                     return new TXBD220401FileLoader();
+                case "TXBD230101":
+                    return new TXBD230101FileLoader();
                 case "TXZF210101":
                     return new TXZF210101FileLoader();
+                case "TXZF230101":
+                    return new TXZF230101FileLoader();
                 case "TXVT170101":
                     return new TXVT170101FileLoader();
             }
