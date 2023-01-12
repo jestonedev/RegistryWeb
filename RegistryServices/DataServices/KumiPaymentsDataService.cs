@@ -1013,7 +1013,7 @@ namespace RegistryWeb.DataServices
 
         private void AddPaymentCorrections(KumiPayment payment, KumiMemorialOrder memorialOrder)
         {
-            var date = DateTime.Now;
+            var date = memorialOrder.DateDocument;
             if (payment.Sum != memorialOrder.SumZach)
             {
                 payment.PaymentCorrections.Add(new KumiPaymentCorrection
