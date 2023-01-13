@@ -168,9 +168,15 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult GetMassPkBks(int signer)
+        public IActionResult GetPkBks(int signer, int? idPremise)
         {
-            List<int> ids = GetSessionIds();
+            List<int> ids = new List<int>();
+
+            if (idPremise != null)
+            {
+                ids.Add(idPremise.Value);
+            } else
+                ids =  GetSessionIds();
 
             if (!ids.Any())
                 return NotFound();
