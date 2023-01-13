@@ -911,6 +911,27 @@ namespace RegistryWeb.DataServices
                         select row;
             }
 
+            if (filterOptions.StatusSending != null)
+            {
+                var idClaimUin = (from row in registryContext.UinForClaimStatementInSsp
+                                  where row.StatusSending == true
+                                  select row.IdClaim).ToList();
+
+                switch (filterOptions.StatusSending)
+                {
+                    case true:
+                        query = from row in query
+                                where idClaimUin.Contains(row.IdClaim)
+                                select row;
+                        break;
+
+                    case false:
+                        query = from row in query
+                                where !idClaimUin.Contains(row.IdClaim)
+                                select row;
+                        break;
+                }
+            }
             return query;
         }
 
@@ -1236,13 +1257,7 @@ namespace RegistryWeb.DataServices
 
                     var uinForClaim = registryContext.UinForClaimStatementInSsp
                                         .FirstOrDefault(c => c.IdClaim == logClaimStatementInSpp.IdClaim);
-
-                    if (uinForClaim != null)
-                    {
-                        uinForClaim.Uin = GetUinForClaim(uinForClaim.IdClaim);
-                        registryContext.UinForClaimStatementInSsp.Update(uinForClaim);
-                    }
-                    else
+                    if (uinForClaim is null)
                     {
                         UinForClaimStatementInSsp uinForClaimNew = new UinForClaimStatementInSsp
                         {
@@ -1334,6 +1349,12 @@ namespace RegistryWeb.DataServices
             //uinIncrement++;
 
             return promUin;
+        }
+
+        public string ReceiveUin (int idClaim)
+        {
+            return  registryContext.UinForClaimStatementInSsp
+                                        .FirstOrDefault(c => c.IdClaim == idClaim).Uin;
         }
     }
 }

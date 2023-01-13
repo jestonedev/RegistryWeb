@@ -29,6 +29,11 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Claims
                 .HasColumnName("uin")
                 .HasMaxLength(25)
                 .IsUnicode(false);
+
+            builder.Property(e => e.StatusSending)
+                .HasColumnName("status_sending")
+                .HasColumnType("tinyint(1)")
+                .HasDefaultValueSql("0");
         }
     }
 }

@@ -104,10 +104,6 @@
     });
 
 
-
-
-
-
     $("#claimBksAndTransToLegalModal, #claimAddStateModal, #ClaimCommonReportModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
@@ -145,10 +141,18 @@
         e.preventDefault();
     });
 
+
     $("#doverieBtn").on('click', function (e) {
-        url = "/ClaimReports/GetClaimsForDoverie";
-        downloadFile(url);
+        var modal = $("#courtSspStatementModal");
+        modal.modal("show");
         e.preventDefault();
+    });
+
+    $("#courtSspStatementModal .rr-report-submit").on("click", function (e) {
+        var statusSending = $(this).val();
+        url = "/ClaimReports/GetClaimsForDoverie?statusSending=" + statusSending;
+        downloadFile(url);
+        $("#courtSspStatementModal").modal("hide");
     });
 
     $("#addClaimState").on('click', function (e) {

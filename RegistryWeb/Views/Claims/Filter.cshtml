@@ -312,6 +312,16 @@
                                 <input type="date" class="form-control" asp-for="FilterOptions.ClaimFormStatementSSPDateTo">
                             </div>
                         </div>
+                        <div class="form-group col-12 col-lg-6">
+                            <label asp-for="FilterOptions.StatusSending">Статус отправки заявления в ССП</label>
+                            <div class="input-group">
+                                <select class="selectpicker form-control col-12" title="Статус отправки заявления в ССП" asp-for="FilterOptions.StatusSending">
+                                    <option></option>
+                                    <option value="false">Не отправлено</option>
+                                    <option value="true">Отправлено</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

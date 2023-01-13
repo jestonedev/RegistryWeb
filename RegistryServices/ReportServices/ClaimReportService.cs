@@ -215,14 +215,15 @@ namespace RegistryWeb.ReportServices
             return resultcodes.Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
         }
 
-        public byte[] ClaimCourtOspReport(int idClaim, DateTime createDate)
+        public byte[] ClaimCourtOspReport(int idClaim, DateTime createDate, string uin)
         {
             var arguments = new Dictionary<string, object>
             {
                 { "id_claim", idClaim },
-                { "create_date", createDate }
+                { "create_date", createDate },
+                { "uin", uin}
             };
-            var fileName = "registry\\claims\\statement_in_osp";
+            var fileName = "registry\\claims\\statement_in_osp_with_uin";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
@@ -251,7 +252,7 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
-        public byte[] ClaimsForDoverie(List<int> idClaims)
+        public byte[] ClaimsForDoverie(List<int> idClaims, int statusSending)
         {
             var tmpFileName = Path.GetTempFileName();
             var idClaimsStr = idClaims.Select(id => id.ToString()).Aggregate((x, y) => x + "," + y);
@@ -259,9 +260,10 @@ namespace RegistryWeb.ReportServices
                 sw.Write(idClaimsStr);
             var arguments = new Dictionary<string, object>
             {
-                { "filterTmpFile", tmpFileName }
+                { "filterTmpFile", tmpFileName },
+                { "statusSending", statusSending}
             };
-            var fileName = "registry\\claims\\claim_statements_for_doverie";
+            var fileName = "registry\\claims\\claim_statements_for_doverie_with_status";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }

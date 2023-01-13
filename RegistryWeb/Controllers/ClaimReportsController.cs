@@ -172,7 +172,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult GetClaimsForDoverie()
+        public IActionResult GetClaimsForDoverie(int statusSending)
         {
             List<int> ids = GetSessionIds();
 
@@ -184,7 +184,7 @@ namespace RegistryWeb.Controllers
 
             try
             {
-                var file = reportService.ClaimsForDoverie(ids);
+                var file = reportService.ClaimsForDoverie(ids, statusSending);
                 return File(file, odsMime, "обменный файл АИС 'Доверие'.ods");
             }
             catch (Exception ex)
@@ -280,9 +280,11 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
 
             try
-            {
-                var file = reportService.ClaimCourtOspReport(idClaim, createDate);
+            { 
                 claimsDataService.ClaimLogCourtOsp(idClaim);
+                var uin = claimsDataService.ReceiveUin(idClaim);
+                var file = reportService.ClaimCourtOspReport(idClaim, createDate, uin);
+
                 return File(file, odtMime, string.Format("Заявление о возбуждении ИП (иск. работа № {0}).odt", idClaim));
             }
             catch (Exception ex)

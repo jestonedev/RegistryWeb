@@ -17,6 +17,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public DateTime? ClaimFormStatementSSPDateFrom { get; set; }
         public DateTime? ClaimFormStatementSSPDateTo { get; set; }
         public ComparisonSignEnum ClaimFormStatementSSPDateOp { get; set; }
+        public bool? StatusSending { get; set; }
         public DateTime? ClaimDirectionDateFrom { get; set; }
         public DateTime? ClaimDirectionDateTo { get; set; }
         public ComparisonSignEnum ClaimDirectionDateOp { get; set; }
@@ -80,7 +81,7 @@ namespace RegistryWeb.ViewOptions.Filter
                 AmountTotal == null && AmountTenancy == null && AmountPenalties == null && AmountDgiPadunPkk == null &&
                 IdClaimState == null && IsCurrentState == false &&
                 ClaimStateDateFrom == null && ClaimStateDateTo == null &&
-                ClaimFormStatementSSPDateFrom == null && ClaimFormStatementSSPDateTo == null &&
+                ClaimFormStatementSSPDateFrom == null && ClaimFormStatementSSPDateTo == null && StatusSending== null &&
                 ClaimDirectionDateFrom == null && ClaimDirectionDateTo == null &&
                 CourtOrderDateFrom == null && CourtOrderDateTo == null &&
                 ObtainingCourtOrderDateFrom == null && ObtainingCourtOrderDateTo == null;
