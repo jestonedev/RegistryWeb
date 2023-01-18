@@ -233,6 +233,16 @@
                                 Наниматель: <span class="text-primary"><b>@lastPaymentInfo.Tenant</b></span>
                             </div>
                         }
+                        else
+                        {
+                            var tenant = item.ClaimPersons?.Where(r => r.IsClaimer).FirstOrDefault();
+                            if (tenant != null)
+                            {
+                                <div>
+                                    Наниматель: <span class="text-primary"><b>@tenant.Surname @tenant.Name @tenant.Patronymic</b></span>
+                                </div>
+                            }
+                        }
 
                         <div>
                             Дата начала ПИР: @(item.AtDate != null ? item.AtDate.Value.ToString("dd.MM.yyyy") : "н/а")
@@ -277,7 +287,7 @@
                             }
                         }
                         else
-                        if (courtClaimState != null && !string.IsNullOrEmpty(courtClaimState.CourtOrderNum))
+                       if (courtClaimState != null && !string.IsNullOrEmpty(courtClaimState.CourtOrderNum))
                         {
                             <div>
                                 Номер с/п: @courtClaimState.CourtOrderNum
