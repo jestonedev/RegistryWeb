@@ -687,7 +687,8 @@ namespace RegistryWeb.DataServices
 
             if (!string.IsNullOrEmpty(filterOptions.CourtOrderNum))
             {
-                var idClaims = registryContext.ClaimStates.Where(cs => cs.IdStateType == 4 && cs.CourtOrderNum.Contains(filterOptions.CourtOrderNum)).Select(r => r.IdClaim).ToList();
+                var idClaims = registryContext.ClaimStates
+                    .Where(cs => (cs.IdStateType == 4 || cs.IdStateType == 8) && cs.CourtOrderNum.Contains(filterOptions.CourtOrderNum)).Select(r => r.IdClaim).ToList();
                 query = query.Where(p => idClaims.Contains(p.IdClaim));
             }
             

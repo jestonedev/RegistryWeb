@@ -137,7 +137,7 @@
                                 <a class="dropdown-item active rr-payment-revision" href="#" title="Текущая ревизия" aria-label="Текущая ревизия"
                                    data-sum="@Model.Sum" data-id-kbk-type="@Model.IdKbkType" data-kbk="@Model.Kbk" data-taget-code="@Model.TargetCode" data-okato="@Model.Okato"
                                    data-recipient-inn="@Model.RecipientInn" data-recipient-kpp="@Model.RecipientKpp">Текущая ревизия</a>
-                                @foreach (var corrGroup in Model.PaymentCorrections.GroupBy(r => r.Date.Date))
+                                @foreach (var corrGroup in Model.PaymentCorrections.GroupBy(r => r.Date.Date).OrderByDescending(r => r.Key))
                                 {
                                     var sum = "";
                                     if (corrGroup.Where(r => r.FieldName == "Sum").Any())
