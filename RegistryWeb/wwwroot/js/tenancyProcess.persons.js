@@ -13,7 +13,63 @@
     });
 }
 
+function fillPaymentAccount(tenancyPersonElem, modal) {
+    var idAccountElem = tenancyPersonElem.find("[name^='PaymentAccount_']")[0];
+    var accountElem = modal.find(".rr-payment-account").find("[name^='Person.PaymentAccount']")[0];
+    $.ajax({
+        type: 'POST',
+        url: window.location.origin + '/Claims/GetAccountInfo',
+        dataType: 'json',
+        data: { idAccount: parseInt(idAccountElem.value), type: "BKS" },
+        success: function (data) {
+            if (data.paymentAccount) {
+                accountElem.value = data.paymentAccount;
+            }
+            return data;
+        }
+    });
+}
+
 $(function () {
+
+    function initAutocompletePaymentAccount(tenancyPersonElem, modal) {
+
+        var idAccountElem = tenancyPersonElem.find("[name^='PaymentAccount_']");
+        var accountElem = modal.find(".rr-payment-account").find("[name^='Person.PaymentAccount']");
+
+        accountElem.on("input", function () {
+            idAccountElem.val("0");
+        });
+
+        accountElem.autocomplete({
+            appendTo: "#paymentAccountContainer",
+            source: function (request, response) {
+                $.ajax({
+                    type: 'POST',
+                    url: window.location.origin + '/Claims/GetAccounts',
+                    dataType: 'json',
+                    data: { text: request.term, type: "BKS" },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            let account = { label: item.account, value: item.account, idAccount: item.idAccount };
+                            if (data.length === 1) {
+                                idAccountElem.val(account.idAccount);
+                                accountElem.val(account.value);
+                            }
+                            return account;
+                        }));
+                    }
+                });
+            },            
+            select: function (event, ui) {
+                console.log(event);
+                console.log(ui);
+                idAccountElem.val(ui.item.idAccount);
+                accountElem.val(ui.item.value);
+            },            
+            minLength: 3
+        });
+    }
 
     function tenancyPersonFillModal(tenancyPersonElem, action, canEditAll, canEditEmailsOnly) {
         var modal = $("#personModal");
@@ -23,7 +79,7 @@ $(function () {
         fields.each(function (idx, elem) {
             var name = $(elem).attr("name").split("_")[0];
             modal.find("[name='Person." + name + "']").val($(elem).val());
-        });
+        });  
         if (action === "Details" || action === "Delete") {
             modalFields.prop("disabled", "disabled");
         } else
@@ -32,9 +88,12 @@ $(function () {
         } else if (canEditEmailsOnly === "True") {
             modalFields.prop("disabled", "disabled");
             modalFields.filter(function (idx, elem) { return $(elem).prop("name") === "Person.Email"; }).prop("disabled", "");
+            modalFields.filter(function (idx, elem) { return $(elem).prop("name") === "Person.PaymentAccount"; }).prop("disabled", "");
         } else {
             modalFields.prop("disabled", "disabled");
-        }
+        }        
+        fillPaymentAccount(tenancyPersonElem, modal);
+        initAutocompletePaymentAccount(tenancyPersonElem, modal);
     }
 
     function tenancyPersonFillElem(tenancyPersonElem) {
@@ -66,6 +125,7 @@ $(function () {
             data[name] = $(elem).val();
         });
         data["Person.IdProcess"] = $("#TenancyProcessForm #TenancyProcess_IdProcess").val();
+        data["Person.PaymentAccount"] = $("[data-processing|='edit']").find("[name^='PaymentAccount_']").val();
         return data;
     }
 

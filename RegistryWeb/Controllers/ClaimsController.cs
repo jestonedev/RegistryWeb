@@ -214,6 +214,7 @@ namespace RegistryWeb.Controllers
                 var lastPaymentInfo = dataService.GetLastPaymentsInfo(new List<int> { idAccount }).Select(v => v.Value).FirstOrDefault();
                 return Json(new
                 {
+                    PaymentAccount = account?.Account,
                     BksAddress = account?.RawAddress,
                     RegistryAddress = rentObjects.ContainsKey(idAccount) ? rentObjects[idAccount].Select(r => r.Text).Aggregate((acc, v) => acc + ", " + v) : "",
                     AmountTenancy = lastPaymentInfo?.BalanceOutputTenancy,

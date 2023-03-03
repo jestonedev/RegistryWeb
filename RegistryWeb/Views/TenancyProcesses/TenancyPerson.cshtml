@@ -10,6 +10,7 @@
     <input type="hidden" asp-for="IdPerson" id="IdPerson_@id" name="IdPerson_@id" />
     <input type="hidden" asp-for="PersonalAccount" id="PersonalAccount_@id" name="PersonalAccount_@id" />
     <input type="hidden" asp-for="Email" id="Email_@id" name="Email_@id" />
+    <input type="hidden" asp-for="PaymentAccount" id="PaymentAccount_@id" name="PaymentAccount_@id" />
     <input type="hidden" asp-for="Comment" id="Comment_@id" name="Comment_@id" />
     <input type="hidden" asp-for="IncludeDate" id="IncludeDate_@id" name="IncludeDate_@id"
            value="@(Model.IncludeDate.HasValue ? Model.IncludeDate.Value.ToString("yyyy-MM-dd") : "")" />

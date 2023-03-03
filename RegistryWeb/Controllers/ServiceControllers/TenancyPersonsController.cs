@@ -68,6 +68,7 @@ namespace RegistryWeb.Controllers.ServiceControllers
             {
                 var personDb = registryContext.TenancyPersons.FirstOrDefault(tp => tp.IdPerson == person.IdPerson);
                 personDb.Email = person.Email;
+                personDb.PaymentAccount = person.PaymentAccount;
                 registryContext.TenancyPersons.Update(personDb);
             }
             registryContext.SaveChanges();

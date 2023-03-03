@@ -434,22 +434,23 @@
 
 <partial name="ReportsModals">
 
-@section Scripts {
-    <script src="~/js/tenancyProcess.common.js" asp-append-version="true"></script>
-    <script src="~/js/tenancyProcess.reports.js" asp-append-version="true"></script>
-    <script src="~/js/tenancyProcess.accounts.js" asp-append-version="true"></script>
-    <script src="~/lib/bootstrap4-toggle/js/bootstrap4-toggle.min.js"></script>
-    @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete" || (ViewBag.Action == "Edit" && !(ViewBag.CanEditBaseInfo ?? false)))
-    {
-        <script>
-            $(function () {
-                $('select').prop('disabled', true);
-                $('input').prop('disabled', true);
-                $('textarea').prop('disabled', true);
-                $('input[type="hidden"]').prop('disabled', false);
-                $('input[type="submit"]').prop('disabled', false);
-            })
-        </script>
+    @section Scripts {
+        <script src="~/js/tenancyProcess.common.js" asp-append-version="true"></script>
+        <script src="~/js/tenancyProcess.reports.js" asp-append-version="true"></script>
+        <script src="~/js/tenancyProcess.accounts.js" asp-append-version="true"></script>
+        <!--<script src="~/js/tenancyProcess.paymentAccounts.js" asp-append-version="true"></script>-->
+        <script src="~/lib/bootstrap4-toggle/js/bootstrap4-toggle.min.js"></script>
+        @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete" || (ViewBag.Action == "Edit" && !(ViewBag.CanEditBaseInfo ?? false)))
+        {
+            <script>
+                $(function () {
+                    $('select').prop('disabled', true);
+                    $('input').prop('disabled', true);
+                    $('textarea').prop('disabled', true);
+                    $('input[type="hidden"]').prop('disabled', false);
+                    $('input[type="submit"]').prop('disabled', false);
+                })
+            </script>
+        }
     }
-}
 

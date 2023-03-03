@@ -104,6 +104,10 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Tenancies
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
+            builder.Property(e => e.PaymentAccount)
+                .HasColumnName("payment_account")
+                .HasColumnType("int(11)");
+
             builder.Property(e => e.Comment)
                 .HasColumnName("comment")
                 .HasMaxLength(512)

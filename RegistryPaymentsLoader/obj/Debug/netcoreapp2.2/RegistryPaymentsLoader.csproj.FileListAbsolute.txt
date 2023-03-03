@@ -36,3 +36,16 @@ D:\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLo
 D:\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.csproj.CopyComplete
 D:\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.dll
 D:\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.pdb
+C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\bin\Debug\netcoreapp2.2\RegistryPaymentsLoader.deps.json
+C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\bin\Debug\netcoreapp2.2\RegistryPaymentsLoader.dll
+C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\bin\Debug\netcoreapp2.2\RegistryPaymentsLoader.pdb
+C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\bin\Debug\netcoreapp2.2\RegistryDb.dll
+C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\bin\Debug\netcoreapp2.2\RegistryDb.pdb
+C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.csproj.AssemblyReference.cache
+C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.AssemblyInfoInputs.cache
+C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.AssemblyInfo.cs
+C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.csproj.CoreCompileInputs.cache
+C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.csproj.CopyComplete
+C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.dll
+C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.pdb

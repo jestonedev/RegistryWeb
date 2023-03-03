@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "49l+jOt5g3z2E4Vj2YFUE+/INzCsmcrzCZ06kvgIYdoTP8Qc/HGjq5P+9PKUInVIGYaNdzIKHnxs8r9Y1zJk6Q==",
+  "dgSpecHash": "Q1YITmsJGMp+oAHV0eIW5qqDhkPMnQpmFDlZI7qmsHdvIGlQQtLdtgUo5KC4pqqYkQTJNQ4tmFVNnqydZx6XRQ==",
   "success": true,
-  "projectFilePath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
+  "projectFilePath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
   "expectedPackageFiles": [
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.netcore.app\\2.2.0\\microsoft.netcore.app.2.2.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.netcore.dotnetapphost\\2.2.0\\microsoft.netcore.dotnetapphost.2.2.0.nupkg.sha512",

@@ -28,6 +28,7 @@ namespace RegistryDb.Models.Entities.Tenancies
         public string ResidenceFlat { get; set; }
         public string ResidenceRoom { get; set; }
         public string PersonalAccount { get; set; }
+        public int? PaymentAccount { get; set; }
         public string Email { get; set; }
         public string Comment { get; set; }
         public DateTime? IncludeDate { get; set; }
