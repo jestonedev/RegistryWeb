@@ -15,7 +15,10 @@
 
 function fillPaymentAccount(tenancyPersonElem, modal) {
     var idAccountElem = tenancyPersonElem.find("[name^='PaymentAccount_']")[0];
-    var accountElem = modal.find(".rr-payment-account").find("[name^='Person.PaymentAccount']")[0];
+    var accountElem = modal.find(".rr-payment-account").find("[name|='Person.PaymentAccountVisible']")[0];
+    var modalIdAccount = modal.find(".rr-payment-account").find("[name|='Person.PaymentAccount']")[0];
+    modalIdAccount.value = idAccountElem.value;
+    accountElem.value = "";
     $.ajax({
         type: 'POST',
         url: window.location.origin + '/Claims/GetAccountInfo',
@@ -36,8 +39,8 @@ $(function () {
 
     function initAutocompletePaymentAccount(modal) {
         
-        var accountElem = modal.find(".rr-payment-account").find("[name^='Person.PaymentAccount']");
-        var idAccountFormElem = modal.find(".rr-payment-account").find("[name^='PaymentAccountHidden']");
+        var accountElem = modal.find(".rr-payment-account").find("[name|='Person.PaymentAccountVisible']");
+        var idAccountFormElem = modal.find(".rr-payment-account").find("[name|='Person.PaymentAccount']");
             
         accountElem.on("input", function () {
             idAccountFormElem.val(null);
@@ -88,7 +91,7 @@ $(function () {
             modalFields.prop("disabled", "");
         } else if (canEditEmailsOnly === "True") {
             modalFields.prop("disabled", "disabled");
-            modalFields.filter(function (idx, elem) { return $(elem).prop("name") === "Person.Email" || $(elem).prop("name") === "Person.PaymentAccount"; }).prop("disabled", "");
+            modalFields.filter(function (idx, elem) { return $(elem).prop("name") === "Person.Email" || $(elem).prop("name") === "Person.PaymentAccountVisible"; }).prop("disabled", "");
         } else {
             modalFields.prop("disabled", "disabled");
         }        
@@ -125,7 +128,6 @@ $(function () {
             data[name] = $(elem).val();
         });
         data["Person.IdProcess"] = $("#TenancyProcessForm #TenancyProcess_IdProcess").val();
-        data["Person.PaymentAccount"] = $("[data-processing|='edit']").find("[name^='PaymentAccount_']").val();
         return data;
     }
 
