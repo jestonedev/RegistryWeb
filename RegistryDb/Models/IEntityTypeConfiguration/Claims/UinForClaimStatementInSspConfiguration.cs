@@ -23,6 +23,11 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Claims
             
             builder.Property(e => e.IdClaim)
                 .HasColumnName("id_claim")
+                .IsRequired()
+                .HasColumnType("int(11)");
+
+            builder.Property(e => e.IdPerson)
+                .HasColumnName("id_person")
                 .HasColumnType("int(11)");
 
             builder.Property(e => e.Uin)

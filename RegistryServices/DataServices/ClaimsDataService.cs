@@ -1228,14 +1228,11 @@ namespace RegistryWeb.DataServices
                     IdClaim = idClaim,
                     ExecutorLogin = securityService.User.UserName
                 };
-                UinForClaimStatementInSsp uinForClaim = new UinForClaimStatementInSsp
-                {
-                    IdClaim = idClaim,
-                    Uin = GetUinForClaim(idClaim)
-                };
 
+                List<UinForClaimStatementInSsp> uinForClaims = GetUinPersonsForClaim(idClaim);
+                 
                 registryContext.LogClaimStatementInSpp.Add(logClaimStatementInSpp);
-                registryContext.UinForClaimStatementInSsp.Add(uinForClaim);
+                registryContext.UinForClaimStatementInSsp.AddRange(uinForClaims);
             }
             else
             {
@@ -1254,19 +1251,7 @@ namespace RegistryWeb.DataServices
                         IdClaim = idClaim,
                         ExecutorLogin = securityService.User.UserName
                     };
-                    registryContext.LogClaimStatementInSpp.Add(logClaimStatementInSpp);
-
-                    var uinForClaim = registryContext.UinForClaimStatementInSsp
-                                        .FirstOrDefault(c => c.IdClaim == logClaimStatementInSpp.IdClaim);
-                    if (uinForClaim is null)
-                    {
-                        UinForClaimStatementInSsp uinForClaimNew = new UinForClaimStatementInSsp
-                        {
-                            IdClaim = idClaim,
-                            Uin = GetUinForClaim(idClaim)
-                        };
-                        registryContext.UinForClaimStatementInSsp.Add(uinForClaimNew);
-                    }
+                    registryContext.LogClaimStatementInSpp.Add(logClaimStatementInSpp);                      
                 }
                 else
                 {
@@ -1276,11 +1261,89 @@ namespace RegistryWeb.DataServices
                                                                 ? logClaimStatementInSppOrig.ExecutorLogin : securityService.User.UserName;
                     registryContext.LogClaimStatementInSpp.Update(logClaimStatementInSppOrig);
                 }
+
+                var oldUinForClaims = registryContext.UinForClaimStatementInSsp
+                    .Where(c => c.IdClaim == idClaim).ToList(); //список существующих уин
+
+                List<UinForClaimStatementInSsp> newUinForClaims = GetUinPersonsForClaim(idClaim);// количество совпадает со списком членов семьи
+
+                foreach(var oldUinForClaim in oldUinForClaims)
+                {
+                    if (oldUinForClaim.IdPerson == null)
+                    {
+                        oldUinForClaim.IdPerson = registryContext.ClaimPersons
+                                               .Where(c => c.IdClaim == idClaim)
+                                               .FirstOrDefault(c => c.IsClaimer == true)?.IdPerson;
+                        registryContext.UinForClaimStatementInSsp.Update(oldUinForClaim);
+                        continue;
+                    }
+                    if (newUinForClaims.Any(r => r.IdPerson == oldUinForClaim.IdPerson)) continue;
+                    registryContext.UinForClaimStatementInSsp.Remove(oldUinForClaim);
+
+                }
+
+                foreach(var newUinForClaim in newUinForClaims)
+                {
+                    if (oldUinForClaims.Any(r => r.IdPerson == newUinForClaim.IdPerson)) continue;
+                    registryContext.UinForClaimStatementInSsp.Add(newUinForClaim);
+                }
             }
             registryContext.SaveChanges();
         }
 
-        public string GetUinForClaim(int idClaim)
+
+        public List<UinForClaimStatementInSsp> GetUinPersonsForClaim(int idClaim)
+        {
+            List<UinForClaimStatementInSsp> uinForClaims = new List<UinForClaimStatementInSsp>();
+            
+            var idPersons = registryContext.ClaimPersons
+                                           .Where(c => c.IdClaim == idClaim && c.Deleted == 0).Select(c => c.IdPerson).ToList();
+
+            if (idPersons.Count() != 0)
+            {
+                foreach (var idPerson in idPersons)
+                {
+                    var uinForClaim = new UinForClaimStatementInSsp
+                    {
+                        IdClaim = idClaim,
+                        IdPerson = idPerson,
+                        Uin = GetUinForClaim(GetAccountForCLaim(idClaim), idPerson),
+                    };
+                    uinForClaims.Add(uinForClaim);
+                }
+            }
+            else
+            {
+                var uinForClaim = new UinForClaimStatementInSsp
+                {
+                    IdClaim = idClaim,
+                    IdPerson = null,
+                    Uin = GetUinForClaim(GetAccountForCLaim(idClaim)),
+                };
+                uinForClaims.Add(uinForClaim);
+            }
+            return uinForClaims;
+        }
+
+
+        private string GetAccountForCLaim(int idClaim) 
+        {
+            var claim = registryContext.Claims.FirstOrDefault(c => c.IdClaim == idClaim);
+
+            return claim.IdAccount != null ?
+                    (from cl in registryContext.Claims
+                        join pa in registryContext.PaymentAccounts
+                        on cl.IdAccount equals pa.IdAccount
+                        where cl.IdClaim == idClaim
+                        select pa.Account).FirstOrDefault()
+                : (from cl in registryContext.Claims
+                    join ka in registryContext.KumiAccounts
+                    on cl.IdAccountKumi equals ka.IdAccount
+                    where cl.IdClaim == idClaim
+                    select ka.Account).FirstOrDefault();
+        }
+
+        public string GetUinForClaim(string account, int? idPerson = null)
         {
             // +1-8 байт - urn в десятичной системе (дополнить нулями слева до 8) равен "00009703"
             // +9-18 байт - ЛС (account) с дополненными впереди нулями 
@@ -1289,26 +1352,21 @@ namespace RegistryWeb.DataServices
 
             //var uinIncrement = 0;
 
-            var claim = registryContext.Claims.FirstOrDefault(c => c.IdClaim == idClaim);
-
-            var account = claim.IdAccount != null ?
-                                            (from cl in registryContext.Claims
-                                            join pa in registryContext.PaymentAccounts
-                                            on cl.IdAccount equals pa.IdAccount
-                                            where cl.IdClaim==idClaim
-                                            select pa.Account).FirstOrDefault() 
-                                        : (from cl in registryContext.Claims
-                                            join ka in registryContext.KumiAccounts
-                                            on cl.IdAccountKumi equals ka.IdAccount
-                                            where cl.IdClaim == idClaim
-                                            select ka.Account).FirstOrDefault();
-
-            var curSec = DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString("F0"); // время UTC в секундах с 1 января 1970 года (не без первого знака, т.е. 10 символов)
-
             while (account.Count() != 10)
                 account = account.Insert(0, "0");
 
-            var promUin = "00009703"+ account + curSec.Substring(4); /*+ String.Format("{0:D6}", uinIncrement)*/
+            var promUin = "00009703" + account;
+            if (idPerson != null) // если члены семьи заполнены
+            {
+                var uniqVal = idPerson.ToString().PadLeft(6, '0');
+                promUin += uniqVal;
+            }
+            else
+            {
+                promUin += DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString("F0").Substring(4);/* 
+                                                    // время UTC в секундах с 1 января 1970 года (не без первого знака, т.е. 10 символов)
+                                                         String.Format("{0:D6}", uinIncrement)*/
+            }
 
             int j = 1, summ = 0, checkBit = 0;
 
@@ -1352,10 +1410,10 @@ namespace RegistryWeb.DataServices
             return promUin;
         }
 
-        public string ReceiveUin (int idClaim)
+        public int ReceivePersonCount(int idClaim)
         {
-            return  registryContext.UinForClaimStatementInSsp
-                                        .FirstOrDefault(c => c.IdClaim == idClaim).Uin;
+            return registryContext.ClaimPersons
+                                           .Where(c => c.IdClaim == idClaim && c.Deleted == 0).Count();
         }
     }
 }

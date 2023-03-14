@@ -8,6 +8,7 @@ namespace RegistryDb.Models.Entities.Claims
     {
         public int Id { get; set; }
         public int IdClaim { get; set; }
+        public int? IdPerson { get; set; }
         public string Uin { get; set; }
         public bool StatusSending { get; set; }
     }
