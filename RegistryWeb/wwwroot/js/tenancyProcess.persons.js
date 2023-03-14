@@ -15,7 +15,10 @@
 
 function fillPaymentAccount(tenancyPersonElem, modal) {
     var idAccountElem = tenancyPersonElem.find("[name^='PaymentAccount_']")[0];
-    var accountElem = modal.find(".rr-payment-account").find("[name^='Person.PaymentAccount']")[0];
+    var accountElem = modal.find(".rr-payment-account").find("[name|='Person.PaymentAccountVisible']")[0];
+    var modalIdAccount = modal.find(".rr-payment-account").find("[name|='Person.PaymentAccount']")[0];
+    modalIdAccount.value = idAccountElem.value;
+    accountElem.value = "";
     $.ajax({
         type: 'POST',
         url: window.location.origin + '/Claims/GetAccountInfo',
@@ -32,13 +35,15 @@ function fillPaymentAccount(tenancyPersonElem, modal) {
 
 $(function () {
 
-    function initAutocompletePaymentAccount(tenancyPersonElem, modal) {
+    var currentTenancyPerson;
 
-        var idAccountElem = tenancyPersonElem.find("[name^='PaymentAccount_']");
-        var accountElem = modal.find(".rr-payment-account").find("[name^='Person.PaymentAccount']");
-
+    function initAutocompletePaymentAccount(modal) {
+        
+        var accountElem = modal.find(".rr-payment-account").find("[name|='Person.PaymentAccountVisible']");
+        var idAccountFormElem = modal.find(".rr-payment-account").find("[name|='Person.PaymentAccount']");
+            
         accountElem.on("input", function () {
-            idAccountElem.val("0");
+            idAccountFormElem.val(null);
         });
 
         accountElem.autocomplete({
@@ -53,7 +58,7 @@ $(function () {
                         response($.map(data, function (item) {
                             let account = { label: item.account, value: item.account, idAccount: item.idAccount };
                             if (data.length === 1) {
-                                idAccountElem.val(account.idAccount);
+                                idAccountFormElem.val(account.idAccount);
                                 accountElem.val(account.value);
                             }
                             return account;
@@ -62,9 +67,7 @@ $(function () {
                 });
             },            
             select: function (event, ui) {
-                console.log(event);
-                console.log(ui);
-                idAccountElem.val(ui.item.idAccount);
+                idAccountFormElem.val(ui.item.idAccount);
                 accountElem.val(ui.item.value);
             },            
             minLength: 3
@@ -72,6 +75,7 @@ $(function () {
     }
 
     function tenancyPersonFillModal(tenancyPersonElem, action, canEditAll, canEditEmailsOnly) {
+        currentTenancyPerson = tenancyPersonElem;
         var modal = $("#personModal");
         var fields = tenancyPersonElem.find("input, select, textarea");
         var modalFields = modal.find("input, select, textarea");
@@ -87,13 +91,12 @@ $(function () {
             modalFields.prop("disabled", "");
         } else if (canEditEmailsOnly === "True") {
             modalFields.prop("disabled", "disabled");
-            modalFields.filter(function (idx, elem) { return $(elem).prop("name") === "Person.Email"; }).prop("disabled", "");
-            modalFields.filter(function (idx, elem) { return $(elem).prop("name") === "Person.PaymentAccount"; }).prop("disabled", "");
+            modalFields.filter(function (idx, elem) { return $(elem).prop("name") === "Person.Email" || $(elem).prop("name") === "Person.PaymentAccountVisible"; }).prop("disabled", "");
         } else {
             modalFields.prop("disabled", "disabled");
         }        
         fillPaymentAccount(tenancyPersonElem, modal);
-        initAutocompletePaymentAccount(tenancyPersonElem, modal);
+        initAutocompletePaymentAccount(modal);
     }
 
     function tenancyPersonFillElem(tenancyPersonElem) {
@@ -125,7 +128,6 @@ $(function () {
             data[name] = $(elem).val();
         });
         data["Person.IdProcess"] = $("#TenancyProcessForm #TenancyProcess_IdProcess").val();
-        data["Person.PaymentAccount"] = $("[data-processing|='edit']").find("[name^='PaymentAccount_']").val();
         return data;
     }
 
@@ -273,6 +275,9 @@ $(function () {
     }
 
     $("#personModal").on("click", "#savePersonModalBtn", function (e) {
+        var idAccountElem = currentTenancyPerson.find("[name^='PaymentAccount_']");
+        var idAccountFormElem = $("#personModal").find(".rr-payment-account").find("[name^='PaymentAccountHidden']");
+        idAccountElem.val(idAccountFormElem.val());
         let action = $('#TenancyProcessPersons').data('action');
         var form = $("#TenancyProcessPersonsModalForm");
         var validator = form.validate();

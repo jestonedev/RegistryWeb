@@ -91,26 +91,27 @@
                             <label for="Person_PersonalAccount">Номер телефона</label>
                             <input type="text" id="Person_PersonalAccount" maxlength="255" name="Person.PersonalAccount" class="form-control" title="Телефон участника найма" />
                         </div>
-                        <div class="form-group col-md-6 col-lg-4">
+                        <div class="form-group col-md-6 col-lg-3">
                             <label for="Person_IncludeDate">Дата включения</label>
                             <div class="input-group date">
                                 <input type="date" id="Person_IncludeDate" name="Person.IncludeDate" class="form-control" title="Дата включения участника в найм">
                             </div>
                         </div>
-                        <div class="form-group col-md-6 col-lg-4">
+                        <div class="form-group col-md-6 col-lg-3">
                             <label for="Person_ExcludeDate">Дата исключения</label>
                             <div class="input-group date">
                                 <input type="date" id="Person_ExcludeDate" name="Person.ExcludeDate" class="form-control" title="Дата исключения участника из найм">
                             </div>
                         </div>
-                        <div class="form-group col-md-6 col-lg-4">
+                        <div class="form-group col-md-6 col-lg-3">
                             <label for="Person_Email">E-mail</label>
                             <input type="email" id="Person_Email" maxlength="255" name="Person.Email" class="form-control" title="Адрес электронной почты">
                             <span class="text-danger field-validation-valid" data-valmsg-for="Person.Email" data-valmsg-replace="true"></span>
                         </div>
-                        <div id="paymentAccountContainer" class="form-group col-md-6 col-lg-4 rr-payment-account">
-                            <label for="Person_PaymentAccount">Номер счета</label>
-                            <input type="text" id="Person_PaymentAccount" maxlength="255" name="Person.PaymentAccount" class="ui-autocomplete-input form-control" title="Номер счета">
+                        <div id="paymentAccountContainer" class="form-group col-md-6 col-lg-3 rr-payment-account">
+                            <label for="Person_PaymentAccount">Номер лицевого счета</label>
+                            <input type="hidden" id="Person_PaymentAccount" name="Person.PaymentAccount"/>
+                            <input type="text" id="Person_PaymentAccount_Visible" maxlength="255" name="Person.PaymentAccountVisible" class="ui-autocomplete-input form-control" title="Номер счета">
                             <span class="text-danger field-validation-valid" data-valmsg-for="Person.PaymentAccount" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-md-12">
