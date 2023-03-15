@@ -108,6 +108,8 @@ namespace RegistryDb.Models.Entities.RegistryObjects.Buildings
         public DateTime? LandCadastralDate { get; set; }
         [Required(ErrorMessage = "Укажите площадь земельного участка")]
         public double LandArea { get; set; }
+        public int? IdOrganization { get; set; }
+        public string PostIndex { get; set; }
         public byte Deleted { get; set; }
 
         public virtual HeatingType IdHeatingTypeNavigation { get; set; }
@@ -116,6 +118,7 @@ namespace RegistryDb.Models.Entities.RegistryObjects.Buildings
         public virtual StructureTypeOverlap StructureTypeOverlapNavigation { get; set; }
         public virtual FoundationType FoundationTypeNavigation { get; set; }
         public virtual GovernmentDecree GovernmentDecreeNavigation { get; set; }
+        public virtual BuildingManagmentOrg IdOrganizationNavigation { get; set; }
         public virtual KladrStreet IdStreetNavigation { get; set; }
         public virtual IList<PrivContract> PrivContracts { get; set; }
         public virtual IList<FundBuildingAssoc> FundsBuildingsAssoc { get; set; }

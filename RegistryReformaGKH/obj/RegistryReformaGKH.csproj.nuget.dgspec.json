@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj": {}
+    "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj": {}
   },
   "projects": {
-    "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj": {
+    "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
+        "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
         "projectName": "RegistryReformaGKH",
-        "projectPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
-        "packagesPath": "C:\\Users\\belpe\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryReformaGKH\\obj\\",
+        "projectPath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
+        "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
+        "outputPath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\belpe\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\TutGA\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -60,7 +60,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     }

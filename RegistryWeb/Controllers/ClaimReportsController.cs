@@ -282,8 +282,8 @@ namespace RegistryWeb.Controllers
             try
             { 
                 claimsDataService.ClaimLogCourtOsp(idClaim);
-                var uin = claimsDataService.ReceiveUin(idClaim);
-                var file = reportService.ClaimCourtOspReport(idClaim, createDate, uin);
+                var personsCount = claimsDataService.ReceivePersonCount(idClaim);
+                var file = reportService.ClaimCourtOspReport(idClaim, createDate, personsCount);
 
                 return File(file, odtMime, string.Format("Заявление о возбуждении ИП (иск. работа № {0}).odt", idClaim));
             }

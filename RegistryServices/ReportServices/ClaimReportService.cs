@@ -215,15 +215,27 @@ namespace RegistryWeb.ReportServices
             return resultcodes.Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
         }
 
-        public byte[] ClaimCourtOspReport(int idClaim, DateTime createDate, string uin)
+        public byte[] ClaimCourtOspReport(int idClaim, DateTime createDate, int personsCount)
         {
+            var fileconfigname = "";
+
+            switch (personsCount)
+            {
+                case  0:
+                    fileconfigname = "statement_in_osp_with_uin";
+                    break;
+                default:
+                    fileconfigname = "statement_in_osp_with_uinAllFamily";
+                    break;
+            }
+
             var arguments = new Dictionary<string, object>
             {
                 { "id_claim", idClaim },
                 { "create_date", createDate },
-                { "uin", uin}
             };
-            var fileName = "registry\\claims\\statement_in_osp_with_uin";
+
+            var fileName = "registry\\claims\\" + fileconfigname;
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
