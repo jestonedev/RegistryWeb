@@ -73,6 +73,7 @@ namespace RegistryDb.Models
         }
 
         public virtual DbSet<Building> Buildings { get; set; }
+        public virtual DbSet<BuildingManagmentOrg> BuildingManagmentOrgs { get; set; }
         public virtual DbSet<Premise> Premises { get; set; }
         public virtual DbSet<Preparer> Preparers { get; set; }
         public virtual DbSet<SubPremise> SubPremises { get; set; }
@@ -285,6 +286,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new DocumentIssuedByConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new BuildingConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new BuildingManagmentOrgConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremiseConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremisesCommentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PremisesDoorKeysConfiguration(nameDatebase));

@@ -132,7 +132,7 @@
         <form asp-controller="Buildings" asp-action="@ViewBag.Action" enctype="multipart/form-data" id="building" data-action="@ViewBag.Action" data-caneditbaseinfo="@ViewBag.CanEditBaseInfo" data-caneditlandinfo="@ViewBag.CanEditLandInfo" method="post">
             <input type="hidden" asp-for="IdBuilding" />
             <div class="form-row">
-                <div class="form-group col-md-9 col-lg-8 mb-2">
+                <div class="form-group col-md-6 col-lg-6 mb-2">
                     <label class="mb-1" asp-for="IdStreet">Улица</label>
                     <select class="selectpicker form-control" data-live-search="true" data-style="btn-info" asp-for="IdStreet" title="Улица"
                             asp-items="@(new SelectList(ViewBag.KladrStreets, "IdStreet", "StreetName", Model.IdStreet))">
@@ -144,6 +144,10 @@
                     <label class="mb-1" asp-for="House">Номер дома</label>
                     <input type="text" class="form-control btn-info input-house" asp-for="House" maxlength="20" title="Номер дома">
                     <span asp-validation-for="House" class="text-danger"></span>
+                </div>
+                <div class="form-group col-12 col-md-3 col-lg-2 mb-2">
+                    <label class="mb-1" asp-for="PostIndex">Почтовый индекс</label>
+                    <input type="text" class="form-control input-decimal" asp-for="PostIndex" maxlength="6" title="Почтовый индекс">
                 </div>
                 <div class="form-group col-6 col-lg-2 mb-2">
                     <label class="mb-1" asp-for="IdDecree">Постановление</label>
@@ -395,9 +399,12 @@
                     <span asp-validation-for="RentCoefficient" class="text-danger"></span>
                 </div>
                 <div class="form-group col-12 col-md-4 mb-2">
-                    <label class="mb-1" asp-for="HousingCooperative">Управляющая компания / ТСЖ</label>
-                    <input type="text" class="form-control" asp-for="HousingCooperative" maxlength="255" title="Управляющая компания / ТСЖ">
-                    <span asp-validation-for="HousingCooperative" class="text-danger"></span>
+                    <label class="mb-1" asp-for="IdOrganization">Управляющая компания / ТСЖ</label>
+                    <select class="selectpicker form-control" data-live-search="true" asp-for="IdOrganization" title="Управляющая организация / ТСЖ"
+                            asp-items="@(new SelectList(ViewBag.BuildingManagmentOrgs, "IdOrganization", "Name", Model.IdOrganization))">
+                        <option></option>
+                    </select>
+                    <span asp-validation-for="IdOrganization" class="text-danger"></span>
                 </div>
             </div>
 

@@ -506,6 +506,11 @@ namespace RegistryWeb.DataServices
             get => registryContext.FoundationTypes.AsNoTracking();
         }
 
+        public IEnumerable<BuildingManagmentOrg> BuildingManagmentOrgs
+        {
+            get => registryContext.BuildingManagmentOrgs.AsNoTracking();
+        }
+
         public IEnumerable<SelectableSigner> SelectableSigners
         {
             get => registryContext.SelectableSigners.Where(s => s.IdSignerGroup == 1).ToList();

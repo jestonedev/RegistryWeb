@@ -19,6 +19,8 @@ namespace RegistryServices.ViewModel.Payments
         public IEnumerable<KladrRegion> Regions { get; set; }
         public SelectList KladrRegionsList { get; set; }
         public SelectList KladrStreetsList { get; set; }
+        public SelectList BuildingManagmentOrgsList { get; set; }
         public Dictionary<int, DateTime> MonthsList { get; set; }
+
     }
 }

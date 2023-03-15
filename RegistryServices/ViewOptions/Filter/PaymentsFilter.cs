@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RegistryWeb.ViewOptions.Filter
 {
@@ -19,6 +21,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public int? IdSubPremises { get; set; }
         public int? IdPremises { get; set; }
         public int? IdBuilding { get; set; }
+        public List<int> IdBuildingManagmentOrg { get; set; }
         public int? IdPreset { get; set; } // Поисковые пресеты
         public int? IdClaimsBehavior { get; set; } // Поведение при фильтрации с учетом исковых работ
         public string IdRegion { get; set; }
@@ -83,6 +86,7 @@ namespace RegistryWeb.ViewOptions.Filter
             RecalcPenaltiesOp = 2;
             RecalcTenancyOp = 2;
             TransferBalanceOp = 2;
+            IdBuildingManagmentOrg = new List<int>();
         }
 
         public bool IsEmpty()
@@ -93,7 +97,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool IsModalEmpty()
         {
             return Account == null && AccountGisZkh == null && Crn == null && Tenant == null && RawAddress == null &&
-                IdRegion == null && IdStreet == null && House == null && PremisesNum == null && IdPreset == null && IdClaimsBehavior == null &&
+                IdRegion == null && IdStreet == null && House == null && PremisesNum == null && !IdBuildingManagmentOrg.Any() && IdPreset == null && IdClaimsBehavior == null &&
                 BalanceInputTotal == null && BalanceInputTenancy == null && BalanceInputPenalties == null &&
                 BalanceInputDgiPadunPkk == null && ChargingTotal == null && ChargingTenancy == null && ChargingPenalties == null &&
                 ChargingDgiPadunPkk == null && RecalcTenancy == null && RecalcPenalties == null && RecalcDgiPadunPkk == null &&

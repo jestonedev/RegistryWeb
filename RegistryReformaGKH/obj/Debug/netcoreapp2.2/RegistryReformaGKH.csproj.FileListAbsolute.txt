@@ -26,3 +26,4 @@ D:\Projects\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryRefor
 D:\Projects\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.csproj.CoreCompileInputs.cache
 D:\Projects\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.dll
 D:\Projects\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.pdb
+D:\Projects\Visual Studio Projects\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.csprojAssemblyReference.cache

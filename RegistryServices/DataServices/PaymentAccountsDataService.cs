@@ -52,7 +52,8 @@ namespace RegistryWeb.DataServices
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
             viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "IdRegion", "Region");
             viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
-            
+            viewModel.BuildingManagmentOrgsList = new SelectList(registryContext.BuildingManagmentOrgs , "IdOrganization", "Name");
+
             if (viewModel.FilterOptions.IsEmpty())
             {
                 viewModel.PageOptions.Rows = 0;
@@ -117,9 +118,31 @@ namespace RegistryWeb.DataServices
             if (!filterOptions.IsEmpty())
             {
                 query = AddressFilter(query, filterOptions);
+                query = BuildingOrgManagmentFilter(query, filterOptions.IdBuildingManagmentOrg);
                 query = PaymentAccountFilter(query, filterOptions);
             }
             return query;
+        }
+
+        private IQueryable<Payment> BuildingOrgManagmentFilter(IQueryable<Payment> query, List<int> idBuildingManagmentOrg)
+        {
+            if (!idBuildingManagmentOrg.Any()) return query;
+            var premisesIds = (from buildingRow in registryContext.Buildings
+                              join premiseRow in registryContext.Premises
+                              on buildingRow.IdBuilding equals premiseRow.IdBuilding
+                              where buildingRow.IdOrganization != null && idBuildingManagmentOrg.Contains(buildingRow.IdOrganization.Value)
+                              select premiseRow.IdPremises).ToList();
+            var accountsIds = (from accountRow in registryContext.PaymentAccountPremisesAssoc
+                              where premisesIds.Contains(accountRow.IdPremise)
+                              select accountRow.IdAccount).ToList();
+            accountsIds = accountsIds.Union(
+                    from accountRow in registryContext.PaymentAccountSubPremisesAssoc
+                    join subPremisesRow in registryContext.SubPremises
+                    on accountRow.IdSubPremise equals subPremisesRow.IdSubPremises
+                    where premisesIds.Contains(subPremisesRow.IdPremises)
+                    select accountRow.IdAccount
+                ).ToList();
+            return query.Where(r => accountsIds.Contains(r.IdAccount));
         }
 
         private IQueryable<Payment> AddressFilter(IQueryable<Payment> query, PaymentsFilter filterOptions)

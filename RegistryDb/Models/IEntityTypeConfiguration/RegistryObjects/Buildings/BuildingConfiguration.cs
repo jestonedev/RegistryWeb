@@ -274,6 +274,15 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.RegistryObjects.Buildings
                 .HasColumnName("wear")
                 .HasDefaultValueSql("0");
 
+            builder.Property(e => e.IdOrganization)
+                .HasColumnName("id_organization")
+                .HasColumnType("int(11)");
+
+            builder.Property(e => e.PostIndex)
+                .HasColumnName("post_index")
+                .HasMaxLength(6)
+                .IsUnicode(false);
+
             builder.HasOne(d => d.IdHeatingTypeNavigation)
                 .WithMany(p => p.Buildings)
                 .HasForeignKey(d => d.IdHeatingType);
@@ -311,6 +320,12 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.RegistryObjects.Buildings
                 .HasForeignKey(d => d.IdDecree)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_buildings_id_decree");
+
+            builder.HasOne(d => d.IdOrganizationNavigation)
+                .WithMany(p => p.Buildings)
+                .HasForeignKey(d => d.IdOrganization)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_buildings_id_organization");
 
             //Фильтры по умолчанию
             builder.HasQueryFilter(e => e.Deleted == 0);

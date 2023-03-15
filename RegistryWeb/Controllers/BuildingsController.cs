@@ -285,6 +285,7 @@ namespace RegistryWeb.Controllers
             ViewBag.HeatingTypes = dataService.HeatingTypes;
             ViewBag.GovernmentDecrees = dataService.GovernmentDecrees;
             ViewBag.FoundationTypes = dataService.FoundationTypes;
+            ViewBag.BuildingManagmentOrgs = dataService.BuildingManagmentOrgs;
             ViewBag.SignersList = new SelectList(dataService.SelectableSigners.Select(s => new {
                 s.IdRecord,
                 Snp = s.Surname + " " + s.Name + (s.Patronymic == null ? "" : " " + s.Patronymic)
