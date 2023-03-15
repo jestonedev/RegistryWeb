@@ -160,6 +160,7 @@ namespace RegistryWeb.Controllers
             ViewBag.CurrentExecutor = dataService.CurrentExecutor?.ExecutorName;
             ViewBag.CanEdit = securityService.HasPrivilege(Privileges.ClaimsWrite);
             ViewBag.Emails = dataService.GetTenantsEmails(viewModel.Payments.Select(r => r.IdAccount).ToList());
+            ViewBag.EmailsModified = dataService.GetTenantsEmailsModified(viewModel.Payments.Select(r => r.IdAccount).ToList());
             return View("AccountReports", viewModel);
         }
 

@@ -73,9 +73,25 @@ namespace RegistryWeb.DataServices
                         continue;
                     var curEmails = registryContext.TenancyPersons
                         .Where(per => per.IdProcess == tp.IdProcess && per.Email != null)
-                        .Select(per => per.Email)
+                        .Select(per => new { per.Email, per.PaymentAccount })
                         .ToList();
-                    emails.AddRange(curEmails);
+                    var emailsCount = 0;
+                    foreach (var curE in curEmails)
+                    {
+                        if (curE.PaymentAccount == idAccount)
+                        {
+                            emails.Add(curE.Email);
+                            emailsCount++;
+                        }
+                    }
+                    if (emailsCount == 0) {
+                        foreach (var curE in curEmails)
+                        {
+                            emails.Add(curE.Email);
+                            emailsCount++;
+                        }
+                    }
+                    // emails.AddRange(curEmails);
                 }
                 emails = new List<string>(emails.Distinct());
 

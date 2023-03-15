@@ -10,6 +10,7 @@
     var canEdit = ViewBag.CanEdit;
     var errorPayments = (List<Payment>)ViewData["ErrorPayments"];
     var emails = (Dictionary<int, List<string>>)ViewData["Emails"];
+    var emailsModified = (Dictionary<int, List<string>>)ViewData["EmailsModified"];
 }
 
 @section styles
@@ -115,11 +116,24 @@
                         }
                     </td>
                     <td>
-                        @if (emails.ContainsKey(item.IdAccount))
+                        @if (emailsModified.ContainsKey(item.IdAccount))
                         {
-                            foreach (var email in emails[item.IdAccount])
+                            if (emailsModified[item.IdAccount].Count > 0)
                             {
-                                <div>@email</div>
+                                foreach (var email in emailsModified[item.IdAccount])
+                                {
+                                    <div>@email</div>
+                                }
+                            }
+                            else
+                            {
+                                if (emails.ContainsKey(item.IdAccount))
+                                {
+                                    foreach (var email in emails[item.IdAccount])
+                                    {
+                                        <div>@email</div>
+                                    }
+                                }
                             }
                         }
                     </td>
