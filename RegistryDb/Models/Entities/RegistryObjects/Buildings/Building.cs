@@ -90,7 +90,6 @@ namespace RegistryDb.Models.Entities.RegistryObjects.Buildings
         [Required(ErrorMessage = "Выберите постановление")]
         public int IdDecree { get; set; }
         public string BtiRooms { get; set; }
-        public string HousingCooperative { get; set; }
         [Required(ErrorMessage = "Укажите дату включения в РМИ")]
         public DateTime RegDate { get; set; }
         [Required(ErrorMessage = "Укажите коэффициент оплаты")]

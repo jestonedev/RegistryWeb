@@ -196,6 +196,8 @@
 
     $("#claimAddStateModal #ClaimState_IdStateType").change();
 
+    /* Отчеты ClaimReports/Index */
+
     $(".rr-claim-common-modal-report").on("click", function (e) {
         var modal = $("#ClaimCommonReportModal");
         var title = $(this).find(".media-body").text();
@@ -297,4 +299,46 @@
         downloadFile(url);
         e.preventDefault();
     });
+
+    $(".rr-payment-uk-invoice-modal-report").on("click", function (e) {
+        var modal = $("#PaymentUkInvoiceReportModal");
+        var title = $(this).find(".media-body").text();
+        modal.find(".modal-title").text(title);
+        var action = $(this).data("action");
+        modal.find("input[name='ActionUrl']").val(action);
+        modal.find("input, textarea, select").prop("disabled", false);
+        modal.modal("show");
+        e.preventDefault();
+    });
+
+    $("#PaymentUkInvoiceReportModal  .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("form");
+        var isValid = form.valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight(form);
+            return false;
+        }
+
+        var action = form.find("input[name='ActionUrl']").val();
+
+        var url = "/ClaimReports/Get" + action + "?";
+        var ids = form.find("[name='Uk']").val();
+        var idsStr = "";
+        for (var i = 0; i < ids.length; i++) {
+            idsStr += "idsOrganization="+ids[i];
+            if (i < ids.length - 1) {
+                idsStr += "&";
+            }
+        }
+        url += idsStr;
+
+        if (url !== undefined) {
+            downloadFile(url);
+        }
+
+        $("#PaymentUkInvoiceReportModal").modal("hide");
+
+    });
+
 });

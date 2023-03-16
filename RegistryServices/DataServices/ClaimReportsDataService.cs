@@ -41,7 +41,8 @@ namespace RegistryWeb.DataServices
             {
                 Executors = registryContext.Executors.Where(e => !e.IsInactive).ToList(),
                 StateTypes = registryContext.ClaimStateTypes.ToList(),
-                CurrentExecutor = securityServices.Executor
+                CurrentExecutor = securityServices.Executor,
+                BuildingManagmentOrgs = registryContext.BuildingManagmentOrgs.ToList()
             };
 
             var monthsList = registryContext.Payments

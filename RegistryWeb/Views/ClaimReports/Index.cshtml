@@ -1,5 +1,7 @@
 ﻿@using RegistryServices.ViewModel.Claims
 @using RegistryDb.Models.Entities.Common
+@using RegistryDb.Models.Entities.RegistryObjects.Buildings
+
 @model ClaimReportsVM;
 @{
     ViewData["Title"] = "Отчеты по претензионно-исковой работе";
@@ -81,7 +83,22 @@
                 <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
                 <div class="media-body pl-2 pr-2">Отчет о проделанной работе</div>
             </div>
-        </div>    </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-payment-uk-invoice-modal-report" title="Накладная на отправку ЛС БКС"
+             data-action="UkInvoiceAgg">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Накладная на отправку ЛС БКС</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-payment-uk-invoice-modal-report" title="Детализация по накладной на отправку ЛС БКС"
+             data-action="UkInvoiceDetails">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Детализация по накладной на отправку ЛС БКС</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <form id="ClaimCommonReportForm">
@@ -236,6 +253,49 @@
                                 <option value="1">Успешно отправленные</option>
                                 <option value="2">Ошибки отправки</option>
                             </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="PaymentUkInvoiceReportForm">
+    <div class="modal fade" id="PaymentUkInvoiceReportModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="ActionUrl" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="PaymentUkInvoiceReport_Uk">УК / ТСЖ</label>
+                            <select class="selectpicker form-control" title="УК / ТСЖ" name="Uk" multiple data-actions-box="true" data-live-search="true"
+                                    data-val="true" data-val-required="Не выбрана УК / ТСЖ" id="PaymentUkInvoiceReport_Uk">
+                                @foreach (BuildingManagmentOrg buildingManagmentOrg in Model.BuildingManagmentOrgs)
+                                {
+                                    if (buildingManagmentOrg.IdOrganization == 1)
+                                    {
+                                        <option value="@buildingManagmentOrg.IdOrganization" selected>@buildingManagmentOrg.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@buildingManagmentOrg.IdOrganization">@buildingManagmentOrg.Name</option>
+                                    }
+                                }
+
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Uk" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                 </div>
