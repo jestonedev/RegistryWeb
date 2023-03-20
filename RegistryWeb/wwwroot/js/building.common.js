@@ -2,6 +2,71 @@
     return '<input type="hidden" name="' + name + '" value="' + value + '">';
 };
 
+let isCustomOrganization = false;
+
+$(function () {
+    $("#addOrganizationBtn").off();
+    $("#addOrganizationBtn").on('click', function (e) {
+        $("#addOrganizationBtn").hide();
+        $("#cancelOrganizationBtn").show(); 
+        $("#organizationContainer").hide();
+        $("#addOrganizationContainer").show();
+        isCustomOrganization = true;
+        e.preventDefault();
+    });
+
+    $("#cancelOrganizationBtn").off();
+    $("#cancelOrganizationBtn").on('click', function (e) {
+        $("#cancelOrganizationBtn").hide();
+        $("#addOrganizationBtn").show();
+        $("#addOrganizationContainer").hide();
+        $('#CustomOrganization').val('');
+        $("#organizationContainer").show();
+        isCustomOrganization = false;
+        e.preventDefault();
+    });
+});
+
+let saveNewBuilding = function (e) {
+    let orgSelectElem = $('#organizationContainer').find('[class="selectpicker form-control" ]');
+    let customOrganization = $("#CustomOrganization").val();
+    //if (!$("#customOrganization").valid()) return false;
+    let code = 0;
+    $.ajax({
+        type: 'POST',
+        url: window.location.origin + '/BuildingDemolitionInfo/AddOrganization',
+        data: { organizationName: customOrganization },
+        async: false,
+        success: function (id) {
+            code = id;
+            if (id > 0) {
+                orgSelectElem.append("<option value='" + id + "'>" + customOrganization + "</option>");
+                $("#cancelOrganization").click();
+                orgSelectElem.val(id).selectpicker("refresh");
+            } else
+                if (id === -3) {
+                    $("#cancelOrganizationBtn").click();
+                    var duplicateOption = orgSelectElem.find("option").filter(function (idx, elem) {
+                        return $(elem).text() === customDocumentIssuedBy;
+                    });
+                    var optionId = 0;
+                    if (duplicateOption.length > 0) {
+                        optionId = duplicateOption.prop("value");
+                    } else {
+                        alert('Произошла ошибка при сохранении управляющей компании или ТСЖ');
+                    }
+                    orgSelectElem.val(optionId).selectpicker("refresh");
+                    code = optionId;
+                } else {
+                    alert('Произошла ошибка при сохранении управляющей компании или ТСЖ');
+                    return false;
+                }
+        }
+    });
+    return code > 0;
+    e.preventDefault();
+}
+
 let createBuildingClick = function (event) {
     event.preventDefault();
     $("input.decimal").each(function (idx, elem) {
@@ -98,6 +163,9 @@ let updateDisableState = function (state, action, canEditBaseInfo, canEditLandIn
 };
 
 let editBuildingClick = function (e) {
+    if (isCustomOrganization && $('#CustomOrganization').val() != '') {
+        console.log(saveNewBuilding(e));
+    }
     $("input.decimal").each(function (idx, elem) {
         $(elem).val($(elem).val().replace(".", ","));
     });
@@ -209,7 +277,7 @@ $(function () {
     $('#createBtn').click(createBuildingClick);
     $('#editBtn').click(editBuildingClick);
     $('#deleteBtn').click(deleteBuildingClick);
-    $('#IsMemorial').click(memorialCardClick);
+    $('#IsMemorial').click(memorialCardClick);  
 
     $("form").on("change", "select", function () {
         var isValid = $(this).valid();
@@ -220,5 +288,5 @@ $(function () {
 
             $("button[data-id='" + id + "']").removeClass("input-validation-error");
         }
-    });
+    });  
 });

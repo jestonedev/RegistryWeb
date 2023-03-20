@@ -77,6 +77,23 @@ namespace RegistryWeb.Controllers.ServiceControllers
             });
         }
 
+        public IActionResult AddOrganization(string organizationName)
+        {
+            if (organizationName == null)
+                return Json(-1);
+            if (!securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))
+                return Json(-2);
+            var duplicates = registryContext.BuildingManagmentOrgs.FirstOrDefault(r => r.Name == organizationName);
+            if (duplicates != null)
+            {
+                return Json(-3);
+            }
+            var organization = new BuildingManagmentOrg { Name = organizationName };
+            registryContext.BuildingManagmentOrgs.Add(organization);
+            registryContext.SaveChanges();
+            return Json(organization.IdOrganization);
+        }
+
         public IActionResult GetActFile(int? idFile)
         {
             if (idFile == null)

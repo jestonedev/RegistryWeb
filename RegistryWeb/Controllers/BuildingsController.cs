@@ -62,7 +62,7 @@ namespace RegistryWeb.Controllers
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
                 viewModel.FilterOptions));
-        }
+        }        
 
         public IActionResult BuildingReports()
         {

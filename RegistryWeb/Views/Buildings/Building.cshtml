@@ -400,11 +400,25 @@
                 </div>
                 <div class="form-group col-12 col-md-4 mb-2">
                     <label class="mb-1" asp-for="IdOrganization">Управляющая компания / ТСЖ</label>
-                    <select class="selectpicker form-control" data-live-search="true" asp-for="IdOrganization" title="Управляющая организация / ТСЖ"
-                            asp-items="@(new SelectList(ViewBag.BuildingManagmentOrgs, "IdOrganization", "Name", Model.IdOrganization))">
-                        <option></option>
-                    </select>
-                    <span asp-validation-for="IdOrganization" class="text-danger"></span>
+                    <button id="cancelOrganizationBtn" style="display: none" class="btn pt-0 pb-0 pl-1 pr-1 text-danger" title="Отменить добавление">
+                        <span class="oi oi-ban"></span>
+                    </button>
+                    @if (ViewBag.Action == ActionTypeEnum.Create || ViewBag.Action == ActionTypeEnum.Edit)
+                    {
+                        <button id="addOrganizationBtn" class="btn pt-0 pb-0 pl-1 pr-1 text-success" title="Добавить новую управляющую уомпанию или ТСЖ">
+                            <span class="oi oi-plus"></span>
+                        </button>
+                    }
+                    <div id="organizationContainer">
+                        <select class="selectpicker form-control" data-live-search="true" asp-for="IdOrganization" title="Управляющая организация / ТСЖ"
+                                asp-items="@(new SelectList(ViewBag.BuildingManagmentOrgs, "IdOrganization", "Name", Model.IdOrganization))">
+                            <option></option>
+                        </select>
+                        <span asp-validation-for="IdOrganization" class="text-danger"></span>
+                    </div>
+                    <div id="addOrganizationContainer" style="display: none;">
+                        <input type="text" style="" class="form-control" id="CustomOrganization" name="CustomOrganization" placeholder="Наименование УК / ТСЖ" title="Наименование УК / ТСЖ">
+                    </div>
                 </div>
             </div>
 
