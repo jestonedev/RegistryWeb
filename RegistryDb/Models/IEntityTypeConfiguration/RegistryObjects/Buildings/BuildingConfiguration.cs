@@ -119,11 +119,6 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.RegistryObjects.Buildings
                 .HasMaxLength(20)
                 .IsUnicode(false);
 
-            builder.Property(e => e.HousingCooperative)
-                .HasColumnName("housing_cooperative")
-                .HasMaxLength(255)
-                .IsUnicode(false);
-
             builder.Property(e => e.IdHeatingType)
                 .HasColumnName("id_heating_type")
                 .HasColumnType("int(11)");

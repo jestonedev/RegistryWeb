@@ -8,4 +8,8 @@
     cursor: pointer;
 }
 
-
+.modal-title {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}

@@ -300,5 +300,26 @@ namespace RegistryWeb.ReportServices
             var fileName = "registry\\claims\\cnt_statistic_claim";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
-        }    }
+        }
+
+        public byte[] UkInvoiceAgg(List<int> idsOrganization)
+        {
+            var arguments = new Dictionary<string, object> {
+                { "ids", idsOrganization.Aggregate("", (acc, v) => acc+","+v.ToString() ) }
+            };
+            var fileName = "registry\\claims\\uk_invoice_agg";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+
+        public byte[] UkInvoiceDetails(List<int> idsOrganization)
+        {
+            var arguments = new Dictionary<string, object> {
+                { "ids", idsOrganization.Aggregate("", (acc, v) => acc+","+v.ToString() ) }
+            };
+            var fileName = "registry\\claims\\uk_invoice_details";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+    }
 }
