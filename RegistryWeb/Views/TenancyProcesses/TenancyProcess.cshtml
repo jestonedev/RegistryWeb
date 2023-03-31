@@ -354,6 +354,29 @@
                     <span asp-validation-for="TenancyProcess.IdEmployer" class="text-danger"></span>
                 </div>
             </div>
+            <div class="row mv-emergency-group @(Model.TenancyProcess.IdRentTypeCategory == 23 ? "" : "d-none")">
+                <div class="col-md-12">
+                    <h5>Адрес аварийного МКД</h5>
+                    <hr class="mb-2 mt-2" />
+                </div>
+                <div class="form-group form-group col-md-12 col-lg-6">
+                    <label for="Person_RegistrationIdStreet">Улица</label>
+                    <select class="selectpicker form-control" data-live-search="true" asp-for="TenancyProcess.IdStreetMvEmergency" title="Улица аварийного МКД" asp-items="@(new SelectList(ViewBag.Streets, "IdStreet", "StreetName"))">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-6 col-md-6 col-lg-3">
+                    <label for="Person_RegistrationHouse">Дом</label>
+                    <input type="text" id="Person_RegistrationHouse" maxlength="10" asp-for="TenancyProcess.HouseMvEmergency" class="form-control input-house" title="Номер аварийного МКД" />
+                </div>
+                <div class="form-group col-sm-6 col-md-6 col-lg-3">
+                    <label for="Person_RegistrationFlat">Квартира</label>
+                    <input type="text" id="Person_RegistrationFlat" maxlength="15" asp-for="TenancyProcess.PremiseNumMvEmergency" class="form-control input-premise-num" title="Квартира в аварийном МКД" />
+                </div>
+                <div class="col-md-12">
+                    <hr class="mt-0" />
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-6 rr-tenancy-card">
                     <div class="card mb-2">

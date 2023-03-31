@@ -127,6 +127,21 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Tenancies
                 .HasColumnType("tinyint(1)")
                 .HasDefaultValueSql("0");
 
+            builder.Property(e => e.IdStreetMvEmergency)
+                .HasColumnName("id_street_mv_emergency")
+                .HasMaxLength(17)
+                .IsUnicode(false);
+
+            builder.Property(e => e.HouseMvEmergency)
+                .HasColumnName("house_mv_emergency")
+                .HasMaxLength(10)
+                .IsUnicode(false);
+
+            builder.Property(e => e.PremiseNumMvEmergency)
+                .HasColumnName("premise_num_mv_emergency")
+                .HasMaxLength(15)
+                .IsUnicode(false);
+
             builder.HasOne(d => d.IdRentTypeNavigation)
                 .WithMany(p => p.TenancyProcesses)
                 .HasForeignKey(d => d.IdRentType)

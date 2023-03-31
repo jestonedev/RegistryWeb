@@ -40,6 +40,9 @@ namespace RegistryDb.Models.Entities.Tenancies
         public string Description { get; set; }
         public DateTime? SubTenancyDate { get; set; }
         public string SubTenancyNum { get; set; }
+        public string IdStreetMvEmergency { get; set; }
+        public string HouseMvEmergency { get; set; }
+        public string PremiseNumMvEmergency { get; set; }
         public byte Deleted { get; set; }
         public virtual IList<KumiAccountsTenancyProcessesAssoc> AccountsTenancyProcessesAssoc { get; set; }
         public virtual TenancyActiveProcess TenancyActiveContractNavigation { get; set; }

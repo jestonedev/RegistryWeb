@@ -37,6 +37,17 @@ $(function () {
             employerWrapper.addClass("d-none");
             rentTypeWrapper.addClass("mb-3").removeClass("mb-2").addClass("col-md-12").removeClass("col-md-6");
         }
+        $("#TenancyProcess_IdRentTypeCategory").change();
+    });
+
+    $("#TenancyProcess_IdRentTypeCategory").on("change", function () {
+        if ($(this).val() === "23") {
+            $(".mv-emergency-group").removeClass("d-none");
+        } else {
+            $(".mv-emergency-group").find("select").val("").selectpicker('refresh');
+            $(".mv-emergency-group").find("input").val("");
+            $(".mv-emergency-group").addClass("d-none");
+        }
     });
 
     var lastEndDateBeforeDismissal = undefined;
