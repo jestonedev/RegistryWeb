@@ -190,16 +190,17 @@ namespace RegistryWeb.ReportServices
             var runnInvoiceResults = new Dictionary<Dictionary<string, object>, int>();
             var dic = new Dictionary<int, IEnumerable<string>>();
 
-            foreach (var invoice in invoices)
+            
+            for (var i = 0; i < invoices.Count; i++)
             {
                 var p = new Process();
                 p.StartInfo.FileName = "dotnet";
                 p.StartInfo.WorkingDirectory = invoiceGeneratorPath;
-                p.StartInfo.Arguments = "\"" + Path.Combine(invoiceGeneratorPath, "RegistryInvoiceGenerator.dll") + "\"" + GetArgumentsForGenerator(invoice);
+                p.StartInfo.Arguments = "\"" + Path.Combine(invoiceGeneratorPath, "RegistryInvoiceGenerator.dll") + "\"" + GetArgumentsForGenerator(invoices[i]);
                 p.Start();
-                runnedInvoices.Add(invoice, p);                
+                runnedInvoices.Add(invoices[i], p);                
 
-                if (runnedInvoices.Count >= 100 || runnedInvoices.Count==invoices.Count)
+                if (runnedInvoices.Count >= 100 || i==invoices.Count-1)
                 {
                     foreach(var runnedInvoice in runnedInvoices)
                     {
