@@ -3836,6 +3836,7 @@
       },
       "RegistryPaymentsLoader/1.0.0": {
         "dependencies": {
+          "NPOI": "2.5.5",
           "RegistryDb": "1.0.0"
         },
         "runtime": {

@@ -26,11 +26,9 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool? IdsOwnershipRightTypeContains { get; set; }
         public List<int> IdsObjectState { get; set; }
         public List<int> IdsComment { get; set; }
-        public bool? IdsCommentContains { get; set; }
         public List<int> IdsDoorKeys { get; set; }
         public bool? IdsDoorKeysContains { get; set; }
         public List<int> IdsPremisesType { get; set; }
-        public bool? IdsPremisesTypeContains { get; set; }
 
         public bool IsRestrictionEmpty()
         {

@@ -336,10 +336,7 @@ namespace RegistryWeb.DataServices
         {
             if (filterOptions.IdsComment != null && filterOptions.IdsComment.Any())
             {
-                if (filterOptions.IdsCommentContains == null || filterOptions.IdsCommentContains.Value)
-                    query = query.Where(p => filterOptions.IdsComment.Contains(p.IdPremisesComment));
-                else
-                    query = query.Where(p => !filterOptions.IdsComment.Contains(p.IdPremisesComment));
+                query = query.Where(p => filterOptions.IdsComment.Contains(p.IdPremisesComment));
             }
             return query;
         }
@@ -542,10 +539,7 @@ namespace RegistryWeb.DataServices
         {
             if (filterOptions.IdsPremisesType != null && filterOptions.IdsPremisesType.Any())
             {
-                if (filterOptions.IdsPremisesTypeContains == null || filterOptions.IdsPremisesTypeContains.Value)
-                    query = query.Where(p => filterOptions.IdsPremisesType.Contains(p.IdPremisesType));
-                else
-                    query = query.Where(p => !filterOptions.IdsPremisesType.Contains(p.IdPremisesType));
+                query = query.Where(p => filterOptions.IdsPremisesType.Contains(p.IdPremisesType));
             }
             return query;
         }
