@@ -128,30 +128,24 @@
                             <input type="text" class="form-control input-filter-numbers" asp-for="FilterOptions.Floors" title="Этаж">
                         </div>
                     </div>
+                    
                     <div class="form-row">
-                        <div class="form-group col-lg-6 col-md-12">
+                        <div class="form-group col-lg-3 col-md-6 ">
+                            <label asp-for="FilterOptions.IdsPremisesType">Тип помещения</label>
+                            <div class="row">
+                                <div class="col-12 ">
+                                    <select multiple class="selectpicker form-control" data-actions-box="true" title="Тип помещения" asp-for="FilterOptions.IdsPremisesType" asp-items="@Model.PremisesTypesList"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-6">
                             <label asp-for="FilterOptions.IdsComment">Примечание</label>
                             <div class="row">
-                                <div class="col-4 pr-1">
-                                    <select class="selectpicker form-control" asp-for="FilterOptions.IdsCommentContains" title="Содержит/не содержит">
-                                        @if (Model.FilterOptions.IdsCommentContains == null || Model.FilterOptions.IdsCommentContains.Value)
-                                        {
-                                            <option value="True" selected>Содержит</option>
-                                            <option value="False">Не содержит</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="True">Содержит</option>
-                                            <option value="False" selected>Не содержит</option>
-                                        }
-                                    </select>
-                                </div>
-                                <div class="col-8 pl-1">
+                                <div class="col-12 ">
                                     <select multiple class="selectpicker form-control" data-actions-box="true" title="Примечание" asp-for="FilterOptions.IdsComment" asp-items="@Model.CommentList"></select>
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group col-lg-6 col-md-12">
                             <label asp-for="FilterOptions.IdsDoorKeys">Ключи</label>
                             <div class="row">

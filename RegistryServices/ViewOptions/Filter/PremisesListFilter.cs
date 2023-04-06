@@ -29,6 +29,8 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool? IdsCommentContains { get; set; }
         public List<int> IdsDoorKeys { get; set; }
         public bool? IdsDoorKeysContains { get; set; }
+        public List<int> IdsPremisesType { get; set; }
+        public bool? IdsPremisesTypeContains { get; set; }
 
         public bool IsRestrictionEmpty()
         {
@@ -52,6 +54,7 @@ namespace RegistryWeb.ViewOptions.Filter
                 (Floors == null) && CadastralNum == null &&
                 (IdsObjectState == null || IdsObjectState.Count == 0) &&
                 (IdsComment == null || IdsComment.Count == 0) &&
+                (IdsPremisesType == null || IdsPremisesType.Count == 0) &&
                 (IdsDoorKeys == null || IdsDoorKeys.Count == 0) &&
                 StDateOwnershipRight == null && EndDateOwnershipRight == null;
         }

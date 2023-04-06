@@ -157,6 +157,7 @@ namespace RegistryWeb.DataServices
                 query = OwnershipRightFilter(query, filterOptions);
                 query = RestrictionFilter(query, filterOptions);
                 query = DateFilter(query, filterOptions);
+                query = PremisesTypeFilter(query, filterOptions);
             }
             return query;
         }
@@ -533,6 +534,18 @@ namespace RegistryWeb.DataServices
                                  (filterOptions.RestrictionDate == null || porRow.Date == filterOptions.RestrictionDate))
                              select q).Distinct();
                 }
+            }
+            return query;
+        }
+
+        private IQueryable<Premise> PremisesTypeFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
+        {
+            if (filterOptions.IdsPremisesType != null && filterOptions.IdsPremisesType.Any())
+            {
+                if (filterOptions.IdsPremisesTypeContains == null || filterOptions.IdsPremisesTypeContains.Value)
+                    query = query.Where(p => filterOptions.IdsPremisesType.Contains(p.IdPremisesType));
+                else
+                    query = query.Where(p => !filterOptions.IdsPremisesType.Contains(p.IdPremisesType));
             }
             return query;
         }

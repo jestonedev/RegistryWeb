@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryServices\\RegistryServices.csproj": {}
+    "D:\\Projects\\RegistryWeb\\RegistryServices\\RegistryServices.csproj": {}
   },
   "projects": {
-    "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {
+    "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
+        "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
         "projectName": "RegistryDb",
-        "projectPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
-        "packagesPath": "C:\\Users\\belpe\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryDb\\obj\\",
+        "projectPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
+        "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
+        "outputPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\belpe\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\TutGA\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -68,24 +68,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj": {
+    "D:\\Projects\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj",
+        "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj",
         "projectName": "RegistryPaymentsLoader",
-        "projectPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj",
-        "packagesPath": "C:\\Users\\belpe\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryPaymentsLoader\\obj\\",
+        "projectPath": "D:\\Projects\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj",
+        "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
+        "outputPath": "D:\\Projects\\RegistryWeb\\RegistryPaymentsLoader\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\belpe\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\TutGA\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -99,8 +99,8 @@
           "netcoreapp2.2": {
             "targetAlias": "netcoreapp2.2",
             "projectReferences": {
-              "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {
-                "projectPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryDb\\RegistryDb.csproj"
+              "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {
+                "projectPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj"
               }
             }
           }
@@ -136,24 +136,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj": {
+    "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
+        "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
         "projectName": "RegistryReformaGKH",
-        "projectPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
-        "packagesPath": "C:\\Users\\belpe\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryReformaGKH\\obj\\",
+        "projectPath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
+        "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
+        "outputPath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\belpe\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\TutGA\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -196,24 +196,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryServices\\RegistryServices.csproj": {
+    "D:\\Projects\\RegistryWeb\\RegistryServices\\RegistryServices.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryServices\\RegistryServices.csproj",
+        "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryServices\\RegistryServices.csproj",
         "projectName": "RegistryServices",
-        "projectPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryServices\\RegistryServices.csproj",
-        "packagesPath": "C:\\Users\\belpe\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryServices\\obj\\",
+        "projectPath": "D:\\Projects\\RegistryWeb\\RegistryServices\\RegistryServices.csproj",
+        "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
+        "outputPath": "D:\\Projects\\RegistryWeb\\RegistryServices\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\belpe\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\TutGA\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -227,14 +227,14 @@
           "netcoreapp2.2": {
             "targetAlias": "netcoreapp2.2",
             "projectReferences": {
-              "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {
-                "projectPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryDb\\RegistryDb.csproj"
+              "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {
+                "projectPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj"
               },
-              "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj": {
-                "projectPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj"
+              "D:\\Projects\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj": {
+                "projectPath": "D:\\Projects\\RegistryWeb\\RegistryPaymentsLoader\\RegistryPaymentsLoader.csproj"
               },
-              "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj": {
-                "projectPath": "C:\\Users\\belpe\\Documents\\registry\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj"
+              "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj": {
+                "projectPath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj"
               }
             }
           }
@@ -278,7 +278,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     }
