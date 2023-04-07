@@ -119,11 +119,11 @@ namespace RegistryWeb.ReportServices
                 if (Directory.Exists(destDirectory)) Directory.Delete(destDirectory);
                 Directory.CreateDirectory(destDirectory);
             }
-            foreach (var invoice in invoices)
+            for (var i =0; i < invoices.Count; i++)
             {
+                var invoice = invoices[i];
                 var arguments = new Dictionary<string, object>
                 {
-                    { "id_account", invoice.IdAcconut },
                     { "--address", invoice.Address },
                     { "--account", invoice.Account },
                     { "--tenant", invoice.Tenant },
@@ -142,7 +142,32 @@ namespace RegistryWeb.ReportServices
                 if (action == "Send")
                     arguments.Add("--email", invoice.Emails.Aggregate((x, y) => x + "," + y));
                 else
-                    arguments.Add("--move-to-filename", Path.Combine(destDirectory, string.Format("Счет-извещение по ЛС № {0}.pdf", invoice.Account)));
+                {
+                    if (invoices.Count - 1 <= i)
+                    {
+                        arguments.Add("--move-to-filename", Path.Combine(destDirectory, string.Format("Счет-извещение по ЛС № {0}.pdf", invoice.Account)));
+                    }
+                    else
+                    {
+                        var preInvoce = invoice;
+                        i++;
+                        invoice = invoices[i];
+                        arguments.Add("--address-2", invoice.Address);
+                        arguments.Add("--account-2", invoice.Account);
+                        arguments.Add("--tenant-2", invoice.Tenant);
+                        arguments.Add("--on-date-2", invoice.OnData.ToString("dd.MM.yyyy"));
+                        arguments.Add("--balance-input-2", invoice.BalanceInput);
+                        arguments.Add("--charging-tenancy-2", invoice.ChargingTenancy);
+                        arguments.Add("--charging-penalty-2", invoice.ChargingPenalty);
+                        arguments.Add("--payed-2", invoice.Payed);
+                        arguments.Add("--recalc-tenancy-2", invoice.RecalcTenancy);
+                        arguments.Add("--recalc-penalty-2", invoice.RecalcPenalty);
+                        arguments.Add("--balance-output-2", invoice.BalanceOutput);
+                        arguments.Add("--total-area-2", invoice.TotalArea);
+                        arguments.Add("--prescribed-2", invoice.Prescribed);
+                        arguments.Add("--move-to-filename", Path.Combine(destDirectory, string.Format("Счет-извещение по ЛС № {0}, {1}.pdf", preInvoce.Account, invoice.Account)));
+                    }
+                }
                 parametrs.Add(arguments);
             }
             return GenerateInvoices(parametrs);
