@@ -11,5 +11,6 @@ namespace RegistryServices.ViewModel.Payments
         public Dictionary<int, List<Address>> RentObjects { get; set; }
         public Payment LastPayment { get; set; }
         public PaymentAccountTableJson PaymentAccountTableJson { get; set; }
+        public PaymentAccountComment Comment {get;set;}
     }
 }

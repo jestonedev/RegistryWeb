@@ -98,6 +98,11 @@ $(document).ready(function () {
     });
     updateDataTableExportCols(table);
     $('.card-body').hide();
+
+    $('.account-toggler').each(function (idx, e) {
+        $(e).on('click', $('#' + $(e).data("for")), elementToogleHide);
+    });
+
     $("#configModalShow").on("click", function (e) {
         e.preventDefault();
         $("#configModal").modal("show");
@@ -177,4 +182,70 @@ $(document).ready(function () {
         }
         cardBody.toggle(isHidden);
     });
+
+    var typeBtn = undefined;
+
+    $('.panel-comment').on('click', '#addComment', function (e) {
+        toggle();
+        typeBtn = 0;
+        var modal = $("#CommentModal");
+        modal.modal('show');
+    });
+
+    $('.panel-comment').on('click', '#editComment', function (e) {
+        toggle();
+        typeBtn = 1;
+        var modal = $("#CommentModal");
+        $(".payment-text-comment").val($("#Comment").val());
+        modal.modal('show');
+    });
+
+    function toggle() {
+        let personToggle = $('.account-toggler[data-for="Comment"]');
+        if (!isExpandElemntArrow(personToggle)) // развернуть при добавлении, если было свернуто
+            personToggle.click();
+    }
+
+    $("#CommentModal").on("click", ".save-text-comment", function (e) {
+        var modal = $(this).closest("#CommentModal")
+        var idAccount = $("#LastPayment_IdAccount").val();
+        var textComment = $(".payment-text-comment").val();
+        switch (typeBtn) {
+            case 0:
+                $.ajax({
+                    type: 'POST',
+                    url: window.location.origin + '/PaymentAccounts/AddComment',
+                    data: { idAccount: idAccount, textComment: textComment },
+                    success: function (data) {
+                        $("#Comment").val(textComment);
+                        var btnEdit = "<a href='#' id='editComment' class='form-control btn btn-success oi oi-pencil' title='Изменить'></a>";
+                        $("#addComment").replaceWith(btnEdit);
+                        modal.modal('hide');
+                    }
+                });
+                break;
+            case 1:
+                if (textComment == '') {
+                    var btnEdit = "<a href='#' id='addComment' class='form-control btn btn-success' title='Добавить'>&#10010;</a>";
+                    $("#editComment").replaceWith(btnEdit);
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: window.location.origin + '/PaymentAccounts/AddComment',
+                    data: { idAccount: idAccount, textComment: textComment },
+                    success: function (data) {
+                        $("#Comment").val(textComment);
+                        modal.modal('hide');
+                    }
+                });
+                break;
+        }
+        
+        e.preventDefault();
+    });
+
+    $('#CommentModal').on('hide.bs.modal', function () {
+        $('.payment-text-comment').val('');
+    });
 });
+

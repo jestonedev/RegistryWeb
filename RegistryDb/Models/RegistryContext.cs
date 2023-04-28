@@ -165,6 +165,11 @@ namespace RegistryDb.Models
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<PaymentAccountPremiseAssoc> PaymentAccountPremisesAssoc { get; set; }
         public virtual DbSet<PaymentAccountSubPremiseAssoc> PaymentAccountSubPremisesAssoc { get; set; }
+
+
+        public virtual DbSet<PaymentAccountComment> PaymentAccountComments { get; set; }
+
+
         public virtual DbSet<Claim> Claims { get; set; }
         public virtual DbSet<ClaimState> ClaimStates { get; set; }
         public virtual DbSet<ClaimStateType> ClaimStateTypes { get; set; }
@@ -370,6 +375,11 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new PaymentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PaymentAccountPremiseAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new PaymentAccountSubPremiseAssocConfiguration(nameDatebase));
+
+
+            modelBuilder.ApplyConfiguration(new PaymentAccountCommentConfiguration(nameDatebase));
+
+
             modelBuilder.ApplyConfiguration(new ClaimConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ClaimStateConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new ClaimStateTypeConfiguration(nameDatebase));

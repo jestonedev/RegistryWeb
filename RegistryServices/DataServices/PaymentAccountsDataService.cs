@@ -1253,6 +1253,7 @@ namespace RegistryWeb.DataServices
                                   where row.IdAccount == idAccount
                                   orderby row.Date
                                   select row).ToList();
+            viewModel.Comment = registryContext.PaymentAccountComments.FirstOrDefault(c => c.IdAccount == idAccount);
             var lastPaymentList = new List<Payment>();
             lastPaymentList.Add(viewModel.LastPayment);
             viewModel.RentObjects = GetRentObjects(lastPaymentList);
@@ -1441,6 +1442,36 @@ namespace RegistryWeb.DataServices
                 return registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
                                 e.ExecutorLogin.ToLowerInvariant() == userName);
             }
+        }
+
+        public bool AddCommentsForPaymentAccount(int idAccount, string comment )
+        {
+            try
+            {
+                var AccountComment = registryContext.PaymentAccountComments.Where(c => c.IdAccount == idAccount).FirstOrDefault();
+               
+                if (AccountComment != null)
+                {
+                    AccountComment.Comment = comment;
+                    registryContext.PaymentAccountComments.Update(AccountComment);
+                }
+                else
+                {
+                    var Comment = new PaymentAccountComment()
+                        {
+                            IdAccount = idAccount,
+                            Comment = comment
+                        };
+                        registryContext.PaymentAccountComments.Add(Comment);
+                }
+                registryContext.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
         }
     }
 }
