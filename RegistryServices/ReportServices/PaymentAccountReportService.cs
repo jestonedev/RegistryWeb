@@ -125,6 +125,7 @@ namespace RegistryWeb.ReportServices
                 var arguments = new Dictionary<string, object>
                 {
                     { "--address", invoice.Address },
+                    { "--id-account", invoice.IdAcconut },
                     { "--account", invoice.Account },
                     { "--tenant", invoice.Tenant },
                     { "--on-date", invoice.OnData.ToString("dd.MM.yyyy")},
