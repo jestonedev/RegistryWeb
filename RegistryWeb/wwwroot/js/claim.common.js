@@ -198,6 +198,39 @@ $(function () {
             totalSum += sum;
         }
         $("#Claim_AmountTotal").val(totalSum.toFixed(2).replace(".", ","));
+
+        var factTotalSum = 0;
+        var factTenancyElem = $("#Claim_FactAmountTenancy");
+        if (factTenancyElem.valid() && factTenancyElem.val() !== "" && factTenancyElem.val() !== null) {
+            let sum = parseFloat(factTenancyElem.val().replace(",", "."));
+            factTenancyElem.val(sum.toFixed(2).replace(".", ","));
+            factTotalSum += sum;
+        }
+        var factPenaltiesElem = $("#Claim_FactAmountPenalties");
+        if (factPenaltiesElem.valid() && factPenaltiesElem.val() !== "" && factPenaltiesElem.val() !== null) {
+            let sum = parseFloat(factPenaltiesElem.val().replace(",", "."));
+            factPenaltiesElem.val(sum.toFixed(2).replace(".", ","));
+            factTotalSum += sum;
+        }
+        var factDgiElem = $("#Claim_FactAmountDgi");
+        if (factDgiElem.valid() && factDgiElem.val() !== "" && factDgiElem.val() !== null) {
+            let sum = parseFloat(factDgiElem.val().replace(",", "."));
+            factDgiElem.val(sum.toFixed(2).replace(".", ","));
+            factTotalSum += sum;
+        }
+        var factPadunElem = $("#Claim_FactAmountPadun");
+        if (factPadunElem.valid() && factPadunElem.val() !== "" && factPadunElem.val() !== null) {
+            let sum = parseFloat(factPadunElem.val().replace(",", "."));
+            factPadunElem.val(sum.toFixed(2).replace(".", ","));
+            factTotalSum += sum;
+        }
+        var factPkkElem = $("#Claim_FactAmountPkk");
+        if (factPkkElem.valid() && factPkkElem.val() !== "" && factPkkElem.val() !== null) {
+            let sum = parseFloat(factPkkElem.val().replace(",", "."));
+            factPkkElem.val(sum.toFixed(2).replace(".", ","));
+            factTotalSum += sum;
+        }
+        $("#Claim_FactAmountTotal").val(factTotalSum.toFixed(2).replace(".", ","));
     });
 
     // IdAccount

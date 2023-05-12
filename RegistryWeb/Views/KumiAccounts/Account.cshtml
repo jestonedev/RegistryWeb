@@ -262,15 +262,22 @@
                     var payedPenaltyClaimsSum = 0.00m;
                     if (Model.Claims != null)
                     {
+                        DateTime? bksLastChargeDate = null;
+                        if (Model.Charges.Any(r => r.IsBksCharge == 1))
+                        {
+                            bksLastChargeDate = Model.Charges.Where(r => r.IsBksCharge == 1).Select(r => r.EndDate).Max();
+                        }
+
                         foreach (var claim in Model.Claims)
                         {
                             if (claim.ClaimStates == null) { continue; }
                             var completeState = claim.ClaimStates.FirstOrDefault(r => r.IdStateType == 6);
                             var prepareCourtOrderState = claim.ClaimStates.FirstOrDefault(r => r.IdStateType == 4);
+
                             if (prepareCourtOrderState != null &&
                                 prepareCourtOrderState.CourtOrderDate != null &&
                                 (completeState == null || (completeState != null && completeState.CourtOrderCancelDate == null))
-                                && claim.EndDeptPeriod != null)
+                                && claim.EndDeptPeriod != null && (bksLastChargeDate == null || claim.AtDate > bksLastChargeDate))
                             {
                                 tenancyClaimsSum += (claim.AmountTenancy + claim.AmountDgi + claim.AmountPadun + claim.AmountPkk) ?? 0.00m;
                                 penaltyClaimsSum += claim.AmountPenalties ?? 0.00m;
@@ -280,6 +287,11 @@
                         {
                             var tenancyOnAccount = charge.PaymentCharges?.Sum(r => r.TenancyValue) ?? 0m;
                             var penaltyOnAccount = charge.PaymentCharges?.Sum(r => r.PenaltyValue) ?? 0m;
+                            if (charge.IsBksCharge == 1)
+                            {
+                                tenancyOnAccount = charge.PaymentTenancy;
+                                penaltyOnAccount = charge.PaymentPenalty;
+                            }
                             payedTenancyClaimsSum += charge.PaymentTenancy - tenancyOnAccount;
                             payedPenaltyClaimsSum += charge.PaymentPenalty - penaltyOnAccount;
                         }
@@ -293,7 +305,7 @@
                         <input type="text" asp-for="CurrentBalanceTenancy" title="Текущее сальдо найм" class="form-control" disabled />
 
                         <div class="input-group-append">
-                            <span class="input-group-text" id="basic-addon2" title="За вычетом суммы найма, взыскиваемой по исковым работам. Учитываются только неотмененные исковые работы с вынесеным судебным приказом (дата и номер) и с указанным периодом взыскания">
+                            <span class="input-group-text" id="basic-addon2" title="За вычетом суммы найма, предъявленной по исковым работам. Учитываются только неотмененные исковые работы с вынесеным судебным приказом (дата и номер) и с указанным периодом взыскания. Не учитываются исковые работы, сформированные в период выставления начислиний БКС, т.к. в движении средств отражены фактические выплаты по этим исковым работам">
                                 @(Model.CurrentBalanceTenancy - (tenancyClaimsSum - payedTenancyClaimsSum))
                             </span>
                         </div>
@@ -305,7 +317,7 @@
                     <div class="input-group">
                         <input type="text" asp-for="CurrentBalancePenalty" title="Текущее сальдо пени" class="form-control" disabled />
                         <div class="input-group-append">
-                            <span class="input-group-text" id="basic-addon2" title="За вычетом суммы пени, взыскиваемой по исковым работам. Учитываются только неотмененные исковые работы с вынесеным судебным приказом (дата и номер) и с указанным периодом взыскания">
+                            <span class="input-group-text" id="basic-addon2" title="За вычетом суммы пени, предъявленной по исковым работам. Учитываются только неотмененные исковые работы с вынесеным судебным приказом (дата и номер) и с указанным периодом взыскания. Не учитываются исковые работы, сформированные в период выставления начислиний БКС, т.к. в движении средств отражены фактические выплаты по этим исковым работам">
                                 @(Model.CurrentBalancePenalty - (penaltyClaimsSum - payedPenaltyClaimsSum))
                             </span>
                         </div>
@@ -341,10 +353,10 @@
                 </div>
                 <div class="card-body p-0" id="Charges">
                     @{
-                        var currMonthEndDate = DateTime.Now.Date.AddDays(-DateTime.Now.Date.Day).AddMonths(1);
-                        var prevMonthEndDate = currMonthEndDate.AddDays(1).AddMonths(-1).AddDays(-1);
+                        var currMonthEndDate = DateTime.Now.Date.AddDays(-DateTime.Now.Date.Day + 1).AddMonths(1).AddDays(-1);
+                        var prevMonthEndDate = currMonthEndDate.AddDays(-currMonthEndDate.Day);
 
-                        if (!Model.Charges.Any(r => r.EndDate == currMonthEndDate))
+                        if (!Model.Charges.Any(r => r.EndDate == currMonthEndDate) && Model.Charges.Any(r => r.EndDate == prevMonthEndDate))
                         {
                             KumiCharge prevCharge = Model.Charges.FirstOrDefault(r => r.EndDate == prevMonthEndDate);
                             Model.Charges.Add(new KumiCharge
@@ -507,7 +519,7 @@
                                 <tr>
                                     <th class="text-center p-1" rowspan="2" title="Период взыскания">Период взыскания</th>
                                     <th class="text-center p-1" rowspan="2" title="Состояние">Состояние</th>
-                                    <th class="text-center p-1" colspan="2" title="Взыскиваемая сумма">Взыскиваемая сумма</th>
+                                    <th class="text-center p-1" colspan="2" title="Предъявленная сумма">Предъявленная сумма</th>
                                     <th class="text-center p-1" colspan="2" title="Взысканная сумма">Взысканная сумма</th>
                                     <th class="text-center p-1" colspan="2" title="Остаток">Остаток</th>
                                 </tr>

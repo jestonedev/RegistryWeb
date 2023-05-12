@@ -74,9 +74,10 @@ namespace RegistryPaymentCalculator
                         var startCalcDate = service.GetAccountStartCalcDate(account);
                         if (startCalcDate == null) continue;
                         var dbChargingInfo = service.GetDbChargingInfo(account);
+
                         startRewriteDate = service.CorrectStartRewriteDate(startRewriteDate, startCalcDate.Value, dbChargingInfo);
 
-                        var chargingInfo = service.CalcChargesInfo(account, startCalcDate.Value, endCalcDate, startRewriteDate);
+                        var chargingInfo = service.CalcChargesInfo(account, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate);
                         var recalcInsertIntoCharge = new KumiCharge();
                         if (chargingInfo.Any())
                         {

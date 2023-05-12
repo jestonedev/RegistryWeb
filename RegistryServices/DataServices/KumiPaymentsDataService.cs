@@ -624,15 +624,9 @@ namespace RegistryWeb.DataServices
                     payment.Sum - distributedTenancySum - distributedPenaltySum));
 
             var isPl = payment.IdSource == 3 || payment.IdSource == 5;
-            var date = payment.DateExecute ?? payment.DateIn ?? payment.DateExecute;
+            var date = payment.DateExecute ?? payment.DateIn ?? payment.DateDocument;
             if (date == null)
                 throw new ApplicationException("В платеже не указана " + (isPl ? "дата исполнения распоряжения" : "дата списания со счета"));
-
-            if (payment.Sum == distributedTenancySum + distributedPenaltySum + tenancySum + penaltySum)
-            {
-                payment.IsPosted = 1;
-                registryContext.KumiPayments.Update(payment);
-            }
 
             IQueryable<KumiAccount> accounts = null;
 
@@ -692,6 +686,7 @@ namespace RegistryWeb.DataServices
                     if (idAccount == null)
                         throw new ApplicationException(string.Format("Исковая работа {0} не привязана к лицевому счету КУМИ", idObject));
                     accounts = registryContext.KumiAccounts.Where(r => r.IdAccount == idAccount);
+                    var accountsIds = accounts.Select(r => r.IdAccount).ToList();
 
                     claim.AmountTenancyRecovered = (claim.AmountTenancyRecovered ?? 0) + tenancySum;
                     claim.AmountPenaltiesRecovered = (claim.AmountPenaltiesRecovered ?? 0) + penaltySum;
@@ -708,7 +703,14 @@ namespace RegistryWeb.DataServices
                     break;
             }
 
+            if (payment.Sum == distributedTenancySum + distributedPenaltySum + tenancySum + penaltySum)
+            {
+                payment.IsPosted = 1;
+                registryContext.KumiPayments.Update(payment);
+            }
+
             registryContext.SaveChanges();
+
             registryContext.DetachAllEntities();
 
             // Recalculate

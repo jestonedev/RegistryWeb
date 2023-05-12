@@ -100,6 +100,11 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("tinyint(1)")
                 .IsRequired();
 
+            builder.Property(e => e.IsBksCharge)
+                .HasColumnName("is_bks_charge")
+                .HasColumnType("tinyint(1)")
+                .IsRequired();
+
             builder.HasOne(e => e.Account).WithMany(e => e.Charges)
                 .HasForeignKey(e => e.IdAccount);
 

@@ -52,7 +52,7 @@
                 var tenancyInfos = Model.TenancyInfo[item.IdAccount];
                 var activeTenancies = tenancyInfos.Where(r => r.TenancyProcess.TenancyPersons.Any(p => p.ExcludeDate == null || p.ExcludeDate > DateTime.Now)
                 && (r.TenancyProcess.RegistrationNum == null || !r.TenancyProcess.RegistrationNum.EndsWith("н")));
-                if (activeTenancies.Any())
+                if (activeTenancies.Any() && item.IdState == 1)
                 {
                     payment = activeTenancies.Select(r => r.RentObjects.Sum(ro => ro.PaymentAfter28082019)).Sum();
                 }

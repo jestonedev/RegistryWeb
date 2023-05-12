@@ -268,7 +268,7 @@
                         <div class="card-header d-flex justify-content-between pt-2 pb-2">
                             <h4 class="mt-1 rr-claim-amount-sum-header">Задолженность</h4>
                             <div class="btn-group" role="group">
-                                <a href="#" data-for="ClaimAmount" class="form-control btn btn-primary claim-toggler" title="Развернуть сумму к взысканию" style="font-weight:bold;">∧</a>
+                                <a href="#" data-for="ClaimAmount" class="form-control btn btn-primary claim-toggler" title="Отобразить информацию по задолженности" style="font-weight:bold;">∧</a>
                             </div>
                         </div>
                         <div id="ClaimAmount" class="card-body @(ViewBag.Action == "Delete" || ViewBag.Action == "Details" ? "p-0" : "p-3")">
@@ -288,7 +288,7 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td class="text-center p-1"><b>К взысканию</b></td>
+                                            <td class="text-center p-1"><b>Предъявлено</b></td>
                                             <td class="text-center p-1">@(Model.Claim.AmountTenancy ?? 0.00m)</td>
                                             <td class="text-center p-1">@(Model.Claim.AmountPenalties ?? 0.00m)</td>
                                             <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@(Model.Claim.AmountDgi ?? 0.00m)</td>
@@ -301,7 +301,19 @@
                                         @if (Model.Claim.IdAccountKumiNavigation != null)
                                         {
                                             <tr>
-                                                <td class="text-center p-1"><b>Взысканная</b></td>
+                                                <td class="text-center p-1"><b>Высужено</b></td>
+                                                <td class="text-center p-1">@(Model.Claim.FactAmountTenancy ?? 0.00m)</td>
+                                                <td class="text-center p-1">@(Model.Claim.FactAmountPenalties ?? 0.00m)</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@(Model.Claim.FactAmountDgi ?? 0.00m)</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@(Model.Claim.FactAmountPadun ?? 0.00m)</td>
+                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@(Model.Claim.FactAmountPkk ?? 0.00m)</td>
+                                                <td class="text-center p-1">
+                                                    @((Model.Claim.FactAmountTenancy + Model.Claim.FactAmountPenalties + Model.Claim.FactAmountDgi + Model.Claim.FactAmountPadun + Model.Claim.FactAmountPkk) ?? 0.00m)
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="text-center p-1"><b>Фактически взыскано</b></td>
                                                 <td class="text-center p-1">
                                                     @if (Model.Claim.AmountTenancyRecovered > 0 || Model.Claim.AmountPenaltiesRecovered > 0)
                                                     {
@@ -397,6 +409,8 @@
                             }
                             else
                             {
+                                <h5>Предъявленная задолженость</h5>
+                                <hr />
                                 <div class="row">
                                     <div class="form-group col-4 mb-2">
                                         <label class="mb-1" asp-for="Claim.AmountTenancy">Найм</label>
@@ -430,6 +444,43 @@
                                         <label class="mb-1" asp-for="Claim.AmountPkk">ПКК</label>
                                         <input type="text" class="form-control decimal input-decimal" asp-for="Claim.AmountPkk" title="Сумма к взысканию (ПКК)">
                                         <span asp-validation-for="Claim.AmountPkk" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <h5 class="mt-3">Высуженная задолженность</h5>
+                                <hr />
+                                <div class="row">
+                                    <div class="form-group col-4 mb-2">
+                                        <label class="mb-1" asp-for="Claim.FactAmountTenancy">Найм</label>
+                                        <input type="text" class="form-control decimal input-decimal" asp-for="Claim.FactAmountTenancy" title="Высужено (найм)">
+                                        <span asp-validation-for="Claim.FactAmountTenancy" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-4 mb-2">
+                                        <label class="mb-1" asp-for="Claim.FactAmountPenalties">Пени</label>
+                                        <input type="text" class="form-control decimal input-decimal" asp-for="Claim.FactAmountPenalties" title=Высужено (пени)">
+                                        <span asp-validation-for="Claim.FactAmountPenalties" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-4 mb-2">
+                                        <label class="mb-1">Итого</label>
+                                        <input type="text" disabled class="form-control" id="Claim_FactAmountTotal" name="Claim.FactAmountTotal"
+                                               value="@(Model.Claim.FactAmountTenancy + Model.Claim.FactAmountPenalties + Model.Claim.FactAmountDgi + Model.Claim.FactAmountPadun + Model.Claim.FactAmountPkk)"
+                                               title="Высужено (итого)">
+                                    </div>
+                                </div>
+                                <div class="row rr-claim-additional-amount @(Model.Claim.IdAccount != null ? "" : "d-none")">
+                                    <div class="form-group col-4 mb-0">
+                                        <label class="mb-1" asp-for="Claim.FactAmountDgi">ДГИ</label>
+                                        <input type="text" class="form-control decimal input-decimal" asp-for="Claim.FactAmountDgi" title="Высужено (ДГИ)">
+                                        <span asp-validation-for="Claim.FactAmountDgi" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-4 mb-0">
+                                        <label class="mb-1" asp-for="Claim.FactAmountPadun">Падун</label>
+                                        <input type="text" class="form-control decimal input-decimal" asp-for="Claim.FactAmountPadun" title="Высужено (Падун)">
+                                        <span asp-validation-for="Claim.FactAmountPadun" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-4 mb-0">
+                                        <label class="mb-1" asp-for="Claim.FactAmountPkk">ПКК</label>
+                                        <input type="text" class="form-control decimal input-decimal" asp-for="Claim.FactAmountPkk" title="Высужено (ПКК)">
+                                        <span asp-validation-for="Claim.FactAmountPkk" class="text-danger"></span>
                                     </div>
                                 </div>
                             }

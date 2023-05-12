@@ -25,6 +25,13 @@ namespace RegistryDb.Models.Entities.Claims
         public decimal? AmountDgi { get; set; }
         public decimal? AmountPadun { get; set; }
         public decimal? AmountPkk { get; set; }
+        // Фактически высужено
+        public decimal? FactAmountTenancy { get; set; }
+        public decimal? FactAmountPenalties { get; set; }
+        public decimal? FactAmountDgi { get; set; }
+        public decimal? FactAmountPadun { get; set; }
+        public decimal? FactAmountPkk { get; set; }
+
         public DateTime? AtDate { get; set; }
         public DateTime? StartDeptPeriod { get; set; }
         public DateTime? EndDeptPeriod { get; set; }

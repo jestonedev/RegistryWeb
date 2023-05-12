@@ -63,6 +63,26 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Claims
                 .HasColumnName("amount_penalties_recovered")
                 .HasColumnType("decimal");
 
+            builder.Property(e => e.FactAmountTenancy)
+                .HasColumnName("fact_amount_tenancy")
+                .HasColumnType("decimal");
+
+            builder.Property(e => e.FactAmountPenalties)
+                .HasColumnName("fact_amount_penalties")
+                .HasColumnType("decimal");
+
+            builder.Property(e => e.FactAmountDgi)
+                .HasColumnName("fact_amount_dgi")
+                .HasColumnType("decimal");
+
+            builder.Property(e => e.FactAmountPadun)
+                .HasColumnName("fact_amount_padun")
+                .HasColumnType("decimal");
+
+            builder.Property(e => e.FactAmountPkk)
+                .HasColumnName("fact_amount_pkk")
+                .HasColumnType("decimal");
+
             builder.Property(e => e.AtDate)
                 .HasColumnName("at_date")
                 .HasColumnType("date");
