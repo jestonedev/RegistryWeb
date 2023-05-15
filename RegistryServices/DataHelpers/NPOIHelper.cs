@@ -50,6 +50,11 @@ namespace RegistryServices.DataHelpers
 
         public static void CreateActSpanedCell(ISheet sheet, int rowIndex, int columnIndex, int spanRowCount, int spanColumnCount, string value, ICellStyle style, CellType cellType = CellType.String)
         {
+            if (spanRowCount == 1 && spanColumnCount == 1)
+            {
+                CreateActCell(sheet, rowIndex, columnIndex, value, style, cellType);
+                return;
+            }
             for (var j = rowIndex; j < rowIndex + spanRowCount; j++)
             {
                 var row = sheet.GetRow(j);
