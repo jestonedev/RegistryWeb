@@ -158,7 +158,6 @@ namespace RegistryWeb.ReportServices
             
             var rowIndex = 3;
             var penaltyAcc = 0.0m;
-            var paymentsSum = 0.0m;
             var totalPenalty = 0.0m;
 
             foreach (var charge in actChargeVMs.OrderBy(r => r.Date))
@@ -229,21 +228,33 @@ namespace RegistryWeb.ReportServices
                                 break;
                             case KumiActPaymentEventVM payment:
                                 var paymentDiff = -Math.Min(payment.TenancyTail, charge.Value);
-                                paymentsSum += paymentDiff;
                                 var paymentRequsits = "Платеж: ";
                                 if (!string.IsNullOrEmpty(payment.NumDocument))
                                 {
                                     paymentRequsits += "№ ПД " + payment.NumDocument + " ";
                                 }
                                 else
+                                if (payment.IdPayment <= Int32.MaxValue - 100000)  // Зарезервированные идентификаторы для платежей БКС
                                 {
                                     paymentRequsits += "Id " + payment.IdPayment + " ";
                                 }
                                 paymentRequsits += " на сумму найм " + payment.Tenancy.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб. и пени " +
                                     payment.Penalty.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                if (payment.Tenancy > payment.TenancyTail || payment.Penalty > payment.PenaltyTail)
+                                {
+                                    paymentRequsits += ", ранее неучтеный остаток ";
+                                }
                                 if (payment.Tenancy > payment.TenancyTail)
                                 {
-                                    paymentRequsits += ", неучтеный остаток найм " + payment.TenancyTail.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                    paymentRequsits += "найм " + payment.TenancyTail.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
+                                }
+                                if (payment.Penalty > payment.PenaltyTail)
+                                {
+                                    if (payment.Tenancy > payment.TenancyTail)
+                                    {
+                                        paymentRequsits += " и ";
+                                    }
+                                    paymentRequsits += "пени " + payment.TenancyTail.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.";
                                 }
                                 NPOIHelper.CreateActCell(sheet, rowIndex, 2, paymentDiff.ToString(CultureInfo.GetCultureInfo("ru-RU")) + " руб.",
                                     NPOIHelper.GetActBaseDataCellStyle(workbook, HorizontalAlignment.Right));
@@ -261,7 +272,6 @@ namespace RegistryWeb.ReportServices
                                 break;
                             case KumiActClaimEventVM claim:
                                 var claimDiff = -Math.Min(claim.TenancyTail, charge.Value);
-                                paymentsSum += claimDiff;
                                 var claimRequsits = "ПИР: период взыскания ";
                                 if (claim.StartDeptPeriod != null)
                                 {

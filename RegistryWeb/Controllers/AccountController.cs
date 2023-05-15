@@ -26,7 +26,7 @@ namespace RegistryWeb.Controllers
             var connectionStringTemplate = "server=" + config.GetValue<string>("Server") + ";" +
                 "port=" + config.GetValue<string>("Port") + ";" +
                 "user={0};password={1};" +
-                "database=" + config.GetValue<string>("Database") + ";";
+                "database=" + config.GetValue<string>("Database") + "; convert zero datetime=True";
 
             var connectionString = string.Format(connectionStringTemplate, "registry", "registry");
 

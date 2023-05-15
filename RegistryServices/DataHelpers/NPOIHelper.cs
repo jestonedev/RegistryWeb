@@ -9,10 +9,13 @@ namespace RegistryServices.DataHelpers
 {
     public static class NPOIHelper
     {
+        public static ICellStyle headerCellStyle = null;
+        public static Dictionary<string, ICellStyle> baseDataCellStyles = new Dictionary<string, ICellStyle>();
 
         public static ICellStyle GetActHeaderCellStyle(HSSFWorkbook workbook)
         {
-            var headerCellStyle = workbook.CreateCellStyle();
+            if (headerCellStyle != null) return headerCellStyle;
+            headerCellStyle = workbook.CreateCellStyle();
             headerCellStyle.BorderTop = BorderStyle.Thin;
             headerCellStyle.BorderBottom = BorderStyle.Thin;
             headerCellStyle.BorderLeft = BorderStyle.Thin;
@@ -27,6 +30,9 @@ namespace RegistryServices.DataHelpers
 
         public static ICellStyle GetActBaseDataCellStyle(HSSFWorkbook workbook, HorizontalAlignment alignment, bool isItalic = false, bool isBold = false)
         {
+            var keyName = alignment.ToString() + isItalic.ToString() + isBold.ToString();
+            if (baseDataCellStyles.ContainsKey(keyName))
+                return baseDataCellStyles[keyName];
             var cellStyle = workbook.CreateCellStyle();
             cellStyle.BorderTop = BorderStyle.Thin;
             cellStyle.BorderBottom = BorderStyle.Thin;
@@ -38,6 +44,7 @@ namespace RegistryServices.DataHelpers
             font.IsItalic = isItalic;
             font.IsBold = isBold;
             cellStyle.SetFont(font);
+            baseDataCellStyles.Add(keyName, cellStyle);
             return cellStyle;
         }
 

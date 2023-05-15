@@ -307,8 +307,54 @@ namespace RegistryWeb.DataServices
             var chargeIds = charges.Select(r => r.IdCharge);
 
             var paymentIds = charges.SelectMany(r => r.PaymentCharges).Select(r => r.IdPayment);
+
+            var account = registryContext.KumiAccounts.Include(r => r.Charges).FirstOrDefault(r => r.IdAccount == idAccount);
+            if (account == null) return new List<KumiActChargeVM>();
+
+            // Берем только платежи после даты последнего начисления БКС
+            DateTime? maxBksCharegeDate = null;
+            if (account.Charges.Any(r => r.IsBksCharge == 1))
+            {
+                maxBksCharegeDate = account.Charges.Where(r => r.IsBksCharge == 1).Select(r => r.EndDate).Max();
+            }
+
             // Оригиналы платежей и ПИР для добавления в акт
-            var payments = registryContext.KumiPayments.Include(r => r.PaymentCharges).Where(r => paymentIds.Contains(r.IdPayment)).ToList();
+            var payments = registryContext.KumiPayments.Include(r => r.PaymentCharges).Where(r => paymentIds.Contains(r.IdPayment)
+                && (maxBksCharegeDate == null || (r.DateExecute ?? r.DateIn ?? r.DateDocument).Value > maxBksCharegeDate)).ToList();
+
+
+            var bksPayments = new List<KumiPayment>();
+            var idIndex = 0;
+            foreach(var charge in registryContext.KumiCharges.Where(r => r.IdAccount == account.IdAccount && r.IsBksCharge == 1 && r.PaymentTenancy + r.PaymentPenalty > 0))
+            {
+
+                bksPayments.Add(new KumiPayment
+                {
+                    IdPayment = Int32.MaxValue - idIndex,
+                    DateIn = charge.StartDate,
+                    DateExecute = charge.StartDate,
+                    DateDocument = charge.StartDate,
+                    Sum = charge.PaymentTenancy + charge.PaymentPenalty,
+                    PaymentCharges = new List<KumiPaymentCharge> {
+                            new KumiPaymentCharge {
+                                Date = charge.StartDate,
+                                TenancyValue = charge.PaymentTenancy,
+                                IdCharge = charge.IdCharge,
+                                IdDisplayCharge = charge.IdCharge,
+                            },
+                            new KumiPaymentCharge {
+                                Date = charge.StartDate,
+                                PenaltyValue = charge.PaymentPenalty,
+                                IdCharge = charge.IdCharge,
+                                IdDisplayCharge = charge.IdCharge,
+                            },
+                        }
+                });
+                idIndex++;
+            }
+
+            payments.AddRange(bksPayments);
+
             var resultPayments = payments.Select(r => new KumiActPaymentEventVM
             {
                 Date = (r.DateExecute ?? r.DateIn ?? r.DateDocument).Value,
@@ -317,11 +363,13 @@ namespace RegistryWeb.DataServices
                 IdPayment = r.IdPayment,
                 NumDocument = r.NumDocument,
                 DateDocument = r.DateDocument
-            }).Where(r => r.Date <= atDate);
+            });
+
+            resultPayments = resultPayments.Where(r => r.Date <= atDate);
 
             var claims = registryContext.Claims.Include(r => r.PaymentClaims).Include(r => r.ClaimStates).Where(r => r.IdAccountKumi == idAccount).ToList();
             var resultClaims = claims.Where(r =>
-                    r.EndDeptPeriod <= atDate &&
+                    r.EndDeptPeriod <= atDate && (maxBksCharegeDate == null || r.AtDate > maxBksCharegeDate) &&
                     r.ClaimStates.Any(s => s.IdStateType == 4 && s.CourtOrderDate != null) &&
                     !r.ClaimStates.Any(s => s.IdStateType == 6 && s.CourtOrderCancelDate != null))
                 .Select(r => new KumiActClaimEventVM
@@ -364,7 +412,7 @@ namespace RegistryWeb.DataServices
                 var allPenaltiesCalcEvents = new List<KumiActPeniCalcEventVM>();
                 while (true)
                 {
-                    var firstPayment = paymentsForCalc.Where(r => r.Tenancy > 0).OrderByDescending(r => r.Date).FirstOrDefault();
+                    var firstPayment = paymentsForCalc.Where(r => r.Tenancy > 0).OrderBy(r => r.Date).FirstOrDefault();
                     KumiActPaymentEventVM eventPayment = null;
                     if (firstPayment != null)
                     {
@@ -382,7 +430,7 @@ namespace RegistryWeb.DataServices
                             }).First();
                     }
 
-                    var firstClaim = claimsForCalc.Where(r => r.Tenancy > 0).OrderByDescending(r => r.Date).FirstOrDefault();
+                    var firstClaim = claimsForCalc.Where(r => r.Tenancy > 0).OrderBy(r => r.Date).FirstOrDefault();
                     KumiActClaimEventVM eventClaim = null;
                     if (firstClaim != null)
                     {
