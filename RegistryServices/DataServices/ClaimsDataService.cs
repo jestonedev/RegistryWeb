@@ -650,7 +650,6 @@ namespace RegistryWeb.DataServices
             {
                 query = query.Where(p => p.IdAccountKumi == filterOptions.IdAccountKumi);
             }
-
             if (filterOptions.AmountTotal != null)
             {
                 query = query.Where(p => filterOptions.AmountTotalOp == 1 ?
@@ -679,19 +678,16 @@ namespace RegistryWeb.DataServices
                      p.AmountPadun <= filterOptions.AmountDgiPadunPkk ||
                      p.AmountPkk <= filterOptions.AmountDgiPadunPkk));
             }
-
             if (filterOptions.AtDate != null)
             {
                 query = query.Where(p => p.AtDate == filterOptions.AtDate);
             }
-
             if (!string.IsNullOrEmpty(filterOptions.CourtOrderNum))
             {
                 var idClaims = registryContext.ClaimStates
                     .Where(cs => (cs.IdStateType == 4 || cs.IdStateType == 8) && cs.CourtOrderNum.Contains(filterOptions.CourtOrderNum)).Select(r => r.IdClaim).ToList();
                 query = query.Where(p => idClaims.Contains(p.IdClaim));
             }
-            
 
             if (filterOptions.IdClaimState != null)
             {
@@ -766,11 +762,24 @@ namespace RegistryWeb.DataServices
                 }
                 else
                 {
-                    query = from row in query
-                            join claimsStatesRow in registryContext.ClaimStates
-                            on row.IdClaim equals claimsStatesRow.IdClaim
-                            where claimsStatesRow.IdStateType == filterOptions.IdClaimState
-                            select row;
+                    if (filterOptions.ClaimStateDateFrom != null)
+                    { 
+                        query = from row in query
+                                join claimsStatesRow in registryContext.ClaimStates
+                                on row.IdClaim equals claimsStatesRow.IdClaim
+                                where claimsStatesRow.IdStateType == filterOptions.IdClaimState
+                                && claimsStatesRow.DateStartState >= filterOptions.ClaimStateDateFrom
+                                select row;
+
+                    }
+                    else
+                    {
+                        query = from row in query
+                                join claimsStatesRow in registryContext.ClaimStates
+                                on row.IdClaim equals claimsStatesRow.IdClaim
+                                where claimsStatesRow.IdStateType == filterOptions.IdClaimState
+                                select row;
+                    }
 
                     if (filterOptions.ClaimDirectionDateFrom != null)
                     {

@@ -221,9 +221,9 @@ namespace RegistryWeb.Controllers
             TempData["ErrorReason"] = "по указанным лицевым счетам уже имеются незавершенные исковые работы";
             return RedirectToAction("AccountsReports");
         }
-        public JsonResult AddComment(int idAccount,  string textComment)
+        public JsonResult AddComment(int idAccount,  string textComment, string path)
         {
-            return Json(dataService.AddCommentsForPaymentAccount(idAccount, textComment));
+            return Json(dataService.AddCommentsForPaymentAccount(idAccount, textComment, path));
         }
 
     }

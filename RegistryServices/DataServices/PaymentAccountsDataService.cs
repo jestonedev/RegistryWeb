@@ -1273,8 +1273,7 @@ namespace RegistryWeb.DataServices
         {
             var viewModel = new PaymentsAccountTableVM();
             var lastPayment = GetQuery().Where(r => r.IdAccount == idAccount).ToList();
-            var accounts = GetAccountIdsAssocs(lastPayment);
-            var accountIds = accounts.Select(r => r.IdAccountActual);
+            var accountIds = GetAccountIdsAssocs(lastPayment).Select(r => r.IdAccountActual);
             viewModel.Payments = (from row in registryContext.Payments.Include(r => r.PaymentAccountNavigation)
                                   where accountIds.Contains(row.IdAccount)
                                   orderby row.Date ascending
@@ -1282,6 +1281,27 @@ namespace RegistryWeb.DataServices
             viewModel.RentObjects = GetRentObjects(lastPayment);
             viewModel.LastPayment = viewModel.Payments.LastOrDefault();
 
+            var accounts = registryContext.PaymentAccounts.Where(r => accountIds.Contains(r.IdAccount)).ToList();
+            var comments = registryContext.PaymentAccountComments.Where(r => accountIds.Contains(r.IdAccount)).ToList();
+            
+            if (comments.Any())
+            {
+                viewModel.Comment = new PaymentAccountComment
+                {
+                    IdAccount = idAccount,
+                    Comment = (from row in accounts
+                                                join com in comments
+                                                   on row.IdAccount equals com.IdAccount into a
+                                                from b in a.DefaultIfEmpty()
+                                                where b != null
+                                                group new { b, row } by b.Comment into g
+                                                select comments.Select(r => r.Comment).Distinct().Count() > 1 ?
+                                                              g.Aggregate("", (acc, v) => acc + "ЛС №:" + v.row.Account + ", ").Trim(new char[] { ' ', ',' }) + ": " + g.Key
+                                                                  : g.Key)
+                           .Aggregate((x, y) => x + "\r\n" + y)
+                };
+            }
+            
             var json = registryContext.PersonalSettings
                 .SingleOrDefault(ps => ps.IdUser == user.IdUser)
                 ?.PaymentAccauntTableJson;
@@ -1444,34 +1464,53 @@ namespace RegistryWeb.DataServices
             }
         }
 
-        public bool AddCommentsForPaymentAccount(int idAccount, string comment )
+        public bool AddCommentsForPaymentAccount(int idAccount, string comment, string path )
         {
             try
             {
-                var AccountComment = registryContext.PaymentAccountComments.Where(c => c.IdAccount == idAccount).FirstOrDefault();
-               
-                if (AccountComment != null)
+                switch(path)
                 {
-                    AccountComment.Comment = comment;
-                    registryContext.PaymentAccountComments.Update(AccountComment);
-                }
-                else
-                {
-                    var Comment = new PaymentAccountComment()
+                    case ("PaymentAccountsTable"):
+                        ActionComments(idAccount, comment);
+                        registryContext.SaveChanges();
+                        break;
+                    case ("PaymentAccountsRentObjectTable"):
+                        var lastPayment = GetQuery().Where(r => r.IdAccount == idAccount).ToList();
+                        var accounts = GetAccountIdsAssocs(lastPayment).Select(c=> c.IdAccountActual).ToList();
+                        foreach(var item in accounts)
                         {
-                            IdAccount = idAccount,
-                            Comment = comment
-                        };
-                        registryContext.PaymentAccountComments.Add(Comment);
+                            ActionComments(item, comment);
+                        }
+                        registryContext.SaveChanges();
+                        break;
                 }
-                registryContext.SaveChanges();
                 return true;
             }
             catch (Exception ex)
             {
                 return false;
             }
+        }
 
+        public void ActionComments(int idAccount, string comment)
+        {
+            var AccountComment = registryContext.PaymentAccountComments
+                                                            .Where(c => c.IdAccount == idAccount)
+                                                            .FirstOrDefault();
+            if (AccountComment != null)
+            {
+                AccountComment.Comment = comment;
+                registryContext.PaymentAccountComments.Update(AccountComment);
+            }
+            else
+            {
+                var Comment = new PaymentAccountComment()
+                {
+                    IdAccount = idAccount,
+                    Comment = comment
+                };
+                registryContext.PaymentAccountComments.Add(Comment);
+            }
         }
     }
 }

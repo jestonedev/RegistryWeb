@@ -210,12 +210,15 @@ $(document).ready(function () {
         var modal = $(this).closest("#CommentModal")
         var idAccount = $("#LastPayment_IdAccount").val();
         var textComment = $(".payment-text-comment").val();
+
+        var pathName = $(location).attr('pathname');
+        var path = pathName.split('/');
         switch (typeBtn) {
             case 0:
                 $.ajax({
                     type: 'POST',
                     url: window.location.origin + '/PaymentAccounts/AddComment',
-                    data: { idAccount: idAccount, textComment: textComment },
+                    data: { idAccount: idAccount, textComment: textComment, path: path[2] },
                     success: function (data) {
                         $("#Comment").val(textComment);
                         var btnEdit = "<a href='#' id='editComment' class='form-control btn btn-success oi oi-pencil' title='Изменить'></a>";
@@ -232,7 +235,7 @@ $(document).ready(function () {
                 $.ajax({
                     type: 'POST',
                     url: window.location.origin + '/PaymentAccounts/AddComment',
-                    data: { idAccount: idAccount, textComment: textComment },
+                    data: { idAccount: idAccount, textComment: textComment, path: path[2] },
                     success: function (data) {
                         $("#Comment").val(textComment);
                         modal.modal('hide');
