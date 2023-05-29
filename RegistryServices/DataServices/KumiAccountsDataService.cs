@@ -452,9 +452,12 @@ namespace RegistryWeb.DataServices
                     IChargeEventVM currentPaymentEvent = null;
                     if (firstPayment == null && firstClaim == null)
                     {
-                        // Платежей и ПИР нет, расчитать начисление до atDate
-                        CalcPenalty(chargeVM.Date, atDate, chargeValue, out List<KumiActPeniCalcEventVM> lastPeniCalcEvents);
-                        chargeVM.Events.AddRange(lastPeniCalcEvents);
+                        // Платежей и ПИР нет, расчитать пени до atDate
+                        if (charge.IsBksCharge == 0)
+                        {
+                            CalcPenalty(chargeVM.Date, atDate, chargeValue, out List<KumiActPeniCalcEventVM> lastPeniCalcEvents);
+                            chargeVM.Events.AddRange(lastPeniCalcEvents);
+                        }
                         break;
                     } else
                     if (firstPayment != null && firstClaim == null)
@@ -484,13 +487,29 @@ namespace RegistryWeb.DataServices
                     currentPaymentEvent.Tenancy -= sum;
                     currentPaymentEvent.Penalty = 0;
                     chargeValue -= sum;
-                    CalcPenalty(chargeVM.Date, currentPaymentEvent.Date, sum, out List<KumiActPeniCalcEventVM> peniCalcEvents);
-                    allPenaltiesCalcEvents.AddRange(peniCalcEvents);
+                    if (charge.IsBksCharge == 0)
+                    {
+                        CalcPenalty(chargeVM.Date, currentPaymentEvent.Date, sum, out List<KumiActPeniCalcEventVM> peniCalcEvents);
+                        allPenaltiesCalcEvents.AddRange(peniCalcEvents);
+                    }
 
                     if (chargeValue == 0)
                         break;
                 }
-                if (isFirstCharge && charge.InputPenalty != 0)
+
+                if (charge.IsBksCharge == 1)
+                {
+                    chargeVM.IsBksCharge = true;
+                    if (charge.ChargePenalty > 0)
+                        chargeVM.Events.Add(new KumiActPeniCalcEventVM
+                        {
+                            EndDate = charge.EndDate,
+                            StartDate = charge.StartDate,
+                            Tenancy = charge.ChargeTenancy,
+                            Penalty = charge.ChargePenalty
+                        });
+                }
+                if (isFirstCharge && (charge.InputPenalty != 0 || charge.InputTenancy != 0))
                 {
                     allPenaltiesCalcEvents.Add(new KumiActPeniCalcEventVM
                     {
@@ -937,6 +956,7 @@ namespace RegistryWeb.DataServices
             while(resultChargesInfo.Where(r => r.Value > 0).Any() && resultPayments.Where(r => r.Value > 0).Any())
             {
                 var firstCharge = resultChargesInfo.Where(r => r.Value > 0).OrderBy(r => r.Date).First();
+                var dbCharge = dbCharges.Where(r => r.EndDate == firstCharge.Date).First();
                 while (firstCharge.Value > 0 && resultPayments.Where(r => r.Value > 0).Any())
                 {
                     var firstPayment = resultPayments.Where(r => r.Value > 0).OrderBy(r => r.Date).First();
@@ -952,17 +972,21 @@ namespace RegistryWeb.DataServices
                         calcSum = firstCharge.Value;
                         firstCharge.Value = 0;
                     }
-                    penalty += CalcPenalty(firstCharge.Date, firstPayment.Date, calcSum, out List<KumiActPeniCalcEventVM> peniCalcEvents);
+                    if (dbCharge.IsBksCharge != 1) // Не считать пени на начисления БКС
+                        penalty += CalcPenalty(firstCharge.Date, firstPayment.Date, calcSum, out List<KumiActPeniCalcEventVM> peniCalcEvents);
                 }
             }
 
             foreach(var charge in resultChargesInfo.Where(r => r.Value > 0))
             {
-                penalty += CalcPenalty(charge.Date, endDate.Value, charge.Value, out List<KumiActPeniCalcEventVM> peniCalcEvents);
+                var dbCharge = dbCharges.Where(r => r.EndDate == charge.Date).First();
+                if (dbCharge.IsBksCharge != 1)  // Не считать пени на начисления БКС
+                    penalty += CalcPenalty(charge.Date, endDate.Value, charge.Value, out List<KumiActPeniCalcEventVM> peniCalcEvents);
             }
 
+            // Учет итогового пени за все периоды (включая нерасчетного пени от БКС) для последующего вычитания предыдущих периодов
+            penalty += charges.Where(r => r.IsBksCharge == 1).Select(r => r.ChargePenalty + r.RecalcPenalty).Sum();
             var prevPenalty = charges.Where(r => r.EndDate < endDate).Sum(r => r.ChargePenalty + r.RecalcPenalty);
-
             return penalty- prevPenalty;
         }
 

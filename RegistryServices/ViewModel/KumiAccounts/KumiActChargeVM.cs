@@ -9,5 +9,6 @@ namespace RegistryServices.ViewModel.KumiAccounts
         public DateTime Date { get; set; }  // Период (оно же - дата начисления - EndDate)
         public decimal Value { get; set; }  // Начисление в указанном периоде
         public List<IChargeEventVM> Events { get; set; }
+        public bool IsBksCharge { get; set; }
     }
 }

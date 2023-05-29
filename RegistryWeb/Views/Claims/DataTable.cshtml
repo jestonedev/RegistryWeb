@@ -181,6 +181,28 @@
                         {
                             rentObjectsBks = Model.RentObjectsBks[item.IdAccount.Value];
                         }
+                        var isEqualAddress = false;
+                        if (rentObjectsKumi != null && rentObjectsBks != null && rentObjectsKumi.Count == rentObjectsBks.Count)
+                        {
+                            isEqualAddress = true;
+                            foreach (var rentObjectKumi in rentObjectsKumi)
+                            {
+                                var founded = false;
+                                foreach(var rentObjectBks in rentObjectsBks)
+                                {
+                                    if (rentObjectBks.Id == rentObjectKumi.Id && rentObjectBks.AddressType == rentObjectKumi.AddressType)
+                                    {
+                                        founded = true;
+                                        break;
+                                    }
+                                }
+                                if (!founded)
+                                {
+                                    isEqualAddress = false;
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     @if (item.IdAccountKumi != null)
@@ -199,8 +221,7 @@
                             }
                         </div>
                     }
-                    else
-                    if (item.IdAccount != null)
+                    @if (item.IdAccount != null && !isEqualAddress)
                     {
                         @if (rentObjectsBks != null)
                         {
@@ -212,7 +233,6 @@
                             </div>
                         }
                         else
-                       if (item.IdAccount != null)
                         {
                             <div class="row">
                                 <div class="col-auto">
@@ -275,6 +295,7 @@
 
                         @{
                             var courtClaimState = item.ClaimStates.FirstOrDefault(r => r.IdStateType == 4);
+                            var executeClaimState = item.ClaimStates.LastOrDefault(r => r.IdStateType == 5 && (r.DirectionCourtOrderBailiffsDate != null || r.RepeatedDirectionCourtOrderBailiffsDate != null));
                             var lawsuitClaimState = item.ClaimStates.LastOrDefault(r => r.IdStateType == 8);
                         }
                         @if (lawsuitClaimState != null)
@@ -287,10 +308,17 @@
                             }
                         }
                         else
-                       if (courtClaimState != null && !string.IsNullOrEmpty(courtClaimState.CourtOrderNum))
+                      if (courtClaimState != null && !string.IsNullOrEmpty(courtClaimState.CourtOrderNum))
                         {
                             <div>
                                 Номер с/п: @courtClaimState.CourtOrderNum
+                            </div>
+                        }
+                        @if (executeClaimState != null)
+                        {
+                            <div>
+                                Дата направления с/п приставам: @(executeClaimState.RepeatedDirectionCourtOrderBailiffsDate == null ? 
+                                    executeClaimState.DirectionCourtOrderBailiffsDate.Value.ToString("dd.MM.yyyy") : executeClaimState.RepeatedDirectionCourtOrderBailiffsDate.Value.ToString("dd.MM.yyyy"))
                             </div>
                         }
 
