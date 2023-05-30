@@ -316,6 +316,7 @@ namespace RegistryWeb.Controllers
 
                 if (claimsResult == null)
                     claimsResult = new List<Claim>().AsQueryable();
+                claimsResult = claimsResult.OrderByDescending(r => r.AtDate);
                 var count = claimsResult.Count();
                 if (count > 3)
                     claimsResult = claimsResult.Take(3);
@@ -333,7 +334,10 @@ namespace RegistryWeb.Controllers
                         r.AmountTenancyRecovered,
                         r.AmountPenaltiesRecovered,
                         r.StartDeptPeriod,
-                        r.EndDeptPeriod
+                        r.EndDeptPeriod,
+                        AccountCurrentBalanceTenancy = r.IdAccountKumiNavigation.CurrentBalanceTenancy,
+                        AccountCurrentBalancePenalty = r.IdAccountKumiNavigation.CurrentBalancePenalty,
+                        AccountLastChargeDate = r.IdAccountKumiNavigation.LastChargeDate
                     })
                 });
             }
@@ -341,6 +345,7 @@ namespace RegistryWeb.Controllers
             {
                 if (accountsResult == null)
                     accountsResult = new List<KumiAccount>().AsQueryable();
+                accountsResult = accountsResult.OrderByDescending(r => r.LastChargeDate);
                 var count = accountsResult.Count();
                 if (count > 3)
                     accountsResult = accountsResult.Take(3);

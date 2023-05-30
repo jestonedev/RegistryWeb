@@ -1464,52 +1464,52 @@ namespace RegistryWeb.DataServices
             }
         }
 
-        public bool AddCommentsForPaymentAccount(int idAccount, string comment, string path )
+        public bool AddCommentsForPaymentAccount(int idAccount, string comment, string path)
         {
             try
             {
                 switch(path)
                 {
-                    case ("PaymentAccountsTable"):
-                        ActionComments(idAccount, comment);
+                    case "PaymentAccountsTable":
+                        SaveComment(idAccount, comment);
                         registryContext.SaveChanges();
                         break;
-                    case ("PaymentAccountsRentObjectTable"):
+                    case "PaymentAccountsRentObjectTable":
                         var lastPayment = GetQuery().Where(r => r.IdAccount == idAccount).ToList();
                         var accounts = GetAccountIdsAssocs(lastPayment).Select(c=> c.IdAccountActual).ToList();
                         foreach(var item in accounts)
                         {
-                            ActionComments(item, comment);
+                            SaveComment(item, comment);
                         }
                         registryContext.SaveChanges();
                         break;
                 }
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
         }
 
-        public void ActionComments(int idAccount, string comment)
+        public void SaveComment(int idAccount, string comment)
         {
-            var AccountComment = registryContext.PaymentAccountComments
+            var savedComment = registryContext.PaymentAccountComments
                                                             .Where(c => c.IdAccount == idAccount)
                                                             .FirstOrDefault();
-            if (AccountComment != null)
+            if (savedComment != null)
             {
-                AccountComment.Comment = comment;
-                registryContext.PaymentAccountComments.Update(AccountComment);
+                savedComment.Comment = comment;
+                registryContext.PaymentAccountComments.Update(savedComment);
             }
             else
             {
-                var Comment = new PaymentAccountComment()
+                var newComment = new PaymentAccountComment()
                 {
                     IdAccount = idAccount,
                     Comment = comment
                 };
-                registryContext.PaymentAccountComments.Add(Comment);
+                registryContext.PaymentAccountComments.Add(newComment);
             }
         }
     }

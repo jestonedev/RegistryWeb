@@ -768,9 +768,12 @@ namespace RegistryWeb.DataServices
                                 join claimsStatesRow in registryContext.ClaimStates
                                 on row.IdClaim equals claimsStatesRow.IdClaim
                                 where claimsStatesRow.IdStateType == filterOptions.IdClaimState
-                                && claimsStatesRow.DateStartState >= filterOptions.ClaimStateDateFrom
+                                && DateComparison(
+                                    filterOptions.ClaimStateDateOp,
+                                    claimsStatesRow.DateStartState,
+                                    filterOptions.ClaimStateDateFrom,
+                                    filterOptions.ClaimStateDateTo)
                                 select row;
-
                     }
                     else
                     {
@@ -822,7 +825,7 @@ namespace RegistryWeb.DataServices
                 }
             }
 
-            if (filterOptions.ClaimStateDateFrom != null)
+            if (filterOptions.ClaimStateDateFrom != null && filterOptions.IdClaimState == null)
             {
                 query = (from row in query
                         join claimsStatesRow in registryContext.ClaimStates

@@ -159,8 +159,8 @@
 
     function buildClaimForDistribTable(claims, factCount) {
         var table = "<table class='table table-bordered mb-0 text-center'>";
-        table += "<thead><tr><th rowspan='2'></th><th rowspan='2'>ЛС</th><th rowspan='2'>Период взыскания</th><th colspan='2'>Взыскиваемая сумма</th><th colspan='2'>Взысканная сумма</th></tr>" +
-            "<tr><th>Найм</th><th>Пени</th><th>Найм</th><th>Пени</th></tr></thead><tbody>";
+        table += "<thead><tr><th rowspan='2'></th><th rowspan='2'>ЛС</th><th colspan='2'>Текущее сальдо</th><th rowspan='2'>Период взыскания</th><th colspan='2'>Взыскиваемая сумма</th><th colspan='2'>Взысканная сумма</th></tr>" +
+            "<tr><th>Найм</th><th>Пени</th><th>Найм</th><th>Пени</th><th>Найм</th><th>Пени</th></tr></thead><tbody>";
         for (var j = 0; j < claims.length; j++) {
             var claim = claims[j];
             idObject = claim.idClaim;
@@ -224,6 +224,8 @@
             table += "<td>" + accountNum
                 + " <sup><span title='" + claim.accountState + "' class='" + stateClass + "'><b>" + claim.accountState.substr(0, 1) + "</b></span></sup>"
                 + "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-payment-list-eye-btn' href='/KumiAccounts/Details?idAccount=" + claim.idAccount + "' target='_blank'></a>"
+                + "</td>"
+                + "<td>" + distributePaymentFormatSum(claim.accountCurrentBalanceTenancy) + "</td><td>" + distributePaymentFormatSum(claim.accountCurrentBalancePenalty)
                 + "</td><td>" + deptPeriod
                 + "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-payment-list-eye-btn' href='/Claims/Details?idClaim=" + claim.idClaim + "' target='_blank'></a>"
                 + "</td><td>" + distributePaymentFormatSum(amountTenancy) + "</td><td>" + distributePaymentFormatSum(amountPenalties)
@@ -231,10 +233,10 @@
             table += "</tr>";
         }
         if (claims.length < factCount) {
-            table += "<tr><td colspan='7' class='text-center'><i class='text-danger'>Всего найдено " + factCount + " совпадений. Уточните запрос</i></td></tr>";
+            table += "<tr><td colspan='9' class='text-center'><i class='text-danger'>Всего найдено " + factCount + " совпадений. Уточните запрос</i></td></tr>";
         }
         if (factCount === 0) {
-            table += "<tr><td colspan='7' class='text-center'><i class='text-danger'>Исковые работы не найдены</i></td></tr>";
+            table += "<tr><td colspan='9' class='text-center'><i class='text-danger'>Исковые работы не найдены</i></td></tr>";
         }
         table += "</tbody></table>";
         return table;
@@ -256,10 +258,10 @@
                     currentTenancy = parseFloat($(row.find("td")[3]).text().replace(",", "."));
                     break;
                 case 1:
-                    currentPenalty = parseFloat($(row.find("td")[4]).text().replace(",", "."));
-                    currentPenalty -= parseFloat($(row.find("td")[6]).text().replace(",", "."));
-                    currentTenancy = parseFloat($(row.find("td")[3]).text().replace(",", "."));
-                    currentTenancy -= parseFloat($(row.find("td")[5]).text().replace(",", "."));
+                    currentPenalty = parseFloat($(row.find("td")[6]).text().replace(",", "."));
+                    currentPenalty -= parseFloat($(row.find("td")[8]).text().replace(",", "."));
+                    currentTenancy = parseFloat($(row.find("td")[5]).text().replace(",", "."));
+                    currentTenancy -= parseFloat($(row.find("td")[7]).text().replace(",", "."));
                     break;
             }
             var distributionTenancy = Math.round(Math.max(Math.min(sumForDistribution, Math.max(currentTenancy, 0)), 0) * 100) / 100;
@@ -385,6 +387,18 @@
             modal.find("#DistributePaymentToAccount_DistributeTo").val(1).change();
             modal.find("#DistributePaymentToAccount_ClaimCourtOrderNum").val(purposeInfo.court_order);
         }
+        if (purposeInfo.address !== null) {
+            var idStreet = getIdStreetForStreetName(purposeInfo.address.street,
+                modal.find("#DistributePaymentToAccount_IdStreet option").map(function (idx, opt) {
+                    var street = $(opt).text();
+                    var idStreet = $(opt).attr("value");
+                    return { street, idStreet };
+                }));
+            modal.find("#DistributePaymentToAccount_IdStreet").val(idStreet).selectpicker('refresh');
+            modal.find("#DistributePaymentToAccount_House").val(purposeInfo.address.house);
+            modal.find("#DistributePaymentToAccount_PremisesNum").val(purposeInfo.address.premise);
+        }
+
         modal.modal('show');
         if (!isEmptyPurpose(purposeInfo)) {
             modal.find("#searchDistributePaymentToAccountModalBtn").click();
@@ -392,15 +406,28 @@
         e.preventDefault();
     });
 
+    function getIdStreetForStreetName(street, array) {
+        for (var i = 0; i < array.length; i++)
+        {
+            optStreet = array[i];
+            var optStreetParts = optStreet.street.split(',');
+            var optStreetName = optStreetParts[optStreetParts.length - 1];
+            optStreetName = optStreetName.replace('ул.', '').replace('пер.', '').replace('пр-кт.', '').replace('б-р.', '').replace('гск.', '').replace('туп.', '');
+            optStreetName = $.trim(optStreetName).toUpperCase();
+            if (optStreetName === street) return optStreet.idStreet;
+        }
+    }
+
     function isEmptyPurpose(purpose) {
-        return purpose.account === null && purpose.contract_num === null && purpose.court_order === null;
+        return purpose.account === null && purpose.contract_num === null && purpose.court_order === null && purpose.address === null;
     }
 
     function parsePurpose(purpose) {
         var purposeInfo = {
             account: null,
             contract_num: null,
-            court_order: null
+            court_order: null,
+            address: null
         };
         var match = null;
 
@@ -416,7 +443,42 @@
             purposeInfo.account = match.value[2];
         }
 
+        var addressRegex1 = /\/\/без НДС$/gmiu;
+        if (addressRegex1.test(purpose)) {
+            // Почта РФ
+            var purposeParts = purpose.split('//');
+            if (purposeParts.length >= 2) {
+                var address = purposeParts[purposeParts.length - 2];
+                purposeInfo.address = extractAddressFromString(address);
+            }
+        }
+
         return purposeInfo;
+    }
+
+    function extractAddressFromString(address) {
+        var addressParts = $.trim(address).split('.');
+        if (addressParts.length < 3) addressParts = $.trim(address).split(',');
+        if (addressParts.length < 3) return null;
+        var premise = addressParts[addressParts.length - 1];
+        var house = addressParts[addressParts.length - 2];
+        var street = null;
+        var exclusion1 = /^\(ПУСТО\)\.(.+) Ж\.Р\.[ ]?СТЕНИХА/gmiu;
+        var exclusion1Matches = address.matchAll(exclusion1);
+        while ((match = exclusion1Matches.next()).done !== true) {
+            street = $.trim(match.value[1]);
+        }
+        if (address.indexOf("К.МАРКСА") !== -1) {
+            street = "К.МАРКСА";
+        }
+        if (street === null) {
+            street = addressParts[addressParts.length - 3];
+        }
+        return {
+            street: street.replace('XX ПАРТСЪЕЗДА', 'ХХ ПАРТСЪЕЗДА'),
+            house: house,
+            premise: premise
+        };
     }
 
     $("#DistributePaymentToAccountModal").on("hide.bs.modal", function (e) {
