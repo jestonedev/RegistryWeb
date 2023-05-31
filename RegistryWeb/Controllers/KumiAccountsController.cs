@@ -218,6 +218,8 @@ namespace RegistryWeb.Controllers
                     r.IdProcess,
                     r.RegistrationDate,
                     r.RegistrationNum,
+                    Tenant = r.TenancyPersons.Where(p => p.IdKinship == 1 && p.ExcludeDate == null)
+                        .Select(p => p.Surname + " " + p.Name + (p.Patronymic!=null ? " " + p.Patronymic : "")).FirstOrDefault(),
                     AccountsInfo = accounts.Where(a => a.AccountsTenancyProcessesAssoc.Any(assoc => assoc.IdProcess == r.IdProcess))
                     .Select(a => new {
                         a.IdAccount,

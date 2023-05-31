@@ -149,8 +149,8 @@
                             <span class="text-danger">найм @Math.Round(accountChargeInfo?.TenancyValue ?? 0, 2) руб., пени @Math.Round(accountChargeInfo?.PenaltyValue ?? 0, 2) руб.</span>
                             <br />
                             @for (var i = 0; i < claimChargeInfo.Count(); i++)
-                                {
-                                    var claim = claimChargeInfo.ElementAt(i);
+                            {
+                                var claim = claimChargeInfo.ElementAt(i);
                                 <span class="text-danger">
                                     <b>
                                         Из них расп. по
@@ -199,14 +199,17 @@
                                     </div>
                                 }
 
-                                @foreach (var claim in claims.GroupBy(r => r.IdClaim)
-                                    .Select(r => new { IdClaim = r.Key,
+                                @foreach (var claim in claims.GroupBy(r => new { r.IdClaim, r.IdAccountKumi, r.Account } )
+                                  .Select(r => new { IdClaim = r.Key.IdClaim,
+                                      IdAccountKumi = r.Key.IdAccountKumi, Account = r.Key.Account,
                                       DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
                                       DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum) }))
                                 {
                                     <div class="text-danger">
-                                        <u>ИР №@claim.IdClaim:</u>
+                                        <u>ИР №@claim.IdClaim</u>
                                         <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="Claims" asp-action="Details" asp-route-idClaim="@claim.IdClaim"></a>
+                                        <u>ЛС №@claim.Account:</u>
+                                        <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@claim.IdAccountKumi"></a>
                                         <br />найм @claim.DistrubutedToTenancySum руб., пени @claim.DistrubutedToPenaltySum руб.
                                     </div>
                                 }

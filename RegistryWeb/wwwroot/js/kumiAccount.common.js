@@ -170,8 +170,11 @@
     function tenancyDeleteItem(item, forceClear) {
         if ($(".rr-tenancy-info").length === 1) {
             if (forceClear || item.find("input[id^='IdProcess_']").val() == "") {
-                item.find(".input-group-prepend button.disabled").addClass("disabled");
+                item.find(".input-group-prepend button").addClass("disabled");
                 item.find("input").val("");
+                item.find("input").attr("title", "");
+                item.find("[id^='Fraction_']").val("1,0000").attr("title", "Доля");
+                item.find('input[id^="IdAssoc"]').val("0");
                 var changeBtn = item.find("[id^='tenancyChangeBtn_']");
                 var deleteBtn = item.find("[id^='tenancyDeleteBtn_']");
                 changeBtn.css("display", "none");
@@ -258,6 +261,18 @@
                         tenancyRequisits = "№ " + regNum + " " +
                             (regDateStr !== null ? "от " + regDateStr : "");
                     }
+                    var tenancyTitle = tenancyRequisits;
+                    if (tenancy.tenant !== null) {
+                        var tenantParts = tenancy.tenant.split(' ');
+                        var tenantShort = tenantParts[0] + " ";
+                        for (var l = 1; l < tenantParts.length; l++) {
+                            tenantShort += tenantParts[l].length > 0 ? (tenantParts[l][0] + ". ") : "";
+                        }
+                        tenantShort = $.trim(tenantShort);
+                        tenancyRequisits += ", " + tenantShort;
+                        tenancyTitle += ", " + tenancy.tenant;
+                    }
+
 
                     var radioButton = "<div class='form-check'><input style='margin-top: -7px' name='tenancySelected' value='" + idProcess + "' type='radio' class='form-check-input'></div>";
                     var tenancyLink = "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn' href='/TenancyProcesses/Details?idProcess=" + idProcess + "' target='_blank'></a>";
@@ -296,7 +311,7 @@
                         table += "<tr data-id-process='" + idProcess + "' data-id-building='" + idBuilding + "' data-id-premise='" + idPremises + "'>";
                         if (j === 0) {
                             table += "<td rowspan='" + rentObjects.length + "' style='vertical-align: middle'>" + radioButton + "</td>";
-                            table += "<td rowspan='" + rentObjects.length + "' style='vertical-align: middle'><span class='rr-tenancy-requisits'>" + tenancyRequisits + "</span>" + tenancyLink + accountInfo + "</td>";
+                            table += "<td rowspan='" + rentObjects.length + "' style='vertical-align: middle'><span class='rr-tenancy-requisits' title='" + tenancyTitle +"'>" + tenancyRequisits + "</span>" + tenancyLink + accountInfo + "</td>";
                         }
                         table += "<td style='vertical-align: middle'>" + rentObjects[j].address.text + "</td>";
                         table += "</tr>";
@@ -338,6 +353,7 @@
             var tenancyElem = $($(".rr-tenancy-info")[tenancyIndex]);
             tenancyElem.find("[name$='.IdProcess']").val(tenancyInfo.idProcess);
             tenancyElem.find("[id^='TenancyRequisits_']").val(tenancyInfo.tenancyRequisits);
+            tenancyElem.find("[id^='TenancyRequisits_']").attr("title", tenancyInfo.tenancyTitle);
 
             var tenancyDetails = tenancyElem.find('[href^="/TenancyProcesses/Details"]');
             tenancyDetails.attr('href', '/TenancyProcesses/Details?idProcess=' + tenancyInfo.idProcess);
@@ -355,6 +371,7 @@
                 }
 
                 currentRentElem.find("[id^='TenancyAddress_']").val(rentObject.addressText);
+                currentRentElem.find("[id^='TenancyAddress_']").attr("title", rentObject.addressText);
 
                 
                 var addressDetails = currentRentElem.find('[href^="/Buildings/Details"]')
@@ -382,11 +399,12 @@
             return $(elem).is(':checked');
         }).val();
         var rows = $("#resultTenancyModal tr[data-id-process='" + idProcess + "']");
-        var result = { idProcess: null, tenancyRequisits: null, rentObjects: [] };
+        var result = { idProcess: null, tenancyRequisits: null, tenancyTitle: null, rentObjects: [] };
         for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
             if (i === 0) {
                 result.tenancyRequisits = $($(row).find("td")[1]).find(".rr-tenancy-requisits").text();
+                result.tenancyTitle = $($(row).find("td")[1]).find(".rr-tenancy-requisits").attr("title");
                 result.idProcess = idProcess;
             }
             result.rentObjects.push({

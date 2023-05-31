@@ -158,8 +158,8 @@ $(function () {
     });
 
 $("#TenancyProcess_RegistrationNum").on("change", function () {
-        var val = $(this).val();
-        if (val.indexOf("н") !== -1) {
+        var val = $.trim($(this).val());
+        if (val.endsWith("н") && val !== "б/н" && val !== "б\\н") {
             var now = new Date();
             var year = now.getFullYear();
             var month = now.getMonth() + 1;

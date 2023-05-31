@@ -132,7 +132,7 @@
                 }
                 <td class="align-middle">
                     <input type="checkbox" class="idCheckbox" data-id="@item.IdAccount" @Html.Raw(check) />
-                    @if (tenancyOutOfPeriod || hasActiveTenanciesAndAnul || hasNoActiveTenanciesAndActive)
+                    @if ((tenancyOutOfPeriod && item.IdState != 2) || hasActiveTenanciesAndAnul || hasNoActiveTenanciesAndActive)
                     {
                         var warning = "";
                         if (hasNoActiveTenanciesAndActive)

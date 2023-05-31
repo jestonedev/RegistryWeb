@@ -129,6 +129,29 @@
                         {
                             tenancyRequisits = "Рег. №: " + tenancyInfo[i].TenancyProcess?.IdProcess;
                         }
+
+                        var tenant = tenancyInfo[i].Tenant;
+                        var tenantSnp = "";
+                        var tenantSnpShort = "";
+                        if (tenant != null)
+                        {
+                            tenantSnp += tenant.Surname + " " + tenant.Name + (string.IsNullOrEmpty(tenant.Patronymic) ? "" : " " + tenant.Patronymic);
+                            tenantSnpShort += tenant.Surname + " "+ tenant.Name.Substring(0,1)+"." + (string.IsNullOrEmpty(tenant.Patronymic) ? "" : " " + tenant.Patronymic.Substring(0, 1) + ".");
+                        }
+                        else
+                        {
+                            tenantSnp = tenantSnpShort = "без нанимателя";
+                        }
+
+                        var tenancyTitle = tenancyRequisits;
+
+
+                        if (idProcess != null)
+                        {
+                            tenancyTitle += ", " + tenantSnp;
+                            tenancyRequisits += ", " + tenantSnpShort;
+                        }
+
                         var hideLastString = true;
                         if ((ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create) && i == 0)
                         {
@@ -138,7 +161,7 @@
                         <div class="form-row rr-tenancy-info @(((i + 1) == tenancyInfo.Count()) && hideLastString ? "d-none" : "")">
                             <input type="hidden" value="@(tenancyInfo[i].AccountAssoc != null ? tenancyInfo[i].AccountAssoc.IdAssoc : 0)" id="IdAssoc_@i" name="AccountsTenancyProcessesAssoc[@i].IdAssoc" />
                             <input type="hidden" value="@idProcess" id="IdProcess_@i" name="AccountsTenancyProcessesAssoc[@i].IdProcess" />
-                            <div class="form-group col-4">
+                            <div class="form-group col-5">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <button class="btn btn-success dropdown-toggle @(idProcess != null ? "" : "disabled")" type="button" title="Процесс найма" aria-label="Процесс найма" id="HomesBtn_@i" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -148,12 +171,13 @@
                                             <a class="dropdown-item" asp-action="Details" asp-controller="TenancyProcesses" asp-route-idProcess="@idProcess">Процесс найма</a>
                                         </div>
                                     </div>
-                                    <input name="TenancyRequisits[@i]" id="TenancyRequisits_@i" type="text" value="@tenancyRequisits" class="form-control" title="Реквизиты процесса найма" disabled />
+                                    <input name="TenancyRequisits[@i]" id="TenancyRequisits_@i" type="text" value="@tenancyRequisits" class="form-control" title="@tenancyTitle" disabled />
                                 </div>
                             </div>
                             <div class="form-group col-1">
                                 <input type="text" maxlength="6" value="@(tenancyInfo[i].AccountAssoc != null ? tenancyInfo[i].AccountAssoc.Fraction : 0.0000m)" class="form-control input-fraction" id="Fraction_@i" name="AccountsTenancyProcessesAssoc[@i].Fraction"  title="Доля"  />
                             </div>
+
                             @{
                                 if (tenancyInfo[i].RentObjects == null || !tenancyInfo[i].RentObjects.Any())
                                 {
@@ -184,8 +208,12 @@
                                     }
                                 }
                                 var address = rentObject?.Text;
+                                if (address != null)
+                                {
+                                    address = address.Replace("жилрайон.", "ж.р.");
+                                }
 
-                                <div class="form-group rr-tenancy-address col-7 @(j > 0 ? "offset-5" : "")">
+                                <div class="form-group rr-tenancy-address col-6 @(j == 0 ? "" : "offset-5")">
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <button class="btn btn-success dropdown-toggle @(idBuilding != null ? "" : "disabled")" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="HomesBtn_@i" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -196,7 +224,7 @@
                                                 <a class="dropdown-item @(idPremise == null ? "d-none" : "")" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@idPremise">Помещение</a>
                                             </div>
                                         </div>
-                                        <input name="TenancyAddress[@i]" id="TenancyAddress_@i" type="text" value="@address" class="form-control" title="Адрес" disabled />
+                                        <input name="TenancyAddress[@i]" id="TenancyAddress_@i" type="text" value="@address" class="form-control" title="@address" disabled />
                                         @if (j == 0)
                                         {
                                             @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
@@ -419,7 +447,15 @@
                                         <td class="text-center p-1 rr-charge-period-payment-tenancy">
                                             @{
                                                 var tenancyOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.TenancyValue) ?? 0m;
+                                                if (charge.IsBksCharge == 1)
+                                                {
+                                                    tenancyOnAccount = charge.PaymentTenancy;
+                                                }
                                                 var penaltyOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.PenaltyValue) ?? 0m;
+                                                if (charge.IsBksCharge == 1)
+                                                {
+                                                    penaltyOnAccount = charge.PaymentPenalty;
+                                                }
                                                 totalPaymentTenancyByAccount += tenancyOnAccount;
                                                 totalPaymentPenaltyByAccount += penaltyOnAccount;
                                             }

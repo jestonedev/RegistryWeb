@@ -135,6 +135,7 @@ namespace RegistryWeb.DataServices
                     IdClaim = r.Claim.IdClaim,
                     IdCharge = r.IdDisplayCharge ?? 0,
                     IdAccountKumi = r.Claim.IdAccountKumi,
+                    Account = r.Claim.IdAccountKumiNavigation.Account,
                     DistrubutedToPenaltySum = r.PenaltyValue,
                     DistrubutedToTenancySum = r.TenancyValue,
                     Sum = r.PenaltyValue + r.TenancyValue
