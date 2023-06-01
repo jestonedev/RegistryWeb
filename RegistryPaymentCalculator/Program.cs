@@ -22,7 +22,9 @@ namespace RegistryPaymentCalculator
                 try
                 {
                     ConsoleLogger.Log("Выборка лицевых счетов");
-                    var accounts = db.KumiAccounts.Where(r => r.IdState == 1 || r.IdState == 3);
+                    var lastChargeDate = DateTime.Now.Date;
+                    lastChargeDate = lastChargeDate.AddDays(-lastChargeDate.Day);
+                    var accounts = db.KumiAccounts.Where(r => (r.IdState == 1 || r.IdState == 3) && r.LastChargeDate < lastChargeDate);
                     ConsoleLogger.Log("Подготовка лицевых счетов");
                     var accountsPrepare = service.GetAccountsPrepareForPaymentCalculator(accounts);
                     accountsInfo = service.GetAccountInfoForPaymentCalculator(accountsPrepare);
@@ -66,6 +68,7 @@ namespace RegistryPaymentCalculator
                 var endCalcDate = DateTime.Now.Date;
                 endCalcDate = endCalcDate.AddDays(-endCalcDate.Day + 1).AddMonths(1).AddDays(-1);
 
+                var i = 0;
                 foreach (var account in accountsInfo)
                 {
                     try
@@ -88,14 +91,18 @@ namespace RegistryPaymentCalculator
                         service.UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate);
                     } catch(Exception e)
                     {
-                        ConsoleLogger.Error(string.Format("Ошибка: {0}", e.Message));
+                        var message = e.InnerException != null ? e.InnerException.Message : e.Message;
+                        ConsoleLogger.Error(string.Format("Ошибка: {0}", message));
 
                         var sender = new SmtpSender(Configuration.SmtpHost, Configuration.SmtpPort);
-                        sender.SendEmail("Ошибка во время выставления начислений",
-                            e.Message, Configuration.SmtpFrom, Configuration.SmtpErrorTo);
+                        sender.SendEmail("Ошибка во время выставления начислений по лицевому счету " + account.Account,
+                            message, Configuration.SmtpFrom, Configuration.SmtpErrorTo);
+                        
                         if (e.GetType() != typeof(ApplicationException))
                         {
-                            return;
+                            i++;
+                            if (i == 10)
+                                return;
                         }
                     }
                 }
