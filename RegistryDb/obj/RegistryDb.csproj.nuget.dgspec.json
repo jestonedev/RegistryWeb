@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {}
+    "D:\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {}
   },
   "projects": {
-    "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {
+    "D:\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
+        "projectUniqueName": "D:\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
         "projectName": "RegistryDb",
-        "projectPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
+        "projectPath": "D:\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
         "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\obj\\",
+        "outputPath": "D:\\RegistryWeb\\RegistryDb\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
