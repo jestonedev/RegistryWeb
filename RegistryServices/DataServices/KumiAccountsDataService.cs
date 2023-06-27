@@ -285,8 +285,17 @@ namespace RegistryWeb.DataServices
                     startRewriteDate = startCalcDate;
 
                 var dbChargingInfo = GetDbChargingInfo(account);
-                
-                var chargingInfo = CalcChargesInfo(account, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate.Value);
+
+                // Если было начисление на текущий или будущий период, то сохранить его при перерасчете (по-умолчанию начислеяются только закрытыие периоды)
+                var forceCalcChargeOnFutureDate = false;
+                var lastDbCharge = dbChargingInfo.OrderByDescending(r => r.EndDate).FirstOrDefault();
+                if (lastDbCharge != null && lastDbCharge.EndDate >= DateTime.Now.Date)
+                {
+                    forceCalcChargeOnFutureDate = true;
+                    endCalcDate = lastDbCharge.EndDate;
+                }
+
+                var chargingInfo = CalcChargesInfo(account, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate.Value, forceCalcChargeOnFutureDate);
                 var recalcInsertIntoCharge = new KumiCharge();
                 if (chargingInfo.Any()) recalcInsertIntoCharge = chargingInfo.Last();
 

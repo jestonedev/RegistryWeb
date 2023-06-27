@@ -31,7 +31,7 @@ namespace RegistryPaymentCalculator
                     var lastChargeDate = DateTime.Now.Date;
                     lastChargeDate = lastChargeDate.AddDays(-lastChargeDate.Day);
                     if (preLaunch) lastChargeDate = lastChargeDate.AddDays(1).AddMonths(1).AddDays(-1);
-                    var accounts = db.KumiAccounts.Where(r => (r.IdState == 1 || r.IdState == 3) && r.LastChargeDate < lastChargeDate).Take(10);
+                    var accounts = db.KumiAccounts.Where(r => (r.IdState == 1 || r.IdState == 3) && r.LastChargeDate < lastChargeDate);
                     ConsoleLogger.Log("Подготовка лицевых счетов");
                     var accountsPrepare = service.GetAccountsPrepareForPaymentCalculator(accounts);
                     accountsInfo = service.GetAccountInfoForPaymentCalculator(accountsPrepare);
