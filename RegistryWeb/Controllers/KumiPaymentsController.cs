@@ -17,7 +17,6 @@ using RegistryWeb.ViewOptions;
 using RegistryWeb.Enums;
 using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Enums;
-using RegistryServices.Models;
 using RegistryServices.Models.KumiPayments;
 
 namespace RegistryWeb.Controllers
@@ -40,6 +39,8 @@ namespace RegistryWeb.Controllers
             this.claimsDataService = claimsDataService;
             this.tenancyProcessesDataService = tenancyProcessesDataService;
             this.zipArchiveDataService = zipArchiveDataService;
+            nameIds = "idPayment";
+            nameMultimaster = "KumiPaymentReports";
         }
 
         public IActionResult Index(KumiPaymentsVM viewModel, bool isBack = false)
@@ -72,6 +73,7 @@ namespace RegistryWeb.Controllers
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
                 viewModel.FilterOptions);
+
 
             return View(vm);
         }
@@ -298,7 +300,6 @@ namespace RegistryWeb.Controllers
                     IsCurrentState = true
                 });
             }
-
 
             if (filterOptions.DistributeTo == KumiPaymentDistributeToEnum.ToClaim)
             {
@@ -669,5 +670,24 @@ namespace RegistryWeb.Controllers
                 kbkInfo = kbkInfo.ToList()
             });
         }
+
+        public IActionResult KumiPaymentReports(PageOptions pageOptions)
+        {
+
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+                return View("NotAccess");
+            var canEditBaseInfo =
+                securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) ||
+                securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal);
+            ViewBag.CanEditBaseInfo = canEditBaseInfo;
+            
+            var ids =  GetSessionIds();
+            var viewModel = dataService.GetKumiPaymentViewModelForMassReports(ids, canEditBaseInfo);
+            ViewBag.KbkDescriptions = dataService.KbkDescriptions;
+            ViewBag.Count = viewModel.Payments.Count();
+
+            return View("KumiPaymentReports", viewModel);
+        }
+
     }
 }

@@ -18,7 +18,7 @@
 
         @if (canWrite)
         {
-            <div class="form-group col-6 col-md-2 col-lg-3">
+            <div class="form-group  col-6 col-md-3 col-lg-2 " style="max-width: 20%;">
                 <div class="dropdown">
                     <button class="btn btn-success dropdown-toggle col-md-12" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Добавить платеж">
                         &#10010;
@@ -53,7 +53,7 @@
         }
         @if (Model.FilterOptions.IsModalEmpty())
         {
-            <div class="form-group col-6 col-md-3 col-lg-2">
+            <div class="form-group col-5 col-md-3 col-lg-2">
                 <a class="btn btn-block btn-secondary" href="#" id="filterModalShow">Фильтр</a>
             </div>
         }
@@ -66,19 +66,20 @@
         }
         @if (canWrite)
         {
-            <div class="form-group col-6 col-md-2 col-lg-2">
-                <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle col-md-12" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Добавить платеж">
-                        <span class="oi oi-transfer" style="font-size: 80%;"></span>
-                        <span class="d-md-none d-lg-inline">Обмен</span>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" style="padding: 0;" href="#">
-                            <label class="mb-0" style="cursor: pointer; width:100%;padding: .25rem 1.5rem;" for="UploadPaymentsFiles">Загрузить платежи из файлов ФК (bd*, vt*, zip, 7z) или БКС (xlsx)</label>
-                        </a>
-                        <a href="#" class="dropdown-item payment-ufs-download-btn">Сформировать файл с уведомлениями об уточнении платежей</a>
+            <div class="form-group col-7 col-md-3 " style="max-width: 23%;">
+                    <div class="dropdown">
+                        <button class="btn btn-success dropdown-toggle col-md-12" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-grid-three-up" style="font-size: 80%;"></span> Мастер операций
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" style="padding: 0;" href="#">
+                                <label class="mb-0" style="cursor: pointer; width:100%;padding: .25rem 1.5rem;" for="UploadPaymentsFiles">Загрузить платежи из файлов ФК (bd*, vt*, zip, 7z) или БКС (xlsx)</label>
+                            </a>
+                            <a href="#" class="dropdown-item payment-ufs-download-btn">Сформировать файл с уведомлениями об уточнении платежей</a>
+                            <a href="#" class="dropdown-item addselect">Добавить отфильтрованные платежи в форму распределения</a>
+                            <a class="dropdown-item" asp-controller="KumiPayments" asp-action="KumiPaymentReports">Перейти на форму распределения платежей</a>
+                        </div>
                     </div>
-                </div>
             </div>
         }
     </div>

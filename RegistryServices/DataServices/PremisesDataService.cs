@@ -133,8 +133,6 @@ namespace RegistryWeb.DataServices
         {
             return GetQueryIncludes(registryContext.Premises);           
         }
-
-
         private IQueryable<Premise> GetQueryFilter(IQueryable<Premise> query, PremisesListFilter filterOptions)
         {
             if (!filterOptions.IsEmpty())

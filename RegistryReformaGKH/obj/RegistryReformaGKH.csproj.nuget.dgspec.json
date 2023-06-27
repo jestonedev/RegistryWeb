@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj": {}
+    "D:\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj": {}
   },
   "projects": {
-    "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj": {
+    "D:\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
+        "projectUniqueName": "D:\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
         "projectName": "RegistryReformaGKH",
-        "projectPath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
+        "projectPath": "D:\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
         "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\obj\\",
+        "outputPath": "D:\\RegistryWeb\\RegistryReformaGKH\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
