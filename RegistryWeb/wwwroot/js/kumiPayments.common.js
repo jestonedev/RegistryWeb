@@ -98,6 +98,9 @@ $(function () {
             kbkElem.removeClass("text-danger");
         }
 
+        var kbkDescription = $(this).data('kbkDescription');
+        kbkElem.attr("title", kbkDescription);
+
         var targetCode = $(this).data('targetCode');
         var targetCodeElem = $("#TargetCode");
         targetCodeElem.val(targetCode);

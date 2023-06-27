@@ -3,6 +3,7 @@ using RegistryDb.Models.Entities.KumiAccounts;
 
 namespace RegistryPaymentsLoader.Models
 {
+    [Serializable]
     public class KumiPaymentExtract
     {
         public string Guid { get; set; }

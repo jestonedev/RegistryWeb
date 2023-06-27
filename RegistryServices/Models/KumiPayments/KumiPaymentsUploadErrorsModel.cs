@@ -6,6 +6,7 @@ using RegistryPaymentsLoader.Models;
 
 namespace RegistryServices.Models.KumiPayments
 {
+    [Serializable]
     public class KumiPaymentsUploadStateModel
     {
         public List<Tuple<KumiPayment, string>> PaymentsDicitionaryBindErrors { get; set; }

@@ -19,6 +19,8 @@ using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Enums;
 using RegistryServices.Models;
 using RegistryServices.Models.KumiPayments;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RegistryWeb.Controllers
 {
@@ -390,12 +392,19 @@ namespace RegistryWeb.Controllers
 
         }
 
-        public IActionResult ApplyMemorialOrder(int idPayment, int idOrder, string returnUrl)
+        public IActionResult ApplyMemorialOrder(int idPayment, List<int> idOrders, string returnUrl)
         {
             try
             {
-                dataService.ApplyMemorialOrderToPayment(idPayment, idOrder, out bool updatedExistsPayment);
-                if (updatedExistsPayment)
+                var updatedExistsPayment = true;
+                var redirectToList = false;
+                foreach (var idOrder in idOrders)
+                {
+                    dataService.ApplyMemorialOrderToPayment(idPayment, idOrder, out updatedExistsPayment);
+                    if (!updatedExistsPayment)
+                        redirectToList = true;
+                }
+                if (!redirectToList)
                 {
                     return Json(new
                     {
@@ -647,7 +656,7 @@ namespace RegistryWeb.Controllers
             }
             try
             {
-                var errorModel = dataService.UploadInfoFromTff(tffStrings, kumiPaymentGroupFiles);
+                var errorModel = dataService.UploadInfoFromTff(tffStrings, kumiPaymentGroupFiles);            
                 return View("UploadPaymentsResult", errorModel);
             } catch(ApplicationException e)
             {

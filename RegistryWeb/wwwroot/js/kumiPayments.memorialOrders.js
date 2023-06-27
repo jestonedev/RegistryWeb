@@ -18,11 +18,10 @@
         $(".input-decimal").each(function (idx, elem) {
             $(elem).val($(elem).val().replace(".", ","));
         });
-        var div = $('#resultMemorialOrderModal');
-        div.html("").closest('.form-row').addClass("d-none");
-        $('#errorMemorialOrderModal').html('').closest('.form-row').addClass("d-none");
-        $('#setMemorialOrderModalBtn').attr('disabled', true);
+        var createNewPaymentAction = $('#setMemorialOrderModalBtn').text() === "Создать";
+        clearMemorialOrderModal();
         $('#searchMemorialOrderModalBtn').text('Ищем...').attr('disabled', true);
+        var div = $('#resultMemorialOrderModal');
         $.ajax({
             async: true,
             type: 'POST',
@@ -52,7 +51,7 @@
                     var sum = memorialOrder.sumZach;
                     var kbk = memorialOrder.kbk;
 
-                    var radioButton = "<div class='form-check'><input style='margin-top: -7px' name='MemorialOrder_IdOrder' value='" + idOrder + "' type='radio' class='form-check-input'></div>";
+                    var radioButton = "<div class='form-check'><input style='margin-top: -7px' name='MemorialOrder_IdOrder' value='" + idOrder + "' type='" + (createNewPaymentAction ? "radio" : "checkbox") + "' class='form-check-input'></div>";
 
                     
                     table += "<tr>";
@@ -76,7 +75,7 @@
         e.preventDefault();
     }
 
-    $("#resultMemorialOrderModal").on('click', "[name='MemorialOrder_IdOrder'][type='radio']", function (e) {
+    $("#resultMemorialOrderModal").on('click', "[name='MemorialOrder_IdOrder'][type='radio'],[name='MemorialOrder_IdOrder'][type='checkbox']", function (e) {
         if ($(this).is(":checked")) {
             $("#setMemorialOrderModalBtn").attr('disabled', false);
         }
@@ -91,7 +90,7 @@
         $('#setMemorialOrderModalBtn').text('Сохраняем...').attr('disabled', true);
         var data = {
             "IdPayment": modal.find("#MemorialOrder_IdPayment").val(),
-            "IdOrder": $("[name='MemorialOrder_IdOrder']:checked").val(),
+            "IdOrders": $("[name='MemorialOrder_IdOrder']:checked").map(function (idx, elem) { return $(elem).val(); }).toArray(),
             "ReturnUrl": modal.find("#MemorialOrder_ReturnUrl").val()
         };
         var url = window.location.origin + '/KumiPayments/ApplyMemorialOrder';
@@ -128,7 +127,7 @@
         var idPayment = $(this).data("idPayment");
         $("#MemorialOrderModalForm").find("#MemorialOrder_IdPayment").val(idPayment);
         var modal = $("#MemorialOrderModal");
-        modal.find("input[type='text'], input[type='date']").prop("disabled", false);
+        clearMemorialOrderModal();
         modal.find("#setMemorialOrderModalBtn").text("Привязать");
         modal.modal('show');
         e.preventDefault();
@@ -136,9 +135,18 @@
 
     $(".rr-add-payment-by-memorial-order").on("click", function (e) {
         var modal = $("#MemorialOrderModal");
-        modal.find("input[type='text'], input[type='date']").prop("disabled", false);
+        clearMemorialOrderModal();
         modal.find("#setMemorialOrderModalBtn").text("Создать");
         modal.modal('show');
         e.preventDefault();
     });
+
+    function clearMemorialOrderModal() {
+        var modal = $("#MemorialOrderModal");
+        var div = $('#resultMemorialOrderModal');
+        div.html("").closest('.form-row').addClass("d-none");
+        $('#errorMemorialOrderModal').html('').closest('.form-row').addClass("d-none");
+        modal.find("input[type='text'], input[type='date']").prop("disabled", false);
+        $('#setMemorialOrderModalBtn').attr('disabled', true);
+    }
 });

@@ -1,7 +1,8 @@
 {
   "profiles": {
     "RegistryPaymentCalculator": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "--pre-launch"
     }
   }
 }

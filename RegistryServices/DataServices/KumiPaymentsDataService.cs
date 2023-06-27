@@ -23,6 +23,8 @@ using RegistryDb.Models.Entities.RegistryObjects.Kladr;
 using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Enums;
 using RegistryServices.Models.KumiPayments;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RegistryWeb.DataServices
 {
@@ -68,6 +70,12 @@ namespace RegistryWeb.DataServices
 
             UploadPayments(payments, group, extracts, loadState);
             UploadMemorialOrders(memorialOrders, group, loadState);
+
+            var loadStateSerializeObject = JsonSerializer.Serialize(loadState, typeof(KumiPaymentsUploadStateModel), new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+            });
+            group.Log = loadStateSerializeObject;
 
             registryContext.SaveChanges();
 
@@ -396,16 +404,6 @@ namespace RegistryWeb.DataServices
 
             if ((payment.PaymentCharges != null && payment.PaymentCharges.Any()) || (payment.PaymentClaims != null && payment.PaymentClaims.Any()))
                 throw new ApplicationException("Платеж распределен. Для привязки мемориального ордера необходимо отменить распределение платежа");
-
-            if (payment.Guid == null)
-            {
-                payment.Guid = mo.Guid;
-            }
-
-            if (payment.Guid != mo.Guid)
-                throw new ApplicationException(
-                    string.Format("Глобальный идентификатор платежа {0} не соответсвуют глобальному идентификатору платежного документа в мемориальном ордере {1}", 
-                    payment.Guid, mo.Guid));
 
             var idParentPayment = payment.IdPayment;
 

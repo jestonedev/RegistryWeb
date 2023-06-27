@@ -13,6 +13,12 @@ namespace RegistryPaymentCalculator
     {
         static void Main(string[] args)
         {
+            var preLaunch = false;
+            foreach(var arg in args)
+            {
+                if (arg == "--pre-launch") preLaunch = true;
+            }
+
             var connectionString = string.Format(Configuration.ConnectionString, Configuration.DbName);
 
             using (var db = new RegistryContext(connectionString, Configuration.DbName))
@@ -24,7 +30,8 @@ namespace RegistryPaymentCalculator
                     ConsoleLogger.Log("Выборка лицевых счетов");
                     var lastChargeDate = DateTime.Now.Date;
                     lastChargeDate = lastChargeDate.AddDays(-lastChargeDate.Day);
-                    var accounts = db.KumiAccounts.Where(r => (r.IdState == 1 || r.IdState == 3) && r.LastChargeDate < lastChargeDate);
+                    if (preLaunch) lastChargeDate = lastChargeDate.AddDays(1).AddMonths(1).AddDays(-1);
+                    var accounts = db.KumiAccounts.Where(r => (r.IdState == 1 || r.IdState == 3) && r.LastChargeDate < lastChargeDate).Take(10);
                     ConsoleLogger.Log("Подготовка лицевых счетов");
                     var accountsPrepare = service.GetAccountsPrepareForPaymentCalculator(accounts);
                     accountsInfo = service.GetAccountInfoForPaymentCalculator(accountsPrepare);
@@ -80,7 +87,7 @@ namespace RegistryPaymentCalculator
 
                         startRewriteDate = service.CorrectStartRewriteDate(startRewriteDate, startCalcDate.Value, dbChargingInfo);
 
-                        var chargingInfo = service.CalcChargesInfo(account, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate);
+                        var chargingInfo = service.CalcChargesInfo(account, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate, preLaunch);
                         var recalcInsertIntoCharge = new KumiCharge();
                         if (chargingInfo.Any())
                         {
