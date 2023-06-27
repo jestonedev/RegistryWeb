@@ -1,6 +1,4 @@
 ﻿@using RegistryWeb.Extensions;
-@using RegistryWeb.ViewOptions;
-@using RegistryWeb.SecurityServices;
 @using RegistryDb.Models.Entities.KumiAccounts;
 @using RegistryServices.Models.KumiPayments;
 @model RegistryServices.ViewModel.KumiAccounts.KumiPaymentsVM;
@@ -8,12 +6,9 @@
     Context.Session.Set("Controller", "KumiPayments");
     Context.Session.Set("Action", "KumiPaymentReports");
 
-    ViewData["Title"] = "Форма распределения платежей";
+    ViewData["Title"] = "Форма массового распределения платежей";
     var kbkDescriptions = (List<KumiKbkDescription>)ViewBag.KbkDescriptions;
     var text = "Количество записей: " + ViewBag.Count;
-    //  var canEdit = (bool)ViewData["CanEditBaseInfo"];
-    // var canReadTenancy = (bool)ViewData["CanReadTenancyInfo"];
-    // var errorPremises = (List<Premise>)ViewData["ErrorPremises"];
 }
 
 <div class="col status"></div>
@@ -31,8 +26,8 @@
         <a class="form-control btn btn-primary" asp-controller="KumiPayments" asp-action="ClearSessionIds">Очистить</a>
     </div>
 
-    <div class="form-group col-md-3 col-lg-3">
-        <a class="form-control btn btn-warning" asp-controller="KumiPayments" asp-action="">Распределить</a>
+    <div class="form-group col-md-6">
+        <a class="form-control btn btn-warning disabled" asp-controller="KumiPayments" asp-action="">Распределить платежи</a>
     </div>
 </div>
 
@@ -41,7 +36,7 @@
         <tr>
             <th>Платеж</th>
             <th>Назначение платежа</th>
-            <th>Информация распределения</th>
+            <th>Информация о распределении</th>
             <th width="100px"></th>
         </tr>
     </thead>
@@ -108,7 +103,7 @@
                         }
                     }
                     else
-               if (Model.FilterOptions.IdClaim != null)
+                    if (Model.FilterOptions.IdClaim != null)
                     {
                         <br />
                         var claimChargeInfo = claims.Where(r => r.IdPayment == item.IdPayment && r.IdClaim == Model.FilterOptions.IdClaim)
