@@ -680,22 +680,18 @@ namespace RegistryWeb.Controllers
             });
         }
 
-        public IActionResult KumiPaymentReports(PageOptions pageOptions)
+        public IActionResult PaymentsMassDistributeForm()
         {
-
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+            if (!securityService.HasPrivilege(Privileges.AccountsReadWrite))
                 return View("NotAccess");
-            var canEditBaseInfo =
-                securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) ||
-                securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal);
-            ViewBag.CanEditBaseInfo = canEditBaseInfo;
             
             var ids =  GetSessionIds();
-            var viewModel = dataService.GetKumiPaymentViewModelForMassReports(ids, canEditBaseInfo);
+            var viewModel = dataService.GetKumiPaymentViewModelForMassDistribution(ids);
             ViewBag.KbkDescriptions = dataService.KbkDescriptions;
+            ViewBag.KladrStreets = dataService.Streets;
             ViewBag.Count = viewModel.Payments.Count();
 
-            return View("KumiPaymentReports", viewModel);
+            return View("PaymentsMassDistributeForm", viewModel);
         }
 
     }

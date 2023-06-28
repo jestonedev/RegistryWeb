@@ -1278,15 +1278,15 @@ namespace RegistryWeb.DataServices
         public List<KumiAccountState> AccountStates { get => registryContext.KumiAccountStates.ToList(); }
         public List<ClaimStateType> ClaimStateTypes { get => registryContext.ClaimStateTypes.ToList(); }
 
-        public KumiPaymentsVM GetKumiPaymentViewModelForMassReports(List<int> ids,  bool canEditBaseInfo)
+        public KumiPaymentsVM GetKumiPaymentViewModelForMassDistribution(List<int> ids)
         {
             var viewModel = InitializeViewModel(null,null, null);
-            viewModel.Payments = GetPaymentsForMassReports(ids).ToList();
+            viewModel.Payments = GetPaymentsForMassDistribution(ids).ToList();
             viewModel.DistributionInfoToObjects = GetDistributionInfoToObjects(viewModel.Payments.Select(r => r.IdPayment).ToList());
             return viewModel;
         }
 
-        public IQueryable<KumiPayment> GetPaymentsForMassReports(List<int> ids)
+        public IQueryable<KumiPayment> GetPaymentsForMassDistribution(List<int> ids)
         {
             return registryContext.KumiPayments
                 .Where(b => ids.Contains(b.IdPayment));

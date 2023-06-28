@@ -1,4 +1,104 @@
-﻿$(function () {
+﻿function parsePurpose(purpose) {
+    var purposeInfo = {
+        account: null,
+        contract_num: null,
+        court_order: null,
+        address: null
+    };
+    var match = null;
+
+    var courtOrderRegex = /(ИД)[ ]*([0-9][-][0-9]{1,6}[ ]?[\/][ ]?([0-9]{4}|[0-9]{2}))/gmiu;
+    var courtOrderMatches = purpose.matchAll(courtOrderRegex);
+    while ((match = courtOrderMatches.next()).done !== true) {
+        purposeInfo.court_order = match.value[2];
+    }
+    var accountRegex = /ЛИЦ(\.?|ЕВОЙ)?[ ]+СЧЕТ[ ]*[:]?[ ]*([0-9]{6,})/gmiu;
+    var accountMatches = purpose.matchAll(accountRegex);
+    while ((match = accountMatches.next()).done !== true) {
+        purposeInfo.account = match.value[2];
+    }
+
+    var addressRegex1 = /\/\/без НДС$/gmiu;
+    if (addressRegex1.test(purpose)) {
+        // Почта РФ
+        var purposeParts = purpose.split('//');
+        if (purposeParts.length >= 2) {
+            var address = purposeParts[purposeParts.length - 2];
+            purposeInfo.address = extractAddressFromString(address);
+        }
+    }
+
+    return purposeInfo;
+}
+
+function extractAddressFromString(address) {
+    var addressParts = $.trim(address).split('.');
+    if (addressParts.length < 3) addressParts = $.trim(address).split(',');
+    if (addressParts.length < 3) return null;
+    var premise = addressParts[addressParts.length - 1];
+    var house = addressParts[addressParts.length - 2];
+    var street = null;
+    var exclusion1 = /^\(ПУСТО\)\.(.+) Ж\.Р\.[ ]?СТЕНИХА/gmiu;
+    var exclusion1Matches = address.matchAll(exclusion1);
+    while ((match = exclusion1Matches.next()).done !== true) {
+        street = $.trim(match.value[1]);
+    }
+    if (address.indexOf("К.МАРКСА") !== -1) {
+        street = "К.МАРКСА";
+    }
+    if (street === null) {
+        street = addressParts[addressParts.length - 3];
+    }
+    return {
+        street: street.replace('XX ПАРТСЪЕЗДА', 'ХХ ПАРТСЪЕЗДА'),
+        house: house,
+        premise: premise
+    };
+}
+
+function isEmptyPurpose(purpose) {
+    return purpose.account === null && purpose.contract_num === null && purpose.court_order === null && purpose.address === null;
+}
+
+function claimDeptPeriodsToStr(claim) {
+    var startDeptPeriodStr = null;
+    if (claim.startDeptPeriod !== null) {
+        var startDeptPeriod = new Date(claim.startDeptPeriod);
+        year = startDeptPeriod.getFullYear();
+        month = startDeptPeriod.getMonth() + 1;
+        day = startDeptPeriod.getDate();
+        startDeptPeriodStr = (day < 10 ? "0" + day : day) + "." + (month < 10 ? "0" + month : month) + "." + year;
+    }
+
+    var endDeptPeriodStr = null;
+    if (claim.endDeptPeriod !== null) {
+        var endDeptPeriod = new Date(claim.endDeptPeriod);
+        year = endDeptPeriod.getFullYear();
+        month = endDeptPeriod.getMonth() + 1;
+        day = endDeptPeriod.getDate();
+        endDeptPeriodStr = (day < 10 ? "0" + day : day) + "." + (month < 10 ? "0" + month : month) + "." + year;
+    }
+
+    var deptPeriod = "";
+    if (startDeptPeriodStr !== null) {
+        deptPeriod = "с " + startDeptPeriodStr;
+    }
+    if (startDeptPeriodStr !== null && endDeptPeriodStr !== null) {
+        deptPeriod += " ";
+    }
+    if (endDeptPeriodStr !== null) {
+        deptPeriod += "по " + endDeptPeriodStr;
+    }
+    return deptPeriod;
+}
+
+function distributePaymentFormatSum(sum) {
+    var sumParts = sum.toString().replace(".", ",").split(',');
+    if (sumParts.length === 1) return sumParts[0] + ",00";
+    return sumParts[0] + "," + sumParts[1].padEnd(2, '0');
+}
+
+$(function () {
     $("#DistributePaymentToAccount_IdRegion").on('change', distributePaymentToAccountModalChange);
 
     function distributePaymentToAccountModalChange(e) {
@@ -173,34 +273,8 @@
             if (amountTenancyRecovered === null) amountTenancyRecovered = 0;
             var amountPenaltiesRecovered = claim.amountPenaltiesRecovered;
             if (amountPenaltiesRecovered === null) amountPenaltiesRecovered = 0;
-            var startDeptPeriodStr = null;
-            if (claim.startDeptPeriod !== null) {
-                var startDeptPeriod = new Date(claim.startDeptPeriod);
-                year = startDeptPeriod.getFullYear();
-                month = startDeptPeriod.getMonth() + 1;
-                day = startDeptPeriod.getDate();
-                startDeptPeriodStr = (day < 10 ? "0" + day : day) + "." + (month < 10 ? "0" + month : month) + "." + year;
-            }
 
-            var endDeptPeriodStr = null;
-            if (claim.endDeptPeriod !== null) {
-                var endDeptPeriod = new Date(claim.endDeptPeriod);
-                year = endDeptPeriod.getFullYear();
-                month = endDeptPeriod.getMonth() + 1;
-                day = endDeptPeriod.getDate();
-                endDeptPeriodStr = (day < 10 ? "0" + day : day) + "." + (month < 10 ? "0" + month : month) + "." + year;
-            }
-
-            var deptPeriod = "";
-            if (startDeptPeriodStr !== null) {
-                deptPeriod = "с " + startDeptPeriodStr;
-            }
-            if (startDeptPeriodStr !== null && endDeptPeriodStr !== null) {
-                deptPeriod += " ";
-            }
-            if (endDeptPeriodStr !== null) {
-                deptPeriod += "по " + endDeptPeriodStr;
-            }
+            var deptPeriod = claimDeptPeriodsToStr(claim);
 
             stateClass = "";
             switch (claim.idAccountState) {
@@ -265,7 +339,7 @@
                     break;
             }
             var distributionTenancy = Math.round(Math.max(Math.min(sumForDistribution, Math.max(currentTenancy, 0)), 0) * 100) / 100;
-            var distributionPenalty = Math.min(Math.round((sumForDistribution - distributionTenancy) * 100) / 100, currentPenalty);
+            var distributionPenalty = Math.max(Math.min(Math.round((sumForDistribution - distributionTenancy) * 100) / 100, currentPenalty), 0);
             distributionTenancy = Math.round((sumForDistribution - distributionPenalty)*100)/100;
             $("#DistributePaymentToAccount_TenancySum").val((distributionTenancy + "").replace(".", ","));
             $("#DistributePaymentToAccount_PenaltySum").val((distributionPenalty + "").replace(".", ","));
@@ -307,12 +381,6 @@
         });
 
         e.preventDefault();
-    }
-
-    function distributePaymentFormatSum(sum) {
-        var sumParts = sum.toString().replace(".", ",").split(',');
-        if (sumParts.length === 1) return sumParts[0] + ",00";
-        return sumParts[0] + "," + sumParts[1].padEnd(2, '0');
     }
 
     $("#DistributePaymentToAccount_TenancySum, #DistributePaymentToAccount_PenaltySum").on("change", function () {
@@ -416,69 +484,6 @@
             optStreetName = $.trim(optStreetName).toUpperCase();
             if (optStreetName === street) return optStreet.idStreet;
         }
-    }
-
-    function isEmptyPurpose(purpose) {
-        return purpose.account === null && purpose.contract_num === null && purpose.court_order === null && purpose.address === null;
-    }
-
-    function parsePurpose(purpose) {
-        var purposeInfo = {
-            account: null,
-            contract_num: null,
-            court_order: null,
-            address: null
-        };
-        var match = null;
-
-        var courtOrderRegex = /(ИД)[ ]*([0-9][-][0-9]{1,6}[ ]?[\/][ ]?([0-9]{4}|[0-9]{2}))/gmiu;
-        var courtOrderMatches = purpose.matchAll(courtOrderRegex);
-        while ((match = courtOrderMatches.next()).done !== true)
-        {
-            purposeInfo.court_order = match.value[2];
-        }
-        var accountRegex = /ЛИЦ(\.?|ЕВОЙ)?[ ]+СЧЕТ[ ]*[:]?[ ]*([0-9]{6,})/gmiu;
-        var accountMatches = purpose.matchAll(accountRegex);
-        while ((match = accountMatches.next()).done !== true) {
-            purposeInfo.account = match.value[2];
-        }
-
-        var addressRegex1 = /\/\/без НДС$/gmiu;
-        if (addressRegex1.test(purpose)) {
-            // Почта РФ
-            var purposeParts = purpose.split('//');
-            if (purposeParts.length >= 2) {
-                var address = purposeParts[purposeParts.length - 2];
-                purposeInfo.address = extractAddressFromString(address);
-            }
-        }
-
-        return purposeInfo;
-    }
-
-    function extractAddressFromString(address) {
-        var addressParts = $.trim(address).split('.');
-        if (addressParts.length < 3) addressParts = $.trim(address).split(',');
-        if (addressParts.length < 3) return null;
-        var premise = addressParts[addressParts.length - 1];
-        var house = addressParts[addressParts.length - 2];
-        var street = null;
-        var exclusion1 = /^\(ПУСТО\)\.(.+) Ж\.Р\.[ ]?СТЕНИХА/gmiu;
-        var exclusion1Matches = address.matchAll(exclusion1);
-        while ((match = exclusion1Matches.next()).done !== true) {
-            street = $.trim(match.value[1]);
-        }
-        if (address.indexOf("К.МАРКСА") !== -1) {
-            street = "К.МАРКСА";
-        }
-        if (street === null) {
-            street = addressParts[addressParts.length - 3];
-        }
-        return {
-            street: street.replace('XX ПАРТСЪЕЗДА', 'ХХ ПАРТСЪЕЗДА'),
-            house: house,
-            premise: premise
-        };
     }
 
     $("#DistributePaymentToAccountModal").on("hide.bs.modal", function (e) {
