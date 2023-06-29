@@ -75,7 +75,6 @@ namespace RegistryWeb.DataServices
             {
                 ReferenceHandler = ReferenceHandler.Preserve,
             });
-            group.Log = loadStateSerializeObject;
 
             registryContext.SaveChanges();
 

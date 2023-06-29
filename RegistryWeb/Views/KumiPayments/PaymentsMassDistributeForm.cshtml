@@ -23,7 +23,7 @@
 <h4 class="mb-3">@text</h4>
 
 <div class="d-none">
-    <select id="KladrStreetsForSearchIdByName" asp-items="@(new SelectList((List<KladrStreet>)ViewData["KladrStreets"], "IdStreet", "StreetName"))"></select>
+    <select id="KladrStreetsForSearchIdByName" asp-items="@(new SelectList((List<KladrStreet>)ViewData["Streets"], "IdStreet", "StreetName"))"></select>
 </div>
 
 <div class="form-row">
@@ -72,13 +72,13 @@
                             }
                             <div class="rr-payment-distribution-sum-details">
                                 @foreach (var account in accounts.GroupBy(r => new { r.IdAccount, r.Account })
-                              .Select(r => new
-                              {
-                                  r.Key.Account,
-                                  r.Key.IdAccount,
-                                  DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
-                                  DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum)
-                              }))
+                             .Select(r => new
+                             {
+                                 r.Key.Account,
+                                 r.Key.IdAccount,
+                                 DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
+                                 DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum)
+                             }))
                                 {
                                     <div class="text-danger">
                                         <u>ЛС №@account.Account:</u>
@@ -88,14 +88,14 @@
                                 }
 
                                 @foreach (var claim in claims.GroupBy(r => new { r.IdClaim, r.IdAccountKumi, r.Account })
-                          .Select(r => new
-                          {
-                              IdClaim = r.Key.IdClaim,
-                              IdAccountKumi = r.Key.IdAccountKumi,
-                              Account = r.Key.Account,
-                              DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
-                              DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum)
-                          }))
+                         .Select(r => new
+                         {
+                             IdClaim = r.Key.IdClaim,
+                             IdAccountKumi = r.Key.IdAccountKumi,
+                             Account = r.Key.Account,
+                             DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
+                             DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum)
+                         }))
                                 {
                                     <div class="text-danger">
                                         <u>ИР №@claim.IdClaim</u>
@@ -116,7 +116,7 @@
                         }
                         @if (!string.IsNullOrEmpty(item.NumDocument) || item.DateDocument != null)
                         {
-                            <div>
+                            <div class="rr-payment-doc-requisits">
                                 <b>@(isPl ? "Распоряжение" : "Платежный документ"):</b>
                                 @if (!string.IsNullOrEmpty(item.NumDocument))
                                 {
@@ -197,7 +197,7 @@
 
                                     <div class="input-group">
                                         <div class="input-group-prepend">
-                                            <button class="btn btn-outline-secondary rr-distrib-to-payment-sum-lefovers" type="button">
+                                            <button class="btn btn-outline-secondary rr-distrib-to-penalty-sum-lefovers" type="button">
                                                 <span class="oi oi-action-redo"></span>
                                             </button>
                                         </div>
@@ -226,6 +226,8 @@
 
     </tbody>
 </table>
+
+<partial name="PaymentModals" />
 
 @section Scripts {
     <script src="~/js/kumiPayments.distributeToAccount.js" asp-append-version="true"></script>

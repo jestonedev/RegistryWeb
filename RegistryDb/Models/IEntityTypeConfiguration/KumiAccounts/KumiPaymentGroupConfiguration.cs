@@ -36,10 +36,6 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
-            builder.Property(e => e.Log)
-                .HasColumnName("log")
-                .IsUnicode(false);
-
             builder.HasMany(e => e.PaymentGroupFiles)
                 .WithOne(e => e.PaymentGroup)
                 .HasForeignKey(e => e.IdGroup);

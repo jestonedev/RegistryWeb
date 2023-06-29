@@ -688,7 +688,10 @@ namespace RegistryWeb.Controllers
             var ids =  GetSessionIds();
             var viewModel = dataService.GetKumiPaymentViewModelForMassDistribution(ids);
             ViewBag.KbkDescriptions = dataService.KbkDescriptions;
-            ViewBag.KladrStreets = dataService.Streets;
+            ViewBag.Regions = dataService.Regions;
+            ViewBag.Streets = dataService.Streets;
+            ViewBag.ClaimStateTypes = dataService.ClaimStateTypes;
+            ViewBag.AccountStates = dataService.AccountStates;
             ViewBag.Count = viewModel.Payments.Count();
 
             return View("PaymentsMassDistributeForm", viewModel);

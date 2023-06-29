@@ -17,12 +17,12 @@
             var idStreetElem = $("#KladrStreetsForSearchIdByName");
             var idStreet = null;
             if (purposeInfo.address !== null && purposeInfo.address.street !== null) {
-                var foundedOptions = idStreetElem.find("option").filter(function (idx, elem) {
-                    return $(elem).text() === purposeInfo.address.street;
-                });
-                if (foundedOptions.length > 0) {
-                    idStreet = foundedOptions[0].attr("value");
-                }
+                idStreet = getIdStreetForStreetName(purposeInfo.address.street,
+                    idStreetElem.find("option").map(function (idx, opt) {
+                        var street = $(opt).text();
+                        var idStreet = $(opt).attr("value");
+                        return { street, idStreet };
+                    }));
             }
             $.ajax({
                 async: true,
@@ -46,55 +46,7 @@
                         notFoundDistribObjectByPurpose(paymentRow, "Найдено более одного совпадения", "Выберите лицевой счет или ПИР для распределния платежа");
                     }
                     if (result.count === 1) {
-                        $(paymentRow).find(".rr-payment-distribution-details-loader").addClass("d-none");
-                        $(paymentRow).find(".rr-payment-distribution-object-info").removeClass("text-danger").removeClass("d-none");
-                        $(paymentRow).find(".rr-payment-distribution-object-info").find(".rr-control-change-object, .rr-control-delete-object").removeClass("d-none");
-                        $(paymentRow).find(".rr-payment-distribution-object-info").find(".rr-control-add-object").addClass("d-none");
-                        $(paymentRow).find(".rr-payment-distribution-sums-wrapper").removeClass("d-none");
-
-                        var sum = $(paymentRow).data("paymentSum");
-                        sum = (sum + "").replace(",", ".");
-                        sum = parseFloat(sum);
-
-                        var sumPosted = $(paymentRow).data("paymentSumPosted");
-                        sumPosted = (sumPosted + "").replace(",", ".");
-                        sumPosted = parseFloat(sumPosted);
-
-                        var sumForDistribution = sum - sumPosted;
-                        var currentPenalty = 0;
-                        var currentTenancy = 0;
-
-                        if (result.claims !== undefined) {
-                            var claim = result.claims[0];
-
-                            var html = buildClaimForMassDistributionFormInfo(claim);
-                            $(paymentRow).find(".rr-payment-distribution-object-info .rr-payment-distribution-object-caption").html(html);
-                                               
-                            currentPenalty = claim.amountPenalties === undefined ? 0 : claim.amountPenalties;
-                            currentPenalty -= claim.amountPenaltiesRecovered === null ? 0 : claim.amountPenaltiesRecovered;
-                            currentTenancy = claim.amountTenancy === undefined ? 0 : claim.amountTenancy;
-                            currentTenancy -= claim.amountTenancyRecovered === null ? 0 : claim.amountTenancyRecovered;
-
-                            $(paymentRow).data("idClaim", claim.idClaim);
-                            $(paymentRow).data("state", "selected");
-                        } 
-                        if (result.accounts !== undefined) {
-                            var account = result.accounts[0];
-                            html = buildAccountForMassDistributionFormInfo(account);
-                            $(paymentRow).find(".rr-payment-distribution-object-info .rr-payment-distribution-object-caption").html(html);
-
-                            currentPenalty = account.currentBalancePenalty === null ? 0 : account.currentBalancePenalty;
-                            currentTenancy = account.currentBalanceTenancy === null ? 0 : account.currentBalanceTenancy;
-
-                            $(paymentRow).data("idAccount", account.idAccount);
-                            $(paymentRow).data("state", "selected");
-                        }
-
-                        var distributionTenancy = Math.round(Math.max(Math.min(sumForDistribution, Math.max(currentTenancy, 0)), 0) * 100) / 100;
-                        var distributionPenalty = Math.max(Math.min(Math.round((sumForDistribution - distributionTenancy) * 100) / 100, currentPenalty), 0);
-                        distributionTenancy = Math.round((sumForDistribution - distributionPenalty) * 100) / 100;
-                        $(paymentRow).find(".rr-distribution-tenancy-sum").val((distributionTenancy + "").replace(".", ","));
-                        $(paymentRow).find(".rr-distribution-penalty-sum").val((distributionPenalty + "").replace(".", ","));
+                        buildMassDistributionFormInfo(paymentRow, result);
                     }
 
                     if (paymentRows.length > 0) {
@@ -103,6 +55,60 @@
                 }
             });
         }
+    }
+
+    function buildMassDistributionFormInfo(paymentRow, result, forceTenancySum, forcePenaltySum) {
+        $(paymentRow).find(".rr-payment-distribution-result-info").addClass("d-none");
+        $(paymentRow).find(".rr-payment-distribution-details-loader").addClass("d-none");
+        $(paymentRow).find(".rr-payment-distribution-object-info").removeClass("text-danger").removeClass("d-none");
+        $(paymentRow).find(".rr-payment-distribution-object-info").find(".rr-control-change-object, .rr-control-delete-object").removeClass("d-none");
+        $(paymentRow).find(".rr-payment-distribution-object-info").find(".rr-control-add-object").addClass("d-none");
+        $(paymentRow).find(".rr-payment-distribution-sums-wrapper").removeClass("d-none");
+
+        var sum = $(paymentRow).data("paymentSum");
+        sum = (sum + "").replace(",", ".");
+        sum = parseFloat(sum);
+
+        var sumPosted = $(paymentRow).data("paymentSumPosted");
+        sumPosted = (sumPosted + "").replace(",", ".");
+        sumPosted = parseFloat(sumPosted);
+
+        var sumForDistribution = sum - sumPosted;
+        var currentPenalty = 0;
+        var currentTenancy = 0;
+
+        if (result.claims !== undefined) {
+            var claim = result.claims[0];
+
+            var html = buildClaimForMassDistributionFormInfo(claim);
+            $(paymentRow).find(".rr-payment-distribution-object-info .rr-payment-distribution-object-caption").html(html);
+
+            currentPenalty = claim.amountPenalties === undefined ? 0 : claim.amountPenalties;
+            currentPenalty -= claim.amountPenaltiesRecovered === null ? 0 : claim.amountPenaltiesRecovered;
+            currentTenancy = claim.amountTenancy === undefined ? 0 : claim.amountTenancy;
+            currentTenancy -= claim.amountTenancyRecovered === null ? 0 : claim.amountTenancyRecovered;
+
+            $(paymentRow).data("idClaim", claim.idClaim);
+            $(paymentRow).data("state", "selected");
+        }
+        if (result.accounts !== undefined) {
+            var account = result.accounts[0];
+            html = buildAccountForMassDistributionFormInfo(account);
+            $(paymentRow).find(".rr-payment-distribution-object-info .rr-payment-distribution-object-caption").html(html);
+
+            currentPenalty = account.currentBalancePenalty === null ? 0 : account.currentBalancePenalty;
+            currentTenancy = account.currentBalanceTenancy === null ? 0 : account.currentBalanceTenancy;
+
+            $(paymentRow).data("idAccount", account.idAccount);
+            $(paymentRow).data("state", "selected");
+        }
+
+        var distributionTenancy = Math.round(Math.max(Math.min(sumForDistribution, Math.max(currentTenancy, 0)), 0) * 100) / 100;
+        var distributionPenalty = Math.max(Math.min(Math.round((sumForDistribution - distributionTenancy) * 100) / 100, currentPenalty), 0);
+        distributionTenancy = Math.round((sumForDistribution - distributionPenalty) * 100) / 100;
+
+        $(paymentRow).find(".rr-distribution-tenancy-sum").val(((forceTenancySum === undefined ? distributionTenancy : forceTenancySum) + "").replace(".", ","));
+        $(paymentRow).find(".rr-distribution-penalty-sum").val(((forcePenaltySum === undefined ? distributionPenalty : forcePenaltySum) + "").replace(".", ","));
     }
 
     function buildAccountForMassDistributionFormInfo(account) {
@@ -192,22 +198,143 @@
     }
 
     $(".rr-payment-for-distribution").on("click", ".rr-control-add-object", function (e) {
-        // TODO отображение модального окна поиска ЛС\ПИР
+        var paymentRow = $(this).closest("tr");
+        var idPayment = paymentRow.data("idPayment");
+        var paymentSum = paymentRow.data("paymentSum");
+        var paymentSumPosted = paymentRow.data("paymentSumPosted");
+        var purpose = paymentRow.find(".rr-payment-purpose.rr-distribute-form-payment-purpose").text();
+
+        distributionModalInitiate(purpose, paymentSum, paymentSumPosted, idPayment, true, attachPaymentToObjectOnSelectCallback);
+
         e.preventDefault();
     });
 
     $(".rr-payment-for-distribution").on("click", ".rr-control-change-object", function (e) {
-        // TODO отображение модального окна поиска ЛС\ПИР
+        var paymentRow = $(this).closest("tr");
+        var idPayment = paymentRow.data("idPayment");
+        var paymentSum = paymentRow.data("paymentSum");
+        var paymentSumPosted = paymentRow.data("paymentSumPosted");
+        var purpose = paymentRow.find(".rr-payment-purpose.rr-distribute-form-payment-purpose").text();
+
+        distributionModalInitiate(purpose, paymentSum, paymentSumPosted, idPayment, true, attachPaymentToObjectOnSelectCallback);
+
         e.preventDefault();
     });
 
+    function attachPaymentToObjectOnSelectCallback(distribInfo) {
+        var paymentRow = $(".rr-payment-for-distribution[data-id-payment='" + distribInfo.IdPayment + "']");
+        var result = { count: 1 };
+        if (distribInfo.DistributeTo === 0) {
+            result.accounts = [distribInfo.Description];
+        } else {
+            result.claims = [distribInfo.Description];
+        }
+        buildMassDistributionFormInfo(paymentRow, result, distribInfo.TenancySum, distribInfo.PenaltySum);
+
+        $("#DistributePaymentToAccountModal").modal('hide');
+
+    }
+
     $(".rr-payment-for-distribution").on("click", ".rr-control-delete-object", function (e) {
-        // TODO отображение окна подтверждения удаления связки с ЛС\ПИР
+        var paymentRow = $(this).closest("tr");
+        var paymentSumText = paymentRow.find(".rr-payment-sum").text();
+        var paymentDocRequisitsHtml = paymentRow.find(".rr-payment-doc-requisits").html();
+        var idPayment = paymentRow.data("idPayment");
+        var distribObjectCaptionHtml = paymentRow.find(".rr-payment-distribution-object-caption").html();
+        var modal = $("#ConfirmDeletePaymentLinkToDistirbutionObjectModal");
+        modal.find(".rr-payment-doc-requisits").html(paymentDocRequisitsHtml);
+        modal.find(".rr-payment-sum").text(paymentSumText);
+        modal.find("#ConfirmDeletePaymentLinkToDistirbutionObject_IdPayment").val(idPayment);
+        modal.find(".rr-distrib-object-body").html(distribObjectCaptionHtml);
+        modal.modal('show');
         e.preventDefault();
+    });
+
+    $("#confirmDeletePaymentLinkToDistirbutionObjectModalBtn").on("click", function (e) {
+        var modal = $("#ConfirmDeletePaymentLinkToDistirbutionObjectModal");
+        var idPayment = modal.find("#ConfirmDeletePaymentLinkToDistirbutionObject_IdPayment").val();
+        var paymentRow = $(".rr-payment-for-distribution[data-id-payment='" + idPayment + "']");
+        paymentRow.find(".rr-payment-distribution-result-info").removeClass("d-none").addClass("text-danger").text("Назначение платежа не выбрано");
+        paymentRow.find(".rr-payment-distribution-object-caption").html("<span class='text-danger'>Выберите лицевой счет или ПИР для распределния платежа</span>");
+        paymentRow.find(".rr-payment-distribution-object-controls").find(".rr-control-delete-object, .rr-control-change-object").addClass("d-none");
+        paymentRow.find(".rr-payment-distribution-object-controls .rr-control-add-object").removeClass("d-none");
+        paymentRow.find(".rr-payment-distribution-sums-wrapper").addClass("d-none").find("input").val("");
+        $(paymentRow).removeData("idAccount");
+        $(paymentRow).removeData("idClaim");
+        $(paymentRow).data("state", "notselected");
+        modal.modal('hide');
     });
 
     $(".rr-payment-for-distribution").on("click", ".rr-remove-payment-from-master", function (e) {
-        // TODO отображение окна подтверждения удаления платежа из мастера
+        var paymentRow = $(this).closest("tr");
+        var paymentSumText = paymentRow.find(".rr-payment-sum").text();
+        var paymentDocRequisitsHtml = paymentRow.find(".rr-payment-doc-requisits").html();
+        var idPayment = paymentRow.data("idPayment");
+        var modal = $("#ConfirmDeletePaymentFromMassDistributeFormModal");
+        modal.find(".rr-payment-doc-requisits").html(paymentDocRequisitsHtml);
+        modal.find(".rr-payment-sum").text(paymentSumText);
+        modal.find("#ConfirmDeletePaymentFromMassDistributeForm_IdPayment").val(idPayment);
+        modal.modal('show');
         e.preventDefault();
+    });
+
+    $("#confirmDeletePaymentFromMassDistributeFormModalBtn").on("click", function (e) {
+        var modal = $("#ConfirmDeletePaymentFromMassDistributeFormModal");
+        var idPayment = modal.find("#ConfirmDeletePaymentFromMassDistributeForm_IdPayment").val();
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/KumiPayments/CheckIdToSession',
+            data: { id: idPayment, isCheck: false },
+            success: function () {
+                $(".rr-payment-for-distribution[data-id-payment='" + idPayment+"']").remove();
+                modal.modal('hide');
+            }
+        });
+        e.preventDefault();
+    });
+
+    $(".rr-payment-for-distribution").on("click", ".rr-distrib-to-tenancy-sum-lefovers", function (e) {
+        var paymentRow = $(this).closest("tr");
+        var sum = parseFloat((paymentRow.data("paymentSum") + "").replace(",", "."));
+        var sumPosted = parseFloat((paymentRow.data("paymentSumPosted") + "").replace(",", "."));
+        var sumForDistribute = sum - sumPosted;
+        var penaltySum = parseFloat(paymentRow.find(".rr-distribution-penalty-sum").val().replace(",", "."));
+        var tenancySum = Math.round(Math.max(0, sumForDistribute - penaltySum) * 100) / 100;
+        paymentRow.find(".rr-distribution-tenancy-sum").val((tenancySum + "").replace(".", ","));
+        e.preventDefault();
+    });
+
+    $(".rr-payment-for-distribution").on("click", ".rr-distrib-to-penalty-sum-lefovers", function (e) {
+        var paymentRow = $(this).closest("tr");
+        var sum = parseFloat((paymentRow.data("paymentSum") + "").replace(",", "."));
+        var sumPosted = parseFloat((paymentRow.data("paymentSumPosted") + "").replace(",", "."));
+        var sumForDistribute = sum - sumPosted;
+        var tenancySum = parseFloat(paymentRow.find(".rr-distribution-tenancy-sum").val().replace(",", "."));
+        var penaltySum = Math.round(Math.max(0, sumForDistribute - tenancySum) * 100) / 100;
+        paymentRow.find(".rr-distribution-penalty-sum").val((penaltySum + "").replace(".", ","));
+        e.preventDefault();
+    });
+
+    $(".rr-payment-for-distribution").on("change", ".rr-distribution-tenancy-sum, .rr-distribution-penalty-sum", function () {
+        var paymentRow = $(this).closest("tr");
+        var sum = parseFloat((paymentRow.data("paymentSum") + "").replace(",", "."));
+        var sumPosted = parseFloat((paymentRow.data("paymentSumPosted") + "").replace(",", "."));
+        var sumForDistribution = sum - sumPosted;
+
+        var value = parseFloat($(this).val().replace(",", "."));
+        if (isNaN(value)) value = 0;
+        value = Math.min(sumForDistribution, value);
+        $(this).val((value + "").replace(".", ","));
+        var diffSum = Math.round((sumForDistribution - value) * 100) / 100;
+        if ($(this).hasClass("rr-distribution-tenancy-sum")) {
+            var penalty = parseFloat(paymentRow.find(".rr-distribution-penalty-sum").val().replace(",", "."));
+            if (penalty > diffSum)
+                paymentRow.find(".rr-distribution-penalty-sum").val((diffSum + "").replace(".", ","));
+        }
+        if ($(this).hasClass("rr-distribution-penalty-sum")) {
+            var tenancy = parseFloat(paymentRow.find(".rr-distribution-tenancy-sum").val().replace(",", "."));
+            if (tenancy > diffSum)
+                paymentRow.find(".rr-distribution-tenancy-sum").val((diffSum + "").replace(".", ","));
+        }
     });
 });
