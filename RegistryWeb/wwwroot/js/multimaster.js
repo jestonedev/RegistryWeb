@@ -33,6 +33,7 @@
             case "Claims": nameObject = "Претензионно-исковые работы"; break;
             case "PaymentAccounts": nameObject = "Лицевые счета"; break;
             case "KumiAccounts": nameObject = "Лицевые счета"; break;
+            case "KumiPayments": nameObject = "Платежи"; break;
         }
         if (nameObject === null) {
             $(".info").html("Мультимастер для данного реестра отсутствует");

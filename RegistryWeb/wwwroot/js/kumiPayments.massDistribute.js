@@ -10,9 +10,13 @@
     function getPaymentDistributionInfo(paymentRow) {
         var purpose = $(paymentRow).find(".rr-payment-purpose").text();
         var purposeInfo = parsePurpose(purpose);
-        if (isEmptyPurpose(purposeInfo) && paymentRows.length > 0) {
-            notFoundDistribObjectByPurpose(paymentRow, "Назначение платежа не определено", "Выберите лицевой счет или ПИР для распределния платежа");
-            getPaymentDistributionInfo(paymentRows.shift());
+        if (isEmptyPurpose(purposeInfo)) {
+            if (paymentRows.length > 0) {
+                notFoundDistribObjectByPurpose(paymentRow, "Назначение платежа не определено", "Выберите лицевой счет или ПИР для распределния платежа");
+                getPaymentDistributionInfo(paymentRows.shift());
+            } else {
+                $("#RunMassPaymentDistribution").removeClass("disabled");
+            }
         } else {
             var idStreetElem = $("#KladrStreetsForSearchIdByName");
             var idStreet = null;
@@ -51,14 +55,17 @@
 
                     if (paymentRows.length > 0) {
                         getPaymentDistributionInfo(paymentRows.shift());
+                    } else {
+                        $("#RunMassPaymentDistribution").removeClass("disabled");
                     }
                 }
             });
         }
     }
 
-    function buildMassDistributionFormInfo(paymentRow, result, forceTenancySum, forcePenaltySum) {
-        $(paymentRow).find(".rr-payment-distribution-result-info").addClass("d-none");
+    function buildMassDistributionFormInfo(paymentRow, result, forceTenancySum, forcePenaltySum, hideResultInfo) {
+        if (hideResultInfo)
+            $(paymentRow).find(".rr-payment-distribution-result-info").addClass("d-none");
         $(paymentRow).find(".rr-payment-distribution-details-loader").addClass("d-none");
         $(paymentRow).find(".rr-payment-distribution-object-info").removeClass("text-danger").removeClass("d-none");
         $(paymentRow).find(".rr-payment-distribution-object-info").find(".rr-control-change-object, .rr-control-delete-object").removeClass("d-none");
@@ -107,8 +114,8 @@
         var distributionPenalty = Math.max(Math.min(Math.round((sumForDistribution - distributionTenancy) * 100) / 100, currentPenalty), 0);
         distributionTenancy = Math.round((sumForDistribution - distributionPenalty) * 100) / 100;
 
-        $(paymentRow).find(".rr-distribution-tenancy-sum").val(((forceTenancySum === undefined ? distributionTenancy : forceTenancySum) + "").replace(".", ","));
-        $(paymentRow).find(".rr-distribution-penalty-sum").val(((forcePenaltySum === undefined ? distributionPenalty : forcePenaltySum) + "").replace(".", ","));
+        $(paymentRow).find(".rr-distribution-tenancy-sum").val((((forceTenancySum === undefined || forceTenancySum === false) ? distributionTenancy.toString() : forceTenancySum.toString())).replace(".", ","));
+        $(paymentRow).find(".rr-distribution-penalty-sum").val((((forcePenaltySum === undefined || forcePenaltySum === false) ? distributionPenalty.toString() : forcePenaltySum.toString())).replace(".", ","));
     }
 
     function buildAccountForMassDistributionFormInfo(account) {
@@ -142,7 +149,9 @@
             lastChargeDateStr = "н/а";
         }
 
-        var html = "<div><u>ЛС №" + account.account + ":</u>" +
+        var html = "<div class='rr-payment-distribution-object-caption-wrapper' data-id-account='" + account.idAccount + "' data-account='" + account.account + "' data-account-state='" + account.state
+            + "' data-account-id-state='" + account.idState + "' data-current-balance-tenancy='" + currentBalanceTenancy + "' data-current-balance-penalty='" + currentBalancePenalty
+            + "' data-last-charge-date='" + account.lastChargeDate +"'><u>ЛС №" + account.account + ":</u>" +
             " <sup><span title='" + account.state + "' class='" + stateClass + "'><b>" + account.state.substr(0, 1) + "</b></span></sup> " +
             "<a class=\"btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn\" target=\"_blank\" href=\"/KumiAccounts/Details?idAccount=" + account.idAccount + "\"></a>" +
             "</div>" +
@@ -175,7 +184,12 @@
         var amountPenaltiesRecovered = claim.amountPenaltiesRecovered;
         if (amountPenaltiesRecovered === null) amountPenaltiesRecovered = 0;
 
-        var html = "<div><u>ИР №" + claim.idClaim + "</u> " +
+        var html = "<div class='rr-payment-distribution-object-caption-wrapper' data-id-claim='" + claim.idClaim + "' data-id-account='" + claim.idAccount
+            + "' data-account='" + claim.account + "' data-account-id-state='" + claim.idAccountState + "' data-account-state='" + claim.accountState
+            + "' data-account-current-balance-tenancy='" + claim.accountCurrentBalanceTenancy + "' data-account-current-balance-penalty='" + claim.accountCurrentBalancePenalty
+            + "' data-claim-amount-tenancy='" + amountTenancy + "' data-claim-amount-penalty='" + amountPenalties + "' data-claim-amount-tenancy-recovered='" + amountTenancyRecovered
+            + "' data-claim-amount-penalty-recovered='" + amountPenaltiesRecovered + "' data-claim-start-dept-period='" + claim.startDeptPeriod
+            + "' data-claim-end-dept-period='"+claim.endDeptPeriod+"'><u>ИР №" + claim.idClaim + "</u> " +
             "<a class=\"btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn\" target=\"_blank\" href=\"/Claims/Details?idClaim=" + claim.idClaim + "\"></a> <br class=\"d-lg-none\"/>" +
             "<u>ЛС №" + claim.account + ":</u>" +
             " <sup><span title='" + claim.accountState + "' class='" + stateClass + "'><b>" + claim.accountState.substr(0, 1) + "</b></span></sup> " +
@@ -229,7 +243,7 @@
         } else {
             result.claims = [distribInfo.Description];
         }
-        buildMassDistributionFormInfo(paymentRow, result, distribInfo.TenancySum, distribInfo.PenaltySum);
+        buildMassDistributionFormInfo(paymentRow, result, distribInfo.TenancySum, distribInfo.PenaltySum, true);
 
         $("#DistributePaymentToAccountModal").modal('hide');
 
@@ -254,7 +268,8 @@
         var modal = $("#ConfirmDeletePaymentLinkToDistirbutionObjectModal");
         var idPayment = modal.find("#ConfirmDeletePaymentLinkToDistirbutionObject_IdPayment").val();
         var paymentRow = $(".rr-payment-for-distribution[data-id-payment='" + idPayment + "']");
-        paymentRow.find(".rr-payment-distribution-result-info").removeClass("d-none").addClass("text-danger").text("Назначение платежа не выбрано");
+        paymentRow.find(".rr-payment-distribution-result-info").removeClass("d-none").addClass("text-danger").removeClass("alert")
+            .removeClass("alert-danger").removeClass("alert-warning").text("Назначение платежа не выбрано");
         paymentRow.find(".rr-payment-distribution-object-caption").html("<span class='text-danger'>Выберите лицевой счет или ПИР для распределния платежа</span>");
         paymentRow.find(".rr-payment-distribution-object-controls").find(".rr-control-delete-object, .rr-control-change-object").addClass("d-none");
         paymentRow.find(".rr-payment-distribution-object-controls .rr-control-add-object").removeClass("d-none");
@@ -337,4 +352,204 @@
                 paymentRow.find(".rr-distribution-tenancy-sum").val((diffSum + "").replace(".", ","));
         }
     });
+
+    $("#RunMassPaymentDistribution").on("click", function () {
+        $("#ConfirmRunPaymentDistirbutionModal").modal('show');
+    });
+
+    var paymentsForDistribution = [];
+
+    $("#confirmRunPaymentDistirbutionBtn").on("click", function () {
+        stopingDistribution = false;
+        $("#MassPaymentDistributionBackBtn, #MassPaymentDistributionClearAllBtn, #RunMassPaymentDistribution, .rr-remove-payment-from-master").addClass("disabled");
+        $(".rr-payment-distribution-object-controls").addClass("d-none");
+        $(".rr-payment-distribution-sums-wrapper").find("input, button").attr("disabled", "disabled");
+        $("#StopMassPaymentDistribution").removeClass("disabled");
+        $("#ConfirmRunPaymentDistirbutionModal").modal('hide');
+
+        var paymentsForDistributionRows = $(".rr-payment-for-distribution").filter(function (idx, elem) {
+            return $(elem).data("state") === "selected";
+        });
+
+        paymentsForDistributionRows.find(".rr-payment-distribution-result-info").addClass("d-none").removeClass("alert").removeClass("alert-primary").removeClass("alert-danger").removeClass("alert-warning").removeClass("text-danger").removeClass("text-warning");
+        paymentsForDistributionRows.find(".rr-payment-distribution-details-loader").addClass("d-none");
+        paymentsForDistribution = paymentsForDistributionRows.map(function (idx, elem) {
+            return {
+                "IdPayment": $(elem).data("idPayment"),
+                "IdObject": $(elem).data("idClaim") === undefined ? $(elem).data("idAccount") : $(elem).data("idClaim"),
+                "DistributeTo": $(elem).data("idClaim") === undefined ? 0 : 1,
+                "TenancySum": $(elem).find(".rr-distribution-tenancy-sum").val().replace(".", ","),
+                "PenaltySum": $(elem).find(".rr-distribution-penalty-sum").val().replace(".", ",")
+                };
+            }).toArray();
+
+        if (paymentsForDistribution.length > 0) {
+            var paymentInfo = paymentsForDistribution.shift();
+            distributePayment(paymentInfo);
+        } else {
+            cancelPaymentDistribution();
+        }
+
+    });
+
+    $("#StopMassPaymentDistribution").on("click", function () {
+        $("#ConfirmStopPaymentDistirbutionModal").modal('show');
+    });
+
+    var stopingDistribution = false;
+
+    $("#confirmStopPaymentDistirbutionBtn").on("click", function () {
+        stopingDistribution = true;
+        $("#ConfirmStopPaymentDistirbutionModal").modal('hide');
+    });
+
+    function cancelPaymentDistribution() {
+        $("#MassPaymentDistributionBackBtn, #MassPaymentDistributionClearAllBtn, #RunMassPaymentDistribution, .rr-remove-payment-from-master").removeClass("disabled");
+        $(".rr-payment-distribution-object-controls").removeClass("d-none");
+        $(".rr-payment-distribution-sums-wrapper").find("input, button").removeAttr("disabled");
+        $("#StopMassPaymentDistribution").addClass("disabled");
+    }
+
+    function distributePayment(paymentInfo) {
+        var paymentRow = $(".rr-payment-for-distribution[data-id-payment='" + paymentInfo.IdPayment + "']");
+        paymentRow.find(".rr-payment-distribution-details-loader .rr-loader-title").text("Распределение платежа");
+        paymentRow.find(".rr-payment-distribution-details-loader").addClass("alert").addClass("alert-primary").removeClass("d-none");
+
+        var url = window.location.origin + '/KumiPayments/DistributePaymentToAccount';
+        $.ajax({
+            async: true,
+            type: 'POST',
+            url: url,
+            data: paymentInfo,
+            success: function (result) {
+                console.log(result);
+
+                paymentRow.find(".rr-payment-distribution-details-loader").addClass("d-none");
+                if (result.state === "Error") {
+                    paymentRow.find(".rr-payment-distribution-result-info").text(result.error).addClass("text-danger").addClass("alert").addClass("alert-danger").removeClass("d-none");
+                } else {
+                    //var oldPostedSum = parseFloat((paymentRow.data("paymentSumPosted") + "").replace(",", "."));
+                    var sum = parseFloat((paymentRow.data("paymentSum") + "").replace(",", "."));
+                    var postedSum = result.distrubutedToTenancySum + result.distrubutedToPenaltySum;
+                    var distribTenancySum = parseFloat(paymentRow.find(".rr-distribution-tenancy-sum").val().replace(",", "."));
+                    var distribPenaltySum = parseFloat(paymentRow.find(".rr-distribution-penalty-sum").val().replace(",", "."));
+                    postedSum = Math.round(postedSum * 100) / 100;
+                    paymentRow.data("paymentSumPosted", postedSum.toString().replace(".", ","));
+                    var distribObject = getDistributionObjectForPaymentRow(paymentRow);
+                    if (postedSum === sum) {
+                        paymentRow.find(".rr-payment-distribution-result-info").text("Платеж распределен ").addClass("text-success").removeClass("d-none");
+                        paymentRow.find(".rr-payment-distribution-object-info, .rr-payment-distribution-sums-wrapper").addClass("d-none");
+                        paymentRow.data("state", "distributed");
+                    } else {
+                        paymentRow.find(".rr-payment-distribution-result-info").text("Платеж распределен не полностью ").addClass("alert").addClass("alert-warning").addClass("text-warning").removeClass("d-none");
+
+                        if (distribObject.claims === undefined) {
+                            var account = distribObject.accounts[0];
+                            account.currentBalanceTenancy = Math.round((account.currentBalanceTenancy - distribTenancySum)*100)/100;
+                            account.currentBalancePenalty = Math.round((account.currentBalancePenalty - distribPenaltySum) * 100) / 100;
+                        } else {
+                            var claim = distribObject.claims[0];
+                            claim.amountTenancyRecovered = Math.round((claim.amountTenancyRecovered + distribTenancySum) * 100) / 100;
+                            claim.amountPenaltiesRecovered = Math.round((claim.amountPenaltiesRecovered + distribPenaltySum) * 100) / 100;
+                        }
+                        buildMassDistributionFormInfo(paymentRow, distribObject, false);
+                    }
+                    buildPaymentInfo(paymentRow, distribObject, distribTenancySum, distribPenaltySum);
+                }
+                if (paymentsForDistribution.length > 0 && !stopingDistribution) {
+                    var paymentInfo = paymentsForDistribution.shift();
+                    distributePayment(paymentInfo);
+                } else {
+                    cancelPaymentDistribution();
+                }
+            }
+        });
+    }
+
+    function getDistributionObjectForPaymentRow(paymentRow) {
+        var data = {
+            "Count": 1
+        };
+        var distributionObjectWrapper = paymentRow.find(".rr-payment-distribution-object-caption-wrapper");
+
+
+        if (distributionObjectWrapper.data("idClaim") == undefined) {
+            data.accounts = [
+                {
+                    idAccount: distributionObjectWrapper.data("idAccount"),
+                    account: distributionObjectWrapper.data("account"),
+                    idState: distributionObjectWrapper.data("accountIdState"),
+                    state: distributionObjectWrapper.data("accountState"),
+                    currentBalanceTenancy: distributionObjectWrapper.data("currentBalanceTenancy"),
+                    currentBalancePenalty: distributionObjectWrapper.data("currentBalancePenalty"),
+                    lastChargeDate: distributionObjectWrapper.data("lastChargeDate")
+                }
+            ];
+        } else {
+            data.claims = [
+                {
+                    idClaim: distributionObjectWrapper.data("idClaim"),
+                    idAccount: distributionObjectWrapper.data("idAccount"),
+                    account: distributionObjectWrapper.data("account"),
+                    idAccountState: distributionObjectWrapper.data("accountIdState"),
+                    accountState: distributionObjectWrapper.data("accountState"),
+                    accountCurrentBalanceTenancy: distributionObjectWrapper.data("accountCurrentBalanceTenancy"),
+                    accountCurrentBalancePenalty: distributionObjectWrapper.data("accountCurrentBalancePenalty"),
+                    amountTenancy: distributionObjectWrapper.data("claimAmountTenancy"),
+                    amountPenalties: distributionObjectWrapper.data("claimAmountPenalty"),
+                    amountTenancyRecovered: distributionObjectWrapper.data("claimAmountTenancyRecovered"),
+                    amountPenaltiesRecovered: distributionObjectWrapper.data("claimAmountPenaltyRecovered"),
+                    startDeptPeriod: distributionObjectWrapper.data("claimStartDeptPeriod"),
+                    endDeptPeriod: distributionObjectWrapper.data("claimEndDeptPeriod")
+                }
+            ];
+        }
+        return data;
+    }
+
+    function buildPaymentInfo(paymentRow, distribObject, distribTenancySum, distribPenaltySum) {
+        var sum = parseFloat((paymentRow.data("paymentSum") + "").replace(",", "."));
+        var postedSum = parseFloat((paymentRow.data("paymentSumPosted") + "").replace(",", "."));
+        paymentRow.find(".rr-payment-sum").text(distributePaymentFormatSum(sum) + " руб., расп.: " + distributePaymentFormatSum(postedSum)+" руб.");
+
+        var paymentObjectDetailsRows = paymentRow.find(".rr-payment-distribution-sum-details .rr-payment-object-detail");
+        var html = "";
+        var elem = null;
+        if (distribObject.claims === undefined) {
+            var account = distribObject.accounts[0];
+            var elems = paymentObjectDetailsRows.filter(function (idx, elem) { return $(elem).data("idAccount") === account.idAccount; });
+            if (elems.length !== 0) elem = elems[0];
+            else {
+                var elemOuter = $('<div class="text-danger rr-payment-object-detail" data-id-account="' + account.idAccount + '" data-payment-distrib-tenancy="0" data-payment-distrib-penalty="0">');
+                paymentRow.find(".rr-payment-distribution-sum-details").append(elemOuter);
+                elem = paymentRow.find(".rr-payment-distribution-sum-details .rr-payment-object-detail").last();
+            }
+            var distributedTenancy = Math.round((parseFloat(($(elem).data("paymentDistribTenancy") + "").replace(",", ".")) + distribTenancySum) * 100) / 100;
+            var distributedPenalty = Math.round((parseFloat(($(elem).data("paymentDistribPenalty") + "").replace(",", ".")) + distribPenaltySum) * 100) / 100;
+            $(elem).data("paymentDistribTenancy", distributedTenancy);
+            $(elem).data("paymentDistribPenalty", distributedPenalty);
+
+            html = "<u>ЛС №" + account.account + ":</u> <a class=\"btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn\" target=\"_blank\" href=\"/KumiAccounts/Details?idAccount=" + account.idAccount
+                + "\"></a><br>найм " + distributePaymentFormatSum(distributedTenancy) + " руб., пени " + distributePaymentFormatSum(distributedPenalty) + " руб.";
+        } else {
+            var claim = distribObject.claims[0];
+            elems = paymentObjectDetailsRows.filter(function (idx, elem) { return $(elem).data("idClaim") === claim.idClaim; });
+            if (elems.length !== 0) elem = elems[0];
+            else {
+                elemOuter = $('<div class="text-danger rr-payment-object-detail" data-id-claim="' + claim.idClaim + '" data-payment-distrib-tenancy="0" data-payment-distrib-penalty="0">');
+                paymentRow.find(".rr-payment-distribution-sum-details").append(elemOuter);
+                elem = paymentRow.find(".rr-payment-distribution-sum-details .rr-payment-object-detail").last();
+            }
+
+            distributedTenancy = Math.round((parseFloat(($(elem).data("paymentDistribTenancy") + "").replace(",", ".")) + distribTenancySum) * 100) / 100;
+            distributedPenalty = Math.round((parseFloat(($(elem).data("paymentDistribPenalty") + "").replace(",", ".")) + distribPenaltySum) * 100) / 100;
+            $(elem).data("paymentDistribTenancy", distributedTenancy);
+            $(elem).data("paymentDistribPenalty", distributedPenalty);
+
+            html = "<u>ИР №" + claim.idClaim + "</u> <a class=\"btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn\" target=\"_blank\" href=\"/Claims/Details?idClaim=" + claim.idClaim
+                + "\"></a> <u>ЛС №" + claim.account + ":</u> <a class=\"btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn\" target=\"_blank\" href=\"/KumiAccounts/Details?idAccount=" + claim.idAccount
+                + "\"></a><br>найм " + distributePaymentFormatSum(distributedTenancy) + " руб., пени " + distributePaymentFormatSum(distributedPenalty) + " руб.";
+        }
+        $(elem).html(html);
+    }
 });

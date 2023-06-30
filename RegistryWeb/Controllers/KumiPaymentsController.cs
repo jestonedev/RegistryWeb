@@ -20,6 +20,7 @@ using RegistryServices.Enums;
 using RegistryServices.Models.KumiPayments;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 
 namespace RegistryWeb.Controllers
 {
@@ -41,8 +42,10 @@ namespace RegistryWeb.Controllers
             this.claimsDataService = claimsDataService;
             this.tenancyProcessesDataService = tenancyProcessesDataService;
             this.zipArchiveDataService = zipArchiveDataService;
-            nameIds = "idPayment";
-            nameMultimaster = "KumiPaymentReports";
+
+            nameFilteredIdsDict = "filteredPaymentsIdsDict";
+            nameIds = "idPayments";
+            nameMultimaster = "PaymentsMassDistributeForm";
         }
 
         public IActionResult Index(KumiPaymentsVM viewModel, bool isBack = false)
@@ -74,8 +77,9 @@ namespace RegistryWeb.Controllers
             var vm = dataService.GetViewModel(
                 viewModel.OrderOptions,
                 viewModel.PageOptions,
-                viewModel.FilterOptions);
+                viewModel.FilterOptions, out List<int> filteredPaymentsIds);
 
+            AddSearchIdsToSession(vm.FilterOptions, filteredPaymentsIds);
 
             return View(vm);
         }
@@ -419,6 +423,31 @@ namespace RegistryWeb.Controllers
                         RedirectUrl = "/KumiPayments/Index?FilterOptions.IdParentPayment=" + idPayment
                     });
             } catch(Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
+                });
+            }
+        }
+
+        public IActionResult DistributePaymentToAccountFake(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo,
+            decimal tenancySum, decimal penaltySum)
+        {
+            try
+            {
+                Thread.Sleep(2000);
+                if (idPayment % 2 == 0) throw new Exception("Тестовая ошибка распределния платежа");
+                return Json(new
+                {
+                    State = "Success",
+                    Sum = tenancySum+ penaltySum,
+                    DistrubutedToTenancySum = tenancySum,
+                    DistrubutedToPenaltySum = penaltySum
+                });
+            }
+            catch (Exception e)
             {
                 return Json(new
                 {

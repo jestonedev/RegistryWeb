@@ -27,15 +27,18 @@
 </div>
 
 <div class="form-row">
-    <div class="form-group col-md-3 col-lg-3">
-        <a class="form-control btn btn-primary" asp-controller="KumiPayments" asp-action="Index" asp-route-isBack="true">Назад</a>
+    <div class="form-group col-md-3">
+        <a class="form-control btn btn-primary" id="MassPaymentDistributionBackBtn" asp-controller="KumiPayments" asp-action="Index" asp-route-isBack="true">Назад</a>
     </div>
-    <div class="form-group col-md-3 col-lg-3">
-        <a class="form-control btn btn-primary" asp-controller="KumiPayments" asp-action="ClearSessionIds">Очистить</a>
+    <div class="form-group col-md-3">
+        <a class="form-control btn btn-primary" id="MassPaymentDistributionClearAllBtn" asp-controller="KumiPayments" asp-action="ClearSessionIds">Очистить</a>
     </div>
 
-    <div class="form-group col-md-6">
-        <a class="form-control btn btn-warning disabled" asp-controller="KumiPayments" asp-action="">Распределить платежи</a>
+    <div class="form-group col-md-3">
+        <a class="form-control btn btn-warning disabled" id="RunMassPaymentDistribution" href="#">Распределить платежи</a>
+    </div>
+    <div class="form-group col-md-3">
+        <a class="form-control btn btn-warning disabled" id="StopMassPaymentDistribution" href="#">Остановить распределение</a>
     </div>
 </div>
 
@@ -80,7 +83,7 @@
                                  DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum)
                              }))
                                 {
-                                    <div class="text-danger">
+                                    <div class="text-danger rr-payment-object-detail" data-id-account="@account.IdAccount" data-payment-distrib-tenancy="@account.DistrubutedToTenancySum" data-payment-distrib-penalty="@account.DistrubutedToPenaltySum">
                                         <u>ЛС №@account.Account:</u>
                                         <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@account.IdAccount"></a>
                                         <br />найм @account.DistrubutedToTenancySum руб., пени @account.DistrubutedToPenaltySum руб.
@@ -97,7 +100,7 @@
                              DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum)
                          }))
                                 {
-                                    <div class="text-danger">
+                                    <div class="text-danger rr-payment-object-detail"  data-id-claim="@claim.IdClaim" data-payment-distrib-tenancy="@claim.DistrubutedToTenancySum" data-payment-distrib-penalty="@claim.DistrubutedToPenaltySum">
                                         <u>ИР №@claim.IdClaim</u>
                                         <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="Claims" asp-action="Details" asp-route-idClaim="@claim.IdClaim"></a>
                                         <u>ЛС №@claim.Account:</u>
@@ -164,7 +167,7 @@
                         }
                         <div>
                             <div class="rr-payment-distribution-details-loader text-center @(!validKbk || fullDistributed ? "d-none" : "")">
-                                <img src="/image/spinner.gif" />
+                                <img src="/image/spinner.gif" /> <span class="rr-loader-title">Поиск связи по назначению...</span>
                             </div>
                             <div class="rr-payment-distribution-result-info text-center @(!validKbk || fullDistributed ? "" : "d-none")
                                  @(validKbk ? "" : "text-danger")

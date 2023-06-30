@@ -88,7 +88,7 @@ namespace RegistryWeb.DataServices
             return vm;
         }
 
-        public KumiPaymentsVM GetViewModel(OrderOptions orderOptions, PageOptions pageOptions, KumiPaymentsFilter filterOptions)
+        public KumiPaymentsVM GetViewModel(OrderOptions orderOptions, PageOptions pageOptions, KumiPaymentsFilter filterOptions, out List<int> filteredPaymentsIds)
         {
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
             var payments = GetQuery();
@@ -102,6 +102,9 @@ namespace RegistryWeb.DataServices
 
             if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
                 viewModel.PageOptions.CurrentPage = 1;
+
+            filteredPaymentsIds = query.Select(r => r.IdPayment).ToList();
+
             query = GetQueryPage(query, viewModel.PageOptions);
             viewModel.Payments = query.ToList();
             viewModel.DistributionInfoToObjects = GetDistributionInfoToObjects(viewModel.Payments.Select(r => r.IdPayment).ToList());
@@ -114,6 +117,7 @@ namespace RegistryWeb.DataServices
                     viewModel.EndDate = charge.EndDate;
                 }
             }
+
             return viewModel;
         }
 
