@@ -473,7 +473,7 @@
         var distributionObjectWrapper = paymentRow.find(".rr-payment-distribution-object-caption-wrapper");
 
 
-        if (distributionObjectWrapper.data("idClaim") == undefined) {
+        if (distributionObjectWrapper.data("idClaim") === undefined) {
             data.accounts = [
                 {
                     idAccount: distributionObjectWrapper.data("idAccount"),

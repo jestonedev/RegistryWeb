@@ -76,6 +76,15 @@ namespace RegistryWeb.DataServices
                 ReferenceHandler = ReferenceHandler.Preserve,
             });
 
+            var log = new KumiPaymentGroupLog()
+            {
+                IdGroup = registryContext.KumiPaymentGroups.LastOrDefault().IdGroup + 1,
+                Log = loadStateSerializeObject
+            };
+            registryContext.KumiPaymentGroupLog.Add(log);
+
+          //  group.Log = loadStateSerializeObject;
+
             registryContext.SaveChanges();
 
             return loadState;
@@ -1293,6 +1302,49 @@ namespace RegistryWeb.DataServices
         {
             return registryContext.KumiPayments
                 .Where(b => ids.Contains(b.IdPayment));
+        }
+
+        public IQueryable<KumiPaymentGroup> GetPaymentLogs()
+        {
+            
+            return registryContext.KumiPaymentGroups
+                .Include(r => r.PaymentGroupFiles);
+        }
+        public KumiPaymentGroupsVM GetPaymentGroupsVM(PageOptions pageOptions)
+        {
+            var vm = new KumiPaymentGroupsVM();
+            vm.PageOptions = pageOptions ?? vm.PageOptions;
+            var query = registryContext.KumiPaymentGroups
+                .Include(r => r.PaymentGroupFiles).OrderByDescending(c=> c.Date);
+            vm.PageOptions.TotalRows = query.Count();
+            var count = query.Count();
+            vm.PageOptions.Rows = count;
+            vm.PageOptions.TotalPages = Math.Max((int)Math.Ceiling(count / (double)vm.PageOptions.SizePage), 1);
+            vm.PageOptions.CurrentPage = Math.Min(vm.PageOptions.CurrentPage, vm.PageOptions.TotalPages);
+
+            vm.paymentGroups = GetKumiPaymentGroupPage(query, vm.PageOptions).ToList();
+
+            return vm ;
+        }
+
+        private IQueryable<KumiPaymentGroup> GetKumiPaymentGroupPage(IQueryable<KumiPaymentGroup> query, PageOptions pageOptions)
+        {
+            var page = query
+                .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
+                .Take(pageOptions.SizePage);
+            return page;
+        }
+
+
+        public KumiPaymentsUploadStateModel UploadLogPaymentGroups(int idGroup)
+        {
+            var log = registryContext.KumiPaymentGroupLog.FirstOrDefault(c => c.IdGroup == idGroup).Log;
+
+            var loadState = JsonSerializer.Deserialize<KumiPaymentsUploadStateModel>(log, new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+            });
+            return loadState;
         }
     }
 }

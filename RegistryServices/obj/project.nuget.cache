@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "PlhzpxweNBjc1NmcLZMOapIlMGVUQOX7Zr/fahhDqQlYr9n9G9RO+hUnWmDHTMuzS/mdxCZh64pQDuuMexUQYQ==",
+  "dgSpecHash": "VE4Tf96CPI3UMz8KonAtNjOKsxcCJCmI2mD4XsNaJz+Aghx1Hj6svwmWL9otzj/ZJi7IO4cNua49YF7zSeShMw==",
   "success": true,
-  "projectFilePath": "D:\\RegistryWeb\\RegistryServices\\RegistryServices.csproj",
+  "projectFilePath": "D:\\Projects\\RegistryWeb\\RegistryServices\\RegistryServices.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\TutGA\\.nuget\\packages\\bouncycastle.netcore\\1.8.3\\bouncycastle.netcore.1.8.3.nupkg.sha512",
     "C:\\Users\\TutGA\\.nuget\\packages\\google.protobuf\\3.6.1\\google.protobuf.3.6.1.nupkg.sha512",

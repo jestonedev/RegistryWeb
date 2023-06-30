@@ -39,6 +39,7 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
             builder.HasMany(e => e.PaymentGroupFiles)
                 .WithOne(e => e.PaymentGroup)
                 .HasForeignKey(e => e.IdGroup);
+
         }
     }
 }
