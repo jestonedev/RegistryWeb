@@ -228,6 +228,7 @@ namespace RegistryDb.Models
         public virtual DbSet<KumiPayerStatus> KumiPayerStatuses { get; set; }
         public virtual DbSet<KumiPaymentGroup> KumiPaymentGroups { get; set; }
         public virtual DbSet<KumiPaymentGroupFile> KumiPaymentGroupFiles { get; set; }
+        public virtual DbSet<KumiPaymentGroupLog> KumiPaymentGroupLog { get; set; }
         public virtual DbSet<KumiPaymentInfoSource> KumiPaymentInfoSources { get; set; }
         public virtual DbSet<KumiPaymentKind> KumiPaymentKinds { get; set; }
         public virtual DbSet<KumiPaymentReason> KumiPaymentReasons { get; set; }
@@ -418,6 +419,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new KumiPayerStatusConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentGroupConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentGroupFileConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPaymentGroupLogConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentInfoSourceConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentKindConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentReasonConfiguration(nameDatebase));

@@ -1,0 +1,64 @@
+﻿@using RegistryWeb.Extensions;
+@using RegistryWeb.ViewOptions;
+@using RegistryWeb.SecurityServices;
+@using RegistryDb.Models.Entities.KumiAccounts;
+@using RegistryServices.Models.KumiPayments;
+@model RegistryServices.ViewModel.KumiAccounts.KumiPaymentGroupsVM;
+
+
+@{
+    ViewData["Title"] = "Лог загрузки файлов ФК";
+    var TotalRows = "Количество записей: " + Model.PageOptions.TotalRows;
+} 
+
+<h2>@ViewData["Title"]</h2>
+<h4>@TotalRows</h4>
+
+
+<table class="table table-hover rr-payments-log-table">
+    <thead>
+        <tr style="align-content: center;">
+            <th></th>
+            <th class="r-table-header-cell">
+                Дата
+            </th>
+            <th class="r-table-header-cell">
+                Пользователь
+            </th>
+            <th class="r-table-header-cell" style="padding-left: 50px;">
+                Список файлов
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.paymentGroups)
+        {
+            var textFiles = item.PaymentGroupFiles?.Select(c => c.FileName).ToList();
+            <tr>
+                <td></td>
+                <td>
+                    @item.Date.ToString("dd.MM.yyyy")
+                </td>
+                <td>
+                    @item.User
+                </td>
+                <td>
+                    <ul style="list-style-type:none">
+                        @foreach (var text in textFiles)
+                        {
+                            <li>@text</li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"
+                       asp-action="UploadLog" asp-controller="KumiPayments" asp-route-idGroup="@item.IdGroup"></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<page-link page-model="Model.PageOptions" page-action="Index"></page-link>

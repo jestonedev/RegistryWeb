@@ -698,5 +698,27 @@ namespace RegistryWeb.Controllers
             return View("KumiPaymentReports", viewModel);
         }
 
+
+        public IActionResult LoadPaymentsLog(PageOptions pageOptions)
+        {
+            var vm = dataService.GetPaymentGroupsVM(pageOptions);
+            return View("PaymentLog", vm);
+
+        }
+
+        public IActionResult UploadLog(int idGroup)
+        {
+            try
+            {
+                var loadstate = dataService.UploadLogPaymentGroups(idGroup);
+                return View("UploadPaymentsResult", loadstate);
+            }
+            catch( Exception e)
+            {
+                return  Error(e.Message);
+            }
+           
+        }
+
     }
 }
