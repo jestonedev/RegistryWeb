@@ -657,8 +657,8 @@ namespace RegistryWeb.Controllers
             }
             try
             {
-                var errorModel = dataService.UploadInfoFromTff(tffStrings, kumiPaymentGroupFiles);            
-                return View("UploadPaymentsResult", errorModel);
+                dataService.UploadInfoFromTff(tffStrings, kumiPaymentGroupFiles, out int idGroup);
+                return RedirectToAction("UploadLog", new { idGroup } );
             } catch(ApplicationException e)
             {
                 return Error(e.Message);

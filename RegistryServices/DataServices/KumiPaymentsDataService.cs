@@ -41,7 +41,7 @@ namespace RegistryWeb.DataServices
             this.securityService = securityService;
         }
 
-        public KumiPaymentsUploadStateModel UploadInfoFromTff(List<TffString> tffStrings, List<KumiPaymentGroupFile> kumiPaymentGroupFiles)
+        public KumiPaymentsUploadStateModel UploadInfoFromTff(List<TffString> tffStrings, List<KumiPaymentGroupFile> kumiPaymentGroupFiles, out int idGroup)
         {
             var loadState = new KumiPaymentsUploadStateModel();
 
@@ -87,6 +87,7 @@ namespace RegistryWeb.DataServices
 
             registryContext.SaveChanges();
 
+            idGroup = log.IdGroup;
             return loadState;
         }
 
@@ -1311,7 +1312,7 @@ namespace RegistryWeb.DataServices
             var vm = new KumiPaymentGroupsVM();
             vm.PageOptions = pageOptions ?? vm.PageOptions;
             var query = registryContext.KumiPaymentGroups
-                .Include(r => r.PaymentGroupFiles).OrderByDescending(c=> c.Date);
+                .Include(r => r.PaymentGroupFiles).OrderByDescending(c=> c.Date).ThenByDescending(c=> c.IdGroup);
             vm.PageOptions.TotalRows = query.Count();
             var count = query.Count();
             vm.PageOptions.Rows = count;
