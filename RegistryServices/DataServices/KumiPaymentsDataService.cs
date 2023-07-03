@@ -1354,8 +1354,17 @@ namespace RegistryWeb.DataServices
                               join paymentRow in registryContext.KumiPayments
                               on assocRow.IdPayment equals paymentRow.IdPayment
                               where IdOrders.Contains(assocRow.IdOrder)
-                              select new KeyValuePair<int, KumiPayment>(assocRow.IdOrder, paymentRow);
-            return paymentRows.ToDictionary().ToList();
+                              select new
+                              {
+                                  assocRow.IdOrder,
+                                  paymentRow
+                              };
+            var paymentRowsDict = new Dictionary<int, KumiPayment>();
+            foreach (var paymentRow in paymentRows)
+            {
+                paymentRowsDict.Add(paymentRow.IdOrder, paymentRow.paymentRow);
+            }
+            return paymentRowsDict;
         }
     }
 }

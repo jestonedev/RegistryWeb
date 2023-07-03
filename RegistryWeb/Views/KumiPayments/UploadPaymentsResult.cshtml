@@ -4,7 +4,7 @@
 
 @{
     ViewData["Title"] = "Результат загрузки платежей";
-    var memorialOrderPayments = (List<KumiPayment>)ViewBag.MemorialOrderPayments;
+    var memorialOrderPayments = (Dictionary<int, KumiPayment>)ViewBag.MemorialOrderPayments;
 
 }
 
@@ -172,13 +172,15 @@
                             }
                             else
                             {
-
-                                 var payment = memorialOrderPayments.FirstOrDefault(r => r.IdPayment = moAssoc.)
-                                if ()
+                                if (memorialOrderPayments.ContainsKey(moAssoc.IdOrder))
                                 {
-
+                                    var payment = memorialOrderPayments[moAssoc.IdOrder];
+                                    <span>@(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</span>
                                 }
-                                <span class="text-danger"><i>Не связан с платежом</i></span>
+                                else
+                                {
+                                    <span class="text-danger"><i>Не связан с платежом</i></span>
+                                }
                             }
                         }
 
@@ -204,7 +206,15 @@
                             }
                             else
                             {
-                                <span class="text-danger"><i>Не связан с платежом</i></span>
+                                if (memorialOrderPayments.ContainsKey(moAssoc.IdOrder))
+                                {
+                                    var payment = memorialOrderPayments[moAssoc.IdOrder];
+                                    <span>@(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger"><i>Не связан с платежом</i></span>
+                                }
                             }
                         }
 

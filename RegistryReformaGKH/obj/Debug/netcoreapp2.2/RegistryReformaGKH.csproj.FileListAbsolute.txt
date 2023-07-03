@@ -36,4 +36,3 @@ D:\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.csp
 D:\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.dll
 D:\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.pdb
 D:\Projects\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.csproj.AssemblyReference.cache
-D:\Projects\Visual Studio Projects\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.csprojAssemblyReference.cache
