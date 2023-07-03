@@ -78,7 +78,7 @@ namespace RegistryWeb.DataServices
 
             var log = new KumiPaymentGroupLog()
             {
-                IdGroup = registryContext.KumiPaymentGroups.LastOrDefault().IdGroup + 1,
+                IdGroup = group.IdGroup,
                 Log = loadStateSerializeObject
             };
             registryContext.KumiPaymentGroupLog.Add(log);
