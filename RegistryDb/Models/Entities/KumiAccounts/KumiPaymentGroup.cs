@@ -13,8 +13,7 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         }
         public int IdGroup { get; set; }
         public DateTime Date { get; set; }
-        public string User { get; set; }
-        public virtual IList<KumiPayment> Payments { get; set; }
+        public string User { get; set; }        public virtual IList<KumiPayment> Payments { get; set; }
         public virtual IList<KumiMemorialOrder> MemorialOrders { get; set; }
         public virtual IList<KumiPaymentGroupFile> PaymentGroupFiles { get; set; }
         public virtual KumiPaymentGroupLog PaymentGroupLog {get;set;}

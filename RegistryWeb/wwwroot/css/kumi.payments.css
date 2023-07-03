@@ -28,15 +28,27 @@
     text-overflow: ellipsis;
 }
 
+.rr-payment-purpose.rr-distribute-form-payment-purpose {
+    width: 200px;
+}
+
 @media(min-width: 768px) {
     .rr-payment-purpose {
         width: 200px;
+    }
+
+    .rr-payment-purpose.rr-distribute-form-payment-purpose {
+        width: 300px;
     }
 }
 
 @media(min-width: 992px) {
     .rr-payment-purpose {
         width: 300px;
+    }
+
+    .rr-payment-purpose.rr-distribute-form-payment-purpose {
+        width: 450px;
     }
 }
 
