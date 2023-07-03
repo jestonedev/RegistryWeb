@@ -1347,5 +1347,15 @@ namespace RegistryWeb.DataServices
             });
             return loadState;
         }
+
+        public Dictionary<int, KumiPayment> GetPaymentsByOrders(List<int> IdOrders)
+        {
+            var paymentRows = from assocRow in registryContext.KumiMemorialOrderPaymentAssocs
+                              join paymentRow in registryContext.KumiPayments
+                              on assocRow.IdPayment equals paymentRow.IdPayment
+                              where IdOrders.Contains(assocRow.IdOrder)
+                              select new KeyValuePair<int, KumiPayment>(assocRow.IdOrder, paymentRow);
+            return paymentRows.ToDictionary().ToList();
+        }
     }
 }

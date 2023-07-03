@@ -739,6 +739,10 @@ namespace RegistryWeb.Controllers
             try
             {
                 var loadstate = dataService.UploadLogPaymentGroups(idGroup);
+                var idOrders = loadstate.InsertedMemorialOrders.Select(r => r.IdOrder)
+                   .Union(loadstate.SkipedMemorialOrders.Select(r => r.IdOrder)).ToList();
+
+                ViewBag.MemorialOrderPayments = dataService.GetPaymentsByOrders(idOrders);
                 return View("UploadPaymentsResult", loadstate);
             }
             catch( Exception e)

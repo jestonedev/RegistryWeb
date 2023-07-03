@@ -1,8 +1,11 @@
 ﻿@using RegistryServices.Models.KumiPayments
+@using RegistryDb.Models.Entities.KumiAccounts
 @model KumiPaymentsUploadStateModel
 
 @{
     ViewData["Title"] = "Результат загрузки платежей";
+    var memorialOrderPayments = (List<KumiPayment>)ViewBag.MemorialOrderPayments;
+
 }
 
 <h1 class="mb-3">Результат загрузки платежей</h1>
@@ -154,7 +157,8 @@
             @foreach (var moAssoc in Model.InsertedMemorialOrders)
             {
                 <tr>
-                    <td>@(moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "")@(moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "")
+                    <td>
+                        @(moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "")@(moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "")
                         <span class="badge bg-success text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
                               title="Новый мемориальный ордер">?</span>
                     </td>
@@ -168,6 +172,12 @@
                             }
                             else
                             {
+
+                                 var payment = memorialOrderPayments.FirstOrDefault(r => r.IdPayment = moAssoc.)
+                                if ()
+                                {
+
+                                }
                                 <span class="text-danger"><i>Не связан с платежом</i></span>
                             }
                         }
@@ -179,7 +189,8 @@
             @foreach (var moAssoc in Model.SkipedMemorialOrders)
             {
                 <tr>
-                    <td>@(moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "")@(moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "")
+                    <td>
+                        @(moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "")@(moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "")
                         <span class="badge bg-warning text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
                               title="Присутствовавший в системе мемориальный ордер">?</span>
                     </td>
