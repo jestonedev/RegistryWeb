@@ -712,9 +712,120 @@ namespace RegistryWeb.DataServices
             tenancyProcess.AccountsTenancyProcessesAssoc = null;
             registryContext.TenancyProcesses.Add(tenancyProcess);
             registryContext.SaveChanges();
-
+            if (!assocs.Any(r => r.IdAccount != 0 || !string.IsNullOrEmpty(r.AccountNavigation.Account)))
+            {
+                assocs = FindAccountFromPrevTenancyOrCreateNew(assocs, tenancyProcess);
+            }
             AddAndBindAccounts(assocs, tenancyProcess.IdProcess);
             registryContext.SaveChanges();
+        }
+
+        private IList<KumiAccountsTenancyProcessesAssoc> FindAccountFromPrevTenancyOrCreateNew(IList<KumiAccountsTenancyProcessesAssoc> accountsAssoc, TenancyProcess tenancyProcess)
+        {
+            var tenancies = tenancyProcess.TenancyPersons.Select(r => r.Surname.Trim() + " " + r.Name.Trim() + (r.Patronymic != null ? (" " + r.Patronymic.Trim()) : ""));
+
+            var addressInfix = (from row in
+                                (from row in tenancyProcess.TenancyBuildingsAssoc
+                                 select new
+                                 {
+                                     row.IdProcess,
+                                     Infix = string.Concat("b", row.IdBuilding)
+                                 })
+                                .Union(from row in tenancyProcess.TenancyPremisesAssoc
+                                       select new
+                                       {
+                                           row.IdProcess,
+                                           Infix = string.Concat("p", row.IdPremise)
+                                       })
+                                .Union(from row in tenancyProcess.TenancySubPremisesAssoc
+                                       select new
+                                       {
+                                           row.IdProcess,
+                                           Infix = string.Concat("sp", row.IdSubPremise)
+                                       })
+                                 orderby row.Infix
+                                 group row.Infix by row.IdProcess into gs
+                                 select new
+                                 {
+                                     IdProcess = gs.Key,
+                                     AddressCode = string.Join("", gs)
+                                 }).Select(r => r.AddressCode).FirstOrDefault();
+
+            var tenancyIdsByTenant = registryContext.TenancyPersons.Where(r => tenancies.Contains(r.Surname.Trim() + " " + r.Name.Trim() + (r.Patronymic != null ? (" " + r.Patronymic.Trim()) : ""))).Select(r => r.IdProcess).ToList().Distinct();
+
+            var allObjects = (from row in
+                                (from row in registryContext.TenancyBuildingsAssoc
+                                 select new
+                                 {
+                                     row.IdProcess,
+                                     Infix = string.Concat("b", row.IdBuilding)
+                                 })
+                                .Union(from row in registryContext.TenancyPremisesAssoc
+                                       select new
+                                       {
+                                           row.IdProcess,
+                                           Infix = string.Concat("p", row.IdPremise)
+                                       })
+                                .Union(from row in registryContext.TenancySubPremisesAssoc
+                                       select new
+                                       {
+                                           row.IdProcess,
+                                           Infix = string.Concat("sp", row.IdSubPremise)
+                                       })
+                              orderby row.Infix
+                              group row.Infix by row.IdProcess into gs
+                              select new
+                              {
+                                  IdProcess = gs.Key,
+                                  AddressCode = string.Join("", gs)
+                              }).AsEnumerable();
+
+            var tenancyIdsByAddress = (from allObjectsRow in allObjects
+                                    where allObjectsRow.AddressCode == addressInfix
+                                       select allObjectsRow.IdProcess).ToList();
+
+            var accounts = registryContext.KumiAccountsTenancyProcessesAssocs.Include(r => r.AccountNavigation)
+                .Where(r => tenancyIdsByTenant.Contains(r.IdProcess) && tenancyIdsByAddress.Contains(r.IdProcess)).ToList();
+
+            var result = new List<KumiAccountsTenancyProcessesAssoc>();
+            if (accounts.Any())
+            {
+                foreach (var account in accounts.GroupBy(r => r.IdProcess).OrderByDescending(r => r.Key).First())
+                {
+                    result.Add(new KumiAccountsTenancyProcessesAssoc
+                    {
+                        IdProcess = tenancyProcess.IdProcess,
+                        IdAccount = account.IdAccount,
+                        Fraction = account.Fraction,
+                        AccountNavigation = new KumiAccount
+                        {
+                            Account = account.AccountNavigation.Account
+                        }
+                    });
+                }
+            }
+
+            if (!result.Any())
+            {
+                string account = null; ;
+                while (true)
+                {
+                    account = registryContext.GetNextKumiAccountNumber();
+                    if (registryContext.KumiAccounts.Count(r => r.Account == account) == 0)
+                        break;
+                }
+                result.Add(new KumiAccountsTenancyProcessesAssoc
+                {
+                    IdProcess = tenancyProcess.IdProcess,
+                    Fraction = 1.0000m,
+                    AccountNavigation = new KumiAccount
+                    {
+                        Account = account
+                    }
+                });
+            }
+
+            return result;
         }
 
         public void Edit(TenancyProcess tenancyProcess)

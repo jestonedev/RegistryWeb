@@ -591,13 +591,16 @@ namespace RegistryWeb.DataServices
             var startRewriteDate = DateTime.Now.Date;
             startRewriteDate = startRewriteDate.AddDays(-startRewriteDate.Day + 1);
 
-            if (DateTime.Now.Date.Day <= 3) // Предыдущий период блокируется для перезаписи по истечении трех дней текущего периода
-            {
-                startRewriteDate = startRewriteDate.AddMonths(-1);
-            }
 
             var endCalcDate = DateTime.Now.Date;
             endCalcDate = endCalcDate.AddDays(-endCalcDate.Day + 1).AddMonths(1).AddDays(-1);
+
+            if (DateTime.Now.Date.Day >= 25) // Предыдущий период блокируется для перезаписи по истечении трех дней текущего периода
+            {
+                startRewriteDate = startRewriteDate.AddMonths(1);
+                endCalcDate = endCalcDate.AddDays(1).AddMonths(1).AddDays(-1);
+            }
+
             kumiAccountsDataService.RecalculateAccounts(accounts, startRewriteDate, endCalcDate);  
 
             return new KumiPaymentDistributionInfo
@@ -655,7 +658,13 @@ namespace RegistryWeb.DataServices
 
                     var startPeriodDate = date.Value.AddDays(-date.Value.Day + 1);
                     var endPeriodDate = date.Value.AddDays(-date.Value.Day + 1).AddMonths(1).AddDays(-1);
-                    var charge = registryContext.KumiCharges.AsNoTracking().FirstOrDefault(r => r.IdAccount == idObject && r.StartDate == startPeriodDate && r.EndDate == endPeriodDate);
+                    if (date.Value.Day >= 25)  // Если платеж после 25 числа включительно, то распределяем его на следующий месяц
+                    {
+                        startPeriodDate = startPeriodDate.AddMonths(1);
+                        endPeriodDate = endPeriodDate.AddDays(1).AddMonths(1).AddDays(-1);
+                    }
+                    var charge = registryContext.KumiCharges.AsNoTracking()
+                        .FirstOrDefault(r => r.IdAccount == idObject && r.StartDate == startPeriodDate && r.EndDate == endPeriodDate);
 
                     var paymentCharge = new KumiPaymentCharge
                     {
@@ -728,12 +737,17 @@ namespace RegistryWeb.DataServices
             // Recalculate
             var startRewriteDate = DateTime.Now.Date;
             startRewriteDate = startRewriteDate.AddDays(-startRewriteDate.Day + 1);
-            if (DateTime.Now.Date.Day <= 3) // Предыдущий период блокируется для перезаписи по истечении трех дней текущего периода
-            {
-                startRewriteDate = startRewriteDate.AddMonths(-1);
-            }
+
+
             var endCalcDate = DateTime.Now.Date;
             endCalcDate = endCalcDate.AddDays(-endCalcDate.Day + 1).AddMonths(1).AddDays(-1);
+
+            if (DateTime.Now.Date.Day >= 25) // Предыдущий период блокируется для перезаписи по истечении трех дней текущего периода
+            {
+                startRewriteDate = startRewriteDate.AddMonths(1);
+                endCalcDate = endCalcDate.AddDays(1).AddMonths(1).AddDays(-1);
+            }
+            
             kumiAccountsDataService.RecalculateAccounts(accounts, startRewriteDate, endCalcDate);
 
             return new KumiPaymentDistributionInfo

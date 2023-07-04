@@ -61,5 +61,15 @@ namespace RegistryPaymentCalculator
                 return toStr.Split(',').Select(r => r.Trim()).ToList();
             }
         }
+        public static List<string> SmtpSuccessTo
+        {
+            get
+            {
+                var toStr = ConfigurationManager.AppSettings["smtpSuccessTo"];
+                if (string.IsNullOrWhiteSpace(toStr)) return new List<string>();
+                return toStr.Split(',').Select(r => r.Trim()).ToList();
+            }
+        }
+
     }
 }

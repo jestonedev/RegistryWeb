@@ -432,31 +432,6 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult DistributePaymentToAccountFake(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo,
-            decimal tenancySum, decimal penaltySum)
-        {
-            try
-            {
-                Thread.Sleep(2000);
-                if (idPayment % 2 == 0) throw new Exception("Тестовая ошибка распределния платежа");
-                return Json(new
-                {
-                    State = "Success",
-                    Sum = tenancySum+ penaltySum,
-                    DistrubutedToTenancySum = tenancySum,
-                    DistrubutedToPenaltySum = penaltySum
-                });
-            }
-            catch (Exception e)
-            {
-                return Json(new
-                {
-                    State = "Error",
-                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
-                });
-            }
-        }
-
         public IActionResult DistributePaymentToAccount(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo,
             decimal tenancySum, decimal penaltySum)
         {

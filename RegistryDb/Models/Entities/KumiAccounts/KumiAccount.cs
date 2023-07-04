@@ -24,6 +24,7 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public byte RecalcMarker { get; set; }
         public string RecalcReason { get; set; }
         public DateTime? LastChargeDate { get; set; }
+        public DateTime? LastCalcDate { get; set; }
         public decimal? CurrentBalanceTenancy { get; set; }
         public decimal? CurrentBalancePenalty { get; set; }
         public byte Deleted { get; set; }

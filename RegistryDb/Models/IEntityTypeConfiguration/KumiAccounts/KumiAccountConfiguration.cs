@@ -64,6 +64,10 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnName("last_charge_date")
                 .HasColumnType("date");
 
+            builder.Property(e => e.LastCalcDate)
+                .HasColumnName("last_calc_date")
+                .HasColumnType("date");
+
             builder.Property(e => e.CurrentBalanceTenancy)
                 .HasColumnName("current_balance_tenancy")
                 .HasColumnType("decimal(12,2)");

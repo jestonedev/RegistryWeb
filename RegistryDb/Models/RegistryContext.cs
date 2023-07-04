@@ -217,6 +217,7 @@ namespace RegistryDb.Models
         public virtual DbSet<KumiAccountsTenancyProcessesAssoc> KumiAccountsTenancyProcessesAssocs { get; set; }
         public virtual DbSet<KumiAccountState> KumiAccountStates { get; set; }
         public virtual DbSet<KumiCharge> KumiCharges { get; set; }
+        public virtual DbSet<KumiChargeMassCalcInfo> KumiChargeMassChargeInfos { get; set; }
         public virtual DbSet<KumiPayment> KumiPayments { get; set; }
         public virtual DbSet<KumiPaymentCharge> KumiPaymentCharges { get; set; }
         public virtual DbSet<KumiPaymentClaim> KumiPaymentClaims { get; set; }
@@ -248,6 +249,9 @@ namespace RegistryDb.Models
         public virtual DbSet<BuildingOwnershipRightCurrent> BuildingsOwnershipRightCurrent { get; set; }
         public virtual DbSet<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
         public virtual DbSet<KumiAccountAddress> KumiAccountAddresses { get; set; }
+
+        // Stored procedures
+        private DbSet<NextAccountNumber> NextKumiAccountNumber { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -408,6 +412,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new KumiAccountsTenancyProcessesAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiAccountStateConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiChargeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiChargeMassCalcInfoConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentChargeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentClaimConfiguration(nameDatebase));
@@ -437,6 +442,11 @@ namespace RegistryDb.Models
 
             foreach (var entry in changedEntriesCopy)
                 entry.State = EntityState.Detached;
+        }
+
+        public string GetNextKumiAccountNumber()
+        {
+            return NextKumiAccountNumber.FromSql("SELECT CAST(f_nextval('kumi_accounts') AS CHAR) AS id").FirstOrDefault()?.Id;
         }
     }
 }

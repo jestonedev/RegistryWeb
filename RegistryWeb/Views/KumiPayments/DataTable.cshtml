@@ -5,7 +5,7 @@
 @using RegistryServices.Models.KumiPayments;
 @model RegistryServices.ViewModel.KumiAccounts.KumiPaymentsVM;
 @{
-    var ids = Context.Session.Get<List<int>>("idPayment") ?? new List<int>();
+    var ids = Context.Session.Get<List<int>>("idPayments") ?? new List<int>();
     var check = "";
     Context.Session.Set("Controller", "KumiPayments");
     Context.Session.Set("Action", "Index");

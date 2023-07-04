@@ -230,17 +230,19 @@ namespace RegistryWeb.DataServices
 
             DateTime? startRewriteDate = DateTime.Now.Date;
             startRewriteDate = startRewriteDate.Value.AddDays(-startRewriteDate.Value.Day + 1);
-            if (DateTime.Now.Date.Day <= 3) // Предыдущий период блокируется для перезаписи по истечении трех дней текущего периода
+
+            var endCalcDate = DateTime.Now.Date;
+            endCalcDate = endCalcDate.AddDays(-endCalcDate.Day + 1).AddMonths(1).AddDays(-1);
+
+            if (DateTime.Now.Date.Day >= 25) // Предыдущий период блокируется для перезаписи по истечении трех дней текущего периода
             {
-                startRewriteDate = startRewriteDate.Value.AddMonths(-1);
+                startRewriteDate = startRewriteDate.Value.AddMonths(1);
+                endCalcDate = endCalcDate.AddDays(1).AddMonths(1).AddDays(-1);
             }
             if (recalcType == KumiAccountRecalcTypeEnum.RewriteCharge)
             {
                 startRewriteDate = recalcStartDate;
             }
-
-            var endCalcDate = DateTime.Now.Date;
-            endCalcDate = endCalcDate.AddDays(-endCalcDate.Day + 1).AddMonths(1).AddDays(-1);
 
             RecalculateAccounts(accounts, startRewriteDate, endCalcDate);
         }
@@ -301,7 +303,7 @@ namespace RegistryWeb.DataServices
 
                 startRewriteDate = CorrectStartRewriteDate(startRewriteDate.Value, startCalcDate.Value, dbChargingInfo);
                 CalcRecalcInfo(account, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, endCalcDate, startRewriteDate.Value);
-                UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate.Value);
+                UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate.Value, null);
             }
         }
 
@@ -325,6 +327,7 @@ namespace RegistryWeb.DataServices
             if (account.Charges.Any(r => r.IsBksCharge == 1))
             {
                 maxBksCharegeDate = account.Charges.Where(r => r.IsBksCharge == 1).Select(r => r.EndDate).Max();
+                maxBksCharegeDate = maxBksCharegeDate.Value.AddDays(-maxBksCharegeDate.Value.Day + 1).AddDays(24); // 25 число месяца, когда было начисление БКС
             }
 
             // Оригиналы платежей и ПИР для добавления в акт
@@ -547,7 +550,7 @@ namespace RegistryWeb.DataServices
 
         public void UpdateChargesIntoDb(KumiAccountInfoForPaymentCalculator account, List<KumiCharge> chargingInfo,
             List<KumiCharge> dbChargingInfo,
-            DateTime startCalcDate, DateTime endCalcDate, DateTime startRewriteDate)
+            DateTime startCalcDate, DateTime endCalcDate, DateTime startRewriteDate, DateTime? calcDate)
         {
             var actualDbCharges = dbChargingInfo.ToList();
             KumiCharge firstDbRewriteCharge = null;
@@ -670,6 +673,10 @@ namespace RegistryWeb.DataServices
             accountDb.CurrentBalanceTenancy = currentTenancy;
             accountDb.CurrentBalancePenalty = currentPenalty;
             accountDb.LastChargeDate = lastChargingDate;
+            if (calcDate != null)
+                accountDb.LastCalcDate = calcDate;
+            else
+                accountDb.LastCalcDate = (accountDb.LastCalcDate != null && accountDb.LastCalcDate > DateTime.Now.Date) ? accountDb.LastCalcDate : DateTime.Now.Date;
             accountDb.RecalcMarker = 0;
             accountDb.RecalcReason = null;
             registryContext.SaveChanges();
@@ -874,10 +881,12 @@ namespace RegistryWeb.DataServices
                 }
             }
 
+            var paymentStartDate = startDate.AddMonths(-1).AddDays(24);
+            var paymentEndDate = endDate.AddDays(1).AddMonths(-1).AddDays(23);
             var payments = account.Payments.Where(r =>
-                r.DateExecute != null ? r.DateExecute >= startDate && r.DateExecute <= endDate :
-                r.DateIn != null ? r.DateIn >= startDate && r.DateIn <= endDate :
-                r.DateDocument != null ? r.DateDocument >= startDate && r.DateDocument <= endDate : false);
+                r.DateExecute != null ? r.DateExecute >= paymentStartDate && r.DateExecute <= paymentEndDate :
+                r.DateIn != null ? r.DateIn >= paymentStartDate && r.DateIn <= paymentEndDate :
+                r.DateDocument != null ? r.DateDocument >= paymentStartDate && r.DateDocument <= paymentEndDate : false);
 
             var claimIds = account.Claims.Select(r => r.IdClaim).ToList();
             var chargeIds = account.Charges.Select(r => r.IdCharge).ToList();
@@ -916,10 +925,12 @@ namespace RegistryWeb.DataServices
         {
             var chargeIds = dbCharges.Select(r => r.IdCharge).ToList();
 
+            var paymentEndDate = endDate.Value.AddDays(1).AddMonths(-1).AddDays(23);
+
             var calcPayments = payments.Where(r =>
-                r.DateExecute != null ? r.DateExecute <= endDate :
-                r.DateIn != null ? r.DateIn <= endDate :
-                r.DateDocument != null ? r.DateDocument <= endDate : false).Where(r => r.PaymentCharges.Any(pc => chargeIds.Contains(pc.IdCharge)));
+                r.DateExecute != null ? r.DateExecute <= paymentEndDate :
+                r.DateIn != null ? r.DateIn <= paymentEndDate :
+                r.DateDocument != null ? r.DateDocument <= paymentEndDate : false).Where(r => r.PaymentCharges.Any(pc => chargeIds.Contains(pc.IdCharge)));
 
             // Для ПИР, которые были до даты последнего начисления БКС:
             // Не учитывать в расчете пени, т.к. оплаты по ним отражены в движении от БКС
@@ -930,7 +941,7 @@ namespace RegistryWeb.DataServices
             }
 
             var preparedClaims = claims.Where(r =>
-                    r.EndDeptPeriod <= endDate && (bksChargeLastDate == null || r.AtDate > bksChargeLastDate) &&
+                    r.EndDeptPeriod <= paymentEndDate && (bksChargeLastDate == null || r.AtDate > bksChargeLastDate) &&
                     r.ClaimStates.Any(s => s.IdStateType == 4 && s.CourtOrderDate != null) &&
                     !r.ClaimStates.Any(s => s.IdStateType == 6 && s.CourtOrderCancelDate != null))
                 .Select(r => new KumiSumDateInfo
@@ -1208,6 +1219,7 @@ namespace RegistryWeb.DataServices
                 if (account.Charges.Any(r => r.IsBksCharge == 1))
                 {
                     maxBksCharegeDate = account.Charges.Where(r => r.IsBksCharge == 1).Select(r => r.EndDate).Max();
+                    maxBksCharegeDate = maxBksCharegeDate.Value.AddDays(-maxBksCharegeDate.Value.Day+1).AddDays(24); // 25 число месяца, когда было начисление БКС
                 }
 
                 accountInfo.Payments = accountInfo.Payments.Where(r => maxBksCharegeDate == null || (r.DateExecute ?? r.DateIn ?? r.DateDocument).Value > maxBksCharegeDate).ToList();
