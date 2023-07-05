@@ -273,20 +273,31 @@ namespace RegistryWeb.Controllers
         {
             IQueryable<KumiAccount> accountsResult = null;
             IQueryable<Claim> claimsResult = null;
+
+            var idStreet = filterOptions.IdStreet;
+            var house = filterOptions.House;
+            var premise = filterOptions.PremisesNum;
+            filterOptions.IdStreet = null;
+            filterOptions.House = null;
+            filterOptions.PremisesNum = null;
+
             if (!filterOptions.IsTenancyEmpty())
             {
                 var tenancies = tenancyProcessesDataService.GetTenancyProcesses(filterOptions);
                 accountsResult = tenancies.Where(r => r.AccountsTenancyProcessesAssoc.Count() > 0)
-                    .SelectMany(r => r.AccountsTenancyProcessesAssoc.Select(atpa => atpa.AccountNavigation));
+                    .SelectMany(r => r.AccountsTenancyProcessesAssoc.Select(atpa => atpa.AccountNavigation)).Distinct();
             }
 
-            if(!filterOptions.IsAccountEmpty())
+            if (!filterOptions.IsAccountEmpty() || !string.IsNullOrEmpty(idStreet) || !string.IsNullOrEmpty(house) || !string.IsNullOrEmpty(premise))
             {
                 var accounts = kumiAccountsDataService.GetKumiAccounts(new KumiAccountsFilter
                 {
                     Account = filterOptions.Account,
                     AccountGisZkh = filterOptions.AccountGisZkh,
-                    IdAccountState = filterOptions.IdAccountState
+                    IdAccountState = filterOptions.IdAccountState,
+                    IdStreet = idStreet,
+                    House = house,
+                    PremisesNum = premise
                 });
                 if (accountsResult == null)
                     accountsResult = accounts;
@@ -330,7 +341,8 @@ namespace RegistryWeb.Controllers
                 return Json(new
                 {
                     Count = count,
-                    Claims = claimsResult.Select(r => new {
+                    Claims = claimsResult.Select(r => new
+                    {
                         r.IdClaim,
                         r.IdAccountKumiNavigation.Account,
                         IdAccount = r.IdAccountKumi,
@@ -344,7 +356,9 @@ namespace RegistryWeb.Controllers
                         r.EndDeptPeriod,
                         AccountCurrentBalanceTenancy = r.IdAccountKumiNavigation.CurrentBalanceTenancy,
                         AccountCurrentBalancePenalty = r.IdAccountKumiNavigation.CurrentBalancePenalty,
-                        AccountLastChargeDate = r.IdAccountKumiNavigation.LastChargeDate
+                        AccountLastChargeDate = r.IdAccountKumiNavigation.LastChargeDate,
+                        CourtOrderNum = r.ClaimStates.FirstOrDefault(cs => cs.IdStateType == 4) == null ? null :
+                            r.ClaimStates.FirstOrDefault(cs => cs.IdStateType == 4).CourtOrderNum
                     })
                 });
             }

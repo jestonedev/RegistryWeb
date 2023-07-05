@@ -39,6 +39,7 @@ using RegistryDb.Models.Entities.RegistryObjects.Common;
 using RegistryDb.Models.Entities.RegistryObjects.Common.Restrictions;
 using RegistryDb.Models.Entities.Tenancies;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace RegistryDb.Models
 {
@@ -214,6 +215,7 @@ namespace RegistryDb.Models
 
         //Платежи
         public virtual DbSet<KumiAccount> KumiAccounts { get; set; }
+        private DbSet<KumiAccountAddressInfix> KumiAccountAddressInfixes { get; set; }
         public virtual DbSet<KumiAccountsTenancyProcessesAssoc> KumiAccountsTenancyProcessesAssocs { get; set; }
         public virtual DbSet<KumiAccountState> KumiAccountStates { get; set; }
         public virtual DbSet<KumiCharge> KumiCharges { get; set; }
@@ -409,6 +411,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new PrivContractorWarrantTemplateConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new KumiAccountConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiAccountAddressInfixConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiAccountsTenancyProcessesAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiAccountStateConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiChargeConfiguration(nameDatebase));
@@ -447,6 +450,23 @@ namespace RegistryDb.Models
         public string GetNextKumiAccountNumber()
         {
             return NextKumiAccountNumber.FromSql("SELECT CAST(f_nextval('kumi_accounts') AS CHAR) AS id").FirstOrDefault()?.Id;
+        }
+
+        public List<int> GetKumiAccountIdsByAddressInfixes(List<string> infixes)
+        {
+            if (!infixes.Any())
+                return new List<int>();
+            var query = "SELECT * FROM kumi_accounts_address_infix WHERE ";
+            for (var i = 0; i < infixes.Count; i++)
+            {
+                query += string.Format(" infix LIKE '{0}%'", infixes[i]);
+                if (i < infixes.Count - 1)
+                {
+                    query += " OR ";
+                }
+            }
+            var result = KumiAccountAddressInfixes.FromSql(query);
+            return result.Select(r => r.IdAccount).ToList();
         }
     }
 }

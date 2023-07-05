@@ -1660,61 +1660,21 @@ namespace RegistryWeb.DataServices
 
             var addresses = addressesDataService.GetAddressesByText(filterOptions.Address.Text).Select(r => r.Id);
 
-            var buildingsAssoc = registryContext.TenancyBuildingsAssoc
-                .Include(b => b.BuildingNavigation)
-                .Include(t => t.ProcessNavigation)
-                .ThenInclude(p => p.AccountsTenancyProcessesAssoc);
-
-            var premisesAssoc = registryContext.TenancyPremisesAssoc
-                .Include(p => p.PremiseNavigation)
-                .ThenInclude(b => b.IdBuildingNavigation)
-                .Include(t => t.ProcessNavigation)
-                .ThenInclude(p => p.AccountsTenancyProcessesAssoc);
-
-            var subPremisesAssoc = registryContext.TenancySubPremisesAssoc
-                .Include(sp => sp.SubPremiseNavigation)
-                .ThenInclude(p => p.IdPremisesNavigation)
-                .ThenInclude(b => b.IdBuildingNavigation)
-                .Include(t => t.ProcessNavigation)
-                .ThenInclude(p => p.AccountsTenancyProcessesAssoc);
-
             IEnumerable<int> idAccounts = new List<int>();
             var filtered = false;
 
             if (filterOptions.Address.AddressType == AddressTypes.Street || !string.IsNullOrEmpty(filterOptions.IdStreet))
             {
                 var streets = filterOptions.Address.AddressType == AddressTypes.Street ? addresses : new List<string> { filterOptions.IdStreet };
-                var idBuildingAccounts = buildingsAssoc
-                    .Where(oba => streets.Contains(oba.BuildingNavigation.IdStreet) && 
-                        oba.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(oba => oba.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                var idPremiseAccounts = premisesAssoc
-                    .Where(opa => streets.Contains(opa.PremiseNavigation.IdBuildingNavigation.IdStreet) && 
-                        opa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(opa => opa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                var idSubPremiseAccounts = subPremisesAssoc
-                    .Where(ospa => streets.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet) && 
-                        ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                idAccounts = idBuildingAccounts.Union(idPremiseAccounts.Union(idSubPremiseAccounts));
+                var infixes = streets.Select(r => string.Concat("s", r));
+
+                idAccounts = registryContext.GetKumiAccountIdsByAddressInfixes(infixes.ToList());
                 filtered = true;
             } else
             if (!string.IsNullOrEmpty(filterOptions.IdRegion))
             {
-                var idBuildingAccounts = buildingsAssoc
-                    .Where(oba => oba.BuildingNavigation.IdStreet.StartsWith(filterOptions.IdRegion) && 
-                        oba.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(oba => oba.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                var idPremiseAccounts = premisesAssoc
-                    .Where(opa => opa.PremiseNavigation.IdBuildingNavigation.IdStreet.StartsWith(filterOptions.IdRegion) && 
-                        opa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(opa => opa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                var idSubPremiseAccounts = subPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation
-                    .IdBuildingNavigation.IdStreet.StartsWith(filterOptions.IdRegion) && 
-                        ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                idAccounts = idBuildingAccounts.Union(idPremiseAccounts.Union(idSubPremiseAccounts));
+                var infix = "s"+filterOptions.IdRegion.ToString();
+                idAccounts = registryContext.GetKumiAccountIdsByAddressInfixes(new List<string> { infix });
                 filtered = true;
             }
             var addressesInt = addresses.Where(a => int.TryParse(a, out int aInt)).Select(a => int.Parse(a));
@@ -1725,16 +1685,11 @@ namespace RegistryWeb.DataServices
                 {
                     addressesInt = new List<int> { filterOptions.IdBuilding.Value };
                 }
-                var idBuildingAccounts = buildingsAssoc
-                    .Where(oba => addressesInt.Contains(oba.IdBuilding) && oba.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(oba => oba.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                var idPremiseAccounts = premisesAssoc
-                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdBuilding) && opa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(opa => opa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                var idSubPremiseAccounts = subPremisesAssoc
-                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuilding) && ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                idAccounts = idBuildingAccounts.Union(idPremiseAccounts.Union(idSubPremiseAccounts));
+
+                var infixes = from buildingBow in registryContext.Buildings
+                              where addressesInt.Contains(buildingBow.IdBuilding)
+                              select string.Concat("s", buildingBow.IdStreet, "b", buildingBow.IdBuilding.ToString());
+                idAccounts = registryContext.GetKumiAccountIdsByAddressInfixes(infixes.ToList());
                 filtered = true;
             }
             if ((filterOptions.Address.AddressType == AddressTypes.Premise && addressesInt.Any()) || filterOptions.IdPremises != null)
@@ -1743,13 +1698,13 @@ namespace RegistryWeb.DataServices
                 {
                     addressesInt = new List<int> { filterOptions.IdPremises.Value };
                 }
-                var idPremiseAccounts = premisesAssoc
-                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdPremises) && opa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(opa => opa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                var idSubPremiseAccounts = subPremisesAssoc
-                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdPremises) && ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                idAccounts = idPremiseAccounts.Union(idSubPremiseAccounts);
+                
+                var infixes = from buildingBow in registryContext.Buildings
+                                join premisesRow in registryContext.Premises
+                                on buildingBow.IdBuilding equals premisesRow.IdBuilding
+                              where addressesInt.Contains(premisesRow.IdPremises)
+                              select string.Concat("s", buildingBow.IdStreet, "b", buildingBow.IdBuilding.ToString(), "p", premisesRow.IdPremises.ToString());
+                idAccounts = registryContext.GetKumiAccountIdsByAddressInfixes(infixes.ToList());
                 filtered = true;
             }
             if ((filterOptions.Address.AddressType == AddressTypes.SubPremise && addressesInt.Any()) || filterOptions.IdSubPremises != null)
@@ -1758,47 +1713,49 @@ namespace RegistryWeb.DataServices
                 {
                     addressesInt = new List<int> { filterOptions.IdSubPremises.Value };
                 }
-                idAccounts = subPremisesAssoc
-                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdSubPremises) && ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
+
+                var infixes = from buildingBow in registryContext.Buildings
+                              join premisesRow in registryContext.Premises
+                              on buildingBow.IdBuilding equals premisesRow.IdBuilding
+                              join subPremisesRow in registryContext.SubPremises
+                              on premisesRow.IdPremises equals subPremisesRow.IdPremises
+                              where addressesInt.Contains(subPremisesRow.IdSubPremises)
+                              select string.Concat("s", buildingBow.IdStreet, "b", buildingBow.IdBuilding.ToString(), "p", 
+                                premisesRow.IdPremises.ToString(), "sp", subPremisesRow.IdSubPremises.ToString());
+                idAccounts = registryContext.GetKumiAccountIdsByAddressInfixes(infixes.ToList());
+                filtered = true;
+            }
+            if (!string.IsNullOrEmpty(filterOptions.House))
+            {
+                var infixes = from buildingBow in registryContext.Buildings
+                              where buildingBow.House.ToLowerInvariant().Equals(filterOptions.House.ToLowerInvariant())
+                              select string.Concat("s", buildingBow.IdStreet, "b", buildingBow.IdBuilding.ToString());
+                var idAccountsBuf = registryContext.GetKumiAccountIdsByAddressInfixes(infixes.ToList());
+                if (filtered)
+                    idAccounts = idAccounts.Intersect(idAccountsBuf);
+                else
+                    idAccounts = idAccountsBuf;
+                filtered = true;
+
+            }
+            if (!string.IsNullOrEmpty(filterOptions.PremisesNum))
+            {
+                var infixes = from buildingBow in registryContext.Buildings
+                              join premisesRow in registryContext.Premises
+                              on buildingBow.IdBuilding equals premisesRow.IdBuilding
+                              where premisesRow.PremisesNum.ToLower().Equals(filterOptions.PremisesNum.ToLowerInvariant())
+                              select string.Concat("s", buildingBow.IdStreet, "b", buildingBow.IdBuilding.ToString(), "p", premisesRow.IdPremises.ToString());
+                var idAccountsBuf = registryContext.GetKumiAccountIdsByAddressInfixes(infixes.ToList());
+                if (filtered)
+                    idAccounts = idAccounts.Intersect(idAccountsBuf);
+                else
+                    idAccounts = idAccountsBuf;
                 filtered = true;
             }
             if (filtered)
             {
                 query = from q in query
-                        join idAccount in idAccounts on q.IdAccount equals idAccount
-                        select q;
-            }
-            if (!string.IsNullOrEmpty(filterOptions.House))
-            {
-                var idBuildingAccounts = buildingsAssoc
-                   .Where(oba => oba.BuildingNavigation.House.ToLowerInvariant().Equals(filterOptions.House.ToLowerInvariant()) 
-                        && oba.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                   .SelectMany(oba => oba.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                var idPremiseAccounts = premisesAssoc
-                    .Where(opa => opa.PremiseNavigation.IdBuildingNavigation.House.ToLowerInvariant().Equals(filterOptions.House.ToLowerInvariant())
-                        && opa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(opa => opa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                var idSubPremiseAccounts = subPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.House.ToLowerInvariant().Equals(filterOptions.House.ToLowerInvariant())
-                        && ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                query = from q in query
-                        join idAccount in idBuildingAccounts.Union(idPremiseAccounts.Union(idSubPremiseAccounts)) on q.IdAccount equals idAccount
-                        select q;
-            }
-            if (!string.IsNullOrEmpty(filterOptions.PremisesNum))
-            {
-                var idPremiseAccounts = premisesAssoc
-                    .Where(opa => opa.PremiseNavigation.PremisesNum.ToLowerInvariant().Equals(filterOptions.PremisesNum.ToLowerInvariant())
-                        && opa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(opa => opa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                var idSubPremiseAccounts = subPremisesAssoc
-                    .Where(ospa => ospa.SubPremiseNavigation.IdPremisesNavigation.PremisesNum.ToLowerInvariant().Equals(filterOptions.PremisesNum.ToLowerInvariant())
-                        && ospa.ProcessNavigation.AccountsTenancyProcessesAssoc != null)
-                    .SelectMany(ospa => ospa.ProcessNavigation.AccountsTenancyProcessesAssoc.Select(r => r.IdAccount));
-                query = from q in query
-                        join idAccount in idPremiseAccounts.Union(idSubPremiseAccounts) on q.IdAccount equals idAccount
+                        where idAccounts.Contains(q.IdAccount)
                         select q;
             }
             return query;

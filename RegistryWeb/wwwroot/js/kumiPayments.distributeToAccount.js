@@ -111,7 +111,7 @@ function distributePaymentFormatSum(sum) {
 
 var distributionModalOnSelectCallback = undefined;
 
-function distributionModalInitiate(purpose, paymentSum, paymentSumPosted, idPayment, attachInsteadOfDistribute, onSelectCallback) {
+function distributionModalInitiate(purpose, account, paymentSum, paymentSumPosted, idPayment, attachInsteadOfDistribute, onSelectCallback) {
     distributionModalOnSelectCallback = onSelectCallback;
 
     var modalForm = $("#DistributePaymentToAccountModalForm");
@@ -123,6 +123,9 @@ function distributionModalInitiate(purpose, paymentSum, paymentSumPosted, idPaym
     modalForm.find("#DistributePaymentToAccount_SumForDistribution").val(sumForDistribution);
     
     var purposeInfo = parsePurpose(purpose);
+
+    if (purposeInfo.account === null)
+        purposeInfo.account = account;
 
     var modal = $("#DistributePaymentToAccountModal");
     modal.find("input[type='text'], input[type='date'], select").prop("disabled", false);
@@ -327,7 +330,7 @@ $(function () {
 
     function buildClaimForDistribTable(claims, factCount) {
         var table = "<table class='table table-bordered mb-0 text-center'>";
-        table += "<thead><tr><th rowspan='2'></th><th rowspan='2'>ЛС</th><th colspan='2'>Текущее сальдо</th><th rowspan='2'>Период взыскания</th><th colspan='2'>Взыскиваемая сумма</th><th colspan='2'>Взысканная сумма</th></tr>" +
+        table += "<thead><tr><th rowspan='2'></th><th rowspan='2'>ЛС</th><th colspan='2'>Текущее сальдо</th><th rowspan='2'>ПИР</th><th colspan='2'>Взыскиваемая сумма</th><th colspan='2'>Взысканная сумма</th></tr>" +
             "<tr><th>Найм</th><th>Пени</th><th>Найм</th><th>Пени</th><th>Найм</th><th>Пени</th></tr></thead><tbody>";
         for (var j = 0; j < claims.length; j++) {
             var claim = claims[j];
@@ -372,7 +375,7 @@ $(function () {
                 + "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-payment-list-eye-btn' href='/KumiAccounts/Details?idAccount=" + claim.idAccount + "' target='_blank'></a>"
                 + "</td>"
                 + "<td>" + distributePaymentFormatSum(claim.accountCurrentBalanceTenancy) + "</td><td>" + distributePaymentFormatSum(claim.accountCurrentBalancePenalty)
-                + "</td><td>" + deptPeriod
+                + "</td><td>" + (claim.courtOrderNum != null ? "с\\п " + claim.courtOrderNum+", " : "") + deptPeriod
                 + "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-payment-list-eye-btn' href='/Claims/Details?idClaim=" + claim.idClaim + "' target='_blank'></a>"
                 + "</td><td>" + distributePaymentFormatSum(amountTenancy) + "</td><td>" + distributePaymentFormatSum(amountPenalties)
                 + "</td><td>" + distributePaymentFormatSum(amountTenancyRecovered) + "</td><td>" + distributePaymentFormatSum(amountPenaltiesRecovered) + "</td>";

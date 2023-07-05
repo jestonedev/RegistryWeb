@@ -11,8 +11,8 @@
         var purpose = $(paymentRow).find(".rr-payment-purpose").text();
         var purposeInfo = parsePurpose(purpose);
         if (isEmptyPurpose(purposeInfo)) {
+            notFoundDistribObjectByPurpose(paymentRow, "Назначение платежа не определено", "Выберите лицевой счет или ПИР для распределния платежа");
             if (paymentRows.length > 0) {
-                notFoundDistribObjectByPurpose(paymentRow, "Назначение платежа не определено", "Выберите лицевой счет или ПИР для распределния платежа");
                 getPaymentDistributionInfo(paymentRows.shift());
             } else {
                 $("#RunMassPaymentDistribution").removeClass("disabled");
@@ -218,7 +218,7 @@
         var paymentSumPosted = paymentRow.data("paymentSumPosted");
         var purpose = paymentRow.find(".rr-payment-purpose.rr-distribute-form-payment-purpose").text();
 
-        distributionModalInitiate(purpose, paymentSum, paymentSumPosted, idPayment, true, attachPaymentToObjectOnSelectCallback);
+        distributionModalInitiate(purpose, null, paymentSum, paymentSumPosted, idPayment, true, attachPaymentToObjectOnSelectCallback);
 
         e.preventDefault();
     });
@@ -229,8 +229,8 @@
         var paymentSum = paymentRow.data("paymentSum");
         var paymentSumPosted = paymentRow.data("paymentSumPosted");
         var purpose = paymentRow.find(".rr-payment-purpose.rr-distribute-form-payment-purpose").text();
-
-        distributionModalInitiate(purpose, paymentSum, paymentSumPosted, idPayment, true, attachPaymentToObjectOnSelectCallback);
+        var account = paymentRow.find(".rr-payment-distribution-object-caption-wrapper").data("account");
+        distributionModalInitiate(purpose, account, paymentSum, paymentSumPosted, idPayment, true, attachPaymentToObjectOnSelectCallback);
 
         e.preventDefault();
     });
@@ -368,7 +368,7 @@
         $("#ConfirmRunPaymentDistirbutionModal").modal('hide');
 
         var paymentsForDistributionRows = $(".rr-payment-for-distribution").filter(function (idx, elem) {
-            return $(elem).data("state") === "selected";
+            return $(elem).data("state") === "selected" && $(elem).find(".rr-payment-checked-for-distrib").is(":checked");
         });
 
         paymentsForDistributionRows.find(".rr-payment-distribution-result-info").addClass("d-none").removeClass("alert").removeClass("alert-primary").removeClass("alert-danger").removeClass("alert-warning").removeClass("text-danger").removeClass("text-warning");
@@ -422,8 +422,6 @@
             url: url,
             data: paymentInfo,
             success: function (result) {
-                console.log(result);
-
                 paymentRow.find(".rr-payment-distribution-details-loader").addClass("d-none");
                 if (result.state === "Error") {
                     paymentRow.find(".rr-payment-distribution-result-info").text(result.error).addClass("text-danger").addClass("alert").addClass("alert-danger").removeClass("d-none");
