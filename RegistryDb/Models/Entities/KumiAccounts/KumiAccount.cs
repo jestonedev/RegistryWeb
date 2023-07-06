@@ -33,5 +33,6 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public virtual IList<KumiAccountsTenancyProcessesAssoc> AccountsTenancyProcessesAssoc { get; set; }
         public virtual IList<Claim> Claims { get; set; }
         public virtual IList<KumiCharge> Charges { get; set; }
+        public virtual IList<KumiChargeCorrection> Corrections { get; set; }
     }
 }

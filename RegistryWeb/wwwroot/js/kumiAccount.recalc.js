@@ -5,6 +5,8 @@
     recalcAccountFormValidator.settings.ignore = '.rr-valid-ignore';
     recalcAccountFormValidator.settings.ignoreTitle = true;
 
+    var addChargeCorrectionForm = $("#accountAddCorrectionForm");
+
     $("#AccountKumiRecalc_RecalcType").on("change", function (e) {
         var idRecalcType = $(this).val();
         var recalcPeriodElem = $("#AccountKumiRecalc_RecalcPeriod");
@@ -41,9 +43,17 @@
         e.preventDefault();
     });
 
+    $("#AccountRecalcBtn").on("click", function (e) {
+        var idAccount = $("#accountForm #IdAccount").val();
+        var modal = $("#accountRecalcModal");
+        modal.find("input[name='AccountKumiRecalc.IdAccount']").val(idAccount);
+        modal.find("select, input").prop('disabled', false);
+        modal.modal('show');
+        e.preventDefault();
+    });
+
     $("#accountRecalcForm .rr-report-submit").on("click", function (e) {
-        if ($(this).is)
-        $(".rr-recalc-account-error").addClass("d-none");
+        recalcAccountForm.find(".rr-recalc-account-error").addClass("d-none");
         if (recalcAccountForm.valid()) {
             $(this).attr("disabled", "disabled").text("Выполняется расчет...");
             var recalcType = $("#AccountKumiRecalc_RecalcType").val();
@@ -64,6 +74,51 @@
             }
         } else {
             fixBootstrapSelectHighlight(recalcAccountForm);
+        }
+        e.preventDefault();
+    });
+
+    $("#AddChargeCorrectionBtn").on("click", function (e) {
+        var idAccount = $("#accountForm #IdAccount").val();
+        var modal = $("#accountAddCorrectionModal");
+
+        var chargeListHref = modal.find(".rr-charge-corrections-list-href");
+        if (chargeListHref.data("idAccount") === undefined) {
+            chargeListHref.data("idAccount", idAccount);
+            chargeListHref.attr("href", chargeListHref.attr("href") + "?idAccount=" + idAccount);
+        }
+        modal.find("input[name='AccountKumiChargeCorrection.IdAccount']").val(idAccount);
+        modal.find("textarea, input").prop('disabled', false);
+        modal.modal('show');
+        e.preventDefault();
+    });
+
+    $("#accountAddCorrectionForm .rr-report-submit").on("click", function (e) {
+        addChargeCorrectionForm.find(".rr-recalc-account-error").addClass("d-none");
+        var tenancyValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_TenancyValue");
+        $(tenancyValueElem).val($(tenancyValueElem).val().replace(',', '.'));
+        var penaltyValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PenaltyValue");
+        $(penaltyValueElem).val($(penaltyValueElem).val().replace(',', '.'));
+
+        if (addChargeCorrectionForm.valid()) {
+            $(this).attr("disabled", "disabled").text("Сохранение...");
+            var atDate = $("#AccountKumiChargeCorrection_AtDate").val();
+            var description = $("#AccountKumiChargeCorrection_Description").val();
+            var tenancyValue = $("#AccountKumiChargeCorrection_TenancyValue").val().replace('.', ',');
+            var penaltyValue = $("#AccountKumiChargeCorrection_PenaltyValue").val().replace('.', ',');
+            var idAccount = addChargeCorrectionForm.find("input[name='AccountKumiChargeCorrection.IdAccount']").val();
+
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + '/KumiAccounts/AddChargeCorrection',
+                data: { idAccount, atDate, tenancyValue, penaltyValue, description },
+                dataType: 'json',
+                success: function () {
+                    recalcAccounts([idAccount], [], 0, null, null);
+                }
+            });
+        } else {
+            fixBootstrapSelectHighlight(addChargeCorrectionForm);
         }
         e.preventDefault();
     });
@@ -96,7 +151,7 @@
                         location.reload();
                     }
                 } else {
-                    $(".rr-recalc-account-error").removeClass("d-none").text(data.error);
+                    recalcAccountForm.find(".rr-recalc-account-error").removeClass("d-none").text(data.error);
                     recalcAccountForm.find(".progress").addClass("d-none");
                     $("#accountRecalcModal .rr-report-submit").removeAttr("disabled").text("Перерасчет");
                 }

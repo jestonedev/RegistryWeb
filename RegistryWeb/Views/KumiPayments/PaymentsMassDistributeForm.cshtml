@@ -45,7 +45,6 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th></th>
             <th>Платеж</th>
             <th class="text-center">Информация о распределении</th>
             <th width="100px"></th>
@@ -59,9 +58,6 @@
                 var sum = item.Sum;
                 var sumPosted = item.PaymentCharges.Select(r => r.TenancyValue + r.PenaltyValue).Sum() + item.PaymentClaims.Select(r => r.TenancyValue + r.PenaltyValue).Sum();
                 <tr class="rr-payment-for-distribution" data-state="initial" data-payment-sum="@sum" data-payment-sum-posted="@sumPosted" data-id-payment="@item.IdPayment">
-                    <td class="align-middle">
-                        <input type="checkbox" class="rr-payment-checked-for-distrib" />
-                    </td>
                     <td>
                         @{
                             var isPl = item.IdSource == 3 || item.IdSource == 5;
@@ -212,6 +208,9 @@
                                     </div>
 
                                 </div>
+                            </div>
+                            <div class="rr-payment-checked-for-distrib-wrapper text-center d-none">
+                                <input type="checkbox" class="rr-payment-checked-for-distrib" /> Платеж проверен
                             </div>
                         </div>
                     </td>

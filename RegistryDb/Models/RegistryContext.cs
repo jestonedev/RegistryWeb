@@ -219,6 +219,7 @@ namespace RegistryDb.Models
         public virtual DbSet<KumiAccountsTenancyProcessesAssoc> KumiAccountsTenancyProcessesAssocs { get; set; }
         public virtual DbSet<KumiAccountState> KumiAccountStates { get; set; }
         public virtual DbSet<KumiCharge> KumiCharges { get; set; }
+        public virtual DbSet<KumiChargeCorrection> KumiChargeCorrections { get; set; }
         public virtual DbSet<KumiChargeMassCalcInfo> KumiChargeMassChargeInfos { get; set; }
         public virtual DbSet<KumiPayment> KumiPayments { get; set; }
         public virtual DbSet<KumiPaymentCharge> KumiPaymentCharges { get; set; }
@@ -415,6 +416,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new KumiAccountsTenancyProcessesAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiAccountStateConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiChargeConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiChargeCorrectionConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiChargeMassCalcInfoConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentChargeConfiguration(nameDatebase));
@@ -465,7 +467,9 @@ namespace RegistryDb.Models
                     query += " OR ";
                 }
             }
+#pragma warning disable EF1000 // Possible SQL injection vulnerability.
             var result = KumiAccountAddressInfixes.FromSql(query);
+#pragma warning restore EF1000 // Possible SQL injection vulnerability.
             return result.Select(r => r.IdAccount).ToList();
         }
     }

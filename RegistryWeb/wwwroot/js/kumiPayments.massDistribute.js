@@ -116,6 +116,8 @@
 
         $(paymentRow).find(".rr-distribution-tenancy-sum").val((((forceTenancySum === undefined || forceTenancySum === false) ? distributionTenancy.toString() : forceTenancySum.toString())).replace(".", ","));
         $(paymentRow).find(".rr-distribution-penalty-sum").val((((forcePenaltySum === undefined || forcePenaltySum === false) ? distributionPenalty.toString() : forcePenaltySum.toString())).replace(".", ","));
+
+        $(paymentRow).find(".rr-payment-checked-for-distrib-wrapper").removeClass("d-none");
     }
 
     function buildAccountForMassDistributionFormInfo(account) {
@@ -231,7 +233,6 @@
         var purpose = paymentRow.find(".rr-payment-purpose.rr-distribute-form-payment-purpose").text();
         var account = paymentRow.find(".rr-payment-distribution-object-caption-wrapper").data("account");
         distributionModalInitiate(purpose, account, paymentSum, paymentSumPosted, idPayment, true, attachPaymentToObjectOnSelectCallback);
-
         e.preventDefault();
     });
 
@@ -244,6 +245,8 @@
             result.claims = [distribInfo.Description];
         }
         buildMassDistributionFormInfo(paymentRow, result, distribInfo.TenancySum, distribInfo.PenaltySum, true);
+
+        paymentRow.find(".rr-payment-checked-for-distrib-wrapper").removeClass("d-none").find("input").prop("checked", false);
 
         $("#DistributePaymentToAccountModal").modal('hide');
 
@@ -277,6 +280,7 @@
         $(paymentRow).removeData("idAccount");
         $(paymentRow).removeData("idClaim");
         $(paymentRow).data("state", "notselected");
+        paymentRow.find(".rr-payment-checked-for-distrib-wrapper").addClass("d-none").find("input").prop("checked", false);
         modal.modal('hide');
     });
 
@@ -366,6 +370,7 @@
         $(".rr-payment-distribution-sums-wrapper").find("input, button").attr("disabled", "disabled");
         $("#StopMassPaymentDistribution").removeClass("disabled");
         $("#ConfirmRunPaymentDistirbutionModal").modal('hide');
+        $(".rr-payment-checked-for-distrib").attr("disabled", "disabled");
 
         var paymentsForDistributionRows = $(".rr-payment-for-distribution").filter(function (idx, elem) {
             return $(elem).data("state") === "selected" && $(elem).find(".rr-payment-checked-for-distrib").is(":checked");
@@ -408,6 +413,8 @@
         $(".rr-payment-distribution-object-controls").removeClass("d-none");
         $(".rr-payment-distribution-sums-wrapper").find("input, button").removeAttr("disabled");
         $("#StopMassPaymentDistribution").addClass("disabled");
+        $(".rr-payment-checked-for-distrib").removeAttr("disabled");
+
     }
 
     function distributePayment(paymentInfo) {
@@ -425,8 +432,9 @@
                 paymentRow.find(".rr-payment-distribution-details-loader").addClass("d-none");
                 if (result.state === "Error") {
                     paymentRow.find(".rr-payment-distribution-result-info").text(result.error).addClass("text-danger").addClass("alert").addClass("alert-danger").removeClass("d-none");
+                    $(paymentRow).find(".rr-payment-checked-for-distrib-wrapper").find("input").prop("checked", false);
+                    $(paymentRow).closest("tbody").prepend(paymentRow);
                 } else {
-                    //var oldPostedSum = parseFloat((paymentRow.data("paymentSumPosted") + "").replace(",", "."));
                     var sum = parseFloat((paymentRow.data("paymentSum") + "").replace(",", "."));
                     var postedSum = result.distrubutedToTenancySum + result.distrubutedToPenaltySum;
                     var distribTenancySum = parseFloat(paymentRow.find(".rr-distribution-tenancy-sum").val().replace(",", "."));
@@ -438,6 +446,7 @@
                         paymentRow.find(".rr-payment-distribution-result-info").text("Платеж распределен ").addClass("text-success").removeClass("d-none");
                         paymentRow.find(".rr-payment-distribution-object-info, .rr-payment-distribution-sums-wrapper").addClass("d-none");
                         paymentRow.data("state", "distributed");
+                        $(paymentRow).find(".rr-payment-checked-for-distrib-wrapper").addClass("d-none").find("input").prop("checked", false);
                     } else {
                         paymentRow.find(".rr-payment-distribution-result-info").text("Платеж распределен не полностью ").addClass("alert").addClass("alert-warning").addClass("text-warning").removeClass("d-none");
 

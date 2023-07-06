@@ -123,6 +123,8 @@ namespace RegistryWeb.DataServices
         {
             var accRecalcTenancy = 0m;
             var accRecalcPenalty = 0m;
+            var accCorrectionTenancy = 0m;
+            var accCorrectionPenalty = 0m;
             var accPaymentTenancy = 0m;
             var accPaymentPenalty = 0m;
             foreach (var dbCharge in dbChargingInfo)
@@ -149,14 +151,14 @@ namespace RegistryWeb.DataServices
             for (var i = 0; i < sortedChargingInfo.Count; i++)
             {
                 var charge = sortedChargingInfo[i];
-
+                // Если начисление перезаписываемое, то пропускаем, т.к. перерасчет по нему встанет как положено и нет необходимости в переносе на текущий период
                 if (startRewriteDate < charge.StartDate)
                 {
                     continue;
                 }
 
+                // Если в БД есть начисление, но оно перенесено от БКС, то пропускаем, т.к. эти начисления считаются неперезаписываемыми
                 var dbCharge = dbChargingInfo.FirstOrDefault(r => r.StartDate == charge.StartDate && r.EndDate == charge.EndDate);
-
                 if (dbCharge != null && dbCharge.IsBksCharge == 1) continue;
 
                 var dbNextCharge = dbChargingInfo.OrderBy(r => r.EndDate).FirstOrDefault(r => r.EndDate > charge.EndDate);
@@ -177,12 +179,16 @@ namespace RegistryWeb.DataServices
                     accPaymentPenalty += charge.PaymentPenalty;
                 }
                 else
+                // Если в БД есть начисление, но в расчете есть начисления после него, то аккумулируем разницу платежей, перерасчета и корректировок
+                // для переноса на последнее начисление
                 if (dbCharge != null && nextCharge != null)
                 {
                     if (startRewriteDate != charge.StartDate)
                     {
                         accRecalcTenancy += charge.ChargeTenancy - dbCharge.ChargeTenancy;
                         accRecalcPenalty += charge.ChargePenalty - dbCharge.ChargePenalty;
+                        accCorrectionTenancy += charge.CorrectionTenancy - dbCharge.CorrectionTenancy;
+                        accCorrectionPenalty += charge.CorrectionPenalty - dbCharge.CorrectionPenalty;
                         accPaymentTenancy += charge.PaymentTenancy - dbCharge.PaymentTenancy;
                         accPaymentPenalty += charge.PaymentPenalty - dbCharge.PaymentPenalty;
                     }
@@ -193,6 +199,8 @@ namespace RegistryWeb.DataServices
 
             recalcInsertIntoCharge.RecalcTenancy = accRecalcTenancy;
             recalcInsertIntoCharge.RecalcPenalty = accRecalcPenalty;
+            recalcInsertIntoCharge.CorrectionTenancy = accCorrectionTenancy;
+            recalcInsertIntoCharge.CorrectionPenalty = accCorrectionPenalty;
             recalcInsertIntoCharge.PaymentTenancy += accPaymentTenancy;
             recalcInsertIntoCharge.PaymentPenalty += accPaymentPenalty;
         }
@@ -211,6 +219,17 @@ namespace RegistryWeb.DataServices
                 if (startRewriteDate < minStartRewriteDate) startRewriteDate = minStartRewriteDate;
             }
             return startRewriteDate;
+        }
+
+        public void AddChargeCorrection(int idAccount, decimal tenancyValue, decimal penaltyValue, DateTime atDate, string description)
+        {
+            registryContext.KumiChargeCorrections.Add(new KumiChargeCorrection {
+                IdAccount = idAccount,
+                Sum = sum,
+                Date = atDate,
+                Description = description
+            });
+            registryContext.SaveChanges();
         }
 
         public List<KumiAccount> GetAccountsForTenancies(List<TenancyProcess> tenancies)
@@ -862,6 +881,14 @@ namespace RegistryWeb.DataServices
                     chargePenalty = currentSavedCharge.ChargePenalty;
                 }
             }
+
+            var correctionTenancy = 0m;
+            var correctionPenalty = 0m;
+            // Если есть корректировки, учитываем их
+            var corrections = account.Corrections.Where(r => r.Date >= startDate && r.Date <= endDate);
+            correctionTenancy = corrections.Select(r => r.TenancyValue).Sum();
+            correctionPenalty = corrections.Select(r => r.PenaltyValue).Sum();
+
             // Если лицевой счет в статусе "Действующий", то перерасчитываем начисления
             // Не начисляем за будущие периоды
             if ((endDate < DateTime.Now.Date || forceCalcChargeOnFutureDate))
@@ -913,10 +940,12 @@ namespace RegistryWeb.DataServices
                 ChargePenalty = chargePenalty,
                 RecalcTenancy = recalcTenancy,
                 RecalcPenalty = recalcPenalty,
+                CorrectionTenancy = correctionTenancy,
+                CorrectionPenalty = correctionPenalty,
                 PaymentTenancy = paymentTenancy,
                 PaymentPenalty = paymentPenalty,
-                OutputTenancy = inputBalanceTenancy + chargeTenancy + recalcTenancy - paymentTenancy,
-                OutputPenalty = inputBalancePenalty + chargePenalty + recalcPenalty - paymentPenalty,
+                OutputTenancy = inputBalanceTenancy + chargeTenancy + recalcTenancy + correctionTenancy - paymentTenancy,
+                OutputPenalty = inputBalancePenalty + chargePenalty + recalcPenalty + correctionPenalty - paymentPenalty,
             };
         }
 
@@ -1171,7 +1200,7 @@ namespace RegistryWeb.DataServices
         {
             var result = new List<KumiAccountPrepareForPaymentCalculator>();
             var tenancyInfo = GetTenancyInfo(accounts);
-            foreach(var account in accounts.Include(r => r.Charges).Include(r => r.Claims).AsNoTracking().ToList())
+            foreach(var account in accounts.Include(r => r.Charges).Include(r => r.Claims).Include(r => r.Corrections).AsNoTracking().ToList())
             {
                 var accountInfo = new KumiAccountPrepareForPaymentCalculator();
                 accountInfo.Account = account;
@@ -1279,6 +1308,8 @@ namespace RegistryWeb.DataServices
                 accountInfo.Payments = account.Payments;
                 accountInfo.Claims = account.Claims;
                 accountInfo.Charges = account.Account.Charges.ToList();
+                accountInfo.Corrections = account.Account.Corrections.ToList();
+
                 accountInfo.TenancyInfo = new List<KumiTenancyInfoForPaymentCalculator>();
                 foreach(var tenancy in account.TenancyInfo)
                 {

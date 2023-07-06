@@ -19,5 +19,6 @@ namespace RegistryWeb.ViewModel
         public List<KumiCharge> Charges { get; set; }
         public List<KumiPayment> Payments { get; set; }
         public List<Claim> Claims { get; set; }
+        public List<KumiChargeCorrection> Corrections { get; set; }
     }
 }

@@ -11,7 +11,7 @@ namespace RegistryWeb
 
         public DbConnectionSettings(IHttpContextAccessor httpContextAccessor, IConfiguration config)
         {
-            connString = httpContextAccessor.HttpContext.User.FindFirst("connString").Value;
+            connString = httpContextAccessor.HttpContext.User.FindFirst("connString")?.Value;
             nameDatebase = config.GetValue<string>("Database");
         }
 

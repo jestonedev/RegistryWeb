@@ -22,6 +22,8 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public decimal PaymentPenalty { get; set; }
         public decimal RecalcTenancy { get; set; }
         public decimal RecalcPenalty { get; set; }
+        public decimal CorrectionTenancy { get; set; }
+        public decimal CorrectionPenalty { get; set; }
         public decimal OutputTenancy { get; set; }
         public decimal OutputPenalty { get; set; }
         public byte Deleted { get; set; }

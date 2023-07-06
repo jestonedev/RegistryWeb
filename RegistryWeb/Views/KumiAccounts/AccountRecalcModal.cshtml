@@ -75,3 +75,54 @@
         </div>
     </div>
 </form>
+
+<form id="accountAddCorrectionForm" autocomplete="off">
+    <div class="modal fade" id="accountAddCorrectionModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить корректировку начисления</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="AccountKumiChargeCorrection.IdAccount" />
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="AccountKumiChargeCorrection.AtDate">Дата корректировки</label>
+
+                            <input type="date" class="form-control" title="Дата корректировки" value="@(DateTime.Now.Date.ToString("yyyy-MM-dd"))" name="AccountKumiChargeCorrection.AtDate"
+                                   data-val="true" data-val-required="Укажите дату корректировки" id="AccountKumiChargeCorrection_AtDate" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.AtDate" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="AccountKumiChargeCorrection.TenancyValue">Сумма найм</label>
+                            <input type="text" class="form-control input-decimal" title="Сумма найм" name="AccountKumiChargeCorrection.TenancyValue"
+                                   data-val="true" data-val-required="Укажите сумму найм" id="AccountKumiChargeCorrection_TenancyValue" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.TenancyValue" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="AccountKumiChargeCorrection.PenaltyValue">Сумма пени</label>
+                            <input type="text" class="form-control input-decimal" title="Сумма пени" name="AccountKumiChargeCorrection.PenaltyValue"
+                                   data-val="true" data-val-required="Укажите сумму пени" id="AccountKumiChargeCorrection_PenaltyValue" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.PenaltyValue" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label class="mb-1" for="AccountKumiChargeCorrection.Description">Причина корректировки</label>
+                            <textarea rows="4" class="form-control" id="AccountKumiChargeCorrection_Description" name="AccountKumiChargeCorrection.Description" maxlength="1024" title="Причина корректировки"></textarea>
+                        </div>
+                    </div>
+                    <div class="rr-recalc-account-error alert alert-danger text-center p-1 mb-0 d-none"></div>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-success rr-charge-corrections-list-href align-self-start" asp-action="ChargeCorrectionsList" target="_blank">Список корректировок</a>
+                    <button type="button" class="btn btn-primary rr-report-submit">Добавить</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

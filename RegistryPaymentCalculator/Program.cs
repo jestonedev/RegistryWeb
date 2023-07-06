@@ -13,6 +13,7 @@ namespace RegistryPaymentCalculator
     {
         static void Main(string[] args)
         {
+            var runDate = DateTime.Now.Date;
             var preLaunch = false;
             foreach(var arg in args)
             {
@@ -86,31 +87,42 @@ namespace RegistryPaymentCalculator
                 var i = 0;
                 foreach (var account in accountsInfo)
                 {
+                    var accountLocal = account;
                     try
                     {
                         ConsoleLogger.Log(string.Format("Выставление начисления по ЛС {0}", account.Account));
-                        var startCalcDate = service.GetAccountStartCalcDate(account);
+                        // Проверка на изменения в течение выполнения массового расчета
+                        var accountDb = db.KumiAccounts.FirstOrDefault(r => r.IdAccount == account.IdAccount);
+                        if (accountDb == null || (accountDb.IdState != 1 && accountDb.IdState != 3)) continue;
+                        if (accountDb.LastCalcDate >= runDate)
+                        {
+                            accountLocal = 
+                                service.GetAccountInfoForPaymentCalculator(
+                                    service.GetAccountsPrepareForPaymentCalculator(new List<KumiAccount> { accountDb }.AsQueryable())).FirstOrDefault();
+                        }
+
+                        var startCalcDate = service.GetAccountStartCalcDate(accountLocal);
                         if (startCalcDate == null) continue;
-                        var dbChargingInfo = service.GetDbChargingInfo(account);
+                        var dbChargingInfo = service.GetDbChargingInfo(accountLocal);
 
                         startRewriteDate = service.CorrectStartRewriteDate(startRewriteDate, startCalcDate.Value, dbChargingInfo);
 
-                        var chargingInfo = service.CalcChargesInfo(account, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate, preLaunch);
+                        var chargingInfo = service.CalcChargesInfo(accountLocal, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate, preLaunch);
                         var recalcInsertIntoCharge = new KumiCharge();
                         if (chargingInfo.Any())
                         {
                             recalcInsertIntoCharge = chargingInfo.Last();
                         }
                         
-                        service.CalcRecalcInfo(account, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, endCalcDate, startRewriteDate);
-                        service.UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate, lastCalcDate);
+                        service.CalcRecalcInfo(accountLocal, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, endCalcDate, startRewriteDate);
+                        service.UpdateChargesIntoDb(accountLocal, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate, lastCalcDate);
                     } catch(Exception e)
                     {
                         var message = e.InnerException != null ? e.InnerException.Message : e.Message;
                         ConsoleLogger.Error(string.Format("Ошибка: {0}", message));
 
                         
-                        sender.SendEmail("Ошибка во время выставления начислений по лицевому счету " + account.Account,
+                        sender.SendEmail("Ошибка во время выставления начислений по лицевому счету " + accountLocal.Account,
                             message, Configuration.SmtpFrom, Configuration.SmtpErrorTo);
                         
                         if (e.GetType() != typeof(ApplicationException))

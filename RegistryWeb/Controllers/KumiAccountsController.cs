@@ -255,6 +255,31 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult AddChargeCorrection(int idAccount, decimal tenancyValue, decimal penaltyValue, DateTime atDate, string description)
+        {
+            try
+            {
+                dataService.AddChargeCorrection(idAccount, tenancyValue, penaltyValue, atDate, description);
+                return Json(new
+                {
+                    State = "Success"
+                });
+            } catch(Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.Message
+                });
+            }
+        }
+
+        public IActionResult ChargeCorrectionsList(int idAccount)
+        {
+            //TODO
+            return NotFound();
+        }
+
         [HttpPost]
         public IActionResult CalcForecastPeriod(int idAccount, DateTime calcToDate) {
             var charge = dataService.CalcForecastChargeInfo(idAccount, calcToDate);

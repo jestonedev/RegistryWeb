@@ -373,6 +373,9 @@
                 <div class="card-header d-flex justify-content-between pt-2 pb-2">
                     <h3>Начисления</h3>
                     <div class="btn-group" role="group">
+                        <a href="#" id="AddChargeCorrectionBtn" class="form-control btn btn-warning @(Model.IdState == 2 ? "disabled" : "")">
+                            <span style="top: 2px;" class="oi oi-pencil"></span>
+                        </a>
                         <a href="#" id="AccountRecalcBtn" class="form-control btn btn-success @(Model.IdState == 2 ? "disabled" : "")">
                             <span style="top: 2px;" class="oi oi-calculator"></span>
                         </a>

@@ -433,15 +433,6 @@
 
     $(".rr-charge-archive-btn").on("click", toggleChargeArchive);
 
-    $("#AccountRecalcBtn").on("click", function (e) {
-        var idAccount = $("#accountForm #IdAccount").val();
-        var modal = $("#accountRecalcModal");
-        modal.find("input[name='AccountKumiRecalc.IdAccount']").val(idAccount);
-        modal.find("select, input").prop('disabled', false);
-        modal.modal('show');
-        e.preventDefault();
-    });
-
     $("#accountForm").on("change", "[id^='Fraction_']", function () {
         var val = $(this).val();
         if (val === "" || val === undefined) {

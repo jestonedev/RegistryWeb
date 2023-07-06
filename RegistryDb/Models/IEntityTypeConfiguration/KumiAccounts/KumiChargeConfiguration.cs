@@ -80,6 +80,16 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("decimal(12,2)")
                 .IsRequired();
 
+            builder.Property(e => e.CorrectionTenancy)
+                .HasColumnName("correction_tenancy")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.CorrectionPenalty)
+                .HasColumnName("correction_penalty")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
             builder.Property(e => e.OutputTenancy)
                 .HasColumnName("output_tenancy")
                 .HasColumnType("decimal(12,2)")
