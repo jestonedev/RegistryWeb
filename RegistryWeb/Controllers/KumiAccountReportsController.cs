@@ -115,7 +115,7 @@ namespace RegistryWeb.Controllers
             if (invoiceAction == "Export" && results.Any())
             {
                 return GenerateInvoiceError(results);
-            }/**/
+            }
 
             var correctInvoices = invoices.FindAll(x => (x.Tenant != null || x.Address != "") &&
                 ((invoiceAction == "Send" && x.Emails.Any()) || invoiceAction == "Export"));

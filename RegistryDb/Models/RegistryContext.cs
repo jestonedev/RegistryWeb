@@ -67,7 +67,7 @@ namespace RegistryDb.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
+            if (!optionsBuilder.IsConfigured && !string.IsNullOrEmpty(connString))
             {
                 optionsBuilder.UseMySQL(connString);
             }

@@ -30,6 +30,7 @@
 
 .rr-payment-purpose.rr-distribute-form-payment-purpose {
     width: 200px;
+    word-wrap: break-word;
 }
 
 @media(min-width: 768px) {

@@ -438,8 +438,8 @@
                                     totalChargePenalty += charge.ChargePenalty;
                                     totalPaymentTenancy += charge.PaymentTenancy;
                                     totalPaymentPenalty += charge.PaymentPenalty;
-                                    totalRecalcTenancy += charge.RecalcTenancy;
-                                    totalRecalcPenalty += charge.RecalcPenalty;
+                                    totalRecalcTenancy += charge.RecalcTenancy + charge.CorrectionTenancy;
+                                    totalRecalcPenalty += charge.RecalcPenalty + charge.CorrectionPenalty;
                                     i++;
                                     <tr class="@(count - i + 1 > 12 ? "rr-charge-archive" : "") @(charge.EndDate == currMonthEndDate ? "rr-charge-current-month-row" : "")" data-charge-end-date="@charge.EndDate.ToString("yyyy-MM-dd")">
                                         <td class="text-center p-1"><b>@charge.EndDate.ToString("dd.MM.yyyy")</b></td>
@@ -483,8 +483,8 @@
                                                 @charge.PaymentPenalty
                                             }
                                         </td>
-                                        <td class="text-center p-1 rr-charge-period-recalc-tenancy">@charge.RecalcTenancy</td>
-                                        <td class="text-center p-1 rr-charge-period-recalc-penalty">@charge.RecalcPenalty</td>
+                                        <td class="text-center p-1 rr-charge-period-recalc-tenancy">@(charge.RecalcTenancy+charge.CorrectionTenancy)</td>
+                                        <td class="text-center p-1 rr-charge-period-recalc-penalty">@(charge.RecalcPenalty+charge.CorrectionPenalty)</td>
                                         <td class="text-center p-1 rr-charge-period-output-tenancy">@charge.OutputTenancy</td>
                                         <td class="text-center p-1 rr-charge-period-output-penalty">@charge.OutputPenalty</td>
                                     </tr>

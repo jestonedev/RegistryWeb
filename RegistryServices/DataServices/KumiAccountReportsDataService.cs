@@ -97,7 +97,6 @@ namespace RegistryWeb.DataServices
 
             };
             return infoForReport;
-
         }
 
         public InvoiceGeneratorParam GetInvoiceGeneratorParam(int idAccount, DateTime onDate, string textmessage)
@@ -124,8 +123,8 @@ namespace RegistryWeb.DataServices
                     ChargingTenancy = payKumi.ChargeTenancy.ToString().Replace(',', '.'),
                     ChargingPenalty = payKumi.ChargePenalty.ToString().Replace(',', '.'),
                     Payed = (payKumi.PaymentTenancy+payKumi.PaymentPenalty).ToString().Replace(',', '.'),
-                    RecalcTenancy = payKumi.RecalcTenancy.ToString().Replace(',', '.'),
-                    RecalcPenalty = payKumi.RecalcPenalty.ToString().Replace(',', '.'),
+                    RecalcTenancy = (payKumi.RecalcTenancy+payKumi.CorrectionTenancy).ToString().Replace(',', '.'),
+                    RecalcPenalty = (payKumi.RecalcPenalty+payKumi.CorrectionPenalty).ToString().Replace(',', '.'),
                     BalanceOutput = (payKumi.OutputTenancy + payKumi.OutputPenalty).ToString().Replace(',', '.'),
                     TotalArea = infoForReport.Where(c => c.Key.Contains("totalArea")).Select(c => c.Value).FirstOrDefault().ToString().Replace(',', '.'),
                     Prescribed = (int)infoForReport.Where(c => c.Key.Contains("prescribed")).Select(c => c.Value).FirstOrDefault(),

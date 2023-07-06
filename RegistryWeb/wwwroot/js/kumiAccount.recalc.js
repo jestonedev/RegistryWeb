@@ -99,6 +99,10 @@
         $(tenancyValueElem).val($(tenancyValueElem).val().replace(',', '.'));
         var penaltyValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PenaltyValue");
         $(penaltyValueElem).val($(penaltyValueElem).val().replace(',', '.'));
+        var paymentTenancyValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PaymentTenancyValue");
+        $(tenancyValueElem).val($(tenancyValueElem).val().replace(',', '.'));
+        var paymentPenaltyValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PaymentPenaltyValue");
+        $(penaltyValueElem).val($(penaltyValueElem).val().replace(',', '.'));
 
         if (addChargeCorrectionForm.valid()) {
             $(this).attr("disabled", "disabled").text("Сохранение...");
@@ -106,12 +110,14 @@
             var description = $("#AccountKumiChargeCorrection_Description").val();
             var tenancyValue = $("#AccountKumiChargeCorrection_TenancyValue").val().replace('.', ',');
             var penaltyValue = $("#AccountKumiChargeCorrection_PenaltyValue").val().replace('.', ',');
+            var paymentTenancyValue = $("#AccountKumiChargeCorrection_PaymentTenancyValue").val().replace('.', ',');
+            var paymentPenaltyValue = $("#AccountKumiChargeCorrection_PaymentPenaltyValue").val().replace('.', ',');
             var idAccount = addChargeCorrectionForm.find("input[name='AccountKumiChargeCorrection.IdAccount']").val();
 
             $.ajax({
                 type: 'POST',
                 url: window.location.origin + '/KumiAccounts/AddChargeCorrection',
-                data: { idAccount, atDate, tenancyValue, penaltyValue, description },
+                data: { idAccount, atDate, tenancyValue, penaltyValue, paymentTenancyValue, paymentPenaltyValue, description },
                 dataType: 'json',
                 success: function () {
                     recalcAccounts([idAccount], [], 0, null, null);
@@ -213,6 +219,8 @@
             var chargeTotalElem = $(".rr-charge-total-row");
             for (var i = 0; i < props.length; i++) {
                 var value = resultCharge[props[i]];
+                if (props[i] === "recalcTenancy") value += resultCharge["correctionTenancy"];
+                if (props[i] === "recalcPenalty") value += resultCharge["correctionPenalty"];
                 var elem = chargeCurrentMonthElem.find(cellClasses[i+4]);
                 elem.html("").text(value.toFixed(2).replace(".", ","));
                 elem.css("color", "#ff5400").attr("title", "Значение предварительно расчитано и может измениться по окончании незавершенного периода");

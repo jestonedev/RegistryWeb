@@ -34,6 +34,6 @@
   </ItemGroup>
 
 
-  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JSONSchema="" appsettings_1Development_1json__JSONSchema="https://json.schemastore.org/aiproj.json" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1Production_1json__JSONSchema="" appsettings_1json__JSONSchema="" appsettings_1Development_1json__JSONSchema="https://json.schemastore.org/aiproj.json" /></VisualStudio></ProjectExtensions>
 
 </Project>

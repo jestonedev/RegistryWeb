@@ -50,6 +50,16 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("decimal(12,2)")
                 .IsRequired();
 
+            builder.Property(e => e.PaymentTenancyValue)
+                .HasColumnName("payment_tenancy_value")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.PaymentPenaltyValue)
+                .HasColumnName("payment_penalty_value")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
             builder.HasOne(e => e.Account)
                 .WithMany(e => e.Corrections)
                 .HasForeignKey(e => e.IdAccount);

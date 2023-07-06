@@ -78,7 +78,7 @@
 
 <form id="accountAddCorrectionForm" autocomplete="off">
     <div class="modal fade" id="accountAddCorrectionModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Добавить корректировку начисления</h5>
@@ -96,17 +96,31 @@
                                    data-val="true" data-val-required="Укажите дату корректировки" id="AccountKumiChargeCorrection_AtDate" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.AtDate" data-valmsg-replace="true"></span>
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group col-3">
-                            <label for="AccountKumiChargeCorrection.TenancyValue">Сумма найм</label>
-                            <input type="text" class="form-control input-decimal" title="Сумма найм" name="AccountKumiChargeCorrection.TenancyValue"
-                                   data-val="true" data-val-required="Укажите сумму найм" id="AccountKumiChargeCorrection_TenancyValue" />
+                            <label for="AccountKumiChargeCorrection.TenancyValue">Начислено найм</label>
+                            <input type="text" class="form-control input-decimal" value="0,00" title="Сумма найм" name="AccountKumiChargeCorrection.TenancyValue"
+                                   data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_TenancyValue" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.TenancyValue" data-valmsg-replace="true"></span>
                         </div>
                         <div class="form-group col-3">
-                            <label for="AccountKumiChargeCorrection.PenaltyValue">Сумма пени</label>
-                            <input type="text" class="form-control input-decimal" title="Сумма пени" name="AccountKumiChargeCorrection.PenaltyValue"
-                                   data-val="true" data-val-required="Укажите сумму пени" id="AccountKumiChargeCorrection_PenaltyValue" />
+                            <label for="AccountKumiChargeCorrection.PenaltyValue">Начислено пени</label>
+                            <input type="text" class="form-control input-decimal" value="0,00" title="Сумма пени" name="AccountKumiChargeCorrection.PenaltyValue"
+                                   data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_PenaltyValue" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.PenaltyValue" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="AccountKumiChargeCorrection.PaymentTenancyValue">Оплата найм</label>
+                            <input type="text" class="form-control input-decimal" value="0,00" title="Сумма найм" name="AccountKumiChargeCorrection.PaymentTenancyValue"
+                                   data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_PaymentTenancyValue" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.PaymentTenancyValue" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="AccountKumiChargeCorrection.PaymentPenaltyValue">Оплата пени</label>
+                            <input type="text" class="form-control input-decimal" value="0,00" title="Сумма пени" name="AccountKumiChargeCorrection.PaymentPenaltyValue"
+                                   data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_PaymentPenaltyValue" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.PaymentPenaltyValue" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="form-row">

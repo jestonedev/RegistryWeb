@@ -12,6 +12,8 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public string Description { get; set; }
         public decimal TenancyValue { get; set; }
         public decimal PenaltyValue { get; set; }
+        public decimal PaymentTenancyValue { get; set; }
+        public decimal PaymentPenaltyValue { get; set; }
         public virtual KumiAccount Account { get; set; }
     }
 }
