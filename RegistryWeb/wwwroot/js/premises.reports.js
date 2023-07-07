@@ -45,6 +45,24 @@
         e.preventDefault();
     });
 
+    $("body").on('click', ".rr-report-sub-premise-notice-to-ies", function (e) {
+        var idSubPremise = $(this).data("id-sub-premise");
+        $("#noticeToIesModal").find("[name='NoticeToIes.NoticeType']").val(2);
+        $("#noticeToIesModal").find("[name='NoticeToIes.IdObject']").val(idSubPremise);
+        $("#noticeToIesModal").find("input, textarea, select").prop("disabled", false);
+        $("#noticeToIesModal").modal("show");
+        e.preventDefault();
+    });
+
+    $("body").on('click', ".rr-report-premise-notice-to-ies", function (e) {
+        var idPremise = $(this).data("id-premise");
+        $("#noticeToIesModal").find("[name='NoticeToIes.NoticeType']").val(1);
+        $("#noticeToIesModal").find("[name='NoticeToIes.IdObject']").val(idPremise);
+        $("#noticeToIesModal").find("input, textarea, select").prop("disabled", false);
+        $("#noticeToIesModal").modal("show");
+        e.preventDefault();
+    });
+
     $("body").on('click', ".rr-report-premise-area, #massReferenceBtn", function (e) {
         url = "/PremiseReports/GetPremisesArea";
         if ($(this).data("id-premise") !== undefined) {
@@ -174,7 +192,7 @@
         e.preventDefault();
     });
 
-    $("#excerptForm, #noticeToBksForm, #massActForm, #restrictionForm, #ownershipRightForm, #updatePremiseForm, #pkBksForm").on("change", "select", function () {
+    $("#excerptForm, #noticeToBksForm, #noticeToIesForm, #massActForm, #restrictionForm, #ownershipRightForm, #updatePremiseForm, #pkBksForm").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
     
@@ -283,6 +301,37 @@
         }
 
         $("#noticeToBksModal").modal("hide");
+    });
+
+    $("#noticeToIesModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var isValid = $(this).closest("#noticeToIesForm").valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight($(this).closest("#noticeToIesForm"));
+            return false;
+        }
+        var idObject = $("#noticeToIesModal").find("[name='NoticeToIes.IdObject']").val();
+        var noticeType = $("#noticeToIesModal").find("[name='NoticeToIes.NoticeType']").val();
+        var actionText = $("#noticeToIesModal").find("[name='NoticeToIes.ActionText']").val();
+        var signer = $("#noticeToIesModal").find("[name='NoticeToIes.Signer']").val();
+        if ($("#noticeToIesModal").find(".input-validation-error").length > 0) {
+            return false;
+        }
+        switch (noticeType) {
+            case "1":
+                var url = "/PremiseReports/GetPremiseNoticeToIes?idPremise=" + idObject + "&actionText=" + actionText
+                    + "&signer=" + signer;
+                break;
+            case "2":
+                url = "/PremiseReports/GetSubPremiseNoticeToIes?idSubPremise=" + idObject + "&actionText=" + actionText
+                    + "&signer=" + signer;
+                break;
+        }
+        if (url !== undefined) {
+            downloadFile(url);
+        }
+
+        $("#noticeToIesModal").modal("hide");
     });
 
     $("#massActModal .rr-report-submit").on("click", function (e) {

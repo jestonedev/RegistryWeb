@@ -266,6 +266,20 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
+        public byte[] NoticeToIes(int idProcess, string actionText, int signer)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "id", idProcess },
+                { "notice_type", 1 },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
+                { "text", actionText },
+                { "signer", signer }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\notice_IES_tenancy");
+            return DownloadFile(fileNameReport);
+        }
+
         private string ProcessesIdsToString(List<int> idProcesses)
         {
             return idProcesses.Select(r => r.ToString()).Aggregate((v, acc) => v + "," + acc);

@@ -95,6 +95,36 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult GetPremiseNoticeToIes(int idPremise, string actionText, int signer)
+        {
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.PremiseNoticeToIes(idPremise, actionText, signer);
+                return File(file, odtMime, string.Format(@"Извещение в ИЭСБК на помещение № {0}.odt", idPremise));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetSubPremiseNoticeToIes(int idSubPremise, string actionText, int signer)
+        {
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.SubPremiseNoticeToIes(idSubPremise, actionText, signer);
+                return File(file, odtMime, string.Format(@"Извещение в ИЭСБК на комнату № {0}.odt", idSubPremise));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
         public IActionResult GetSubPremiseNoticeToBks(int idSubPremise, string actionText, int paymentType, int signer)
         {
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
