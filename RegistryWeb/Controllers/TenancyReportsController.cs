@@ -514,5 +514,20 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
+
+        public IActionResult GetNoticeToIes(int idProcess, string actionText, int signer)
+        {
+            if (!securityService.HasPrivilege(Privileges.RegistryRead))
+                return View("NotAccess");
+            try
+            {
+                var file = reportService.NoticeToIes(idProcess, actionText, signer);
+                return File(file, odtMime, string.Format(@"Извещение в ИЭСБК по найму № {0}.odt", idProcess));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
     }
 }

@@ -273,3 +273,44 @@
         </div>
     </div>
 </form>
+
+<form id="noticeToIesForm">
+    <div class="modal fade" id="noticeToIesModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Извещение в ИЭСБК</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="NoticeToIes.IdProcess" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="NoticeToIes.ActionText">Действие</label>
+                            <select class="selectpicker form-control" title="Действие" name="NoticeToIes.ActionText"
+                                    data-val="true" data-val-required="Поле обязательно для заполнения" id="NoticeToIes.ActionText">
+                                <option value="заключен договор">заключен договор</option>
+                                <option value="оформлено соглашение к договору">оформлено соглашение к договору</option>
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="NoticeToBks.ActionText" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="NoticeToIes.Signer">Подписывающий</label>
+                            <select class="selectpicker form-control" title="Подписывающий" name="NoticeToIes.Signer"
+                                    data-val="true" data-val-required="Подписывающий обязателен для заполнения" id="NoticeToIes.Signer" asp-items="@bksSignersList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="NoticeToIes.Signer" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary rr-report-submit">Сформировать</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

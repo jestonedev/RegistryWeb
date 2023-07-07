@@ -81,6 +81,34 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
+        public byte[] PremiseNoticeToIes(int idPremise, string actionText, int signer)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "id", idPremise },
+                { "notice_type", 1 },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
+                { "text", actionText },
+                { "signer", signer }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\registry\\notice_IES_tenancy");
+            return DownloadFile(fileNameReport);
+        }
+
+        public byte[] SubPremiseNoticeToIes(int idPremise, string actionText, int signer)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "id", idPremise },
+                { "notice_type", 2 },
+                { "executor", securityService.User.UserName.Replace("PWR\\", "") },
+                { "text", actionText },
+                { "signer", signer }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\registry\\notice_IES_tenancy");
+            return DownloadFile(fileNameReport);
+        }
+
         public byte[] SubPremiseNoticeToBks(int idSubPremise, string actionText, int paymentType, int signer)
         {
             var arguments = new Dictionary<string, object>

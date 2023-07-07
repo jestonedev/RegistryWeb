@@ -162,7 +162,7 @@
         e.preventDefault();
     });
 
-    $("#preContractModal, #openDateModal, #tenancyWarningModal, #tenancyReasonModal, #tenancyActAfModal, #noticeToBksModal").on("change", "select", function () {
+    $("#preContractModal, #openDateModal, #tenancyWarningModal, #tenancyReasonModal, #tenancyActAfModal, #noticeToBksModal, #noticeToIesModal").on("change", "select", function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
 
@@ -192,6 +192,33 @@
             + "&paymentType=" + paymentType + "&signer=" + signer;
         downloadFile(url);
         $("#noticeToBksModal").modal("hide");
+    });
+
+    $("body").on('click', ".rr-report-notice-to-ies", function (e) {
+        var idProcess = $(this).data("id-process");
+        $("#noticeToIesModal").find("[name='NoticeToIes.IdProcess']").val(idProcess);
+        $("#noticeToIesModal").find("input, textarea, select").prop("disabled", false);
+        $("#noticeToIesModal").modal("show");
+        e.preventDefault();
+    });
+
+    $("#noticeToIesModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var isValid = $(this).closest("#noticeToIesForm").valid();
+        if (!isValid) {
+            fixBootstrapSelectHighlight($(this).closest("#noticeToIesForm"));
+            return false;
+        }
+        var idProcess = $("#noticeToIesModal").find("[name='NoticeToIes.IdProcess']").val();
+        var actionText = $("#noticeToIesModal").find("[name='NoticeToIes.ActionText']").val();
+        var signer = $("#noticeToIesModal").find("[name='NoticeToIes.Signer']").val();
+        if ($("#noticeToIesModal").find(".input-validation-error").length > 0) {
+            return false;
+        }
+        var url = "/TenancyReports/GetNoticeToIes?idProcess=" + idProcess + "&actionText=" + actionText
+            + "&signer=" + signer;
+        downloadFile(url);
+        $("#noticeToIesModal").modal("hide");
     });
 
     /*      МУЛЬТИМАСТЕР        */
