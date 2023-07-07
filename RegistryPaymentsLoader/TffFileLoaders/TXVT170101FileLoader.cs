@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using RegistryPaymentsLoader.Helpers;
 using RegistryPaymentsLoader.TffStrings;
 
 namespace RegistryPaymentsLoader.TffFileLoaders
@@ -13,6 +14,10 @@ namespace RegistryPaymentsLoader.TffFileLoaders
             var stringVersion = tffStringParts[0];
             switch (stringVersion)
             {
+                case "VT":
+                    if (tffStringParts.Length != 26) return null;
+                    NoticeDate = TffTypesHelper.StringToDate(tffStringParts[3]);
+                    return null;
                 case "VTOPER":
                     if (tffStringParts.Length != 19) return null;
                     return new TXVT170101StringVTOPER(tffStringParts);

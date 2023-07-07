@@ -71,6 +71,8 @@ namespace RegistryWeb.DataServices
             UploadPayments(payments, group, extracts, loadState);
             UploadMemorialOrders(memorialOrders, group, loadState);
 
+            registryContext.SaveChanges();
+
             var loadStateSerializeObject = JsonSerializer.Serialize(loadState, typeof(KumiPaymentsUploadStateModel), new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve,
@@ -82,8 +84,6 @@ namespace RegistryWeb.DataServices
                 Log = loadStateSerializeObject
             };
             registryContext.KumiPaymentGroupLog.Add(log);
-
-          //  group.Log = loadStateSerializeObject;
 
             registryContext.SaveChanges();
 
@@ -131,38 +131,120 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
-        private IEnumerable<KumiPaymentDistributionInfoToObject> GetDistributionInfoToObjects(List<int> idPayments)
+        private List<KumiPaymentDistributionInfoToObject> GetDistributionInfoToObjects(List<int> idPayments)
         {
-            IEnumerable<KumiPaymentDistributionInfoToObject> paymentChargesInfo = registryContext.KumiPaymentCharges.Where(r => idPayments.Contains(r.IdPayment))
-                .Include(r => r.Charge).ThenInclude(r => r.Account).ToList()
-                .Select(r => new KumiPaymentDistributionInfoToAccount
-                {
-                    ObjectType =  KumiPaymentDistributeToEnum.ToKumiAccount,
-                    IdPayment = r.IdPayment,
-                    IdAccount = r.Charge.IdAccount,
-                    IdCharge = r.IdDisplayCharge ?? r.IdCharge,
-                    Account = r.Charge.Account.Account,
-                    DistrubutedToPenaltySum = r.PenaltyValue,
-                    DistrubutedToTenancySum = r.TenancyValue,
-                    Sum = r.PenaltyValue + r.TenancyValue
-                });
-            IEnumerable<KumiPaymentDistributionInfoToObject> paymentClaimsInfo = registryContext.KumiPaymentClaims.Where(r => idPayments.Contains(r.IdPayment))
-                .Include(r => r.Claim).ThenInclude(r => r.IdAccountKumiNavigation)
-                .ToList()
-                .Select(r => new KumiPaymentDistributionInfoToClaim
-                {
-                    ObjectType = KumiPaymentDistributeToEnum.ToClaim,
-                    IdPayment = r.IdPayment,
-                    IdClaim = r.Claim.IdClaim,
-                    IdCharge = r.IdDisplayCharge ?? 0,
-                    IdAccountKumi = r.Claim.IdAccountKumi,
-                    Account = r.Claim.IdAccountKumiNavigation.Account,
-                    DistrubutedToPenaltySum = r.PenaltyValue,
-                    DistrubutedToTenancySum = r.TenancyValue,
-                    Sum = r.PenaltyValue + r.TenancyValue
-                });
+            var kpc = (from kpcRow in registryContext.KumiPaymentCharges
+                      where idPayments.Contains(kpcRow.IdPayment)
+                      select kpcRow).ToList();
 
-            return paymentChargesInfo.Union(paymentClaimsInfo);
+            var cIds = kpc.Select(r => r.IdCharge);
+
+            var c = (from cRow in registryContext.KumiCharges
+                     where cIds.Contains(cRow.IdCharge)
+                     select cRow).ToList();
+
+            var aIds = c.Select(r => r.IdAccount);
+
+            var a = (from aRow in registryContext.KumiAccounts
+                     where aIds.Contains(aRow.IdAccount)
+                     select aRow).ToList();
+
+            var charges = (from kpcRow in kpc
+                           join cRow in c
+                           on kpcRow.IdCharge equals cRow.IdCharge
+                           join aRow in a
+                           on cRow.IdAccount equals aRow.IdAccount
+                           select new
+                           {
+                               kpcRow,
+                               cRow,
+                               aRow
+                           }).ToList();
+
+            var tenants = (from assocRow in registryContext.KumiAccountsTenancyProcessesAssocs
+                           join tRow in registryContext.TenancyProcesses
+                           on assocRow.IdProcess equals tRow.IdProcess
+                           join tpRow in registryContext.TenancyPersons
+                           on tRow.IdProcess equals tpRow.IdProcess
+                           where aIds.Contains(assocRow.IdAccount) && tpRow.IdKinship == 1 && tpRow.ExcludeDate == null
+                           select new
+                           {
+                               assocRow.IdAccount,
+                               tRow.IdProcess,
+                               Tenant = string.Concat(tpRow.Surname, ' ', tpRow.Name, ' ', tpRow.Patronymic)
+                           }).ToList();
+
+            var paymentChargesInfo =charges.Select(r => new KumiPaymentDistributionInfoToAccount
+                {
+                    ObjectType = KumiPaymentDistributeToEnum.ToKumiAccount,
+                    IdPayment = r.kpcRow.IdPayment,
+                    IdAccount = r.cRow.IdAccount,
+                    IdCharge = r.kpcRow.IdDisplayCharge ?? r.kpcRow.IdCharge,
+                    Account = r.aRow.Account,
+                    DistrubutedToPenaltySum = r.kpcRow.PenaltyValue,
+                    DistrubutedToTenancySum = r.kpcRow.TenancyValue,
+                    Sum = r.kpcRow.PenaltyValue + r.kpcRow.TenancyValue,
+                    Tenant = tenants.Where(t => t.IdAccount == r.cRow.IdAccount).OrderByDescending(t => t.IdProcess)
+                                .Select(t => t.Tenant).FirstOrDefault()
+                }).ToList();
+
+            var kpcClaims = (from kpcRow in registryContext.KumiPaymentClaims
+                             where idPayments.Contains(kpcRow.IdPayment)
+                             select kpcRow).ToList();
+
+            cIds = kpcClaims.Select(r => r.IdClaim);
+
+            var cClaims = (from cRow in registryContext.Claims
+                            where cIds.Contains(cRow.IdClaim)
+                            select cRow).ToList();
+
+            aIds = cClaims.Where(r => r.IdAccountKumi != null).Select(r => (int)r.IdAccountKumi);
+
+            var aClaims = (from aRow in registryContext.KumiAccounts
+                     where aIds.Contains(aRow.IdAccount)
+                     select aRow).ToList();
+
+            var claims = (from kpcRow in kpcClaims
+                           join cRow in cClaims
+                           on kpcRow.IdClaim equals cRow.IdClaim
+                           join aRow in aClaims
+                           on cRow.IdAccount equals aRow.IdAccount
+                           select new
+                           {
+                               kpcRow,
+                               cRow,
+                               aRow
+                           }).ToList();
+
+            var tenantsClaims = (from assocRow in registryContext.KumiAccountsTenancyProcessesAssocs
+                           join tRow in registryContext.TenancyProcesses
+                           on assocRow.IdProcess equals tRow.IdProcess
+                           join tpRow in registryContext.TenancyPersons
+                           on tRow.IdProcess equals tpRow.IdProcess
+                           where aIds.Contains(assocRow.IdAccount) && tpRow.IdKinship == 1 && tpRow.ExcludeDate == null
+                           select new
+                           {
+                               assocRow.IdAccount,
+                               tRow.IdProcess,
+                               Tenant = string.Concat(tpRow.Surname, ' ', tpRow.Name, ' ', tpRow.Patronymic)
+                           }).ToList();
+
+            var paymentClaimsInfo = claims.Select(r => new KumiPaymentDistributionInfoToClaim
+            {
+                ObjectType = KumiPaymentDistributeToEnum.ToClaim,
+                IdPayment = r.kpcRow.IdPayment,
+                IdClaim = r.cRow.IdClaim,
+                IdCharge = r.kpcRow.IdDisplayCharge ?? 0,
+                IdAccountKumi = r.cRow.IdAccountKumi,
+                Account = r.aRow.Account,
+                DistrubutedToPenaltySum = r.kpcRow.PenaltyValue,
+                DistrubutedToTenancySum = r.kpcRow.TenancyValue,
+                Sum = r.kpcRow.PenaltyValue + r.kpcRow.TenancyValue,
+                Tenant = tenants.Where(t => t.IdAccount == r.cRow.IdAccountKumi).OrderByDescending(t => t.IdProcess)
+                                .Select(t => t.Tenant).FirstOrDefault()
+            }).ToList();
+
+            return paymentChargesInfo.Select(r => (KumiPaymentDistributionInfoToObject)r).Union(paymentClaimsInfo).ToList();
         }
 
         private IQueryable<KumiPayment> GetQueryOrder(IQueryable<KumiPayment> query, OrderOptions orderOptions)
@@ -658,11 +740,6 @@ namespace RegistryWeb.DataServices
 
                     var startPeriodDate = date.Value.AddDays(-date.Value.Day + 1);
                     var endPeriodDate = date.Value.AddDays(-date.Value.Day + 1).AddMonths(1).AddDays(-1);
-                    if (date.Value.Day >= 25)  // Если платеж после 25 числа включительно, то распределяем его на следующий месяц
-                    {
-                        startPeriodDate = startPeriodDate.AddMonths(1);
-                        endPeriodDate = endPeriodDate.AddDays(1).AddMonths(1).AddDays(-1);
-                    }
                     var charge = registryContext.KumiCharges.AsNoTracking()
                         .FirstOrDefault(r => r.IdAccount == idObject && r.StartDate == startPeriodDate && r.EndDate == endPeriodDate);
 
@@ -1362,22 +1439,26 @@ namespace RegistryWeb.DataServices
             return loadState;
         }
 
-        public Dictionary<int, KumiPayment> GetPaymentsByOrders(List<int> IdOrders)
+        public Dictionary<int, KumiPayment> GetPaymentsByOrders(List<KumiMemorialOrder> orders)
         {
+            var idOrders = orders.Select(r => r.IdOrder).ToList();
+            var orderNums = orders.Select(r => r.NumDocument).ToList();
             var paymentRows = from assocRow in registryContext.KumiMemorialOrderPaymentAssocs
                               join paymentRow in registryContext.KumiPayments
                               on assocRow.IdPayment equals paymentRow.IdPayment
-                              where IdOrders.Contains(assocRow.IdOrder)
+                              where idOrders.Contains(assocRow.IdOrder)
                               select new
                               {
                                   assocRow.IdOrder,
                                   paymentRow
                               };
+
             var paymentRowsDict = new Dictionary<int, KumiPayment>();
             foreach (var paymentRow in paymentRows)
             {
                 paymentRowsDict.Add(paymentRow.IdOrder, paymentRow.paymentRow);
             }
+
             return paymentRowsDict;
         }
     }

@@ -10,6 +10,7 @@ namespace RegistryPaymentsLoader.TffFileLoaders
     public abstract class TffFileLoader
     {
         public abstract string Version { get; }
+        public DateTime? NoticeDate { get; protected set; }
         public virtual List<TffString> Load(Stream dataStream)
         {
             var result = new List<TffString>();

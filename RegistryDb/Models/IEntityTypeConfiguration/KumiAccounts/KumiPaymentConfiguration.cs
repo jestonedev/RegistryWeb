@@ -210,6 +210,10 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasMaxLength(1024)
                 .IsUnicode(false);
 
+            builder.Property(e => e.DateEnrollUfk)
+                .HasColumnName("date_enroll_ufk")
+                .HasColumnType("date");
+
             builder.Property(e => e.IsPosted)
                 .HasColumnName("is_posted")
                 .HasColumnType("tinyint(1)")

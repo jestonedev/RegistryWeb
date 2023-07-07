@@ -182,20 +182,20 @@ namespace RegistryWeb.DataServices
 
             recalcInsertIntoCharge.RecalcTenancy = accRecalcTenancy;
             recalcInsertIntoCharge.RecalcPenalty = accRecalcPenalty;
-            recalcInsertIntoCharge.CorrectionTenancy = accCorrectionTenancy;
-            recalcInsertIntoCharge.CorrectionPenalty = accCorrectionPenalty;
+            recalcInsertIntoCharge.CorrectionTenancy += accCorrectionTenancy;
+            recalcInsertIntoCharge.CorrectionPenalty += accCorrectionPenalty;
             recalcInsertIntoCharge.PaymentTenancy += accPaymentTenancy;
             recalcInsertIntoCharge.PaymentPenalty += accPaymentPenalty;
         }
 
         public DateTime CorrectStartRewriteDate(DateTime startRewriteDate, DateTime startDate, List<KumiCharge> dbChargingInfo)
         {
-            if (dbChargingInfo.Where(r => r.Hidden == 0).Any())
+            /*if (dbChargingInfo.Where(r => r.Hidden == 0).Any())
             {
                 var lastChargeEndDate = dbChargingInfo.Where(r => r.Hidden == 0).OrderBy(r => r.EndDate).Last().EndDate;
                 var maxStartRewriteDate = lastChargeEndDate.AddDays(1);
                 if (maxStartRewriteDate < startRewriteDate) startRewriteDate = maxStartRewriteDate;
-            }
+            }*/
             if (dbChargingInfo.Any(r => r.IsBksCharge == 1))
             {
                 var minStartRewriteDate = dbChargingInfo.Where(r => r.IsBksCharge == 1).OrderBy(r => r.EndDate).Last().EndDate.AddDays(1);
@@ -217,6 +217,36 @@ namespace RegistryWeb.DataServices
                 Description = description
             });
             registryContext.SaveChanges();
+        }
+
+        public int GetIdAccountByCorrection(int idCorrection)
+        {
+            return registryContext.KumiChargeCorrections.Where(r => r.IdCorrection == idCorrection).FirstOrDefault()?.IdAccount ?? 0;
+        }
+
+        public void DeleteChargeCorrection(int idCorrection)
+        {
+            var correction = registryContext.KumiChargeCorrections.FirstOrDefault(r => r.IdCorrection == idCorrection);
+            registryContext.KumiChargeCorrections.Remove(correction);
+            registryContext.SaveChanges();
+        }
+
+        public KumiChargeCorrectionsVM GetAccountCorrectionsVm(int idAccount)
+        {
+            var viewModel = new KumiChargeCorrectionsVM();
+            viewModel.PageOptions = new PageOptions();
+            var corrections = registryContext.KumiChargeCorrections.Where(r => r.IdAccount == idAccount).OrderByDescending(r => r.Date);
+            viewModel.PageOptions.TotalRows = corrections.Count();
+            var count = corrections.Count();
+            viewModel.PageOptions.Rows = count;
+            viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
+
+            if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
+                viewModel.PageOptions.CurrentPage = 1;
+            viewModel.ChargeCorrections = corrections.Skip((viewModel.PageOptions.CurrentPage - 1) * viewModel.PageOptions.SizePage)
+                .Take(viewModel.PageOptions.SizePage);
+            viewModel.Account = GetKumiAccount(idAccount);
+            return viewModel;
         }
 
         public List<KumiAccount> GetAccountsForTenancies(List<TenancyProcess> tenancies)
@@ -893,7 +923,7 @@ namespace RegistryWeb.DataServices
 
                 if ((account.IdState == 1 || account.IdState == 3) && (currentSavedCharge == null || currentSavedCharge.IsBksCharge != 1))
                 {
-                    chargePenalty = Math.Round(CalcPenalty(account.Charges, prevCharges, account.Claims, account.Payments, endDate, startRewriteDate), 2);
+                    chargePenalty = Math.Round(CalcPenalty(account.Corrections, account.Charges, prevCharges, account.Claims, account.Payments, endDate, startRewriteDate), 2);
                 }
             }
             
@@ -940,7 +970,7 @@ namespace RegistryWeb.DataServices
             };
         }
 
-        private decimal CalcPenalty(List<KumiCharge> dbCharges, List<KumiCharge> charges, List<Claim> claims, 
+        private decimal CalcPenalty(List<KumiChargeCorrection> corrections,  List<KumiCharge> dbCharges, List<KumiCharge> charges, List<Claim> claims, 
             List<KumiPayment> payments, DateTime? endDate, DateTime startRewriteDate)
         {
             var chargeIds = dbCharges.Select(r => r.IdCharge).ToList();
@@ -974,9 +1004,16 @@ namespace RegistryWeb.DataServices
                 Value = r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc=> pc.TenancyValue)
             });
 
-            var resultPayments = preparedClaims.Union(preparedPayments).ToList();
+            var paymentCorrections = corrections.Where(r => r.PaymentTenancyValue != 0)
+                .Select(r => new KumiSumDateInfo
+                {
+                    Date = r.Date,
+                    Value = r.PaymentTenancyValue
+                });
 
-            var corrections = registryContext.KumiChargeCorrections
+            var resultPayments = preparedClaims.Union(preparedPayments).Union(paymentCorrections).ToList();
+
+            var chargeCorrections = corrections.Where(r => r.TenancyValue != 0)
                 .Select(r => new KumiSumDateInfo {
                     Date = r.Date,
                     Value = r.TenancyValue
@@ -986,24 +1023,25 @@ namespace RegistryWeb.DataServices
                 dbCharges.Where(r => r.StartDate < startRewriteDate && r.EndDate <= endDate)
                 .Union(charges.Where(r => r.StartDate >= startRewriteDate && r.EndDate <= endDate));
             var firstChargeInputInfo = resultCharges.OrderBy(r => r.EndDate).FirstOrDefault();
+
             var resultChargesInfo = resultCharges
                 .Select(r => new KumiSumDateInfo
                 {
                     Date = r.EndDate,
                     Value = firstChargeInputInfo != null && firstChargeInputInfo.EndDate == r.EndDate ? 
                         r.ChargeTenancy + r.RecalcTenancy + firstChargeInputInfo.InputTenancy : r.ChargeTenancy + r.RecalcTenancy
-                }).Union(corrections).ToList();
+                }).Union(chargeCorrections).ToList();
 
             var penalty = 0m;
 
             // Расчет пени
-            while(resultChargesInfo.Where(r => r.Value > 0).Any() && resultPayments.Where(r => r.Value > 0).Any())
+            while(resultChargesInfo.Where(r => r.Value != 0).Any() && resultPayments.Where(r => r.Value != 0).Any())
             {
-                var firstCharge = resultChargesInfo.Where(r => r.Value > 0).OrderBy(r => r.Date).First();
+                var firstCharge = resultChargesInfo.Where(r => r.Value != 0).OrderBy(r => r.Date).First();
                 var dbCharge = dbCharges.Where(r => r.EndDate == firstCharge.Date).FirstOrDefault();
-                while (firstCharge.Value > 0 && resultPayments.Where(r => r.Value > 0).Any())
+                while (firstCharge.Value != 0 && resultPayments.Where(r => r.Value != 0).Any())
                 {
-                    var firstPayment = resultPayments.Where(r => r.Value > 0).OrderBy(r => r.Date).First();
+                    var firstPayment = resultPayments.Where(r => r.Value != 0).OrderBy(r => r.Date).First();
                     var calcSum = 0m;
                     if (firstCharge.Value >= firstPayment.Value)
                     {
@@ -2298,12 +2336,13 @@ namespace RegistryWeb.DataServices
             return result;
         }
 
-        public KumiAccount GetKumiAccount(int idAccount)
+        public KumiAccount GetKumiAccount(int idAccount, bool withHiddenCharges = false)
         {
             var account = registryContext.KumiAccounts
                 .Include(r => r.AccountsTenancyProcessesAssoc)
                 .Include(r => r.Charges)
                 .Include(r => r.Claims)
+                .Include(r => r.Corrections)
                 .SingleOrDefault(a => a.IdAccount == idAccount);
             if (account == null) return null;
             foreach(var claim in account.Claims)
@@ -2311,7 +2350,7 @@ namespace RegistryWeb.DataServices
                 var currentClaimState = registryContext.ClaimStates.Include(r => r.IdStateTypeNavigation).Where(r => r.IdClaim == claim.IdClaim);
                 claim.ClaimStates = currentClaimState.ToList();
             }
-            account.Charges = account.Charges.Where(r => r.Hidden != 1).ToList();
+            account.Charges = account.Charges.Where(r => withHiddenCharges || r.Hidden != 1).ToList();
             foreach (var charge in account.Charges)
             {
                 var paymentCharges = registryContext.KumiPaymentCharges.Where(r => r.IdCharge == charge.IdCharge);

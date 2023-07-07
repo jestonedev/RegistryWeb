@@ -66,6 +66,7 @@ namespace RegistryPaymentsLoader.TffStrings
                 RecipientBankBik = tffStringParts[22],
                 RecipientBankName = tffStringParts[23],
                 RecipientBankAccount = tffStringParts[24],
+                DateEnrollUfk = TffTypesHelper.StringToDate(tffStringParts[45]),
             };
         }
     }

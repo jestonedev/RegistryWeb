@@ -25,8 +25,11 @@
             <th class="r-table-header-cell">
                 Пользователь
             </th>
-            <th class="r-table-header-cell" style="padding-left: 50px;">
+            <th class="r-table-header-cell">
                 Список файлов
+            </th>
+            <th class="r-table-header-cell">
+                Дата выписки
             </th>
             <th></th>
         </tr>
@@ -44,12 +47,24 @@
                     @item.User
                 </td>
                 <td>
-                    <ul style="list-style-type:none">
-                        @foreach (var text in textFiles)
+                    @foreach (var text in textFiles)
+                    {
+                        <div>@text</div>
+                    }
+                </td>
+                <td>
+                    @{
+                        var notices = @item.PaymentGroupFiles?.Where(c => c.NoticeDate != null).Select(c => c.NoticeDate).Distinct();
+                        
+                        if (notices.Count() > 1)
                         {
-                            <li>@text</li>
+                            <div><b>Несколько выписок: </b></div>
                         }
-                    </ul>
+                        foreach (var notice in notices)
+                        {
+                            <div>@notice.Value.ToString("dd.MM.yyyy")</div>
+                        }
+                    }
                 </td>
                 <td>
                     <a class="btn btn-primary oi oi-eye" title="Подробнее" aria-label="Подробнее"

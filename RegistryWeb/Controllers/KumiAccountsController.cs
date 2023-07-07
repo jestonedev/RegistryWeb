@@ -109,7 +109,7 @@ namespace RegistryWeb.Controllers
             {
                 if (!idAccount.HasValue)
                     return NotFound();
-                account = dataService.GetKumiAccount(idAccount.Value);
+                account = dataService.GetKumiAccount(idAccount.Value, true);
                 if (account == null)
                     return NotFound();
             }
@@ -277,8 +277,29 @@ namespace RegistryWeb.Controllers
 
         public IActionResult ChargeCorrectionsList(int idAccount)
         {
-            //TODO
-            return NotFound();
+            return View(dataService.GetAccountCorrectionsVm(idAccount));
+        }
+
+        public IActionResult DeleteCorrection(int idCorrection)
+        {
+            try
+            {
+                var idAccount = dataService.GetIdAccountByCorrection(idCorrection);
+                dataService.DeleteChargeCorrection(idCorrection);
+                dataService.RecalculateAccounts(new List<int> { idAccount }, 0, null);
+                return Json(new
+                {
+                    State = "Success"
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.Message
+                });
+            }
         }
 
         [HttpPost]

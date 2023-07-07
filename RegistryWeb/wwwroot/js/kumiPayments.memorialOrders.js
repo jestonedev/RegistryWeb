@@ -90,7 +90,7 @@
         $('#setMemorialOrderModalBtn').text('Сохраняем...').attr('disabled', true);
         var data = {
             "IdPayment": modal.find("#MemorialOrder_IdPayment").val(),
-            "IdOrders": $("[name='MemorialOrder_IdOrder']:checked").map(function (idx, elem) { return $(elem).val(); }).toArray(),
+            "IdOrders": modal.find("[name='MemorialOrder_IdOrder']:checked").map(function (idx, elem) { return $(elem).val(); }).toArray(),
             "ReturnUrl": modal.find("#MemorialOrder_ReturnUrl").val()
         };
         var url = window.location.origin + '/KumiPayments/ApplyMemorialOrder';
@@ -98,7 +98,8 @@
         if (createNewPaymentAction) {
             url = window.location.origin + '/KumiPayments/CreateByMemorialOrder';
             saveBtnTitle = "Создать";
-        }
+            data.IdOrder = modal.find("[name='MemorialOrder_IdOrder']:checked").val();
+        };
         
         $.ajax({
             async: true,

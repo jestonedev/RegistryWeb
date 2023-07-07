@@ -1,0 +1,103 @@
+﻿@using RegistryWeb.Extensions;
+@using RegistryWeb.ViewOptions;
+@using RegistryWeb.SecurityServices;
+@using RegistryDb.Models.Entities.KumiAccounts;
+@using RegistryServices.Models.KumiPayments;
+@model RegistryServices.ViewModel.KumiAccounts.KumiChargeCorrectionsVM;
+
+
+@{
+    ViewData["Title"] = "Список корректировок по ЛС №" + Model.Account.Account;
+    var TotalRows = "Количество записей: " + Model.PageOptions.TotalRows;
+}
+
+<h2>@ViewData["Title"]</h2>
+<h4>@TotalRows</h4>
+
+
+<table class="table table-hover rr-payments-log-table">
+    <thead>
+        <tr style="align-content: center;">
+            <th rowspan="2" class="r-table-header-cell">
+                Дата
+            </th>
+            <th colspan="2">Начисление</th>
+            <th colspan="2">Оплата</th>
+            <th rowspan="2" class="r-table-header-cell">
+                Причина корректировки
+            </th>
+            <th rowspan="2"></th>
+        </tr>
+        <tr>
+            <th class="r-table-header-cell">
+                Найм
+            </th>
+            <th class="r-table-header-cell">
+                Пени
+            </th>
+            <th class="r-table-header-cell">
+                Найм
+            </th>
+            <th class="r-table-header-cell">
+                Пени
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ChargeCorrections)
+        {
+            <tr>
+                <td>
+                    @item.Date.ToString("dd.MM.yyyy")
+                </td>
+                <td style="white-space: nowrap;">
+                    @item.TenancyValue.ToString("#0.00") руб.
+                </td>
+                <td style="white-space: nowrap;">
+                    @item.PenaltyValue.ToString("#0.00") руб.
+                </td>
+                <td style="white-space: nowrap;">
+                    @item.PaymentTenancyValue.ToString("#0.00") руб.
+                </td>
+                <td style="white-space: nowrap;">
+                    @item.PaymentPenaltyValue.ToString("#0.00") руб.
+                </td>
+                <td>
+                    @item.Description
+                </td>
+                <td>
+                    <a class="btn btn-danger oi oi-x rr-delete-correction" title="Удалить корректировку" aria-label="Удалить корректировку"
+                       href="#" data-id-correction="@item.IdCorrection"></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<page-link page-model="Model.PageOptions" page-action="Index"></page-link>
+
+
+<div class="modal fade" id="ConfirmDeleteCorrectionModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <input type="hidden" id="DeleteCorrection_IdCorrection" />
+            <div class="modal-header">
+                <h5 class="modal-title">Подтвердите удаление корректировки</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div>Вы уверены, что хотите удалить корректировку?</div>
+                <div class="d-none text-center text-danger rr-delete-correction-error"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <button id="confirmDeleteCorrection" type="button" class="btn btn-success">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/kumiAccount.corrections.js" asp-append-version="true"></script>

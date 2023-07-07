@@ -7,5 +7,6 @@ namespace RegistryServices.Models.KumiPayments
     {
         public int IdAccount { get; set; }
         public string Account { get; set; }
+        public string Tenant { get; set; }
     }
 }

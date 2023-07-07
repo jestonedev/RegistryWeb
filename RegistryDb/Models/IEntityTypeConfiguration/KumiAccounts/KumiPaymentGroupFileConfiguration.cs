@@ -41,6 +41,11 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .IsRequired()
                 .HasMaxLength(10)
                 .IsUnicode(false);
+
+
+            builder.Property(e => e.NoticeDate)
+                .HasColumnName("notice_date")
+                .HasColumnType("date");
         }
     }
 }

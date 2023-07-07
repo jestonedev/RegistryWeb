@@ -521,7 +521,7 @@ $(function () {
         else
             purpose = $("#Purpose").text();
 
-        distributionModalInitiate(purpose, paymentSum, paymentSumPosted, idPayment, false, distributePaymentToObjectOnSelectCallback);
+        distributionModalInitiate(purpose, null, paymentSum, paymentSumPosted, idPayment, false, distributePaymentToObjectOnSelectCallback);
 
         e.preventDefault();
     });
