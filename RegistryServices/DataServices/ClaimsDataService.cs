@@ -641,6 +641,10 @@ namespace RegistryWeb.DataServices
 
         public IQueryable<Claim> ClaimFilter(IQueryable<Claim> query, ClaimsFilter filterOptions)
         {
+            if (filterOptions.IdClaim != null && filterOptions.IdClaim != 0)
+            {
+                query = query.Where(p => p.IdClaim == filterOptions.IdClaim.Value);
+            }
             if (filterOptions.IdAccountBks != null)
             {
                 var ids = GetAccountIdsWithSameAddress(filterOptions.IdAccountBks.Value);
