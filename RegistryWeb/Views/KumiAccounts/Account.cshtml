@@ -315,6 +315,10 @@
                         {
                             var tenancyOnAccount = charge.PaymentCharges?.Sum(r => r.TenancyValue) ?? 0m;
                             var penaltyOnAccount = charge.PaymentCharges?.Sum(r => r.PenaltyValue) ?? 0m;
+
+                            tenancyOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentTenancyValue);
+                            penaltyOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentPenaltyValue);
+
                             if (charge.IsBksCharge == 1)
                             {
                                 tenancyOnAccount = charge.PaymentTenancy;
@@ -422,7 +426,7 @@
                             <tbody>
                                 @{
                                     var i = 0;
-                                    var count = Model.Charges.Count;
+                                    var count = Model.Charges.Where(r => r.Hidden == 0).Count();
                                     var totalChargeTenancy = 0.00m;
                                     var totalChargePenalty = 0.00m;
                                     var totalPaymentTenancy = 0.00m;
@@ -432,29 +436,34 @@
                                     var totalRecalcTenancy = 0.00m;
                                     var totalRecalcPenalty = 0.00m;
                                 }
-                                @foreach (var charge in Model.Charges.OrderBy(r => r.EndDate))
+                                @foreach (var charge in Model.Charges.Where(r => r.Hidden == 0).OrderBy(r => r.EndDate))
                                 {
-                                    totalChargeTenancy += charge.ChargeTenancy;
-                                    totalChargePenalty += charge.ChargePenalty;
+                                    if (charge.EndDate <= DateTime.Now.Date)
+                                    {
+                                        totalChargeTenancy += charge.ChargeTenancy;
+                                        totalChargePenalty += charge.ChargePenalty;
+                                        totalRecalcTenancy += charge.RecalcTenancy + charge.CorrectionTenancy;
+                                        totalRecalcPenalty += charge.RecalcPenalty + charge.CorrectionPenalty;
+                                    }
                                     totalPaymentTenancy += charge.PaymentTenancy;
                                     totalPaymentPenalty += charge.PaymentPenalty;
-                                    totalRecalcTenancy += charge.RecalcTenancy + charge.CorrectionTenancy;
-                                    totalRecalcPenalty += charge.RecalcPenalty + charge.CorrectionPenalty;
                                     i++;
                                     <tr class="@(count - i + 1 > 12 ? "rr-charge-archive" : "") @(charge.EndDate == currMonthEndDate ? "rr-charge-current-month-row" : "")" data-charge-end-date="@charge.EndDate.ToString("yyyy-MM-dd")">
                                         <td class="text-center p-1"><b>@charge.EndDate.ToString("dd.MM.yyyy")</b></td>
                                         <td class="text-center p-1 rr-charge-period-input-tenancy">@charge.InputTenancy</td>
                                         <td class="text-center p-1 rr-charge-period-input-penalty">@charge.InputPenalty</td>
-                                        <td class="text-center p-1 rr-charge-period-tenancy">@charge.ChargeTenancy</td>
-                                        <td class="text-center p-1 rr-charge-period-penalty">@charge.ChargePenalty</td>
+                                        <td class="text-center p-1 rr-charge-period-tenancy">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargeTenancy : 0)</td>
+                                        <td class="text-center p-1 rr-charge-period-penalty">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargePenalty : 0)</td>
                                         <td class="text-center p-1 rr-charge-period-payment-tenancy">
                                             @{
                                                 var tenancyOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.TenancyValue) ?? 0m;
+                                                tenancyOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentTenancyValue);
                                                 if (charge.IsBksCharge == 1)
                                                 {
                                                     tenancyOnAccount = charge.PaymentTenancy;
                                                 }
                                                 var penaltyOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.PenaltyValue) ?? 0m;
+                                                penaltyOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentPenaltyValue);
                                                 if (charge.IsBksCharge == 1)
                                                 {
                                                     penaltyOnAccount = charge.PaymentPenalty;
@@ -483,8 +492,8 @@
                                                 @charge.PaymentPenalty
                                             }
                                         </td>
-                                        <td class="text-center p-1 rr-charge-period-recalc-tenancy">@(charge.RecalcTenancy+charge.CorrectionTenancy)</td>
-                                        <td class="text-center p-1 rr-charge-period-recalc-penalty">@(charge.RecalcPenalty+charge.CorrectionPenalty)</td>
+                                        <td class="text-center p-1 rr-charge-period-recalc-tenancy">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcTenancy + charge.CorrectionTenancy : 0)</td>
+                                        <td class="text-center p-1 rr-charge-period-recalc-penalty">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcPenalty + charge.CorrectionTenancy : 0)</td>
                                         <td class="text-center p-1 rr-charge-period-output-tenancy">@charge.OutputTenancy</td>
                                         <td class="text-center p-1 rr-charge-period-output-penalty">@charge.OutputPenalty</td>
                                     </tr>

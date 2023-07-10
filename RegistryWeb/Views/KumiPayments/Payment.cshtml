@@ -367,12 +367,20 @@
                     <input type="date" asp-for="DateExecute" value="@(Model.DateExecute != null ? Model.DateExecute.Value.ToString("yyyy-MM-dd") : "")"
                            title="@fieldDetailTitle" class="form-control" />
                 </div>
+
+
                 @if (isPl)
                 {
                     <input type="hidden" asp-for="DatePay" />
                 }
                 else
                 {
+                    <div class="form-group col-6 col-lg-3 mb-2">
+                        <label class="rr-payment-label mb-1" asp-for="DateEnrollUfk">Дата зачисления на л\с УФК</label>
+                        <input type="date" asp-for="DateEnrollUfk" value="@(Model.DateEnrollUfk != null ? Model.DateEnrollUfk.Value.ToString("yyyy-MM-dd") : "")"
+                               title="Дата зачисления на л\с УФК" class="form-control" />
+                    </div>
+
                     <div class="form-group col-6 col-lg-3 mb-2">
                         <label class="rr-payment-label mb-1" asp-for="DatePay">Срок платежа</label>
                         <input type="date" asp-for="DatePay" value="@(Model.DatePay != null ? Model.DatePay.Value.ToString("yyyy-MM-dd") : "")"
@@ -421,12 +429,13 @@
                         </select>
                     </div>
                 }
-
-                <div class="form-group @(isPl ? "col-12 col-lg-6" : "col-6 col-lg-3" )  mb-2">
-                    <label class="rr-payment-label mb-1" asp-for="Uin">УИН</label>
-                    <input type="text" asp-for="Uin" data-val="true" title="Уникальный идентификатор начисления" class="form-control input-numbers" maxlength="25" />
-                </div>
-
+                @if (isPl)
+                {
+                    <div class="form-group @(isPl ? "col-12 col-lg-6" : "col-6 col-lg-3" )  mb-2">
+                        <label class="rr-payment-label mb-1" asp-for="Uin">УИН</label>
+                        <input type="text" asp-for="Uin" data-val="true" title="Уникальный идентификатор начисления" class="form-control input-numbers" maxlength="25" />
+                    </div>
+                }
                 <input type="hidden" asp-for="IdPurpose" />
             </div>
 
@@ -465,8 +474,16 @@
             </div>
 
             <div class="form-row">
+                @if (!isPl)
+                {
+                    <div class="form-group col-6 col-lg-3 mb-2">
+                        <label class="rr-payment-label mb-1" asp-for="Uin">УИН</label>
+                        <input type="text" asp-for="Uin" data-val="true" title="Уникальный идентификатор начисления" class="form-control input-numbers" maxlength="25" />
+                    </div>
+                }
 
-                <div class="form-group col-12 col-lg-6 mb-2">
+
+                <div class="form-group @(isPl ? "col-12 col-lg-6 mb-2" : "col-6 col-lg-3 mb-2")">
                     <label class="rr-payment-label mb-1">Основание платежа</label>
                     <select class="selectpicker form-control" asp-for="IdPaymentReason" title="Основание платежа"
                             asp-items="@(new SelectList(ViewBag.PaymentReasons, "IdPaymentReason", "Name", Model.IdPaymentReason))">

@@ -4,18 +4,17 @@ using RegistryDb.Models.Entities.Claims;
 using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryServices.Models.KumiPayments;
 using RegistryWeb.ViewModel;
+using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RegistryServices.ViewModel.KumiAccounts
 {
-    public class KumiPaymentsVM : ListVM<KumiPaymentsFilter>
+    public class KumiChargeCorrectionsVM : ListVM<FilterOptions>
     {
-        public IEnumerable<KumiPayment> Payments { get; set; }
-        public SelectList PaymentSourcesList { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
-        public List<KumiPaymentDistributionInfoToObject> DistributionInfoToObjects { get; set; }
+        public IEnumerable<KumiChargeCorrection> ChargeCorrections { get; set; }
+        public KumiAccount Account { get; set; }
     }
 }
