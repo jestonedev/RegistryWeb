@@ -160,7 +160,7 @@
                         </div>
                         <div class="form-group col-lg-3 col-6 mb-2">
                             <label asp-for="FilterOptions.Kbk" class="rr-payment-filter-label mb-1">КБК</label>
-                            <input type="text" class="form-control input-filter-numbers" maxlength="20" asp-for="FilterOptions.Kbk" title="КБК">
+                            <input type="text" class="form-control input-filter-numbers" maxlength="20" asp-for="FilterOptions.Kbk" value="@(Model.FilterOptions.Kbk == null ? "90111109044041000120" : Model.FilterOptions.Kbk)" title="КБК">
                         </div>
                         <div class="form-group col-lg-3 col-6 mb-2">
                             <label asp-for="FilterOptions.Okato" class="rr-payment-filter-label mb-1">Код ОКТМО</label>

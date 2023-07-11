@@ -178,23 +178,39 @@
                         </div>
                         <div class="card-body toggle-hide" id="AccountSumFilters">
                             <div class="form-row">
-                                <input type="hidden" asp-for="FilterOptions.CurrentBalanceTotalOp" />
-                                <div class="form-group col-md-12 col-lg-4">
-                                    <label asp-for="FilterOptions.CurrentBalanceTotal" class="rr-payment-filter-label">Сальдо вх. (Итого)</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="#">≥</a>
-                                                <a class="dropdown-item" href="#">≤</a>
-                                            </div>
-                                        </div>
-                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.CurrentBalanceTotal">
+                                <div class="form-group col-6">
+                                    <label>Критерий фильтрации</label>
+                                    <select class="selectpicker form-control" id="AccountSumFilterCriteria" title="Критерий фильтрации">
+                                        @if (Model.FilterOptions.AtDate == null)
+                                        {
+                                            <option value="1" selected>По последнему начислению</option>
+                                            <option value="2">По дате начисления</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">По последнему начислению</option>
+                                            <option value="2" selected>По дате начисления</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <label asp-for="FilterOptions.AtDate">Дата</label>
+                                    <div class="input-group date">
+                                        @if (Model.FilterOptions.AtDate == null)
+                                        {
+                                            <input type="date" disabled class="form-control" asp-for="FilterOptions.AtDate" title="Дата">
+                                        }
+                                        else
+                                        {
+                                            <input type="date" class="form-control" asp-for="FilterOptions.AtDate" title="Дата">
+                                        }
                                     </div>
                                 </div>
-                                <input type="hidden" asp-for="FilterOptions.CurrentBalanceTenancyOp" />
-                                <div class="form-group col-md-6 col-lg-4">
-                                    <label asp-for="FilterOptions.CurrentBalanceTenancy" class="rr-payment-filter-label">Сальдо вх. (Найм)</label>
+                            </div>
+                            <div class="form-row">
+                                <input type="hidden" asp-for="FilterOptions.BalanceInputTotalOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.BalanceInputTotal" class="rr-payment-filter-label">Сальдо вх. (Итого)</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
@@ -203,12 +219,12 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.CurrentBalanceTenancy">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceInputTotal">
                                     </div>
                                 </div>
-                                <input type="hidden" asp-for="FilterOptions.CurrentBalancePenaltyOp" />
-                                <div class="form-group col-md-6 col-lg-4">
-                                    <label asp-for="FilterOptions.CurrentBalancePenalty" class="rr-payment-filter-label">Сальдо вх. (Пени)</label>
+                                <input type="hidden" asp-for="FilterOptions.BalanceInputTenancyOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.BalanceInputTenancy" class="rr-payment-filter-label">Сальдо вх. (Найм)</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
@@ -217,7 +233,267 @@
                                                 <a class="dropdown-item" href="#">≤</a>
                                             </div>
                                         </div>
-                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.CurrentBalancePenalty">
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceInputTenancy">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.BalanceInputPenaltiesOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.BalanceInputPenalties" class="rr-payment-filter-label">Сальдо вх. (Пени)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceInputPenalties">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.BalanceInputDgiPadunPkkOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.BalanceInputDgiPadunPkk" class="rr-payment-filter-label">Сальдо вх. (ДГИ/Падун/ПКК)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceInputDgiPadunPkk">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <input type="hidden" asp-for="FilterOptions.ChargingTotalOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.ChargingTotal" class="rr-payment-filter-label">Начисление (Итого)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.ChargingTotal">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.ChargingTenancyOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.ChargingTenancy" class="rr-payment-filter-label">Начисление (Найм)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.ChargingTenancy">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.ChargingPenaltiesOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.ChargingPenalties" class="rr-payment-filter-label">Начисление (Пени)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.ChargingPenalties">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.ChargingDgiPadunPkkOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.ChargingDgiPadunPkk" class="rr-payment-filter-label">Начисление (ДГИ/Падун/ПКК)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.ChargingDgiPadunPkk">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <input type="hidden" asp-for="FilterOptions.RecalcTotalOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.RecalcTotal" class="rr-payment-filter-label">Перерасчет (Итого)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.RecalcTotal">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.RecalcTenancyOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.RecalcTenancy" class="rr-payment-filter-label">Перерасчет (Найм)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.RecalcTenancy">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.RecalcPenaltiesOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.RecalcPenalties" class="rr-payment-filter-label">Перерасчет (Пени)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.RecalcPenalties">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.RecalcDgiPadunPkkOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.RecalcDgiPadunPkk" class="rr-payment-filter-label">Перерасчет (ДГИ/Падун/ПКК)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.RecalcDgiPadunPkk">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <input type="hidden" asp-for="FilterOptions.PaymentTotalOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.PaymentTotal" class="rr-payment-filter-label">Оплата (Итого)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.PaymentTotal">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.PaymentTenancyOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.PaymentTenancy" class="rr-payment-filter-label">Оплата (Найм)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.PaymentTenancy">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.PaymentPenaltiesOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.PaymentPenalties" class="rr-payment-filter-label">Оплата (Пени)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.PaymentPenalties">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.PaymentDgiPadunPkkOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.PaymentDgiPadunPkk" class="rr-payment-filter-label">Оплата (ДГИ/Падун/ПКК)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.PaymentDgiPadunPkk">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <input type="hidden" asp-for="FilterOptions.BalanceOutputTotalOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.BalanceOutputTotal" class="rr-payment-filter-label">Сальдо исх. (Итого)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceOutputTotal">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.BalanceOutputTenancyOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.BalanceOutputTenancy" class="rr-payment-filter-label">Сальдо исх. (Найм)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceOutputTenancy">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.BalanceOutputPenaltiesOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.BalanceOutputPenalties" class="rr-payment-filter-label">Сальдо исх. (Пени)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceOutputPenalties">
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="FilterOptions.BalanceOutputDgiPadunPkkOp" />
+                                <div class="form-group col-md-6 col-lg-3">
+                                    <label asp-for="FilterOptions.BalanceOutputDgiPadunPkk" class="rr-payment-filter-label">Сальдо исх. (ДГИ/Падун/ПКК)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">≥</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">≥</a>
+                                                <a class="dropdown-item" href="#">≤</a>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control decimal input-filter-decimal" asp-for="FilterOptions.BalanceOutputDgiPadunPkk">
                                     </div>
                                 </div>
                             </div>

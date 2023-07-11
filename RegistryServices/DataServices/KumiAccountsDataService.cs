@@ -1861,24 +1861,163 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<KumiAccount> BalanceFilter(IQueryable<KumiAccount> query, KumiAccountsFilter filterOptions)
         {
-            if (filterOptions.CurrentBalanceTenancy != null)
+            var charges = new List<KumiCharge>();
+
+            if (filterOptions.AtDate == null)
             {
-                query = query.Where(p => filterOptions.CurrentBalanceTenancyOp == 1 ?
-                        p.CurrentBalanceTenancy >= filterOptions.CurrentBalanceTenancy :
-                        p.CurrentBalanceTenancy <= filterOptions.CurrentBalanceTenancy);
-            }
-            if (filterOptions.CurrentBalancePenalty != null)
+                var lastChargesIds =
+                          (from cRow in registryContext.KumiCharges
+                          group cRow by cRow.IdAccount into gs
+                          select gs.Max(r => r.IdCharge)).ToList();
+                charges = (from cRow in registryContext.KumiCharges
+                           where lastChargesIds.Contains(cRow.IdCharge)
+                            select cRow).ToList();
+            } else
             {
-                query = query.Where(p => filterOptions.CurrentBalancePenaltyOp == 1 ?
-                        p.CurrentBalancePenalty >= filterOptions.CurrentBalancePenalty :
-                        p.CurrentBalancePenalty <= filterOptions.CurrentBalancePenalty);
+                charges = registryContext.KumiCharges.Where(r => r.EndDate == filterOptions.AtDate).ToList();
             }
-            if (filterOptions.CurrentBalanceTotal != null)
+
+            List<int> resultAIds = null;
+            // Input balance
+            if (filterOptions.BalanceInputTotal != null)
             {
-                query = query.Where(p => filterOptions.CurrentBalanceTotalOp == 1 ?
-                        (p.CurrentBalancePenalty+p.CurrentBalanceTenancy) >= filterOptions.CurrentBalanceTotal :
-                        (p.CurrentBalancePenalty + p.CurrentBalanceTenancy) <= filterOptions.CurrentBalanceTotal);
+                var aIds = charges.Where(p => filterOptions.BalanceInputTotalOp == 1 ?
+                        p.InputTenancy + p.InputPenalty >= filterOptions.BalanceInputTotal :
+                        p.InputTenancy + p.InputPenalty <= filterOptions.BalanceInputTotal).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
             }
+
+            if (filterOptions.BalanceInputTenancy != null)
+            {
+                var aIds = charges.Where(p => filterOptions.BalanceInputTenancyOp == 1 ?
+                        p.InputTenancy >= filterOptions.BalanceInputTenancy :
+                        p.InputTenancy <= filterOptions.BalanceInputTenancy).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
+            if (filterOptions.BalanceInputPenalties != null)
+            {
+                var aIds = charges.Where(p => filterOptions.BalanceInputPenaltiesOp == 1 ?
+                        p.InputPenalty >= filterOptions.BalanceInputPenalties :
+                        p.InputPenalty <= filterOptions.BalanceInputPenalties).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
+            // Output balance
+            if (filterOptions.BalanceOutputTotal != null)
+            {
+                var aIds = charges.Where(p => filterOptions.BalanceOutputTotalOp == 1 ?
+                        p.OutputTenancy + p.OutputPenalty >= filterOptions.BalanceOutputTotal :
+                        p.OutputTenancy + p.OutputPenalty <= filterOptions.BalanceOutputTotal).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
+            if (filterOptions.BalanceOutputTenancy != null)
+            {
+                var aIds = charges.Where(p => filterOptions.BalanceOutputTenancyOp == 1 ?
+                        p.OutputTenancy >= filterOptions.BalanceOutputTenancy :
+                        p.OutputTenancy <= filterOptions.BalanceOutputTenancy).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
+            if (filterOptions.BalanceOutputPenalties != null)
+            {
+                var aIds = charges.Where(p => filterOptions.BalanceOutputPenaltiesOp == 1 ?
+                        p.OutputPenalty >= filterOptions.BalanceOutputPenalties :
+                        p.OutputPenalty <= filterOptions.BalanceOutputPenalties).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
+            // Charging
+            if (filterOptions.ChargingTotal != null)
+            {
+                var aIds = charges.Where(p => filterOptions.ChargingTotalOp == 1 ?
+                        p.ChargeTenancy + p.ChargePenalty >= filterOptions.ChargingTotal :
+                        p.ChargeTenancy + p.ChargePenalty <= filterOptions.ChargingTotal).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
+            if (filterOptions.ChargingTenancy != null)
+            {
+                var aIds = charges.Where(p => filterOptions.ChargingTenancyOp == 1 ?
+                        p.ChargeTenancy >= filterOptions.ChargingTenancy :
+                        p.ChargeTenancy <= filterOptions.ChargingTenancy).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
+            if (filterOptions.ChargingPenalties != null)
+            {
+                var aIds = charges.Where(p => filterOptions.ChargingPenaltiesOp == 1 ?
+                        p.ChargePenalty >= filterOptions.ChargingPenalties :
+                        p.ChargePenalty <= filterOptions.ChargingPenalties).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
+            // Payment
+            if (filterOptions.PaymentTotal != null)
+            {
+                var aIds = charges.Where(p => filterOptions.PaymentTotalOp == 1 ?
+                        p.PaymentTenancy + p.PaymentPenalty >= filterOptions.PaymentTotal :
+                        p.PaymentTenancy + p.PaymentPenalty <= filterOptions.PaymentTotal).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
+            if (filterOptions.PaymentTenancy != null)
+            {
+                var aIds = charges.Where(p => filterOptions.PaymentTenancyOp == 1 ?
+                        p.PaymentTenancy >= filterOptions.PaymentTenancy :
+                        p.PaymentTenancy <= filterOptions.PaymentTenancy).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
+            if (filterOptions.PaymentPenalties != null)
+            {
+                var aIds = charges.Where(p => filterOptions.PaymentPenaltiesOp == 1 ?
+                        p.PaymentPenalty >= filterOptions.PaymentPenalties :
+                        p.PaymentPenalty <= filterOptions.PaymentPenalties).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+            if (resultAIds != null)
+            {
+                query = query.Where(r => resultAIds.Contains(r.IdAccount));
+            }
+
             return query;
         }
 
@@ -1908,8 +2047,10 @@ namespace RegistryWeb.DataServices
                 return query;
             }
             var idAccounts = registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons).Include(tp => tp.AccountsTenancyProcessesAssoc)
-                    .Where(r => r.TenancyPersons.Count(p => p.Email != null) > 0 && r.AccountsTenancyProcessesAssoc.Count() > 0)
+                    .Where(r => r.AnnualDate == null && r.TenancyPersons.Count(p => p.Email != null && p.ExcludeDate == null) > 0
+                            && r.AccountsTenancyProcessesAssoc.Count() > 0)
                     .SelectMany(r => r.AccountsTenancyProcessesAssoc.Select(atpa => atpa.IdAccount));
+
 
             query = query.Where(r => idAccounts.Contains(r.IdAccount));
             return query;
