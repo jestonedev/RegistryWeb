@@ -1830,9 +1830,9 @@ namespace RegistryWeb.DataServices
             {
                 query = query.Where(a => a.Account.Contains(filterOptions.Account));
             }
-            if (filterOptions.IdAccountState != null)
+            if (filterOptions.IdsAccountState != null && filterOptions.IdsAccountState.Any())
             {
-                query = query.Where(a => a.IdState == filterOptions.IdAccountState);
+                query = query.Where(a => filterOptions.IdsAccountState.Contains(a.IdState));
             }
             if (!string.IsNullOrEmpty(filterOptions.Tenant))
             {

@@ -1,0 +1,148 @@
+﻿table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.main-table, table.main-table td {
+    border: 1px solid black;
+}
+
+table.main-table .main-content-td {
+    border-right: 0px;
+}
+
+.main-content-td p {
+    margin: 0px 0;
+    margin-left: 5px;
+}
+
+table.money-table .money-td {
+    text-align: right;
+    padding-right: 30px;
+}
+
+table.money-table .money-header, table.area-table .area-header {
+    padding-left: 5px;
+}
+
+table.money-table, table.money-table td, table.area-table, table.area-table td {
+    border: 0px;
+}
+
+table.area-table {
+    table-layout: fixed;
+}
+
+.main-content-td .account, .main-content-td .total-area {
+    margin-right: 20px;
+}
+
+table.service-table {
+    margin-top: 20pt;
+}
+
+table.service-table * {
+    font-size: 8pt;
+}
+
+table.main-table td.qr-td {
+    vertical-align: top;
+    border-left: 0px;
+}
+
+table.calc-center-table {
+    margin-top: 20px;
+}
+
+.calc-center-td {
+    padding-left: 5px;
+}
+
+table.calc-center-table .calc-center-td, table.calc-center-table {
+    border: 0;
+}
+
+.qr {
+    width: 4.5cm;
+    height: 4.5cm;
+}
+
+.qr-td {
+    padding-top: 8px;
+    padding-right: 8px;
+}
+
+.qr-td .qr {
+    margin: 2pt;
+}
+
+.invoice-header-td {
+    vertical-align: central;
+    padding-right: 7px;
+}
+
+.main-content-td {
+    padding: 10px 0 5px 5px;
+}
+
+body {
+    font-family: Arial;
+    font-size: 10pt;
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+}
+
+body * {
+    font-size: 9pt;
+}
+
+.rr-invoice-wrapper {
+    height: 10.5cm;
+}
+
+@page {
+    size: A4;
+    margin: 0;
+}
+
+.page {
+    width: 21cm;
+    min-height: 29.7cm;
+    padding: 1cm;
+    margin: 1cm auto;
+    border: 1px #D3D3D3 solid;
+    border-radius: 5px;
+    background: white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+@media print {
+    .page {
+        margin: 0;
+        border: initial;
+        border-radius: initial;
+        width: initial;
+        min-height: initial;
+        box-shadow: initial;
+        background: initial;
+        page-break-after: always;
+    }
+
+    body * {
+        font-size: 11pt;
+    }
+
+    table.service-table * {
+        font-size: 10pt;
+    }
+
+    .qr {
+        width: 5.5cm;
+        height: 5.5cm;
+    }
+
+    .rr-invoice-wrapper {
+        height: 11.7cm;
+    }
+}

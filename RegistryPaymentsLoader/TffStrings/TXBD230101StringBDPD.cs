@@ -17,9 +17,9 @@ namespace RegistryPaymentsLoader.TffStrings
             var paymentST = CredentialString?.ToPaymentST();
             return new KumiPayment
             {
-                Guid = tffStringParts[46],
+                Guid = tffStringParts[46] == "" ? null : tffStringParts[46],
                 IdSource = 2, // BDPD
-                NumDocument = tffStringParts[4],
+                NumDocument = tffStringParts[4] == "" ? null : tffStringParts[4],
                 DateDocument = TffTypesHelper.StringToDate(tffStringParts[5]),
                 DateIn = TffTypesHelper.StringToDate(tffStringParts[8]),
                 DateExecute = TffTypesHelper.StringToDate(tffStringParts[9]),
@@ -33,10 +33,10 @@ namespace RegistryPaymentsLoader.TffStrings
                     Code = tffStringParts[10]
                 },
                 Sum = TffTypesHelper.StringToDecimal(tffStringParts[6]) ?? 0,
-                Uin = tffStringParts[28],
+                Uin = tffStringParts[28] == "" ? null : tffStringParts[28],
                 IdPurpose = TffTypesHelper.StringToInt(tffStringParts[26]),
-                Purpose = tffStringParts[30],
-                Kbk = tffStringParts[32],
+                Purpose = tffStringParts[30] == "" ? null : tffStringParts[30],
+                Kbk = paymentST.Kbk, // tffStringParts[32],
                 KbkType = paymentST == null ? null : new KumiKbkType
                 {
                     Code = paymentST.KbkType

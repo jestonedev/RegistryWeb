@@ -104,11 +104,11 @@
                             <label asp-for="FilterOptions.Account">Лицевой счет</label>
                             <input type="text" class="form-control input-filter-numbers" asp-for="FilterOptions.Account" title="Лицевой счет">
                         </div>
+
                         <div class="form-group col-6 col-lg-3">
-                            <label asp-for="FilterOptions.IdAccountState">Состояние</label>
-                            <select class="selectpicker form-control" title="Состояние лицевого счета" 
-                                asp-for="FilterOptions.IdAccountState" asp-items="@Model.AccountStates">
-                                <option selected></option>
+                            <label asp-for="FilterOptions.IdsAccountState">Состояние</label>
+                            <select multiple class="selectpicker form-control" data-actions-box="true" title="Состояние лицевого счета"
+                                    asp-for="FilterOptions.IdsAccountState" asp-items="@Model.AccountStates">
                             </select>
                         </div>
                         <div class="form-group col-6 col-lg-3">

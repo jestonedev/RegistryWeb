@@ -602,6 +602,10 @@ namespace RegistryWeb.DataServices
             {
                 query = query.Where(r => r.DateExecute == filterOptions.DateExecute);
             }
+            if (filterOptions.DateEnrollUfk != null)
+            {
+                query = query.Where(r => r.DateEnrollUfk == filterOptions.DateEnrollUfk);
+            }
             if (!string.IsNullOrEmpty(filterOptions.Uin))
             {
                 query = query.Where(r => r.Uin != null && r.Uin.Contains(filterOptions.Uin));

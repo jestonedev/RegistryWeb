@@ -35,6 +35,16 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("varchar(256)")
                 .HasMaxLength(256)
                 .IsRequired();
+
+            builder.Property(e => e.Address)
+                .HasColumnName("address")
+                .HasColumnType("varchar(1024)")
+                .HasMaxLength(1024)
+                .IsRequired();
+
+            builder.Property(e => e.TotalArea)
+                .HasColumnName("total_area")
+                .HasColumnType("double");
         }
     }
 }

@@ -40,6 +40,7 @@ using RegistryDb.Models.Entities.RegistryObjects.Common.Restrictions;
 using RegistryDb.Models.Entities.Tenancies;
 using System.Linq;
 using System.Collections.Generic;
+using System;
 
 namespace RegistryDb.Models
 {
@@ -99,6 +100,7 @@ namespace RegistryDb.Models
         public virtual DbSet<SelectableSigner> SelectableSigners { get; set; }
         public virtual DbSet<DistrictCommittee> DistrictCommittees { get; set; }
         public virtual DbSet<DistrictCommitteesPreContractPreamble> DistrictCommitteesPreContractPreambles { get; set; }
+
 
         //Документы
         public virtual DbSet<ActTypeDocument> ActTypeDocuments { get; set; }
@@ -216,6 +218,7 @@ namespace RegistryDb.Models
         //Платежи
         public virtual DbSet<KumiAccount> KumiAccounts { get; set; }
         private DbSet<KumiAccountAddressInfix> KumiAccountAddressInfixes { get; set; }
+        private DbSet<KumiAccountActualTenancyProcessSearchInfo> KumiAccountActualTenancyProcessSearchInfos { get; set; }
         public virtual DbSet<KumiAccountsTenancyProcessesAssoc> KumiAccountsTenancyProcessesAssocs { get; set; }
         public virtual DbSet<KumiAccountState> KumiAccountStates { get; set; }
         public virtual DbSet<KumiCharge> KumiCharges { get; set; }
@@ -413,6 +416,7 @@ namespace RegistryDb.Models
 
             modelBuilder.ApplyConfiguration(new KumiAccountConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiAccountAddressInfixConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiAccountActualTenancyProcessSearchInfoConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiAccountsTenancyProcessesAssocConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiAccountStateConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiChargeConfiguration(nameDatebase));
@@ -471,6 +475,16 @@ namespace RegistryDb.Models
             var result = KumiAccountAddressInfixes.FromSql(query);
 #pragma warning restore EF1000 // Possible SQL injection vulnerability.
             return result.Select(r => r.IdAccount).ToList();
+        }
+
+        public List<KumiAccountAddressInfix> GetAddressByAccountIds(List<int> idAccounts)
+        {
+            return KumiAccountAddressInfixes.Where(r => idAccounts.Contains(r.IdAccount)).ToList();
+        }
+
+        public List<KumiAccountActualTenancyProcessSearchInfo> GetTenantsByAccountIds(List<int> idAccounts)
+        {
+            return KumiAccountActualTenancyProcessSearchInfos.Where(r => idAccounts.Contains(r.IdAccount)).ToList();
         }
     }
 }

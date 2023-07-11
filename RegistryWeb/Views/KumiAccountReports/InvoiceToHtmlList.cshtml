@@ -1,0 +1,90 @@
+﻿@using RegistryWeb.ViewModel;
+@using InvoiceGenerator;
+@model List<InvoiceGeneratorParam>;
+@{
+    Layout = null;
+    ViewData["Title"] = "Квитанции на оплату";
+    var errors = (Dictionary<int, IEnumerable<string>>)ViewBag.Errors;
+    var errorCodes = (Dictionary<int, string>)ViewBag.ErrorCodes;
+}
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ЖФ</title>
+    <link rel="shortcut icon" href="~/home.png" type="image/x-icon">
+    <link href="~/lib/bootstrap-4.3.1/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/kumi.accounts.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/kum.accounts.mass.invoice.css" asp-append-version="true" />
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap-4.3.1/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/kumiAccount.mass.invoices.js" asp-append-version="true"></script>
+</head>
+
+<body>
+    @if (errors.Any())
+    {
+        <div class="page">
+            <div class="alert alert-danger rr-invoice-errors">
+                @{
+                    foreach (var result in errors.Where(r => r.Key != 0))
+                    {
+                        var error = "";
+                        if (errorCodes.ContainsKey(result.Key))
+                        {
+                            error += errorCodes[result.Key] + ". ЛС № ";
+                        }
+                        else
+                        {
+                            error += "Неизвестная ошибка. ЛС № ";
+                        }
+                        error += result.Value.Aggregate((acc, v) => acc + ", " + v) + ". ";
+
+                        <div>@error</div>
+                    }
+                }
+            </div>
+        </div>
+    }
+
+    @for (var i = 0; i < Model.Count; i++)
+    {
+        var invoice = Model[i];
+        if (i % 3 == 0)
+        {
+            @:<div class="page">
+        }
+        <div data-id-account="@invoice.IdAccount" data-account="@invoice.Account" data-address="@invoice.Address"
+             data-tenant="@invoice.Tenant" data-total-area="@invoice.TotalArea" data-presribed="@invoice.Prescribed"
+             data-balance-input="@invoice.BalanceInput" data-balance-output="@invoice.BalanceOutput"
+             data-charging-tenancy="@invoice.ChargingTenancy" data-charging-penalty="@invoice.ChargingPenalty"
+             data-payed="@invoice.Payed" data-on-date="@invoice.OnDate"
+             data-recalc-tenancy="@invoice.RecalcTenancy" data-recalc-penalty="@invoice.RecalcPenalty" class="rr-invoice-wrapper"></div>
+
+        @if ((i-2) % 3 == 0)
+        {
+            @:</div>
+        }
+    }
+
+    <div class="modal fade" data-backdrop="static" id="invoicesMassCreatingModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Формирование квитанций</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="progress d-none">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="stopInvoiceMassCreating" data-dismiss="modal">Остановить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>

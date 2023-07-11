@@ -16,10 +16,10 @@ namespace RegistryPaymentsLoader.TffStrings
         public override KumiPaymentST ToPaymentST() {
             return new KumiPaymentST
             {
-                Kbk = tffStringParts[1],
-                KbkType = tffStringParts[2],
-                TargetCode = tffStringParts[3],
-                Okato = tffStringParts[5],
+                Kbk = tffStringParts[1] == "" ? null : tffStringParts[1],
+                KbkType = tffStringParts[2] == "" ? null : tffStringParts[2],
+                TargetCode = tffStringParts[3] == "" ? null : tffStringParts[3],
+                Okato = tffStringParts[5] == "" ? null : tffStringParts[5],
                 Sum = TffTypesHelper.StringToDecimal(tffStringParts[6]) ?? 0,
                 PaymentWay = TffTypesHelper.StringToInt(tffStringParts[7]) ?? 0
             };

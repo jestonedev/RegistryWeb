@@ -1,11 +1,13 @@
-﻿namespace RegistryWeb.ViewOptions.Filter
+﻿using System.Collections.Generic;
+
+namespace RegistryWeb.ViewOptions.Filter
 {
     public class KumiAccountsFilter : FilterAddressOptions
     {
         public string FrontSideAccount { get; set; }
         public string Account { get; set; }
         public string AccountGisZkh { get; set; }
-        public int? IdAccountState { get; set; }
+        public List<int> IdsAccountState { get; set; }
         public string Tenant { get; set; }
         public bool Emails { get; set; }
         public string IdStreet { get; set; }
@@ -40,7 +42,7 @@
         {
             return Account == null && AccountGisZkh == null && Tenant == null &&
                 IdRegion == null && IdStreet == null && House == null && PremisesNum == null && IdPreset == null && IdClaimsBehavior == null &&
-                CurrentBalanceTenancy == null && CurrentBalancePenalty == null && CurrentBalanceTotal == null && !Emails && IdAccountState == null;
+                CurrentBalanceTenancy == null && CurrentBalancePenalty == null && CurrentBalanceTotal == null && !Emails && (IdsAccountState == null || IdsAccountState.Count == 0);
         }
     }
 }

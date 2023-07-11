@@ -84,7 +84,7 @@
             case -5:
                 return "Ошибка удаления временных файлов";
             case -6:
-                return "Отсутствует платеж на указанную дату";
+                return "Отсутствует наниматель, адрес или начисление на указанную дату";
             case -7:
                 return "Отсутствует электронная почта для отправки";
             case -8:
@@ -111,10 +111,18 @@
         var idAccount = form.find("[name='AccountKumi.IdAccount']").val();
         var textmessage = form.find("[name='AccountKumi.TextMessage']").val();
         var action = form.find("[name='AccountKumi.Action']").val();
-        var url = window.location.origin + "/KumiAccountReports/InvoiceGenerator?onDate=" + onDate + "&invoiceAction=" + action + "&textmessage=" + textmessage;
-        if (idAccount !== "" && idAccount !== "0") {
-            url += "&idAccount=" + idAccount;
+        var controllerAction = "InvoiceToHtmlList";
+        var additionalParams = "";
+        if (action === "Send") {
+            controllerAction = "InvoiceGenerator";
+            additionalParams += "&textmessage=" + textmessage;
         }
+        if (idAccount !== "" && idAccount !== "0") {
+            controllerAction = "InvoiceGenerator";
+            additionalParams += "&idAccount=" + idAccount;
+        }
+
+        var url = window.location.origin + "/KumiAccountReports/" + controllerAction + "?onDate=" + onDate + "&invoiceAction=" + action + additionalParams;
 
         if (action === "Send") {
             if (idAccount !== "" && idAccount !== "0") {
@@ -176,8 +184,6 @@
                         }
                         else
                             $("rr-errorsinv").css("display", "none");
-
-                        $("#accountKumiRegInGenModal").modal("hide");
                     }
                 });
             }

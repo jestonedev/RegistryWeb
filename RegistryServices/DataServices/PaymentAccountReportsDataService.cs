@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using InvoiceGenerator;
+using Microsoft.EntityFrameworkCore;
 using RegistryDb.Models;
 using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.Payments;
@@ -97,11 +98,11 @@ namespace RegistryWeb.DataServices
 
                 var ob = new InvoiceGeneratorParam
                 {
-                    IdAcconut = pay.IdAccount,
+                    IdAccount = pay.IdAccount,
                     Address = pay.PaymentAccountNavigation.RawAddress,
                     Account = pay.PaymentAccountNavigation.Account,
                     Tenant = pay.Tenant,
-                    OnData = onDate,
+                    OnDate = onDate,
                     BalanceInput = pay.BalanceInput.ToString().Replace(',', '.'),
                     ChargingTenancy = (pay.ChargingTenancy+pay.ChargingDgi).ToString().Replace(',', '.'),
                     ChargingPenalty = pay.ChargingPenalties.ToString().Replace(',', '.'),
@@ -122,11 +123,11 @@ namespace RegistryWeb.DataServices
                         .FirstOrDefault(a => a.IdAccount == idAccount).Account;
                 return new InvoiceGeneratorParam
                 {
-                    IdAcconut = idAccount,
+                    IdAccount = idAccount,
                     Address = "",
                     Account = ac ?? "",
                     Tenant = null,
-                    OnData = onDate,
+                    OnDate = onDate,
                     BalanceInput = "",
                     ChargingTenancy = "",
                     ChargingPenalty = "",
@@ -146,10 +147,10 @@ namespace RegistryWeb.DataServices
         {
             return new LogInvoiceGenerator
             {
-                IdAccount = param.IdAcconut,
+                IdAccount = param.IdAccount,
                 AccountType = 1,
                 CreateDate = DateTime.Now,
-                OnDate = param.OnData,
+                OnDate = param.OnDate,
                 Emails = string.Join(", ", param.Emails).ToString(),
                 ResultCode = errorCode
             };

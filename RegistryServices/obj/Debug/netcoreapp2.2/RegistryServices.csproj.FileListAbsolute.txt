@@ -76,3 +76,5 @@ C:\Users\belpe\Documents\registry\RegistryWeb\RegistryServices\obj\Debug\netcore
 C:\Users\belpe\Documents\registry\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.dll
 C:\Users\belpe\Documents\registry\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.pdb
 C:\Users\belpe\Documents\registry\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.genruntimeconfig.cache
+D:\Projects\Visual Studio Projects\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\InvoiceGenerator.dll
+D:\Projects\Visual Studio Projects\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\InvoiceGenerator.pdb

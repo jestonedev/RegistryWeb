@@ -88,3 +88,5 @@ D:\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPayment
 D:\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.dll
 D:\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.pdb
 D:\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.genruntimeconfig.cache
+D:\Projects\Visual Studio Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\InvoiceGenerator.dll
+D:\Projects\Visual Studio Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\InvoiceGenerator.pdb

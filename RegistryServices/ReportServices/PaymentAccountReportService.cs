@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using InvoiceGenerator;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.Payments;
@@ -125,10 +126,10 @@ namespace RegistryWeb.ReportServices
                 var arguments = new Dictionary<string, object>
                 {
                     { "--address", invoice.Address },
-                    { "--id-account", invoice.IdAcconut },
+                    { "--id-account", invoice.IdAccount },
                     { "--account", invoice.Account },
                     { "--tenant", invoice.Tenant },
-                    { "--on-date", invoice.OnData.ToString("dd.MM.yyyy")},
+                    { "--on-date", invoice.OnDate.ToString("dd.MM.yyyy")},
                     { "--balance-input", invoice.BalanceInput },
                     { "--charging-tenancy", invoice.ChargingTenancy },
                     { "--charging-penalty", invoice.ChargingPenalty },
@@ -156,7 +157,7 @@ namespace RegistryWeb.ReportServices
                         arguments.Add("--address-2", invoice.Address);
                         arguments.Add("--account-2", invoice.Account);
                         arguments.Add("--tenant-2", invoice.Tenant);
-                        arguments.Add("--on-date-2", invoice.OnData.ToString("dd.MM.yyyy"));
+                        arguments.Add("--on-date-2", invoice.OnDate.ToString("dd.MM.yyyy"));
                         arguments.Add("--balance-input-2", invoice.BalanceInput);
                         arguments.Add("--charging-tenancy-2", invoice.ChargingTenancy);
                         arguments.Add("--charging-penalty-2", invoice.ChargingPenalty);
