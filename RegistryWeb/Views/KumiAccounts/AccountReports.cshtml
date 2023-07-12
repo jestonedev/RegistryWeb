@@ -120,6 +120,11 @@
                                 <b>ЕЛС для ГИС ЖКХ:</b> @item.AccountGisZkh
                             </div>
                         }
+
+                        @if (!String.IsNullOrWhiteSpace(@item.Owner))
+                        {
+                            <div><b>Владелец ЛС: </b><br />@item.Owner</div>
+                        }
                         <div>
                             <b>Дата начисления:</b> @(item.LastChargeDate.HasValue ? item.LastChargeDate.Value.ToString("dd.MM.yyyy") : "н/а")
                         </div>

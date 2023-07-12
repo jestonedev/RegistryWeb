@@ -255,30 +255,28 @@
             </div>
 
             <div class="form-row">
-                <div class="form-group col-6 col-lg-3 mb-2">
+                <div class="form-group col-6 col-lg-4 mb-2">
                     <label class="rr-account-label mb-1" asp-for="Account">Лицевой счет</label>
                     <input type="text" asp-for="Account" data-val="true" data-val-required="Укажите лицевой счет" title="Лицевой счет" class="form-control input-numbers" maxlength="255" />
                     <span class="text-danger" asp-validation-for="Account"></span>
                 </div>
-                <div class="form-group col-6 col-lg-3 mb-2">
+                <div class="form-group col-6 col-lg-4 mb-2">
                     <label class="rr-account-label mb-1" asp-for="AccountGisZkh">Лицевой счет ГИС ЖКХ</label>
                     <input type="text" asp-for="AccountGisZkh" title="Лицевой сче ГИС ЖКХ" class="form-control input-account-zkh" maxlength="255" />
                 </div>
-                <div class="form-group col-6 col-lg-3 mb-2">
+                <div class="form-group col-6 col-lg-4 mb-2">
                     <label class="rr-account-label mb-1">Состояние</label>
                     <select class="selectpicker form-control" asp-for="IdState" title="Состояние"
                             asp-items="@(new SelectList(ViewBag.States, "IdState", "State", Model.IdState))"></select>
                     <span class="text-danger" asp-validation-for="IdState"></span>
                 </div>
-                <div class="form-group col-6 col-lg-3 mb-2">
+                <div class="form-group col-6 col-lg-4 mb-2">
                     <label class="rr-account-label mb-1" asp-for="CreateDate">Дата создания</label>
                     <input type="date" asp-for="CreateDate" value="@(ViewBag.Action == ActionTypeEnum.Create ?
                             DateTime.Now.Date.ToString("yyyy-MM-dd") : Model.CreateDate.ToString("yyyy-MM-dd"))"
                            title="Дата создания" class="form-control" disabled />
                 </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-6 col-lg-3 mb-2">
+                <div class="form-group col-6 col-lg-4 mb-2">
                     <label class="rr-account-label mb-1" asp-for="LastChargeDate">Дата начисления</label>
                     <input type="date" asp-for="LastChargeDate" title="Дата последнего начисления" class="form-control" disabled />
                 </div>
@@ -329,8 +327,12 @@
                         }
                     }
                 }
+                <div class="form-group col-6 col-lg-4 mb-2">
+                    <label class="rr-account-label mb-1" asp-for="AnnualDate">Дата аннулирования</label>
+                    <input type="date" asp-for="AnnualDate" title="Дата аннулирования" class="form-control" disabled />
+                </div>
 
-                <div class="form-group col-6 col-lg-3 mb-2">
+                <div class="form-group col-6 col-lg-4 mb-2">
                     <label class="rr-account-label mb-1" asp-for="CurrentBalanceTenancy">Сальдо найм</label>
                     <div class="input-group">
 
@@ -343,7 +345,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group col-6 col-lg-3 mb-2">
+                <div class="form-group col-6 col-lg-4 mb-2">
                     <label class="rr-account-label mb-1" asp-for="CurrentBalancePenalty">Сальдо пени</label>
 
                     <div class="input-group">
@@ -355,9 +357,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group col-6 col-lg-3 mb-2">
-                    <label class="rr-account-label mb-1" asp-for="AnnualDate">Дата аннулирования</label>
-                    <input type="date" asp-for="AnnualDate" title="Дата аннулирования" class="form-control" disabled />
+                <div class="form-group col-6 col-lg-4 mb-2">
+                    <label class="rr-account-label mb-1" asp-for="Owner">Владелец ЛС</label>
+                    <input type="text" asp-for="Owner" title="Владелец ЛС - указывается, если не совпадает с нанимателем по договору найма" class="form-control" maxlength="355" />
                 </div>
             </div>
             @if (Model.RecalcMarker == 1)

@@ -126,7 +126,7 @@ namespace RegistryWeb.DataServices
                     IdAccount = idAccount,
                     Address = address?.Address,
                     Account = account.Account,
-                    Tenant = tenant?.Tenant,
+                    Tenant = string.IsNullOrEmpty(account.Owner) ? tenant?.Tenant : account.Owner,
                     OnDate = onDate,
                     BalanceInput = (charge?.InputTenancy + charge?.InputPenalty).ToString().Replace(',', '.'),
                     ChargingTenancy = charge?.ChargeTenancy.ToString().Replace(',', '.'),

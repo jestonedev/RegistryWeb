@@ -76,6 +76,12 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnName("current_balance_penalty")
                 .HasColumnType("decimal(12,2)");
 
+
+            builder.Property(e => e.Owner)
+                .HasColumnName("owner")
+                .HasMaxLength(355)
+                .IsUnicode(false);
+
             builder.Property(e => e.Deleted)
                 .HasColumnName("deleted")
                 .HasColumnType("tinyint(1)")

@@ -54,7 +54,7 @@
                 && (r.TenancyProcess.RegistrationNum == null || !r.TenancyProcess.RegistrationNum.EndsWith("н")));
                 if (activeTenancies.Any() && item.IdState == 1)
                 {
-                    payment = activeTenancies.Select(r => r.RentObjects.Sum(ro => ro.PaymentAfter28082019)).Sum();
+                    payment = Math.Round(activeTenancies.Select(r => r.AccountAssoc.Fraction*r.RentObjects.Sum(ro => ro.PaymentAfter28082019)).Sum(), 2);
                 }
                 var currentDate = DateTime.Now.Date;
                 foreach (var tenancy in activeTenancies)
@@ -165,6 +165,10 @@
                         <div title="Единый лицевой счет для ГИС ЖКХ">
                             <b>ЕЛС для ГИС ЖКХ:</b> @item.AccountGisZkh
                         </div>
+                    }
+                    @if (!String.IsNullOrWhiteSpace(@item.Owner))
+                    {
+                        <div><b>Владелец ЛС: </b><br />@item.Owner</div>
                     }
                     <div>
                         <b>Дата начисления:</b> @(item.LastChargeDate.HasValue ? item.LastChargeDate.Value.ToString("dd.MM.yyyy") : "н/а")

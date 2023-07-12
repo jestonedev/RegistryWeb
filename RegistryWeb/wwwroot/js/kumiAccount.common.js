@@ -366,7 +366,7 @@
                 if (i > 0) {
                     tenancyElem.append(firstRentAddressElem.clone(true));
                     currentRentElem = tenancyElem.find(".rr-tenancy-address").last();
-                    currentRentElem.addClass("offset-5");
+                    currentRentElem.addClass("offset-6");
                     currentRentElem.find(".input-group-append").remove();
                 }
 
