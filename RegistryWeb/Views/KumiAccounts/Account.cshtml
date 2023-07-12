@@ -476,7 +476,7 @@
                                             @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentTenancy - tenancyOnAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge")">@charge.PaymentTenancy</a>
+                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge" )">@charge.PaymentTenancy</a>
                                             }
                                             else
                                             {
@@ -547,9 +547,62 @@
                     }
                     else
                     {
-                        <div class="text-center rr-list-group-item-empty mt-2 mb-2">
-                            <i>Начисления отсутствуют</i>
-                        </div>
+                        @if (Model.IdState == 1)
+                        {
+                            var endDate = DateTime.Now.Date.AddDays(-DateTime.Now.Day+1).AddMonths(1).AddDays(-1);
+                            <table class="table table-bordered table-striped m-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center p-1" title="Дата последнего начисления">Дата</th>
+                                        <th class="text-center p-1" title="Входящее сальдо найм">Вх. найм</th>
+                                        <th class="text-center p-1" title="Входящее сальдо пени">Вх. пени</th>
+                                        <th class="text-center p-1" title="Начислено найм">Начислено найм</th>
+                                        <th class="text-center p-1" title="Начислено пени">Начислено пени</th>
+                                        <th class="text-center p-1" title="Оплачено найм">Оплата найм</th>
+                                        <th class="text-center p-1" title="Оплачено пени">Оплата пени</th>
+                                        <th class="text-center p-1" title="Перерасчет найм">Перерасчет найм</th>
+                                        <th class="text-center p-1" title="Перерасчет пени">Перерасчет пени</th>
+                                        <th class="text-center p-1" title="Исходящее сальдо найм">Исх. найм</th>
+                                        <th class="text-center p-1" title="Исходящее сальдо пени">Исх. пени</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="rr-charge-current-month-row" data-charge-end-date="@endDate.ToString("yyyy-MM-dd")">
+                                        <td class="text-center p-1"><b>@endDate.ToString("dd.MM.yyyy")</b></td>
+                                        <td class="text-center p-1 rr-charge-period-input-tenancy">0</td>
+                                        <td class="text-center p-1 rr-charge-period-input-penalty">0</td>
+                                        <td class="text-center p-1 rr-charge-period-tenancy">0</td>
+                                        <td class="text-center p-1 rr-charge-period-penalty">0</td>
+                                        <td class="text-center p-1 rr-charge-period-payment-tenancy">0</td>
+                                        <td class="text-center p-1 rr-charge-period-payment-penalty">0
+                                        </td>
+                                        <td class="text-center p-1 rr-charge-period-recalc-tenancy">0</td>
+                                        <td class="text-center p-1 rr-charge-period-recalc-penalty">0</td>
+                                        <td class="text-center p-1 rr-charge-period-output-tenancy">0</td>
+                                        <td class="text-center p-1 rr-charge-period-output-penalty">0</td>
+                                    </tr>
+                                    <tr class="rr-charge-total-row">
+                                        <td class="text-center p-1"><b>Итого</b></td>
+                                        <td class="text-center p-1"><b>-</b></td>
+                                        <td class="text-center p-1"><b>-</b></td>
+                                        <td class="text-center p-1 rr-charge-total-tenancy"><b>0</b></td>
+                                        <td class="text-center p-1 rr-charge-total-penalty"><b>0</b></td>
+                                        <td class="text-center p-1"><b>0</b></td>
+                                        <td class="text-center p-1"><b>0</b></td>
+                                        <td class="text-center p-1 rr-charge-total-recalc-tenancy"><b>0</b></td>
+                                        <td class="text-center p-1 rr-charge-total-recalc-penalty"><b>0</b></td>
+                                        <td class="text-center p-1"><b>-</b></td>
+                                        <td class="text-center p-1"><b>-</b></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="text-center rr-list-group-item-empty mt-2 mb-2">
+                                <i>Начисления отсутствуют</i>
+                            </div>
+                        }
                     }
                 </div>
             </div>

@@ -254,10 +254,31 @@
                         @if (ViewBag.Action == "Details" || ViewBag.Action == "Delete")
                         {
                             @if(Model.TenancyProcess.AccountsTenancyProcessesAssoc[i].IdAccount != 0)
-                            { 
+                            {
+                                var stateClass = "";
+                                var stateTitle = "";
+                                switch (Model.TenancyProcess.AccountsTenancyProcessesAssoc[i].AccountNavigation.IdState) {
+                                    case 1:
+                                        stateClass = "text-success";
+                                        stateTitle = "Действующий";
+                                        break;
+                                    case 2:
+                                        stateClass = "text-danger";
+                                        stateTitle = "Аннулированный";
+                                        break;
+                                    case 3:
+                                        stateClass = "text-warning";
+                                        stateTitle = "Не начисляется плата за найм";
+                                        break;
+                                    case 4:
+                                        stateClass = "text-warning";
+                                        stateTitle = "Не начисляется пени и плата за найм";
+                                        break;
+                                }
+
                                 <div class="input-group">
-                                    <input class="form-control" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].AccountNavigation.Account" title="Номер лицевого счета" />
-                                    <input class="form-control input-fraction" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].Fraction" title="Доля" />
+                                    <input class="form-control @stateClass" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].AccountNavigation.Account" title="Номер лицевого счета. Статус: @stateTitle" />
+                                    <input class="form-control input-fraction @stateClass" type="text" asp-for="TenancyProcess.AccountsTenancyProcessesAssoc[i].Fraction" title="Доля" />
                                     <div class="input-group-append">
                                         <a class="btn btn-outline-secondary rr-tenancy-account-view-btn" title="Карточка лицевого счета" target="_blank" asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@Model.TenancyProcess.AccountsTenancyProcessesAssoc[i].IdAccount">
                                             <span class="oi oi-eye"></span>

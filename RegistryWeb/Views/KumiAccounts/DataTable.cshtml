@@ -315,7 +315,7 @@
                 <td style="position: relative">
                     @if (Model.ClaimsInfo.ContainsKey(item.IdAccount))
                     {
-                        var claimsInfo = Model.ClaimsInfo[item.IdAccount].OrderByDescending(r => r.StartDeptPeriod);
+                        var claimsInfo = Model.ClaimsInfo[item.IdAccount].Where(r => r.IdAccount == item.IdAccount).OrderByDescending(r => r.StartDeptPeriod);
                         @for (var i = 0; i < claimsInfo.Count(); i++)
                         {
                             var claimInfo = claimsInfo.ElementAt(i);
@@ -354,6 +354,13 @@
                         {
                             <div class="text-center  mt-2">
                                 <a class="text-dark rr-additional-info" title="Детальная информация" href="#"><span class="oi oi-chevron-bottom"></span></a>
+                            </div>
+                        }
+                        var additionClaims = Model.ClaimsInfo[item.IdAccount].Where(r => r.IdAccount != item.IdAccount);
+                        if (additionClaims.Count() > 0)
+                        {
+                            <div class="@(claimsInfo.Count() > 0 ? "mt-2" : "")">
+                                <a asp-controller="Claims" target="_blank" asp-action="Index" asp-route-filterOptions.IdAccountKumi="@item.IdAccount">@(claimsInfo.Count() > 0 ? "Еще " : "")ПИР по тому же адресу: @additionClaims.Count()</a>
                             </div>
                         }
                     }

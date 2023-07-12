@@ -652,7 +652,9 @@ namespace RegistryWeb.DataServices
             }
             if (filterOptions.IdAccountKumi != null)
             {
-                query = query.Where(p => p.IdAccountKumi == filterOptions.IdAccountKumi);
+                var infixes = registryContext.GetAddressByAccountIds(new List<int> { filterOptions.IdAccountKumi.Value }).Select(r => r.Infix).ToList();
+                var ids = registryContext.GetKumiAccountIdsByAddressInfixes(infixes);
+                query = query.Where(p => p.IdAccountKumi != null && ids.Contains(p.IdAccountKumi.Value));
             }
             if (filterOptions.AmountTotal != null)
             {

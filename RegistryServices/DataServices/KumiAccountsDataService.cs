@@ -2412,8 +2412,11 @@ namespace RegistryWeb.DataServices
 
         private Dictionary<int, List<ClaimInfo>> GetClaimsInfo(IEnumerable<KumiAccount> accounts)
         {
-            var accountsIds = accounts.Select(r => r.IdAccount);
-            var claims = registryContext.Claims.Where(c => c.IdAccountKumi != null && accountsIds.Contains(c.IdAccountKumi.Value));
+            var accountsIds = accounts.Select(r => r.IdAccount).ToList();
+            var addressInfixes = registryContext.GetAddressByAccountIds(accountsIds);
+            var actualAccountsIds = registryContext.GetKumiAccountIdsByAddressInfixes(addressInfixes.Select(r => r.Infix).ToList());
+
+            var claims = registryContext.Claims.Where(c => c.IdAccountKumi != null && actualAccountsIds.Contains(c.IdAccountKumi.Value));
             var claimIds = claims.Select(r => r.IdClaim);
 
             var claimLastStatesIds = from row in registryContext.ClaimStates
@@ -2438,7 +2441,7 @@ namespace RegistryWeb.DataServices
                              };
 
             claimsInfo = from claimRow in claims
-                         join accountId in accountsIds
+                         join accountId in actualAccountsIds
                          on claimRow.IdAccountKumi equals accountId
                          join claimsInfoRow in claimsInfo
                          on claimRow.IdClaim equals claimsInfoRow.IdClaim into c
@@ -2455,25 +2458,20 @@ namespace RegistryWeb.DataServices
                              AmountTenancy = claimRow.AmountTenancy,
                              AmountPenalty = claimRow.AmountPenalties
                          };
+            var result = new Dictionary<int, List<ClaimInfo>>();
+            foreach(var idAccount in accountsIds)
+            {
+                var resultItems = new List<ClaimInfo>();
+                var addressInfix = addressInfixes.FirstOrDefault(r => r.IdAccount == idAccount)?.Infix;
+                if (addressInfix == null) {
+                    result.Add(idAccount, resultItems);
+                    continue;
+                }
+                var pairedAccountsIds = registryContext.GetKumiAccountIdsByAddressInfixes(new List<string> { addressInfix });
+                resultItems = claimsInfo.Where(r => pairedAccountsIds.Contains(r.IdAccount)).ToList();
+                result.Add(idAccount, resultItems);
+            }
 
-
-            var result =
-                    claimsInfo
-                    .Select(c => new ClaimInfo
-                    {
-                        ClaimCurrentState = c.ClaimCurrentState,
-                        IdClaimCurrentState = c.IdClaimCurrentState,
-                        IdClaim = c.IdClaim,
-                        StartDeptPeriod = c.StartDeptPeriod,
-                        EndDeptPeriod = c.EndDeptPeriod,
-                        EndedForFilter = c.EndedForFilter,
-                        AmountTenancy = c.AmountTenancy,
-                        AmountPenalty = c.AmountPenalty,
-                        IdAccount = c.IdAccount
-                    })
-                    .GroupBy(r => r.IdAccount)
-                    .Select(r => new { IdAccount = r.Key, Claims = r.OrderByDescending(v => v.IdClaim).Select(v => v) })
-                    .ToDictionary(v => v.IdAccount, v => v.Claims.ToList());
             return result;
         }
 
