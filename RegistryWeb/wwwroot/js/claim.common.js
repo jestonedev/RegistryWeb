@@ -248,6 +248,24 @@ $(function () {
             $("#Claim_IdAccountKumi").val(account.idAccount);
             $("#Claim_IdAccountKumiNavigation_Account").val(account.value);
         }
+
+        refreshArrears(account, type);
+
+        var accountErrorWrapper = $("input[name='AnyAccountRequire']");
+        var idAccountBks = form.find("#Claim_IdAccountNavigation_Account");
+        var idAccountKumi = form.find("#Claim_IdAccountKumiNavigation_Account");
+
+        if (idAccountBks.val() !== "" || idAccountKumi !== "") {
+            clearValidationError(accountErrorWrapper);
+            removeErrorFromValidator(form.validate(), accountErrorWrapper);
+            $(".rr-account-common-error").removeClass("mb-2");
+            idAccountBks.removeClass("input-validation-error");
+            idAccountKumi.removeClass("input-validation-error");
+        }
+    }
+
+    function refreshArrears(account, type)
+    {
         if (account.idAccount !== "" && account.idAccount !== null) {
             var amountHeader = $(".rr-claim-amount-sum-header");
             amountHeader.html("Сумма к взысканию <span class='text-danger'>(обновляется...)</span>");
@@ -273,17 +291,6 @@ $(function () {
                     $("input[id='Claim_AmountPkk']").val(address.amountPkk).focusout();
                 }
             });
-        }
-        var accountErrorWrapper = $("input[name='AnyAccountRequire']");
-        var idAccountBks = form.find("#Claim_IdAccountNavigation_Account");
-        var idAccountKumi = form.find("#Claim_IdAccountKumiNavigation_Account");
-
-        if (idAccountBks.val() !== "" || idAccountKumi !== "") {
-            clearValidationError(accountErrorWrapper);
-            removeErrorFromValidator(form.validate(), accountErrorWrapper);
-            $(".rr-account-common-error").removeClass("mb-2");
-            idAccountBks.removeClass("input-validation-error");
-            idAccountKumi.removeClass("input-validation-error");
         }
     }
 
@@ -311,6 +318,8 @@ $(function () {
             if (action === "Create")
                 selectAccount(ui.item, "BKS");
             $("#Claim_IdAccount").val(ui.item.idAccount);
+            if (action !== "Create")
+                updateAppearsButtons();
         },
         minLength: 3
     });
@@ -320,6 +329,8 @@ $(function () {
             $('#Claim_IdAccountNavigation_Account').val("");
             $("input[name='Claim.BksAddress']").val("");
             $("input[name='Claim.RegistryAddressBks']").val("");
+            if (action !== "Create")
+                updateAppearsButtons();
         }
     });
 
@@ -392,6 +403,8 @@ $(function () {
             if (action === "Create")
                 selectAccount(ui.item, "KUMI");
             $("#Claim_IdAccountKumi").val(ui.item.idAccount);
+            if (action !== "Create")
+                updateAppearsButtons();
         },
         minLength: 3
     });
@@ -400,8 +413,39 @@ $(function () {
         if ($('#Claim_IdAccountKumi').val() === "") {
             $('#Claim_IdAccountKumiNavigation_Account').val("");
             $("input[name='Claim.RegistryAddressKumi']").val("");
+            if (action !== "Create")
+                updateAppearsButtons();
         }
     });
+
+    updateAppearsButtons();
+
+    function updateAppearsButtons() {
+        var allAccountsBtn = $(".rr-update-by-accounts");
+        var kumiAccountBtn = $(".rr-update-by-kumi-account").filter(function (idx, elem) { return $(elem).closest(".rr-claim-account-update-arrears").length == 0; });
+        var bksAccountBtn = $(".rr-update-by-bks-account").filter(function (idx, elem) { return $(elem).closest(".rr-claim-account-update-arrears").length == 0; });;
+        allAccountsBtn.addClass("d-none").removeClass("disabled");
+        kumiAccountBtn.addClass("d-none");
+        bksAccountBtn.addClass("d-none");
+
+        var idKumiAccount = $('#Claim_IdAccountKumi').val();
+        var idBksAccount = $('#Claim_IdAccount').val();
+        if (idBksAccount !== "" && idKumiAccount !== "") {
+            allAccountsBtn.removeClass("d-none");
+            allAccountsBtn.parent().prepend(allAccountsBtn);
+        } else
+        if (idBksAccount !== "") {
+            bksAccountBtn.removeClass("d-none");
+            bksAccountBtn.parent().prepend(bksAccountBtn);
+        } else
+        if (idKumiAccount !== "") {
+            kumiAccountBtn.removeClass("d-none");
+            kumiAccountBtn.parent().prepend(kumiAccountBtn);
+        } else {
+            kumiAccountBtn.removeClass("d-none").addClass("disabled");
+            kumiAccountBtn.parent().prepend(kumiAccountBtn);
+        }
+    }
 
     $("#PersonsSourceModal .rr-select-source").on('click', function (e) {
         var form = $("#ClaimForm");
@@ -456,28 +500,23 @@ $(function () {
                 reformatClaimForBksAndKumiAccount();
                 break;
         }
+        updateAppearsButtons();
         e.preventDefault();
     });
 
+    $("body").on("click", ".rr-update-by-kumi-account", function (e) {
+        var idAccount = $("#Claim_IdAccountKumi").val();
+        var account = $("#Claim_IdAccountKumiNavigation_Account").val();
+        var accountObj = { label: account, value: account, idAccount: idAccount };
+        refreshArrears(accountObj, "KUMI");
+        e.preventDefault();
+    });
 
-    $(".rr-claim-account-update-arrears .dropdown-item").on("click", function (e) {
-        var text = $(this).text();
-        switch (text) {
-            case "По ЛС КУМИ":
-                var idAccount = $("#Claim_IdAccountKumi").val();
-                var account = $("#Claim_IdAccountKumiNavigation_Account").val();
-                var accountObj = { label: account, value: account, idAccount: idAccount };
-                selectAccount(accountObj, "KUMI");
-                reformatClaimForKumiAccount();
-                break;
-            case "По ЛС БКС":
-                var idAccount = $("#Claim_IdAccount").val();
-                var account = $("#Claim_IdAccountNavigation_Account").val();
-                var accountObj = { label: account, value: account, idAccount: idAccount };
-                selectAccount(accountObj, "BKS");
-                reformatClaimForBksAccount();
-                break;
-        }
+    $("body").on("click", ".rr-update-by-bks-account", function (e) {
+        var idAccount = $("#Claim_IdAccount").val();
+        var account = $("#Claim_IdAccountNavigation_Account").val();
+        var accountObj = { label: account, value: account, idAccount: idAccount };
+        refreshArrears(accountObj, "BKS");
         e.preventDefault();
     });
 

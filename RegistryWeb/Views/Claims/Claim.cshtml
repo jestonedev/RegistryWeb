@@ -267,17 +267,26 @@
                     <div class="card mb-2">
                         <div class="card-header d-flex justify-content-between pt-2 pb-2">
                             <h4 class="mt-1 rr-claim-amount-sum-header">Задолженность</h4>
-                            <div class="btn-group" role="group">
+                            <div class="btn-group">
                                 @if (ViewBag.Action == "Edit")
                                 {
-                                    <button class="form-control btn btn-outline-info dropdown-toggle oi oi-loop-circular" type="button"
+                                    <button class="form-control btn btn-success dropdown-toggle  rr-update-by-accounts d-none" type="button"
                                         title="Обновить задолженность" aria-label="Обновить задолженность" style="font-weight:bold;"
                                         id="accountsBtn_@Model.Claim.IdClaim" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="oi oi-loop-circular"></span>
                                     </button>
                                     <div class="dropdown-menu rr-claim-account-update-arrears" aria-labelledby="accountsBtn_@Model.Claim.IdClaim">
-                                        <a href="#" class="dropdown-item" title="По ЛС КУМИ" aria-label="По ЛС КУМИ">По ЛС КУМИ</a>
-                                        <a href="#" class="dropdown-item" title="По ЛС БКС (основной)" aria-label="По ЛС БКС (основной)">По ЛС БКС</a>
+                                        <a href="#" class="dropdown-item rr-update-by-kumi-account" title="Из ЛС КУМИ" aria-label="Из ЛС КУМИ">Из ЛС КУМИ</a>
+                                        <a href="#" class="dropdown-item rr-update-by-bks-account" title="Из ЛС БКС (основной)" aria-label="Из ЛС БКС (основной)">Из ЛС БКС</a>
                                     </div>
+                                    <button class="form-control btn btn-success rr-update-by-kumi-account d-none" type="button"
+                                        title="Обновить задолженность из ЛС КУМИ" aria-label="Обновить задолженность из ЛС КУМИ" style="font-weight:bold;">
+                                            <span class="oi oi-loop-circular"></span>
+                                    </button>
+                                    <button class="form-control btn btn-success rr-update-by-bks-account d-none" type="button"
+                                        title="Обновить задолженность из ЛС БКС" aria-label="Обновить задолженность из ЛС БКС" style="font-weight:bold;">
+                                            <span class="oi oi-loop-circular"></span>
+                                    </button>
                                 }
                                 <a href="#" data-for="ClaimAmount" class="form-control btn btn-primary claim-toggler" title="Отобразить информацию по задолженности" style="font-weight:bold;">∧</a>
                             </div>
