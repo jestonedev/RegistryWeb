@@ -1,6 +1,7 @@
 ﻿
 $(function () {
     var form = $("#ClaimForm");
+    var action = form.data("action");
 
     $('.claim-toggler').each(function (idx, e) {
         $(e).on('click', $('#' + $(e).data("for")), elementToogleHide);
@@ -296,16 +297,20 @@ $(function () {
                 success: function (data) {
                     response($.map(data, function (item) {
                         let account = { label: item.account, value: item.account, idAccount: item.idAccount };
-                        if (data.length === 1) {
-                            selectAccount(account, "BKS");
-                        }
+
+                        if (action==="Create")
+                            if (data.length === 1) {
+                                selectAccount(account, "BKS");
+                            }
                         return account;
                     }));
                 }
             });
         },
         select: function (event, ui) {
-            selectAccount(ui.item, "BKS");
+            if (action === "Create")
+                selectAccount(ui.item, "BKS");
+            $("#Claim_IdAccount").val(ui.item.idAccount);
         },
         minLength: 3
     });
@@ -373,16 +378,20 @@ $(function () {
                 success: function (data) {
                     response($.map(data, function (item) {
                         let account = { label: item.account, value: item.account, idAccount: item.idAccount };
-                        if (data.length === 1) {
-                            selectAccount(account, "KUMI");
-                        }
+
+                        if (action === "Create")
+                            if (data.length === 1) {
+                                selectAccount(account, "KUMI");
+                            }
                         return account;
                     }));
                 }
             });
         },
         select: function (event, ui) {
-            selectAccount(ui.item, "KUMI");
+            if (action === "Create")
+                selectAccount(ui.item, "KUMI");
+            $("#Claim_IdAccountKumi").val(ui.item.idAccount);
         },
         minLength: 3
     });
@@ -445,6 +454,28 @@ $(function () {
                 break;
             case "ЛС БКС/КУМИ":
                 reformatClaimForBksAndKumiAccount();
+                break;
+        }
+        e.preventDefault();
+    });
+
+
+    $(".rr-claim-account-update-arrears .dropdown-item").on("click", function (e) {
+        var text = $(this).text();
+        switch (text) {
+            case "По ЛС КУМИ":
+                var idAccount = $("#Claim_IdAccountKumi").val();
+                var account = $("#Claim_IdAccountKumiNavigation_Account").val();
+                var accountObj = { label: account, value: account, idAccount: idAccount };
+                selectAccount(accountObj, "KUMI");
+                reformatClaimForKumiAccount();
+                break;
+            case "По ЛС БКС":
+                var idAccount = $("#Claim_IdAccount").val();
+                var account = $("#Claim_IdAccountNavigation_Account").val();
+                var accountObj = { label: account, value: account, idAccount: idAccount };
+                selectAccount(accountObj, "BKS");
+                reformatClaimForBksAccount();
                 break;
         }
         e.preventDefault();

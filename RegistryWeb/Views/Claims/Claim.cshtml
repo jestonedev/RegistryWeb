@@ -268,6 +268,17 @@
                         <div class="card-header d-flex justify-content-between pt-2 pb-2">
                             <h4 class="mt-1 rr-claim-amount-sum-header">Задолженность</h4>
                             <div class="btn-group" role="group">
+                                @if (ViewBag.Action == "Edit")
+                                {
+                                    <button class="form-control btn btn-outline-info dropdown-toggle oi oi-loop-circular" type="button"
+                                        title="Обновить задолженность" aria-label="Обновить задолженность" style="font-weight:bold;"
+                                        id="accountsBtn_@Model.Claim.IdClaim" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    </button>
+                                    <div class="dropdown-menu rr-claim-account-update-arrears" aria-labelledby="accountsBtn_@Model.Claim.IdClaim">
+                                        <a href="#" class="dropdown-item" title="По ЛС КУМИ" aria-label="По ЛС КУМИ">По ЛС КУМИ</a>
+                                        <a href="#" class="dropdown-item" title="По ЛС БКС (основной)" aria-label="По ЛС БКС (основной)">По ЛС БКС</a>
+                                    </div>
+                                }
                                 <a href="#" data-for="ClaimAmount" class="form-control btn btn-primary claim-toggler" title="Отобразить информацию по задолженности" style="font-weight:bold;">∧</a>
                             </div>
                         </div>
