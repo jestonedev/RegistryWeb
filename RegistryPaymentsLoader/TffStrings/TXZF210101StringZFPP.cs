@@ -16,9 +16,9 @@ namespace RegistryPaymentsLoader.TffStrings
         {
             return new KumiPayment
             {
-                Guid = tffStringParts[42],
+                Guid = tffStringParts[42] == "" ? null : tffStringParts[42],
                 IdSource = 4, // ZF_PP
-                NumDocument = tffStringParts[1],
+                NumDocument = tffStringParts[1] == "" ? null : tffStringParts[1],
                 DateDocument = TffTypesHelper.StringToDate(tffStringParts[2]),
                 DateIn = TffTypesHelper.StringToDate(tffStringParts[5]),
                 DateExecute = TffTypesHelper.StringToDate(tffStringParts[6]),
@@ -33,10 +33,10 @@ namespace RegistryPaymentsLoader.TffStrings
                     Code = tffStringParts[7]
                 },
                 Sum = TffTypesHelper.StringToDecimal(tffStringParts[3]) ?? 0,
-                Uin = tffStringParts[25],
+                Uin = tffStringParts[25] == "" ? null : tffStringParts[25],
                 IdPurpose = TffTypesHelper.StringToInt(tffStringParts[23]),
-                Purpose = tffStringParts[26],
-                Kbk = tffStringParts[28],
+                Purpose = tffStringParts[26] == "" ? null : tffStringParts[26],
+                Kbk = tffStringParts[28] == "" ? null : tffStringParts[28],
                 KbkType = null,
                 TargetCode = null,
                 Okato = null,

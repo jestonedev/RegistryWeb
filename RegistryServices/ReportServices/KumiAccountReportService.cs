@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using InvoiceGenerator;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -59,11 +60,11 @@ namespace RegistryWeb.ReportServices
             {
                 var arguments = new Dictionary<string, object>
                 {
-                    { "id_account", invoice.IdAcconut },
+                    { "id_account", invoice.IdAccount },
                     { "--address", invoice.Address },
                     { "--account", invoice.Account },
                     { "--tenant", invoice.Tenant },
-                    { "--on-date", invoice.OnData.ToString("dd.MM.yyyy")},
+                    { "--on-date", invoice.OnDate.ToString("dd.MM.yyyy")},
                     { "--balance-input", invoice.BalanceInput },
                     { "--charging-tenancy", invoice.ChargingTenancy },
                     { "--charging-penalty", invoice.ChargingPenalty },

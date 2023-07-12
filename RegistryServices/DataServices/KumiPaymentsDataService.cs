@@ -25,6 +25,7 @@ using RegistryServices.Enums;
 using RegistryServices.Models.KumiPayments;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using RegistryServices.Classes;
 
 namespace RegistryWeb.DataServices
 {
@@ -602,6 +603,10 @@ namespace RegistryWeb.DataServices
             {
                 query = query.Where(r => r.DateExecute == filterOptions.DateExecute);
             }
+            if (filterOptions.DateEnrollUfk != null)
+            {
+                query = query.Where(r => r.DateEnrollUfk == filterOptions.DateEnrollUfk);
+            }
             if (!string.IsNullOrEmpty(filterOptions.Uin))
             {
                 query = query.Where(r => r.Uin != null && r.Uin.Contains(filterOptions.Uin));
@@ -890,7 +895,7 @@ namespace RegistryWeb.DataServices
                 }
                 catch (KumiPaymentBindDictionaryException e)
                 {
-                    loadState.MemorialOrdersDicitionaryBindErrors.Add(new Tuple<KumiMemorialOrder, string>(mo, e.Message));
+                    loadState.MemorialOrdersDicitionaryBindErrors.Add(new RegistryTuple<KumiMemorialOrder, string>(mo, e.Message));
                     continue;
                 }
 
@@ -938,7 +943,7 @@ namespace RegistryWeb.DataServices
                 {
                     dbPayment = ApplyMemorialOrder(dbPayment, mo);
 
-                    loadState.BindedMemorialOrders.Add(new Tuple<KumiMemorialOrder, KumiPayment>(mo, dbPayment));
+                    loadState.BindedMemorialOrders.Add(new RegistryTuple<KumiMemorialOrder, KumiPayment>(mo, dbPayment));
 
                     if (dbPayment.IdPayment != 0)
                     {
@@ -959,7 +964,7 @@ namespace RegistryWeb.DataServices
                 }
                 catch (KumiPaymentCheckVtOperException e)
                 {
-                    loadState.BindMemorialOrdersErrors.Add(new Tuple<KumiMemorialOrder, string>(mo, e.Message));
+                    loadState.BindMemorialOrdersErrors.Add(new RegistryTuple<KumiMemorialOrder, string>(mo, e.Message));
                 }
             }
         }
@@ -1010,12 +1015,12 @@ namespace RegistryWeb.DataServices
                 }
                 catch (KumiPaymentBindDictionaryException e)
                 {
-                    loadState.PaymentsDicitionaryBindErrors.Add(new Tuple<KumiPayment, string>(payment, e.Message));
+                    loadState.PaymentsDicitionaryBindErrors.Add(new RegistryTuple<KumiPayment, string>(payment, e.Message));
                     continue;
                 }
                 catch (KumiPaymentCheckVtOperException e)
                 {
-                    loadState.CheckExtractErrors.Add(new Tuple<KumiPayment, string>(payment, e.Message));
+                    loadState.CheckExtractErrors.Add(new RegistryTuple<KumiPayment, string>(payment, e.Message));
                     continue;
                 }
 
@@ -1257,7 +1262,7 @@ namespace RegistryWeb.DataServices
             if (payment.PaymentReason != null)
             {
                 var paymentReason = kumiPaymentReasons.FirstOrDefault(r => r.Code == payment.PaymentReason.Code);
-                if (paymentReason == null && payment.PaymentReason.Code != "0")
+                if (paymentReason == null && payment.PaymentReason.Code != "0" && payment.PaymentReason.Code != "00")
                     throw new KumiPaymentBindDictionaryException(string.Format("Указан некорректный показатель основания платежа {0} в платеже {1}", payment.PaymentReason.Code, payment.Guid));
                 payment.PaymentReason = null;
                 payment.IdPaymentReason = paymentReason?.IdPaymentReason;
@@ -1268,8 +1273,8 @@ namespace RegistryWeb.DataServices
             if (payment.PayerStatus != null)
             {
                 var payerStatus = kumiPayerStatuses.FirstOrDefault(r => r.Code == payment.PayerStatus.Code);
-                if (payerStatus == null && payment.PayerStatus.Code != "0")
-                    throw new KumiPaymentBindDictionaryException(string.Format("Указан некорректный показатель основания платежа {0} в платеже {1}", payment.PayerStatus.Code, payment.Guid));
+                if (payerStatus == null && payment.PayerStatus.Code != "0" && payment.PayerStatus.Code != "00")
+                    throw new KumiPaymentBindDictionaryException(string.Format("Указан некорректный статус составителя расчетного документа {0} в платеже {1}", payment.PayerStatus.Code, payment.Guid));
                 payment.PayerStatus = null;
                 payment.IdPayerStatus = payerStatus?.IdPayerStatus;
             }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using InvoiceGenerator;
+using Microsoft.EntityFrameworkCore;
 using RegistryDb.Models;
 using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.KumiAccounts;
@@ -99,6 +100,52 @@ namespace RegistryWeb.DataServices
             return infoForReport;
         }
 
+        public List<InvoiceGeneratorParam> GetInvoiceGeneratorParam(List<int> idAccounts, DateTime onDate, string textmessage)
+        {
+            var paymentDate = new DateTime(onDate.Year, onDate.Month, 1);
+            paymentDate = paymentDate.AddMonths(1).AddDays(-1);
+            var charges = (from cRow in registryContext.KumiCharges
+                          where idAccounts.Contains(cRow.IdAccount) && cRow.EndDate == paymentDate
+                          select cRow).ToList();
+            var accounts = (from aRow in registryContext.KumiAccounts
+                            where idAccounts.Contains(aRow.IdAccount)
+                            select aRow).ToList();
+            var addresses = registryContext.GetAddressByAccountIds(idAccounts);
+            var tenants = registryContext.GetTenantsByAccountIds(idAccounts);
+
+            var result = new List<InvoiceGeneratorParam>();
+            foreach(var idAccount in idAccounts)
+            {
+                var charge = charges.FirstOrDefault(r => r.IdAccount == idAccount);
+                var account = accounts.FirstOrDefault(r => r.IdAccount == idAccount);
+                var address = addresses.FirstOrDefault(r => r.IdAccount == idAccount);
+                var tenant = tenants.FirstOrDefault(r => r.IdAccount == idAccount);
+
+                var ob = new InvoiceGeneratorParam
+                {
+                    IdAccount = idAccount,
+                    Address = address?.Address,
+                    Account = account.Account,
+                    Tenant = tenant?.Tenant,
+                    OnDate = onDate,
+                    BalanceInput = (charge?.InputTenancy + charge?.InputPenalty).ToString().Replace(',', '.'),
+                    ChargingTenancy = charge?.ChargeTenancy.ToString().Replace(',', '.'),
+                    ChargingPenalty = charge?.ChargePenalty.ToString().Replace(',', '.'),
+                    Payed = (charge?.PaymentTenancy + charge?.PaymentPenalty).ToString().Replace(',', '.'),
+                    RecalcTenancy = (charge?.RecalcTenancy + charge?.CorrectionTenancy).ToString().Replace(',', '.'),
+                    RecalcPenalty = (charge?.RecalcPenalty + charge?.CorrectionPenalty).ToString().Replace(',', '.'),
+                    BalanceOutput = (charge?.OutputTenancy + charge?.OutputPenalty).ToString().Replace(',', '.'),
+                    TotalArea = address?.TotalArea.ToString().Replace(',', '.'),
+                    Prescribed = tenant?.Prescribed ?? 0,
+                    Emails = string.IsNullOrEmpty(tenant?.Emails) ? new List<string>() : tenant.Emails.Split(",").ToList(),
+                    TextMessage = textmessage
+                };
+
+                result.Add(ob);
+            }
+            return result.OrderBy(r => r.Address).ThenBy(r => r.Account).ToList();
+        }
+
         public InvoiceGeneratorParam GetInvoiceGeneratorParam(int idAccount, DateTime onDate, string textmessage)
         {
             var paymentDate = new DateTime(onDate.Year, onDate.Month, 1);
@@ -114,11 +161,11 @@ namespace RegistryWeb.DataServices
 
                 var ob = new InvoiceGeneratorParam
                 {
-                    IdAcconut = payKumi.IdAccount,
+                    IdAccount = payKumi.IdAccount,
                     Address = infoForReport.Where(c => c.Key.Contains("address")).Select(c => c.Value).FirstOrDefault().ToString(),
                     Account = payKumi.Account.Account,
                     Tenant = infoForReport.Where(c => c.Key.Contains("tenant")).Select(c => c.Value).FirstOrDefault().ToString(),
-                    OnData = onDate,
+                    OnDate = onDate,
                     BalanceInput = (payKumi.InputTenancy + payKumi.InputPenalty).ToString().Replace(',', '.'),
                     ChargingTenancy = payKumi.ChargeTenancy.ToString().Replace(',', '.'),
                     ChargingPenalty = payKumi.ChargePenalty.ToString().Replace(',', '.'),
@@ -139,11 +186,11 @@ namespace RegistryWeb.DataServices
                         .FirstOrDefault(a => a.IdAccount == idAccount).Account;
                 return new InvoiceGeneratorParam
                 {
-                    IdAcconut = idAccount,
+                    IdAccount = idAccount,
                     Address = "",
                     Account = ac ?? "",
                     Tenant = null,
-                    OnData = onDate,
+                    OnDate = onDate,
                     BalanceInput = "",
                     ChargingTenancy = "",
                     ChargingPenalty = "",
@@ -163,10 +210,10 @@ namespace RegistryWeb.DataServices
         {
             return new LogInvoiceGenerator
             {
-                IdAccount = param.IdAcconut,
+                IdAccount = param.IdAccount,
                 AccountType = 2,
                 CreateDate = DateTime.Now,
-                OnDate = param.OnData,
+                OnDate = param.OnDate,
                 Emails = string.Join(", ", param.Emails).ToString(),
                 ResultCode = errorCode
             };

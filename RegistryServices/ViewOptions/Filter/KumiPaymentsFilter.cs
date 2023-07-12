@@ -14,6 +14,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public DateTime? DateDocument { get; set; }
         public DateTime? DateIn { get; set; }
         public DateTime? DateExecute { get; set; }
+        public DateTime? DateEnrollUfk { get; set; }
         public string Uin { get; set; }
         public decimal? Sum { get; set; }
         public string Purpose { get; set; }
@@ -64,7 +65,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool IsModalEmpty()
         {
             return (IdsSource == null || IdsSource.Count == 0) 
-                 && NumDocument == null && DateDocument == null && DateIn == null && DateExecute == null &&
+                 && NumDocument == null && DateDocument == null && DateIn == null && DateExecute == null && DateEnrollUfk == null &&
                  Uin == null && Sum == null && Purpose == null && Kbk == null && Okato == null && PayerInn == null &&
                  PayerKpp == null && PayerName == null && PayerAccount == null && PayerBankName == null &&
                  PayerBankBik == null && PayerBankAccount == null && RecipientInn == null && RecipientKpp == null &&

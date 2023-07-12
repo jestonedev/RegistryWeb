@@ -21,6 +21,7 @@ var filterClear = function () {
     $("form.filterForm").submit();
 };
 
+
 var toggleAdditionInfo = function (e) {
     var paymentsDetail = $(this).closest("td").find("div.rr-account-additional-info");
     var icon = $(this).find(".oi");
@@ -59,6 +60,13 @@ var filterIdRegionChange = function (e) {
 };
 
 $(function () {
+    $("#AccountSumFilterCriteria").on("change", function () {
+        var val = $(this).val();
+        if (val === "1")
+            $("#FilterOptions_AtDate").val("");
+        $("#FilterOptions_AtDate").prop("disabled", val === "2" ? "" : "disabled");
+    });
+
     $('#AccountSumFiltersToggler').on("click", $("#AccountSumFilters"), elementToogleHide);
     $('#searchModalBtn').click(searchModal);
     $('#filterModal #FilterOptions_IdRegion').on('change', function (e) {

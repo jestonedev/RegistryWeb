@@ -12,6 +12,8 @@ using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.ViewModel;
 using RegistryDb.Models.Entities.Payments;
+using InvoiceGenerator;
+using Microsoft.Extensions.Configuration;
 
 namespace RegistryWeb.Controllers
 {
@@ -28,13 +30,13 @@ namespace RegistryWeb.Controllers
         private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
         private const string xlsxMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private const string docxMime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-        public KumiAccountReportsController(KumiAccountReportService reportService, KumiAccountReportsDataService dataService, SecurityService securityService, TenancyProcessesDataService processesDataService)
+        public KumiAccountReportsController(KumiAccountReportService reportService, KumiAccountReportsDataService dataService, 
+            SecurityService securityService, TenancyProcessesDataService processesDataService)
         {
             this.reportService = reportService;
             this.dataService = dataService;
             this.securityService = securityService;
             this.processesDataService = processesDataService;
-
             nameFilteredIdsDict = "filteredKumiAccountsIdsDict";
             nameIds = "idKumiAccounts";
             nameMultimaster = "KumiAccountsReports";
@@ -63,6 +65,65 @@ namespace RegistryWeb.Controllers
               }
         }
 
+        public IActionResult GenerateInvoice(InvoiceGeneratorParamTyped invoice)
+        {
+            try
+            {
+                var baseDirecotry = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                var generator = new InvoiceGenerator.InvoiceGenerator(baseDirecotry, "files\\qr");
+                return Json(new
+                {
+                    State = "Success",
+                    Html = generator.GenerateHtml(invoice),
+                    invoice.IdAccount
+                });
+            } catch(Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.InnerException != null ? e.InnerException.Message : e.Message,
+                    invoice.IdAccount
+                });
+            }
+        }
+
+        public IActionResult InvoiceToHtmlList(int? idAccount, DateTime onDate)
+        {
+            var results = new Dictionary<int, IEnumerable<string>>();
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return Json(new { ErrorCode = -8, results });
+            List<int> ids = new List<int>();
+            if (idAccount == null)
+            {
+                ids = GetSessionIds();
+            }
+            else
+            {
+                ids.Add(idAccount.Value);
+            }
+
+            if (!ids.Any())
+            {
+                ViewBag.Errors = results;
+                return View(new List<InvoiceGeneratorParam>());
+            }
+
+            var invoices = dataService.GetInvoiceGeneratorParam(ids, onDate, null);
+
+            var emptyPaymentsInvoices = invoices.FindAll(x => x.Tenant == null || x.Address == null || x.BalanceInput == "");
+            if (emptyPaymentsInvoices.Any())
+            {
+                results.Add(-6, emptyPaymentsInvoices.Select(s => s.Account).AsEnumerable());
+            }
+
+            var correctInvoices = invoices.FindAll(x => x.Tenant != null && x.Address != null && x.BalanceInput != "");
+
+            ViewBag.Errors = results;
+            ViewBag.ErrorCodes = errorCodes;
+            return View(correctInvoices);
+        }
+
         public IActionResult InvoiceGenerator(int? idAccount, DateTime onDate, string invoiceAction, string textmessage)
         {
             var results = new Dictionary<int, IEnumerable<string>>();
@@ -81,13 +142,9 @@ namespace RegistryWeb.Controllers
             if (!ids.Any())
                 return Json(new { ErrorCode = -8, results });
 
-            var invoices = new List<InvoiceGeneratorParam>();
+            var invoices = dataService.GetInvoiceGeneratorParam(ids, onDate, textmessage);
 
-            foreach (int id in ids)
-                invoices.Add(dataService.GetInvoiceGeneratorParam(id, onDate, textmessage));
-
-            
-            var emptyPaymentsInvoices = invoices.FindAll(x => x.Tenant == null && x.Address == "");
+            var emptyPaymentsInvoices = invoices.FindAll(x => x.Tenant == null || x.Address == null || x.BalanceInput == null);
             if (emptyPaymentsInvoices.Any())
             {
                 results.Add(-6, emptyPaymentsInvoices.Select(s => s.Account).AsEnumerable());
@@ -117,7 +174,7 @@ namespace RegistryWeb.Controllers
                 return GenerateInvoiceError(results);
             }
 
-            var correctInvoices = invoices.FindAll(x => (x.Tenant != null || x.Address != "") &&
+            var correctInvoices = invoices.FindAll(x => x.Tenant != null && x.Address != null && x.BalanceInput != null &&
                 ((invoiceAction == "Send" && x.Emails.Any()) || invoiceAction == "Export"));
             if (correctInvoices.Count() > 0)
             {
@@ -196,41 +253,25 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        private Dictionary<int, string> errorCodes = new Dictionary<int, string> {
+            { -1,  "Ошибка при сохранении qr - кода" },
+            { -2,  "Ошибка сохранения html - файла" },
+            { -3,  "Ошибка конвертации html в pdf" },
+            { -4,  "Ошибка отправки сообщения" },
+            { -5,  "Ошибка удаления временных файлов" },
+            { -6,  "Некорректный лицевой счет (отсутствует наниматель, адрес или начисление)" },
+            { -7,  "Отсутствует электронная почта для отправки" },
+            { -8,  "Недостаточно прав на данную операцию" },
+        };
         private IActionResult GenerateInvoiceError(Dictionary<int, IEnumerable<string>> results)
         {
             var error = "";
             foreach (var result in results.Where(r => r.Key != 0))
             {
-                switch (result.Key)
-                {
-                    case -1:
-                        error += "Ошибка при сохранении qr - кода. ЛС № ";
-                        break;
-                    case -2:
-                        error += "Ошибка сохранения html - файла. ЛС № ";
-                        break;
-                    case -3:
-                        error += "Ошибка конвертации html в pdf. ЛС № ";
-                        break;
-                    case -4:
-                        error += "Ошибка отправки сообщения. ЛС № ";
-                        break;
-                    case -5:
-                        error += "Ошибка удаления временных файлов. ЛС № ";
-                        break;
-                    case -6:
-                        error += "Отсутствует платеж на указанную дату. ЛС № ";
-                        break;
-                    case -7:
-                        error += "Отсутствует электронная почта для отправки. ЛС № ";
-                        break;
-                    case -8:
-                        error += "Недостаточно прав на данную операцию. ЛС № ";
-                        break;
-                    default:
-                        error += "Неизвестная ошибка. ЛС № ";
-                        break;
-                }
+                if (errorCodes.ContainsKey(result.Key))
+                    error += errorCodes[result.Key] + ". ЛС № ";
+                else
+                    error += "Неизвестная ошибка. ЛС № ";
                 if (result.Value.Count() > 8)
                     error += result.Value.Take(8).Aggregate((acc, v) => acc + ", " + v) + "... ";
                 else

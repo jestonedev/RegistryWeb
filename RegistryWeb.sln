@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegistryServices", "Registr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegistryPaymentCalculator", "RegistryPaymentCalculator\RegistryPaymentCalculator.csproj", "{AADEF8A0-2609-416E-9204-0C1A098C0241}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistryPaymentsLoader", "RegistryPaymentsLoader\RegistryPaymentsLoader.csproj", "{6BF9F75B-DD4F-4EDE-8F2F-5C431CF264C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegistryPaymentsLoader", "RegistryPaymentsLoader\RegistryPaymentsLoader.csproj", "{6BF9F75B-DD4F-4EDE-8F2F-5C431CF264C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceGenerator", "InvoiceGenerator\InvoiceGenerator.csproj", "{FDB61A15-0CC5-42C0-9CF1-050CE98BC42C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{6BF9F75B-DD4F-4EDE-8F2F-5C431CF264C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BF9F75B-DD4F-4EDE-8F2F-5C431CF264C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BF9F75B-DD4F-4EDE-8F2F-5C431CF264C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDB61A15-0CC5-42C0-9CF1-050CE98BC42C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDB61A15-0CC5-42C0-9CF1-050CE98BC42C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDB61A15-0CC5-42C0-9CF1-050CE98BC42C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDB61A15-0CC5-42C0-9CF1-050CE98BC42C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

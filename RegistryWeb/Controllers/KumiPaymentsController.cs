@@ -290,11 +290,13 @@ namespace RegistryWeb.Controllers
 
             if (!filterOptions.IsAccountEmpty() || !string.IsNullOrEmpty(idStreet) || !string.IsNullOrEmpty(house) || !string.IsNullOrEmpty(premise))
             {
+                var idsAccountState = new List<int>();
+                if (filterOptions.IdAccountState != null) idsAccountState.Add(filterOptions.IdAccountState.Value);
                 var accounts = kumiAccountsDataService.GetKumiAccounts(new KumiAccountsFilter
                 {
                     Account = filterOptions.Account,
                     AccountGisZkh = filterOptions.AccountGisZkh,
-                    IdAccountState = filterOptions.IdAccountState,
+                    IdsAccountState = idsAccountState,
                     IdStreet = idStreet,
                     House = house,
                     PremisesNum = premise

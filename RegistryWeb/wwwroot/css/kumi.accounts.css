@@ -76,3 +76,15 @@
         font-size: 80%;
     }
 }
+
+@media print
+{
+    .rr-invoice-errors {
+
+    }
+}
+
+
+.rr-page-break {
+    page-break-after: always;
+}

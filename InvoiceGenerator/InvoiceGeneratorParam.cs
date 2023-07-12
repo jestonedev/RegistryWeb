@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace RegistryWeb.ViewModel
+namespace InvoiceGenerator
 {
     public class InvoiceGeneratorParam
     {
-        public int IdAcconut { get; set; }
+        public int IdAccount { get; set; }
         public string Address { get; set; }
         public string Account { get; set; }
         public string Tenant { get; set; }
-        public DateTime OnData { get; set; }
+        public DateTime OnDate { get; set; }
         public string BalanceInput { get; set; }
         public string ChargingTenancy { get; set; }
         public string ChargingPenalty { get; set; }

@@ -12,6 +12,7 @@ using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.ViewModel;
 using RegistryDb.Models.Entities.Payments;
+using InvoiceGenerator;
 
 namespace RegistryWeb.Controllers
 {
