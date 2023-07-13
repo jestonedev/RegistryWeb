@@ -1861,6 +1861,8 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<KumiAccount> BalanceFilter(IQueryable<KumiAccount> query, KumiAccountsFilter filterOptions)
         {
+            if (filterOptions.IsBalanceEmpty()) return query;
+
             var charges = new List<KumiCharge>();
 
             if (filterOptions.AtDate == null)

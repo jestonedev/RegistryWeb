@@ -40,6 +40,7 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasMaxLength(1024)
                 .IsUnicode(false);
 
+            // Найм
             builder.Property(e => e.TenancyValue)
                 .HasColumnName("tenancy_value")
                 .HasColumnType("decimal(12,2)")
@@ -57,6 +58,39 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
 
             builder.Property(e => e.PaymentPenaltyValue)
                 .HasColumnName("payment_penalty_value")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            // ДГИ
+            builder.Property(e => e.DgiValue)
+                .HasColumnName("dgi_value")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.PaymentDgiValue)
+                .HasColumnName("payment_dgi_value")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            // ПКК
+            builder.Property(e => e.PkkValue)
+                .HasColumnName("pkk_value")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.PaymentPkkValue)
+                .HasColumnName("payment_pkk_value")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            // Падун
+            builder.Property(e => e.PadunValue)
+                .HasColumnName("padun_value")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.PaymentPadunValue)
+                .HasColumnName("payment_padun_value")
                 .HasColumnType("decimal(12,2)")
                 .IsRequired();
 

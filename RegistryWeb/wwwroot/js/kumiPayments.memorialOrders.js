@@ -114,8 +114,11 @@
                 } else {
                     if (action !== undefined)
                         location.href = result.redirectUrl;
-                    else 
+                    else {
                         window.open(result.redirectUrl, '_blank');
+                        $("#MemorialOrderModal").modal('hide');
+                        location.reload();
+                    }
                 }
                 $('#setMemorialOrderModalBtn').text(saveBtnTitle).attr('disabled', false);
             }

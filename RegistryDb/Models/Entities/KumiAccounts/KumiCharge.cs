@@ -14,6 +14,7 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public int IdAccount { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        // Найм
         public decimal InputTenancy { get; set; }
         public decimal InputPenalty { get; set; }
         public decimal ChargeTenancy { get; set; }
@@ -26,6 +27,31 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public decimal CorrectionPenalty { get; set; }
         public decimal OutputTenancy { get; set; }
         public decimal OutputPenalty { get; set; }
+
+        // ДГИ
+        public decimal InputDgi { get; set; }
+        public decimal ChargeDgi { get; set; }
+        public decimal PaymentDgi { get; set; }
+        public decimal RecalcDgi { get; set; }
+        public decimal CorrectionDgi { get; set; }
+        public decimal OutputDgi { get; set; }
+
+        // ПКК
+        public decimal InputPkk { get; set; }
+        public decimal ChargePkk { get; set; }
+        public decimal PaymentPkk { get; set; }
+        public decimal RecalcPkk { get; set; }
+        public decimal CorrectionPkk { get; set; }
+        public decimal OutputPkk { get; set; }
+
+        // Падун
+        public decimal InputPadun { get; set; }
+        public decimal ChargePadun { get; set; }
+        public decimal PaymentPadun { get; set; }
+        public decimal RecalcPadun { get; set; }
+        public decimal CorrectionPadun { get; set; }
+        public decimal OutputPadun { get; set; }
+
         public byte Deleted { get; set; }
         public byte Hidden { get; set; }
         public byte IsBksCharge { get; set; }

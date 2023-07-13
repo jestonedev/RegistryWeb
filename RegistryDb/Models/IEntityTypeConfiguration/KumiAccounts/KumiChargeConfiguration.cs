@@ -40,6 +40,7 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("date")
                 .IsRequired();
 
+            // Найм
             builder.Property(e => e.InputTenancy)
                 .HasColumnName("input_tenancy")
                 .HasColumnType("decimal(12,2)")
@@ -97,6 +98,99 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
 
             builder.Property(e => e.OutputPenalty)
                 .HasColumnName("output_penalty")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            // ДГИ
+            builder.Property(e => e.InputDgi)
+                .HasColumnName("input_dgi")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.ChargeDgi)
+                .HasColumnName("charge_dgi")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.PaymentDgi)
+                .HasColumnName("payment_dgi")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.RecalcDgi)
+                .HasColumnName("recalc_dgi")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.CorrectionDgi)
+                .HasColumnName("correction_dgi")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.OutputDgi)
+                .HasColumnName("output_dgi")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            // ПКК
+            builder.Property(e => e.InputPkk)
+                .HasColumnName("input_pkk")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.ChargePkk)
+                .HasColumnName("charge_pkk")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.PaymentPkk)
+                .HasColumnName("payment_pkk")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.RecalcPkk)
+                .HasColumnName("recalc_pkk")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.CorrectionPkk)
+                .HasColumnName("correction_pkk")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.OutputPkk)
+                .HasColumnName("output_pkk")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            // Падун
+            builder.Property(e => e.InputPadun)
+                .HasColumnName("input_padun")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.ChargePadun)
+                .HasColumnName("charge_padun")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.PaymentPadun)
+                .HasColumnName("payment_padun")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.RecalcPadun)
+                .HasColumnName("recalc_padun")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.CorrectionPadun)
+                .HasColumnName("correction_padun")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            builder.Property(e => e.OutputPadun)
+                .HasColumnName("output_padun")
                 .HasColumnType("decimal(12,2)")
                 .IsRequired();
 
