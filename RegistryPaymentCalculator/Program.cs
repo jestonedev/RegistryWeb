@@ -103,7 +103,7 @@ namespace RegistryPaymentCalculator
 
                         var startCalcDate = service.GetAccountStartCalcDate(accountLocal);
                         if (startCalcDate == null) continue;
-                        var dbChargingInfo = service.GetDbChargingInfo(accountLocal);
+                        var dbChargingInfo = accountLocal.Charges;
 
                         startRewriteDate = service.CorrectStartRewriteDate(startRewriteDate, startCalcDate.Value, dbChargingInfo);
 

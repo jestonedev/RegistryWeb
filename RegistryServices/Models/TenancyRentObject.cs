@@ -1,4 +1,7 @@
-﻿namespace RegistryWeb.ViewModel
+﻿using RegistryDb.Models.Entities.Tenancies;
+using System.Collections.Generic;
+
+namespace RegistryWeb.ViewModel
 {
     public class TenancyRentObject
     {
@@ -8,5 +11,6 @@
         public double? RentArea { get; set; }
         public decimal Payment { get; set; }
         public decimal PaymentAfter28082019 { get; set; }
+        public List<TenancyPaymentHistory> TenancyPaymentHistory { get; set; }
     }
 }

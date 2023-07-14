@@ -88,7 +88,7 @@ namespace RegistryWeb.DataServices
             while(startDate < endDate)
             {
                 var subEndDate = startDate.AddMonths(1).AddDays(-1);
-                var charge = CalcChargeInfo(account, startDate, subEndDate, charges, startRewriteDate, out bool outOfBound, forceCalcChargeOnFutureDate);
+                var charge = CalcChargeInfo(account, startDate, subEndDate, charges, dbChargers, startRewriteDate, out bool outOfBound, forceCalcChargeOnFutureDate);
                 if (!outOfBound)
                     charges.Add(charge);
                 startDate = startDate.AddMonths(1);
@@ -791,11 +791,11 @@ namespace RegistryWeb.DataServices
 
         private void UpdateChargeDisplayInfo(int idAccount, DateTime startRewriteDate)
         {
-            var charges = registryContext.KumiCharges.Include(r => r.PaymentCharges).Where(r => r.IdAccount == idAccount);
+            var charges = registryContext.KumiCharges.Include(r => r.PaymentCharges).Where(r => r.IdAccount == idAccount).ToList();
             // Если строк начисления нет в БД, то нечего обновлять
             if (charges.Count() == 0) return;
             var lastCharge = charges.OrderByDescending(r => r.EndDate).First();
-            var claims = registryContext.Claims.Include(r => r.PaymentClaims).Where(r => r.IdAccountKumi == idAccount);
+            var claims = registryContext.Claims.Include(r => r.PaymentClaims).Where(r => r.IdAccountKumi == idAccount).ToList();
             foreach(var charge in charges)
             {
                 foreach(var paymentCharge in charge.PaymentCharges)
@@ -814,7 +814,7 @@ namespace RegistryWeb.DataServices
                 }
             }
             var paymentIds = claims.SelectMany(r => r.PaymentClaims).Select(r => r.IdPayment).Distinct();
-            var payments = registryContext.KumiPayments.Where(r => paymentIds.Contains(r.IdPayment));
+            var payments = registryContext.KumiPayments.Where(r => paymentIds.Contains(r.IdPayment)).ToList();
             foreach(var claim in claims)
             {
                 foreach(var paymentClaim in claim.PaymentClaims)
@@ -924,7 +924,7 @@ namespace RegistryWeb.DataServices
         }
 
         public KumiCharge CalcChargeInfo(KumiAccountInfoForPaymentCalculator account, DateTime startDate, DateTime endDate,
-            List<KumiCharge> prevCharges, DateTime startRewriteDate, out bool outOfBound, bool forceCalcChargeOnFutureDate)
+            List<KumiCharge> prevCharges, List<KumiCharge> dbCharges, DateTime startRewriteDate, out bool outOfBound, bool forceCalcChargeOnFutureDate)
         {
             // Входящее сальдо
             var inputBalanceTenancy = account.CurrentBalanceTenancy;
@@ -946,8 +946,7 @@ namespace RegistryWeb.DataServices
                 inputBalancePadun = prevCharge.OutputPadun;
             } else
             {
-                var dbCharge = registryContext.KumiCharges.AsNoTracking()
-                    .FirstOrDefault(r => r.IdAccount == account.IdAccount && r.StartDate == startDate && r.EndDate == endDate);
+                var dbCharge = dbCharges.FirstOrDefault(r => r.IdAccount == account.IdAccount && r.StartDate == startDate && r.EndDate == endDate);
                 if (dbCharge != null)
                 {
                     inputBalanceTenancy = dbCharge.InputTenancy;
@@ -1366,7 +1365,7 @@ namespace RegistryWeb.DataServices
         public List<KumiAccountPrepareForPaymentCalculator> GetAccountsPrepareForPaymentCalculator(IQueryable<KumiAccount> accounts)
         {
             var result = new List<KumiAccountPrepareForPaymentCalculator>();
-            var tenancyInfo = GetTenancyInfo(accounts);
+            var tenancyInfo = GetTenancyInfo(accounts, true);
             foreach(var account in accounts.Include(r => r.Charges).Include(r => r.Claims).Include(r => r.Corrections).AsNoTracking().ToList())
             {
                 var accountInfo = new KumiAccountPrepareForPaymentCalculator();
@@ -1377,7 +1376,9 @@ namespace RegistryWeb.DataServices
                     accountInfo.TenancyPaymentHistories = new Dictionary<int, List<TenancyPaymentHistory>>();
                     foreach (var tenancy in accountInfo.TenancyInfo)
                     {
-                        var paymentsHistory = new List<TenancyPaymentHistory>();
+                        accountInfo.TenancyPaymentHistories.Add(tenancy.TenancyProcess.IdProcess, 
+                            tenancy.RentObjects.SelectMany(r => r.TenancyPaymentHistory).ToList());
+                        /*var paymentsHistory = new List<TenancyPaymentHistory>();
                         foreach(var rentObject in tenancy.RentObjects)
                         {
                             if (!int.TryParse(rentObject.Address.Id, out int id)) continue;
@@ -1397,22 +1398,26 @@ namespace RegistryWeb.DataServices
                             }
                         }
                         if (!accountInfo.TenancyPaymentHistories.ContainsKey(tenancy.TenancyProcess.IdProcess))
-                            accountInfo.TenancyPaymentHistories.Add(tenancy.TenancyProcess.IdProcess, paymentsHistory);
+                            accountInfo.TenancyPaymentHistories.Add(tenancy.TenancyProcess.IdProcess, paymentsHistory);*/
                     }
                 }
                 var chargesIds = account.Charges.Select(r => r.IdCharge).ToList();
                 var claimsIds = account.Claims.Select(r => r.IdClaim).ToList();
 
-                accountInfo.Payments = registryContext.KumiPayments.Include(p => p.PaymentCharges)
-                    .Where(p => p.PaymentCharges.Any(r => chargesIds.Contains(r.IdCharge))).ToList()
-                    .Union(
-                        registryContext.KumiPayments.Include(p => p.PaymentClaims)
-                        .Where(p => p.PaymentClaims.Any(r => claimsIds.Contains(r.IdClaim))).ToList())
-                    .ToList();
+                accountInfo.Payments = (from pRow in registryContext.KumiPayments
+                                        join pcRow in registryContext.KumiPaymentCharges
+                                        on pRow.IdPayment equals pcRow.IdPayment
+                                        where chargesIds.Contains(pcRow.IdCharge)
+                                        select pRow).Union(
+                                        from pRow in registryContext.KumiPayments
+                                        join pcRow in registryContext.KumiPaymentClaims
+                                        on pRow.IdPayment equals pcRow.IdPayment
+                                        where claimsIds.Contains(pcRow.IdClaim)
+                                        select pRow
+                                        ).Distinct().ToList();
 
                 // Платежи по начислениям БКС (замороженные строки без фактических платежей)
-                var bksPayments = registryContext.KumiCharges
-                    .Where(r => r.IdAccount == account.IdAccount && r.IsBksCharge == 1 && 
+                var bksPayments = account.Charges.Where(r => r.IsBksCharge == 1 && 
                         (r.PaymentTenancy != 0 || r.PaymentPenalty != 0 || r.PaymentDgi != 0 || r.PaymentPkk != 0 || r.PaymentPadun != 0))
                     .Select(r => new KumiPayment {
                         DateIn = r.StartDate,
@@ -1457,9 +1462,10 @@ namespace RegistryWeb.DataServices
 
                 // Исковые работы
                 accountInfo.Claims = account.Claims.ToList();
-                foreach(var claim in accountInfo.Claims)
+                var claimsStates = registryContext.ClaimStates.Where(r => claimsIds.Contains(r.IdClaim)).ToList();
+                foreach (var claim in accountInfo.Claims)
                 {
-                    claim.ClaimStates = registryContext.ClaimStates.Where(r => r.IdClaim == claim.IdClaim).ToList();
+                    claim.ClaimStates = claimsStates.Where(r => r.IdClaim == claim.IdClaim).ToList();
                 }
                 if (accountInfo.TenancyInfo == null)
                     accountInfo.TenancyInfo = new List<KumiAccountTenancyInfoVM>();
@@ -2322,7 +2328,7 @@ namespace RegistryWeb.DataServices
                 .Take(pageOptions.SizePage);
         }
 
-        public Dictionary<int, List<KumiAccountTenancyInfoVM>> GetTenancyInfo(IEnumerable<KumiAccount> accounts)
+        public Dictionary<int, List<KumiAccountTenancyInfoVM>> GetTenancyInfo(IEnumerable<KumiAccount> accounts, bool loadPaymentHistory = false)
         {
             var accountIds = (from account in accounts
                               select
@@ -2334,7 +2340,7 @@ namespace RegistryWeb.DataServices
             var tenancyProcesses = registryContext.TenancyProcesses.Include(r => r.TenancyRentPeriods)
                 .Include(r => r.TenancyPersons).Where(r => tenancyIds.Contains(r.IdProcess)).ToList();
 
-            var buildings = from tbaRow in registryContext.TenancyBuildingsAssoc
+            var buildings = (from tbaRow in registryContext.TenancyBuildingsAssoc
                             join buildingRow in registryContext.Buildings.Include(r => r.IdStateNavigation)
                             on tbaRow.IdBuilding equals buildingRow.IdBuilding
                             join streetRow in registryContext.KladrStreets
@@ -2359,8 +2365,8 @@ namespace RegistryWeb.DataServices
                                     LivingArea = buildingRow.LivingArea,
                                     RentArea = tbaRow.RentTotalArea
                                 }
-                            };
-            var premises = from tpaRow in registryContext.TenancyPremisesAssoc
+                            }).ToList();
+            var premises = (from tpaRow in registryContext.TenancyPremisesAssoc
                            join premiseRow in registryContext.Premises.Include(r => r.IdStateNavigation)
                            on tpaRow.IdPremise equals premiseRow.IdPremises
                            join buildingRow in registryContext.Buildings
@@ -2392,8 +2398,8 @@ namespace RegistryWeb.DataServices
                                    LivingArea = premiseRow.LivingArea,
                                    RentArea = tpaRow.RentTotalArea
                                }
-                           };
-            var subPremises = from tspaRow in registryContext.TenancySubPremisesAssoc
+                           }).ToList();
+            var subPremises = (from tspaRow in registryContext.TenancySubPremisesAssoc
                               join subPremiseRow in registryContext.SubPremises.Include(r => r.IdStateNavigation)
                               on tspaRow.IdSubPremise equals subPremiseRow.IdSubPremises
                               join premiseRow in registryContext.Premises
@@ -2428,7 +2434,28 @@ namespace RegistryWeb.DataServices
                                       LivingArea = subPremiseRow.LivingArea,
                                       RentArea = tspaRow.RentTotalArea
                                   }
-                              };
+                              }).ToList();
+
+            var paymentHistoryBuildings = new List<TenancyPaymentHistory>();
+            var paymentHistoryPremises = new List<TenancyPaymentHistory>();
+            var paymentHistorySubPremises = new List<TenancyPaymentHistory>();
+            if (loadPaymentHistory)
+            {
+                var buildingIds = buildings.Select(r => int.Parse(r.RentObject.Address.Id)).ToList();
+                paymentHistoryBuildings = (from row in registryContext.TenancyPaymentsHistory
+                                          where buildingIds.Contains(row.IdBuilding) && row.IdPremises == null
+                                          select row).ToList();
+
+                var premisesIds = premises.Select(r => int.Parse(r.RentObject.Address.Id)).ToList();
+                paymentHistoryPremises = (from row in registryContext.TenancyPaymentsHistory
+                                            where row.IdPremises != null && premisesIds.Contains(row.IdPremises.Value) && row.IdSubPremises == null
+                                           select row).ToList();
+
+                var subPremisesIds = subPremises.Select(r => int.Parse(r.RentObject.Address.Id)).ToList();
+                paymentHistorySubPremises = (from row in registryContext.TenancyPaymentsHistory
+                                          where row.IdSubPremises != null && subPremisesIds.Contains(row.IdSubPremises.Value)
+                                          select row).ToList();
+            }
 
             var objects = buildings.Union(premises).Union(subPremises).ToList();
 
@@ -2524,6 +2551,7 @@ namespace RegistryWeb.DataServices
                        Math.Round(paymentsAfter28082019Buildings.Where(
                             r => r.IdProcess == obj.IdProcess && r.IdBuilding.ToString() == obj.RentObject.Address.Id
                             ).Sum(r => (r.K1 + r.K2 + r.K3) / 3 * r.KC * r.Hb * (decimal)r.RentArea), 2);
+                    obj.RentObject.TenancyPaymentHistory = paymentHistoryBuildings.Where(r => r.IdBuilding.ToString() == obj.RentObject.Address.Id).ToList();
                 }
                 if (obj.RentObject.Address.AddressType == AddressTypes.Premise)
                 {
@@ -2533,6 +2561,7 @@ namespace RegistryWeb.DataServices
                         Math.Round(paymentsAfter28082019Premises.Where(
                             r => r.IdProcess == obj.IdProcess && r.IdPremises.ToString() == obj.RentObject.Address.Id
                             ).Sum(r => (r.K1 + r.K2 + r.K3) / 3 * r.KC * r.Hb * (decimal)r.RentArea), 2);
+                    obj.RentObject.TenancyPaymentHistory = paymentHistoryPremises.Where(r => r.IdPremises.ToString() == obj.RentObject.Address.Id).ToList();
                 }
                 if (obj.RentObject.Address.AddressType == AddressTypes.SubPremise)
                 {
@@ -2542,6 +2571,7 @@ namespace RegistryWeb.DataServices
                         Math.Round(paymentsAfter28082019SubPremises.Where(
                             r => r.IdProcess == obj.IdProcess && r.IdSubPremises.ToString() == obj.RentObject.Address.Id
                             ).Sum(r => (r.K1 + r.K2 + r.K3) / 3 * r.KC * r.Hb * (decimal)r.RentArea), 2);
+                    obj.RentObject.TenancyPaymentHistory = paymentHistorySubPremises.Where(r => r.IdSubPremises.ToString() == obj.RentObject.Address.Id).ToList();
                 }
             }
 
@@ -2559,7 +2589,7 @@ namespace RegistryWeb.DataServices
                     {
                         RentObjects = rentObjects,
                         TenancyProcess = tenancyProcess,
-                        Tenant = registryContext.TenancyPersons.FirstOrDefault(r => r.IdProcess == tenancyProcess.IdProcess && r.ExcludeDate == null && r.IdKinship == 1),
+                        Tenant = tenancyProcess.TenancyPersons.FirstOrDefault(r => r.ExcludeDate == null && r.IdKinship == 1),
                         AccountAssoc = currentAssoc
                     };
                     result[accountId].Add(tenancyInfo);
