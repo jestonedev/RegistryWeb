@@ -110,6 +110,7 @@ namespace RegistryWeb.DataServices
             var accounts = (from aRow in registryContext.KumiAccounts
                             where idAccounts.Contains(aRow.IdAccount)
                             select aRow).ToList();
+            
             var addresses = registryContext.GetAddressByAccountIds(idAccounts);
             var tenants = registryContext.GetTenantsByAccountIds(idAccounts);
 
@@ -120,7 +121,6 @@ namespace RegistryWeb.DataServices
                 var account = accounts.FirstOrDefault(r => r.IdAccount == idAccount);
                 var address = addresses.FirstOrDefault(r => r.IdAccount == idAccount);
                 var tenant = tenants.FirstOrDefault(r => r.IdAccount == idAccount);
-
                 var ob = new InvoiceGeneratorParam
                 {
                     IdAccount = idAccount,
@@ -128,13 +128,17 @@ namespace RegistryWeb.DataServices
                     Account = account.Account,
                     Tenant = string.IsNullOrEmpty(account.Owner) ? tenant?.Tenant : account.Owner,
                     OnDate = onDate,
-                    BalanceInput = (charge?.InputTenancy + charge?.InputPenalty).ToString().Replace(',', '.'),
-                    ChargingTenancy = charge?.ChargeTenancy.ToString().Replace(',', '.'),
+                    BalanceInput = (charge?.InputTenancy + charge?.InputPenalty+ charge?.InputDgi + charge?.InputPkk + charge?.InputPadun).ToString().Replace(',', '.'),
+                    ChargingTenancy = (charge?.ChargeTenancy + charge?.ChargeDgi + charge?.ChargePkk + charge?.ChargePadun).ToString().Replace(',', '.'),
                     ChargingPenalty = charge?.ChargePenalty.ToString().Replace(',', '.'),
-                    Payed = (charge?.PaymentTenancy + charge?.PaymentPenalty).ToString().Replace(',', '.'),
-                    RecalcTenancy = (charge?.RecalcTenancy + charge?.CorrectionTenancy).ToString().Replace(',', '.'),
+                    Payed = (charge?.PaymentTenancy + charge?.PaymentPenalty + charge?.PaymentDgi + charge?.PaymentPkk + charge?.PaymentPadun).ToString().Replace(',', '.'),
+                    RecalcTenancy = (charge?.RecalcTenancy + charge?.CorrectionTenancy +
+                        charge?.RecalcDgi + charge?.CorrectionDgi + 
+                        charge?.RecalcPkk + charge?.CorrectionPkk +
+                        charge?.RecalcPadun + charge?.CorrectionPadun).ToString().Replace(',', '.'),
                     RecalcPenalty = (charge?.RecalcPenalty + charge?.CorrectionPenalty).ToString().Replace(',', '.'),
-                    BalanceOutput = (charge?.OutputTenancy + charge?.OutputPenalty).ToString().Replace(',', '.'),
+                    BalanceOutput = (charge?.OutputTenancy + charge?.OutputPenalty + charge?.OutputDgi + charge?.OutputPkk + charge?.OutputPadun)
+                        .ToString().Replace(',', '.'),
                     TotalArea = address?.TotalArea.ToString().Replace(',', '.'),
                     Prescribed = tenant?.Prescribed ?? 0,
                     Emails = string.IsNullOrEmpty(tenant?.Emails) ? new List<string>() : tenant.Emails.Split(",").ToList(),

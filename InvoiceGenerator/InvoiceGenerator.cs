@@ -55,7 +55,7 @@ namespace InvoiceGenerator
                 invoice.BalanceOutput.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")));
             html += "</table>";
 
-            html += string.Format("<p>Площадь общая: <b class=\"total-area\">{0}</b> количество проживающих: <b>{0}</b> чел.</p>",
+            html += string.Format("<p>Площадь общая: <b class=\"total-area\">{0}</b> количество проживающих: <b>{1}</b> чел.</p>",
                 invoice.TotalArea.ToString("N1", CultureInfo.GetCultureInfo("ru-RU")),
                 invoice.Prescribed);
 
