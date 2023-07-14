@@ -90,7 +90,10 @@
     }
 }
 
-
 .rr-page-break {
     page-break-after: always;
+}
+
+.rr-tenancy-type-selectors label {
+    cursor: pointer;
 }

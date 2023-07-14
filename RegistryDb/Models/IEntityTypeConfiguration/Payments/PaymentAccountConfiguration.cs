@@ -43,6 +43,10 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Payments
                 .HasColumnName("raw_address")
                 .HasMaxLength(255)
                 .IsUnicode(false);
+
+            builder.Property(e => e.Prescribed)
+                .HasColumnName("prescribed")
+                .HasColumnType("int(11)");
         }
     }
 }

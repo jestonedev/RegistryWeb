@@ -618,6 +618,7 @@ namespace RegistryWeb.Controllers
                 var orders = loadstate.InsertedMemorialOrders.Union(loadstate.SkipedMemorialOrders).ToList();
 
                 ViewBag.MemorialOrderPayments = dataService.GetPaymentsByOrders(orders);
+                ViewBag.KbkDescriptions = dataService.KbkDescriptions;
 
                 return View("UploadPaymentsResult", loadstate);
             }

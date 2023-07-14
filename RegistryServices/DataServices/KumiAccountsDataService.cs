@@ -2076,6 +2076,17 @@ namespace RegistryWeb.DataServices
                     resultAIds = resultAIds.Intersect(aIds).ToList();
             }
 
+            if (filterOptions.BalanceInputDgiPadunPkk != null)
+            {
+                var aIds = charges.Where(p => filterOptions.BalanceInputDgiPadunPkkOp == 1 ?
+                        (p.InputDgi >= filterOptions.BalanceInputDgiPadunPkk || p.InputPkk >= filterOptions.BalanceInputDgiPadunPkk || p.InputPadun >= filterOptions.BalanceInputDgiPadunPkk) :
+                        (p.InputDgi <= filterOptions.BalanceInputDgiPadunPkk || p.InputPkk <= filterOptions.BalanceInputDgiPadunPkk || p.InputPadun <= filterOptions.BalanceInputDgiPadunPkk)).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
             // Output balance
             if (filterOptions.BalanceOutputTotal != null)
             {
@@ -2104,6 +2115,17 @@ namespace RegistryWeb.DataServices
                 var aIds = charges.Where(p => filterOptions.BalanceOutputPenaltiesOp == 1 ?
                         p.OutputPenalty >= filterOptions.BalanceOutputPenalties :
                         p.OutputPenalty <= filterOptions.BalanceOutputPenalties).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
+            if (filterOptions.BalanceOutputDgiPadunPkk != null)
+            {
+                var aIds = charges.Where(p => filterOptions.BalanceOutputDgiPadunPkkOp == 1 ?
+                        (p.OutputDgi >= filterOptions.BalanceOutputDgiPadunPkk || p.OutputPkk >= filterOptions.BalanceOutputDgiPadunPkk || p.OutputPadun >= filterOptions.BalanceOutputDgiPadunPkk) :
+                        (p.OutputDgi <= filterOptions.BalanceOutputDgiPadunPkk || p.OutputPkk <= filterOptions.BalanceOutputDgiPadunPkk || p.OutputPadun <= filterOptions.BalanceOutputDgiPadunPkk)).Select(r => r.IdAccount);
                 if (resultAIds == null)
                     resultAIds = aIds.ToList();
                 else
@@ -2144,6 +2166,17 @@ namespace RegistryWeb.DataServices
                     resultAIds = resultAIds.Intersect(aIds).ToList();
             }
 
+            if (filterOptions.ChargingDgiPadunPkk != null)
+            {
+                var aIds = charges.Where(p => filterOptions.ChargingDgiPadunPkkOp == 1 ?
+                        (p.ChargeDgi >= filterOptions.ChargingDgiPadunPkk || p.ChargePkk >= filterOptions.ChargingDgiPadunPkk || p.ChargePadun >= filterOptions.ChargingDgiPadunPkk) :
+                        (p.ChargeDgi <= filterOptions.ChargingDgiPadunPkk || p.ChargePkk <= filterOptions.ChargingDgiPadunPkk || p.ChargePadun <= filterOptions.ChargingDgiPadunPkk)).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
             // Payment
             if (filterOptions.PaymentTotal != null)
             {
@@ -2177,6 +2210,18 @@ namespace RegistryWeb.DataServices
                 else
                     resultAIds = resultAIds.Intersect(aIds).ToList();
             }
+
+            if (filterOptions.PaymentDgiPadunPkk != null)
+            {
+                var aIds = charges.Where(p => filterOptions.PaymentDgiPadunPkkOp == 1 ?
+                        (p.PaymentDgi >= filterOptions.PaymentDgiPadunPkk || p.PaymentPkk >= filterOptions.PaymentDgiPadunPkk || p.PaymentPadun >= filterOptions.PaymentDgiPadunPkk) :
+                        (p.PaymentDgi <= filterOptions.PaymentDgiPadunPkk || p.PaymentPkk <= filterOptions.PaymentDgiPadunPkk || p.PaymentPadun <= filterOptions.PaymentDgiPadunPkk)).Select(r => r.IdAccount);
+                if (resultAIds == null)
+                    resultAIds = aIds.ToList();
+                else
+                    resultAIds = resultAIds.Intersect(aIds).ToList();
+            }
+
             if (resultAIds != null)
             {
                 query = query.Where(r => resultAIds.Contains(r.IdAccount));

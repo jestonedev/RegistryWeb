@@ -1444,7 +1444,7 @@ namespace RegistryWeb.DataServices
             return loadState;
         }
 
-        public Dictionary<int, KumiPayment> GetPaymentsByOrders(List<KumiMemorialOrder> orders)
+        public Dictionary<Tuple<int, int>, KumiPayment> GetPaymentsByOrders(List<KumiMemorialOrder> orders)
         {
             var idOrders = orders.Select(r => r.IdOrder).ToList();
             var orderNums = orders.Select(r => r.NumDocument).ToList();
@@ -1458,10 +1458,10 @@ namespace RegistryWeb.DataServices
                                   paymentRow
                               };
 
-            var paymentRowsDict = new Dictionary<int, KumiPayment>();
+            var paymentRowsDict = new Dictionary<Tuple<int, int>, KumiPayment>();
             foreach (var paymentRow in paymentRows)
             {
-                paymentRowsDict.Add(paymentRow.IdOrder, paymentRow.paymentRow);
+                paymentRowsDict.Add(new Tuple<int, int>(paymentRow.IdOrder, paymentRow.paymentRow.IdPayment), paymentRow.paymentRow);
             }
 
             return paymentRowsDict;

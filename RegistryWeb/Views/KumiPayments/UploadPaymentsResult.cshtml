@@ -4,7 +4,8 @@
 
 @{
     ViewData["Title"] = "Результат загрузки платежей";
-    var memorialOrderPayments = (Dictionary<int, KumiPayment>)ViewBag.MemorialOrderPayments;
+    var memorialOrderPayments = (Dictionary<Tuple<int, int>, KumiPayment>)ViewBag.MemorialOrderPayments;
+    var kbkDescriptions = (List<KumiKbkDescription>)ViewBag.KbkDescriptions;
 
 }
 
@@ -156,11 +157,15 @@
         <tbody>
             @foreach (var moAssoc in Model.InsertedMemorialOrders)
             {
+                var kbk = moAssoc.Kbk;
+                var description = kbkDescriptions.FirstOrDefault(r => r.Kbk == kbk)?.Description;
+
                 <tr>
                     <td>
-                        @(moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "")@(moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "")
+                        <b>Реквизиты:</b> @(moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "")@(moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "")
                         <span class="badge bg-success text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
                               title="Новый мемориальный ордер">?</span>
+                        <br /><b>КБК:</b> <span class="@(kbk == "90111109044041000120" ? "text-danger" : "")" title="@description">@kbk</span>
                     </td>
                     <td>
                         @{
@@ -172,10 +177,14 @@
                             }
                             else
                             {
-                                if (memorialOrderPayments.ContainsKey(moAssoc.IdOrder))
+                                if (memorialOrderPayments.Any(r => r.Key.Item1 == moAssoc.IdOrder))
                                 {
-                                    var payment = memorialOrderPayments[moAssoc.IdOrder];
-                                    <span>@(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</span>
+                                    var payments = memorialOrderPayments.Where(r => r.Key.Item1 == moAssoc.IdOrder);
+                                    foreach (var paymentPair in payments)
+                                    {
+                                        var payment = paymentPair.Value;
+                                        <span>@(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</span>
+                                    }
                                 }
                                 else
                                 {
@@ -190,11 +199,14 @@
             }
             @foreach (var moAssoc in Model.SkipedMemorialOrders)
             {
+                var kbk = moAssoc.Kbk;
+                var description = kbkDescriptions.FirstOrDefault(r => r.Kbk == kbk)?.Description;
                 <tr>
                     <td>
-                        @(moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "")@(moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "")
+                        <b>Реквизиты:</b> @(moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "")@(moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "")
                         <span class="badge bg-warning text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
                               title="Присутствовавший в системе мемориальный ордер">?</span>
+                        <br /><b>КБК:</b> <span class="@(kbk == "90111109044041000120" ? "text-danger" : "")" title="@description">@kbk</span>
                     </td>
                     <td>
                         @{
@@ -206,10 +218,14 @@
                             }
                             else
                             {
-                                if (memorialOrderPayments.ContainsKey(moAssoc.IdOrder))
+                                if (memorialOrderPayments.Any(r => r.Key.Item1 == moAssoc.IdOrder))
                                 {
-                                    var payment = memorialOrderPayments[moAssoc.IdOrder];
-                                    <span>@(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</span>
+                                    var payments = memorialOrderPayments.Where(r => r.Key.Item1 == moAssoc.IdOrder);
+                                    foreach (var paymentPair in payments)
+                                    {
+                                        var payment = paymentPair.Value;
+                                        <span>@(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</span>
+                                    }
                                 }
                                 else
                                 {

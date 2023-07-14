@@ -422,6 +422,8 @@
 
         for (var i = 0; i < cellClasses.length; i++) {
             var elem = chargeCurrentMonthElem.find(cellClasses[i].cssSelector);
+            if (elem.find("a").length > 0)
+                elem = elem.find("a");
             cellClasses[i].value = parseFloat(elem.text().replace(",", "."));
             elem.html("").text(cellClasses[i].value.toFixed(2).replace(".", ","));
             if (cellClasses[i].property !== null)
@@ -431,6 +433,8 @@
             var chargeTotalElem = $(".rr-charge-total-row");
             for (var i = 0; i < cellClasses.length; i++) {
                 var elem = chargeCurrentMonthElem.find(cellClasses[i].cssSelector);
+                if (elem.find("a").length > 0)
+                    elem = elem.find("a");
                 if (cellClasses[i].property !== null) {
                     value = 0;
                     if (Array.isArray(cellClasses[i].property)) {

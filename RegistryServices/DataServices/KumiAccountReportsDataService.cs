@@ -110,21 +110,27 @@ namespace RegistryWeb.DataServices
             var accounts = (from aRow in registryContext.KumiAccounts
                             where idAccounts.Contains(aRow.IdAccount)
                             select aRow).ToList();
-            
+            var bksAccounts = (from aRow in registryContext.PaymentAccounts
+                               where idAccounts.Contains(aRow.IdAccount)
+                               select aRow).ToList();
+
             var addresses = registryContext.GetAddressByAccountIds(idAccounts);
             var tenants = registryContext.GetTenantsByAccountIds(idAccounts);
+          
 
             var result = new List<InvoiceGeneratorParam>();
             foreach(var idAccount in idAccounts)
             {
                 var charge = charges.FirstOrDefault(r => r.IdAccount == idAccount);
                 var account = accounts.FirstOrDefault(r => r.IdAccount == idAccount);
-                var address = addresses.FirstOrDefault(r => r.IdAccount == idAccount);
+                var bksAccount = bksAccounts.FirstOrDefault(r => r.IdAccount == idAccount);
+                var addressList = addresses.Where(r => r.IdAccount == idAccount).ToList() ?? new List<KumiAccountAddressInfix>();
+                var address = JoinAddresses(addressList.Select(r => r.Address).ToList());
                 var tenant = tenants.FirstOrDefault(r => r.IdAccount == idAccount);
                 var ob = new InvoiceGeneratorParam
                 {
                     IdAccount = idAccount,
-                    Address = address?.Address,
+                    Address = address,
                     Account = account.Account,
                     Tenant = string.IsNullOrEmpty(account.Owner) ? tenant?.Tenant : account.Owner,
                     OnDate = onDate,
@@ -139,8 +145,8 @@ namespace RegistryWeb.DataServices
                     RecalcPenalty = (charge?.RecalcPenalty + charge?.CorrectionPenalty).ToString().Replace(',', '.'),
                     BalanceOutput = (charge?.OutputTenancy + charge?.OutputPenalty + charge?.OutputDgi + charge?.OutputPkk + charge?.OutputPadun)
                         .ToString().Replace(',', '.'),
-                    TotalArea = address?.TotalArea.ToString().Replace(',', '.'),
-                    Prescribed = tenant?.Prescribed ?? 0,
+                    TotalArea = addressList.Sum(r => r.TotalArea).ToString().Replace(',', '.'),
+                    Prescribed = ((bksAccount != null && bksAccount.Prescribed != null && bksAccount.Prescribed != 0) ? bksAccount.Prescribed :  tenant?.Prescribed) ?? 0,
                     Emails = string.IsNullOrEmpty(tenant?.Emails) ? new List<string>() : tenant.Emails.Split(",").ToList(),
                     TextMessage = textmessage
                 };
@@ -150,64 +156,70 @@ namespace RegistryWeb.DataServices
             return result.OrderBy(r => r.Address).ThenBy(r => r.Account).ToList();
         }
 
-        public InvoiceGeneratorParam GetInvoiceGeneratorParam(int idAccount, DateTime onDate, string textmessage)
+        private string JoinAddresses(List<string> addressList)
         {
-            var paymentDate = new DateTime(onDate.Year, onDate.Month, 1);
-            paymentDate = paymentDate.AddMonths(1).AddDays(-1);
-            var payKumi = registryContext.KumiCharges
-                .Where(kc => kc.IdAccount == idAccount && kc.EndDate == paymentDate)
-                .Include(c => c.Account)
-                .FirstOrDefault();
+            if (addressList.Count == 0) return "";
+            if (addressList.Count == 1) return addressList.First();
 
-            if (payKumi != null)
+            var address = "";
+            var addressPartsList = addressList.Select(r => r.Split(", ", 5)).ToList();
+            var groupedByRegion = addressPartsList.GroupBy(r => r[0]);
+            foreach(var groupRegion in groupedByRegion)
             {
-                var infoForReport = GetInfoForReport(payKumi.IdAccount);
+                if (groupRegion.All(r => r.Count() > 1))
+                {
+                    var groupedByStreet = groupRegion.GroupBy(r => r[1]);
+                    
+                    foreach (var groupStreet in groupedByStreet)
+                    {
+                        if (groupStreet.All(r => r.Count() > 2))
+                        {
+                            var groupedByHouse = groupStreet.GroupBy(r => r[2]);
+                            foreach (var groupHouse in groupedByHouse)
+                            {
+                                if (groupHouse.All(r => r.Count() > 3))
+                                {
+                                    var groupedByPremise = groupHouse.GroupBy(r => r[3]);
+                                    foreach(var groupPremise in groupedByPremise)
+                                    {
+                                        if (!string.IsNullOrWhiteSpace(address))
+                                        {
+                                            address += ", ";
+                                        }
+                                        address += groupRegion.Key + ", " + groupStreet.Key + ", " + groupHouse.Key + ", " + 
+                                            groupPremise.Key + groupPremise.Aggregate("", (acc, v) => acc + (v.Length == 5 ? ", " + v[4] : ""));
+                                    }
+                                } else
+                                {
+                                    if (!string.IsNullOrWhiteSpace(address))
+                                    {
+                                        address += ", ";
+                                    }
+                                    address += groupRegion.Key + ", " + groupStreet.Key + ", " + groupHouse.Key;
+                                }
+                            }
 
-                var ob = new InvoiceGeneratorParam
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrWhiteSpace(address))
+                            {
+                                address += ", ";
+                            }
+                            address += groupRegion.Key + ", " + groupStreet.Key;
+                        }
+                    }
+                }
+                else
                 {
-                    IdAccount = payKumi.IdAccount,
-                    Address = infoForReport.Where(c => c.Key.Contains("address")).Select(c => c.Value).FirstOrDefault().ToString(),
-                    Account = payKumi.Account.Account,
-                    Tenant = infoForReport.Where(c => c.Key.Contains("tenant")).Select(c => c.Value).FirstOrDefault().ToString(),
-                    OnDate = onDate,
-                    BalanceInput = (payKumi.InputTenancy + payKumi.InputPenalty).ToString().Replace(',', '.'),
-                    ChargingTenancy = payKumi.ChargeTenancy.ToString().Replace(',', '.'),
-                    ChargingPenalty = payKumi.ChargePenalty.ToString().Replace(',', '.'),
-                    Payed = (payKumi.PaymentTenancy+payKumi.PaymentPenalty).ToString().Replace(',', '.'),
-                    RecalcTenancy = (payKumi.RecalcTenancy+payKumi.CorrectionTenancy).ToString().Replace(',', '.'),
-                    RecalcPenalty = (payKumi.RecalcPenalty+payKumi.CorrectionPenalty).ToString().Replace(',', '.'),
-                    BalanceOutput = (payKumi.OutputTenancy + payKumi.OutputPenalty).ToString().Replace(',', '.'),
-                    TotalArea = infoForReport.Where(c => c.Key.Contains("totalArea")).Select(c => c.Value).FirstOrDefault().ToString().Replace(',', '.'),
-                    Prescribed = (int)infoForReport.Where(c => c.Key.Contains("prescribed")).Select(c => c.Value).FirstOrDefault(),
-                    Emails = (List<string>)infoForReport.Where(c => c.Key.Contains("emails")).Select(c => c.Value).FirstOrDefault(),
-                    TextMessage = textmessage
-                };
-                return ob;
+                    if (!string.IsNullOrWhiteSpace(address))
+                    {
+                        address += ", ";
+                    }
+                    address += groupRegion.Key;
+                }
             }
-            else
-            {
-                var ac = registryContext.KumiAccounts
-                        .FirstOrDefault(a => a.IdAccount == idAccount).Account;
-                return new InvoiceGeneratorParam
-                {
-                    IdAccount = idAccount,
-                    Address = "",
-                    Account = ac ?? "",
-                    Tenant = null,
-                    OnDate = onDate,
-                    BalanceInput = "",
-                    ChargingTenancy = "",
-                    ChargingPenalty = "",
-                    Payed = "",
-                    RecalcTenancy = "",
-                    RecalcPenalty = "",
-                    BalanceOutput = "",
-                    TotalArea = "",
-                    Prescribed = 0,
-                    Emails = new List<string>(),
-                    TextMessage = ""
-                };
-            }
+            return address;
         }
 
         public LogInvoiceGenerator InvoiceGeneratorParamToLog(InvoiceGeneratorParam param, int errorCode)
