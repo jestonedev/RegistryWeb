@@ -200,6 +200,12 @@ namespace RegistryWeb.DataServices
             return new List<ClaimPerson>();
         }
 
+        public string GetAccountAddress(int idAccount)
+        {
+            var infixes = registryContext.GetAddressByAccountIds(new List<int> { idAccount }).Select(r => r.Address).ToList();
+            return infixes.FirstOrDefault() ?? "";
+        }
+
         public List<ClaimPerson> GetClaimPersonsFromTenancy(int? idAccountBks, int? idAccountKumi)
         {
             var tenancyPersons = new List<TenancyPerson>();

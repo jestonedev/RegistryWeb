@@ -451,4 +451,32 @@
         }
         $(this).val(val);
     });
+
+    $(".rr-tenancy-type-selectors input[name='ChargesSelector']").removeAttr("disabled");
+
+    $(".rr-tenancy-type-selectors .btn").on('click', function () {
+        var id = $(this).find("input").attr("id");
+        $("#Charges td.rr-charge-total, #Charges th.rr-charge-total," +
+            "#Charges td.rr-charge-tenancy, #Charges th.rr-charge-tenancy," +
+            "#Charges td.rr-charge-dgi, #Charges th.rr-charge-dgi," +
+            "#Charges td.rr-charge-padun, #Charges th.rr-charge-padun," +
+            "#Charges td.rr-charge-pkk, #Charges th.rr-charge-pkk").addClass("d-none");
+        switch (id) {
+            case "AllChargesSelector":
+                $("#Charges td.rr-charge-total, #Charges th.rr-charge-total").removeClass("d-none");
+                break;
+            case "TenancySelector":
+                $("#Charges td.rr-charge-tenancy, #Charges th.rr-charge-tenancy").removeClass("d-none");
+                break;
+            case "DgiSelector":
+                $("#Charges td.rr-charge-dgi, #Charges th.rr-charge-dgi").removeClass("d-none");
+                break;
+            case "PkkSelector":
+                $("#Charges td.rr-charge-pkk, #Charges th.rr-charge-pkk").removeClass("d-none");
+                break;
+            case "PadunSelector":
+                $("#Charges td.rr-charge-padun, #Charges th.rr-charge-padun").removeClass("d-none");
+                break;
+        }
+    });
 });

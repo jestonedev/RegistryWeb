@@ -102,10 +102,19 @@ namespace RegistryWeb.DataServices
         {
             var accRecalcTenancy = 0m;
             var accRecalcPenalty = 0m;
+            var accRecalcDgi = 0m;
+            var accRecalcPkk = 0m;
+            var accRecalcPadun = 0m;
             var accCorrectionTenancy = 0m;
             var accCorrectionPenalty = 0m;
+            var accCorrectionDgi = 0m;
+            var accCorrectionPkk = 0m;
+            var accCorrectionPadun = 0m;
             var accPaymentTenancy = 0m;
             var accPaymentPenalty = 0m;
+            var accPaymentDgi = 0m;
+            var accPaymentPkk = 0m;
+            var accPaymentPadun = 0m;
             foreach (var dbCharge in dbChargingInfo)
             {
                 if (dbCharge.IsBksCharge == 1) continue;
@@ -123,6 +132,9 @@ namespace RegistryWeb.DataServices
                 {
                     accRecalcPenalty -= dbCharge.OutputPenalty - dbCharge.InputPenalty;
                     accRecalcTenancy -= dbCharge.OutputTenancy - dbCharge.InputTenancy;
+                    accRecalcDgi -= dbCharge.OutputDgi - dbCharge.InputDgi;
+                    accRecalcPkk -= dbCharge.OutputPkk - dbCharge.InputPkk;
+                    accRecalcPadun -= dbCharge.OutputPadun - dbCharge.InputPadun;
                 }
             }
             
@@ -144,8 +156,11 @@ namespace RegistryWeb.DataServices
                 // Если в БД нет соответствующего начисления, но это начисление не является последним в БД, то добавляем сумму в перерасчет
                 if (dbCharge == null && dbNextCharge != null && startRewriteDate != charge.StartDate)
                 {
-                    accRecalcPenalty += charge.OutputPenalty - charge.InputPenalty;
                     accRecalcTenancy += charge.OutputTenancy - charge.InputTenancy;
+                    accRecalcPenalty += charge.OutputPenalty - charge.InputPenalty;
+                    accRecalcDgi += charge.OutputDgi - charge.InputDgi;
+                    accRecalcPkk += charge.OutputPkk - charge.InputPkk;
+                    accRecalcPadun += charge.OutputPadun - charge.InputPadun;
                 }
                 else
                 // Признак Hidden присваивается заблокированным периодам, по которым производилась привязка платежей без начислений
@@ -154,6 +169,9 @@ namespace RegistryWeb.DataServices
                 {
                     accPaymentTenancy += charge.PaymentTenancy;
                     accPaymentPenalty += charge.PaymentPenalty;
+                    accPaymentDgi += charge.PaymentDgi;
+                    accPaymentPkk += charge.PaymentPkk;
+                    accPaymentPadun += charge.PaymentPadun;
                 }
                 else
                 // Если в БД есть начисление, но в расчете есть начисления после него, то аккумулируем разницу платежей, перерасчета и корректировок
@@ -164,10 +182,21 @@ namespace RegistryWeb.DataServices
                     {
                         accRecalcTenancy += charge.ChargeTenancy - dbCharge.ChargeTenancy;
                         accRecalcPenalty += charge.ChargePenalty - dbCharge.ChargePenalty;
+                        accRecalcDgi += charge.ChargeDgi - dbCharge.ChargeDgi;
+                        accRecalcPkk += charge.ChargePkk - dbCharge.ChargePkk;
+                        accRecalcPadun += charge.ChargePadun - dbCharge.ChargePadun;
+
                         accCorrectionTenancy += charge.CorrectionTenancy - dbCharge.CorrectionTenancy;
                         accCorrectionPenalty += charge.CorrectionPenalty - dbCharge.CorrectionPenalty;
+                        accCorrectionDgi += charge.CorrectionDgi - dbCharge.CorrectionDgi;
+                        accCorrectionPkk += charge.CorrectionPkk - dbCharge.CorrectionPkk;
+                        accCorrectionPadun += charge.CorrectionPadun - dbCharge.CorrectionPadun;
+
                         accPaymentTenancy += charge.PaymentTenancy - dbCharge.PaymentTenancy;
                         accPaymentPenalty += charge.PaymentPenalty - dbCharge.PaymentPenalty;
+                        accPaymentDgi += charge.PaymentDgi - dbCharge.PaymentDgi;
+                        accPaymentPkk += charge.PaymentPkk - dbCharge.PaymentPkk;
+                        accPaymentPadun += charge.PaymentPadun - dbCharge.PaymentPadun;
 
                         // Для начислений не от БКС от общей суммы перерасчета необходимо отнять те перерасчеты, что уже учтены в предыдущих начислениях. 
                         // Для начислений БКС перерасчет переносится 1 к 1
@@ -175,6 +204,9 @@ namespace RegistryWeb.DataServices
                         {
                             accRecalcTenancy -= dbCharge.RecalcTenancy;
                             accRecalcPenalty -= dbCharge.RecalcPenalty;
+                            accRecalcDgi -= dbCharge.RecalcDgi;
+                            accRecalcPkk -= dbCharge.RecalcPkk;
+                            accRecalcPadun -= dbCharge.RecalcPadun;
                         }
                     }
                 }
@@ -182,20 +214,25 @@ namespace RegistryWeb.DataServices
 
             recalcInsertIntoCharge.RecalcTenancy = accRecalcTenancy;
             recalcInsertIntoCharge.RecalcPenalty = accRecalcPenalty;
+            recalcInsertIntoCharge.RecalcDgi = accRecalcDgi;
+            recalcInsertIntoCharge.RecalcPkk = accRecalcPkk;
+            recalcInsertIntoCharge.RecalcPadun = accRecalcPadun;
+
             recalcInsertIntoCharge.CorrectionTenancy += accCorrectionTenancy;
             recalcInsertIntoCharge.CorrectionPenalty += accCorrectionPenalty;
+            recalcInsertIntoCharge.CorrectionDgi += accCorrectionDgi;
+            recalcInsertIntoCharge.CorrectionPkk += accCorrectionPkk;
+            recalcInsertIntoCharge.CorrectionPadun += accCorrectionPadun;
+
             recalcInsertIntoCharge.PaymentTenancy += accPaymentTenancy;
             recalcInsertIntoCharge.PaymentPenalty += accPaymentPenalty;
+            recalcInsertIntoCharge.PaymentDgi += accPaymentDgi;
+            recalcInsertIntoCharge.PaymentPkk += accPaymentPkk;
+            recalcInsertIntoCharge.PaymentPadun += accPaymentPadun;
         }
 
         public DateTime CorrectStartRewriteDate(DateTime startRewriteDate, DateTime startDate, List<KumiCharge> dbChargingInfo)
         {
-            /*if (dbChargingInfo.Where(r => r.Hidden == 0).Any())
-            {
-                var lastChargeEndDate = dbChargingInfo.Where(r => r.Hidden == 0).OrderBy(r => r.EndDate).Last().EndDate;
-                var maxStartRewriteDate = lastChargeEndDate.AddDays(1);
-                if (maxStartRewriteDate < startRewriteDate) startRewriteDate = maxStartRewriteDate;
-            }*/
             if (dbChargingInfo.Any(r => r.IsBksCharge == 1))
             {
                 var minStartRewriteDate = dbChargingInfo.Where(r => r.IsBksCharge == 1).OrderBy(r => r.EndDate).Last().EndDate.AddDays(1);
@@ -205,14 +242,23 @@ namespace RegistryWeb.DataServices
         }
 
         public void AddChargeCorrection(int idAccount, decimal tenancyValue, decimal penaltyValue,
-            decimal paymentTenancyValue, decimal paymentPenaltyValue, DateTime atDate, string description)
+            decimal dgiValue, decimal pkkValue, decimal padunValue,
+            decimal paymentTenancyValue, decimal paymentPenaltyValue, 
+            decimal paymentDgiValue, decimal paymentPkkValue, decimal paymentPadunValue,
+            DateTime atDate, string description)
         {
             registryContext.KumiChargeCorrections.Add(new KumiChargeCorrection {
                 IdAccount = idAccount,
                 TenancyValue = tenancyValue,
                 PenaltyValue = penaltyValue,
+                DgiValue = dgiValue,
+                PkkValue = pkkValue,
+                PadunValue = padunValue,
                 PaymentTenancyValue = paymentTenancyValue,
                 PaymentPenaltyValue = paymentPenaltyValue,
+                PaymentDgiValue = paymentDgiValue,
+                PaymentPkkValue = paymentPkkValue,
+                PaymentPadunValue = paymentPadunValue,
                 Date = atDate,
                 Description = description
             });
@@ -620,6 +666,9 @@ namespace RegistryWeb.DataServices
 
             var currentTenancy = 0m;
             var currentPenalty = 0m;
+            var currentDgi = 0m;
+            var currentPkk = 0m;
+            var currentPadun = 0m;
             DateTime? lastChargingDate = null;
             var sortedChargingInfo = chargingInfo.OrderBy(r => r.EndDate).ToList();
 
@@ -647,11 +696,17 @@ namespace RegistryWeb.DataServices
                     if (prevCharge == null)
                     {
                         charge.InputTenancy = firstDbRewriteCharge?.InputTenancy ?? charge.InputTenancy;
-                        charge.InputPenalty = firstDbRewriteCharge?.InputPenalty ?? charge.InputTenancy;
+                        charge.InputPenalty = firstDbRewriteCharge?.InputPenalty ?? charge.InputPenalty;
+                        charge.InputDgi = firstDbRewriteCharge?.InputDgi ?? charge.InputDgi;
+                        charge.InputPkk = firstDbRewriteCharge?.InputPkk ?? charge.InputPkk;
+                        charge.InputPadun = firstDbRewriteCharge?.InputPadun ?? charge.InputPadun;
                     } else
                     {
                         charge.InputTenancy = prevCharge.OutputTenancy;
                         charge.InputPenalty = prevCharge.OutputPenalty;
+                        charge.InputDgi = prevCharge.OutputDgi;
+                        charge.InputPkk = prevCharge.OutputPkk;
+                        charge.InputPadun = prevCharge.OutputPadun;
                     }
                 } else
                 if (prevCharge != null)
@@ -660,19 +715,31 @@ namespace RegistryWeb.DataServices
                     {
                         charge.InputTenancy = lastDbLockedCharge.OutputTenancy;
                         charge.InputPenalty = lastDbLockedCharge.OutputPenalty;
+                        charge.InputDgi = lastDbLockedCharge.OutputDgi;
+                        charge.InputPkk = lastDbLockedCharge.OutputPkk;
+                        charge.InputPadun = lastDbLockedCharge.OutputPadun;
                         lastDbLockedCharge = null;
                     } else
                     {
                         charge.InputTenancy = prevCharge.OutputTenancy;
                         charge.InputPenalty = prevCharge.OutputPenalty;
+                        charge.InputDgi = prevCharge.OutputDgi;
+                        charge.InputPkk = prevCharge.OutputPkk;
+                        charge.InputPadun = prevCharge.OutputPadun;
                     }
                 }
 
                 charge.OutputTenancy = charge.InputTenancy + charge.ChargeTenancy - charge.PaymentTenancy + charge.RecalcTenancy + charge.CorrectionTenancy;
                 charge.OutputPenalty = charge.InputPenalty + charge.ChargePenalty - charge.PaymentPenalty + charge.RecalcPenalty + charge.CorrectionPenalty;
+                charge.OutputDgi = charge.InputDgi + charge.ChargeDgi - charge.PaymentDgi + charge.CorrectionDgi;
+                charge.OutputPkk = charge.InputPkk + charge.ChargePkk - charge.PaymentPkk + charge.CorrectionPkk;
+                charge.OutputPadun = charge.InputPadun + charge.ChargePadun - charge.PaymentPadun + charge.CorrectionPadun;
 
-                var notAddCharge = nextCharge == null && charge.PaymentTenancy == 0 && charge.PaymentPenalty == 0 && charge.ChargeTenancy == 0 &&
-                            charge.ChargePenalty == 0 && charge.RecalcTenancy == 0 && charge.RecalcPenalty == 0 && charge.CorrectionTenancy == 0 && charge.CorrectionPenalty == 0;
+                var notAddCharge = nextCharge == null && 
+                    charge.PaymentTenancy == 0 && charge.PaymentPenalty == 0 && charge.PaymentDgi == 0 && charge.PaymentPkk == 0 && charge.PaymentPadun == 0 &&
+                    charge.ChargeTenancy == 0 && charge.ChargePenalty == 0 && charge.ChargeDgi == 0 && charge.ChargePkk == 0 && charge.ChargePadun == 0 &&
+                    charge.RecalcTenancy == 0 && charge.RecalcPenalty == 0 && charge.RecalcDgi == 0 && charge.RecalcPkk == 0 && charge.RecalcPadun == 0 &&
+                    charge.CorrectionTenancy == 0 && charge.CorrectionPenalty == 0 && charge.CorrectionDgi == 0 && charge.CorrectionPkk == 0 && charge.CorrectionPadun == 0;
 
                 if (dbCharge == null)
                 {
@@ -698,12 +765,19 @@ namespace RegistryWeb.DataServices
                 {
                     currentTenancy = charge.OutputTenancy;
                     currentPenalty = charge.OutputPenalty;
-                    lastChargingDate = chargingInfo.Where(r => r.ChargePenalty != 0 || r.ChargeTenancy != 0).OrderByDescending(r => r.EndDate).FirstOrDefault()?.EndDate;
+                    currentDgi = charge.OutputDgi;
+                    currentPkk = charge.OutputPkk;
+                    currentPadun = charge.OutputPadun;
+                    lastChargingDate = chargingInfo.Where(r => r.ChargePenalty != 0 || r.ChargeTenancy != 0 || r.ChargeDgi != 0 || r.ChargePkk != 0 || r.ChargePadun != 0)
+                        .OrderByDescending(r => r.EndDate).FirstOrDefault()?.EndDate;
                 }
             }
             var accountDb = registryContext.KumiAccounts.FirstOrDefault(r => r.IdAccount == account.IdAccount);
             accountDb.CurrentBalanceTenancy = currentTenancy;
             accountDb.CurrentBalancePenalty = currentPenalty;
+            accountDb.CurrentBalanceDgi = currentDgi;
+            accountDb.CurrentBalancePkk = currentPkk;
+            accountDb.CurrentBalancePadun = currentPadun;
             accountDb.LastChargeDate = lastChargingDate;
             if (calcDate != null)
                 accountDb.LastCalcDate = calcDate;
@@ -737,7 +811,6 @@ namespace RegistryWeb.DataServices
                     {
                         paymentCharge.IdDisplayCharge = paymentCharge.IdCharge;
                     }
-
                 }
             }
             var paymentIds = claims.SelectMany(r => r.PaymentClaims).Select(r => r.IdPayment).Distinct();
@@ -779,9 +852,9 @@ namespace RegistryWeb.DataServices
                     IdAccountKumi = account.IdAccount,
                     AmountTenancy = account.CurrentBalanceTenancy,
                     AmountPenalties = account.CurrentBalancePenalty,
-                    AmountDgi = 0,
-                    AmountPadun = 0,
-                    AmountPkk = 0,
+                    AmountDgi = account.CurrentBalanceDgi,
+                    AmountPadun = account.CurrentBalancePadun,
+                    AmountPkk = account.CurrentBalancePkk,
                     ClaimStates = new List<ClaimState> {
                         new ClaimState {
                             IdStateType = registryContext.ClaimStateTypes.Where(r => r.IsStartStateType).First().IdStateType,
@@ -856,6 +929,9 @@ namespace RegistryWeb.DataServices
             // Входящее сальдо
             var inputBalanceTenancy = account.CurrentBalanceTenancy;
             var inputBalancePenalty = account.CurrentBalancePenalty;
+            var inputBalanceDgi = account.CurrentBalanceDgi;
+            var inputBalancePkk = account.CurrentBalancePkk;
+            var inputBalancePadun = account.CurrentBalancePadun;
 
             KumiCharge prevCharge = null;
             if (prevCharges.Any())
@@ -865,6 +941,9 @@ namespace RegistryWeb.DataServices
             {
                 inputBalanceTenancy = prevCharge.OutputTenancy;
                 inputBalancePenalty = prevCharge.OutputPenalty;
+                inputBalanceDgi = prevCharge.OutputDgi;
+                inputBalancePkk = prevCharge.OutputPkk;
+                inputBalancePadun = prevCharge.OutputPadun;
             } else
             {
                 var dbCharge = registryContext.KumiCharges.AsNoTracking()
@@ -873,15 +952,24 @@ namespace RegistryWeb.DataServices
                 {
                     inputBalanceTenancy = dbCharge.InputTenancy;
                     inputBalancePenalty = dbCharge.InputPenalty;
+                    inputBalanceDgi = dbCharge.InputDgi;
+                    inputBalancePkk = dbCharge.InputPkk;
+                    inputBalancePadun = dbCharge.InputPadun;
                 }
             }
 
             // Перенос перерасчетов из БД и начислений
             var recalcTenancy = 0m;
             var recalcPenalty = 0m;
+            var recalcDgi = 0m;
+            var recalcPkk = 0m;
+            var recalcPadun = 0m;
 
             var chargeTenancy = 0m;
             var chargePenalty = 0m;
+            var chargeDgi = 0m;
+            var chargePkk = 0m;
+            var chargePadun = 0m;
 
             KumiCharge currentSavedCharge = account.Charges.FirstOrDefault(r => r.StartDate == startDate && r.EndDate == endDate);
             if (currentSavedCharge != null)
@@ -890,6 +978,9 @@ namespace RegistryWeb.DataServices
                 if (startRewriteDate > currentSavedCharge.StartDate) {
                     recalcTenancy = currentSavedCharge.RecalcTenancy;
                     recalcPenalty = currentSavedCharge.RecalcPenalty;
+                    recalcDgi = currentSavedCharge.RecalcDgi;
+                    recalcPkk = currentSavedCharge.RecalcPkk;
+                    recalcPadun = currentSavedCharge.RecalcPadun;
                 }
 
                 // Если лицевой счет не находится в статусе "Действующий", то переносим начисления, которые были сохранены в БД
@@ -898,15 +989,25 @@ namespace RegistryWeb.DataServices
                 {
                     chargeTenancy = currentSavedCharge.ChargeTenancy;
                     chargePenalty = currentSavedCharge.ChargePenalty;
+                    chargeDgi = currentSavedCharge.ChargeDgi;
+                    chargePkk = currentSavedCharge.ChargePkk;
+                    chargePadun = currentSavedCharge.ChargePadun;
                 }
             }
 
             var correctionTenancy = 0m;
             var correctionPenalty = 0m;
+            var correctionDgi = 0m;
+            var correctionPkk = 0m;
+            var correctionPadun = 0m;
+
             // Если есть корректировки, учитываем их
             var corrections = account.Corrections.Where(r => r.Date >= startDate && r.Date <= endDate);
             correctionTenancy = corrections.Select(r => r.TenancyValue).Sum();
             correctionPenalty = corrections.Select(r => r.PenaltyValue).Sum();
+            correctionDgi = corrections.Select(r => r.DgiValue).Sum();
+            correctionPkk = corrections.Select(r => r.PkkValue).Sum();
+            correctionPadun = corrections.Select(r => r.PadunValue).Sum();
 
             // Если лицевой счет в статусе "Действующий", то перерасчитываем начисления
             // Не начисляем за будущие периоды
@@ -941,11 +1042,26 @@ namespace RegistryWeb.DataServices
             var paymentTenancy = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.TenancyValue))
                 + payments.Where(r => r.PaymentClaims.Any()).Sum(r => r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Select(pc => pc.TenancyValue).Sum());
 
+            var paymentDgi = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.DgiValue))
+               + payments.Where(r => r.PaymentClaims.Any()).Sum(r => r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Select(pc => pc.DgiValue).Sum());
+
+            var paymentPkk = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.PkkValue))
+                + payments.Where(r => r.PaymentClaims.Any()).Sum(r => r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Select(pc => pc.PkkValue).Sum());
+
+            var paymentPadun = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.PadunValue))
+                + payments.Where(r => r.PaymentClaims.Any()).Sum(r => r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Select(pc => pc.PadunValue).Sum());
+
             paymentTenancy += corrections.Select(r => r.PaymentTenancyValue).Sum();
             paymentPenalty += corrections.Select(r => r.PaymentPenaltyValue).Sum();
+            paymentDgi += corrections.Select(r => r.PaymentDgiValue).Sum();
+            paymentPkk += corrections.Select(r => r.PaymentPkkValue).Sum();
+            paymentPadun += corrections.Select(r => r.PaymentPadunValue).Sum();
 
-            if (chargeTenancy != 0 || chargePenalty != 0 || recalcTenancy != 0 || recalcPenalty != 0 || paymentPenalty != 0 || paymentTenancy != 0 ||
-                correctionTenancy != 0 || correctionPenalty != 0 || startDate == DateTime.Now.Date.AddDays(-DateTime.Now.Date.Day+1) || corrections.Any())
+            if (chargeTenancy != 0 || chargePenalty != 0 || chargeDgi != 0 || chargePkk != 0 || chargePadun != 0 ||
+                recalcTenancy != 0 || recalcPenalty != 0 || recalcDgi != 0 || recalcPkk != 0 || recalcPadun != 0 ||
+                paymentTenancy != 0 || paymentPenalty != 0 || paymentDgi != 0 || paymentPkk != 0 || paymentPadun != 0 ||
+                correctionTenancy != 0 || correctionPenalty != 0 || correctionDgi != 0 || correctionPkk != 0 || correctionPadun != 0 ||
+                startDate == DateTime.Now.Date.AddDays(-DateTime.Now.Date.Day+1) || corrections.Any())
                 outOfBound = false;
             else
                 outOfBound = true;
@@ -956,16 +1072,34 @@ namespace RegistryWeb.DataServices
                 IdAccount = account.IdAccount,
                 InputTenancy = inputBalanceTenancy,
                 InputPenalty = inputBalancePenalty,
+                InputDgi = inputBalanceDgi,
+                InputPkk = inputBalancePkk,
+                InputPadun = inputBalancePadun,
                 ChargeTenancy = chargeTenancy,
                 ChargePenalty = chargePenalty,
+                ChargeDgi = chargeDgi,
+                ChargePkk = chargePkk,
+                ChargePadun = chargePadun,
                 RecalcTenancy = recalcTenancy,
                 RecalcPenalty = recalcPenalty,
+                RecalcDgi = recalcDgi,
+                RecalcPkk = recalcPkk,
+                RecalcPadun = recalcPadun,
                 CorrectionTenancy = correctionTenancy,
                 CorrectionPenalty = correctionPenalty,
+                CorrectionDgi = correctionDgi,
+                CorrectionPkk = correctionPkk,
+                CorrectionPadun = correctionPadun,
                 PaymentTenancy = paymentTenancy,
                 PaymentPenalty = paymentPenalty,
+                PaymentDgi = paymentDgi,
+                PaymentPkk = paymentPkk,
+                PaymentPadun = paymentPadun,
                 OutputTenancy = inputBalanceTenancy + chargeTenancy + recalcTenancy + correctionTenancy - paymentTenancy,
                 OutputPenalty = inputBalancePenalty + chargePenalty + recalcPenalty + correctionPenalty - paymentPenalty,
+                OutputDgi = inputBalanceDgi + chargeDgi + correctionDgi - paymentDgi,
+                OutputPkk = inputBalancePkk + chargePkk + correctionPkk - paymentPkk,
+                OutputPadun = inputBalancePadun + chargePadun + correctionPadun - paymentPadun,
                 IsBksCharge = currentSavedCharge == null ? (byte)0 : currentSavedCharge.IsBksCharge
             };
         }
@@ -1269,7 +1403,6 @@ namespace RegistryWeb.DataServices
                 var chargesIds = account.Charges.Select(r => r.IdCharge).ToList();
                 var claimsIds = account.Claims.Select(r => r.IdClaim).ToList();
 
-                // Берем только платежи после даты последнего начисления БКС
                 accountInfo.Payments = registryContext.KumiPayments.Include(p => p.PaymentCharges)
                     .Where(p => p.PaymentCharges.Any(r => chargesIds.Contains(r.IdCharge))).ToList()
                     .Union(
@@ -1278,12 +1411,14 @@ namespace RegistryWeb.DataServices
                     .ToList();
 
                 // Платежи по начислениям БКС (замороженные строки без фактических платежей)
-                var bksPayments = registryContext.KumiCharges.Where(r => r.IdAccount == account.IdAccount && r.IsBksCharge == 1 && r.PaymentTenancy + r.PaymentPenalty > 0)
+                var bksPayments = registryContext.KumiCharges
+                    .Where(r => r.IdAccount == account.IdAccount && r.IsBksCharge == 1 && 
+                        (r.PaymentTenancy != 0 || r.PaymentPenalty != 0 || r.PaymentDgi != 0 || r.PaymentPkk != 0 || r.PaymentPadun != 0))
                     .Select(r => new KumiPayment {
                         DateIn = r.StartDate,
                         DateExecute = r.StartDate,
                         DateDocument = r.StartDate,
-                        Sum = r.PaymentTenancy+r.PaymentPenalty,
+                        Sum = r.PaymentTenancy+r.PaymentPenalty+r.PaymentDgi+r.PaymentPkk+r.PaymentPadun,
                         PaymentCharges = new List<KumiPaymentCharge> {
                             new KumiPaymentCharge {
                                 Date = r.StartDate,
@@ -1297,6 +1432,24 @@ namespace RegistryWeb.DataServices
                                 IdCharge = r.IdCharge,
                                 IdDisplayCharge = r.IdCharge,
                             },
+                            new KumiPaymentCharge {
+                                Date = r.StartDate,
+                                DgiValue = r.PaymentDgi,
+                                IdCharge = r.IdCharge,
+                                IdDisplayCharge = r.IdCharge,
+                            },
+                            new KumiPaymentCharge {
+                                Date = r.StartDate,
+                                PkkValue = r.PaymentPkk,
+                                IdCharge = r.IdCharge,
+                                IdDisplayCharge = r.IdCharge,
+                            },
+                            new KumiPaymentCharge {
+                                Date = r.StartDate,
+                                PadunValue = r.PaymentPadun,
+                                IdCharge = r.IdCharge,
+                                IdDisplayCharge = r.IdCharge,
+                            }
                         }
                     });
 
@@ -1327,7 +1480,10 @@ namespace RegistryWeb.DataServices
                     Account = account.Account.Account,
                     LastChargeDate = account.Account.LastChargeDate,
                     CurrentBalanceTenancy = account.Account.CurrentBalanceTenancy ?? 0,
-                    CurrentBalancePenalty = account.Account.CurrentBalancePenalty ?? 0
+                    CurrentBalancePenalty = account.Account.CurrentBalancePenalty ?? 0,
+                    CurrentBalanceDgi = account.Account.CurrentBalanceDgi ?? 0,
+                    CurrentBalancePkk = account.Account.CurrentBalancePkk ?? 0,
+                    CurrentBalancePadun = account.Account.CurrentBalancePadun ?? 0
                 };
                 accountInfo.Payments = account.Payments;
                 accountInfo.Claims = account.Claims;

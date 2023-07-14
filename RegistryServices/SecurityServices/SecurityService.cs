@@ -47,6 +47,7 @@ namespace RegistryWeb.SecurityServices
         private AclUser GetUser()
         {
             var userName = httpContextAccessor?.HttpContext.User.Identity.Name.ToLowerInvariant();
+            if (string.IsNullOrEmpty(userName)) return new AclUser();
             return registryContext.AclUsers
                 .AsNoTracking()
                 .SingleOrDefault(u => u.UserName.ToLowerInvariant() == userName) ?? new AclUser();

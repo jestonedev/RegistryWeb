@@ -99,25 +99,67 @@
         $(tenancyValueElem).val($(tenancyValueElem).val().replace(',', '.'));
         var penaltyValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PenaltyValue");
         $(penaltyValueElem).val($(penaltyValueElem).val().replace(',', '.'));
+        var dgiValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_DgiValue");
+        if (dgiValueElem.length > 0)
+            $(dgiValueElem).val($(dgiValueElem).val().replace(',', '.'));
+        var pkkValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PkkValue");
+        if (pkkValueElem.length > 0)
+            $(pkkValueElem).val($(pkkValueElem).val().replace(',', '.'));
+        var padunValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PadunValue");
+        if (padunValueElem.length > 0)
+            $(padunValueElem).val($(padunValueElem).val().replace(',', '.'));
+
         var paymentTenancyValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PaymentTenancyValue");
-        $(tenancyValueElem).val($(tenancyValueElem).val().replace(',', '.'));
+        $(paymentTenancyValueElem).val($(tenancyValueElem).val().replace(',', '.'));
         var paymentPenaltyValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PaymentPenaltyValue");
-        $(penaltyValueElem).val($(penaltyValueElem).val().replace(',', '.'));
+        $(paymentPenaltyValueElem).val($(penaltyValueElem).val().replace(',', '.'));
+        var paymentDgiValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PaymentDgiValue");
+        if (paymentDgiValueElem.length > 0)
+            $(paymentDgiValueElem).val($(paymentDgiValueElem).val().replace(',', '.'));
+        var paymentPkkValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PaymentPkkValue");
+        if (paymentPkkValueElem.length > 0)
+            $(paymentPkkValueElem).val($(paymentPkkValueElem).val().replace(',', '.'));
+        var paymentPadunValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PaymentPadunValue");
+        if (paymentPadunValueElem.length > 0)
+            $(paymentPadunValueElem).val($(paymentPadunValueElem).val().replace(',', '.'));
 
         if (addChargeCorrectionForm.valid()) {
             $(this).attr("disabled", "disabled").text("Сохранение...");
             var atDate = $("#AccountKumiChargeCorrection_AtDate").val();
             var description = $("#AccountKumiChargeCorrection_Description").val();
-            var tenancyValue = $("#AccountKumiChargeCorrection_TenancyValue").val().replace('.', ',');
-            var penaltyValue = $("#AccountKumiChargeCorrection_PenaltyValue").val().replace('.', ',');
+            var tenancyValue = tenancyValueElem.val().replace('.', ',');
+            var penaltyValue = penaltyValueElem.val().replace('.', ',');
+            var dgiValue = 0;
+            if (dgiValueElem.length > 0)
+                dgiValue = dgiValueElem.val().replace('.', ',');
+            var pkkValue = 0;
+            if (pkkValueElem.length > 0)
+                pkkValue = pkkValueElem.val().replace('.', ',');
+            var padunValue = 0;
+            if (padunValueElem.length > 0)
+                padunValue = padunValueElem.val().replace('.', ',');
+
             var paymentTenancyValue = $("#AccountKumiChargeCorrection_PaymentTenancyValue").val().replace('.', ',');
             var paymentPenaltyValue = $("#AccountKumiChargeCorrection_PaymentPenaltyValue").val().replace('.', ',');
+            
+            var paymentDgiValue = 0;
+            if (paymentDgiValueElem.length > 0)
+                paymentDgiValue = paymentDgiValueElem.val().replace('.', ',');
+            var paymentPkkValue = 0;
+            if (paymentPkkValueElem.length > 0)
+                paymentPkkValue = paymentPkkValueElem.val().replace('.', ',');
+            var paymentPadunValue = 0;
+            if (paymentPadunValueElem.length > 0)
+                paymentPadunValue = paymentPadunValueElem.val().replace('.', ',');
             var idAccount = addChargeCorrectionForm.find("input[name='AccountKumiChargeCorrection.IdAccount']").val();
 
             $.ajax({
                 type: 'POST',
                 url: window.location.origin + '/KumiAccounts/AddChargeCorrection',
-                data: { idAccount, atDate, tenancyValue, penaltyValue, paymentTenancyValue, paymentPenaltyValue, description },
+                data: {
+                    idAccount, atDate, tenancyValue, penaltyValue, dgiValue, pkkValue, padunValue,
+                    paymentTenancyValue, paymentPenaltyValue, paymentDgiValue, paymentPkkValue, paymentPadunValue, description
+                },
                 dataType: 'json',
                 success: function () {
                     recalcAccounts([idAccount], [], 0, null, null);
@@ -200,47 +242,218 @@
     var chargeCurrentMonthElem = $(".rr-charge-current-month-row");
     if (chargeCurrentMonthElem.length === 1) {
         var endDate = chargeCurrentMonthElem.data("chargeEndDate");
-        var cellClasses = [".rr-charge-period-input-tenancy", ".rr-charge-period-input-penalty",
-            ".rr-charge-period-payment-tenancy", ".rr-charge-period-payment-penalty",
-            ".rr-charge-period-tenancy", ".rr-charge-period-penalty",
-            ".rr-charge-period-recalc-tenancy", ".rr-charge-period-recalc-penalty",
-            ".rr-charge-period-output-tenancy", ".rr-charge-period-output-penalty"];
-        var values = [];
-        var updatedValues = [];
+        var cellClasses = [
+            {
+                cssSelector: ".rr-charge-period-input-tenancy",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-input-penalty", 
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-payment-tenancy",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-payment-penalty",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-tenancy",
+                property: "chargeTenancy"
+            },
+            {
+                cssSelector: ".rr-charge-period-penalty",
+                property: "chargePenalty"
+            },
+            {
+                cssSelector: ".rr-charge-period-recalc-tenancy",
+                property: ["recalcTenancy", "correctionTenancy"]
+            },
+            {
+                cssSelector: ".rr-charge-period-recalc-penalty",
+                property: ["recalcPenalty", "correctionPenalty"]
+            },
+            {
+                cssSelector: ".rr-charge-period-output-tenancy",
+                property: function (elem) {
+                    return parseFloat(elem.closest("tr").find(".rr-charge-period-input-tenancy").text().replace(",", ".")) +
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-tenancy").text().replace(",", ".")) - 
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-payment-tenancy").text().replace(",", ".")) +
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-recalc-tenancy").text().replace(",", "."));
+                }
+            },
+            {
+                cssSelector: ".rr-charge-period-output-penalty",
+                property: function (elem) {
+                    return parseFloat(elem.closest("tr").find(".rr-charge-period-input-penalty").text().replace(",", ".")) +
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-penalty").text().replace(",", ".")) -
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-payment-penalty").text().replace(",", ".")) +
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-recalc-penalty").text().replace(",", "."));
+                }
+            },
+            {
+                cssSelector: ".rr-charge-period-input-dgi",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-payment-dgi",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-dgi",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-recalc-dgi",
+                property: ["recalcDgi", "correctionDgi"]
+            },
+            {
+                cssSelector: ".rr-charge-period-output-dgi",
+                property: function (elem) {
+                    return parseFloat(elem.closest("tr").find(".rr-charge-period-input-dgi").text().replace(",", ".")) +
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-dgi").text().replace(",", ".")) -
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-payment-dgi").text().replace(",", ".")) +
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-recalc-dgi").text().replace(",", "."));
+                }
+            },
+            {
+                cssSelector: ".rr-charge-period-input-pkk",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-payment-pkk",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-pkk",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-recalc-pkk",
+                property: ["recalcPkk", "correctionPkk"]
+            },
+            {
+                cssSelector: ".rr-charge-period-output-pkk",
+                property: function (elem) {
+                    return parseFloat(elem.closest("tr").find(".rr-charge-period-input-pkk").text().replace(",", ".")) +
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-pkk").text().replace(",", ".")) -
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-payment-pkk").text().replace(",", ".")) +
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-recalc-pkk").text().replace(",", "."));
+                }
+            },
+            {
+                cssSelector: ".rr-charge-period-input-padun",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-payment-padun",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-padun",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-recalc-padun",
+                property: ["recalcPadun", "correctionPadun"]
+            },
+            {
+                cssSelector: ".rr-charge-period-output-padun",
+                property: function (elem) {
+                    return parseFloat(elem.closest("tr").find(".rr-charge-period-input-padun").text().replace(",", ".")) +
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-padun").text().replace(",", ".")) -
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-payment-padun").text().replace(",", ".")) +
+                        parseFloat(elem.closest("tr").find(".rr-charge-period-recalc-padun").text().replace(",", "."));
+                }
+            },
+            {
+                cssSelector: ".rr-charge-period-input-all",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-input-all-penalty",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-payment-all",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-payment-all-penalty",
+                property: null
+            },
+            {
+                cssSelector: ".rr-charge-period-all",
+                property: ["chargeTenancy", "chargeDgi", "chargePkk", "chargePadun"]
+            },
+            {
+                cssSelector: ".rr-charge-period-all-penalty",
+                property: "chargePenalty"
+            },
+            {
+                cssSelector: ".rr-charge-period-recalc-all",
+                property: ["recalcTenancy", "correctionTenancy", "recalcDgi", "correctionDgi", "recalcPkk", "correctionPkk", "recalcPadun", "correctionPadun"]
+            },
+            {
+                cssSelector: ".rr-charge-period-recalc-all-penalty",
+                property: ["recalcPenalty", "correctionPenalty"]
+            },
+            {
+                cssSelector: ".rr-charge-period-output-all",
+                property: function (elem) {
+                    var dgi = parseFloat(elem.closest("tr").find(".rr-charge-period-output-dgi").text().replace(",", "."));
+                    if (isNaN(dgi)) dgi = 0;
+                    var pkk = parseFloat(elem.closest("tr").find(".rr-charge-period-output-pkk").text().replace(",", "."));
+                    if (isNaN(pkk)) pkk = 0;
+                    var padun = parseFloat(elem.closest("tr").find(".rr-charge-period-output-padun").text().replace(",", "."));
+                    if (isNaN(padun)) padun = 0;
+                    return parseFloat(elem.closest("tr").find(".rr-charge-period-output-tenancy").text().replace(",", ".")) + dgi + pkk + padun;
+                }
+            },
+            {
+                cssSelector: ".rr-charge-period-output-all-penalty",
+                property: function (elem) {
+                    return parseFloat(elem.closest("tr").find(".rr-charge-period-output-penalty").text().replace(",", "."));
+                }
+            }
+        ];
+
         for (var i = 0; i < cellClasses.length; i++) {
-            var elem = chargeCurrentMonthElem.find(cellClasses[i]);
-            values[i] = parseFloat(elem.text().replace(",", "."));
-            updatedValues[i] = values[i];
-            if (i >= 4)
+            var elem = chargeCurrentMonthElem.find(cellClasses[i].cssSelector);
+            cellClasses[i].value = parseFloat(elem.text().replace(",", "."));
+            elem.html("").text(cellClasses[i].value.toFixed(2).replace(".", ","));
+            if (cellClasses[i].property !== null)
                 elem.html("<img width=\"15\" height=\"15\" style=\"margin-top: -2px;\" src=\"/image/spinner.gif\" />");
         }
         $.post("/KumiAccounts/CalcForecastPeriod", { idAccount: $("#IdAccount").val(), calcToDate: endDate }).done(function (resultCharge) {
-            var props = ["chargeTenancy", "chargePenalty", "recalcTenancy", "recalcPenalty"];
             var chargeTotalElem = $(".rr-charge-total-row");
-            for (var i = 0; i < props.length; i++) {
-                var value = resultCharge[props[i]];
-                if (props[i] === "recalcTenancy") value += resultCharge["correctionTenancy"];
-                if (props[i] === "recalcPenalty") value += resultCharge["correctionPenalty"];
-                var elem = chargeCurrentMonthElem.find(cellClasses[i+4]);
-                elem.html("").text(value.toFixed(2).replace(".", ","));
-                elem.css("color", "#ff5400").attr("title", "Значение предварительно расчитано и может измениться по окончании незавершенного периода");
-                updatedValues[i + 4] = value;
-                var totalElem = chargeTotalElem.find(cellClasses[i+4].replace("-period", "-total")+" b");
+            for (var i = 0; i < cellClasses.length; i++) {
+                var elem = chargeCurrentMonthElem.find(cellClasses[i].cssSelector);
+                if (cellClasses[i].property !== null) {
+                    value = 0;
+                    if (Array.isArray(cellClasses[i].property)) {
+                        for (var j = 0; j < cellClasses[i].property.length; j++)
+                            value += resultCharge[cellClasses[i].property[j]];
+                    } else
+                    if ($.isFunction(cellClasses[i].property))
+                        value = cellClasses[i].property(elem);
+                    else
+                        value = resultCharge[cellClasses[i].property];
+                    elem.html("").text(value.toFixed(2).replace(".", ","));
+                    elem.css("color", "#ff5400").attr("title", "Значение предварительно расчитано и может измениться по окончании незавершенного периода");
+                    cellClasses[i].updatedValue = value;
+                }
+
+                var totalElem = chargeTotalElem.find(cellClasses[i].cssSelector.replace("-period", "-total") + " b");
                 if (totalElem.length === 1) {
                     var totalValue = parseFloat(totalElem.text().replace(",", "."));
-                    totalElem.text((Math.round((totalValue + updatedValues[i + 4] - values[i + 4]) * 100) / 100).toFixed(2).replace(".", ","))
+                    totalElem.text((Math.round((totalValue + cellClasses[i].updatedValue - cellClasses[i].value) * 100) / 100).toFixed(2).replace(".", ","))
                         .css("color", "#ff5400")
                         .attr("title", "Значение с учетом незавершенного периода.\r\nБез учета незавершенного периода - " +
                             totalValue.toFixed(2).replace(".", ",") + " руб.");
                 }
-            }
-
-            for (var j = 0; j <= 1; j++) {
-                chargeCurrentMonthElem.find(cellClasses[j+8]).html("")
-                    .text((Math.round((updatedValues[j + 0] - updatedValues[j + 2] + updatedValues[j + 4] + updatedValues[j +6]) * 100) / 100).toFixed(2).replace(".", ","))
-                    .css("color", "#ff5400")
-                    .attr("title", "Значение расчитано с учетом начисления за незавершенный период и может измениться по окончании периода." +
-                        "\r\nБез учета начисления за незавершенный период - " + values[j +8].toFixed(2).replace(".", ",") + " руб.");
             }
         });
     }

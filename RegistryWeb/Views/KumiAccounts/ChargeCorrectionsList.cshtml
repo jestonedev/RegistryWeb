@@ -9,67 +9,131 @@
 @{
     ViewData["Title"] = "Список корректировок по ЛС №" + Model.Account.Account;
     var TotalRows = "Количество записей: " + Model.PageOptions.TotalRows;
+    var hasDgiCorrections = Model.ChargeCorrections.Any(r => r.DgiValue != 0 || r.PaymentDgiValue != 0);
+    var hasPkkCorrections = Model.ChargeCorrections.Any(r => r.PkkValue != 0 || r.PaymentPkkValue != 0);
+    var hasPadunCorrections = Model.ChargeCorrections.Any(r => r.PadunValue != 0 || r.PaymentPadunValue != 0);
+    var additionalCharges = 0;
+    additionalCharges += hasDgiCorrections ? 1 : 0;
+    additionalCharges += hasPkkCorrections ? 1 : 0;
+    additionalCharges += hasPadunCorrections ? 1 : 0;
+    var colSpan = 2 + additionalCharges;
 }
 
 <h2>@ViewData["Title"]</h2>
 <h4>@TotalRows</h4>
 
 
-<table class="table table-hover rr-payments-log-table">
+<table class="table table-hover table-bordered rr-payments-log-table">
     <thead>
         <tr style="align-content: center;">
-            <th rowspan="2" class="r-table-header-cell">
+            <th class="text-center" rowspan="2" class="r-table-header-cell">
                 Дата
             </th>
-            <th colspan="2">Начисление</th>
-            <th colspan="2">Оплата</th>
-            <th rowspan="2" class="r-table-header-cell">
+            <th class="text-center" colspan="@colSpan">Начисление</th>
+            <th class="text-center" colspan="@colSpan">Оплата</th>
+            <th class="text-center" rowspan="2" class="r-table-header-cell">
                 Причина корректировки
             </th>
             <th rowspan="2"></th>
         </tr>
         <tr>
-            <th class="r-table-header-cell">
-                Найм
-            </th>
-            <th class="r-table-header-cell">
-                Пени
-            </th>
-            <th class="r-table-header-cell">
-                Найм
-            </th>
-            <th class="r-table-header-cell">
-                Пени
-            </th>
+            @for (var i = 0; i < 2; i++)
+            {
+                <th class="r-table-header-cell text-center">
+                    Найм
+                </th>
+                <th class="r-table-header-cell text-center">
+                    Пени
+                </th>
+                @if (hasDgiCorrections)
+                {
+                    <th class="r-table-header-cell text-center">
+                        ДГИ
+                    </th>
+                }
+                @if (hasPkkCorrections)
+                {
+                    <th class="r-table-header-cell text-center">
+                        ПКК
+                    </th>
+                }
+                @if (hasPadunCorrections)
+                {
+                    <th class="r-table-header-cell text-center">
+                        Падун
+                    </th>
+                }
+            }
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.ChargeCorrections)
         {
-            <tr>
-                <td>
-                    @item.Date.ToString("dd.MM.yyyy")
-                </td>
+        <tr>
+            <td>
+                @item.Date.ToString("dd.MM.yyyy")
+            </td>
+            <td style="white-space: nowrap;">
+                @item.TenancyValue.ToString("#0.00") руб.
+            </td>
+            <td style="white-space: nowrap;">
+                @item.PenaltyValue.ToString("#0.00") руб.
+            </td>
+            @if (hasDgiCorrections)
+            {
                 <td style="white-space: nowrap;">
-                    @item.TenancyValue.ToString("#0.00") руб.
+                    @item.DgiValue.ToString("#0.00") руб.
                 </td>
+            }
+
+            @if (hasPkkCorrections)
+            {
                 <td style="white-space: nowrap;">
-                    @item.PenaltyValue.ToString("#0.00") руб.
+                    @item.PkkValue.ToString("#0.00") руб.
                 </td>
+            }
+
+            @if (hasPadunCorrections)
+            {
                 <td style="white-space: nowrap;">
-                    @item.PaymentTenancyValue.ToString("#0.00") руб.
+                    @item.PadunValue.ToString("#0.00") руб.
                 </td>
+            }
+            <td style="white-space: nowrap;">
+                @item.PaymentTenancyValue.ToString("#0.00") руб.
+            </td>
+            <td style="white-space: nowrap;">
+                @item.PaymentPenaltyValue.ToString("#0.00") руб.
+            </td>
+            @if (hasDgiCorrections)
+            {
                 <td style="white-space: nowrap;">
-                    @item.PaymentPenaltyValue.ToString("#0.00") руб.
+                    @item.PaymentDgiValue.ToString("#0.00") руб.
                 </td>
-                <td>
-                    @item.Description
+            }
+
+            @if (hasPkkCorrections)
+            {
+                <td style="white-space: nowrap;">
+                    @item.PaymentPkkValue.ToString("#0.00") руб.
                 </td>
-                <td>
-                    <a class="btn btn-danger oi oi-x rr-delete-correction" title="Удалить корректировку" aria-label="Удалить корректировку"
-                       href="#" data-id-correction="@item.IdCorrection"></a>
+            }
+
+            @if (hasPadunCorrections)
+            {
+                <td style="white-space: nowrap;">
+                    @item.PaymentPadunValue.ToString("#0.00") руб.
                 </td>
-            </tr>
+            }
+
+            <td>
+                @item.Description
+            </td>
+            <td>
+                <a class="btn btn-danger oi oi-x rr-delete-correction" title="Удалить корректировку" aria-label="Удалить корректировку"
+                   href="#" data-id-correction="@item.IdCorrection"></a>
+            </td>
+        </tr>
         }
     </tbody>
 </table>

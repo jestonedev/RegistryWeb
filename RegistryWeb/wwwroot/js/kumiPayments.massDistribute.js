@@ -96,6 +96,7 @@
             currentTenancy -= claim.amountTenancyRecovered === null ? 0 : claim.amountTenancyRecovered;
 
             $(paymentRow).data("idClaim", claim.idClaim);
+            $(paymentRow).removeData("idAccount");
             $(paymentRow).data("state", "selected");
         }
         if (result.accounts !== undefined) {
@@ -107,6 +108,7 @@
             currentTenancy = account.currentBalanceTenancy === null ? 0 : account.currentBalanceTenancy;
 
             $(paymentRow).data("idAccount", account.idAccount);
+            $(paymentRow).removeData("idClaim");
             $(paymentRow).data("state", "selected");
         }
 
