@@ -1378,43 +1378,18 @@ namespace RegistryWeb.DataServices
                     {
                         accountInfo.TenancyPaymentHistories.Add(tenancy.TenancyProcess.IdProcess, 
                             tenancy.RentObjects.SelectMany(r => r.TenancyPaymentHistory).ToList());
-                        /*var paymentsHistory = new List<TenancyPaymentHistory>();
-                        foreach(var rentObject in tenancy.RentObjects)
-                        {
-                            if (!int.TryParse(rentObject.Address.Id, out int id)) continue;
-                            switch (rentObject.Address.AddressType)
-                            {
-                                case AddressTypes.Building:
-                                    paymentsHistory.AddRange(registryContext.TenancyPaymentsHistory.Where(r => r.IdBuilding == id
-                                        && r.IdPremises == null));
-                                    break;
-                                case AddressTypes.Premise:
-                                    paymentsHistory.AddRange(registryContext.TenancyPaymentsHistory.Where(r => r.IdPremises == id
-                                        && r.IdSubPremises == null));
-                                    break;
-                                case AddressTypes.SubPremise:
-                                    paymentsHistory.AddRange(registryContext.TenancyPaymentsHistory.Where(r => r.IdSubPremises == id));
-                                    break;
-                            }
-                        }
-                        if (!accountInfo.TenancyPaymentHistories.ContainsKey(tenancy.TenancyProcess.IdProcess))
-                            accountInfo.TenancyPaymentHistories.Add(tenancy.TenancyProcess.IdProcess, paymentsHistory);*/
                     }
                 }
                 var chargesIds = account.Charges.Select(r => r.IdCharge).ToList();
                 var claimsIds = account.Claims.Select(r => r.IdClaim).ToList();
 
-                accountInfo.Payments = (from pRow in registryContext.KumiPayments
-                                        join pcRow in registryContext.KumiPaymentCharges
-                                        on pRow.IdPayment equals pcRow.IdPayment
-                                        where chargesIds.Contains(pcRow.IdCharge)
-                                        select pRow).Union(
-                                        from pRow in registryContext.KumiPayments
-                                        join pcRow in registryContext.KumiPaymentClaims
-                                        on pRow.IdPayment equals pcRow.IdPayment
-                                        where claimsIds.Contains(pcRow.IdClaim)
-                                        select pRow
-                                        ).Distinct().ToList();
+                var paymentIdsByCharges = registryContext.KumiPaymentCharges.Where(r => chargesIds.Contains(r.IdCharge)).Select(r => r.IdPayment).ToList();
+                var paymentIdsByClaims = registryContext.KumiPaymentClaims.Where(r => claimsIds.Contains(r.IdClaim)).Select(r => r.IdPayment).ToList();
+                accountInfo.Payments = registryContext.KumiPayments.Include(p => p.PaymentCharges)
+                    .Where(p => paymentIdsByCharges.Contains(p.IdPayment)).ToList().Union(
+                    registryContext.KumiPayments.Include(p => p.PaymentClaims)
+                    .Where(p => paymentIdsByClaims.Contains(p.IdPayment)).ToList()
+                    ).ToList();
 
                 // Платежи по начислениям БКС (замороженные строки без фактических платежей)
                 var bksPayments = account.Charges.Where(r => r.IsBksCharge == 1 && 

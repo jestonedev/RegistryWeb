@@ -84,7 +84,7 @@ namespace RegistryWeb.DataServices
 
         public IQueryable<Claim> GetClaimsByAccountIdsForPaymentDistribute(List<int> accountIds)
         {
-            var claims = GetQuery();
+            var claims = GetQuery().Include(r => r.ClaimPersons);
             return claims.Where(r => r.IdAccountKumi != null && accountIds.Contains(r.IdAccountKumi.Value));
         }
 

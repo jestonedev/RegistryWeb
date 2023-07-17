@@ -1,32 +1,71 @@
 ﻿@model RegistryDb.Models.Entities.KumiAccounts.KumiPayment;
 
+@{ 
+    var hasDgi = Model.PaymentCharges.GroupBy(r => new { r.Charge.IdAccount, r.Charge.Account.Account }).Any(r => r.Select(c => c.DgiValue).Sum() > 0)
+        || Model.PaymentClaims.GroupBy(r => new { r.Claim.IdClaim, r.Claim.StartDeptPeriod, r.Claim.EndDeptPeriod, r.Claim.IdAccountKumiNavigation.Account })
+        .Any(r => r.Select(c => c.DgiValue).Sum() > 0);
+    var hasPkk = Model.PaymentCharges.GroupBy(r => new { r.Charge.IdAccount, r.Charge.Account.Account }).Any(r => r.Select(c => c.PkkValue).Sum() > 0)
+        || Model.PaymentClaims.GroupBy(r => new { r.Claim.IdClaim, r.Claim.StartDeptPeriod, r.Claim.EndDeptPeriod, r.Claim.IdAccountKumiNavigation.Account })
+        .Any(r => r.Select(c => c.PkkValue).Sum() > 0);
+    var hasPadun = Model.PaymentCharges.GroupBy(r => new { r.Charge.IdAccount, r.Charge.Account.Account }).Any(r => r.Select(c => c.PadunValue).Sum() > 0)
+        || Model.PaymentClaims.GroupBy(r => new { r.Claim.IdClaim, r.Claim.StartDeptPeriod, r.Claim.EndDeptPeriod, r.Claim.IdAccountKumiNavigation.Account })
+        .Any(r => r.Select(c => c.PadunValue).Sum() > 0);
+    var additionalsCols = 0;
+    additionalsCols += hasDgi ? 1 : 0;
+    additionalsCols += hasPkk ? 1 : 0;
+    additionalsCols += hasPadun ? 1 : 0;
+}
 
 <table class="table table-bordered table-striped m-0">
     <thead>
         <tr>
             <th class="rr-distribute-check-td d-none" rowspan="2"></th>
             <th class="text-center p-1" rowspan="2">Назначение (ЛС/ИР)</th>
-            <th class="text-center p-1" colspan="2">Сумма распределена</th>
+            <th class="text-center p-1" colspan="@(2 + additionalsCols)">Сумма распределена</th>
         </tr>
         <tr>
-            <th class="text-center p-1" >На найм</th>
-            <th class="text-center p-1" >На пени</th>
+            <th class="text-center p-1">На найм</th>
+            <th class="text-center p-1">На пени</th>
+            @if (hasDgi)
+            {
+                <th class="text-center p-1">На ДГИ</th>
+            }
+            @if (hasPkk)
+            {
+                <th class="text-center p-1">На ПКК</th>
+            }
+            @if (hasPadun)
+            {
+                <th class="text-center p-1">На Падун</th>
+            }
         </tr>
     </thead>
     <tbody>
         @foreach (var charge in Model.PaymentCharges.GroupBy(r => new { r.Charge.IdAccount, r.Charge.Account.Account }))
         {
-            <tr>
-                <td class="text-center rr-distribute-check-td d-none"><input type="checkbox" name="Distrubution.IdAccount" checked value="@charge.Key.IdAccount" /></td>
-                <td class="text-center p-1">
-                    ЛС @charge.Key.Account
-                    <a class="btn oi oi-eye p-0 text-primary rr-payment-assoc-eye-btn" target="_blank"
-                       asp-action="Details" asp-controller="KumiAccounts"
-                       asp-route-idAccount="@charge.Key.IdAccount"></a>
-                </td>
-                <td class="text-center p-1">@charge.Select(r => r.TenancyValue).Sum()</td>
-                <td class="text-center p-1">@charge.Select(r => r.PenaltyValue).Sum()</td>
-            </tr>
+        <tr>
+            <td class="text-center rr-distribute-check-td d-none"><input type="checkbox" name="Distrubution.IdAccount" checked value="@charge.Key.IdAccount" /></td>
+            <td class="text-center p-1">
+                ЛС @charge.Key.Account
+                <a class="btn oi oi-eye p-0 text-primary rr-payment-assoc-eye-btn" target="_blank"
+                   asp-action="Details" asp-controller="KumiAccounts"
+                   asp-route-idAccount="@charge.Key.IdAccount"></a>
+            </td>
+            <td class="text-center p-1">@charge.Select(r => r.TenancyValue).Sum()</td>
+            <td class="text-center p-1">@charge.Select(r => r.PenaltyValue).Sum()</td>
+            @if (hasDgi)
+            {
+                <td class="text-center p-1">@charge.Select(r => r.DgiValue).Sum()</td>
+            }
+            @if (hasPkk)
+            {
+                <td class="text-center p-1">@charge.Select(r => r.PkkValue).Sum()</td>
+            }
+            @if (hasPadun)
+            {
+                <td class="text-center p-1">@charge.Select(r => r.PadunValue).Sum()</td>
+            }
+        </tr>
         }
         @foreach (var claim in Model.PaymentClaims.GroupBy(r => new { r.Claim.IdClaim, r.Claim.StartDeptPeriod, r.Claim.EndDeptPeriod, r.Claim.IdAccountKumiNavigation.Account }))
         {
@@ -48,6 +87,18 @@
                 </td>
                 <td class="text-center p-1">@claim.Select(r => r.TenancyValue).Sum()</td>
                 <td class="text-center p-1">@claim.Select(r => r.PenaltyValue).Sum()</td>
+                @if (hasDgi)
+                {
+                    <td class="text-center p-1">@claim.Select(r => r.DgiValue).Sum()</td>
+                }
+                @if (hasPkk)
+                {
+                    <td class="text-center p-1">@claim.Select(r => r.PkkValue).Sum()</td>
+                }
+                @if (hasPadun)
+                {
+                    <td class="text-center p-1">@claim.Select(r => r.PadunValue).Sum()</td>
+                }
             </tr>
         }
     </tbody>

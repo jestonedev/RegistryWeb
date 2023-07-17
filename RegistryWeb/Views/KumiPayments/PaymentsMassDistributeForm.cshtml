@@ -56,7 +56,8 @@
             foreach (var item in Model.Payments)
             {
                 var sum = item.Sum;
-                var sumPosted = item.PaymentCharges.Select(r => r.TenancyValue + r.PenaltyValue).Sum() + item.PaymentClaims.Select(r => r.TenancyValue + r.PenaltyValue).Sum();
+                var sumPosted = item.PaymentCharges.Select(r => r.TenancyValue + r.PenaltyValue + r.DgiValue + r.PkkValue + r.PadunValue).Sum() + 
+                    item.PaymentClaims.Select(r => r.TenancyValue + r.PenaltyValue + r.DgiValue + r.PkkValue + r.PadunValue).Sum();
                 <tr class="rr-payment-for-distribution" data-state="initial" data-payment-sum="@sum" data-payment-sum-posted="@sumPosted" data-id-payment="@item.IdPayment">
                     <td>
                         @{
@@ -80,14 +81,30 @@
                                  r.Key.Account,
                                  r.Key.IdAccount,
                                  DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
-                                 DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum)
+                                 DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum),
+                                 DistrubutedToDgiSum = r.Sum(v => v.DistrubutedToDgiSum),
+                                 DistrubutedToPkkSum = r.Sum(v => v.DistrubutedToPkkSum),
+                                 DistrubutedToPadunSum = r.Sum(v => v.DistrubutedToPadunSum)
                              }))
                                 {
-                                    <div class="text-danger rr-payment-object-detail" data-id-account="@account.IdAccount" data-payment-distrib-tenancy="@account.DistrubutedToTenancySum" data-payment-distrib-penalty="@account.DistrubutedToPenaltySum">
-                                        <u>ЛС №@account.Account:</u>
-                                        <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@account.IdAccount"></a>
-                                        <br />найм @account.DistrubutedToTenancySum руб., пени @account.DistrubutedToPenaltySum руб.
-                                    </div>
+                                <div class="text-danger rr-payment-object-detail" data-id-account="@account.IdAccount" data-payment-distrib-tenancy="@account.DistrubutedToTenancySum" data-payment-distrib-penalty="@account.DistrubutedToPenaltySum" 
+                                     data-payment-distrib-dgi="@account.DistrubutedToDgiSum" data-payment-distrib-pkk="@account.DistrubutedToPkkSum" data-payment-distrib-padun="@account.DistrubutedToPadunSum">
+                                    <u>ЛС №@account.Account:</u>
+                                    <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@account.IdAccount"></a>
+                                    <br />найм @account.DistrubutedToTenancySum руб., пени @account.DistrubutedToPenaltySum руб.
+                                    @if (account.DistrubutedToDgiSum != 0)
+                                    {
+                                        <span>, ДГИ @account.DistrubutedToDgiSum руб.</span>
+                                    }
+                                    @if (account.DistrubutedToPkkSum != 0)
+                                    {
+                                        <span>, ПКК @account.DistrubutedToPkkSum руб.</span>
+                                    }
+                                    @if (account.DistrubutedToPadunSum != 0)
+                                    {
+                                        <span>, Падун @account.DistrubutedToPadunSum руб.</span>
+                                    }
+                                </div>
                                 }
 
                                 @foreach (var claim in claims.GroupBy(r => new { r.IdClaim, r.IdAccountKumi, r.Account })
@@ -97,16 +114,31 @@
                              IdAccountKumi = r.Key.IdAccountKumi,
                              Account = r.Key.Account,
                              DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
-                             DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum)
+                             DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum),
+                             DistrubutedToDgiSum = r.Sum(v => v.DistrubutedToDgiSum),
+                             DistrubutedToPkkSum = r.Sum(v => v.DistrubutedToPkkSum),
+                             DistrubutedToPadunSum = r.Sum(v => v.DistrubutedToPadunSum)
                          }))
                                 {
-                                    <div class="text-danger rr-payment-object-detail"  data-id-claim="@claim.IdClaim" data-payment-distrib-tenancy="@claim.DistrubutedToTenancySum" data-payment-distrib-penalty="@claim.DistrubutedToPenaltySum">
-                                        <u>ИР №@claim.IdClaim</u>
-                                        <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="Claims" asp-action="Details" asp-route-idClaim="@claim.IdClaim"></a>
-                                        <u>ЛС №@claim.Account:</u>
-                                        <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@claim.IdAccountKumi"></a>
-                                        <br />найм @claim.DistrubutedToTenancySum руб., пени @claim.DistrubutedToPenaltySum руб.
-                                    </div>
+                                <div class="text-danger rr-payment-object-detail" data-id-claim="@claim.IdClaim" data-payment-distrib-tenancy="@claim.DistrubutedToTenancySum" data-payment-distrib-penalty="@claim.DistrubutedToPenaltySum">
+                                    <u>ИР №@claim.IdClaim</u>
+                                    <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="Claims" asp-action="Details" asp-route-idClaim="@claim.IdClaim"></a>
+                                    <u>ЛС №@claim.Account:</u>
+                                    <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" asp-controller="KumiAccounts" asp-action="Details" asp-route-idAccount="@claim.IdAccountKumi"></a>
+                                    <br />найм @claim.DistrubutedToTenancySum руб., пени @claim.DistrubutedToPenaltySum руб.
+                                    @if (claim.DistrubutedToDgiSum != 0)
+                                    {
+                                        <span>, ДГИ @claim.DistrubutedToDgiSum руб.</span>
+                                    }
+                                    @if (claim.DistrubutedToPkkSum != 0)
+                                    {
+                                        <span>, ПКК @claim.DistrubutedToPkkSum руб.</span>
+                                    }
+                                    @if (claim.DistrubutedToPadunSum != 0)
+                                    {
+                                        <span>, Падун @claim.DistrubutedToPadunSum руб.</span>
+                                    }
+                                </div>
                                 }
                             </div>
                         </div>
@@ -205,6 +237,48 @@
                                             </button>
                                         </div>
                                         <input type="text" class="form-control input-decimal rr-distribution-penalty-sum" title="Распределение на пени">
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group col-lg-6 d-none">
+                                    <label class="rr-payment-label mb-1">ДГИ</label>
+
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary rr-distrib-to-dgi-sum-lefovers" type="button">
+                                                <span class="oi oi-action-redo"></span>
+                                            </button>
+                                        </div>
+                                        <input type="text" class="form-control input-decimal rr-distribution-dgi-sum" title="Распределение на ДГИ">
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group col-lg-6 d-none">
+                                    <label class="rr-payment-label mb-1">ПКК</label>
+
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary rr-distrib-to-pkk-sum-lefovers" type="button">
+                                                <span class="oi oi-action-redo"></span>
+                                            </button>
+                                        </div>
+                                        <input type="text" class="form-control input-decimal rr-distribution-pkk-sum" title="Распределение на ПКК">
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group col-lg-6 d-none">
+                                    <label class="rr-payment-label mb-1">Падун</label>
+
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary rr-distrib-to-padun-sum-lefovers" type="button">
+                                                <span class="oi oi-action-redo"></span>
+                                            </button>
+                                        </div>
+                                        <input type="text" class="form-control input-decimal rr-distribution-padun-sum" title="Распределение на Падун">
                                     </div>
 
                                 </div>

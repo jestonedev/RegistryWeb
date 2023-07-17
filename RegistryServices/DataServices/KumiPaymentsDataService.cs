@@ -184,7 +184,10 @@ namespace RegistryWeb.DataServices
                     Account = r.aRow.Account,
                     DistrubutedToPenaltySum = r.kpcRow.PenaltyValue,
                     DistrubutedToTenancySum = r.kpcRow.TenancyValue,
-                    Sum = r.kpcRow.PenaltyValue + r.kpcRow.TenancyValue,
+                    DistrubutedToDgiSum = r.kpcRow.DgiValue,
+                    DistrubutedToPkkSum = r.kpcRow.PkkValue,
+                    DistrubutedToPadunSum = r.kpcRow.PadunValue,
+                    Sum = r.kpcRow.PenaltyValue + r.kpcRow.TenancyValue + r.kpcRow.DgiValue + r.kpcRow.PkkValue + r.kpcRow.PadunValue,
                     Tenant = tenants.Where(t => t.IdAccount == r.cRow.IdAccount).OrderByDescending(t => t.IdProcess)
                                 .Select(t => t.Tenant).FirstOrDefault()
                 }).ToList();
@@ -209,7 +212,7 @@ namespace RegistryWeb.DataServices
                            join cRow in cClaims
                            on kpcRow.IdClaim equals cRow.IdClaim
                            join aRow in aClaims
-                           on cRow.IdAccount equals aRow.IdAccount
+                           on cRow.IdAccountKumi equals aRow.IdAccount
                            select new
                            {
                                kpcRow,
@@ -240,7 +243,10 @@ namespace RegistryWeb.DataServices
                 Account = r.aRow.Account,
                 DistrubutedToPenaltySum = r.kpcRow.PenaltyValue,
                 DistrubutedToTenancySum = r.kpcRow.TenancyValue,
-                Sum = r.kpcRow.PenaltyValue + r.kpcRow.TenancyValue,
+                DistrubutedToDgiSum = r.kpcRow.DgiValue,
+                DistrubutedToPkkSum = r.kpcRow.PkkValue,
+                DistrubutedToPadunSum = r.kpcRow.PadunValue,
+                Sum = r.kpcRow.PenaltyValue + r.kpcRow.TenancyValue + r.kpcRow.DgiValue + r.kpcRow.PkkValue + r.kpcRow.PadunValue,
                 Tenant = tenants.Where(t => t.IdAccount == r.cRow.IdAccountKumi).OrderByDescending(t => t.IdProcess)
                                 .Select(t => t.Tenant).FirstOrDefault()
             }).ToList();
@@ -653,6 +659,9 @@ namespace RegistryWeb.DataServices
 
                 claim.AmountTenancyRecovered = (claim.AmountTenancyRecovered ?? 0) - paymentClaim.Select(r => r.TenancyValue).Sum();
                 claim.AmountPenaltiesRecovered = (claim.AmountPenaltiesRecovered ?? 0) - paymentClaim.Select(r => r.PenaltyValue).Sum();
+                claim.AmountDgiRecovered = (claim.AmountDgiRecovered ?? 0) - paymentClaim.Select(r => r.DgiValue).Sum();
+                claim.AmountPkkRecovered = (claim.AmountPkkRecovered ?? 0) - paymentClaim.Select(r => r.PkkValue).Sum();
+                claim.AmountPadunRecovered = (claim.AmountPadunRecovered ?? 0) - paymentClaim.Select(r => r.PadunValue).Sum();
                 registryContext.Claims.Update(claim);
             }
 
@@ -695,11 +704,15 @@ namespace RegistryWeb.DataServices
                 IdPayment = idPayment,
                 Sum = payment.Sum,
                 DistrubutedToTenancySum = 0,
-                DistrubutedToPenaltySum = 0
+                DistrubutedToPenaltySum = 0,
+                DistrubutedToDgiSum = 0,
+                DistrubutedToPkkSum = 0,
+                DistrubutedToPadunSum = 0
             };
         }
 
-        public KumiPaymentDistributionInfo DistributePaymentToAccount(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo, decimal tenancySum, decimal penaltySum)
+        public KumiPaymentDistributionInfo DistributePaymentToAccount(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo, 
+            decimal tenancySum, decimal penaltySum, decimal dgiSum, decimal pkkSum, decimal padunSum)
         {
             if (tenancySum < 0)
                 throw new ApplicationException("Указана отрицательная сумма, распределяемая на найм");
@@ -707,7 +720,16 @@ namespace RegistryWeb.DataServices
             if (penaltySum < 0)
                 throw new ApplicationException("Указана отрицательная сумма, распределяемая на пени");
 
-            if(tenancySum + penaltySum == 0)
+            if (dgiSum < 0)
+                throw new ApplicationException("Указана отрицательная сумма, распределяемая на ДГИ");
+
+            if (pkkSum < 0)
+                throw new ApplicationException("Указана отрицательная сумма, распределяемая на ПКК");
+
+            if (padunSum < 0)
+                throw new ApplicationException("Указана отрицательная сумма, распределяемая на Падун");
+
+            if (tenancySum + penaltySum + dgiSum + pkkSum + padunSum == 0)
                 throw new ApplicationException("Не указана распределяемая сумма");
 
             var payment = registryContext.KumiPayments.Include(r => r.PaymentClaims).Include(r => r.PaymentCharges).FirstOrDefault(r => r.IdPayment == idPayment);
@@ -721,9 +743,18 @@ namespace RegistryWeb.DataServices
                 payment.PaymentClaims.Select(r => r.TenancyValue).Sum();
             var distributedPenaltySum = payment.PaymentCharges.Select(r => r.PenaltyValue).Sum() +
                 payment.PaymentClaims.Select(r => r.PenaltyValue).Sum();
-            if (payment.Sum < distributedTenancySum + distributedPenaltySum + tenancySum + penaltySum)
-                throw new ApplicationException(string.Format("Распределяемая сумма {0} превышает остаток по платежу {1}", tenancySum + penaltySum,
-                    payment.Sum - distributedTenancySum - distributedPenaltySum));
+            var distributedDgiSum = payment.PaymentCharges.Select(r => r.DgiValue).Sum() +
+                payment.PaymentClaims.Select(r => r.DgiValue).Sum();
+            var distributedPkkSum = payment.PaymentCharges.Select(r => r.PkkValue).Sum() +
+                payment.PaymentClaims.Select(r => r.PkkValue).Sum();
+            var distributedPadunSum = payment.PaymentCharges.Select(r => r.PadunValue).Sum() +
+                payment.PaymentClaims.Select(r => r.PadunValue).Sum();
+
+            if (payment.Sum < distributedTenancySum + distributedPenaltySum + distributedDgiSum + distributedPkkSum + distributedPadunSum 
+                + tenancySum + penaltySum + dgiSum + pkkSum + padunSum)
+                throw new ApplicationException(string.Format("Распределяемая сумма {0} превышает остаток по платежу {1}", 
+                    tenancySum + penaltySum + dgiSum + pkkSum + padunSum,
+                    payment.Sum - distributedTenancySum - distributedPenaltySum - distributedDgiSum - distributedPkkSum - distributedPadunSum));
 
             var isPl = payment.IdSource == 3 || payment.IdSource == 5;
             var date = payment.DateExecute ?? payment.DateIn ?? payment.DateDocument;
@@ -753,6 +784,9 @@ namespace RegistryWeb.DataServices
                         IdPayment = idPayment,
                         TenancyValue = tenancySum,
                         PenaltyValue = penaltySum,
+                        DgiValue = dgiSum,
+                        PkkValue = pkkSum,
+                        PadunValue = padunSum,
                         Date = DateTime.Now.Date
                     };
 
@@ -765,6 +799,9 @@ namespace RegistryWeb.DataServices
                             EndDate = endPeriodDate,
                             PaymentTenancy = tenancySum,
                             PaymentPenalty = penaltySum,
+                            PaymentDgi = dgiSum,
+                            PaymentPkk = pkkSum,
+                            PaymentPadun = padunSum,
                             Hidden = 1
                         };
                         paymentCharge.Charge = charge;
@@ -793,6 +830,9 @@ namespace RegistryWeb.DataServices
 
                     claim.AmountTenancyRecovered = (claim.AmountTenancyRecovered ?? 0) + tenancySum;
                     claim.AmountPenaltiesRecovered = (claim.AmountPenaltiesRecovered ?? 0) + penaltySum;
+                    claim.AmountDgiRecovered = (claim.AmountDgiRecovered ?? 0) + dgiSum;
+                    claim.AmountPkkRecovered = (claim.AmountPkkRecovered ?? 0) + pkkSum;
+                    claim.AmountPadunRecovered = (claim.AmountPadunRecovered ?? 0) + padunSum;
                     registryContext.Claims.Update(claim);
 
                     registryContext.KumiPaymentClaims.Add(new KumiPaymentClaim
@@ -801,12 +841,16 @@ namespace RegistryWeb.DataServices
                         IdClaim = idObject,
                         TenancyValue = tenancySum,
                         PenaltyValue = penaltySum,
+                        DgiValue = dgiSum,
+                        PkkValue = pkkSum,
+                        PadunValue = padunSum,
                         Date = DateTime.Now.Date
                     });
                     break;
             }
 
-            if (payment.Sum == distributedTenancySum + distributedPenaltySum + tenancySum + penaltySum)
+            if (payment.Sum == distributedTenancySum + distributedPenaltySum + distributedDgiSum + distributedPkkSum + distributedPadunSum 
+                + tenancySum + penaltySum + dgiSum + pkkSum + padunSum)
             {
                 payment.IsPosted = 1;
                 registryContext.KumiPayments.Update(payment);
@@ -837,7 +881,10 @@ namespace RegistryWeb.DataServices
                 IdPayment = idPayment,
                 Sum = payment.Sum,
                 DistrubutedToTenancySum = distributedTenancySum + tenancySum,
-                DistrubutedToPenaltySum = distributedPenaltySum + penaltySum
+                DistrubutedToPenaltySum = distributedPenaltySum + penaltySum,
+                DistrubutedToDgiSum = distributedDgiSum + dgiSum,
+                DistrubutedToPkkSum = distributedPkkSum + pkkSum,
+                DistrubutedToPadunSum = distributedPadunSum + padunSum
             };
         }
 
