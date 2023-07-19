@@ -93,6 +93,11 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasMaxLength(355)
                 .IsUnicode(false);
 
+            builder.Property(e => e.Description)
+                .HasColumnName("description")
+                .HasMaxLength(1024)
+                .IsUnicode(false);
+
             builder.Property(e => e.Deleted)
                 .HasColumnName("deleted")
                 .HasColumnType("tinyint(1)")

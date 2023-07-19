@@ -467,6 +467,10 @@
                         <label class="rr-account-label mb-1" asp-for="Owner">Владелец ЛС</label>
                         <input type="text" asp-for="Owner" title="Владелец ЛС - указывается, если не совпадает с нанимателем по договору найма" class="form-control" maxlength="355" />
                     </div>
+                    <div class="form-group col-12 mb-2">
+                        <label class="rr-account-label mb-1" asp-for="Description">Примечание</label>
+                        <textarea asp-for="Description" title="Примечание к лицевому счету" class="form-control" maxlength="1024"></textarea>
+                    </div>
                 </div>
                 @if (Model.RecalcMarker == 1)
                 {

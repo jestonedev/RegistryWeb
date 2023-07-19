@@ -413,7 +413,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.PaymentsForPeriod(startDate, endDate);
-                return File(file, odsMime, string.Format("Платежи КБК найма за период {0}-{1}.ods", startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")));
+                return File(file, xlsxMime, string.Format("Платежи КБК найма за период {0}-{1}.xlsx", startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")));
             }
             catch (Exception ex)
             {
