@@ -298,6 +298,7 @@
             + "' data-account-current-balance-tenancy='" + claim.accountCurrentBalanceTenancy + "' data-account-current-balance-penalty='" + claim.accountCurrentBalancePenalty
             + "' data-account-current-balance-dgi='" + claim.accountCurrentBalanceDgi + "' data-account-current-balance-pkk='" + claim.accountCurrentBalancePkk
             + "' data-account-current-balance-padun='" + claim.accountCurrentBalancePadun
+            + "' data-claim-court-order-num='" + claim.courtOrderNum + "' data-claim-tenant='" + claim.tenant
             + "' data-claim-amount-tenancy='" + amountTenancy + "' data-claim-amount-penalty='" + amountPenalties
             + "' data-claim-amount-dgi='" + amountDgi + "' data-claim-amount-pkk='" + amountPkk
             + "' data-claim-amount-padun='" + amountPadun
@@ -305,13 +306,14 @@
             + "' data-claim-amount-dgi-recovered='" + amountDgiRecovered + "' data-claim-amount-pkk-recovered='" + amountPkkRecovered
             + "' data-claim-amount-padun-recovered='" + amountPadunRecovered 
             + "' data-claim-start-dept-period='" + claim.startDeptPeriod
-            + "' data-claim-end-dept-period='"+claim.endDeptPeriod+"'><u>ИР №" + claim.idClaim + "</u> " +
+            + "' data-claim-end-dept-period='" + claim.endDeptPeriod + "'><u>ИР №" + claim.idClaim + (claim.courtOrderNum !== null ? " (" + claim.courtOrderNum+")" : "") + "</u> " +
             "<a class=\"btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn\" target=\"_blank\" href=\"/Claims/Details?idClaim=" + claim.idClaim + "\"></a> <br class=\"d-lg-none\"/>" +
             "<u>ЛС №" + claim.account + ":</u>" +
             " <sup><span title='" + claim.accountState + "' class='" + stateClass + "'><b>" + claim.accountState.substr(0, 1) + "</b></span></sup> " +
             "<a class=\"btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn\" target=\"_blank\" href=\"/KumiAccounts/Details?idAccount=" + claim.idAccount + "\"></a>" +
-            "</div>" +
-            "<div class=\"text-left\"><b>Текущее сальдо:</b><br class=\"d-lg-none\"/> найм " + distributePaymentFormatSum(claim.accountCurrentBalanceTenancy) + " руб., пени " + distributePaymentFormatSum(claim.accountCurrentBalancePenalty) + " руб."
+            "</div>"
+            + (claim.tenant !== null ? "<div class=\"text-left\"><b>Наниматель:</b> " + claim.tenant + "</div>" : "")
+            + "<div class=\"text-left\"><b>Текущее сальдо:</b><br class=\"d-lg-none\"/> найм " + distributePaymentFormatSum(claim.accountCurrentBalanceTenancy) + " руб., пени " + distributePaymentFormatSum(claim.accountCurrentBalancePenalty) + " руб."
             + (claim.accountCurrentBalanceDgi > 0 ? ", ДГИ " + distributePaymentFormatSum(claim.accountCurrentBalanceDgi) + " руб." : "")
             + (claim.accountCurrentBalancePkk > 0 ? ", ПКК " + distributePaymentFormatSum(claim.accountCurrentBalancePkk) + " руб." : "")
             + (claim.accountCurrentBalancePadun > 0 ? ", Падун " + distributePaymentFormatSum(claim.accountCurrentBalancePadun) + " руб." : "")

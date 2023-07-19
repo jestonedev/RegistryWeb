@@ -120,3 +120,7 @@
 #PaymentDistributionDetailsModal td, #PaymentDistributionDetailsModal th, #CancelDistributePaymentToAccountModal td, #CancelDistributePaymentToAccountModal th {
     vertical-align: middle;
 }
+
+#RunMassPaymentDistribution, #StopMassPaymentDistribution {
+    overflow: hidden;
+}
