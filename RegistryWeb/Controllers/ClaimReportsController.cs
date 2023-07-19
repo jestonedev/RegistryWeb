@@ -404,5 +404,40 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
+
+        public IActionResult GetPaymentsForPeriod(DateTime startDate, DateTime endDate)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.PaymentsForPeriod(startDate, endDate);
+                return File(file, xlsxMime, string.Format("Платежи КБК найма за период {0}-{1}.xlsx", startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetBalanceForPeriod(DateTime startDate)
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var paymentDate = new DateTime(startDate.Year, startDate.Month, 1);
+                paymentDate = paymentDate.AddMonths(1).AddDays(-1);
+
+                var file = reportService.BalanceForPeriod(paymentDate);
+                return File(file, xlsxMime, string.Format("Начисления ЛС КУМИ за период на {0}.xlsx", paymentDate.ToString("dd.MM.yyyy")));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
     }
 }

@@ -241,7 +241,7 @@ namespace RegistryWeb.DataServices
                 DistrubutedToPenaltySum = r.kpcRow.PenaltyValue,
                 DistrubutedToTenancySum = r.kpcRow.TenancyValue,
                 Sum = r.kpcRow.PenaltyValue + r.kpcRow.TenancyValue,
-                Tenant = tenants.Where(t => t.IdAccount == r.cRow.IdAccountKumi).OrderByDescending(t => t.IdProcess)
+                Tenant = tenantsClaims.Where(t => t.IdAccount == r.cRow.IdAccountKumi).OrderByDescending(t => t.IdProcess)
                                 .Select(t => t.Tenant).FirstOrDefault()
             }).ToList();
 

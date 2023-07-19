@@ -307,6 +307,28 @@
         var action = $(this).data("action");
         modal.find("input[name='ActionUrl']").val(action);
         modal.find("input, textarea, select").prop("disabled", false);
+
+        var standartWrapper = modal.find("input[name='StartDate']").closest(".form-row");
+        var ukWrapper = modal.find("select[name='Uk']").closest(".form-row");
+        var balanceWrapper = modal.find("select[name='StDate_Month']").closest(".form-row");
+
+        standartWrapper.hide();
+        ukWrapper.hide();
+        balanceWrapper.hide();
+
+        switch (action) {
+            case "UkInvoiceAgg":
+            case "UkInvoiceDetails":
+                ukWrapper.show();
+                break;
+            case "PaymentsForPeriod":
+                standartWrapper.show();
+                break;
+            case "BalanceForPeriod":
+                balanceWrapper.show();
+                break;
+        }
+
         modal.modal("show");
         e.preventDefault();
     });
@@ -323,15 +345,29 @@
         var action = form.find("input[name='ActionUrl']").val();
 
         var url = "/ClaimReports/Get" + action + "?";
-        var ids = form.find("[name='Uk']").val();
-        var idsStr = "";
-        for (var i = 0; i < ids.length; i++) {
-            idsStr += "idsOrganization="+ids[i];
-            if (i < ids.length - 1) {
-                idsStr += "&";
-            }
+        switch (action) {
+            case "UkInvoiceAgg":
+            case "UkInvoiceDetails":
+                var ids = form.find("[name='Uk']").val();
+                var idsStr = "";
+                for (var i = 0; i < ids.length; i++) {
+                    idsStr += "idsOrganization="+ids[i];
+                    if (i < ids.length - 1) {
+                        idsStr += "&";
+                    }
+                }
+                url += idsStr;
+                break;
+            case "PaymentsForPeriod":
+                var startDate = form.find("input[name='StartDate']").val();
+                var endDate = form.find("input[name='EndDate']").val();
+                url += "startDate=" + startDate + "&endDate=" + endDate;
+                break;
+            case "BalanceForPeriod":
+                startDate = form.find("[name='StDate_Year']").val() + "-" + form.find("[name='StDate_Month']").val() + "-01";
+                url += "startDate=" + startDate;
+                break;
         }
-        url += idsStr;
 
         if (url !== undefined) {
             downloadFile(url);

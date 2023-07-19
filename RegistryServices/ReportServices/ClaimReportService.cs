@@ -321,5 +321,26 @@ namespace RegistryWeb.ReportServices
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
+
+        public byte[] PaymentsForPeriod(DateTime startDate, DateTime endDate)
+        {
+            var arguments = new Dictionary<string, object> {
+                { "from_date", startDate.ToString("dd.MM.yyyy") },
+                { "to_date", endDate.ToString("dd.MM.yyyy") }
+            };
+            var fileName = "registry\\kumi_accounts\\payments_for_period";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+
+        public byte[] BalanceForPeriod(DateTime startDate)
+        {
+            var arguments = new Dictionary<string, object> {
+                { "for_date", paymentDate.ToString("dd.MM.yyyy") }
+            };
+            var fileName = "registry\\kumi_accounts\\balance_for_period";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
     }
 }
