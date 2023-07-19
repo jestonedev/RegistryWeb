@@ -633,7 +633,7 @@ namespace RegistryWeb.DataServices
 
         public void UpdateChargesIntoDb(KumiAccountInfoForPaymentCalculator account, List<KumiCharge> chargingInfo,
             List<KumiCharge> dbChargingInfo,
-            DateTime startCalcDate, DateTime endCalcDate, DateTime startRewriteDate, DateTime? calcDate)
+            DateTime startCalcDate, DateTime endCalcDate, DateTime startRewriteDate, DateTime? calcDate, bool updateChargeDisplayInfo = true)
         {
             var actualDbCharges = dbChargingInfo.ToList();
             KumiCharge firstDbRewriteCharge = null;
@@ -786,7 +786,8 @@ namespace RegistryWeb.DataServices
             accountDb.RecalcMarker = 0;
             accountDb.RecalcReason = null;
             registryContext.SaveChanges();
-            UpdateChargeDisplayInfo(accountDb.IdAccount, startRewriteDate);
+            if (updateChargeDisplayInfo)
+                UpdateChargeDisplayInfo(accountDb.IdAccount, startRewriteDate);
         }
 
         private void UpdateChargeDisplayInfo(int idAccount, DateTime startRewriteDate)

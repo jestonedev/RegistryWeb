@@ -110,9 +110,9 @@
             $(padunValueElem).val($(padunValueElem).val().replace(',', '.'));
 
         var paymentTenancyValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PaymentTenancyValue");
-        $(paymentTenancyValueElem).val($(tenancyValueElem).val().replace(',', '.'));
+        $(paymentTenancyValueElem).val($(paymentTenancyValueElem).val().replace(',', '.'));
         var paymentPenaltyValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PaymentPenaltyValue");
-        $(paymentPenaltyValueElem).val($(penaltyValueElem).val().replace(',', '.'));
+        $(paymentPenaltyValueElem).val($(paymentPenaltyValueElem).val().replace(',', '.'));
         var paymentDgiValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_PaymentDgiValue");
         if (paymentDgiValueElem.length > 0)
             $(paymentDgiValueElem).val($(paymentDgiValueElem).val().replace(',', '.'));
