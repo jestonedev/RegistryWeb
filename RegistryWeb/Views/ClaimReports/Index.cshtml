@@ -98,6 +98,20 @@
                 <div class="media-body pl-2 pr-2">Детализация по накладной на отправку ЛС БКС</div>
             </div>
         </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-payment-uk-invoice-modal-report" title="Платежи за период КБК найма"
+             data-action="PaymentsForPeriod">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Платежи за период КБК найма</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 rr-payment-uk-invoice-modal-report" title="Начисления ЛС КУМИ за период"
+             data-action="BalanceForPeriod">
+            <div class="media cardreport align-items-center p-2">
+                <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
+                <div class="media-body pl-2 pr-2">Начисления ЛС КУМИ за период</div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -296,6 +310,61 @@
 
                             </select>
                             <span class="text-danger field-validation-valid" data-valmsg-for="Uk" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="PaymentUkInvoiceReport">С</label>
+                            <input type="date" class="form-control" title="Период (с)" name="StartDate"
+                                   id="PaymentUkInvoiceReport_StartDate" data-val="true" data-val-required="Не указана начальная дата" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="StartDate" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="PaymentUkInvoiceReport">По</label>
+                            <input type="date" class="form-control" title="Период (по)" name="EndDate"
+                                   id="PaymentUkInvoiceReport_EndDate" data-val="true" data-val-required="Не указана конечная дата" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="EndDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <select id="StDate_Month" name="StDate_Month" class="form-control selectpicker" data-title="Выберите месяц"
+                                    data-val="true" data-val-required="Укажите месяц">
+                                <option></option>
+                                @{
+                                    @for (var i = 0; i < allMonthes.Count; i++)
+                                    {
+                                        if (i + 1 == DateTime.Now.Month)
+                                        {
+                                            <option selected value="@(i+1)">@allMonthes[i]</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@(i+1)">@allMonthes[i]</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="StDate_Month" data-valmsg-replace="true"></span>
+
+                        </div>
+                        <div class="form-group col-6">
+                            <select id="StDate_Year" name="StDate_Year" class="form-control selectpicker" data-title="Выберите год"
+                                    data-val="true" data-val-required="Укажите год">
+                                <option></option>
+                                @for (int i = DateTime.Now.Year; i > DateTime.Now.Year - 5; i--)
+                                {
+                                    if (i == DateTime.Now.Year)
+                                    {
+                                        <option selected value="@i">@i</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@i">@i</option>
+                                    }
+                                }
+                            </select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="StDate_Year" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                 </div>
