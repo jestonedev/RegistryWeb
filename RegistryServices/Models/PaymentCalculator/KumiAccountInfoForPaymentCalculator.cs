@@ -15,6 +15,9 @@ namespace RegistryWeb.ViewModel
         public DateTime? LastChargeDate { get; set; }
         public decimal CurrentBalanceTenancy { get; set; }
         public decimal CurrentBalancePenalty { get; set; }
+        public decimal CurrentBalanceDgi { get; set; }
+        public decimal CurrentBalancePadun { get; set; }
+        public decimal CurrentBalancePkk { get; set; }
         public List<KumiTenancyInfoForPaymentCalculator> TenancyInfo { get; set; }
         public List<KumiCharge> Charges { get; set; }
         public List<KumiPayment> Payments { get; set; }

@@ -71,7 +71,8 @@
         }
 
         var sum = item.Sum;
-        var sumPosted = item.PaymentCharges.Select(r => r.TenancyValue + r.PenaltyValue).Sum() + item.PaymentClaims.Select(r => r.TenancyValue + r.PenaltyValue).Sum();
+        var sumPosted = item.PaymentCharges.Select(r => r.TenancyValue + r.PenaltyValue + r.DgiValue + r.PkkValue + r.PadunValue).Sum() + 
+                item.PaymentClaims.Select(r => r.TenancyValue + r.PenaltyValue + r.DgiValue + r.PkkValue + r.PadunValue).Sum();
         <tr style="position: relative" class="@(item.IdPayment == Model.FilterOptions.IdParentPayment ? "text-success" : "")" title="@(item.IdPayment == Model.FilterOptions.IdParentPayment ? "Родительский платеж" : "")">
            
             @{
@@ -203,19 +204,43 @@
                     var accountChargeInfo = accounts.Where(r => r.IdPayment == item.IdPayment &&
                         ((Model.FilterOptions.IdAccount != null && Model.FilterOptions.IdAccount == r.IdAccount) ||
                          (Model.FilterOptions.IdCharge != null && Model.FilterOptions.IdCharge == r.IdCharge)))
-                         .GroupBy(r => r.IdAccount).Select(r => new { TenancyValue = r.Sum(v => v.DistrubutedToTenancySum), PenaltyValue = r.Sum(v => v.DistrubutedToPenaltySum) })
+                         .GroupBy(r => r.IdAccount).Select(r => new {
+                             TenancyValue = r.Sum(v => v.DistrubutedToTenancySum),
+                             PenaltyValue = r.Sum(v => v.DistrubutedToPenaltySum),
+                             DgiValue = r.Sum(v => v.DistrubutedToDgiSum),
+                             PkkValue = r.Sum(v => v.DistrubutedToPkkSum),
+                             PadunValue = r.Sum(v => v.DistrubutedToPadunSum),
+                         })
                          .FirstOrDefault();
 
 
                     var claimChargeInfo = claims.Where(r => r.IdPayment == item.IdPayment &&
                         ((Model.FilterOptions.IdAccount != null && Model.FilterOptions.IdAccount == r.IdAccountKumi) ||
                          (Model.FilterOptions.IdCharge != null && Model.FilterOptions.IdCharge == r.IdCharge)))
-                        .GroupBy(r => r.IdClaim).Select(r => new { IdClaim = r.Key, TenancyValue = r.Sum(v => v.DistrubutedToTenancySum), PenaltyValue = r.Sum(v => v.DistrubutedToPenaltySum) });
+                        .GroupBy(r => r.IdClaim).Select(r => new { IdClaim = r.Key,
+                            TenancyValue = r.Sum(v => v.DistrubutedToTenancySum),
+                            PenaltyValue = r.Sum(v => v.DistrubutedToPenaltySum),
+                            DgiValue = r.Sum(v => v.DistrubutedToDgiSum),
+                            PkkValue = r.Sum(v => v.DistrubutedToPkkSum),
+                            PadunValue = r.Sum(v => v.DistrubutedToPadunSum)
+                        });
 
                     <span class="text-nowrap"><b>На данный ЛС:</b></span>
                     <span class="text-nowrap">
                         <br />найм @Math.Round(accountChargeInfo?.TenancyValue ?? 0, 2) руб.
                         <br />пени @Math.Round(accountChargeInfo?.PenaltyValue ?? 0, 2) руб.
+                        @if (accountChargeInfo?.DgiValue != 0 && accountChargeInfo?.DgiValue != null)
+                        {
+                            <br /><span>ДГИ @Math.Round(accountChargeInfo?.DgiValue ?? 0, 2) руб.</span>
+                        }
+                        @if (accountChargeInfo?.PkkValue != 0 && accountChargeInfo?.PkkValue != null)
+                        {
+                            <br /><span>ПКК @Math.Round(accountChargeInfo?.PkkValue ?? 0, 2) руб.</span>
+                        }
+                        @if (accountChargeInfo?.PadunValue != 0 && accountChargeInfo?.PadunValue != null)
+                        {
+                            <br /><span>Падун @Math.Round(accountChargeInfo?.PadunValue ?? 0, 2) руб.</span>
+                        }
                     </span>
 
                     if (claimChargeInfo.Any())
@@ -239,6 +264,18 @@
                         <span class="text-nowrap">
                             <br />найм @Math.Round(claim.TenancyValue, 2) руб.
                             <br />пени @Math.Round(claim.PenaltyValue, 2) руб.
+                            @if (claim.DgiValue != 0)
+                            {
+                                <br /><span>ДГИ @Math.Round(claim.DgiValue, 2) руб.</span>
+                            }
+                            @if (claim.PkkValue != 0)
+                            {
+                                <br /><span>ПКК @Math.Round(claim.PkkValue, 2) руб.</span>
+                            }
+                            @if (claim.PadunValue != 0)
+                            {
+                                <br /><span>Падун @Math.Round(claim.PadunValue, 2) руб.</span>
+                            }
                         </span>
                         @if (i < claimChargeInfo.Count() - 1)
                         {
@@ -251,7 +288,14 @@
                 if (Model.FilterOptions.IdClaim != null)
                 {
                     var claimChargeInfo = claims.Where(r => r.IdPayment == item.IdPayment && r.IdClaim == Model.FilterOptions.IdClaim)
-                        .GroupBy(r => r.IdClaim).Select(r => new { TenancyValue = r.Sum(v => v.DistrubutedToTenancySum), PenaltyValue = r.Sum(v => v.DistrubutedToPenaltySum) })
+                        .GroupBy(r => r.IdClaim).Select(r => new {
+                            TenancyValue = r.Sum(v => v.DistrubutedToTenancySum),
+                            PenaltyValue = r.Sum(v => v.DistrubutedToPenaltySum),
+                            DgiValue = r.Sum(v => v.DistrubutedToDgiSum),
+                            PkkValue = r.Sum(v => v.DistrubutedToPkkSum),
+                            PadunValue = r.Sum(v => v.DistrubutedToPadunSum)
+
+                        })
                         .FirstOrDefault();
                     <span class="text-nowrap">
                         <b>
@@ -261,20 +305,35 @@
                     <span class="text-nowrap">
                         <br />найм @Math.Round(claimChargeInfo?.TenancyValue ?? 0, 2) руб.
                         <br />пени @Math.Round(claimChargeInfo?.PenaltyValue ?? 0, 2) руб.
+                        @if (claimChargeInfo?.DgiValue != 0 && claimChargeInfo?.DgiValue != null)
+                        {
+                            <br /><span>ДГИ @Math.Round(claimChargeInfo?.DgiValue ?? 0, 2) руб.</span>
+                        }
+                        @if (claimChargeInfo?.PkkValue != 0 && claimChargeInfo?.PkkValue != null)
+                        {
+                            <br /><span>ПКК @Math.Round(claimChargeInfo?.PkkValue ?? 0, 2) руб.</span>
+                        }
+                        @if (claimChargeInfo?.PadunValue != 0 && claimChargeInfo?.PadunValue != null)
+                        {
+                            <br /><span>Падун @Math.Round(claimChargeInfo?.PadunValue ?? 0, 2) руб.</span>
+                        }
                     </span>
                 }
                 else
                 {
                     <div class="rr-payment-distribution-sum-details">
                         @foreach (var account in accounts.GroupBy(r => new { r.IdAccount, r.Account, r.Tenant })
-                .Select(r => new
-                {
-                    r.Key.Account,
-                    r.Key.IdAccount,
-                    r.Key.Tenant,
-                    DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
-                    DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum),
-                }))
+                            .Select(r => new
+                            {
+                                r.Key.Account,
+                                r.Key.IdAccount,
+                                r.Key.Tenant,
+                                DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
+                                DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum),
+                                DistrubutedToDgiSum = r.Sum(v => v.DistrubutedToDgiSum),
+                                DistrubutedToPkkSum = r.Sum(v => v.DistrubutedToPkkSum),
+                                DistrubutedToPadunSum = r.Sum(v => v.DistrubutedToPadunSum)
+                            }))
                         {
                             <div class="text-nowrap">
                                 <u>ЛС №@account.Account:</u>
@@ -285,6 +344,18 @@
                                 }
                                 <br />найм @account.DistrubutedToTenancySum руб.
                                 <br />пени @account.DistrubutedToPenaltySum руб.
+                                @if(account.DistrubutedToDgiSum != 0)
+                                {
+                                     <br /><span>ДГИ @account.DistrubutedToDgiSum руб.</span>
+                                }
+                                @if(account.DistrubutedToPkkSum != 0)
+                                {
+                                     <br /><span>ПКК @account.DistrubutedToPkkSum руб.</span>
+                                }
+                                @if(account.DistrubutedToPadunSum != 0)
+                                {
+                                     <br /><span>Падун @account.DistrubutedToPadunSum руб.</span>
+                                }
                             </div>
                             <br />
                         }
@@ -296,7 +367,10 @@
                     Account = r.Key.Account,
                     r.Key.Tenant,
                     DistrubutedToTenancySum = r.Sum(v => v.DistrubutedToTenancySum),
-                    DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum)
+                    DistrubutedToPenaltySum = r.Sum(v => v.DistrubutedToPenaltySum),
+                    DistrubutedToDgiSum = r.Sum(v => v.DistrubutedToDgiSum),
+                    DistrubutedToPkkSum = r.Sum(v => v.DistrubutedToPkkSum),
+                    DistrubutedToPadunSum = r.Sum(v => v.DistrubutedToPadunSum),
                 }))
                         {
                             <div class="text-nowrap">
@@ -311,6 +385,18 @@
                                 }
                                 <br />найм @claim.DistrubutedToTenancySum руб.
                                 <br />пени @claim.DistrubutedToPenaltySum руб.
+                                @if (claim.DistrubutedToDgiSum != 0)
+                                {
+                                    <br /><span>ДГИ @claim.DistrubutedToDgiSum руб.</span>
+                                }
+                                @if (claim.DistrubutedToPkkSum != 0)
+                                {
+                                    <br /><span>ПКК @claim.DistrubutedToPkkSum руб.</span>
+                                }
+                                @if (claim.DistrubutedToPadunSum != 0)
+                                {
+                                    <br /><span>Падун @claim.DistrubutedToPadunSum руб.</span>
+                                }
                             </div>
                             <br />
                         }

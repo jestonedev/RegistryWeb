@@ -8,6 +8,14 @@
     ViewData["Title"] = Model.IdAccount == 0 ? "Новый лицевой счет" :
         "Лицевой счет №" + Model.Account;
     var canEdit = ((SecurityService)ViewData["SecurityService"])?.HasPrivilege(Privileges.AccountsReadWrite) ?? false;
+
+    var hasDgiCharges = Model.Charges.Any(r => r.InputDgi != 0 || r.ChargeDgi != 0 || r.PaymentDgi != 0 || r.RecalcDgi != 0 || r.CorrectionDgi != 0 || r.OutputDgi != 0);
+    var hasPkkCharges = Model.Charges.Any(r => r.InputPkk != 0 || r.ChargePkk != 0 || r.PaymentPkk != 0 || r.RecalcPkk != 0 || r.CorrectionPkk != 0 || r.OutputPkk != 0);
+    var hasPadunCharges = Model.Charges.Any(r => r.InputPadun != 0 || r.ChargePadun != 0 || r.PaymentPadun != 0 || r.RecalcPadun != 0 || r.CorrectionPadun != 0 || r.OutputPadun != 0);
+    var additionalChargesCount = 0;
+    additionalChargesCount += hasDgiCharges ? 1 : 0;
+    additionalChargesCount += hasPkkCharges ? 1 : 0;
+    additionalChargesCount += hasPadunCharges ? 1 : 0;
 }
 @section Styles {
     <link rel="stylesheet" href="~/css/kumi.accounts.css" asp-append-version="true" />
@@ -104,281 +112,413 @@
             <div class="alert alert-danger text-center">Нельзя удалить лицевой счет, по которому имеются начисления или претензионно-исковые работы.<br />Вместо это вы можете аннулировать его.</div>
         }
 
-        <form autocomplete="off" asp-action="@ViewBag.Action" id="accountForm" data-action="@ViewBag.Action" method="post">
-            <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
-            <input type="hidden" asp-for="IdAccount" />
+            <form autocomplete="off" asp-action="@ViewBag.Action" id="accountForm" data-action="@ViewBag.Action" method="post">
+                <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
+                <input type="hidden" asp-for="IdAccount" />
 
-            <div id="TenancyInfo">
-                @{
-                    var tenancyInfo = (List<KumiAccountTenancyInfoVM>)ViewBag.TenancyInfo;
-                    tenancyInfo = tenancyInfo.Union(new List<KumiAccountTenancyInfoVM>() { new KumiAccountTenancyInfoVM {
-                                                        AccountAssoc = new KumiAccountsTenancyProcessesAssoc { Fraction = 1.0000m },
-                                                        RentObjects = new List<TenancyRentObject> { new TenancyRentObject {  } }} }).ToList();
-                    for (var i = 0; i < tenancyInfo.Count(); i++)
-                    {
-                        var idProcess = tenancyInfo[i].TenancyProcess?.IdProcess;
-                        var tenancyRequisits = "";
-
-                        if (!string.IsNullOrEmpty(tenancyInfo[i].TenancyProcess?.RegistrationNum))
+                <div id="TenancyInfo">
+                    @{
+                        var tenancyInfo = (List<KumiAccountTenancyInfoVM>)ViewBag.TenancyInfo;
+                        tenancyInfo = tenancyInfo.OrderBy(r => r.TenancyProcess.AnnualDate != null).ThenByDescending(r => r.TenancyProcess.RegistrationDate).ToList();
+                        tenancyInfo = tenancyInfo.Union(new List<KumiAccountTenancyInfoVM>() { new KumiAccountTenancyInfoVM {
+                                                                                    AccountAssoc = new KumiAccountsTenancyProcessesAssoc { Fraction = 1.0000m },
+                                                                                    RentObjects = new List<TenancyRentObject> { new TenancyRentObject {  } }} }).ToList();
+                        for (var i = 0; i < tenancyInfo.Count(); i++)
                         {
-                            tenancyRequisits = "№ " + tenancyInfo[i].TenancyProcess.RegistrationNum + " " +
-                                (tenancyInfo[i].TenancyProcess.RegistrationDate.HasValue ? "от " + tenancyInfo[i].TenancyProcess.RegistrationDate.Value.ToString("dd.MM.yyyy") : "");
-                        }
-                        else
-                        if (tenancyInfo[i].TenancyProcess?.IdProcess != null)
-                        {
-                            tenancyRequisits = "Рег. №: " + tenancyInfo[i].TenancyProcess?.IdProcess;
-                        }
+                            var idProcess = tenancyInfo[i].TenancyProcess?.IdProcess;
+                            var tenancyRequisits = "";
 
-                        var tenant = tenancyInfo[i].Tenant;
-                        var tenantSnp = "";
-                        var tenantSnpShort = "";
-                        if (tenant != null)
-                        {
-                            tenantSnp += tenant.Surname + " " + tenant.Name + (string.IsNullOrEmpty(tenant.Patronymic) ? "" : " " + tenant.Patronymic);
-                            tenantSnpShort += tenant.Surname + " "+ tenant.Name.Substring(0,1)+"." + (string.IsNullOrEmpty(tenant.Patronymic) ? "" : " " + tenant.Patronymic.Substring(0, 1) + ".");
-                        }
-                        else
-                        {
-                            tenantSnp = tenantSnpShort = "без нанимателя";
-                        }
-
-                        var tenancyTitle = tenancyRequisits;
-
-
-                        if (idProcess != null)
-                        {
-                            tenancyTitle += ", " + tenantSnp;
-                            tenancyRequisits += ", " + tenantSnpShort;
-                        }
-
-                        var hideLastString = true;
-                        if ((ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create) && i == 0)
-                        {
-                            hideLastString = false;
-                        }
-
-                        <div class="form-row rr-tenancy-info @(((i + 1) == tenancyInfo.Count()) && hideLastString ? "d-none" : "")">
-                            <input type="hidden" value="@(tenancyInfo[i].AccountAssoc != null ? tenancyInfo[i].AccountAssoc.IdAssoc : 0)" id="IdAssoc_@i" name="AccountsTenancyProcessesAssoc[@i].IdAssoc" />
-                            <input type="hidden" value="@idProcess" id="IdProcess_@i" name="AccountsTenancyProcessesAssoc[@i].IdProcess" />
-                            <div class="form-group col-5">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <button class="btn btn-success dropdown-toggle @(idProcess != null ? "" : "disabled")" type="button" title="Процесс найма" aria-label="Процесс найма" id="HomesBtn_@i" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <span class="oi oi-home"></span>
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="HomesBtn_@i">
-                                            <a class="dropdown-item" asp-action="Details" asp-controller="TenancyProcesses" asp-route-idProcess="@idProcess">Процесс найма</a>
-                                        </div>
-                                    </div>
-                                    <input name="TenancyRequisits[@i]" id="TenancyRequisits_@i" type="text" value="@tenancyRequisits" class="form-control" title="@tenancyTitle" disabled />
-                                </div>
-                            </div>
-                            <div class="form-group col-1">
-                                <input type="text" maxlength="6" value="@(tenancyInfo[i].AccountAssoc != null ? tenancyInfo[i].AccountAssoc.Fraction : 0.0000m)" class="form-control input-fraction" id="Fraction_@i" name="AccountsTenancyProcessesAssoc[@i].Fraction"  title="Доля"  />
-                            </div>
-
-                            @{
-                                if (tenancyInfo[i].RentObjects == null || !tenancyInfo[i].RentObjects.Any())
-                                {
-                                    tenancyInfo[i].RentObjects = new List<TenancyRentObject> { new TenancyRentObject() };
-                                }
-                            }
-                            @for (var j = 0; j < tenancyInfo[i].RentObjects.Count; j++)
+                            if (!string.IsNullOrEmpty(tenancyInfo[i].TenancyProcess?.RegistrationNum))
                             {
-                                var rentObject = tenancyInfo[i].RentObjects[j].Address;
+                                tenancyRequisits = "№ " + tenancyInfo[i].TenancyProcess.RegistrationNum + " " +
+                                    (tenancyInfo[i].TenancyProcess.RegistrationDate.HasValue ? "от " + tenancyInfo[i].TenancyProcess.RegistrationDate.Value.ToString("dd.MM.yyyy") : "");
+                            }
+                            else
+                            if (tenancyInfo[i].TenancyProcess?.IdProcess != null)
+                            {
+                                tenancyRequisits = "Рег. №: " + tenancyInfo[i].TenancyProcess?.IdProcess;
+                            }
 
-                                var idBuilding = (string)null;
-                                var idPremise = (string)null;
-                                if (rentObject != null)
-                                {
-                                    switch (rentObject.AddressType)
-                                    {
-                                        case AddressTypes.Building:
-                                            idBuilding = rentObject?.Id;
-                                            break;
-                                        case AddressTypes.Premise:
-                                            idBuilding = rentObject?.IdParents?["Building"];
-                                            idPremise = rentObject?.Id;
-                                            break;
-                                        case AddressTypes.SubPremise:
-                                            idBuilding = rentObject?.IdParents?["Building"];
-                                            idPremise = rentObject?.IdParents?["Premise"];
-                                            break;
-                                    }
-                                }
-                                var address = rentObject?.Text;
-                                if (address != null)
-                                {
-                                    address = address.Replace("жилрайон.", "ж.р.");
-                                }
+                            var tenant = tenancyInfo[i].Tenant;
+                            var tenantSnp = "";
+                            var tenantSnpShort = "";
+                            if (tenant != null)
+                            {
+                                tenantSnp += tenant.Surname + " " + tenant.Name + (string.IsNullOrEmpty(tenant.Patronymic) ? "" : " " + tenant.Patronymic);
+                                tenantSnpShort += tenant.Surname + " " + tenant.Name.Substring(0, 1) + "." + (string.IsNullOrEmpty(tenant.Patronymic) ? "" : " " + tenant.Patronymic.Substring(0, 1) + ".");
+                            }
+                            else
+                            {
+                                tenantSnp = tenantSnpShort = "без нанимателя";
+                            }
 
-                                <div class="form-group rr-tenancy-address col-6 @(j == 0 ? "" : "offset-6")">
+                            var tenancyTitle = tenancyRequisits;
+
+
+                            if (idProcess != null)
+                            {
+                                tenancyTitle += ", " + tenantSnp;
+                                tenancyRequisits += ", " + tenantSnpShort;
+                            }
+
+                            var hideLastString = true;
+                            if ((ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create) && i == 0)
+                            {
+                                hideLastString = false;
+                            }
+                            var isArchiveTenancy = tenancyInfo[i].TenancyProcess?.AnnualDate != null;
+
+                            <div class="form-row rr-tenancy-info @(isArchiveTenancy ? "rr-tenancy-info-archive" : "") @(((i + 1) == tenancyInfo.Count()) && hideLastString ? "d-none" : "")" style="@(isArchiveTenancy ? "display: none" : "")">
+                                <input type="hidden" value="@(tenancyInfo[i].AccountAssoc != null ? tenancyInfo[i].AccountAssoc.IdAssoc : 0)" id="IdAssoc_@i" name="AccountsTenancyProcessesAssoc[@i].IdAssoc" />
+                                <input type="hidden" value="@idProcess" id="IdProcess_@i" name="AccountsTenancyProcessesAssoc[@i].IdProcess" />
+                                <div class="form-group col-5">
                                     <div class="input-group">
                                         <div class="input-group-prepend">
-                                            <button class="btn btn-success dropdown-toggle @(idBuilding != null ? "" : "disabled")" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="HomesBtn_@i" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <button class="btn btn-success dropdown-toggle @(idProcess != null ? "" : "disabled")" type="button" title="Процесс найма" aria-label="Процесс найма" id="HomesBtn_@i" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <span class="oi oi-home"></span>
                                             </button>
                                             <div class="dropdown-menu" aria-labelledby="HomesBtn_@i">
-                                                <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@idBuilding">Здание</a>
-                                                <a class="dropdown-item @(idPremise == null ? "d-none" : "")" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@idPremise">Помещение</a>
+                                                <a class="dropdown-item" asp-action="Details" asp-controller="TenancyProcesses" asp-route-idProcess="@idProcess">Процесс найма</a>
                                             </div>
                                         </div>
-                                        <input name="TenancyAddress[@i]" id="TenancyAddress_@i" type="text" value="@address" class="form-control" title="@address" disabled />
-                                        @if (j == 0)
-                                        {
-                                            @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
-                                            {
-                                                <div class="input-group-append">
-                                                    <button id="tenancyDeleteBtn_@i" title="Удалить" style="@(idProcess != null ? "" : "display: none")" class="btn btn-danger" type="button">
-                                                        <span class="oi oi-trash"></span>
-                                                    </button>
-                                                    <button id="tenancyChangeBtn_@i" title="Редактировать" style="@(idProcess != null ? "" : "display: none")" class="btn btn-success" type="button">
-                                                        <span class="oi oi-pencil"></span>
-                                                    </button>
-                                                    @if (i == 0)
-                                                    {
-                                                        <button id="tenancyAddBtn" title="Добавить" class="btn btn-success" type="button">
-                                                            <span class="oi oi-plus"></span>
-                                                        </button>
-                                                    }
-
-                                                </div>
-                                            }
-                                        }
+                                        <input name="TenancyRequisits[@i]" id="TenancyRequisits_@i" type="text" value="@tenancyRequisits" class="form-control" title="@tenancyTitle" disabled />
                                     </div>
                                 </div>
-                            }
-                        </div>
+                                <div class="form-group col-1">
+                                    <input type="text" maxlength="6" value="@(tenancyInfo[i].AccountAssoc != null ? tenancyInfo[i].AccountAssoc.Fraction : 0.0000m)" class="form-control input-fraction" id="Fraction_@i" name="AccountsTenancyProcessesAssoc[@i].Fraction" title="Доля" />
+                                </div>
+
+                                @{
+                                    if (tenancyInfo[i].RentObjects == null || !tenancyInfo[i].RentObjects.Any())
+                                    {
+                                        tenancyInfo[i].RentObjects = new List<TenancyRentObject> { new TenancyRentObject() };
+                                    }
+                                }
+                                @for (var j = 0; j < tenancyInfo[i].RentObjects.Count; j++)
+                                {
+                                    var rentObject = tenancyInfo[i].RentObjects[j].Address;
+
+                                    var idBuilding = (string)null;
+                                    var idPremise = (string)null;
+                                    if (rentObject != null)
+                                    {
+                                        switch (rentObject.AddressType)
+                                        {
+                                            case AddressTypes.Building:
+                                                idBuilding = rentObject?.Id;
+                                                break;
+                                            case AddressTypes.Premise:
+                                                idBuilding = rentObject?.IdParents?["Building"];
+                                                idPremise = rentObject?.Id;
+                                                break;
+                                            case AddressTypes.SubPremise:
+                                                idBuilding = rentObject?.IdParents?["Building"];
+                                                idPremise = rentObject?.IdParents?["Premise"];
+                                                break;
+                                        }
+                                    }
+                                    var address = rentObject?.Text;
+                                    if (address != null)
+                                    {
+                                        address = address.Replace("жилрайон.", "ж.р.");
+                                    }
+
+                                    <div class="form-group rr-tenancy-address col-6 @(j == 0 ? "" : "offset-6")">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <button class="btn btn-success dropdown-toggle @(idBuilding != null ? "" : "disabled")" type="button" title="Здания и помещения" aria-label="Здания и помещения" id="HomesBtn_@i" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <span class="oi oi-home"></span>
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="HomesBtn_@i">
+                                                    <a class="dropdown-item" asp-action="Details" asp-controller="Buildings" asp-route-idBuilding="@idBuilding">Здание</a>
+                                                    <a class="dropdown-item @(idPremise == null ? "d-none" : "")" asp-action="Details" asp-controller="Premises" asp-route-idPremises="@idPremise">Помещение</a>
+                                                </div>
+                                            </div>
+                                            <input name="TenancyAddress[@i]" id="TenancyAddress_@i" type="text" value="@address" class="form-control" title="@address" disabled />
+                                            @if (j == 0)
+                                            {
+                                                @if (ViewBag.Action == ActionTypeEnum.Edit || ViewBag.Action == ActionTypeEnum.Create)
+                                                {
+                                                    <div class="input-group-append">
+                                                        <button id="tenancyDeleteBtn_@i" title="Удалить" style="@(idProcess != null ? "" : "display: none")" class="btn btn-danger" type="button">
+                                                            <span class="oi oi-trash"></span>
+                                                        </button>
+                                                        <button id="tenancyChangeBtn_@i" title="Редактировать" style="@(idProcess != null ? "" : "display: none")" class="btn btn-success" type="button">
+                                                            <span class="oi oi-pencil"></span>
+                                                        </button>
+                                                        @if (i == 0)
+                                                        {
+                                                            <button id="tenancyAddBtn" title="Добавить" class="btn btn-success" type="button">
+                                                                <span class="oi oi-plus"></span>
+                                                            </button>
+                                                        }
+
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
                     }
-                }
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col-6 col-lg-4 mb-2">
-                    <label class="rr-account-label mb-1" asp-for="Account">Лицевой счет</label>
-                    <input type="text" asp-for="Account" data-val="true" data-val-required="Укажите лицевой счет" title="Лицевой счет" class="form-control input-numbers" maxlength="255" />
-                    <span class="text-danger" asp-validation-for="Account"></span>
-                </div>
-                <div class="form-group col-6 col-lg-4 mb-2">
-                    <label class="rr-account-label mb-1" asp-for="AccountGisZkh">Лицевой счет ГИС ЖКХ</label>
-                    <input type="text" asp-for="AccountGisZkh" title="Лицевой сче ГИС ЖКХ" class="form-control input-account-zkh" maxlength="255" />
-                </div>
-                <div class="form-group col-6 col-lg-4 mb-2">
-                    <label class="rr-account-label mb-1">Состояние</label>
-                    <select class="selectpicker form-control" asp-for="IdState" title="Состояние"
-                            asp-items="@(new SelectList(ViewBag.States, "IdState", "State", Model.IdState))"></select>
-                    <span class="text-danger" asp-validation-for="IdState"></span>
-                </div>
-                <div class="form-group col-6 col-lg-4 mb-2">
-                    <label class="rr-account-label mb-1" asp-for="CreateDate">Дата создания</label>
-                    <input type="date" asp-for="CreateDate" value="@(ViewBag.Action == ActionTypeEnum.Create ?
-                            DateTime.Now.Date.ToString("yyyy-MM-dd") : Model.CreateDate.ToString("yyyy-MM-dd"))"
-                           title="Дата создания" class="form-control" disabled />
-                </div>
-                <div class="form-group col-6 col-lg-4 mb-2">
-                    <label class="rr-account-label mb-1" asp-for="LastChargeDate">Дата начисления</label>
-                    <input type="date" asp-for="LastChargeDate" title="Дата последнего начисления" class="form-control" disabled />
                 </div>
 
-                @{
-                    var tenancyClaimsSum = 0.00m;
-                    var penaltyClaimsSum = 0.00m;
-                    var payedTenancyClaimsSum = 0.00m;
-                    var payedPenaltyClaimsSum = 0.00m;
-                    if (Model.Claims != null)
-                    {
-                        DateTime? bksLastChargeDate = null;
-                        if (Model.Charges.Any(r => r.IsBksCharge == 1))
-                        {
-                            bksLastChargeDate = Model.Charges.Where(r => r.IsBksCharge == 1).Select(r => r.EndDate).Max();
-                        }
-
-                        foreach (var claim in Model.Claims)
-                        {
-                            if (claim.ClaimStates == null) { continue; }
-                            var completeState = claim.ClaimStates.FirstOrDefault(r => r.IdStateType == 6);
-                            var prepareCourtOrderState = claim.ClaimStates.FirstOrDefault(r => r.IdStateType == 4);
-
-                            if (prepareCourtOrderState != null &&
-                                prepareCourtOrderState.CourtOrderDate != null &&
-                                (completeState == null || (completeState != null && completeState.CourtOrderCancelDate == null))
-                                && claim.EndDeptPeriod != null && (bksLastChargeDate == null || claim.AtDate > bksLastChargeDate))
-                            {
-                                tenancyClaimsSum += (claim.AmountTenancy + claim.AmountDgi + claim.AmountPadun + claim.AmountPkk) ?? 0.00m;
-                                penaltyClaimsSum += claim.AmountPenalties ?? 0.00m;
-                            }
-                        }
-                        foreach (var charge in Model.Charges)
-                        {
-                            var tenancyOnAccount = charge.PaymentCharges?.Sum(r => r.TenancyValue) ?? 0m;
-                            var penaltyOnAccount = charge.PaymentCharges?.Sum(r => r.PenaltyValue) ?? 0m;
-
-                            tenancyOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentTenancyValue);
-                            penaltyOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentPenaltyValue);
-
-                            if (charge.IsBksCharge == 1)
-                            {
-                                tenancyOnAccount = charge.PaymentTenancy;
-                                penaltyOnAccount = charge.PaymentPenalty;
-                            }
-                            payedTenancyClaimsSum += charge.PaymentTenancy - tenancyOnAccount;
-                            payedPenaltyClaimsSum += charge.PaymentPenalty - penaltyOnAccount;
-                        }
-                    }
-                }
-                <div class="form-group col-6 col-lg-4 mb-2">
-                    <label class="rr-account-label mb-1" asp-for="AnnualDate">Дата аннулирования</label>
-                    <input type="date" asp-for="AnnualDate" title="Дата аннулирования" class="form-control" disabled />
-                </div>
-
-                <div class="form-group col-6 col-lg-4 mb-2">
-                    <label class="rr-account-label mb-1" asp-for="CurrentBalanceTenancy">Сальдо найм</label>
-                    <div class="input-group">
-
-                        <input type="text" asp-for="CurrentBalanceTenancy" title="Текущее сальдо найм" class="form-control" disabled />
-
-                        <div class="input-group-append">
-                            <span class="input-group-text" id="basic-addon2" title="За вычетом суммы найма, предъявленной по исковым работам. Учитываются только неотмененные исковые работы с вынесеным судебным приказом (дата и номер) и с указанным периодом взыскания. Не учитываются исковые работы, сформированные в период выставления начислиний БКС, т.к. в движении средств отражены фактические выплаты по этим исковым работам">
-                                @(Model.CurrentBalanceTenancy - (tenancyClaimsSum - payedTenancyClaimsSum))
-                            </span>
-                        </div>
+                @if (tenancyInfo.Any(r => r.TenancyProcess != null && r.TenancyProcess.AnnualDate != null))
+                {
+                    <div class="text-center mt-1 mb-1">
+                        <a class="text-dark rr-tenancy-info-archive-btn" title="Архив наймов" href="#"><span class="oi oi-chevron-bottom"></span></a>
                     </div>
-                </div>
-                <div class="form-group col-6 col-lg-4 mb-2">
-                    <label class="rr-account-label mb-1" asp-for="CurrentBalancePenalty">Сальдо пени</label>
+                }
 
-                    <div class="input-group">
-                        <input type="text" asp-for="CurrentBalancePenalty" title="Текущее сальдо пени" class="form-control" disabled />
-                        <div class="input-group-append">
-                            <span class="input-group-text" id="basic-addon2" title="За вычетом суммы пени, предъявленной по исковым работам. Учитываются только неотмененные исковые работы с вынесеным судебным приказом (дата и номер) и с указанным периодом взыскания. Не учитываются исковые работы, сформированные в период выставления начислиний БКС, т.к. в движении средств отражены фактические выплаты по этим исковым работам">
-                                @(Model.CurrentBalancePenalty - (penaltyClaimsSum - payedPenaltyClaimsSum))
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-6 col-lg-4 mb-2">
-                    <label class="rr-account-label mb-1" asp-for="Owner">Владелец ЛС</label>
-                    <input type="text" asp-for="Owner" title="Владелец ЛС - указывается, если не совпадает с нанимателем по договору найма" class="form-control" maxlength="355" />
-                </div>
-            </div>
-            @if (Model.RecalcMarker == 1)
-            {
                 <div class="form-row">
-                    <div class="form-group col-12">
-                        <label asp-for="RecalcReason">Требуется перерасчет</label>
-                        <input class="form-control rr-account-recalc-reason" asp-for="RecalcReason" maxlength="255" title="Требуется перерасчет" disabled />
+                    <div class="form-group col-6 col-lg-4 mb-2">
+                        <label class="rr-account-label mb-1" asp-for="Account">Лицевой счет</label>
+                        <input type="text" asp-for="Account" data-val="true" data-val-required="Укажите лицевой счет" title="Лицевой счет" class="form-control input-numbers" maxlength="255" />
+                        <span class="text-danger" asp-validation-for="Account"></span>
+                    </div>
+                    <div class="form-group col-6 col-lg-4 mb-2">
+                        <label class="rr-account-label mb-1" asp-for="AccountGisZkh">Лицевой счет ГИС ЖКХ</label>
+                        <input type="text" asp-for="AccountGisZkh" title="Лицевой сче ГИС ЖКХ" class="form-control input-account-zkh" maxlength="255" />
+                    </div>
+                    <div class="form-group col-6 col-lg-4 mb-2">
+                        <label class="rr-account-label mb-1">Состояние</label>
+                        <select class="selectpicker form-control" asp-for="IdState" title="Состояние"
+                                asp-items="@(new SelectList(ViewBag.States, "IdState", "State", Model.IdState))"></select>
+                        <span class="text-danger" asp-validation-for="IdState"></span>
+                    </div>
+                    <div class="form-group col-6 col-lg-4 mb-2">
+                        <label class="rr-account-label mb-1" asp-for="CreateDate">Дата создания</label>
+                        <input type="date" asp-for="CreateDate" value="@(ViewBag.Action == ActionTypeEnum.Create ?
+                            DateTime.Now.Date.ToString("yyyy-MM-dd") : Model.CreateDate.ToString("yyyy-MM-dd"))"
+                               title="Дата создания" class="form-control" disabled />
+                    </div>
+                    <div class="form-group col-6 col-lg-4 mb-2">
+                        <label class="rr-account-label mb-1" asp-for="LastChargeDate">Дата начисления</label>
+                        <input type="date" asp-for="LastChargeDate" title="Дата последнего начисления" class="form-control" disabled />
+                    </div>
+
+                    @{
+                        var tenancyClaimsSum = 0.00m;
+                        var penaltyClaimsSum = 0.00m;
+                        var dgiClaimsSum = 0.00m;
+                        var pkkClaimsSum = 0.00m;
+                        var totalClaimsSum = 0.00m;
+
+                        var padunClaimsSum = 0.00m;
+                        var payedTenancyClaimsSum = 0.00m;
+                        var payedPenaltyClaimsSum = 0.00m;
+                        var payedDgiClaimsSum = 0.00m;
+                        var payedPkkClaimsSum = 0.00m;
+                        var payedPadunClaimsSum = 0.00m;
+                        var payedTotalClaimsSum = 0.00m;
+
+                        if (Model.Claims != null)
+                        {
+                            DateTime? bksLastChargeDate = null;
+                            if (Model.Charges.Any(r => r.IsBksCharge == 1))
+                            {
+                                bksLastChargeDate = Model.Charges.Where(r => r.IsBksCharge == 1).Select(r => r.EndDate).Max();
+                            }
+
+                            foreach (var claim in Model.Claims)
+                            {
+                                if (claim.ClaimStates == null) { continue; }
+                                var completeState = claim.ClaimStates.FirstOrDefault(r => r.IdStateType == 6);
+                                var prepareCourtOrderState = claim.ClaimStates.FirstOrDefault(r => r.IdStateType == 4);
+
+                                if (prepareCourtOrderState != null &&
+                                    prepareCourtOrderState.CourtOrderDate != null &&
+                                    (completeState == null || (completeState != null && completeState.CourtOrderCancelDate == null))
+                                    && claim.EndDeptPeriod != null && (bksLastChargeDate == null || claim.AtDate > bksLastChargeDate))
+                                {
+                                    tenancyClaimsSum = claim.AmountTenancy ?? 0.00m;
+                                    penaltyClaimsSum = claim.AmountPenalties ?? 0.00m;
+                                    dgiClaimsSum = claim.AmountDgi ?? 0.00m;
+                                    pkkClaimsSum = claim.AmountPkk ?? 0.00m;
+                                    padunClaimsSum = claim.AmountPadun ?? 0.00m;
+                                    totalClaimsSum = tenancyClaimsSum + penaltyClaimsSum + dgiClaimsSum + pkkClaimsSum + padunClaimsSum;
+                                }
+                            }
+                            foreach (var charge in Model.Charges)
+                            {
+                                var tenancyOnAccount = charge.PaymentCharges?.Sum(r => r.TenancyValue) ?? 0m;
+                                var penaltyOnAccount = charge.PaymentCharges?.Sum(r => r.PenaltyValue) ?? 0m;
+                                var dgiOnAccount = charge.PaymentCharges?.Sum(r => r.DgiValue) ?? 0m;
+                                var pkkOnAccount = charge.PaymentCharges?.Sum(r => r.PkkValue) ?? 0m;
+                                var padunOnAccount = charge.PaymentCharges?.Sum(r => r.PadunValue) ?? 0m;
+
+                                tenancyOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentTenancyValue);
+                                penaltyOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentPenaltyValue);
+                                dgiOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentDgiValue);
+                                pkkOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentPkkValue);
+                                padunOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentPadunValue);
+
+                                if (charge.IsBksCharge == 1)
+                                {
+                                    tenancyOnAccount = charge.PaymentTenancy;
+                                    penaltyOnAccount = charge.PaymentPenalty;
+                                    dgiOnAccount = charge.PaymentDgi;
+                                    pkkOnAccount = charge.PaymentPkk;
+                                    padunOnAccount = charge.PaymentPadun;
+                                }
+                                payedTenancyClaimsSum += charge.PaymentTenancy - tenancyOnAccount;
+                                payedPenaltyClaimsSum += charge.PaymentPenalty - penaltyOnAccount;
+                                payedDgiClaimsSum += charge.PaymentDgi - dgiOnAccount;
+                                payedPkkClaimsSum += charge.PaymentPkk - pkkOnAccount;
+                                payedPadunClaimsSum += charge.PaymentPadun - padunOnAccount;
+                                payedTotalClaimsSum = payedTenancyClaimsSum + payedDgiClaimsSum + payedPkkClaimsSum + payedPadunClaimsSum;
+                            }
+                        }
+                    }
+                    <div class="form-group col-6 col-lg-4 mb-2">
+                        <label class="rr-account-label mb-1" asp-for="AnnualDate">Дата аннулирования</label>
+                        <input type="date" asp-for="AnnualDate" title="Дата аннулирования" class="form-control" disabled />
+                    </div>
+
+                    <div class="form-group col-6 col-lg-4 mb-2">
+                        <label class="rr-account-label mb-1" asp-for="CurrentBalanceTenancy">Сальдо найм</label>
+                        <div class="input-group">
+
+                            <input type="text" asp-for="CurrentBalanceTenancy" title="Текущее сальдо найм" class="form-control" disabled />
+
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2" title="За вычетом суммы найма, предъявленной по исковым работам. Учитываются только неотмененные исковые работы с вынесеным судебным приказом (дата и номер) и с указанным периодом взыскания. Не учитываются исковые работы, сформированные в период выставления начислиний БКС, т.к. в движении средств отражены фактические выплаты по этим исковым работам">
+                                    @(Model.CurrentBalanceTenancy - (tenancyClaimsSum - payedTenancyClaimsSum))
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-6 col-lg-4 mb-2">
+                        <label class="rr-account-label mb-1" asp-for="CurrentBalancePenalty">Сальдо пени</label>
+
+                        <div class="input-group">
+                            <input type="text" asp-for="CurrentBalancePenalty" title="Текущее сальдо пени" class="form-control" disabled />
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2" title="За вычетом суммы пени, предъявленной по исковым работам. Учитываются только неотмененные исковые работы с вынесеным судебным приказом (дата и номер) и с указанным периодом взыскания. Не учитываются исковые работы, сформированные в период выставления начислиний БКС, т.к. в движении средств отражены фактические выплаты по этим исковым работам">
+                                    @(Model.CurrentBalancePenalty - (penaltyClaimsSum - payedPenaltyClaimsSum))
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    @if (hasDgiCharges)
+                    {
+                        <div class="form-group col-6 col-lg-4 mb-2">
+                            <label class="rr-account-label mb-1" asp-for="CurrentBalanceDgi">Сальдо ДГИ</label>
+
+                            <div class="input-group">
+
+                                <input type="text" asp-for="CurrentBalanceDgi" title="Текущее сальдо ДГИ" class="form-control" disabled />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon2" title="За вычетом суммы ДГИ, предъявленной по исковым работам. Учитываются только неотмененные исковые работы с вынесеным судебным приказом (дата и номер) и с указанным периодом взыскания. Не учитываются исковые работы, сформированные в период выставления начислиний БКС, т.к. в движении средств отражены фактические выплаты по этим исковым работам">
+                                        @(Model.CurrentBalanceDgi - (dgiClaimsSum - payedDgiClaimsSum))
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (hasPkkCharges)
+                    {
+                        <div class="form-group col-6 col-lg-4 mb-2">
+                            <label class="rr-account-label mb-1" asp-for="CurrentBalancePkk">Сальдо ПКК</label>
+
+                            <div class="input-group">
+                                <input type="text" asp-for="CurrentBalancePkk" title="Текущее сальдо ПКК" class="form-control" disabled />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon2" title="За вычетом суммы ПКК, предъявленной по исковым работам. Учитываются только неотмененные исковые работы с вынесеным судебным приказом (дата и номер) и с указанным периодом взыскания. Не учитываются исковые работы, сформированные в период выставления начислиний БКС, т.к. в движении средств отражены фактические выплаты по этим исковым работам">
+                                        @(Model.CurrentBalancePkk - (pkkClaimsSum - payedPkkClaimsSum))
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (hasPadunCharges)
+                    {
+                        <div class="form-group col-6 col-lg-4 mb-2">
+                            <label class="rr-account-label mb-1" asp-for="CurrentBalancePadun">Сальдо Падун</label>
+
+                            <div class="input-group">
+                                <input type="text" asp-for="CurrentBalancePadun" title="Текущее сальдо Падун" class="form-control" disabled />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon2" title="За вычетом суммы Падун, предъявленной по исковым работам. Учитываются только неотмененные исковые работы с вынесеным судебным приказом (дата и номер) и с указанным периодом взыскания. Не учитываются исковые работы, сформированные в период выставления начислиний БКС, т.к. в движении средств отражены фактические выплаты по этим исковым работам">
+                                        @(Model.CurrentBalancePadun - (padunClaimsSum - payedPadunClaimsSum))
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @{
+
+                        var cssClasses = "col-12 col-lg-4";
+                        switch (additionalChargesCount)
+                        {
+                            case 1:
+                                cssClasses = "col-6 col-lg-12";
+                                break;
+                            case 2:
+                                cssClasses = "col-12 col-lg-8";
+                                break;
+                            case 3:
+                                cssClasses = "col-6 col-lg-4";
+                                break;
+                        }
+                    }
+                    <div class="form-group @cssClasses mb-2">
+                        <label class="rr-account-label mb-1" asp-for="Owner">Владелец ЛС</label>
+                        <input type="text" asp-for="Owner" title="Владелец ЛС - указывается, если не совпадает с нанимателем по договору найма" class="form-control" maxlength="355" />
                     </div>
                 </div>
-            }
-            <input type="hidden" asp-for="RecalcMarker" />
-        </form>
+                @if (Model.RecalcMarker == 1)
+                {
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label asp-for="RecalcReason">Требуется перерасчет</label>
+                            <input class="form-control rr-account-recalc-reason" asp-for="RecalcReason" maxlength="255" title="Требуется перерасчет" disabled />
+                        </div>
+                    </div>
+                }
+                <input type="hidden" asp-for="RecalcMarker" />
+            </form>
         @if (ViewBag.Action == ActionTypeEnum.Delete || ViewBag.Action == ActionTypeEnum.Details)
         {
             <div class="card mt-2">
-                <div class="card-header d-flex justify-content-between pt-2 pb-2">
+                <div class="card-header d-flex justify-content-between flex-column flex-md-row pt-2 pb-2">
                     <h3>Начисления</h3>
+                    
+                    @if (hasDgiCharges || hasPadunCharges || hasPkkCharges)
+                    {
+                        <div class="btn-group btn-group-toggle rr-tenancy-type-selectors mb-2 mb-md-0" data-toggle="buttons">
+                            <label class="btn btn-secondary active">
+                                <input type="radio" name="ChargesSelector" id="AllChargesSelector" checked> Всего
+                            </label>
+                            <label class="btn btn-secondary">
+                                <input type="radio" name="ChargesSelector" id="TenancySelector"> Найм
+                            </label>
+                            @if (hasDgiCharges)
+                            {
+                                <label class="btn btn-secondary">
+                                    <input type="radio" name="ChargesSelector" id="DgiSelector"> ДГИ
+                                </label>
+                            }
+                            @if (hasPkkCharges)
+                            {
+                                <label class="btn btn-secondary">
+                                    <input type="radio" name="ChargesSelector" id="PkkSelector"> ПКК
+                                </label>
+                            }
+                            @if (hasPadunCharges)
+                            {
+                                <label class="btn btn-secondary">
+                                    <input type="radio" name="ChargesSelector" id="PadunSelector"> Падун
+                                </label>
+                            }
+                        </div>
+                    }
+
                     <div class="btn-group" role="group">
+                        <a href="#" id="CopyChargesToClipboard" class="form-control btn btn-dark">
+                            <span style="top: 2px;" class="oi oi-clipboard"></span>
+                        </a>
                         <a href="#" id="AddChargeCorrectionBtn" class="form-control btn btn-warning @(Model.IdState == 2 ? "disabled" : "")">
                             <span style="top: 2px;" class="oi oi-pencil"></span>
                         </a>
@@ -402,6 +542,9 @@
                                 EndDate = currMonthEndDate,
                                 InputTenancy = prevCharge?.OutputTenancy ?? 0.00m,
                                 InputPenalty = prevCharge?.OutputPenalty ?? 0.00m,
+                                InputDgi = prevCharge?.OutputDgi ?? 0.00m,
+                                InputPkk = prevCharge?.OutputPkk ?? 0.00m,
+                                InputPadun = prevCharge?.OutputPadun ?? 0.00m,
                                 PaymentTenancy = 0.00m,
                                 PaymentPenalty = 0.00m
                             });
@@ -413,16 +556,73 @@
                             <thead>
                                 <tr>
                                     <th class="text-center p-1" title="Дата последнего начисления">Дата</th>
-                                    <th class="text-center p-1" title="Входящее сальдо найм">Вх. найм</th>
-                                    <th class="text-center p-1" title="Входящее сальдо пени">Вх. пени</th>
-                                    <th class="text-center p-1" title="Начислено найм">Начислено найм</th>
-                                    <th class="text-center p-1" title="Начислено пени">Начислено пени</th>
-                                    <th class="text-center p-1" title="Оплачено найм">Оплата найм</th>
-                                    <th class="text-center p-1" title="Оплачено пени">Оплата пени</th>
-                                    <th class="text-center p-1" title="Перерасчет найм">Перерасчет найм</th>
-                                    <th class="text-center p-1" title="Перерасчет пени">Перерасчет пени</th>
-                                    <th class="text-center p-1" title="Исходящее сальдо найм">Исх. найм</th>
-                                    <th class="text-center p-1" title="Исходящее сальдо пени">Исх. пени</th>
+                                    @* Найм *@
+                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Входящее сальдо найм">Вх. найм</th>
+                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Входящее сальдо пени">Вх. пени</th>
+                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Начислено найм">Начислено найм</th>
+                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Начислено пени">Начислено пени</th>
+                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Оплачено найм">Оплата найм</th>
+                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Оплачено пени">Оплата пени</th>
+                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Перерасчет найм">Перерасчет найм</th>
+                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Перерасчет пени">Перерасчет пени</th>
+                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Исходящее сальдо найм">Исх. найм</th>
+                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Исходящее сальдо пени">Исх. пени</th>
+
+                                    @* ДГИ *@
+                                    @if (hasDgiCharges)
+                                    {
+                                        <th class="text-center p-1 rr-charge-dgi d-none" title="Входящее сальдо ДГИ">Вх. ДГИ</th>
+                                        <th class="text-center p-1 rr-charge-dgi d-none" title="Начислено ДГИ">Начислено ДГИ</th>
+                                        <th class="text-center p-1 rr-charge-dgi d-none" title="Оплачено ДГИ">Оплата ДГИ</th>
+                                        <th class="text-center p-1 rr-charge-dgi d-none" title="Перерасчет ДГИ">Перерасчет ДГИ</th>
+                                        <th class="text-center p-1 rr-charge-dgi d-none" title="Исходящее сальдо ДГИ">Исх. ДГИ</th>
+                                    }
+                                    @* ПКК *@
+                                    @if (hasPkkCharges)
+                                    {
+                                        <th class="text-center p-1 rr-charge-pkk d-none" title="Входящее сальдо ПКК">Вх. ПКК</th>
+                                        <th class="text-center p-1 rr-charge-pkk d-none" title="Начислено ПКК">Начислено ПКК</th>
+                                        <th class="text-center p-1 rr-charge-pkk d-none" title="Оплачено ПКК">Оплата ПКК</th>
+                                        <th class="text-center p-1 rr-charge-pkk d-none" title="Перерасчет ПКК">Перерасчет ПКК</th>
+                                        <th class="text-center p-1 rr-charge-pkk d-none" title="Исходящее сальдо ПКК">Исх. ПКК</th>
+                                    }
+                                    @* Падун *@
+                                    @if (hasPadunCharges)
+                                    {
+                                        <th class="text-center p-1 rr-charge-padun d-none" title="Входящее сальдо Падун">Вх. Падун</th>
+                                        <th class="text-center p-1 rr-charge-padun d-none" title="Начислено Падун">Начислено Падун</th>
+                                        <th class="text-center p-1 rr-charge-padun d-none" title="Оплачено Падун">Оплата Падун</th>
+                                        <th class="text-center p-1 rr-charge-padun d-none" title="Перерасчет Падун">Перерасчет Падун</th>
+                                        <th class="text-center p-1 rr-charge-padun d-none" title="Исходящее сальдо Падун">Исх. Падун</th>
+                                    }
+
+                                    @* Всего *@
+                                    @if (hasDgiCharges || hasPadunCharges || hasPkkCharges)
+                                    {
+                                        var title = "найм";
+                                        if (hasDgiCharges)
+                                        {
+                                            title += "+ДГИ";
+                                        }
+                                        if (hasPkkCharges)
+                                        {
+                                            title += "+ПКК";
+                                        }
+                                        if (hasPadunCharges)
+                                        {
+                                            title += "+Падун";
+                                        }
+                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Входящее сальдо @title">Вх. @title</th>
+                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Входящее сальдо пени">Вх. пени</th>
+                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Начислено @title">Начислено @title</th>
+                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Начислено пени">Начислено пени</th>
+                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Оплачено @title">Оплата @title</th>
+                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Оплачено пени">Оплата пени</th>
+                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Перерасчет @title">Перерасчет @title</th>
+                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Перерасчет пени">Перерасчет пени</th>
+                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Исходящее сальдо @title">Исх. @title</th>
+                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Исходящее сальдо пени">Исх. пени</th>
+                                    }
                                 </tr>
                             </thead>
                             <tbody>
@@ -437,6 +637,23 @@
                                     var totalPaymentPenaltyByAccount = 0.00m;
                                     var totalRecalcTenancy = 0.00m;
                                     var totalRecalcPenalty = 0.00m;
+
+                                    var totalChargeDgi = 0.00m;
+                                    var totalPaymentDgi = 0.00m;
+                                    var totalPaymentDgiByAccount = 0.00m;
+                                    var totalRecalcDgi = 0.00m;
+
+                                    var totalChargePkk = 0.00m;
+                                    var totalPaymentPkk = 0.00m;
+                                    var totalPaymentPkkByAccount = 0.00m;
+                                    var totalRecalcPkk = 0.00m;
+
+                                    var totalChargePadun = 0.00m;
+                                    var totalPaymentPadun = 0.00m;
+                                    var totalPaymentPadunByAccount = 0.00m;
+                                    var totalRecalcPadun = 0.00m;
+                                    
+                                    var totalPaymentTotalByAccount = 0.00m;
                                 }
                                 @foreach (var charge in Model.Charges.Where(r => r.Hidden == 0).OrderBy(r => r.EndDate))
                                 {
@@ -444,19 +661,32 @@
                                     {
                                         totalChargeTenancy += charge.ChargeTenancy;
                                         totalChargePenalty += charge.ChargePenalty;
+                                        totalChargeDgi += charge.ChargeDgi;
+                                        totalChargePkk += charge.ChargePkk;
+                                        totalChargePadun += charge.ChargePadun;
+
                                         totalRecalcTenancy += charge.RecalcTenancy + charge.CorrectionTenancy;
                                         totalRecalcPenalty += charge.RecalcPenalty + charge.CorrectionPenalty;
+                                        totalRecalcDgi += charge.RecalcDgi + charge.CorrectionDgi;
+                                        totalRecalcPkk += charge.RecalcPkk + charge.CorrectionPkk;
+                                        totalRecalcPadun += charge.RecalcPadun + charge.CorrectionPadun;
                                     }
                                     totalPaymentTenancy += charge.PaymentTenancy;
                                     totalPaymentPenalty += charge.PaymentPenalty;
+                                    totalPaymentDgi += charge.PaymentDgi;
+                                    totalPaymentPkk += charge.PaymentPkk;
+                                    totalPaymentPadun += charge.PaymentPadun;
                                     i++;
                                     <tr class="@(count - i + 1 > 12 ? "rr-charge-archive" : "") @(charge.EndDate == currMonthEndDate ? "rr-charge-current-month-row" : "")" data-charge-end-date="@charge.EndDate.ToString("yyyy-MM-dd")">
+
                                         <td class="text-center p-1"><b>@charge.EndDate.ToString("dd.MM.yyyy")</b></td>
-                                        <td class="text-center p-1 rr-charge-period-input-tenancy">@charge.InputTenancy</td>
-                                        <td class="text-center p-1 rr-charge-period-input-penalty">@charge.InputPenalty</td>
-                                        <td class="text-center p-1 rr-charge-period-tenancy">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargeTenancy : 0)</td>
-                                        <td class="text-center p-1 rr-charge-period-penalty">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargePenalty : 0)</td>
-                                        <td class="text-center p-1 rr-charge-period-payment-tenancy">
+
+                                        @* Найм *@
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-input-tenancy">@charge.InputTenancy</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-input-penalty">@charge.InputPenalty</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-tenancy">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargeTenancy : 0)</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-penalty">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargePenalty : 0)</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-payment-tenancy">
                                             @{
                                                 var tenancyOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.TenancyValue) ?? 0m;
                                                 tenancyOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentTenancyValue);
@@ -483,7 +713,7 @@
                                                 @charge.PaymentTenancy
                                             }
                                         </td>
-                                        <td class="text-center p-1 rr-charge-period-payment-penalty">
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-payment-penalty">
                                             @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index"
@@ -494,23 +724,154 @@
                                                 @charge.PaymentPenalty
                                             }
                                         </td>
-                                        <td class="text-center p-1 rr-charge-period-recalc-tenancy">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcTenancy + charge.CorrectionTenancy : 0)</td>
-                                        <td class="text-center p-1 rr-charge-period-recalc-penalty">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcPenalty + charge.CorrectionTenancy : 0)</td>
-                                        <td class="text-center p-1 rr-charge-period-output-tenancy">@charge.OutputTenancy</td>
-                                        <td class="text-center p-1 rr-charge-period-output-penalty">@charge.OutputPenalty</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-recalc-tenancy">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcTenancy + charge.CorrectionTenancy : 0)</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-recalc-penalty">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcPenalty + charge.CorrectionPenalty : 0)</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-output-tenancy">@charge.OutputTenancy</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-output-penalty">@charge.OutputPenalty</td>
+
+                                        @* ДГИ *@
+                                        @if (hasDgiCharges)
+                                        {
+                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-input-dgi">@charge.InputDgi</td>
+                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-dgi">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargeDgi : 0)</td>
+                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-payment-dgi">
+                                                @{
+                                                    var dgiOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.DgiValue) ?? 0m;
+                                                    dgiOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentDgiValue);
+                                                    if (charge.IsBksCharge == 1)
+                                                    {
+                                                        dgiOnAccount = charge.PaymentDgi;
+                                                    }
+                                                    totalPaymentDgiByAccount += dgiOnAccount;
+                                                }
+                                                @if (charge.PaymentDgi != 0)
+                                                {
+                                                    <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentDgi - dgiOnAccount) руб." asp-action="Index"
+                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" )">@charge.PaymentDgi</a>
+                                                }
+                                                else
+                                                {
+                                                    @charge.PaymentDgi
+                                                }
+                                            </td>
+                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-recalc-dgi">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcDgi + charge.CorrectionDgi : 0)</td>
+                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-output-dgi">@charge.OutputDgi</td>
+                                        }
+                                        @* ПКК *@
+                                        @if (hasPkkCharges)
+                                        {
+                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-input-pkk">@charge.InputPkk</td>
+                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-pkk">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargePkk : 0)</td>
+                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-payment-pkk">
+                                                @{
+                                                    var pkkOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.PkkValue) ?? 0m;
+                                                    pkkOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentPkkValue);
+                                                    if (charge.IsBksCharge == 1)
+                                                    {
+                                                        pkkOnAccount = charge.PaymentPkk;
+                                                    }
+                                                    totalPaymentPkkByAccount += pkkOnAccount;
+                                                }
+                                                @if (charge.PaymentPkk != 0)
+                                                {
+                                                    <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPkk - pkkOnAccount) руб." asp-action="Index"
+                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" )">@charge.PaymentPkk</a>
+                                                }
+                                                else
+                                                {
+                                                    @charge.PaymentPkk
+                                                }
+                                            </td>
+                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-recalc-pkk">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcPkk + charge.CorrectionPkk : 0)</td>
+                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-output-pkk">@charge.OutputPkk</td>
+                                        }
+                                        @* Падун *@
+                                        @if (hasPadunCharges)
+                                        {
+                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-input-padun">@charge.InputPadun</td>
+                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-padun">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargePadun : 0)</td>
+                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-payment-padun">
+                                                @{
+                                                    var padunOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.PadunValue) ?? 0m;
+                                                    padunOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentPadunValue);
+                                                    if (charge.IsBksCharge == 1)
+                                                    {
+                                                        padunOnAccount = charge.PaymentPadun;
+                                                    }
+                                                    totalPaymentPadunByAccount += padunOnAccount;
+                                                }
+                                                @if (charge.PaymentPadun != 0)
+                                                {
+                                                    <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPadun - padunOnAccount) руб." asp-action="Index"
+                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" )">@charge.PaymentPadun</a>
+                                                }
+                                                else
+                                                {
+                                                    @charge.PaymentPadun
+                                                }
+                                            </td>
+                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-recalc-padun">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcPadun + charge.CorrectionPadun : 0)</td>
+                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-output-padun">@charge.OutputPadun</td>
+                                        }
+
+                                        @* Всего *@
+                                        @if (hasDgiCharges || hasPkkCharges || hasPadunCharges)
+                                        {
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-input-all">@(charge.InputTenancy+charge.InputDgi+charge.InputPkk+charge.InputPadun)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-input-all-penalty">@charge.InputPenalty</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-all">@(charge.EndDate <= DateTime.Now.Date ? (charge.ChargeTenancy+charge.ChargeDgi+charge.ChargePkk + charge.ChargePadun) : 0)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-all-penalty">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargePenalty : 0)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-payment-all">
+                                                @{
+                                                    var totalOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.TenancyValue + r.DgiValue + r.PkkValue + r.PadunValue) ?? 0m;
+                                                    totalOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentTenancyValue + r.PaymentDgiValue + r.PaymentPkkValue + r.PaymentPadunValue);
+                                                    if (charge.IsBksCharge == 1)
+                                                    {
+                                                        totalOnAccount = charge.PaymentTenancy + charge.PaymentDgi + charge.PaymentPkk + charge.PaymentPadun;
+                                                    }
+                                                    totalPaymentTotalByAccount += totalOnAccount;
+                                                }
+                                                @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0 || charge.PaymentDgi != 0 || charge.PaymentPkk != 0 || charge.PaymentPadun != 0)
+                                                {
+                                                    <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @((charge.PaymentTenancy+charge.PaymentDgi+charge.PaymentPkk+charge.PaymentPadun) - totalOnAccount) руб." asp-action="Index"
+                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" )">@(charge.PaymentTenancy + charge.PaymentDgi + charge.PaymentPkk + charge.PaymentPadun)</a>
+                                                }
+                                                else
+                                                {
+                                                    @(charge.PaymentTenancy + charge.PaymentDgi + charge.PaymentPkk + charge.PaymentPadun)
+                                                }
+                                            </td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-payment-all-penalty">
+                                                @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0 || charge.PaymentDgi != 0 || charge.PaymentPkk != 0 || charge.PaymentPadun != 0)
+                                                {
+                                                    <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index"
+                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge">@charge.PaymentPenalty</a>
+                                                }
+                                                else
+                                                {
+                                                    @charge.PaymentPenalty
+                                                }
+                                            </td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all">@(charge.EndDate <= DateTime.Now.Date ? (charge.RecalcTenancy + charge.CorrectionTenancy + charge.RecalcDgi + charge.CorrectionDgi + charge.RecalcPkk + charge.CorrectionPkk + charge.RecalcPadun + charge.CorrectionPadun) : 0)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all-penalty">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcPenalty + charge.CorrectionPenalty : 0)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-output-all">@(charge.OutputTenancy+charge.OutputDgi+charge.OutputPkk+charge.OutputPadun)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-output-all-penalty">@charge.OutputPenalty</td>
+                                        }
                                     </tr>
                                 }
                                 <tr class="rr-charge-total-row">
                                     <td class="text-center p-1"><b>Итого</b></td>
-                                    <td class="text-center p-1"><b>-</b></td>
-                                    <td class="text-center p-1"><b>-</b></td>
-                                    <td class="text-center p-1 rr-charge-total-tenancy"><b>@totalChargeTenancy</b></td>
-                                    <td class="text-center p-1 rr-charge-total-penalty"><b>@totalChargePenalty</b></td>
-                                    <td class="text-center p-1">
+
+                                    @* Найм *@
+                                    <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")"><b>-</b></td>
+                                    <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")"><b>-</b></td>
+                                    <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-total-tenancy"><b>@totalChargeTenancy</b></td>
+                                    <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-total-penalty"><b>@totalChargePenalty</b></td>
+                                    <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")">
                                         @if (totalPaymentTenancy > 0 || totalPaymentPenalty > 0)
                                         {
                                             <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentTenancy - totalPaymentTenancyByAccount) руб." asp-action="Index"
-                                               asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentTenancy</b></a>
+                                                asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentTenancy</b></a>
                                         }
                                         else
                                         {
@@ -518,11 +879,11 @@
                                         }
 
                                     </td>
-                                    <td class="text-center p-1">
+                                    <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")">
                                         @if (totalPaymentTenancy > 0 || totalPaymentPenalty > 0)
                                         {
                                             <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPenalty - totalPaymentPenaltyByAccount) руб." asp-action="Index"
-                                               asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPenalty</b></a>
+                                                asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPenalty</b></a>
                                         }
                                         else
                                         {
@@ -531,10 +892,114 @@
 
 
                                     </td>
-                                    <td class="text-center p-1 rr-charge-total-recalc-tenancy"><b>@totalRecalcTenancy</b></td>
-                                    <td class="text-center p-1 rr-charge-total-recalc-penalty"><b>@totalRecalcPenalty</b></td>
-                                    <td class="text-center p-1"><b>-</b></td>
-                                    <td class="text-center p-1"><b>-</b></td>
+                                    <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-total-recalc-tenancy"><b>@totalRecalcTenancy</b></td>
+                                    <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-total-recalc-penalty"><b>@totalRecalcPenalty</b></td>
+                                    <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")"><b>-</b></td>
+                                    <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")"><b>-</b></td>
+
+                                    @* ДГИ *@
+                                    @if (hasDgiCharges)
+                                    {
+                                        <td class="text-center p-1 rr-charge-dgi d-none"><b>-</b></td>
+                                        <td class="text-center p-1 rr-charge-dgi d-none"><b>@totalChargeDgi</b></td>
+                                        <td class="text-center p-1 rr-charge-dgi d-none">
+                                            @if (totalPaymentDgi > 0)
+                                            {
+                                                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentDgi - totalPaymentDgiByAccount) руб." asp-action="Index"
+                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentDgi</b></a>
+                                            }
+                                            else
+                                            {
+                                                <b>@totalPaymentDgi</b>
+                                            }
+
+                                        </td>
+                                        <td class="text-center p-1 rr-charge-dgi d-none"><b>@totalRecalcDgi</b></td>
+                                        <td class="text-center p-1 rr-charge-dgi d-none"><b>-</b></td>
+                                    }
+
+                                    @* ПКК *@
+                                    @if (hasPkkCharges)
+                                    {
+                                        <td class="text-center p-1 rr-charge-pkk d-none"><b>-</b></td>
+                                        <td class="text-center p-1 rr-charge-pkk d-none"><b>@totalChargePkk</b></td>
+                                        <td class="text-center p-1 rr-charge-pkk d-none">
+                                            @if (totalPaymentPkk > 0)
+                                            {
+                                                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPkk - totalPaymentPkkByAccount) руб." asp-action="Index"
+                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPkk</b></a>
+                                            }
+                                            else
+                                            {
+                                                <b>@totalPaymentPkk</b>
+                                            }
+
+                                        </td>
+                                        <td class="text-center p-1 rr-charge-pkk d-none"><b>@totalRecalcPkk</b></td>
+                                        <td class="text-center p-1 rr-charge-pkk d-none"><b>-</b></td>
+                                    }
+
+                                    @* Падун *@
+                                    @if (hasPadunCharges)
+                                    {
+                                        <td class="text-center p-1 rr-charge-padun d-none"><b>-</b></td>
+                                        <td class="text-center p-1 rr-charge-padun d-none"><b>@totalChargePadun</b></td>
+                                        <td class="text-center p-1 rr-charge-padun d-none">
+                                            @if (totalPaymentPadun > 0)
+                                            {
+                                                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPadun - totalPaymentPadunByAccount) руб." asp-action="Index"
+                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPadun</b></a>
+                                            }
+                                            else
+                                            {
+                                                <b>@totalPaymentPadun</b>
+                                            }
+
+                                        </td>
+                                        <td class="text-center p-1 rr-charge-padun d-none"><b>@totalRecalcPadun</b></td>
+                                        <td class="text-center p-1 rr-charge-padun d-none"><b>-</b></td>
+                                    }
+
+                                    @* Всего *@
+                                    @if (hasDgiCharges || hasPkkCharges || hasPadunCharges)
+                                    {
+                                        <td class="text-center p-1 rr-charge-total"><b>-</b></td>
+                                        <td class="text-center p-1 rr-charge-total"><b>-</b></td>
+                                        <td class="text-center p-1 rr-charge-total rr-charge-total-all"><b>@(totalChargeTenancy+totalChargePkk+totalChargeDgi+totalChargePadun)</b></td>
+                                        <td class="text-center p-1 rr-charge-total rr-charge-total-all-penalty"><b>@totalChargePenalty</b></td>
+                                        <td class="text-center p-1 rr-charge-total">
+                                            @{ 
+                                                var totalPaymentTotal = totalPaymentTenancy + totalPaymentDgi + totalPaymentPkk + totalPaymentPadun;
+                                            }
+                                            @if (totalPaymentTotal > 0 || totalPaymentPenalty > 0)
+                                            {
+                                                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentTotal - totalPaymentTotalByAccount) руб." asp-action="Index"
+                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentTotal</b></a>
+                                            }
+                                            else
+                                            {
+                                                <b>@totalPaymentTotal</b>
+                                            }
+
+                                        </td>
+                                        <td class="text-center p-1 rr-charge-total">
+                                            @if (totalPaymentTotal > 0 || totalPaymentPenalty > 0)
+                                            {
+                                                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPenalty - totalPaymentPenaltyByAccount) руб." asp-action="Index"
+                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPenalty</b></a>
+                                            }
+                                            else
+                                            {
+                                                <b>@totalPaymentPenalty</b>
+                                            }
+
+
+                                        </td>
+                                        <td class="text-center p-1 rr-charge-total rr-charge-total-recalc-all"><b>@(totalRecalcTenancy + totalRecalcDgi + totalRecalcPkk + totalRecalcPadun)</b></td>
+                                        <td class="text-center p-1 rr-charge-total rr-charge-total-recalc-all-penalty"><b>@totalRecalcPenalty</b></td>
+                                        <td class="text-center p-1 rr-charge-total"><b>-</b></td>
+                                        <td class="text-center p-1 rr-charge-total"><b>-</b></td>
+                                    }
                                 </tr>
                             </tbody>
                         </table>
@@ -620,24 +1085,38 @@
                         <table class="table table-bordered table-striped m-0">
                             <thead>
                                 <tr>
+                                    @{ 
+                                        var colSpan = 2 + additionalChargesCount;
+                                    }
                                     <th class="text-center p-1" rowspan="2" title="Период взыскания">Период взыскания</th>
                                     <th class="text-center p-1" rowspan="2" title="Состояние">Состояние</th>
-                                    <th class="text-center p-1" colspan="2" title="Предъявленная сумма">Предъявленная сумма</th>
-                                    <th class="text-center p-1" colspan="2" title="Взысканная сумма">Взысканная сумма</th>
-                                    <th class="text-center p-1" colspan="2" title="Остаток">Остаток</th>
+                                    <th class="text-center p-1" colspan="@colSpan" title="Предъявленная сумма">Предъявленная сумма</th>
+                                    <th class="text-center p-1" colspan="@colSpan" title="Взысканная сумма">Взысканная сумма</th>
+                                    <th class="text-center p-1" colspan="@colSpan" title="Остаток">Остаток</th>
                                 </tr>
                                 <tr>
-                                    <th class="text-center p-1" title="Найм">Найм</th>
-                                    <th class="text-center p-1" title="Пени">Пени</th>
-                                    <th class="text-center p-1" title="Найм">Найм</th>
-                                    <th class="text-center p-1" title="Пени">Пени</th>
-                                    <th class="text-center p-1" title="Найм">Найм</th>
-                                    <th class="text-center p-1" title="Пени">Пени</th>
+                                    @for (var i = 0; i < 3; i++)
+                                    {
+                                        <th class="text-center p-1" title="Найм">Найм</th>
+                                        <th class="text-center p-1" title="Пени">Пени</th>
+                                        @if (hasDgiCharges)
+                                        {
+                                            <th class="text-center p-1" title="ДГИ">ДГИ</th>
+                                        }
+                                        @if (hasPkkCharges)
+                                        {
+                                            <th class="text-center p-1" title="ПКК">ПКК</th>
+                                        }
+                                        @if (hasPadunCharges)
+                                        {
+                                            <th class="text-center p-1" title="Падун">Падун</th>
+                                        }
+                                    }
                                 </tr>
                             </thead>
                             <tbody>
                                 @{ 
-                                    var totals = new decimal[6];
+                                    var totals = new decimal[15];
                                 }
                                 @foreach (var claim in Model.Claims)
                                 {
@@ -670,30 +1149,76 @@
                                     {
                                         rentPeriod = "н/а";
                                     }
-                                    totals[0] += (claim.AmountTenancy + claim.AmountPadun + claim.AmountDgi + claim.AmountPkk) ?? 0m;
+                                    totals[0] += claim.AmountTenancy ?? 0m;
                                     totals[1] += claim.AmountPenalties ?? 0m;
+                                    totals[6] += claim.AmountDgi ?? 0m;
+                                    totals[9] += claim.AmountPkk ?? 0m;
+                                    totals[12] += claim.AmountPadun ?? 0m;
                                     totals[2] += claim.AmountTenancyRecovered ?? 0m;
                                     totals[3] += claim.AmountPenaltiesRecovered ?? 0m;
-                                    totals[4] += (claim.AmountTenancy + claim.AmountPadun + claim.AmountDgi + claim.AmountPkk - claim.AmountTenancyRecovered) ?? 0m;
+                                    totals[7] += claim.AmountDgiRecovered ?? 0m;
+                                    totals[10] += claim.AmountPkkRecovered ?? 0m;
+                                    totals[13] += claim.AmountPadunRecovered ?? 0m;
+                                    totals[4] += (claim.AmountTenancy - claim.AmountTenancyRecovered) ?? 0m;
                                     totals[5] += (claim.AmountPenalties - claim.AmountPenaltiesRecovered) ?? 0m;
+                                    totals[8] += (claim.AmountDgi - claim.AmountDgiRecovered) ?? 0m;
+                                    totals[11] += (claim.AmountPkk - claim.AmountPkkRecovered) ?? 0m;
+                                    totals[14] += (claim.AmountPadun - claim.AmountPadunRecovered) ?? 0m;
 
-                                    <tr class="@(canceledClaim ? "table-danger" : winOrderClaim ? "table-success" : "")" title="@(canceledClaim ? "Отмененная исковая работа" : 
+                                <tr class="@(canceledClaim ? "table-danger" : winOrderClaim ? "table-success" : "")" title="@(canceledClaim ? "Отмененная исковая работа" :
                                         winOrderClaim ? "Вынесен судебный приказ №"+(prepareCourtOrderState.CourtOrderNum ?? "б/н")+" от "+prepareCourtOrderState.CourtOrderDate.Value.ToString("dd.MM.yyyy") : "")">
-                                        <td class="text-center p-1">
-                                            @rentPeriod
-                                            <a class="btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn" target="_blank"
-                                               asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.IdClaim"
-                                               asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
-                                            </a>
-                                        </td>
-                                        <td class="text-center p-1">@(lastState != null ? lastState.IdStateTypeNavigation.StateType : "")</td>
-                                        <td class="text-center p-1">@((claim.AmountTenancy + claim.AmountPadun + claim.AmountDgi + claim.AmountPkk)?.ToString() ?? "0,00")</td>
-                                        <td class="text-center p-1">@(claim.AmountPenalties?.ToString() ?? "0,00")</td>
-                                        <td class="text-center p-1">@(claim.AmountTenancyRecovered?.ToString() ?? "0,00")</td>
-                                        <td class="text-center p-1">@(claim.AmountPenaltiesRecovered?.ToString() ?? "0,00")</td>
-                                        <td class="text-center p-1">@((claim.AmountTenancy + claim.AmountPadun + claim.AmountDgi + claim.AmountPkk - claim.AmountTenancyRecovered)?.ToString() ?? "0,00")</td>
-                                        <td class="text-center p-1">@((claim.AmountPenalties - claim.AmountPenaltiesRecovered)?.ToString() ?? "0,00")</td>
-                                    </tr>
+                                    <td class="text-center p-1">
+                                        @rentPeriod
+                                        <a class="btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn" target="_blank"
+                                           asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.IdClaim"
+                                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
+                                        </a>
+                                    </td>
+                                    <td class="text-center p-1">@(lastState != null ? lastState.IdStateTypeNavigation.StateType : "")</td>
+                                    <td class="text-center p-1">@(claim.AmountTenancy?.ToString() ?? "0,00")</td>
+                                    <td class="text-center p-1">@(claim.AmountPenalties?.ToString() ?? "0,00")</td>
+                                    @if (hasDgiCharges)
+                                    {
+                                        <td class="text-center p-1">@(claim.AmountDgi?.ToString() ?? "0,00")</td>
+                                    }
+                                    @if (hasPkkCharges)
+                                    {
+                                        <td class="text-center p-1">@(claim.AmountPkk?.ToString() ?? "0,00")</td>
+                                    }
+                                    @if (hasPadunCharges)
+                                    {
+                                        <td class="text-center p-1">@(claim.AmountPadun?.ToString() ?? "0,00")</td>
+                                    }
+                                    <td class="text-center p-1">@(claim.AmountTenancyRecovered?.ToString() ?? "0,00")</td>
+                                    <td class="text-center p-1">@(claim.AmountPenaltiesRecovered?.ToString() ?? "0,00")</td>
+                                    @if (hasDgiCharges)
+                                    {
+                                        <td class="text-center p-1">@(claim.AmountDgiRecovered?.ToString() ?? "0,00")</td>
+                                    }
+                                    @if (hasPkkCharges)
+                                    {
+                                        <td class="text-center p-1">@(claim.AmountPkkRecovered?.ToString() ?? "0,00")</td>
+                                    }
+                                    @if (hasPadunCharges)
+                                    {
+                                        <td class="text-center p-1">@(claim.AmountPadunRecovered?.ToString() ?? "0,00")</td>
+                                    }
+
+                                    <td class="text-center p-1">@((claim.AmountTenancy - claim.AmountTenancyRecovered)?.ToString() ?? "0,00")</td>
+                                    <td class="text-center p-1">@((claim.AmountPenalties - claim.AmountPenaltiesRecovered)?.ToString() ?? "0,00")</td>
+                                    @if (hasDgiCharges)
+                                    {
+                                        <td class="text-center p-1">@((claim.AmountDgi - claim.AmountDgiRecovered)?.ToString() ?? "0,00")</td>
+                                    }
+                                    @if (hasPkkCharges)
+                                    {
+                                        <td class="text-center p-1">@((claim.AmountPkk - claim.AmountPkkRecovered)?.ToString() ?? "0,00")</td>
+                                    }
+                                    @if (hasPadunCharges)
+                                    {
+                                        <td class="text-center p-1">@((claim.AmountPadun - claim.AmountPadunRecovered)?.ToString() ?? "0,00")</td>
+                                    }
+                                </tr>
                                 }
                             </tbody>
                             <tfoot>
@@ -723,4 +1248,12 @@
 
 <partial name="AccountModals">
 <partial name="ReportsModals">
+
+@{
+    ViewBag.HasDgiCharges = hasDgiCharges;
+    ViewBag.HasPkkCharges = hasPkkCharges;
+    ViewBag.HasPadunCharges = hasPadunCharges;
+    ViewBag.AdditionalChargesCount = additionalChargesCount;
+}
+
 <partial name="AccountRecalcModal">

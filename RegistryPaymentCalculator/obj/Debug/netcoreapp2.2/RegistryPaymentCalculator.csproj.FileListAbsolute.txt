@@ -33,15 +33,12 @@ D:\Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\Regist
 D:\Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\RegistryServices.pdb
 D:\Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\RegistryPaymentsLoader.pdb
 D:\Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\RegistryReformaGKH.pdb
-D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.csproj.AssemblyReference.cache
-D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.GeneratedMSBuildEditorConfig.editorconfig
 D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.AssemblyInfoInputs.cache
 D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.AssemblyInfo.cs
 D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.csproj.CoreCompileInputs.cache
 D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.csproj.CopyComplete
 D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.dll
 D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.pdb
-D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.genruntimeconfig.cache
 C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\RegistryPaymentCalculator.dll.config
 C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\RegistryPaymentCalculator.deps.json
 C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\RegistryPaymentCalculator.runtimeconfig.json
@@ -90,3 +87,6 @@ D:\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPayment
 D:\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.genruntimeconfig.cache
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\InvoiceGenerator.dll
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\InvoiceGenerator.pdb
+D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.csprojAssemblyReference.cache
+D:\Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\InvoiceGenerator.dll
+D:\Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\InvoiceGenerator.pdb

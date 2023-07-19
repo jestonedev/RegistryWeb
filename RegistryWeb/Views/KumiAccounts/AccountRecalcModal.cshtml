@@ -76,6 +76,28 @@
     </div>
 </form>
 
+@{ 
+    var hasDgiCharges = ViewBag.HasDgiCharges ?? false;
+    var hasPkkCharges = ViewBag.HasPkkCharges ?? false;
+    var hasPadunCharges = ViewBag.HasPadunCharges ?? false;
+    var additionalChargesCount = ViewBag.AdditionalChargesCount ?? 0;
+
+    var cssClasses = "col-lg-3 col-6";
+    switch(additionalChargesCount)
+    {
+        case 0:
+            break;
+        case 1:
+            cssClasses = "col-4";
+            break;
+        case 2:
+            break;
+        case 3:
+            cssClasses = "col-lg-4 col-6";
+            break;
+    }
+}
+
 <form id="accountAddCorrectionForm" autocomplete="off">
     <div class="modal fade" id="accountAddCorrectionModal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
@@ -98,30 +120,86 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-3">
-                            <label for="AccountKumiChargeCorrection.TenancyValue">Начислено найм</label>
+                        <div class="form-group @cssClasses">
+                            <label class="rr-account-label" for="AccountKumiChargeCorrection.TenancyValue">Начислено найм</label>
                             <input type="text" class="form-control input-decimal" value="0,00" title="Сумма найм" name="AccountKumiChargeCorrection.TenancyValue"
                                    data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_TenancyValue" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.TenancyValue" data-valmsg-replace="true"></span>
                         </div>
-                        <div class="form-group col-3">
-                            <label for="AccountKumiChargeCorrection.PenaltyValue">Начислено пени</label>
+                        <div class="form-group @cssClasses">
+                            <label class="rr-account-label" for="AccountKumiChargeCorrection.PenaltyValue">Начислено пени</label>
                             <input type="text" class="form-control input-decimal" value="0,00" title="Сумма пени" name="AccountKumiChargeCorrection.PenaltyValue"
                                    data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_PenaltyValue" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.PenaltyValue" data-valmsg-replace="true"></span>
                         </div>
-                        <div class="form-group col-3">
-                            <label for="AccountKumiChargeCorrection.PaymentTenancyValue">Оплата найм</label>
+                        @if (hasDgiCharges)
+                        {
+                            <div class="form-group @cssClasses">
+                                <label class="rr-account-label" for="AccountKumiChargeCorrection.DgiValue">Начислено ДГИ</label>
+                                <input type="text" class="form-control input-decimal" value="0,00" title="Сумма ДГИ" name="AccountKumiChargeCorrection.DgiValue"
+                                       data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_DgiValue" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.DgiValue" data-valmsg-replace="true"></span>
+                            </div>
+                        }
+                        @if (hasPkkCharges)
+                        {
+                            <div class="form-group @(additionalChargesCount == 3 ? "offset-lg-2" : "") @cssClasses">
+                                <label class="rr-account-label" class="rr-account-label" for="AccountKumiChargeCorrection.PkkValue">Начислено ПКК</label>
+                                <input type="text" class="form-control input-decimal" value="0,00" title="Сумма ПКК" name="AccountKumiChargeCorrection.PkkValue"
+                                       data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_PkkValue" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.PkkValue" data-valmsg-replace="true"></span>
+                            </div>
+                        }
+                        @if (hasPadunCharges)
+                        {
+                            <div class="form-group @cssClasses">
+                                <label class="rr-account-label" for="AccountKumiChargeCorrection.PadunValue">Начислено Падун</label>
+                                <input type="text" class="form-control input-decimal" value="0,00" title="Сумма Падун" name="AccountKumiChargeCorrection.PadunValue"
+                                       data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_PadunValue" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.PadunValue" data-valmsg-replace="true"></span>
+                            </div>
+                        }
+                        <div class="form-group @cssClasses">
+                            <label class="rr-account-label" for="AccountKumiChargeCorrection.PaymentTenancyValue">Оплата найм</label>
                             <input type="text" class="form-control input-decimal" value="0,00" title="Сумма найм" name="AccountKumiChargeCorrection.PaymentTenancyValue"
                                    data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_PaymentTenancyValue" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.PaymentTenancyValue" data-valmsg-replace="true"></span>
                         </div>
-                        <div class="form-group col-3">
-                            <label for="AccountKumiChargeCorrection.PaymentPenaltyValue">Оплата пени</label>
+                        <div class="form-group @cssClasses">
+                            <label class="rr-account-label" for="AccountKumiChargeCorrection.PaymentPenaltyValue">Оплата пени</label>
                             <input type="text" class="form-control input-decimal" value="0,00" title="Сумма пени" name="AccountKumiChargeCorrection.PaymentPenaltyValue"
                                    data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_PaymentPenaltyValue" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.PaymentPenaltyValue" data-valmsg-replace="true"></span>
                         </div>
+                        @if (hasDgiCharges)
+                        {
+                            <div class="form-group @cssClasses">
+                                <label class="rr-account-label" for="AccountKumiChargeCorrection.PaymentDgiValue">Оплата ДГИ</label>
+                                <input type="text" class="form-control input-decimal" value="0,00" title="Сумма ДГИ" name="AccountKumiChargeCorrection.PaymentDgiValue"
+                                       data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_PaymentDgiValue" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.PaymentDgiValue" data-valmsg-replace="true"></span>
+                            </div>
+                        }
+
+                        @if (hasPkkCharges)
+                        {
+                            <div class="form-group @(additionalChargesCount == 3 ? "offset-lg-2" : "") @cssClasses">
+                                <label class="rr-account-label" for="AccountKumiChargeCorrection.PaymentPkkValue">Оплата ПКК</label>
+                                <input type="text" class="form-control input-decimal" value="0,00" title="Сумма ПКК" name="AccountKumiChargeCorrection.PaymentPkkValue"
+                                       data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_PaymentPkkValue" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.PaymentPkkValue" data-valmsg-replace="true"></span>
+                            </div>
+                        }
+
+                        @if (hasPadunCharges)
+                        {
+                            <div class="form-group @cssClasses">
+                                <label class="rr-account-label" for="AccountKumiChargeCorrection.PaymentPadunValue">Оплата пени</label>
+                                <input type="text" class="form-control input-decimal" value="0,00" title="Сумма Падун" name="AccountKumiChargeCorrection.PaymentPadunValue"
+                                       data-val="true" data-val-required="Укажите сумму" id="AccountKumiChargeCorrection_PaymentPadunValue" />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.PaymentPadunValue" data-valmsg-replace="true"></span>
+                            </div>
+                        }
                     </div>
                     <div class="form-row">
                         <div class="form-group col-12">

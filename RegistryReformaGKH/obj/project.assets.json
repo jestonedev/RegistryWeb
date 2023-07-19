@@ -686,23 +686,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Ignatov\\.nuget\\packages\\": {},
+    "C:\\Users\\merva\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Projects\\Visual Studio Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
+      "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
       "projectName": "RegistryReformaGKH",
-      "projectPath": "D:\\Projects\\Visual Studio Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
-      "packagesPath": "C:\\Users\\Ignatov\\.nuget\\packages\\",
-      "outputPath": "D:\\Projects\\Visual Studio Projects\\RegistryWeb\\RegistryReformaGKH\\obj\\",
+      "projectPath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\RegistryReformaGKH.csproj",
+      "packagesPath": "C:\\Users\\merva\\.nuget\\packages\\",
+      "outputPath": "D:\\Projects\\RegistryWeb\\RegistryReformaGKH\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Ignatov\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\merva\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

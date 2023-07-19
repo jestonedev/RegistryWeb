@@ -27,15 +27,12 @@ D:\Projects\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\RegistryReforma
 D:\Projects\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\RegistryDb.pdb
 D:\Projects\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\RegistryPaymentsLoader.pdb
 D:\Projects\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\RegistryReformaGKH.pdb
-D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.csproj.AssemblyReference.cache
-D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.GeneratedMSBuildEditorConfig.editorconfig
 D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.AssemblyInfoInputs.cache
 D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.AssemblyInfo.cs
 D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.csproj.CoreCompileInputs.cache
 D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.csproj.CopyComplete
 D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.dll
 D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.pdb
-D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.genruntimeconfig.cache
 D:\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\RegistryServices.deps.json
 D:\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\RegistryServices.runtimeconfig.json
 D:\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\RegistryServices.runtimeconfig.dev.json
@@ -78,3 +75,6 @@ C:\Users\belpe\Documents\registry\RegistryWeb\RegistryServices\obj\Debug\netcore
 C:\Users\belpe\Documents\registry\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.genruntimeconfig.cache
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\InvoiceGenerator.dll
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\InvoiceGenerator.pdb
+D:\Projects\RegistryWeb\RegistryServices\obj\Debug\netcoreapp2.2\RegistryServices.csprojAssemblyReference.cache
+D:\Projects\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\InvoiceGenerator.dll
+D:\Projects\RegistryWeb\RegistryServices\bin\Debug\netcoreapp2.2\InvoiceGenerator.pdb

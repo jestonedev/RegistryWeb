@@ -18,14 +18,22 @@ namespace RegistryDb.Models.Entities.Claims
         public int? IdAccount { get; set; }
         public int? IdAccountAdditional { get; set; }
         public int? IdAccountKumi { get; set; }
+
+        // Предъявленная задолженность
         public decimal? AmountTenancy { get; set; }
         public decimal? AmountPenalties { get; set; }
-        public decimal? AmountTenancyRecovered { get; set; }
-        public decimal? AmountPenaltiesRecovered { get; set; }
         public decimal? AmountDgi { get; set; }
         public decimal? AmountPadun { get; set; }
         public decimal? AmountPkk { get; set; }
-        // Фактически высужено
+
+        // Фактически взыскано
+        public decimal? AmountTenancyRecovered { get; set; }
+        public decimal? AmountPenaltiesRecovered { get; set; }
+        public decimal? AmountDgiRecovered { get; set; }
+        public decimal? AmountPkkRecovered { get; set; }
+        public decimal? AmountPadunRecovered { get; set; }
+
+        // Высуженная задолженность
         public decimal? FactAmountTenancy { get; set; }
         public decimal? FactAmountPenalties { get; set; }
         public decimal? FactAmountDgi { get; set; }

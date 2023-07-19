@@ -13,8 +13,20 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public int IdPayment { get; set; }
         public int IdCharge { get; set; }
         public DateTime Date { get; set; }
+        
+        // Найм
         public decimal TenancyValue { get; set; }
         public decimal PenaltyValue { get; set; }
+        
+        // ДГИ
+        public decimal DgiValue { get; set; }
+
+        // ПКК
+        public decimal PkkValue { get; set; }
+
+        // Падун
+        public decimal PadunValue { get; set; }
+
         public virtual KumiPayment Payment { get; set; }
         public virtual KumiCharge Charge { get; set; }
         public int? IdDisplayCharge { get; set; }

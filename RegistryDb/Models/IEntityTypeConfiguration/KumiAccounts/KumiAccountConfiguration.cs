@@ -76,6 +76,17 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnName("current_balance_penalty")
                 .HasColumnType("decimal(12,2)");
 
+            builder.Property(e => e.CurrentBalanceDgi)
+                .HasColumnName("current_balance_dgi")
+                .HasColumnType("decimal(12,2)");
+
+            builder.Property(e => e.CurrentBalancePkk)
+                .HasColumnName("current_balance_pkk")
+                .HasColumnType("decimal(12,2)");
+
+            builder.Property(e => e.CurrentBalancePadun)
+                .HasColumnName("current_balance_padun")
+                .HasColumnType("decimal(12,2)");
 
             builder.Property(e => e.Owner)
                 .HasColumnName("owner")

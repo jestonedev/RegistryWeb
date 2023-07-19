@@ -84,7 +84,7 @@ namespace RegistryWeb.DataServices
 
         public IQueryable<Claim> GetClaimsByAccountIdsForPaymentDistribute(List<int> accountIds)
         {
-            var claims = GetQuery();
+            var claims = GetQuery().Include(r => r.ClaimPersons);
             return claims.Where(r => r.IdAccountKumi != null && accountIds.Contains(r.IdAccountKumi.Value));
         }
 
@@ -198,6 +198,12 @@ namespace RegistryWeb.DataServices
                 }).ToList();
             }
             return new List<ClaimPerson>();
+        }
+
+        public string GetAccountAddress(int idAccount)
+        {
+            var infixes = registryContext.GetAddressByAccountIds(new List<int> { idAccount }).Select(r => r.Address).ToList();
+            return infixes.FirstOrDefault() ?? "";
         }
 
         public List<ClaimPerson> GetClaimPersonsFromTenancy(int? idAccountBks, int? idAccountKumi)

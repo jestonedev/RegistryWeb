@@ -93,16 +93,20 @@ namespace RegistryWeb.ViewOptions.Filter
             return IsAddressEmpty() && IsModalEmpty() && IdBuilding == null && IdPremises == null && IdSubPremises == null && FrontSideAccount == null;
         }
 
+        public bool IsBalanceEmpty()
+        {
+            return BalanceInputTotal == null && BalanceInputTenancy == null && BalanceInputPenalties == null &&
+                BalanceInputDgiPadunPkk == null && ChargingTotal == null && ChargingTenancy == null && ChargingPenalties == null &&
+                ChargingDgiPadunPkk == null && RecalcTenancy == null && RecalcPenalties == null && RecalcDgiPadunPkk == null &&
+                RecalcTotal == null && PaymentTenancy == null && PaymentPenalties == null && PaymentDgiPadunPkk == null && PaymentTotal == null &&
+                BalanceOutputTotal == null && BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null;
+        }
+
         public bool IsModalEmpty()
         {
             return Account == null && AccountGisZkh == null && Tenant == null &&
                 IdRegion == null && IdStreet == null && House == null && PremisesNum == null && IdPreset == null && IdClaimsBehavior == null &&
-                BalanceInputTotal == null && BalanceInputTenancy == null && BalanceInputPenalties == null &&
-                BalanceInputDgiPadunPkk == null && ChargingTotal == null && ChargingTenancy == null && ChargingPenalties == null &&
-                ChargingDgiPadunPkk == null && RecalcTenancy == null && RecalcPenalties == null && RecalcDgiPadunPkk == null &&
-                RecalcTotal == null && PaymentTenancy == null && PaymentPenalties == null && PaymentDgiPadunPkk == null && PaymentTotal == null &&
-                BalanceOutputTotal == null && BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null && 
-                !Emails && (IdsAccountState == null || IdsAccountState.Count == 0);
+                IsBalanceEmpty() && !Emails && (IdsAccountState == null || IdsAccountState.Count == 0);
         }
     }
 }

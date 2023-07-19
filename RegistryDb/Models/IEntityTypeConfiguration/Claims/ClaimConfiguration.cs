@@ -35,6 +35,7 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Claims
                  .HasColumnName("id_account_kumi")
                  .HasColumnType("int(11)");
 
+            // Предъявленная задолженность
             builder.Property(e => e.AmountTenancy)
                 .HasColumnName("amount_tenancy")
                 .HasColumnType("decimal");
@@ -55,6 +56,7 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Claims
                 .HasColumnName("amount_pkk")
                 .HasColumnType("decimal");
 
+            // Фактически взыскано
             builder.Property(e => e.AmountTenancyRecovered)
                 .HasColumnName("amount_tenancy_recovered")
                 .HasColumnType("decimal");
@@ -63,6 +65,19 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.Claims
                 .HasColumnName("amount_penalties_recovered")
                 .HasColumnType("decimal");
 
+            builder.Property(e => e.AmountDgiRecovered)
+                .HasColumnName("amount_dgi_recovered")
+                .HasColumnType("decimal");
+
+            builder.Property(e => e.AmountPkkRecovered)
+                .HasColumnName("amount_pkk_recovered")
+                .HasColumnType("decimal");
+
+            builder.Property(e => e.AmountPadunRecovered)
+                .HasColumnName("amount_padun_recovered")
+                .HasColumnType("decimal");
+
+            // Высуженная задолженность
             builder.Property(e => e.FactAmountTenancy)
                 .HasColumnName("fact_amount_tenancy")
                 .HasColumnType("decimal");

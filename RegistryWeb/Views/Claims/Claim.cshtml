@@ -294,15 +294,31 @@
                         <div id="ClaimAmount" class="card-body @(ViewBag.Action == "Delete" || ViewBag.Action == "Details" ? "p-0" : "p-3")">
                             @if (ViewBag.Action == "Delete" || ViewBag.Action == "Details")
                             {
+                                var hasDgi = (Model.Claim.AmountDgi != null && Model.Claim.AmountDgi != 0) ||
+                                    (Model.Claim.AmountDgiRecovered != null && Model.Claim.AmountDgiRecovered != 0) ||
+                                    (Model.Claim.FactAmountDgi != null && Model.Claim.FactAmountDgi != 0) ||
+                                    (Model.LastPaymentInfo != null && (Model.LastPaymentInfo.BalanceDgi != 0 || Model.LastPaymentInfo.BalanceOutputDgi != 0)) ||
+                                    (Model.Claim.IdAccountKumiNavigation != null && Model.Claim.IdAccountKumiNavigation.CurrentBalanceDgi != null && Model.Claim.IdAccountKumiNavigation.CurrentBalanceDgi != 0);
+                                var hasPkk = (Model.Claim.AmountPkk != null && Model.Claim.AmountPkk != 0) ||
+                                    (Model.Claim.AmountPkkRecovered != null && Model.Claim.AmountPkkRecovered != 0) ||
+                                    (Model.Claim.FactAmountPkk != null && Model.Claim.FactAmountPkk != 0) ||
+                                    (Model.LastPaymentInfo != null && (Model.LastPaymentInfo.BalancePkk != 0 || Model.LastPaymentInfo.BalanceOutputPkk != 0)) ||
+                                    (Model.Claim.IdAccountKumiNavigation != null && Model.Claim.IdAccountKumiNavigation.CurrentBalancePkk != null && Model.Claim.IdAccountKumiNavigation.CurrentBalancePkk != 0);
+                                var hasPadun = (Model.Claim.AmountPadun != null && Model.Claim.AmountPadun != 0) ||
+                                    (Model.Claim.AmountPadunRecovered != null && Model.Claim.AmountPadunRecovered != 0) ||
+                                    (Model.Claim.FactAmountPadun != null && Model.Claim.FactAmountPadun != 0) ||
+                                    (Model.LastPaymentInfo != null && (Model.LastPaymentInfo.BalancePadun != 0 || Model.LastPaymentInfo.BalanceOutputPadun != 0)) ||
+                                    (Model.Claim.IdAccountKumiNavigation != null && Model.Claim.IdAccountKumiNavigation.CurrentBalancePadun != null && Model.Claim.IdAccountKumiNavigation.CurrentBalancePadun != 0);
+
                                 <table class="table table-bordered table-striped m-0">
                                     <thead>
                                         <tr>
                                             <th class="text-center p-1"></th>
                                             <th class="text-center p-1" title="Найм">Найм</th>
                                             <th class="text-center p-1" title="Пени">Пени</th>
-                                            <th class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")" title="ДГИ">ДГИ</th>
-                                            <th class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")" title="Падун">Падун</th>
-                                            <th class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")" title="ПКК">ПКК</th>
+                                            <th class="text-center p-1 @(!hasDgi ? "d-none" : "")" title="ДГИ">ДГИ</th>
+                                            <th class="text-center p-1 @(!hasPkk ? "d-none" : "")" title="ПКК">ПКК</th>
+                                            <th class="text-center p-1 @(!hasPadun ? "d-none" : "")" title="Падун">Падун</th>
                                             <th class="text-center p-1" title="Итого">Итого</th>
                                         </tr>
                                     </thead>
@@ -311,34 +327,35 @@
                                             <td class="text-center p-1"><b>Предъявлено</b></td>
                                             <td class="text-center p-1">@(Model.Claim.AmountTenancy ?? 0.00m)</td>
                                             <td class="text-center p-1">@(Model.Claim.AmountPenalties ?? 0.00m)</td>
-                                            <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@(Model.Claim.AmountDgi ?? 0.00m)</td>
-                                            <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@(Model.Claim.AmountPadun ?? 0.00m)</td>
-                                            <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@(Model.Claim.AmountPkk ?? 0.00m)</td>
+                                            <td class="text-center p-1 @(!hasDgi ? "d-none" : "")">@(Model.Claim.AmountDgi ?? 0.00m)</td>
+                                            <td class="text-center p-1 @(!hasPkk ? "d-none" : "")">@(Model.Claim.AmountPkk ?? 0.00m)</td>
+                                            <td class="text-center p-1 @(!hasPadun ? "d-none" : "")">@(Model.Claim.AmountPadun ?? 0.00m)</td>
                                             <td class="text-center p-1">
                                                 @((Model.Claim.AmountTenancy + Model.Claim.AmountPenalties + Model.Claim.AmountDgi + Model.Claim.AmountPadun + Model.Claim.AmountPkk) ?? 0.00m)
                                             </td>
                                         </tr>
                                         @if (Model.Claim.IdAccountKumiNavigation != null)
                                         {
-                                            <tr>
-                                                <td class="text-center p-1"><b>Высужено</b></td>
-                                                <td class="text-center p-1">@(Model.Claim.FactAmountTenancy ?? 0.00m)</td>
-                                                <td class="text-center p-1">@(Model.Claim.FactAmountPenalties ?? 0.00m)</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@(Model.Claim.FactAmountDgi ?? 0.00m)</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@(Model.Claim.FactAmountPadun ?? 0.00m)</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@(Model.Claim.FactAmountPkk ?? 0.00m)</td>
-                                                <td class="text-center p-1">
-                                                    @((Model.Claim.FactAmountTenancy + Model.Claim.FactAmountPenalties + Model.Claim.FactAmountDgi + Model.Claim.FactAmountPadun + Model.Claim.FactAmountPkk) ?? 0.00m)
-                                                </td>
-                                            </tr>
+                                        <tr>
+                                            <td class="text-center p-1"><b>Высужено</b></td>
+                                            <td class="text-center p-1">@(Model.Claim.FactAmountTenancy ?? 0.00m)</td>
+                                            <td class="text-center p-1">@(Model.Claim.FactAmountPenalties ?? 0.00m)</td>
+                                            <td class="text-center p-1 @(!hasDgi ? "d-none" : "")">@(Model.Claim.FactAmountDgi ?? 0.00m)</td>
+                                            <td class="text-center p-1 @(!hasPkk ? "d-none" : "")">@(Model.Claim.FactAmountPkk ?? 0.00m)</td>
+                                            <td class="text-center p-1 @(!hasPadun ? "d-none" : "")">@(Model.Claim.FactAmountPadun ?? 0.00m)</td>
+                                            <td class="text-center p-1">
+                                                @((Model.Claim.FactAmountTenancy + Model.Claim.FactAmountPenalties + Model.Claim.FactAmountDgi + Model.Claim.FactAmountPadun + Model.Claim.FactAmountPkk) ?? 0.00m)
+                                            </td>
+                                        </tr>
 
                                             <tr>
                                                 <td class="text-center p-1"><b>Фактически взыскано</b></td>
                                                 <td class="text-center p-1">
-                                                    @if (Model.Claim.AmountTenancyRecovered > 0 || Model.Claim.AmountPenaltiesRecovered > 0)
+                                                    @if (Model.Claim.AmountTenancyRecovered > 0 || Model.Claim.AmountPenaltiesRecovered > 0 || 
+                                                        Model.Claim.AmountDgiRecovered > 0 || Model.Claim.AmountPkkRecovered > 0 || Model.Claim.AmountPadunRecovered > 0)
                                                     {
-                                                        <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
-                                                           asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">@Model.Claim.AmountTenancyRecovered</a>
+                                                    <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
+                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">@(Model.Claim.AmountTenancyRecovered ?? 0.00m)</a>
                                                     }
                                                     else
                                                     {
@@ -346,28 +363,82 @@
                                                     }
                                                 </td>
                                                 <td class="text-center p-1">
-                                                    @if (Model.Claim.AmountTenancyRecovered > 0 || Model.Claim.AmountPenaltiesRecovered > 0)
+                                                    @if ((Model.Claim.AmountTenancyRecovered !=  null && Model.Claim.AmountTenancyRecovered != 0) || 
+                                                        (Model.Claim.AmountPenaltiesRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                        (Model.Claim.AmountDgiRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                        (Model.Claim.AmountPkkRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                        (Model.Claim.AmountPadunRecovered != null && Model.Claim.AmountPadunRecovered != 0))
                                                     {
-                                                        <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
-                                                           asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">@Model.Claim.AmountPenaltiesRecovered</a>
+                                                    <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
+                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">@(Model.Claim.AmountPenaltiesRecovered ?? 0.00m)</a>
                                                     }
                                                     else
                                                     {
                                                         @(Model.Claim.AmountPenaltiesRecovered ?? 0.00m)
                                                     }
                                                 </td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
-                                                <td class="text-center p-1">
-                                                    @if (Model.Claim.AmountTenancyRecovered > 0 || Model.Claim.AmountPenaltiesRecovered > 0)
+                                                <td class="text-center p-1 @(!hasDgi ? "d-none" : "")">
+                                                    @if ((Model.Claim.AmountTenancyRecovered != null && Model.Claim.AmountTenancyRecovered != 0) ||
+                                                       (Model.Claim.AmountPenaltiesRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                       (Model.Claim.AmountDgiRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                       (Model.Claim.AmountPkkRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                       (Model.Claim.AmountPadunRecovered != null && Model.Claim.AmountPadunRecovered != 0))
                                                     {
-                                                        <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
-                                                           asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">@(Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered)</a>
+                                                    <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
+                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">@(Model.Claim.AmountDgiRecovered ?? 0.00m)</a>
                                                     }
                                                     else
                                                     {
-                                                        @((Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered) ?? 0.00m)
+                                                        @(Model.Claim.AmountDgiRecovered ?? 0.00m)
+                                                    }
+                                                </td>
+                                                <td class="text-center p-1 @(!hasPkk ? "d-none" : "")">
+                                                    @if ((Model.Claim.AmountTenancyRecovered != null && Model.Claim.AmountTenancyRecovered != 0) ||
+                                                       (Model.Claim.AmountPenaltiesRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                       (Model.Claim.AmountDgiRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                       (Model.Claim.AmountPkkRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                       (Model.Claim.AmountPadunRecovered != null && Model.Claim.AmountPadunRecovered != 0))
+                                                    {
+                                                    <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
+                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">@(Model.Claim.AmountPkkRecovered ?? 0.00m)</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        @(Model.Claim.AmountPkkRecovered ?? 0.00m)
+                                                    }
+                                                </td>
+                                                <td class="text-center p-1 @(!hasPadun ? "d-none" : "")">
+                                                    @if ((Model.Claim.AmountTenancyRecovered != null && Model.Claim.AmountTenancyRecovered != 0) ||
+                                                       (Model.Claim.AmountPenaltiesRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                       (Model.Claim.AmountDgiRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                       (Model.Claim.AmountPkkRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                       (Model.Claim.AmountPadunRecovered != null && Model.Claim.AmountPadunRecovered != 0))
+                                                    {
+                                                    <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
+                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">@(Model.Claim.AmountPadunRecovered ?? 0.00m)</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        @(Model.Claim.AmountPadunRecovered ?? 0.00m)
+                                                    }
+                                                </td>
+                                                <td class="text-center p-1">
+                                                    @if ((Model.Claim.AmountTenancyRecovered != null && Model.Claim.AmountTenancyRecovered != 0) ||
+                                                       (Model.Claim.AmountPenaltiesRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                       (Model.Claim.AmountDgiRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                       (Model.Claim.AmountPkkRecovered != null && Model.Claim.AmountPenaltiesRecovered != 0) ||
+                                                       (Model.Claim.AmountPadunRecovered != null && Model.Claim.AmountPadunRecovered != 0))
+                                                    {
+                                                    <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
+                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">
+                                                        @((Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered + Model.Claim.AmountDgiRecovered +
+                                                                Model.Claim.AmountPkkRecovered + Model.Claim.AmountPadunRecovered) ?? 0.00m)
+                                                    </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        @((Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered + Model.Claim.AmountDgiRecovered +
+                                                                    Model.Claim.AmountPkkRecovered + Model.Claim.AmountPadunRecovered) ?? 0.00m)
                                                     }
                                                 </td>
                                             </tr>
@@ -379,11 +450,18 @@
                                                 <td class="text-center p-1">
                                                     @((Model.Claim.AmountPenalties ?? 0.00m) - (Model.Claim.AmountPenaltiesRecovered ?? 0.00m))
                                                 </td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
+                                                <td class="text-center p-1 @(!hasDgi ? "d-none" : "")">
+                                                    @((Model.Claim.AmountDgi ?? 0.00m) - (Model.Claim.AmountDgiRecovered ?? 0.00m))
+                                                </td>
+                                                <td class="text-center p-1 @(!hasPkk ? "d-none" : "")">
+                                                    @((Model.Claim.AmountPkk ?? 0.00m) - (Model.Claim.AmountPkkRecovered ?? 0.00m))
+                                                </td>
+                                                <td class="text-center p-1 @(!hasPadun ? "d-none" : "")">
+                                                    @((Model.Claim.AmountPadun ?? 0.00m) - (Model.Claim.AmountPadunRecovered ?? 0.00m))
+                                                </td>
                                                 <td class="text-center p-1">
-                                                    @(((Model.Claim.AmountTenancy + Model.Claim.AmountPenalties) ?? 0.00m) - ((Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered) ?? 0.00m))
+                                                    @(((Model.Claim.AmountTenancy + Model.Claim.AmountPenalties + Model.Claim.AmountDgi + Model.Claim.AmountPkk + Model.Claim.AmountPadun) ?? 0.00m) - 
+                                                    ((Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered + Model.Claim.AmountDgiRecovered + Model.Claim.AmountPkkRecovered + Model.Claim.AmountPadunRecovered) ?? 0.00m))
                                                 </td>
                                             </tr>
                                         }
@@ -397,18 +475,18 @@
                                                 <td class="text-center p-1"><b>Входящее@(Model.LastPaymentInfo != null && Model.Claim.IdAccountKumiNavigation != null ? " БКС" : "")</b></td>
                                                 <td class="text-center p-1">@Model.LastPaymentInfo.BalanceTenancy</td>
                                                 <td class="text-center p-1">@Model.LastPaymentInfo.BalanceInputPenalties</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@Model.LastPaymentInfo.BalanceDgi</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@Model.LastPaymentInfo.BalancePadun</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@Model.LastPaymentInfo.BalancePkk</td>
+                                                <td class="text-center p-1 @(!hasDgi ? "d-none" : "")">@Model.LastPaymentInfo.BalanceDgi</td>
+                                                <td class="text-center p-1 @(!hasPkk ? "d-none" : "")">@Model.LastPaymentInfo.BalancePkk</td>
+                                                <td class="text-center p-1 @(!hasPadun ? "d-none" : "")">@Model.LastPaymentInfo.BalancePadun</td>
                                                 <td class="text-center p-1">@Model.LastPaymentInfo.BalanceInput</td>
                                             </tr>
                                             <tr>
                                                 <td class="text-center p-1"><b>Исходящее@(Model.LastPaymentInfo != null && Model.Claim.IdAccountKumiNavigation != null ? " БКС" : "")</b></td>
                                                 <td class="text-center p-1">@Model.LastPaymentInfo.BalanceOutputTenancy</td>
                                                 <td class="text-center p-1">@Model.LastPaymentInfo.BalanceOutputPenalties</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@Model.LastPaymentInfo.BalanceOutputDgi</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@Model.LastPaymentInfo.BalanceOutputPadun</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">@Model.LastPaymentInfo.BalanceOutputPkk</td>
+                                                <td class="text-center p-1 @(!hasDgi ? "d-none" : "")">@Model.LastPaymentInfo.BalanceOutputDgi</td>
+                                                <td class="text-center p-1 @(!hasPkk ? "d-none" : "")">@Model.LastPaymentInfo.BalanceOutputPkk</td>
+                                                <td class="text-center p-1 @(!hasPadun ? "d-none" : "")">@Model.LastPaymentInfo.BalanceOutputPadun</td>
                                                 <td class="text-center p-1">@Model.LastPaymentInfo.BalanceOutputTotal</td>
                                             </tr>
                                         }
@@ -418,10 +496,11 @@
                                                 <td class="text-center p-1"><b>Исходящее@(Model.LastPaymentInfo != null && Model.Claim.IdAccountKumiNavigation != null ? " КУМИ" : "")</b></td>
                                                 <td class="text-center p-1">@(Model.Claim.IdAccountKumiNavigation.CurrentBalanceTenancy ?? 0.00m)</td>
                                                 <td class="text-center p-1">@(Model.Claim.IdAccountKumiNavigation.CurrentBalancePenalty ?? 0.00m)</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
-                                                <td class="text-center p-1 @(Model.Claim.IdAccount == null ? "d-none" : "")">0,00</td>
-                                                <td class="text-center p-1">@((Model.Claim.IdAccountKumiNavigation.CurrentBalanceTenancy + Model.Claim.IdAccountKumiNavigation.CurrentBalancePenalty) ?? 0.00m)</td>
+                                                <td class="text-center p-1 @(!hasDgi ? "d-none" : "")">@(Model.Claim.IdAccountKumiNavigation.CurrentBalanceDgi ?? 0.00m)</td>
+                                                <td class="text-center p-1 @(!hasPkk ? "d-none" : "")">@(Model.Claim.IdAccountKumiNavigation.CurrentBalancePkk ?? 0.00m)</td>
+                                                <td class="text-center p-1 @(!hasPadun ? "d-none" : "")">@(Model.Claim.IdAccountKumiNavigation.CurrentBalancePadun ?? 0.00m)</td>
+                                                <td class="text-center p-1">@((Model.Claim.IdAccountKumiNavigation.CurrentBalanceTenancy + Model.Claim.IdAccountKumiNavigation.CurrentBalancePenalty
+                                                 + Model.Claim.IdAccountKumiNavigation.CurrentBalanceDgi + Model.Claim.IdAccountKumiNavigation.CurrentBalancePkk + Model.Claim.IdAccountKumiNavigation.CurrentBalancePadun) ?? 0.00m)</td>
                                             </tr>
                                         }
                                     </tbody>
@@ -449,7 +528,7 @@
                                                title="Сумма к взысканию (итого)">
                                     </div>
                                 </div>
-                                <div class="row rr-claim-additional-amount @(Model.Claim.IdAccount != null ? "" : "d-none")">
+                                <div class="row rr-claim-additional-amount">
                                     <div class="form-group col-4 mb-0">
                                         <label class="mb-1" asp-for="Claim.AmountDgi">ДГИ</label>
                                         <input type="text" class="form-control decimal input-decimal" asp-for="Claim.AmountDgi" title="Сумма к взысканию (ДГИ)">

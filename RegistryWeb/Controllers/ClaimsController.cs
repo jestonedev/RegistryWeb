@@ -227,31 +227,16 @@ namespace RegistryWeb.Controllers
             if (type == "KUMI")
             {
                 var account = dataService.GetAccountKumi(idAccount);
-                var tenancyInfoDict = dataService.GetTenancyInfoKumi(new List<int> { idAccount }).FirstOrDefault();
-                List<KumiAccountTenancyInfoVM> kumiTenancyInfo = null;
-                List<KumiAccountTenancyInfoVM> activeKumiTenancyInfo = null;
-                List<TenancyRentObject> rentObjects = null;
-                if (tenancyInfoDict.Value != null && tenancyInfoDict.Value.Any())
-                {
-                    kumiTenancyInfo = tenancyInfoDict.Value;
-                    activeKumiTenancyInfo = kumiTenancyInfo.Where(r => r.TenancyProcess.TenancyPersons.Any(p => p.ExcludeDate == null || p.ExcludeDate > DateTime.Now)
-                        && (r.TenancyProcess.RegistrationNum == null || !r.TenancyProcess.RegistrationNum.EndsWith("н"))).ToList();
-                }
-                if (activeKumiTenancyInfo != null && activeKumiTenancyInfo.Any())
-                {
-                    kumiTenancyInfo = activeKumiTenancyInfo;
-                }
-                if (kumiTenancyInfo != null && kumiTenancyInfo.Any())
-                {
-                    rentObjects = kumiTenancyInfo.First().RentObjects;
-                }
-
+                var address = dataService.GetAccountAddress(idAccount);
+                
                 return Json(new
                 {
-                    RegistryAddress = rentObjects != null && rentObjects.Any() ? rentObjects.Where(r => r.Address != null)
-                        .Select(r => r.Address.Text).Aggregate((acc, v) => acc + ", " + v) : "",
+                    RegistryAddress = address,
                     AmountTenancy = account.CurrentBalanceTenancy,
-                    AmountPenalties = account.CurrentBalancePenalty
+                    AmountPenalties = account.CurrentBalancePenalty,
+                    AmountDgi = account.CurrentBalanceDgi,
+                    AmountPkk = account.CurrentBalancePkk,
+                    AmountPadun = account.CurrentBalancePadun
                 });
             }
             return Json(null);

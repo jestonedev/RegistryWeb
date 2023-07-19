@@ -40,16 +40,29 @@ namespace RegistryWeb.SecurityServices
 
         private Executor GetExecutor()
         {
-            return registryContext.Executors
+            try
+            {
+                return registryContext.Executors
                 .FirstOrDefault(e => e.ExecutorLogin == User.UserName || e.ExecutorName == User.UserDescription);
+            }
+            catch
+            {
+                return null;
+            }       
         }
 
         private AclUser GetUser()
         {
             var userName = httpContextAccessor?.HttpContext.User.Identity.Name.ToLowerInvariant();
-            return registryContext.AclUsers
-                .AsNoTracking()
-                .SingleOrDefault(u => u.UserName.ToLowerInvariant() == userName) ?? new AclUser();
+            try
+            {
+                return registryContext.AclUsers
+                    .AsNoTracking()
+                    .SingleOrDefault(u => u.UserName.ToLowerInvariant() == userName) ?? new AclUser();
+            }
+            catch {
+                return null;
+            }
         }
 
         private List<AclPrivilege> GetUserPriveleges()

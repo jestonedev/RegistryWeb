@@ -256,11 +256,16 @@ namespace RegistryWeb.Controllers
         }
 
         public IActionResult AddChargeCorrection(int idAccount, decimal tenancyValue, decimal penaltyValue, 
-            decimal paymentTenancyValue, decimal paymentPenaltyValue, DateTime atDate, string description)
+            decimal dgiValue, decimal pkkValue, decimal padunValue,
+            decimal paymentTenancyValue, decimal paymentPenaltyValue, 
+            decimal paymentDgiValue, decimal paymentPkkValue, decimal paymentPadunValue,
+            DateTime atDate, string description)
         {
             try
             {
-                dataService.AddChargeCorrection(idAccount, tenancyValue, penaltyValue, paymentTenancyValue, paymentPenaltyValue, atDate, description);
+                dataService.AddChargeCorrection(idAccount, tenancyValue, penaltyValue, dgiValue, pkkValue, padunValue,
+                    paymentTenancyValue, paymentPenaltyValue, paymentDgiValue, paymentPkkValue, paymentPadunValue,
+                    atDate, description);
                 return Json(new
                 {
                     State = "Success"

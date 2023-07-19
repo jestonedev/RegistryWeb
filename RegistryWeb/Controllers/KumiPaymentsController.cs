@@ -350,17 +350,34 @@ namespace RegistryWeb.Controllers
                         IdAccount = r.IdAccountKumi,
                         AccountState = r.IdAccountKumiNavigation.State.State,
                         IdAccountState = r.IdAccountKumiNavigation.IdState,
-                        AmountTenancy = r.AmountTenancy + r.AmountDgi + r.AmountPadun + r.AmountPkk,
+
+                        // Предъявленная задолженность
+                        r.AmountTenancy,
                         r.AmountPenalties,
+                        r.AmountDgi,
+                        r.AmountPkk,
+                        r.AmountPadun,
+                        // Взысканная задолженность
                         r.AmountTenancyRecovered,
                         r.AmountPenaltiesRecovered,
+                        r.AmountDgiRecovered,
+                        r.AmountPkkRecovered,
+                        r.AmountPadunRecovered,
+
                         r.StartDeptPeriod,
                         r.EndDeptPeriod,
+
                         AccountCurrentBalanceTenancy = r.IdAccountKumiNavigation.CurrentBalanceTenancy,
                         AccountCurrentBalancePenalty = r.IdAccountKumiNavigation.CurrentBalancePenalty,
+                        AccountCurrentBalanceDgi = r.IdAccountKumiNavigation.CurrentBalanceDgi,
+                        AccountCurrentBalancePkk = r.IdAccountKumiNavigation.CurrentBalancePkk,
+                        AccountCurrentBalancePadun = r.IdAccountKumiNavigation.CurrentBalancePadun,
                         AccountLastChargeDate = r.IdAccountKumiNavigation.LastChargeDate,
+
                         CourtOrderNum = r.ClaimStates.FirstOrDefault(cs => cs.IdStateType == 4) == null ? null :
-                            r.ClaimStates.FirstOrDefault(cs => cs.IdStateType == 4).CourtOrderNum
+                            r.ClaimStates.FirstOrDefault(cs => cs.IdStateType == 4).CourtOrderNum,
+                        Tenant = r.ClaimPersons.Where(cp => cp.IsClaimer)
+                            .Select(cp => string.Concat(cp.Surname, ' ', cp.Name, ' ', cp.Patronymic)).FirstOrDefault()
                     })
                 });
             }
@@ -382,7 +399,10 @@ namespace RegistryWeb.Controllers
                         r.State.IdState,
                         r.LastChargeDate,
                         r.CurrentBalanceTenancy,
-                        r.CurrentBalancePenalty
+                        r.CurrentBalancePenalty,
+                        r.CurrentBalanceDgi,
+                        r.CurrentBalancePkk,
+                        r.CurrentBalancePadun
                     })
                 });
             }
@@ -449,17 +469,21 @@ namespace RegistryWeb.Controllers
         }
 
         public IActionResult DistributePaymentToAccount(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo,
-            decimal tenancySum, decimal penaltySum)
+            decimal tenancySum, decimal penaltySum, decimal dgiSum, decimal pkkSum, decimal padunSum)
         {
             try
             {
-                var paymentDistributionInfo = dataService.DistributePaymentToAccount(idPayment, idObject, distributeTo, tenancySum, penaltySum);
+                var paymentDistributionInfo = dataService.DistributePaymentToAccount(idPayment, idObject, distributeTo, tenancySum, penaltySum,
+                    dgiSum, pkkSum, padunSum);
                 return Json(new
                 {
                     State = "Success",
                     paymentDistributionInfo.Sum,
                     paymentDistributionInfo.DistrubutedToTenancySum,
-                    paymentDistributionInfo.DistrubutedToPenaltySum
+                    paymentDistributionInfo.DistrubutedToPenaltySum,
+                    paymentDistributionInfo.DistrubutedToDgiSum,
+                    paymentDistributionInfo.DistrubutedToPkkSum,
+                    paymentDistributionInfo.DistrubutedToPadunSum
                 });
             }
             catch (Exception e)
@@ -618,6 +642,7 @@ namespace RegistryWeb.Controllers
                 var orders = loadstate.InsertedMemorialOrders.Union(loadstate.SkipedMemorialOrders).ToList();
 
                 ViewBag.MemorialOrderPayments = dataService.GetPaymentsByOrders(orders);
+                ViewBag.KbkDescriptions = dataService.KbkDescriptions;
 
                 return View("UploadPaymentsResult", loadstate);
             }

@@ -43,7 +43,8 @@
     ViewBag.CanEditUfs = Model.Guid != null && readWriteRight;
     ViewBag.PaymentHasGuid = Model.Guid != null;
     var isPl = Model.IdSource == 3 || Model.IdSource == 5;
-    var sumPosted = Model.PaymentCharges.Select(r => r.TenancyValue + r.PenaltyValue).Sum() + Model.PaymentClaims.Select(r => r.TenancyValue + r.PenaltyValue).Sum();
+    var sumPosted = Model.PaymentCharges.Select(r => r.TenancyValue + r.PenaltyValue + r.DgiValue + r.PkkValue + r.PadunValue).Sum() 
+        + Model.PaymentClaims.Select(r => r.TenancyValue + r.PenaltyValue + r.DgiValue + r.PkkValue + r.PadunValue).Sum();
 }
 @section Styles {
     <link rel="stylesheet" href="~/css/kumi.payments.css" asp-append-version="true" />

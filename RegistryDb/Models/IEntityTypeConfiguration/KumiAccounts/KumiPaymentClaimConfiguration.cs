@@ -40,6 +40,7 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("date")
                 .IsRequired();
 
+            // Найм
             builder.Property(e => e.TenancyValue)
                 .HasColumnName("tenancy_value")
                 .HasColumnType("decimal(12,2)")
@@ -47,6 +48,24 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
 
             builder.Property(e => e.PenaltyValue)
                 .HasColumnName("penalty_value")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            // ДГИ
+            builder.Property(e => e.DgiValue)
+                .HasColumnName("dgi_value")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            // ПКК
+            builder.Property(e => e.PkkValue)
+                .HasColumnName("pkk_value")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            // Падун
+            builder.Property(e => e.PadunValue)
+                .HasColumnName("padun_value")
                 .HasColumnType("decimal(12,2)")
                 .IsRequired();
 

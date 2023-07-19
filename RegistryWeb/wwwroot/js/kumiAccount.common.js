@@ -56,7 +56,8 @@
         }
 
         if (isValid) {
-
+            $('.rr-tenancy-info.rr-tenancy-info-archive').show();
+            $('.rr-tenancy-info-archive-btn').parent().hide();
             var tenancyInfo = $('.rr-tenancy-info');
             tenancyInfo.each(function (ind, elem) {
                 var idProcessElem = $(elem).find('input[id^="IdProcess"]');
@@ -433,6 +434,23 @@
 
     $(".rr-charge-archive-btn").on("click", toggleChargeArchive);
 
+    var toggleTenancyInfoArchive = function (e) {
+        var archive = $("#TenancyInfo").find(".rr-tenancy-info-archive");
+        var icon = $(this).find(".oi");
+        if (icon.hasClass("oi-chevron-bottom")) {
+            icon.removeClass("oi-chevron-bottom");
+            icon.addClass("oi-chevron-top");
+            archive.show();
+        } else {
+            icon.addClass("oi-chevron-bottom");
+            icon.removeClass("oi-chevron-top");
+            archive.hide();
+        }
+        e.preventDefault();
+    };
+
+    $(".rr-tenancy-info-archive-btn").on("click", toggleTenancyInfoArchive);
+
     $("#accountForm").on("change", "[id^='Fraction_']", function () {
         var val = $(this).val();
         if (val === "" || val === undefined) {
@@ -450,5 +468,57 @@
             val += "0";
         }
         $(this).val(val);
+    });
+
+    $(".rr-tenancy-type-selectors input[name='ChargesSelector']").removeAttr("disabled");
+
+    $(".rr-tenancy-type-selectors .btn").on('click', function () {
+        var id = $(this).find("input").attr("id");
+        $("#Charges td.rr-charge-total, #Charges th.rr-charge-total," +
+            "#Charges td.rr-charge-tenancy, #Charges th.rr-charge-tenancy," +
+            "#Charges td.rr-charge-dgi, #Charges th.rr-charge-dgi," +
+            "#Charges td.rr-charge-padun, #Charges th.rr-charge-padun," +
+            "#Charges td.rr-charge-pkk, #Charges th.rr-charge-pkk").addClass("d-none");
+        switch (id) {
+            case "AllChargesSelector":
+                $("#Charges td.rr-charge-total, #Charges th.rr-charge-total").removeClass("d-none");
+                break;
+            case "TenancySelector":
+                $("#Charges td.rr-charge-tenancy, #Charges th.rr-charge-tenancy").removeClass("d-none");
+                break;
+            case "DgiSelector":
+                $("#Charges td.rr-charge-dgi, #Charges th.rr-charge-dgi").removeClass("d-none");
+                break;
+            case "PkkSelector":
+                $("#Charges td.rr-charge-pkk, #Charges th.rr-charge-pkk").removeClass("d-none");
+                break;
+            case "PadunSelector":
+                $("#Charges td.rr-charge-padun, #Charges th.rr-charge-padun").removeClass("d-none");
+                break;
+        }
+    });
+
+    $("#CopyChargesToClipboard").on("click", function (e) {
+        var head = $("#Charges table thead th").filter(function (idx, elem) {
+            return !$(elem).hasClass("d-none");
+        }).map(function (idx, elem) {
+            return $.trim($(elem).text()) + "\t";
+            }).toArray().reduce(function (acc, v) { return acc + v; });
+        var body = "";
+        $("#Charges table tbody tr").each(function (idx, trElem) {
+            var tr = $(trElem).find("td").filter(function (idx, tdElem) {
+                return !$(tdElem).hasClass("d-none");
+            }).map(function (idx, tdElem) {
+                return $.trim($(tdElem).text()) + "\t";
+                }).toArray().reduce(function (acc, v) { return acc + v; });
+            body += tr + "\n";
+        });
+
+        navigator.clipboard.writeText(head + "\n" + body);
+        $(this).popover({ content: 'Скопировано', placement: 'bottom' }).popover('show');
+        setTimeout(function () {
+            $("#CopyChargesToClipboard").popover('hide');
+        }, 1000);
+        e.preventDefault();
     });
 });
