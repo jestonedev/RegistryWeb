@@ -340,7 +340,7 @@ namespace RegistryWeb.ReportServices
             paymentDate = paymentDate.AddMonths(1).AddDays(-1);
 
             var arguments = new Dictionary<string, object> {
-                { "for_date", paymentDate.ToString("dd.MM.yyyy") }
+                { "for_date", startDate.ToString("dd.MM.yyyy") }
             };
             var fileName = "registry\\kumi_accounts\\balance_for_period";
             var fileNameReport = GenerateReport(arguments, fileName);
