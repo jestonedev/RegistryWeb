@@ -467,6 +467,10 @@
                         <label class="rr-account-label mb-1" asp-for="Owner">Владелец ЛС</label>
                         <input type="text" asp-for="Owner" title="Владелец ЛС - указывается, если не совпадает с нанимателем по договору найма" class="form-control" maxlength="355" />
                     </div>
+                    <div class="form-group col-12 mb-2">
+                        <label class="rr-account-label mb-1" asp-for="Description">Примечание</label>
+                        <textarea asp-for="Description" title="Примечание к лицевому счету" class="form-control" maxlength="1024"></textarea>
+                    </div>
                 </div>
                 @if (Model.RecalcMarker == 1)
                 {
@@ -652,12 +656,15 @@
                                     var totalPaymentPadun = 0.00m;
                                     var totalPaymentPadunByAccount = 0.00m;
                                     var totalRecalcPadun = 0.00m;
-                                    
+
                                     var totalPaymentTotalByAccount = 0.00m;
+
+                                    var currentPeriodCalced = Model.LastCalcDate == DateTime.Now.Date.AddDays(-DateTime.Now.Day+1).AddMonths(1).AddDays(-1)
+                                        && Model.Charges.Any(r => r.EndDate == Model.LastCalcDate && (r.ChargeTenancy != 0 || r.ChargePenalty != 0));
                                 }
                                 @foreach (var charge in Model.Charges.Where(r => r.Hidden == 0).OrderBy(r => r.EndDate))
                                 {
-                                    if (charge.EndDate <= DateTime.Now.Date)
+                                    if (charge.EndDate <= DateTime.Now.Date || currentPeriodCalced)
                                     {
                                         totalChargeTenancy += charge.ChargeTenancy;
                                         totalChargePenalty += charge.ChargePenalty;
@@ -677,15 +684,15 @@
                                     totalPaymentPkk += charge.PaymentPkk;
                                     totalPaymentPadun += charge.PaymentPadun;
                                     i++;
-                                    <tr class="@(count - i + 1 > 12 ? "rr-charge-archive" : "") @(charge.EndDate == currMonthEndDate ? "rr-charge-current-month-row" : "")" data-charge-end-date="@charge.EndDate.ToString("yyyy-MM-dd")">
+                                    <tr class="@(count - i + 1 > 12 ? "rr-charge-archive" : "") @(charge.EndDate == currMonthEndDate ? "rr-charge-current-month-row" : "") @(currentPeriodCalced ? "rr-charge-current-month-row-no-calc" : "")" data-charge-end-date="@charge.EndDate.ToString("yyyy-MM-dd")">
 
                                         <td class="text-center p-1"><b>@charge.EndDate.ToString("dd.MM.yyyy")</b></td>
 
                                         @* Найм *@
                                         <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-input-tenancy">@charge.InputTenancy</td>
                                         <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-input-penalty">@charge.InputPenalty</td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-tenancy">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargeTenancy : 0)</td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-penalty">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargePenalty : 0)</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-tenancy">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.ChargeTenancy : 0)</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-penalty">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.ChargePenalty : 0)</td>
                                         <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-payment-tenancy">
                                             @{
                                                 var tenancyOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.TenancyValue) ?? 0m;
@@ -724,8 +731,8 @@
                                                 @charge.PaymentPenalty
                                             }
                                         </td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-recalc-tenancy">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcTenancy + charge.CorrectionTenancy : 0)</td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-recalc-penalty">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcPenalty + charge.CorrectionPenalty : 0)</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-recalc-tenancy">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.RecalcTenancy + charge.CorrectionTenancy : 0)</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-recalc-penalty">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.RecalcPenalty + charge.CorrectionPenalty : 0)</td>
                                         <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-output-tenancy">@charge.OutputTenancy</td>
                                         <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-output-penalty">@charge.OutputPenalty</td>
 
@@ -733,7 +740,7 @@
                                         @if (hasDgiCharges)
                                         {
                                             <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-input-dgi">@charge.InputDgi</td>
-                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-dgi">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargeDgi : 0)</td>
+                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-dgi">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.ChargeDgi : 0)</td>
                                             <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-payment-dgi">
                                                 @{
                                                     var dgiOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.DgiValue) ?? 0m;
@@ -754,14 +761,14 @@
                                                     @charge.PaymentDgi
                                                 }
                                             </td>
-                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-recalc-dgi">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcDgi + charge.CorrectionDgi : 0)</td>
+                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-recalc-dgi">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.RecalcDgi + charge.CorrectionDgi : 0)</td>
                                             <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-output-dgi">@charge.OutputDgi</td>
                                         }
                                         @* ПКК *@
                                         @if (hasPkkCharges)
                                         {
                                             <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-input-pkk">@charge.InputPkk</td>
-                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-pkk">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargePkk : 0)</td>
+                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-pkk">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.ChargePkk : 0)</td>
                                             <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-payment-pkk">
                                                 @{
                                                     var pkkOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.PkkValue) ?? 0m;
@@ -782,14 +789,14 @@
                                                     @charge.PaymentPkk
                                                 }
                                             </td>
-                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-recalc-pkk">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcPkk + charge.CorrectionPkk : 0)</td>
+                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-recalc-pkk">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.RecalcPkk + charge.CorrectionPkk : 0)</td>
                                             <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-output-pkk">@charge.OutputPkk</td>
                                         }
                                         @* Падун *@
                                         @if (hasPadunCharges)
                                         {
                                             <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-input-padun">@charge.InputPadun</td>
-                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-padun">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargePadun : 0)</td>
+                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-padun">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.ChargePadun : 0)</td>
                                             <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-payment-padun">
                                                 @{
                                                     var padunOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.PadunValue) ?? 0m;
@@ -810,7 +817,7 @@
                                                     @charge.PaymentPadun
                                                 }
                                             </td>
-                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-recalc-padun">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcPadun + charge.CorrectionPadun : 0)</td>
+                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-recalc-padun">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.RecalcPadun + charge.CorrectionPadun : 0)</td>
                                             <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-output-padun">@charge.OutputPadun</td>
                                         }
 
@@ -819,8 +826,8 @@
                                         {
                                             <td class="text-center p-1 rr-charge-total rr-charge-period-input-all">@(charge.InputTenancy+charge.InputDgi+charge.InputPkk+charge.InputPadun)</td>
                                             <td class="text-center p-1 rr-charge-total rr-charge-period-input-all-penalty">@charge.InputPenalty</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-all">@(charge.EndDate <= DateTime.Now.Date ? (charge.ChargeTenancy+charge.ChargeDgi+charge.ChargePkk + charge.ChargePadun) : 0)</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-all-penalty">@(charge.EndDate <= DateTime.Now.Date ? charge.ChargePenalty : 0)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-all">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? (charge.ChargeTenancy+charge.ChargeDgi+charge.ChargePkk + charge.ChargePadun) : 0)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-all-penalty">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.ChargePenalty : 0)</td>
                                             <td class="text-center p-1 rr-charge-total rr-charge-period-payment-all">
                                                 @{
                                                     var totalOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.TenancyValue + r.DgiValue + r.PkkValue + r.PadunValue) ?? 0m;
@@ -852,8 +859,8 @@
                                                     @charge.PaymentPenalty
                                                 }
                                             </td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all">@(charge.EndDate <= DateTime.Now.Date ? (charge.RecalcTenancy + charge.CorrectionTenancy + charge.RecalcDgi + charge.CorrectionDgi + charge.RecalcPkk + charge.CorrectionPkk + charge.RecalcPadun + charge.CorrectionPadun) : 0)</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all-penalty">@(charge.EndDate <= DateTime.Now.Date ? charge.RecalcPenalty + charge.CorrectionPenalty : 0)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? (charge.RecalcTenancy + charge.CorrectionTenancy + charge.RecalcDgi + charge.CorrectionDgi + charge.RecalcPkk + charge.CorrectionPkk + charge.RecalcPadun + charge.CorrectionPadun) : 0)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all-penalty">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.RecalcPenalty + charge.CorrectionPenalty : 0)</td>
                                             <td class="text-center p-1 rr-charge-total rr-charge-period-output-all">@(charge.OutputTenancy+charge.OutputDgi+charge.OutputPkk+charge.OutputPadun)</td>
                                             <td class="text-center p-1 rr-charge-total rr-charge-period-output-all-penalty">@charge.OutputPenalty</td>
                                         }

@@ -4,7 +4,7 @@
 
 @model ClaimReportsVM;
 @{
-    ViewData["Title"] = "Отчеты по претензионно-исковой работе";
+    ViewData["Title"] = "Отчеты по ПИР, ЛС и платежам";
     var myKeys = new List<DateTime>(Model.MonthsList.Values);
     var allMonthes = new List<string> { "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь" };
 }
@@ -43,10 +43,10 @@
                 <div class="media-body pl-2 pr-2">Отчет по исполнителям исковой работы</div>
             </div>
         </div>
-        <div class="col-12 col-md-6 col-lg-4 mb-3" title="Статистика по разделенным лицевым счетам" id="ClaimSplitAccountsReport">
+        <div class="col-12 col-md-6 col-lg-4 mb-3" title="Статистика по разделенным лицевым счетам БКС" id="ClaimSplitAccountsReport">
             <div class="media cardreport align-items-center p-2">
                 <img src="~/image/img_142549.png" class="align-self-center img-fluid pt-3 pl-2 pb-3 pr-2" alt="Отчёт" width="50" height="50">
-                <div class="media-body pl-2 pr-2">Статистика по разделенным лицевым счетам</div>
+                <div class="media-body pl-2 pr-2">Статистика по разделенным лицевым счетам БКС</div>
             </div>
         </div>
         <div class="col-12 col-md-6 col-lg-4 mb-3 rr-claim-common-modal-report" title="Подготовленные судебные приказы"

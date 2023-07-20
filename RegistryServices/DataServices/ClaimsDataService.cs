@@ -361,6 +361,17 @@ namespace RegistryWeb.DataServices
             return viewModel;
         }
 
+        public string GetClaimerByIdClaim(int idClaim)
+        {
+            var tenant = registryContext.ClaimPersons.Where(cp => cp.IsClaimer && cp.IdClaim == idClaim)
+                           .Select(cp => string.Concat(cp.Surname, ' ', cp.Name, ' ', cp.Patronymic)).FirstOrDefault();
+            if (!string.IsNullOrEmpty(tenant)) return tenant;
+            var idAccount = registryContext.Claims.Where(r => r.IdClaim == idClaim).Select(r => r.IdAccountKumi).FirstOrDefault();
+            if (idAccount == null) return null;
+            var tenants = registryContext.GetTenantsByAccountIds(new List<int> { idAccount.Value });
+            return tenants.FirstOrDefault()?.Tenant;
+        }
+
         public IQueryable<Claim> GetClaimsForMassReports(List<int> ids)
         {
             return registryContext.Claims

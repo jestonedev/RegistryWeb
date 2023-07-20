@@ -19,6 +19,7 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public string Okato { get; set; }
         public string InnAdb { get; set; }
         public string KppAdb { get; set; }
+        public DateTime? DateEnrollUfk { get; set; }
         public byte Deleted { get; set; }
         public virtual KumiKbkType KbkType { get; set; }
         public virtual KumiPaymentGroup PaymentGroup { get; set; }

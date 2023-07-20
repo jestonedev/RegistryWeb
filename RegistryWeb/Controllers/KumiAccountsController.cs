@@ -231,14 +231,23 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult RecalcAccounts(List<int> idAccounts, KumiAccountRecalcTypeEnum recalcType, int? recalcStartYear, int? recalcStartMonth)
+        public IActionResult RecalcAccounts(List<int> idAccounts, KumiAccountRecalcTypeEnum recalcType, int? recalcStartYear, int? recalcStartMonth,
+            bool saveCurrentPeriodCharge)
         {
             try
             {
+                if (saveCurrentPeriodCharge && DateTime.Now.Day >= 25 && recalcType != KumiAccountRecalcTypeEnum.RewriteCharge)
+                {
+                    return Json(new
+                    {
+                        State = "Error",
+                        Error = "Текущий период блокируется начиная с 25 числа месяца. Для его принудительного начисления необходимо выбрать \"Перерасчет с переначислением (перезапись)\" и в периоде указать текущий год и текущий месяц"
+                    });
+                }
                 DateTime? recalcStartDate = null;
                 if (recalcStartYear != null && recalcStartMonth != null)
                     recalcStartDate = new DateTime(recalcStartYear.Value, recalcStartMonth.Value, 1);
-                dataService.RecalculateAccounts(idAccounts, recalcType, recalcStartDate);
+                dataService.RecalculateAccounts(idAccounts, recalcType, recalcStartDate, saveCurrentPeriodCharge);
 
                 return Json(new
                 {
@@ -291,7 +300,7 @@ namespace RegistryWeb.Controllers
             {
                 var idAccount = dataService.GetIdAccountByCorrection(idCorrection);
                 dataService.DeleteChargeCorrection(idCorrection);
-                dataService.RecalculateAccounts(new List<int> { idAccount }, 0, null);
+                dataService.RecalculateAccounts(new List<int> { idAccount }, 0, null, false);
                 return Json(new
                 {
                     State = "Success"

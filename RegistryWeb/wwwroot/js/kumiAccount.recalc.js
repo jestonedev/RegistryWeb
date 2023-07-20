@@ -16,6 +16,7 @@
             recalcPeriodElem.selectpicker('refresh');
         } else {
             recalcPeriodElem.find("option[value='1']").removeAttr("disabled");
+            recalcPeriodElem.val(1);
             recalcPeriodElem.selectpicker('refresh');
         }
         recalcPeriodElem.change();
@@ -60,16 +61,17 @@
             var recalcPeriod = $("#AccountKumiRecalc_RecalcPeriod").val();
             var recalcStartYear = recalcPeriod === "0" ? null : $("#AccountKumiRecalc_RecalcPeriodYear").val();
             var recalcStartMonth = recalcPeriod === "0" ? null : $("#AccountKumiRecalc_RecalcPeriodMonth").val();
+            var saveCurrentPeriodCharge = $("#AccountKumiRecalc_SaveCurrentPeriodCharge").is(":checked");
             var idAccount = recalcAccountForm.find("input[name='AccountKumiRecalc.IdAccount']").val();
             if (idAccount !== "") {
                 initRecalcAccountsProgress(1);
-                recalcAccounts([idAccount], [], recalcType, recalcStartYear, recalcStartMonth);
+                recalcAccounts([idAccount], [], recalcType, recalcStartYear, recalcStartMonth, saveCurrentPeriodCharge);
             } else {
                 getAccountIds(function (ids) {
                     initRecalcAccountsProgress(ids.length);
                     var accountIdsForRecalc = ids.slice(0, 10);
                     var accountIdsOther = ids.slice(10);
-                    recalcAccounts(accountIdsForRecalc, accountIdsOther, recalcType, recalcStartYear, recalcStartMonth);
+                    recalcAccounts(accountIdsForRecalc, accountIdsOther, recalcType, recalcStartYear, recalcStartMonth, saveCurrentPeriodCharge);
                 });
             }
         } else {
@@ -162,7 +164,7 @@
                 },
                 dataType: 'json',
                 success: function () {
-                    recalcAccounts([idAccount], [], 0, null, null);
+                    recalcAccounts([idAccount], [], 0, null, null, false);
                 }
             });
         } else {
@@ -182,11 +184,11 @@
         });
     }
 
-    function recalcAccounts(accountIdsForRecalc, accountIdsOther, recalcType, recalcStartYear, recalcStartMonth) {
+    function recalcAccounts(accountIdsForRecalc, accountIdsOther, recalcType, recalcStartYear, recalcStartMonth, saveCurrentPeriodCharge) {
         $.ajax({
             type: 'POST',
             url: window.location.origin + '/KumiAccounts/RecalcAccounts',
-            data: { idAccounts: accountIdsForRecalc, recalcType, recalcStartYear, recalcStartMonth },
+            data: { idAccounts: accountIdsForRecalc, recalcType, recalcStartYear, recalcStartMonth, saveCurrentPeriodCharge },
             dataType: 'json',
             success: function (data) {
                 if (data.state === "Success") {
@@ -194,7 +196,7 @@
                     if (accountIdsOther.length > 0) {
                         accountIdsForRecalc = accountIdsOther.slice(0, 10);
                         accountIdsOther = accountIdsOther.slice(10);
-                        recalcAccounts(accountIdsForRecalc, accountIdsOther, recalcStartYear, recalcStartMonth);
+                        recalcAccounts(accountIdsForRecalc, accountIdsOther, recalcStartYear, recalcStartMonth, saveCurrentPeriodCharge);
                     } else {
                         location.reload();
                     }
@@ -240,7 +242,7 @@
     $("#AccountKumiRecalc_RecalcType").change();
 
     var chargeCurrentMonthElem = $(".rr-charge-current-month-row");
-    if (chargeCurrentMonthElem.length === 1) {
+    if (chargeCurrentMonthElem.length === 1 && !chargeCurrentMonthElem.hasClass("rr-charge-current-month-row-no-calc")) {
         var endDate = chargeCurrentMonthElem.data("chargeEndDate");
         var cellClasses = [
             {

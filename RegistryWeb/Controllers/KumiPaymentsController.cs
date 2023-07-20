@@ -343,7 +343,7 @@ namespace RegistryWeb.Controllers
                 return Json(new
                 {
                     Count = count,
-                    Claims = claimsResult.Select(r => new
+                    Claims = claimsResult.ToList().Select(r => new
                     {
                         r.IdClaim,
                         r.IdAccountKumiNavigation.Account,
@@ -374,10 +374,9 @@ namespace RegistryWeb.Controllers
                         AccountCurrentBalancePadun = r.IdAccountKumiNavigation.CurrentBalancePadun,
                         AccountLastChargeDate = r.IdAccountKumiNavigation.LastChargeDate,
 
-                        CourtOrderNum = r.ClaimStates.FirstOrDefault(cs => cs.IdStateType == 4) == null ? null :
-                            r.ClaimStates.FirstOrDefault(cs => cs.IdStateType == 4).CourtOrderNum,
-                        Tenant = r.ClaimPersons.Where(cp => cp.IsClaimer)
-                            .Select(cp => string.Concat(cp.Surname, ' ', cp.Name, ' ', cp.Patronymic)).FirstOrDefault()
+                        CourtOrderNum = r.ClaimStates.FirstOrDefault(cs => cs.IdStateType == 4 && cs.CourtOrderNum != null) == null ? null :
+                            r.ClaimStates.FirstOrDefault(cs => cs.IdStateType == 4 && cs.CourtOrderNum != null).CourtOrderNum,
+                        Tenant = claimsDataService.GetClaimerByIdClaim(r.IdClaim)
                     })
                 });
             }
@@ -392,7 +391,7 @@ namespace RegistryWeb.Controllers
                 return Json(new
                 {
                     Count = count,
-                    Accounts = accountsResult.Select(r => new {
+                    Accounts = accountsResult.ToList().Select(r => new {
                         r.IdAccount,
                         r.Account,
                         r.State.State,
@@ -402,7 +401,8 @@ namespace RegistryWeb.Controllers
                         r.CurrentBalancePenalty,
                         r.CurrentBalanceDgi,
                         r.CurrentBalancePkk,
-                        r.CurrentBalancePadun
+                        r.CurrentBalancePadun,
+                        Tenant = kumiAccountsDataService.GetTenantByIdAccount(r.IdAccount)
                     })
                 });
             }

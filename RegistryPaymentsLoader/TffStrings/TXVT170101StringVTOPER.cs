@@ -9,8 +9,11 @@ namespace RegistryPaymentsLoader.TffStrings
 {
     public class TXVT170101StringVTOPER : TffStringVT
     {
-        public TXVT170101StringVTOPER(string[] tffStringParts) : base(tffStringParts)
+        private readonly DateTime? noticeDate;
+
+        public TXVT170101StringVTOPER(string[] tffStringParts, DateTime? noticeDate) : base(tffStringParts)
         {
+            this.noticeDate = noticeDate;
         }
 
         public override KumiPaymentExtract ToExtract()
@@ -29,6 +32,7 @@ namespace RegistryPaymentsLoader.TffStrings
                 Okato = tffStringParts[15] == "" ? null : tffStringParts[15],
                 InnAdb = tffStringParts[16] == "" ? null : tffStringParts[16],
                 KppAdb = tffStringParts[17] == "" ? null : tffStringParts[17],
+                DateEnrollUfk = noticeDate
             };
         }
     }

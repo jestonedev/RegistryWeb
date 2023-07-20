@@ -697,7 +697,7 @@ namespace RegistryWeb.DataServices
                 endCalcDate = endCalcDate.AddDays(1).AddMonths(1).AddDays(-1);
             }
 
-            kumiAccountsDataService.RecalculateAccounts(accounts, startRewriteDate, endCalcDate);  
+            kumiAccountsDataService.RecalculateAccounts(accounts, startRewriteDate, endCalcDate, false);  
 
             return new KumiPaymentDistributionInfo
             {
@@ -874,7 +874,7 @@ namespace RegistryWeb.DataServices
                 endCalcDate = endCalcDate.AddDays(1).AddMonths(1).AddDays(-1);
             }
             
-            kumiAccountsDataService.RecalculateAccounts(accounts, startRewriteDate, endCalcDate);
+            kumiAccountsDataService.RecalculateAccounts(accounts, startRewriteDate, endCalcDate, false);
 
             return new KumiPaymentDistributionInfo
             {

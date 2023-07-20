@@ -353,8 +353,9 @@ $(function () {
 
 
             table += "<tr data-account='" + accountNum + "' data-account-id-state='" + account.idState+"' data-account-state='" + state + "' data-last-charge-date='"
-                + account.lastChargeDate + "' data-current-balance-tenancy='" + tenancy + "' data-current-balance-penalty='"
-                + penalty + "' data-current-balance-dgi='" + dgi + "' data-current-balance-pkk='" + pkk + "' data-current-balance-padun='" + padun +"'>";
+                + account.lastChargeDate + "' data-current-balance-tenancy='" + tenancy + "' data-current-balance-penalty='" + penalty
+                + "' data-account-tenant='" + account.tenant
+                + "' data-current-balance-dgi='" + dgi + "' data-current-balance-pkk='" + pkk + "' data-current-balance-padun='" + padun + "'>";
 
             table += "<td style='vertical-align: middle'>" + radioButton + "</td>";
             table += "<td>" + accountNum
@@ -457,6 +458,7 @@ $(function () {
                 + "' data-id-account='" + claim.idAccount + "' data-account-current-balance-tenancy='" + accountCurrentBalanceTenancy
                 + "' data-account-current-balance-penalty='" + accountCurrentBalancePenalty + "' data-account-current-balance-dgi='" + accountCurrentBalanceDgi
                 + "' data-account-current-balance-pkk='" + accountCurrentBalancePkk + "' data-account-current-balance-padun='" + accountCurrentBalancePadun
+                + "' data-claim-court-order-num='" + claim.courtOrderNum + "' data-claim-tenant='" + claim.tenant
                 + "' data-claim-start-dept-period='" + claim.startDeptPeriod
                 + "' data-claim-end-dept-period='" + claim.endDeptPeriod
                 + "' data-claim-amount-tenancy='" + amountTenancy + "' data-claim-amount-penalty='" + amountPenalties
@@ -614,6 +616,7 @@ $(function () {
             data.Description.account = row.data("account");
             data.Description.idState = row.data("accountIdState");
             data.Description.state = row.data("accountState");
+            data.Description.tenant = row.data("accountTenant");
             data.Description.currentBalanceTenancy = row.data("currentBalanceTenancy");
             data.Description.currentBalancePenalty = row.data("currentBalancePenalty");
             data.Description.currentBalanceDgi = row.data("currentBalanceDgi");
@@ -626,6 +629,8 @@ $(function () {
             data.Description.account = row.data("account");
             data.Description.idAccountState = row.data("accountIdState");
             data.Description.accountState = row.data("accountState");
+            data.Description.courtOrderNum = row.data("claimCourtOrderNum");
+            data.Description.tenant = row.data("claimTenant");
             data.Description.amountTenancy = row.data("claimAmountTenancy");
             data.Description.amountPenalties = row.data("claimAmountPenalty");
             data.Description.amountDgi = row.data("claimAmountDgi");
