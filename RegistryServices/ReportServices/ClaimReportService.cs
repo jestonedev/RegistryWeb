@@ -233,7 +233,7 @@ namespace RegistryWeb.ReportServices
             {
                 { "id_claim", idClaim },
                 { "create_date", createDate },
-                { "signer", signer }
+                { "signer", idSigner }
             };
 
             var fileName = "registry\\claims\\" + fileconfigname;

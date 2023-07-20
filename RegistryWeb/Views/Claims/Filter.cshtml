@@ -76,19 +76,25 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-row">
-                        <div class="form-group col-2 col-md-4 col-lg-2">
+                        <div class="form-group col-4 col-md-4 col-lg-4">
                             <label asp-for="FilterOptions.IdClaim" class="rr-claim-filter-label">Реестровый номер</label>
                             <input type="text" class="form-control input-filter-numbers" asp-for="FilterOptions.IdClaim" title="Реестровый номер претензионно-исковой работы">
                         </div>
-                        <div class="form-group col-2 col-md-4 col-lg-2">
+                        <div class="form-group col-4 col-md-4 col-lg-4">
                             <label asp-for="FilterOptions.Crn" class="rr-claim-filter-label">СРН</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.Crn" title="СРН">
                         </div>
-                        <div class="form-group col-2 col-md-4 col-lg-2">
+                        <div class="form-group col-4 col-md-4 col-lg-4">
                             <label asp-for="FilterOptions.Account" class="rr-claim-filter-label">Лицевой счет</label>
                             <input type="text" class="form-control input-filter-numbers" asp-for="FilterOptions.Account" title="Лицевой счет">
                         </div>
-                        <div class="form-group col-6 col-md-12 col-lg-6">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6 col-md-5 col-lg-5">
+                            <label asp-for="FilterOptions.Tenant">ФИО нанимателя</label>
+                            <input type="text" class="form-control input-filter-snp" asp-for="FilterOptions.Tenant" title="ФИО нанимателя">
+                        </div>
+                        <div class="form-group col-6 col-md-7 col-lg-7">
                             <label asp-for="FilterOptions.RawAddress">Адрес по БКС</label>
                             <input type="text" class="form-control" asp-for="FilterOptions.RawAddress" title="Адрес по БКС">
                         </div>
