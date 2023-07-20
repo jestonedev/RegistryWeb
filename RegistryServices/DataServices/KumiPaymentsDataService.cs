@@ -636,6 +636,16 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        public void UpdateBksPaymentsDateEnrollUfkForm(DateTime dateDoc, DateTime dateEnrollUfk)
+        {
+            var payments = registryContext.KumiPayments.Where(r => r.DateDocument == dateDoc && r.IdSource == 6);
+            foreach(var payment in payments)
+            {
+                payment.DateEnrollUfk = dateEnrollUfk;
+            }
+            registryContext.SaveChanges();
+        }
+
         public KumiPaymentDistributionInfo CancelDistributePaymentToAccount(int idPayment, List<int> idClaims, List<int> idAccounts)
         {
             var payment = registryContext.KumiPayments.Include(r => r.PaymentClaims).Include(r => r.PaymentCharges).FirstOrDefault(r => r.IdPayment == idPayment);

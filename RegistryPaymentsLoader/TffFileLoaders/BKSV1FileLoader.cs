@@ -10,7 +10,15 @@ namespace RegistryPaymentsLoader.TffFileLoaders
 {
     class BKSV1FileLoader : TffFileLoader
     {
+        public BKSV1FileLoader(DateTime? dateEnrollUfk)
+        {
+            DateEnrollUfk = dateEnrollUfk;
+        }
+
         public override string Version => "BKSV1";
+
+        public DateTime? DateEnrollUfk { get; }
+
         protected override TffString LoadString(string[] tffStringParts)
         {
             if (tffStringParts.Length != 3) return null;
@@ -69,7 +77,8 @@ namespace RegistryPaymentsLoader.TffFileLoaders
                         row.GetCell(2).StringCellValue,
                         sum,
                         row.GetCell(4).StringCellValue,
-                        payDate
+                        payDate,
+                        DateEnrollUfk == null ? null : DateEnrollUfk.Value.ToString("dd.MM.yyyy")
                     }));
                 }
             }

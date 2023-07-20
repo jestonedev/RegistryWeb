@@ -34,6 +34,17 @@ namespace RegistryPaymentsLoader.TffFileLoaders
                             throw new BDFormatException(
                                 string.Format("Отсутствует строка BD для строки {0}", fileString));
                     } else
+                    if (tffString is TffStringZF)
+                    {
+                        var prevString = result.Last();
+                        if (prevString is TffStringZFZF)
+                        {
+                            ((TffStringZF)tffString).ZfString = (TffStringZFZF)prevString;
+                            result.Remove(prevString);
+                        }
+                        result.Add(tffString);
+                    }
+                    else
                         result.Add(tffString);
                 }
             }

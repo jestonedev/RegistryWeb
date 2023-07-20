@@ -51,7 +51,8 @@ namespace RegistryPaymentsLoader.TffStrings
                 Sum = TffTypesHelper.StringToDecimal(tffStringParts[3]) ?? 0,
                 Purpose = GetPurpose(),
                 Kbk = "90111109044041000120",
-                PayerName = string.Format("{0}", tffStringParts[2])
+                PayerName = string.Format("{0}", tffStringParts[2]),
+                DateEnrollUfk = TffTypesHelper.StringToDate(tffStringParts[6])
             };
         }
     }

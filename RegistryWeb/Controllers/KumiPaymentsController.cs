@@ -519,7 +519,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult UploadPayments(List<IFormFile> files)
+        public IActionResult UploadPayments(List<IFormFile> files, DateTime? dateEnrollUfk)
         {
             var tffStrings = new List<TffString>();
             var kumiPaymentGroupFiles = new List<KumiPaymentGroupFile>();
@@ -563,7 +563,7 @@ namespace RegistryWeb.Controllers
                 {
                     var stream = file.Item1;
                     var fileName = file.Item2;
-                    var tffFileLoader = TffFileLoaderFactory.CreateFileLoader(stream, new FileInfo(fileName));
+                    var tffFileLoader = TffFileLoaderFactory.CreateFileLoader(stream, new FileInfo(fileName), dateEnrollUfk);
                     if (tffFileLoader == null) continue;
                     stream.Seek(0, System.IO.SeekOrigin.Begin);
                     tffStrings.AddRange(tffFileLoader.Load(stream));
@@ -652,6 +652,27 @@ namespace RegistryWeb.Controllers
             }
            
         }
+
+        public IActionResult UpdateBksPaymentsDateEnrollUfkForm(DateTime dateDoc, DateTime dateEnrollUfk)
+        {
+            try
+            {
+                dataService.UpdateBksPaymentsDateEnrollUfkForm(dateDoc, dateEnrollUfk);
+                return Json(new
+                {
+                    State = "Success"
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
+                });
+            }
+        }
+
 
     }
 }

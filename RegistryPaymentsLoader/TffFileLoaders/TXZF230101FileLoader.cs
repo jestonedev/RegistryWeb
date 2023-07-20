@@ -13,6 +13,9 @@ namespace RegistryPaymentsLoader.TffFileLoaders
             var stringVersion = tffStringParts[0];
             switch (stringVersion)
             {
+                case "ZF":
+                    if (tffStringParts.Length != 35) return null;
+                    return new TXZF230101StringZFZF(tffStringParts);
                 case "ZF_PP":
                     if (tffStringParts.Length != 45) return null;
                     return new TXZF230101StringZFPP(tffStringParts);
