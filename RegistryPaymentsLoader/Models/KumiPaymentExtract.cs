@@ -18,6 +18,7 @@ namespace RegistryPaymentsLoader.Models
         public string Okato { get; set; }
         public string InnAdb { get; set; }
         public string KppAdb { get; set; }
+        public DateTime? DateEnrollUfk { get; set; }
 
         public bool IsMemorialOrder() {
             return CodeDoc == "UF";
@@ -39,7 +40,8 @@ namespace RegistryPaymentsLoader.Models
                 TargetCode = TargetCode,
                 Okato = Okato,
                 InnAdb = InnAdb,
-                KppAdb = KppAdb
+                KppAdb = KppAdb,
+                DateEnrollUfk = DateEnrollUfk
             };
         }
     }

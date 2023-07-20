@@ -20,7 +20,7 @@ namespace RegistryPaymentsLoader.TffFileLoaders
                     return null;
                 case "VTOPER":
                     if (tffStringParts.Length != 19) return null;
-                    return new TXVT170101StringVTOPER(tffStringParts);
+                    return new TXVT170101StringVTOPER(tffStringParts, NoticeDate);
             }
             return null;
         }

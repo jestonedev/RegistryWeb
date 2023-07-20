@@ -391,7 +391,7 @@ namespace RegistryWeb.Controllers
                 return Json(new
                 {
                     Count = count,
-                    Accounts = accountsResult.Select(r => new {
+                    Accounts = accountsResult.ToList().Select(r => new {
                         r.IdAccount,
                         r.Account,
                         r.State.State,
@@ -401,7 +401,8 @@ namespace RegistryWeb.Controllers
                         r.CurrentBalancePenalty,
                         r.CurrentBalanceDgi,
                         r.CurrentBalancePkk,
-                        r.CurrentBalancePadun
+                        r.CurrentBalancePadun,
+                        Tenant = kumiAccountsDataService.GetTenantByIdAccount(r.IdAccount)
                     })
                 });
             }

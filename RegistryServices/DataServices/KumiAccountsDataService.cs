@@ -304,7 +304,7 @@ namespace RegistryWeb.DataServices
             return accounts.ToList();
         }
 
-        public void RecalculateAccounts(List<int> accountIds, KumiAccountRecalcTypeEnum recalcType, DateTime? recalcStartDate)
+        public void RecalculateAccounts(List<int> accountIds, KumiAccountRecalcTypeEnum recalcType, DateTime? recalcStartDate, bool saveCurrentPeriodCharge)
         {
             var accounts = registryContext.KumiAccounts.Where(r => accountIds.Contains(r.IdAccount) && r.IdState != 2);
 
@@ -326,7 +326,7 @@ namespace RegistryWeb.DataServices
                 startRewriteDate = recalcStartDate;
             }
 
-            RecalculateAccounts(accounts, startRewriteDate, endCalcDate);
+            RecalculateAccounts(accounts, startRewriteDate, endCalcDate, saveCurrentPeriodCharge);
         }
 
         public KumiCharge CalcForecastChargeInfo(int idAccount, DateTime calcToDate)
@@ -357,7 +357,7 @@ namespace RegistryWeb.DataServices
             return chargingInfo.FirstOrDefault(r => r.EndDate == calcToDate) ?? new KumiCharge();
         }
 
-        public void RecalculateAccounts(IQueryable<KumiAccount> accounts, DateTime? startRewriteDate, DateTime endCalcDate)
+        public void RecalculateAccounts(IQueryable<KumiAccount> accounts, DateTime? startRewriteDate, DateTime endCalcDate, bool saveCurrentPeriodCharge)
         {
             var accountsPrepare = GetAccountsPrepareForPaymentCalculator(accounts);
             var accountsInfo = GetAccountInfoForPaymentCalculator(accountsPrepare);
@@ -372,7 +372,7 @@ namespace RegistryWeb.DataServices
                 var dbChargingInfo = GetDbChargingInfo(account);
 
                 // Если было начисление на текущий или будущий период, то сохранить его при перерасчете (по-умолчанию начислеяются только закрытыие периоды)
-                var forceCalcChargeOnFutureDate = false;
+                var forceCalcChargeOnFutureDate = saveCurrentPeriodCharge;
                 var lastDbCharge = dbChargingInfo.OrderByDescending(r => r.EndDate).FirstOrDefault();
                 if (lastDbCharge != null && lastDbCharge.EndDate >= DateTime.Now.Date)
                 {
@@ -386,8 +386,15 @@ namespace RegistryWeb.DataServices
                 var recalcInsertIntoCharge = new KumiCharge();
                 if (chargingInfo.Any()) recalcInsertIntoCharge = chargingInfo.Last();
                 CalcRecalcInfo(account, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, endCalcDate, startRewriteDate.Value);
-                UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate.Value, null);
+                UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate.Value, 
+                    saveCurrentPeriodCharge ? DateTime.Now.Date.AddDays(-DateTime.Now.Day+1).AddMonths(1).AddDays(-1)  : (DateTime?)null);
             }
+        }
+
+        public string GetTenantByIdAccount(int idAccount)
+        {
+            var tenants = registryContext.GetTenantsByAccountIds(new List<int> { idAccount });
+            return tenants.FirstOrDefault()?.Tenant;
         }
 
         public List<KumiCharge> GetDbChargingInfo(KumiAccountInfoForPaymentCalculator account)
@@ -2336,6 +2343,14 @@ namespace RegistryWeb.DataServices
                 case 8:
                     query = from row in query
                             where row.RecalcMarker == 1
+                            select row;
+                    break;
+                case 9:
+                    var currentPeriodEndDate = DateTime.Now.Date;
+                    currentPeriodEndDate = currentPeriodEndDate.AddDays(-currentPeriodEndDate.Day + 1).AddMonths(1).AddDays(-1);
+                    var nullChargesAccountIds = registryContext.KumiCharges.Where(r => r.EndDate == currentPeriodEndDate && r.ChargeTenancy == 0).Select(r => r.IdAccount).ToList();
+                    query = from row in query
+                            where row.IdState == 1 && (row.LastCalcDate != currentPeriodEndDate || nullChargesAccountIds.Contains(row.IdAccount))
                             select row;
                     break;
             }

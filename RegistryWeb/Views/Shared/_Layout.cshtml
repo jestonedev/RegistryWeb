@@ -55,7 +55,9 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownObjects">
                             <a class="dropdown-item" asp-area="" asp-controller="Buildings" asp-action="Index">Здания</a>
                             <a class="dropdown-item" asp-area="" asp-controller="Premises" asp-action="Index">Помещения</a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" id="areaAvgCostModalBtn">Цена вторичного жилья</a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" asp-area="" asp-controller="RegistryObjectsReports" asp-action="Index">Отчеты</a>
                         </div>
                     </li>
@@ -64,6 +66,7 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownOwners">
                             <a class="dropdown-item" asp-area="" asp-controller="OwnerProcesses" asp-action="Index">Процессы собственности</a>
                             <a class="dropdown-item" asp-area="" asp-controller="OwnerReasonTypes" asp-action="Index">Типы оснований</a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" asp-area="" asp-controller="OwnerReports" asp-action="Index">Отчеты</a>
                             @*<a class="dropdown-item" asp-area="" asp-controller="ReformaGKH" asp-action="Index">Реформа ЖКХ</a>*@
                         </div>
@@ -73,17 +76,19 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownTenancies">
                             <a class="dropdown-item" asp-area="" asp-controller="TenancyProcesses" asp-action="Index">Процессы найма</a>
                             <a class="dropdown-item" asp-area="" asp-controller="DocumentIssued" asp-action="Index">Паспортные столы</a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" asp-area="" asp-controller="TenancyObjectsReports" asp-action="Index">Отчеты</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownClaims" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Иск. работа (найм)</a>
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownClaims" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">ПИР и ЛС (найм)</a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownClaims">
-                            <a class="dropdown-item" asp-area="" asp-controller="PaymentAccounts" asp-action="Index">Лицевые счета БКС</a>
-                            <a class="dropdown-item" asp-area="" asp-controller="Claims" asp-action="Index">Претензионно-исковые работы</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" asp-area="" asp-controller="KumiAccounts" asp-action="Index">Лицевые счета КУМИ</a>
                             <a class="dropdown-item" asp-area="" asp-controller="KumiPayments" asp-action="Index">Платежи</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" asp-area="" asp-controller="PaymentAccounts" asp-action="Index">Лицевые счета БКС</a>
+                            <a class="dropdown-item" asp-area="" asp-controller="KumiAccounts" asp-action="Index">Лицевые счета КУМИ</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" asp-area="" asp-controller="Claims" asp-action="Index">Претензионно-исковые работы</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" asp-area="" asp-controller="ClaimReports" asp-action="Index">Отчеты</a>
                         </div>
@@ -100,6 +105,7 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownPrivatization">
                             <a class="dropdown-item" asp-area="" asp-controller="Privatization" asp-action="Index">Договоры приватизации</a>
                             <a class="dropdown-item" asp-area="" asp-controller="PrivRealtors" asp-action="Index">Риелторы</a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" asp-area="" asp-controller="PrivatizationReports" asp-action="Index">Отчеты</a>
                         </div>
                     </li>

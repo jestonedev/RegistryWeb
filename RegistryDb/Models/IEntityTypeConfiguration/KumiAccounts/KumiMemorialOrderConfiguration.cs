@@ -91,6 +91,11 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                .IsUnicode(false)
                .IsRequired();
 
+            builder.Property(e => e.DateEnrollUfk)
+                .HasColumnName("date_enroll_ufk")
+                .HasColumnType("date")
+                .IsRequired();
+
             builder.Property(e => e.Deleted)
                 .HasColumnName("deleted")
                 .HasColumnType("tinyint(1)")

@@ -243,11 +243,13 @@
             + "' data-current-balance-tenancy='" + currentBalanceTenancy + "' data-current-balance-penalty='" + currentBalancePenalty
             + "' data-current-balance-dgi='" + currentBalanceDgi + "' data-current-balance-pkk='" + currentBalancePkk
             + "' data-current-balance-padun='" + currentBalancePadun
+            + "' data-account-tenant='" + account.tenant
             + "' data-last-charge-date='" + account.lastChargeDate +"'><u>ЛС №" + account.account + ":</u>" +
             " <sup><span title='" + account.state + "' class='" + stateClass + "'><b>" + account.state.substr(0, 1) + "</b></span></sup> " +
             "<a class=\"btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn\" target=\"_blank\" href=\"/KumiAccounts/Details?idAccount=" + account.idAccount + "\"></a>" +
-            "</div>" +
-            "<div class=\"text-left\"><b>Текущее сальдо:</b><br class=\"d-lg-none\"/> найм " + distributePaymentFormatSum(currentBalanceTenancy) + " руб., пени " + distributePaymentFormatSum(currentBalancePenalty) + " руб."
+            "</div>"
+            + (account.tenant !== null ? "<div class=\"text-left\"><b>Наниматель:</b> " + account.tenant + "</div>" : "")
+            + "<div class=\"text-left\"><b>Текущее сальдо:</b><br class=\"d-lg-none\"/> найм " + distributePaymentFormatSum(currentBalanceTenancy) + " руб., пени " + distributePaymentFormatSum(currentBalancePenalty) + " руб."
             + (currentBalanceDgi > 0 ? ", ДГИ " + distributePaymentFormatSum(currentBalanceDgi) + " руб." : "")
             + (currentBalancePkk > 0 ? ", ПКК " + distributePaymentFormatSum(currentBalancePkk) + " руб." : "")
             + (currentBalancePadun > 0 ? ", Падун " + distributePaymentFormatSum(currentBalancePadun) + " руб." : "")
@@ -686,6 +688,7 @@
                     account: distributionObjectWrapper.data("account"),
                     idState: distributionObjectWrapper.data("accountIdState"),
                     state: distributionObjectWrapper.data("accountState"),
+                    tenant: distributionObjectWrapper.data("accountTenant"),
                     currentBalanceTenancy: distributionObjectWrapper.data("currentBalanceTenancy"),
                     currentBalancePenalty: distributionObjectWrapper.data("currentBalancePenalty"),
                     currentBalanceDgi: distributionObjectWrapper.data("currentBalanceDgi"),
@@ -707,6 +710,8 @@
                     accountCurrentBalanceDgi: distributionObjectWrapper.data("accountCurrentBalanceDgi"),
                     accountCurrentBalancePkk: distributionObjectWrapper.data("accountCurrentBalancePkk"),
                     accountCurrentBalancePadun: distributionObjectWrapper.data("accountCurrentBalancePadun"),
+                    tenant: distributionObjectWrapper.data("claimTenant"),
+                    courtOrderNum: distributionObjectWrapper.data("claimCourtOrderNum"),
                     amountTenancy: distributionObjectWrapper.data("claimAmountTenancy"),
                     amountPenalties: distributionObjectWrapper.data("claimAmountPenalty"),
                     amountDgi: distributionObjectWrapper.data("claimAmountDgi"),
