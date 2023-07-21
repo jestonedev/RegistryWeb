@@ -7,6 +7,8 @@ namespace RegistryPaymentsLoader.TffStrings
 {
     public abstract class TffStringZF: TffString
     {
+        public TffStringZFZF ZfString { get; set; }
+
         public TffStringZF(string[] tffStringParts) : base(tffStringParts)
         {
         }

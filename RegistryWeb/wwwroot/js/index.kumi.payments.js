@@ -48,7 +48,23 @@ $(function () {
 
     $("#UploadPaymentsFiles").on("change", function (event) {
         event.preventDefault();
-        $(this).closest("form").submit();
+        if (this.files.length === 0) return;
+        if (this.files.length > 1 || !this.files[0].name.endsWith(".xlsx")) {
+            $(this).closest("form").submit();
+        } else {
+            var modal = $("#UploadPaymentsDateEnrollUfkModal");
+            modal.modal('show');
+        }
+    });
+
+    $("#UploadPaymentsDateEnrollUfkModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("form");
+        if (!form.valid()) return;
+        var dateEnrollUfk = form.find("#UploadPayments_DateEnrollUfk").val();
+        var submitForm = $("form[name='UploadPaymentsForm']");
+        submitForm.find("input[name='DateEnrollUfk']").val(dateEnrollUfk);
+        submitForm.submit();
     });
 
 
@@ -81,4 +97,34 @@ $(function () {
         fixBootstrapSelectHighlightOnChange($(this));
     });
 
+    $("#BksSetDateEnrollUfk").on("click", function (e) {
+        e.preventDefault();
+        var modal = $("#UpdateBksPaymentsDateEnrollUfkModal");
+        modal.modal('show');
+    });
+
+    $("#UpdateBksPaymentsDateEnrollUfkModal .rr-report-submit").on("click", function (e) {
+        e.preventDefault();
+        var form = $(this).closest("form");
+        if (!form.valid()) return;
+        $(this).prop("disabled", "disabled");
+
+        var dateDoc = form.find("#UpdateBksPaymentsDateEnrollUfk_DateDoc").val();
+        var dateEnrollUfk = form.find("#UpdateBksPaymentsDateEnrollUfk_DateEnrollUfk").val();
+
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/KumiPayments/UpdateBksPaymentsDateEnrollUfkForm',
+            data: { dateDoc, dateEnrollUfk  },
+            dataType: 'json',
+            success: function (data) {
+                if (data.state === "Success") {
+                    $("#UpdateBksPaymentsDateEnrollUfkModal").modal('hide');
+                } else {
+                    form.find(".rr-update-date-enroll-ufk-error").removeClass("d-none").text(data.error);
+                }
+                $("#UpdateBksPaymentsDateEnrollUfkModal .rr-report-submit").prop("disabled", "");
+            }
+        });
+    });
 });

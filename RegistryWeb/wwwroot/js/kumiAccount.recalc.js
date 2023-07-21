@@ -53,6 +53,7 @@
         e.preventDefault();
     });
 
+
     $("#accountRecalcForm .rr-report-submit").on("click", function (e) {
         recalcAccountForm.find(".rr-recalc-account-error").addClass("d-none");
         if (recalcAccountForm.valid()) {
@@ -196,7 +197,7 @@
                     if (accountIdsOther.length > 0) {
                         accountIdsForRecalc = accountIdsOther.slice(0, 10);
                         accountIdsOther = accountIdsOther.slice(10);
-                        recalcAccounts(accountIdsForRecalc, accountIdsOther, recalcStartYear, recalcStartMonth, saveCurrentPeriodCharge);
+                        recalcAccounts(accountIdsForRecalc, accountIdsOther, recalcStartYear, recalcStartMonth, null, saveCurrentPeriodCharge);
                     } else {
                         location.reload();
                     }

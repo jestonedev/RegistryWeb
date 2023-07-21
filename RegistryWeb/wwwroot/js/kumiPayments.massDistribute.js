@@ -242,7 +242,7 @@
             + "' data-account-id-state='" + account.idState
             + "' data-current-balance-tenancy='" + currentBalanceTenancy + "' data-current-balance-penalty='" + currentBalancePenalty
             + "' data-current-balance-dgi='" + currentBalanceDgi + "' data-current-balance-pkk='" + currentBalancePkk
-            + "' data-current-balance-padun='" + currentBalancePadun
+            + "' data-current-balance-padun='" + currentBalancePadun + "' data-current-balance-exclude-charge='" + account.currentBalanceExcludeCharge
             + "' data-account-tenant='" + account.tenant
             + "' data-last-charge-date='" + account.lastChargeDate +"'><u>ЛС №" + account.account + ":</u>" +
             " <sup><span title='" + account.state + "' class='" + stateClass + "'><b>" + account.state.substr(0, 1) + "</b></span></sup> " +
@@ -253,6 +253,7 @@
             + (currentBalanceDgi > 0 ? ", ДГИ " + distributePaymentFormatSum(currentBalanceDgi) + " руб." : "")
             + (currentBalancePkk > 0 ? ", ПКК " + distributePaymentFormatSum(currentBalancePkk) + " руб." : "")
             + (currentBalancePadun > 0 ? ", Падун " + distributePaymentFormatSum(currentBalancePadun) + " руб." : "")
+            + (account.currentBalanceExcludeCharge ? " <sup class='text-danger' title='За вычетом начисления текущего периода'>*</sup>" : "")
             + "</div>" +
             "<div class=\"text-left\"><b>Посл. начисление:</b><br class=\"d-lg-none\"/> " + lastChargeDateStr + "</div>";
         return html;
@@ -299,7 +300,7 @@
             + "' data-account='" + claim.account + "' data-account-id-state='" + claim.idAccountState + "' data-account-state='" + claim.accountState
             + "' data-account-current-balance-tenancy='" + claim.accountCurrentBalanceTenancy + "' data-account-current-balance-penalty='" + claim.accountCurrentBalancePenalty
             + "' data-account-current-balance-dgi='" + claim.accountCurrentBalanceDgi + "' data-account-current-balance-pkk='" + claim.accountCurrentBalancePkk
-            + "' data-account-current-balance-padun='" + claim.accountCurrentBalancePadun
+            + "' data-account-current-balance-padun='" + claim.accountCurrentBalancePadun + "' data-account-current-balance-exclude-charge='" + claim.accountCurrentBalanceExcludeCharge
             + "' data-claim-court-order-num='" + claim.courtOrderNum + "' data-claim-tenant='" + claim.tenant
             + "' data-claim-amount-tenancy='" + amountTenancy + "' data-claim-amount-penalty='" + amountPenalties
             + "' data-claim-amount-dgi='" + amountDgi + "' data-claim-amount-pkk='" + amountPkk
@@ -319,6 +320,7 @@
             + (claim.accountCurrentBalanceDgi > 0 ? ", ДГИ " + distributePaymentFormatSum(claim.accountCurrentBalanceDgi) + " руб." : "")
             + (claim.accountCurrentBalancePkk > 0 ? ", ПКК " + distributePaymentFormatSum(claim.accountCurrentBalancePkk) + " руб." : "")
             + (claim.accountCurrentBalancePadun > 0 ? ", Падун " + distributePaymentFormatSum(claim.accountCurrentBalancePadun) + " руб." : "")
+            + (claim.accountCurrentBalanceExcludeCharge ? " <sup class='text-danger' title='За вычетом начисления текущего периода'>*</sup>" : "")
             + "</div>" +
             "<div class=\"text-left\"><b>Период взыскания:</b><br class=\"d-lg-none\"/> " + claimDeptPeriodsToStr(claim) +"</div>" +
             "<div class=\"text-left\"><b>Взыскиваемая сумма:</b><br class=\"d-lg-none\"/> найм " + distributePaymentFormatSum(amountTenancy) + " руб., пени " + distributePaymentFormatSum(amountPenalties) + " руб."
@@ -694,6 +696,7 @@
                     currentBalanceDgi: distributionObjectWrapper.data("currentBalanceDgi"),
                     currentBalancePkk: distributionObjectWrapper.data("currentBalancePkk"),
                     currentBalancePadun: distributionObjectWrapper.data("currentBalancePadun"),
+                    currentBalanceExcludeCharge: distributionObjectWrapper.data("currentBalanceExcludeCharge"),
                     lastChargeDate: distributionObjectWrapper.data("lastChargeDate")
                 }
             ];
@@ -710,6 +713,7 @@
                     accountCurrentBalanceDgi: distributionObjectWrapper.data("accountCurrentBalanceDgi"),
                     accountCurrentBalancePkk: distributionObjectWrapper.data("accountCurrentBalancePkk"),
                     accountCurrentBalancePadun: distributionObjectWrapper.data("accountCurrentBalancePadun"),
+                    accountCurrentBalanceExcludeCharge: distributionObjectWrapper.data("accountCurrentBalanceExcludeCharge"),
                     tenant: distributionObjectWrapper.data("claimTenant"),
                     courtOrderNum: distributionObjectWrapper.data("claimCourtOrderNum"),
                     amountTenancy: distributionObjectWrapper.data("claimAmountTenancy"),

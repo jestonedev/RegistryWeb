@@ -367,11 +367,27 @@ namespace RegistryWeb.Controllers
                         r.StartDeptPeriod,
                         r.EndDeptPeriod,
 
-                        AccountCurrentBalanceTenancy = r.IdAccountKumiNavigation.CurrentBalanceTenancy,
-                        AccountCurrentBalancePenalty = r.IdAccountKumiNavigation.CurrentBalancePenalty,
-                        AccountCurrentBalanceDgi = r.IdAccountKumiNavigation.CurrentBalanceDgi,
-                        AccountCurrentBalancePkk = r.IdAccountKumiNavigation.CurrentBalancePkk,
-                        AccountCurrentBalancePadun = r.IdAccountKumiNavigation.CurrentBalancePadun,
+                        AccountCurrentBalanceTenancy = (r.IdAccountKumiNavigation.LastChargeDate >= DateTime.Now.Date) ? 
+                                (r.IdAccountKumiNavigation.CurrentBalanceTenancy - (r.IdAccountKumiNavigation.Charges
+                                .FirstOrDefault(c => c.EndDate == r.IdAccountKumiNavigation.LastChargeDate)?.ChargeTenancy ?? 0)) : 
+                                r.IdAccountKumiNavigation.CurrentBalanceTenancy,
+                        AccountCurrentBalancePenalty = (r.IdAccountKumiNavigation.LastChargeDate >= DateTime.Now.Date) ? 
+                                (r.IdAccountKumiNavigation.CurrentBalancePenalty - (r.IdAccountKumiNavigation.Charges
+                                .FirstOrDefault(c => c.EndDate == r.IdAccountKumiNavigation.LastChargeDate)?.ChargePenalty ?? 0)) : 
+                                r.IdAccountKumiNavigation.CurrentBalancePenalty,
+                        AccountCurrentBalanceDgi = (r.IdAccountKumiNavigation.LastChargeDate >= DateTime.Now.Date) ? 
+                                (r.IdAccountKumiNavigation.CurrentBalanceDgi - (r.IdAccountKumiNavigation.Charges
+                                .FirstOrDefault(c => c.EndDate == r.IdAccountKumiNavigation.LastChargeDate)?.ChargeDgi ?? 0)) : 
+                                r.IdAccountKumiNavigation.CurrentBalanceDgi,
+                        AccountCurrentBalancePkk = (r.IdAccountKumiNavigation.LastChargeDate >= DateTime.Now.Date) ? 
+                                (r.IdAccountKumiNavigation.CurrentBalancePkk - (r.IdAccountKumiNavigation.Charges
+                                .FirstOrDefault(c => c.EndDate == r.IdAccountKumiNavigation.LastChargeDate)?.ChargePkk ?? 0)) : 
+                                r.IdAccountKumiNavigation.CurrentBalancePkk,
+                        AccountCurrentBalancePadun = (r.IdAccountKumiNavigation.LastChargeDate >= DateTime.Now.Date) ? 
+                                (r.IdAccountKumiNavigation.CurrentBalancePadun - (r.IdAccountKumiNavigation.Charges
+                                .FirstOrDefault(c => c.EndDate == r.IdAccountKumiNavigation.LastChargeDate)?.ChargePadun ?? 0)) : 
+                                r.IdAccountKumiNavigation.CurrentBalancePadun,
+                        AccountCurrentBalanceExcludeCharge = r.IdAccountKumiNavigation.LastChargeDate >= DateTime.Now.Date,
                         AccountLastChargeDate = r.IdAccountKumiNavigation.LastChargeDate,
 
                         CourtOrderNum = r.ClaimStates.FirstOrDefault(cs => cs.IdStateType == 4 && cs.CourtOrderNum != null) == null ? null :
@@ -388,6 +404,7 @@ namespace RegistryWeb.Controllers
                 var count = accountsResult.Count();
                 if (count > 3)
                     accountsResult = accountsResult.Take(3);
+
                 return Json(new
                 {
                     Count = count,
@@ -397,11 +414,17 @@ namespace RegistryWeb.Controllers
                         r.State.State,
                         r.State.IdState,
                         r.LastChargeDate,
-                        r.CurrentBalanceTenancy,
-                        r.CurrentBalancePenalty,
-                        r.CurrentBalanceDgi,
-                        r.CurrentBalancePkk,
-                        r.CurrentBalancePadun,
+                        CurrentBalanceTenancy = (r.LastChargeDate >= DateTime.Now.Date) ? (r.CurrentBalanceTenancy - (r.Charges
+                                .FirstOrDefault(c => c.EndDate == r.LastChargeDate)?.ChargeTenancy ?? 0)) : r.CurrentBalanceTenancy,
+                        CurrentBalancePenalty = (r.LastChargeDate >= DateTime.Now.Date) ? (r.CurrentBalancePenalty - (r.Charges
+                                .FirstOrDefault(c => c.EndDate == r.LastChargeDate)?.ChargePenalty ?? 0)) : r.CurrentBalancePenalty,
+                        CurrentBalanceDgi = (r.LastChargeDate >= DateTime.Now.Date) ? (r.CurrentBalanceDgi - (r.Charges
+                                .FirstOrDefault(c => c.EndDate == r.LastChargeDate)?.ChargeDgi ?? 0)) : r.CurrentBalanceDgi,
+                        CurrentBalancePkk = (r.LastChargeDate >= DateTime.Now.Date) ? (r.CurrentBalancePkk - (r.Charges
+                                .FirstOrDefault(c => c.EndDate == r.LastChargeDate)?.ChargePkk ?? 0)) : r.CurrentBalancePkk,
+                        CurrentBalancePadun = (r.LastChargeDate >= DateTime.Now.Date) ? (r.CurrentBalancePadun - (r.Charges
+                                .FirstOrDefault(c => c.EndDate == r.LastChargeDate)?.ChargePadun ?? 0)) : r.CurrentBalancePadun,
+                        CurrentBalanceExcludeCharge = r.LastChargeDate >= DateTime.Now.Date,
                         Tenant = kumiAccountsDataService.GetTenantByIdAccount(r.IdAccount)
                     })
                 });
@@ -519,7 +542,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult UploadPayments(List<IFormFile> files)
+        public IActionResult UploadPayments(List<IFormFile> files, DateTime? dateEnrollUfk)
         {
             var tffStrings = new List<TffString>();
             var kumiPaymentGroupFiles = new List<KumiPaymentGroupFile>();
@@ -563,7 +586,7 @@ namespace RegistryWeb.Controllers
                 {
                     var stream = file.Item1;
                     var fileName = file.Item2;
-                    var tffFileLoader = TffFileLoaderFactory.CreateFileLoader(stream, new FileInfo(fileName));
+                    var tffFileLoader = TffFileLoaderFactory.CreateFileLoader(stream, new FileInfo(fileName), dateEnrollUfk);
                     if (tffFileLoader == null) continue;
                     stream.Seek(0, System.IO.SeekOrigin.Begin);
                     tffStrings.AddRange(tffFileLoader.Load(stream));
@@ -652,6 +675,27 @@ namespace RegistryWeb.Controllers
             }
            
         }
+
+        public IActionResult UpdateBksPaymentsDateEnrollUfkForm(DateTime dateDoc, DateTime dateEnrollUfk)
+        {
+            try
+            {
+                dataService.UpdateBksPaymentsDateEnrollUfkForm(dateDoc, dateEnrollUfk);
+                return Json(new
+                {
+                    State = "Success"
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
+                });
+            }
+        }
+
 
     }
 }

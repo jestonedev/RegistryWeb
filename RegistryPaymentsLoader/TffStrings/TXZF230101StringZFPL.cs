@@ -8,18 +8,20 @@ namespace RegistryPaymentsLoader.TffStrings
 {
     public class TXZF230101StringZFPL : TffStringZF
     {
+
         public TXZF230101StringZFPL(string[] tffStringParts) : base(tffStringParts)
         {
         }
 
         public override KumiPayment ToPayment()
         {
+            var zfPayment = ZfString?.GetZfPayment();
             return new KumiPayment
             {
                 Guid = tffStringParts[1] == "" ? null : tffStringParts[1],
                 IdSource = 5, // ZF_PL
-                NumDocument = tffStringParts[3] == "" ? null : tffStringParts[3],
-                DateDocument = TffTypesHelper.StringToDate(tffStringParts[4]),
+                NumDocument = zfPayment == null ? (tffStringParts[3] == "" ? null : tffStringParts[3]) : zfPayment.NumDoc,
+                DateDocument = zfPayment == null ? TffTypesHelper.StringToDate(tffStringParts[4]) : zfPayment.DateDoc,
                 DateIn = TffTypesHelper.StringToDate(tffStringParts[4]),
                 DateExecute = TffTypesHelper.StringToDate(tffStringParts[5]),
                 DatePay = null,
@@ -32,14 +34,14 @@ namespace RegistryPaymentsLoader.TffStrings
                 {
                     Code = "01"
                 },
-                Sum = TffTypesHelper.StringToDecimal(tffStringParts[8]) ?? 0,
+                Sum = zfPayment == null ? (TffTypesHelper.StringToDecimal(tffStringParts[8]) ?? 0) : zfPayment.Sum,
                 Uin = tffStringParts[11] == "" ? null : tffStringParts[11],
                 IdPurpose = null,
-                Purpose = tffStringParts[9] == "" ? null : tffStringParts[9],
-                Kbk = tffStringParts[37] == "" ? null : tffStringParts[37],
-                KbkType = null,
-                TargetCode = null,
-                Okato = null,
+                Purpose = zfPayment == null ? (tffStringParts[9] == "" ? null : tffStringParts[9]) : zfPayment.Purpose,
+                Kbk = zfPayment == null ? null : zfPayment.Kbk,
+                KbkType = zfPayment == null ? null : new KumiKbkType { Code = zfPayment.KbkType },
+                TargetCode = zfPayment == null ? null : zfPayment.TargetCode,
+                Okato = zfPayment == null ? null : zfPayment.Okato,
                 PaymentReason = new KumiPaymentReason
                 {
                     Code = tffStringParts[40],
@@ -50,15 +52,15 @@ namespace RegistryPaymentsLoader.TffStrings
                 {
                     Code = tffStringParts[39],
                 },
-                PayerInn = tffStringParts[15],
-                PayerKpp = tffStringParts[16],
-                PayerName = tffStringParts[17],
+                PayerInn = zfPayment == null ? tffStringParts[15] : zfPayment.PayerInn,
+                PayerKpp = zfPayment == null ? tffStringParts[16] : zfPayment.PayerKpp,
+                PayerName = zfPayment == null ? tffStringParts[17] : zfPayment.PayerName,
                 PayerAccount = tffStringParts[19],
                 PayerBankBik = tffStringParts[21],
                 PayerBankName = tffStringParts[20],
                 PayerBankAccount = tffStringParts[22],
-                RecipientInn = tffStringParts[25],
-                RecipientKpp = tffStringParts[26],
+                RecipientInn = zfPayment == null ? tffStringParts[25] : zfPayment.RecipientInn,
+                RecipientKpp = zfPayment == null ? tffStringParts[26] : zfPayment.RecipientKpp,
                 RecipientName = tffStringParts[23],
                 RecipientAccount = tffStringParts[30],
                 RecipientBankBik = tffStringParts[29],

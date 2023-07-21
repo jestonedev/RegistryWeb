@@ -36,7 +36,7 @@ namespace RegistryPaymentsLoader.TffStrings
                 Uin = tffStringParts[11] == "" ? null : tffStringParts[11],
                 IdPurpose = null,
                 Purpose = tffStringParts[9] == "" ? null : tffStringParts[9],
-                Kbk = tffStringParts[37] == "" ? null : tffStringParts[37],
+                Kbk = (tffStringParts[37] == "" ? null : tffStringParts[37]),
                 KbkType = null,
                 TargetCode = null,
                 Okato = null,
