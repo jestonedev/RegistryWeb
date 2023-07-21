@@ -356,6 +356,14 @@
                             <span class="text-danger field-validation-valid" data-valmsg-for="CreateDate" data-valmsg-replace="true"></span>
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="IdSigner">Подписывающий</label>
+                            <select class="selectpicker form-control" title="Подписывающий" name="IdSigner"
+                                    data-val="true" data-val-required="Выберите подписывающего" id="IdSigner" asp-items="@signersList"></select>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Claim.IdSigner" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary rr-report-court-osp-statement">Сформировать</button>

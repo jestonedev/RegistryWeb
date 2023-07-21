@@ -19,7 +19,6 @@ C:\Users\belpe\Documents\registry\RegistryWeb\RegistryReformaGKH\obj\Debug\netco
 D:\Projects\RegistryWeb\RegistryReformaGKH\bin\Debug\netcoreapp2.2\RegistryReformaGKH.deps.json
 D:\Projects\RegistryWeb\RegistryReformaGKH\bin\Debug\netcoreapp2.2\RegistryReformaGKH.dll
 D:\Projects\RegistryWeb\RegistryReformaGKH\bin\Debug\netcoreapp2.2\RegistryReformaGKH.pdb
-D:\Projects\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.GeneratedMSBuildEditorConfig.editorconfig
 D:\Projects\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.AssemblyInfoInputs.cache
 D:\Projects\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.AssemblyInfo.cs
 D:\Projects\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.csproj.CoreCompileInputs.cache
@@ -35,5 +34,4 @@ D:\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.Ass
 D:\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.csproj.CoreCompileInputs.cache
 D:\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.dll
 D:\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.pdb
-D:\Projects\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.csproj.AssemblyReference.cache
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryReformaGKH\obj\Debug\netcoreapp2.2\RegistryReformaGKH.csprojAssemblyReference.cache

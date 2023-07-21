@@ -216,7 +216,7 @@ namespace RegistryWeb.Controllers
 
             try
             {
-                var file = reportService.ClaimStatesReport(startDate, endDate, idStateType, isCurrentState);            
+                var file = reportService.ClaimStatesReport(startDate, endDate, idStateType, isCurrentState);
                 return File(file, odsMime, "Отчет по стадиям исковых работ.ods");
             }
             catch (Exception ex)
@@ -274,16 +274,16 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult GetCourtOspStatement(int idClaim, DateTime createDate)
+        public IActionResult GetCourtOspStatement(int idClaim, DateTime createDate, int idSigner)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
                 return View("NotAccess");
 
             try
-            { 
+            {
                 claimsDataService.ClaimLogCourtOsp(idClaim);
                 var personsCount = claimsDataService.ReceivePersonCount(idClaim);
-                var file = reportService.ClaimCourtOspReport(idClaim, createDate, personsCount);
+                var file = reportService.ClaimCourtOspReport(idClaim, createDate, personsCount, idSigner);
 
                 return File(file, odtMime, string.Format("Заявление о возбуждении ИП (иск. работа № {0}).odt", idClaim));
             }

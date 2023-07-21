@@ -215,7 +215,7 @@ namespace RegistryWeb.ReportServices
             return resultcodes.Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
         }
 
-        public byte[] ClaimCourtOspReport(int idClaim, DateTime createDate, int personsCount)
+        public byte[] ClaimCourtOspReport(int idClaim, DateTime createDate, int personsCount, int idSigner)
         {
             var fileconfigname = "";
 
@@ -233,6 +233,7 @@ namespace RegistryWeb.ReportServices
             {
                 { "id_claim", idClaim },
                 { "create_date", createDate },
+                { "signer", idSigner }
             };
 
             var fileName = "registry\\claims\\" + fileconfigname;
@@ -335,6 +336,9 @@ namespace RegistryWeb.ReportServices
 
         public byte[] BalanceForPeriod(DateTime startDate)
         {
+            var paymentDate = new DateTime(startDate.Year, startDate.Month, 1);
+            paymentDate = paymentDate.AddMonths(1).AddDays(-1);
+
             var arguments = new Dictionary<string, object> {
                 { "for_date", startDate.ToString("dd.MM.yyyy") }
             };

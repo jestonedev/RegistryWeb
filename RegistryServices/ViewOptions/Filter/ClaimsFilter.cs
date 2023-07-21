@@ -9,6 +9,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public int? IdAccountBks { get; set; }
         public int? IdAccountKumi { get; set; }
         public string Account { get; set; }
+        public string Tenant { get; set; }
         public int? IdClaimState { get; set; }
         public bool IsCurrentState { get; set; }
         public DateTime? ClaimStateDateFrom { get; set; }
@@ -74,7 +75,7 @@ namespace RegistryWeb.ViewOptions.Filter
 
         public bool IsModalEmpty()
         {
-            return Account == null && Crn == null && IdClaim == null && RawAddress == null &&
+            return Account == null && Crn == null && Tenant == null && IdClaim == null && RawAddress == null &&
                 IdRegion == null && IdStreet == null && House == null && PremisesNum == null &&
                 AtDate == null && CourtOrderNum == null &&
                 BalanceOutputTotal == null && BalanceOutputTenancy == null && BalanceOutputPenalties == null && BalanceOutputDgiPadunPkk == null &&

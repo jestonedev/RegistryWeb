@@ -80,7 +80,8 @@
     $("body").on('click', ".rr-report-court-osp-statement", function (e) {
         var idClaim = $("#Claim_IdClaim").val();
         var createDate = $("#CreateDate").val();
-        url = "/ClaimReports/GetCourtOspStatement?idClaim=" + idClaim + "&createDate=" + createDate;
+        var idSigner = $("#IdSigner").val();
+        url = "/ClaimReports/GetCourtOspStatement?idClaim=" + idClaim + "&createDate=" + createDate + "&idSigner=" + idSigner;
         downloadFile(url);
         $("#OspModal").modal('hide');
         e.preventDefault();

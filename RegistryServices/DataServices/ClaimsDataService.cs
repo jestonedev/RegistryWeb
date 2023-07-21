@@ -167,7 +167,7 @@ namespace RegistryWeb.DataServices
                     claim.ClaimPersons = claim.ClaimPersons.Union(GetClaimPersonsFromTenancy(claim.IdAccount, claim.IdAccountKumi)).ToList();
                     break;
                 case LoadPersonsSourceEnum.PrevClaim:
-                    claim.ClaimPersons = claim.ClaimPersons.Union(GetClaimPersonsFromPrevClaim(claim.IdAccount, claim.IdAccountKumi)).ToList();           
+                    claim.ClaimPersons = claim.ClaimPersons.Union(GetClaimPersonsFromPrevClaim(claim.IdAccount, claim.IdAccountKumi)).ToList();
                     break;
             }
 
@@ -672,6 +672,12 @@ namespace RegistryWeb.DataServices
                 var infixes = registryContext.GetAddressByAccountIds(new List<int> { filterOptions.IdAccountKumi.Value }).Select(r => r.Infix).ToList();
                 var ids = registryContext.GetKumiAccountIdsByAddressInfixes(infixes);
                 query = query.Where(p => p.IdAccountKumi != null && ids.Contains(p.IdAccountKumi.Value));
+            }
+            if (!string.IsNullOrEmpty(filterOptions.Tenant))
+            {
+                var tenantClaims = registryContext.ClaimPersons.Where(cp => cp.IsClaimer).Select(c=> new { c.IdPerson, c.IdClaim, fio = (String.Concat(c.Surname, ' ', c.Name, ' ', c.Patronymic)).ToLower() });
+                var tenantsIds = tenantClaims.Where(g => g.fio.Contains(filterOptions.Tenant.ToLower())).Select(g => g.IdClaim).ToList();
+                query = query.Where(p => tenantsIds.Contains(p.IdClaim));
             }
             if (filterOptions.AmountTotal != null)
             {
@@ -1286,7 +1292,7 @@ namespace RegistryWeb.DataServices
                         IdClaim = idClaim,
                         ExecutorLogin = securityService.User.UserName
                     };
-                    registryContext.LogClaimStatementInSpp.Add(logClaimStatementInSpp);                      
+                    registryContext.LogClaimStatementInSpp.Add(logClaimStatementInSpp);
                 }
                 else
                 {
