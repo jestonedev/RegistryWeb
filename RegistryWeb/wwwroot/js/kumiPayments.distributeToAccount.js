@@ -354,17 +354,19 @@ $(function () {
 
             table += "<tr data-account='" + accountNum + "' data-account-id-state='" + account.idState+"' data-account-state='" + state + "' data-last-charge-date='"
                 + account.lastChargeDate + "' data-current-balance-tenancy='" + tenancy + "' data-current-balance-penalty='" + penalty
-                + "' data-account-tenant='" + account.tenant
+                + "' data-account-tenant='" + account.tenant + "' data-current-balance-exclude-charge='" + account.currentBalanceExcludeCharge
                 + "' data-current-balance-dgi='" + dgi + "' data-current-balance-pkk='" + pkk + "' data-current-balance-padun='" + padun + "'>";
 
             table += "<td style='vertical-align: middle'>" + radioButton + "</td>";
             table += "<td>" + accountNum
                 + " <sup><span title='" + state + "' class='" + stateClass + "'><b>" + state.substr(0, 1) + "</b></span></sup>"
                 + "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-payment-list-eye-btn' href='/KumiAccounts/Details?idAccount=" + account.idAccount + "' target='_blank'></a>"
-                + "</td><td>" + lastChargeDateStr + "</td><td>" + distributePaymentFormatSum(tenancy) + "</td><td>" + distributePaymentFormatSum(penalty) + "</td>";
-            if (hasDgi) table += "<td>" + distributePaymentFormatSum(dgi) + "</td>";
-            if (hasPkk) table += "<td>" + distributePaymentFormatSum(pkk) + "</td>";
-            if (hasPadun) table += "<td>" + distributePaymentFormatSum(padun) + "</td>";
+                + "</td><td>" + lastChargeDateStr + "</td><td>"
+                + (account.currentBalanceExcludeCharge ? " <sup style='visibility: hidden'>*</sup> " : "") + distributePaymentFormatSum(tenancy) + (account.currentBalanceExcludeCharge ? " <sup class='text-danger' title='За вычетом начисления текущего периода'>*</sup>" : "") + "</td><td>"
+                + (account.currentBalanceExcludeCharge ? " <sup style='visibility: hidden'>*</sup> " : "") + distributePaymentFormatSum(penalty) + (account.currentBalanceExcludeCharge ? " <sup class='text-danger' title='За вычетом начисления текущего периода'>*</sup>" : "") + "</td>";
+            if (hasDgi) table += "<td>" + (account.currentBalanceExcludeCharge ? " <sup style='visibility: hidden'>*</sup> " : "") + distributePaymentFormatSum(dgi) + (account.currentBalanceExcludeCharge ? " <sup class='text-danger' title='За вычетом начисления текущего периода'>*</sup>" : "") + "</td>";
+            if (hasPkk) table += "<td>" + (account.currentBalanceExcludeCharge ? " <sup style='visibility: hidden'>*</sup> " : "") + distributePaymentFormatSum(pkk) + (account.currentBalanceExcludeCharge ? " <sup class='text-danger' title='За вычетом начисления текущего периода'>*</sup>" : "") + "</td>";
+            if (hasPadun) table += "<td>" + (account.currentBalanceExcludeCharge ? " <sup style='visibility: hidden'>*</sup> " : "") + distributePaymentFormatSum(padun) + (account.currentBalanceExcludeCharge ? " <sup class='text-danger' title='За вычетом начисления текущего периода'>*</sup>" : "") + "</td>";
             table += "</tr>";
         }
         if (accounts.length < factCount) {
@@ -458,6 +460,7 @@ $(function () {
                 + "' data-id-account='" + claim.idAccount + "' data-account-current-balance-tenancy='" + accountCurrentBalanceTenancy
                 + "' data-account-current-balance-penalty='" + accountCurrentBalancePenalty + "' data-account-current-balance-dgi='" + accountCurrentBalanceDgi
                 + "' data-account-current-balance-pkk='" + accountCurrentBalancePkk + "' data-account-current-balance-padun='" + accountCurrentBalancePadun
+                + "' data-account-current-balance-exclude-charge='" + claim.accountCurrentBalanceExcludeCharge
                 + "' data-claim-court-order-num='" + claim.courtOrderNum + "' data-claim-tenant='" + claim.tenant
                 + "' data-claim-start-dept-period='" + claim.startDeptPeriod
                 + "' data-claim-end-dept-period='" + claim.endDeptPeriod
@@ -473,10 +476,11 @@ $(function () {
                 + " <sup><span title='" + claim.accountState + "' class='" + stateClass + "'><b>" + claim.accountState.substr(0, 1) + "</b></span></sup>"
                 + "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-payment-list-eye-btn' href='/KumiAccounts/Details?idAccount=" + claim.idAccount + "' target='_blank'></a>"
                 + "</td>"
-                + "<td rowspan='2' style='vertical-align: middle'>" + distributePaymentFormatSum(claim.accountCurrentBalanceTenancy) + "</td><td rowspan='2' style='vertical-align: middle'>" + distributePaymentFormatSum(claim.accountCurrentBalancePenalty) + "</td>"
-                + (hasDgi ? "<td rowspan='2' style='vertical-align: middle'>" + distributePaymentFormatSum(claim.accountCurrentBalanceDgi) + "</td>" : "")
-                + (hasPkk ? "<td rowspan='2' style='vertical-align: middle'>" + distributePaymentFormatSum(claim.accountCurrentBalancePkk) + "</td>" : "")
-                + (hasPadun ? "<td rowspan='2' style='vertical-align: middle'>" + distributePaymentFormatSum(claim.accountCurrentBalancePkk) + "</td>" : "")
+                + "<td rowspan='2' style='vertical-align: middle'>" + (claim.accountCurrentBalanceExcludeCharge ? " <sup style='visibility: hidden'>*</sup> " : "") + distributePaymentFormatSum(claim.accountCurrentBalanceTenancy) + (claim.accountCurrentBalanceExcludeCharge ? " <sup class='text-danger' title='За вычетом начисления текущего периода'>*</sup>" : "")
+                + "</td><td rowspan='2' style='vertical-align: middle'>" + (claim.accountCurrentBalanceExcludeCharge ? " <sup style='visibility: hidden'>*</sup> " : "") + distributePaymentFormatSum(claim.accountCurrentBalancePenalty) + (claim.accountCurrentBalanceExcludeCharge ? " <sup class='text-danger' title='За вычетом начисления текущего периода'>*</sup>" : "") + "</td>"
+                + (hasDgi ? "<td rowspan='2' style='vertical-align: middle'>" + (claim.accountCurrentBalanceExcludeCharge ? " <sup style='visibility: hidden'>*</sup> " : "") + distributePaymentFormatSum(claim.accountCurrentBalanceDgi) + (claim.accountCurrentBalanceExcludeCharge ? " <sup class='text-danger' title='За вычетом начисления текущего периода'>*</sup>" : "") + "</td>" : "")
+                + (hasPkk ? "<td rowspan='2' style='vertical-align: middle'>" + (claim.accountCurrentBalanceExcludeCharge ? " <sup style='visibility: hidden'>*</sup> " : "") + distributePaymentFormatSum(claim.accountCurrentBalancePkk) + (claim.accountCurrentBalanceExcludeCharge ? " <sup class='text-danger' title='За вычетом начисления текущего периода'>*</sup>" : "") + "</td>" : "")
+                + (hasPadun ? "<td rowspan='2' style='vertical-align: middle'>" + (claim.accountCurrentBalanceExcludeCharge ? " <sup style='visibility: hidden'>*</sup> " : "") + distributePaymentFormatSum(claim.accountCurrentBalancePadun) + (claim.accountCurrentBalanceExcludeCharge ? " <sup class='text-danger' title='За вычетом начисления текущего периода'>*</sup>" : "") + "</td>" : "")
                 + "<td rowspan='2' style='vertical-align: middle'>" + (claim.courtOrderNum != null ? "с\\п " + claim.courtOrderNum + "<br/>" : "") + deptPeriod
                 + "<a class='btn oi oi-eye p-0 ml-1 text-primary rr-payment-list-eye-btn' href='/Claims/Details?idClaim=" + claim.idClaim + "' target='_blank'></a>"
                 + "</td><td>Взыскиваемая</td><td>" + distributePaymentFormatSum(amountTenancy) + "</td><td>" + distributePaymentFormatSum(amountPenalties) + "</td>"
@@ -582,7 +586,7 @@ $(function () {
             }
 
             var distributionTenancy = Math.round(Math.max(Math.min(sumForDistribution, Math.max(currentTenancy, 0)), 0) * 100) / 100;
-            var distributionPenalty = Math.max(Math.min(Math.round((sumForDistribution - distributionTenancy) * 100) / 100, currentPenalty), 0);
+            var distributionPenalty = Math.round(Math.max(Math.min((sumForDistribution - distributionTenancy), currentPenalty), 0) * 100) / 100;
             distributionTenancy = Math.round((sumForDistribution - distributionPenalty)*100)/100;
             $("#DistributePaymentToAccount_TenancySum").val(((distributionTenancy === 0 ? "0,00" : distributionTenancy) + "").replace(".", ","));
             $("#DistributePaymentToAccount_PenaltySum").val(((distributionPenalty === 0 ? "0,00" : distributionPenalty) + "").replace(".", ","));
@@ -622,6 +626,7 @@ $(function () {
             data.Description.currentBalanceDgi = row.data("currentBalanceDgi");
             data.Description.currentBalancePkk = row.data("currentBalancePkk");
             data.Description.currentBalancePadun = row.data("currentBalancePadun");
+            data.Description.currentBalanceExcludeCharge = row.data("currentBalanceExcludeCharge");
             data.Description.lastChargeDate = row.data("lastChargeDate");
         } else {
             data.Description.idClaim = data.IdObject;
@@ -646,6 +651,7 @@ $(function () {
             data.Description.accountCurrentBalanceDgi = row.data("accountCurrentBalanceDgi");
             data.Description.accountCurrentBalancePkk = row.data("accountCurrentBalancePkk");
             data.Description.accountCurrentBalancePadun = row.data("accountCurrentBalancePadun");
+            data.Description.accountCurrentBalanceExcludeCharge = row.data("accountCurrentBalanceExcludeCharge");
             data.Description.startDeptPeriod = row.data("claimStartDeptPeriod");
             data.Description.endDeptPeriod = row.data("claimEndDeptPeriod");
         }

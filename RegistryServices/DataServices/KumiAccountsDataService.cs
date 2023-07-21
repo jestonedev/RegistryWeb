@@ -2346,9 +2346,17 @@ namespace RegistryWeb.DataServices
                             select row;
                     break;
                 case 9:
+                    var lastChargesIds =
+                          (from cRow in registryContext.KumiCharges
+                           group cRow by cRow.IdAccount into gs
+                           select gs.Max(r => r.IdCharge)).ToList();
+                    var charges = (from cRow in registryContext.KumiCharges
+                               where lastChargesIds.Contains(cRow.IdCharge)
+                               select cRow);
+
                     var currentPeriodEndDate = DateTime.Now.Date;
                     currentPeriodEndDate = currentPeriodEndDate.AddDays(-currentPeriodEndDate.Day + 1).AddMonths(1).AddDays(-1);
-                    var nullChargesAccountIds = registryContext.KumiCharges.Where(r => r.EndDate == currentPeriodEndDate && r.ChargeTenancy == 0).Select(r => r.IdAccount).ToList();
+                    var nullChargesAccountIds = charges.Where(r => r.EndDate != currentPeriodEndDate || r.ChargeTenancy == 0).Select(r => r.IdAccount).ToList();
                     query = from row in query
                             where row.IdState == 1 && (row.LastCalcDate != currentPeriodEndDate || nullChargesAccountIds.Contains(row.IdAccount))
                             select row;
