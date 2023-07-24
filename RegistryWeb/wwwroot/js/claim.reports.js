@@ -378,4 +378,15 @@
 
     });
 
+    $("#UkInvoiceAggKumi").on("click", function (e) {
+        url = "/ClaimReports/GetUkInvoiceAggKumi";
+        downloadFile(url);
+        e.preventDefault();
+    });
+
+    $("#UkInvoiceDetailsKumi").on("click", function (e) {
+        url = "/ClaimReports/GetUkInvoiceDetailsKumi";
+        downloadFile(url);
+        e.preventDefault();
+    });
 });

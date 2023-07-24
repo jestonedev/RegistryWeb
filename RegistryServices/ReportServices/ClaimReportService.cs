@@ -323,6 +323,24 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
+        public byte[] UkInvoiceAggKumi()
+        {
+            var arguments = new Dictionary<string, object> {
+            };
+            var fileName = "registry\\kumi_accounts\\uk_invoice_agg_kumi";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+
+        public byte[] UkInvoiceDetailsKumi()
+        {
+            var arguments = new Dictionary<string, object> {
+            };
+            var fileName = "registry\\kumi_accounts\\uk_invoice_details_kumi";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+
         public byte[] PaymentsForPeriod(DateTime startDate, DateTime endDate)
         {
             var arguments = new Dictionary<string, object> {

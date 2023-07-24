@@ -153,7 +153,19 @@ namespace RegistryWeb.DataServices
 
                 result.Add(ob);
             }
-            return result.OrderBy(r => r.Address).ThenBy(r => r.Account).ToList();
+            var cnt = result.Count;
+            var tripleCount = (int)Math.Floor((decimal)cnt / 3);
+            result = result.OrderBy(r => r.Address).ThenBy(r => r.Account).ToList();
+            for (var i = 0; i < tripleCount; i++)
+            {
+                result[i].OrderGroup = i;
+                if (tripleCount + i < result.Count)
+                    result[tripleCount + i].OrderGroup = i;
+                if (tripleCount * 2 + i < result.Count)
+                    result[tripleCount * 2 + i].OrderGroup = i;
+            }
+
+            return result.OrderBy(r => r.OrderGroup).ToList();
         }
 
         private string JoinAddresses(List<string> addressList)
