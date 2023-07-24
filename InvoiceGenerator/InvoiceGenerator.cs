@@ -34,13 +34,13 @@ namespace InvoiceGenerator
 
             html += "<td class=\"main-content-td\">";
             html += "<p>Получатель: <b>УФК по Иркутской области (КУМИ г.Братска)</b></p>";
-            html += "<p>г. Братск, Ленина просп., д.37, email: , тел.:349372 (по оплате), тел.:349390 (по начис.)</p>";
+            html += "<p>г. Братск, Ленина просп., д.37, email: , тел.:349393, 349372 (по оплате), тел.:349390 (по начис.)</p>";
             html += "<p>Режим работы: Пн.-Пт. с 9.00-17.00, обед 13.00-14.00, сб.,вс-выходной</p>";
-            html += "<p>Расчетный счет 03100643000000013400 ИНН 3803201800 БИК 012520101</p>";
-            html += "<p>Отд. Иркутск Банка России//УФК по Ирк.обл.г.Иркутск, к/с 40102810145370000026</p>";
+            html += "<p>Казн. счет 03100643000000013400 ИНН 3803201800 БИК 012520101 КПП 380401001</p>";
+            html += "<p>ОТДЕЛЕНИЕ ИРКУТСКА БАНКА РОССИИ//УФК ПО ИРКУТСКОЙ ОБЛАСТИ г Иркутск</p>";
             html += string.Format("<p>Адрес: <b>{0}</b></p>", invoice.Address);
             html += string.Format("<p>Лиц. счет: <b class=\"account\">{0}</b> ЕЛС ГИС ЖКХ:</p>", invoice.Account);
-            html += string.Format("<p>Потребитель: <b>{0}</b></p>", invoice.Tenant);
+            html += string.Format("<p>Потребитель: <b class=\"tenant\">{0}</b>КБК: 901 1 11 09044 04 1000 120</p>", invoice.Tenant);
 
             html += "<table class=\"money-table\">";
             html += string.Format("<tr><td class=\"money-header\">Недоплата на {0}г.</td><td class=\"money-td\">{1}</td></tr>",
@@ -59,16 +59,9 @@ namespace InvoiceGenerator
                 invoice.TotalArea.ToString("N1", CultureInfo.GetCultureInfo("ru-RU")),
                 invoice.Prescribed);
 
-            html += "<table class=\"area-table\"><tr>";
-            html += "<td class=\"area-header\">Общая площадь ж.п.:</td>";
-            html += "<td class=\"area-header\">Площадь нежил. п.:</td>";
-            html += "<td class=\"area-header\">Площадь ОИ:</td>";
-            html += "<td class=\"area-header\">Площадь ОИ э/э:</td>";
-            html += "</tr></table>";
-
             html += "<table class=\"service-table\">";
             html += "<tr><td>Вид услуги</td><td>Ед. изм.</td><td>Норматив</td><td>Объем/Кол-во</td><td>Тариф, руб.</td><td>Размер платы</td><td>Пере-расчет</td><td>Итог за тек. мес.</td></tr>";
-            html += string.Format("<tr><td>Плата за наем КБК 90111109044041000120</td><td>кв.м.</td><td></td><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",
+            html += string.Format("<tr><td>Плата за наем</td><td>кв.м.</td><td></td><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",
                  invoice.TotalArea.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
                  invoice.TotalArea == 0 ? "0" : Math.Round(invoice.ChargingTenancy / (decimal)invoice.TotalArea, 3).ToString("N3", CultureInfo.GetCultureInfo("ru-RU")),
                  invoice.ChargingTenancy.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
@@ -92,7 +85,9 @@ namespace InvoiceGenerator
 
             html += "<td class=\"qr-td\">";
             html += string.Format("<table><tr><td><img src=\"/{0}\" class=\"qr\" /></td></tr></table>", Path.Combine(relativePath, qrFileName));
-            html += "<table class=\"calc-center-table\"><tr><td class=\"calc-center-td\"><img src=\"/image/calc-center.png\" width=\"63\" height=\"168\" /></td></tr></table>";
+            html += string.Format("<table class=\"calc-center-table\"><tr><td class=\"calc-center-td\">Внимание!<br>"+
+                "В счете-извещении<br>учтены платежи,<br>поступившие по<br>состоянию на<br>{0}</td></tr></table>", 
+                new DateTime(invoice.OnDate.Year, invoice.OnDate.Month, 20).ToString("dd.MM.yyyy"));
             html += "</td>";
 
             html += "</tr></table>";

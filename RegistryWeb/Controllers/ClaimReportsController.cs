@@ -405,6 +405,38 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult GetUkInvoiceAggKumi()
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.UkInvoiceAggKumi();
+                return File(file, docxMime, string.Format("Накладная на отправку счетов от {0}.docx", DateTime.Now.ToString("dd.MM.yyyy")));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetUkInvoiceDetailsKumi()
+        {
+            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.UkInvoiceDetailsKumi();
+                return File(file, xlsxMime, string.Format("Детализация по накладной на отправку счетов от {0}.xlsx", DateTime.Now.ToString("dd.MM.yyyy")));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
         public IActionResult GetPaymentsForPeriod(DateTime startDate, DateTime endDate)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))

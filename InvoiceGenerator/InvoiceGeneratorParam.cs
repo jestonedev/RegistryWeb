@@ -20,6 +20,7 @@ namespace InvoiceGenerator
         public string TotalArea { get; set; }
         public string TextMessage { get; set; }
         public int Prescribed { get; set; }
+        public int OrderGroup { get; set; }
         public List<string> Emails { get; set; }
     }
 }

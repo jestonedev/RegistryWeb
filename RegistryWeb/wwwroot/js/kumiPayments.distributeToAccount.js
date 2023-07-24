@@ -49,6 +49,8 @@ function extractAddressFromString(address) {
     if (street === null) {
         street = addressParts[addressParts.length - 3];
     }
+    if (street.endsWith(" ПЕР"))
+        street = street.replace(" ПЕР", "");
     return {
         street: street.replace('XX ПАРТСЪЕЗДА', 'ХХ ПАРТСЪЕЗДА'),
         house: house,
