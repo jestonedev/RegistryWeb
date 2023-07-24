@@ -11,7 +11,7 @@
 
 var filterClearModal = function () {
     $("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal input[type='hidden'], #filterModal select").val("");
-    $('#FilterOptions_IdStreet, #FilterOptions_IdPreset, #FilterOptions_IdRegion, #FilterOptions_IdAccountState, #FilterOptions_IdClaimsBehavior').selectpicker('render');
+    $('#FilterOptions_IdStreet, #FilterOptions_IdPreset, #FilterOptions_IdRegions, #FilterOptions_IdAccountState, #FilterOptions_IdClaimsBehavior').selectpicker('render');
     $("#filterModal input[type='checkbox']").prop("checked", false);
     filterIdRegionChange();
     $("form.filterForm").valid();
@@ -38,12 +38,12 @@ var toggleAdditionInfo = function (e) {
 };
 
 var filterIdRegionChange = function (e) {
-    var idRegion = $('#FilterOptions_IdRegion').selectpicker('val');
+    var idRegions = $('#FilterOptions_IdRegions').selectpicker('val');
     $.ajax({
         type: 'POST',
-        url: window.location.origin + '/Address/GetKladrStreets',
+        url: window.location.origin + '/Address/GetKladrStreetsMultiple',
         dataType: 'json',
-        data: { idRegion },
+        data: { idRegions },
         success: function (data) {
             var select = $('#filterModal #FilterOptions_IdStreet');
             var value = select.val();
@@ -69,7 +69,7 @@ $(function () {
 
     $('#AccountSumFiltersToggler').on("click", $("#AccountSumFilters"), elementToogleHide);
     $('#searchModalBtn').click(searchModal);
-    $('#filterModal #FilterOptions_IdRegion').on('change', function (e) {
+    $('#filterModal #FilterOptions_IdRegions').on('change', function (e) {
         filterIdRegionChange();
         e.preventDefault();
     });

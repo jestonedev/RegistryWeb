@@ -1738,7 +1738,17 @@ namespace RegistryWeb.DataServices
             viewModel.TenancyInfo = GetTenancyInfo(viewModel.Accounts);
             viewModel.ClaimsInfo = GetClaimsInfo(viewModel.Accounts);
             viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "IdRegion", "Region");
-            viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
+            if (filterOptions?.IdRegions != null && filterOptions?.IdRegions.Count > 0)
+            {
+                var streets = new List<KladrStreet>();
+                foreach (var idRegion in filterOptions.IdRegions)
+                {
+                    streets.AddRange(addressesDataService.GetKladrStreets(idRegion));
+                }
+                viewModel.KladrStreetsList = new SelectList(streets, "IdStreet", "StreetName");
+            }
+            else
+                viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(null), "IdStreet", "StreetName");
 
             return viewModel;
         }
@@ -1852,7 +1862,7 @@ namespace RegistryWeb.DataServices
                 string.IsNullOrEmpty(filterOptions.IdStreet) &&
                 string.IsNullOrEmpty(filterOptions.House) &&
                 string.IsNullOrEmpty(filterOptions.PremisesNum) &&
-                string.IsNullOrEmpty(filterOptions.IdRegion) &&
+                (filterOptions.IdRegions == null || !filterOptions.IdRegions.Any()) &&
                 filterOptions.IdBuilding == null &&
                 filterOptions.IdPremises == null &&
                 filterOptions.IdSubPremises == null)
@@ -1871,10 +1881,15 @@ namespace RegistryWeb.DataServices
                 idAccounts = registryContext.GetKumiAccountIdsByAddressInfixes(infixes.ToList());
                 filtered = true;
             } else
-            if (!string.IsNullOrEmpty(filterOptions.IdRegion))
+            if (filterOptions.IdRegions != null && filterOptions.IdRegions.Any())
             {
-                var infix = "s"+filterOptions.IdRegion.ToString();
-                idAccounts = registryContext.GetKumiAccountIdsByAddressInfixes(new List<string> { infix });
+                var ids = new List<int>();
+                foreach (var idRegion in filterOptions.IdRegions)
+                {
+                    var infix = "s" + idRegion.ToString();
+                    ids.AddRange(registryContext.GetKumiAccountIdsByAddressInfixes(new List<string> { infix }));
+                }
+                idAccounts = ids;
                 filtered = true;
             }
             var addressesInt = addresses.Where(a => int.TryParse(a, out int aInt)).Select(a => int.Parse(a));

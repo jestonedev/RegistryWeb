@@ -22,5 +22,10 @@ namespace InvoiceGenerator
         public int Prescribed { get; set; }
         public int OrderGroup { get; set; }
         public List<string> Emails { get; set; }
+
+        public InvoiceGeneratorParam()
+        {
+            OrderGroup = -1;
+        }
     }
 }

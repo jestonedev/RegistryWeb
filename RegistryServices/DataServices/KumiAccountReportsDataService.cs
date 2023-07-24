@@ -154,7 +154,7 @@ namespace RegistryWeb.DataServices
                 result.Add(ob);
             }
             var cnt = result.Count;
-            var tripleCount = (int)Math.Floor((decimal)cnt / 3);
+            var tripleCount = (int)Math.Ceiling((decimal)cnt / 3);
             result = result.OrderBy(r => r.Address).ThenBy(r => r.Account).ToList();
             for (var i = 0; i < tripleCount; i++)
             {

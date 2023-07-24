@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RegistryDb.Models.Entities.RegistryObjects.Kladr;
 using RegistryWeb.DataServices;
 using RegistryWeb.Enums;
 using RegistryWeb.ViewModel;
@@ -101,6 +102,20 @@ namespace RegistryWeb.Controllers
         public JsonResult GetKladrStreets(string idRegion)
         {
             var streets = addressesDataService.GetKladrStreets(idRegion);
+            return Json(streets);
+        }
+
+        public JsonResult GetKladrStreetsMultiple(List<string> idRegions)
+        {
+            var streets = new List<KladrStreet>();
+            if (idRegions != null && idRegions.Any())
+            {
+                foreach (var idRegion in idRegions)
+                {
+                    streets.AddRange(addressesDataService.GetKladrStreets(idRegion));
+                }
+            } else
+                streets.AddRange(addressesDataService.GetKladrStreets(null));
             return Json(streets);
         }
 

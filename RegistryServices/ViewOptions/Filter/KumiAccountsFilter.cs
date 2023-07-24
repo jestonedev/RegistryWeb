@@ -19,7 +19,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public int? IdBuilding { get; set; }
         public int? IdPreset { get; set; } // Поисковые пресеты
         public int? IdClaimsBehavior { get; set; } // Поведение при фильтрации с учетом исковых работ
-        public string IdRegion { get; set; }
+        public List<string> IdRegions { get; set; }
 
         public DateTime? AtDate { get; set; }
         public int BalanceInputTotalOp { get; set; }
@@ -105,7 +105,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool IsModalEmpty()
         {
             return Account == null && AccountGisZkh == null && Tenant == null &&
-                IdRegion == null && IdStreet == null && House == null && PremisesNum == null && IdPreset == null && IdClaimsBehavior == null &&
+                (IdRegions == null || IdRegions.Count == 0) && IdStreet == null && House == null && PremisesNum == null && IdPreset == null && IdClaimsBehavior == null &&
                 IsBalanceEmpty() && !Emails && (IdsAccountState == null || IdsAccountState.Count == 0);
         }
     }
