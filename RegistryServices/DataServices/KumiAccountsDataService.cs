@@ -270,6 +270,22 @@ namespace RegistryWeb.DataServices
             return startRewriteDate;
         }
 
+        public void SaveDescriptionForAddress(int idAccount, string description)
+        {
+            var addresses = registryContext.GetAddressByAccountIds(new List<int> { idAccount });
+            var accountIds = new List<int>();
+            if (addresses.Count == 0)
+                accountIds.Add(idAccount);
+            else
+                accountIds.AddRange(registryContext.GetKumiAccountIdsByAddressInfixes(addresses.Select(r => r.Infix).ToList()));
+            var accounts = registryContext.KumiAccounts.Where(r => accountIds.Contains(r.IdAccount));
+            foreach(var account in accounts)
+            {
+                account.Description = description;
+            }
+            registryContext.SaveChanges();
+        }
+
         public void AddChargeCorrection(int idAccount, decimal tenancyValue, decimal penaltyValue,
             decimal dgiValue, decimal pkkValue, decimal padunValue,
             decimal paymentTenancyValue, decimal paymentPenaltyValue, 

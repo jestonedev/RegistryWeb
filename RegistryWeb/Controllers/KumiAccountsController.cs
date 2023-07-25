@@ -337,6 +337,25 @@ namespace RegistryWeb.Controllers
             return Json(charge);
         }
 
+        public IActionResult SaveDescriptionForAddress(int idAccount, string description) {
+            try
+            {
+                dataService.SaveDescriptionForAddress(idAccount, description);
+                return Json(new
+                {
+                    State = "Success"
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.Message
+                });
+            }
+        }
+
         public IActionResult CreateClaimMass(DateTime atDate)
         {
             if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
