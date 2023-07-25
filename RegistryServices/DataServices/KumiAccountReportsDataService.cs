@@ -6,6 +6,7 @@ using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryDb.Models.Entities.Payments;
 using RegistryDb.Models.Entities.Tenancies;
 using RegistryServices.ViewModel.KumiAccounts;
+using RegistryWeb.DataHelpers;
 using RegistryWeb.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -125,7 +126,7 @@ namespace RegistryWeb.DataServices
                 var account = accounts.FirstOrDefault(r => r.IdAccount == idAccount);
                 var bksAccount = bksAccounts.FirstOrDefault(r => r.IdAccount == idAccount);
                 var addressList = addresses.Where(r => r.IdAccount == idAccount).ToList() ?? new List<KumiAccountAddressInfix>();
-                var address = JoinAddresses(addressList.Select(r => r.Address).ToList());
+                var address = AddressHelper.JoinAddresses(addressList.Select(r => r.Address).ToList());
                 var tenant = tenants.FirstOrDefault(r => r.IdAccount == idAccount);
                 var ob = new InvoiceGeneratorParam
                 {
@@ -166,72 +167,6 @@ namespace RegistryWeb.DataServices
             }
 
             return result.OrderBy(r => r.OrderGroup).ToList();
-        }
-
-        private string JoinAddresses(List<string> addressList)
-        {
-            if (addressList.Count == 0) return "";
-            if (addressList.Count == 1) return addressList.First();
-
-            var address = "";
-            var addressPartsList = addressList.Select(r => r.Split(", ", 5)).ToList();
-            var groupedByRegion = addressPartsList.GroupBy(r => r[0]);
-            foreach(var groupRegion in groupedByRegion)
-            {
-                if (groupRegion.All(r => r.Count() > 1))
-                {
-                    var groupedByStreet = groupRegion.GroupBy(r => r[1]);
-                    
-                    foreach (var groupStreet in groupedByStreet)
-                    {
-                        if (groupStreet.All(r => r.Count() > 2))
-                        {
-                            var groupedByHouse = groupStreet.GroupBy(r => r[2]);
-                            foreach (var groupHouse in groupedByHouse)
-                            {
-                                if (groupHouse.All(r => r.Count() > 3))
-                                {
-                                    var groupedByPremise = groupHouse.GroupBy(r => r[3]);
-                                    foreach(var groupPremise in groupedByPremise)
-                                    {
-                                        if (!string.IsNullOrWhiteSpace(address))
-                                        {
-                                            address += ", ";
-                                        }
-                                        address += groupRegion.Key + ", " + groupStreet.Key + ", " + groupHouse.Key + ", " + 
-                                            groupPremise.Key + groupPremise.Aggregate("", (acc, v) => acc + (v.Length == 5 ? ", " + v[4] : ""));
-                                    }
-                                } else
-                                {
-                                    if (!string.IsNullOrWhiteSpace(address))
-                                    {
-                                        address += ", ";
-                                    }
-                                    address += groupRegion.Key + ", " + groupStreet.Key + ", " + groupHouse.Key;
-                                }
-                            }
-
-                        }
-                        else
-                        {
-                            if (!string.IsNullOrWhiteSpace(address))
-                            {
-                                address += ", ";
-                            }
-                            address += groupRegion.Key + ", " + groupStreet.Key;
-                        }
-                    }
-                }
-                else
-                {
-                    if (!string.IsNullOrWhiteSpace(address))
-                    {
-                        address += ", ";
-                    }
-                    address += groupRegion.Key;
-                }
-            }
-            return address;
         }
 
         public LogInvoiceGenerator InvoiceGeneratorParamToLog(InvoiceGeneratorParam param, int errorCode)

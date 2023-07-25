@@ -19,6 +19,7 @@ using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Models;
 using RegistryDb.Models.Entities.Common;
 using RegistryServices.Models.KumiAccounts;
+using RegistryWeb.DataHelpers;
 
 namespace RegistryWeb.DataServices
 {
@@ -77,7 +78,7 @@ namespace RegistryWeb.DataServices
             return startRentDate.Value.AddDays(-startRentDate.Value.Day + 1);
         }
 
-        public List<KumiCharge> CalcChargesInfo(KumiAccountInfoForPaymentCalculator account, List<KumiCharge> dbChargers, DateTime startDate, DateTime endDate, DateTime startRewriteDate, bool forceCalcChargeOnFutureDate = false)
+        public List<KumiCharge> CalcChargesInfo(KumiAccountInfoForPaymentCalculator account, List<KumiCharge> dbChargers, DateTime startDate, DateTime endDate, DateTime startRewriteDate, bool forceCalcCurrentPeriod = false)
         {
             if (startDate > endDate) throw new ApplicationException(
                 string.Format("Дата начала расчета {0} превышает дату окончания завершенного периода {1}",
@@ -88,7 +89,7 @@ namespace RegistryWeb.DataServices
             while(startDate < endDate)
             {
                 var subEndDate = startDate.AddMonths(1).AddDays(-1);
-                var charge = CalcChargeInfo(account, startDate, subEndDate, charges, dbChargers, startRewriteDate, out bool outOfBound, forceCalcChargeOnFutureDate);
+                var charge = CalcChargeInfo(account, startDate, subEndDate, charges, dbChargers, startRewriteDate, out bool outOfBound, forceCalcCurrentPeriod);
                 if (!outOfBound)
                     charges.Add(charge);
                 startDate = startDate.AddMonths(1);
@@ -229,6 +230,26 @@ namespace RegistryWeb.DataServices
             recalcInsertIntoCharge.PaymentDgi += accPaymentDgi;
             recalcInsertIntoCharge.PaymentPkk += accPaymentPkk;
             recalcInsertIntoCharge.PaymentPadun += accPaymentPadun;
+        }
+
+        public string GetAccountAddress(int idAccount)
+        {
+            var addresses = registryContext.GetAddressByAccountIds(new List<int> { idAccount });
+            if (addresses.Count == 0) return null;
+            return AddressHelper.JoinAddresses(addresses.Select(r => r.Address).ToList());
+        }
+
+        public List<KumiAccount> GetKumiAccountsOnSameAddress(int idAccount)
+        {
+            var addresses = registryContext.GetAddressByAccountIds(new List<int> { idAccount });
+            if (addresses.Count == 0) return new List<KumiAccount> { GetKumiAccount(idAccount) };
+            var accountIds = registryContext.GetKumiAccountIdsByAddressInfixes(addresses.Select(r => r.Infix).ToList());
+            var result = new List<KumiAccount>();
+            foreach(var accountId in accountIds)
+            {
+                result.Add(GetKumiAccount(accountId));
+            }
+            return result;
         }
 
         public DateTime CorrectStartRewriteDate(DateTime startRewriteDate, DateTime startDate, List<KumiCharge> dbChargingInfo)
@@ -372,17 +393,19 @@ namespace RegistryWeb.DataServices
                 var dbChargingInfo = GetDbChargingInfo(account);
 
                 // Если было начисление на текущий или будущий период, то сохранить его при перерасчете (по-умолчанию начислеяются только закрытыие периоды)
-                var forceCalcChargeOnFutureDate = saveCurrentPeriodCharge;
+                var forceCalcCurrentPeriod = saveCurrentPeriodCharge;
                 var lastDbCharge = dbChargingInfo.OrderByDescending(r => r.EndDate).FirstOrDefault();
-                if (lastDbCharge != null && lastDbCharge.EndDate >= DateTime.Now.Date)
+                if (lastDbCharge != null && lastDbCharge.EndDate >= DateTime.Now.Date && 
+                    (lastDbCharge.ChargeTenancy != 0 || lastDbCharge.ChargePenalty != 0 || lastDbCharge.ChargePkk != 0 || 
+                    lastDbCharge.ChargeDgi != 0 || lastDbCharge.ChargePadun != 0))
                 {
-                    forceCalcChargeOnFutureDate = true;
+                    forceCalcCurrentPeriod = true;
                     endCalcDate = lastDbCharge.EndDate;
                 }
 
                 startRewriteDate = CorrectStartRewriteDate(startRewriteDate.Value, startCalcDate.Value, dbChargingInfo);
 
-                var chargingInfo = CalcChargesInfo(account, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate.Value, forceCalcChargeOnFutureDate);
+                var chargingInfo = CalcChargesInfo(account, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate.Value, forceCalcCurrentPeriod);
                 var recalcInsertIntoCharge = new KumiCharge();
                 if (chargingInfo.Any()) recalcInsertIntoCharge = chargingInfo.Last();
                 CalcRecalcInfo(account, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, endCalcDate, startRewriteDate.Value);
@@ -932,7 +955,7 @@ namespace RegistryWeb.DataServices
         }
 
         public KumiCharge CalcChargeInfo(KumiAccountInfoForPaymentCalculator account, DateTime startDate, DateTime endDate,
-            List<KumiCharge> prevCharges, List<KumiCharge> dbCharges, DateTime startRewriteDate, out bool outOfBound, bool forceCalcChargeOnFutureDate)
+            List<KumiCharge> prevCharges, List<KumiCharge> dbCharges, DateTime startRewriteDate, out bool outOfBound, bool forceCalcCurrentPerod)
         {
             // Входящее сальдо
             var inputBalanceTenancy = account.CurrentBalanceTenancy;
@@ -979,8 +1002,12 @@ namespace RegistryWeb.DataServices
             var chargePadun = 0m;
 
             KumiCharge currentSavedCharge = account.Charges.FirstOrDefault(r => r.StartDate == startDate && r.EndDate == endDate);
+            var calcCharge = endDate < DateTime.Now.Date;
             if (currentSavedCharge != null)
             {
+                calcCharge = calcCharge 
+                    || currentSavedCharge.ChargeTenancy != 0 || currentSavedCharge.ChargePenalty != 0 || currentSavedCharge.ChargeDgi != 0
+                    || currentSavedCharge.ChargePkk != 0 || currentSavedCharge.ChargePadun != 0;
                 // Если начисление не входит в период перезаписи, то перенести начисления как есть, иначе обнулить
                 if (startRewriteDate > currentSavedCharge.StartDate) {
                     recalcTenancy = currentSavedCharge.RecalcTenancy;
@@ -992,7 +1019,7 @@ namespace RegistryWeb.DataServices
 
                 // Если лицевой счет не находится в статусе "Действующий", то переносим начисления, которые были сохранены в БД
                 // Игнорируем будущие периоды. Также переносим плату за найм по начислениями БКС
-                if (((endDate < DateTime.Now.Date || forceCalcChargeOnFutureDate) && account.IdState != 1) || currentSavedCharge.IsBksCharge == 1)
+                if (account.IdState != 1 || currentSavedCharge.IsBksCharge == 1)
                 {
                     chargeTenancy = currentSavedCharge.ChargeTenancy;
                     chargePenalty = currentSavedCharge.ChargePenalty;
@@ -1018,7 +1045,7 @@ namespace RegistryWeb.DataServices
 
             // Если лицевой счет в статусе "Действующий", то перерасчитываем начисления
             // Не начисляем за будущие периоды
-            if (endDate < DateTime.Now.Date || forceCalcChargeOnFutureDate)
+            if (calcCharge || (forceCalcCurrentPerod && DateTime.Now.Date >= startDate && DateTime.Now.Date <= endDate))
             {
                 if (account.IdState == 1 && (currentSavedCharge == null || currentSavedCharge.IsBksCharge != 1))
                 {
@@ -1034,16 +1061,28 @@ namespace RegistryWeb.DataServices
                     chargePenalty = Math.Round(CalcPenalty(account.Corrections, account.Charges, prevCharges, account.Claims, account.Payments, endDate, startRewriteDate), 2);
                 }
             }
-            
-            var payments = account.Payments.Where(r =>
+
+            /*var payments = account.Payments.Where(r =>
                 r.DateExecute != null ? r.DateExecute >= startDate && r.DateExecute <= endDate :
                 r.DateIn != null ? r.DateIn >= startDate && r.DateIn <= endDate :
-                r.DateDocument != null ? r.DateDocument >= startDate && r.DateDocument <= endDate : false);
+                r.DateDocument != null ? r.DateDocument >= startDate && r.DateDocument <= endDate : false);*/
+
+            var paymentStartDate = startDate.AddMonths(-1).AddDays(24);
+            var paymentEndDate = endDate.AddDays(1).AddMonths(-1).AddDays(23);
 
             var claimIds = account.Claims.Select(r => r.IdClaim).ToList();
             var chargeIds = account.Charges.Select(r => r.IdCharge).ToList();
 
-            var paymentPenalty = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.PenaltyValue))
+            var paymentCharges = account.Payments.SelectMany(r => r.PaymentCharges).Where(r => r.Date >= paymentStartDate && r.Date <= paymentEndDate && chargeIds.Contains(r.IdCharge));
+            var paymentClaims = account.Payments.SelectMany(r => r.PaymentClaims).Where(r => r.Date >= paymentStartDate && r.Date <= paymentEndDate && claimIds.Contains(r.IdClaim));
+
+            var paymentPenalty = paymentCharges.Sum(r => r.PenaltyValue) + paymentClaims.Sum(r => r.PenaltyValue);
+            var paymentTenancy = paymentCharges.Sum(r => r.TenancyValue) + paymentClaims.Sum(r => r.TenancyValue);
+            var paymentDgi = paymentCharges.Sum(r => r.DgiValue) + paymentClaims.Sum(r => r.DgiValue);
+            var paymentPkk = paymentCharges.Sum(r => r.PkkValue) + paymentClaims.Sum(r => r.PkkValue);
+            var paymentPadun = paymentCharges.Sum(r => r.PadunValue) + paymentClaims.Sum(r => r.PadunValue);
+
+            /*var paymentPenalty = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.PenaltyValue))
                 + payments.Where(r => r.PaymentClaims.Any()).Sum(r => r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Select(pc => pc.PenaltyValue).Sum());
 
             var paymentTenancy = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.TenancyValue))
@@ -1056,7 +1095,7 @@ namespace RegistryWeb.DataServices
                 + payments.Where(r => r.PaymentClaims.Any()).Sum(r => r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Select(pc => pc.PkkValue).Sum());
 
             var paymentPadun = payments.Where(r => r.PaymentCharges.Any()).Sum(r => r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.PadunValue))
-                + payments.Where(r => r.PaymentClaims.Any()).Sum(r => r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Select(pc => pc.PadunValue).Sum());
+                + payments.Where(r => r.PaymentClaims.Any()).Sum(r => r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Select(pc => pc.PadunValue).Sum());*/
 
             paymentTenancy += corrections.Select(r => r.PaymentTenancyValue).Sum();
             paymentPenalty += corrections.Select(r => r.PaymentPenaltyValue).Sum();

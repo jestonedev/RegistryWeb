@@ -766,10 +766,11 @@ namespace RegistryWeb.DataServices
                     tenancySum + penaltySum + dgiSum + pkkSum + padunSum,
                     payment.Sum - distributedTenancySum - distributedPenaltySum - distributedDgiSum - distributedPkkSum - distributedPadunSum));
 
-            var isPl = payment.IdSource == 3 || payment.IdSource == 5;
+            /*var isPl = payment.IdSource == 3 || payment.IdSource == 5;
             var date = payment.DateExecute ?? payment.DateIn ?? payment.DateDocument;
             if (date == null)
-                throw new ApplicationException("В платеже не указана " + (isPl ? "дата исполнения распоряжения" : "дата списания со счета"));
+                throw new ApplicationException("В платеже не указана " + (isPl ? "дата исполнения распоряжения" : "дата списания со счета"));*/
+            
 
             IQueryable<KumiAccount> accounts = null;
 
@@ -784,8 +785,14 @@ namespace RegistryWeb.DataServices
                     if (accounts.First().IdState == 2)
                         throw new ApplicationException(string.Format("Нельзя распределить платеж на аннулированный лицевой счет {0}", account.Account));
 
-                    var startPeriodDate = date.Value.AddDays(-date.Value.Day + 1);
-                    var endPeriodDate = date.Value.AddDays(-date.Value.Day + 1).AddMonths(1).AddDays(-1);
+                    var date = DateTime.Now.Date;
+                    var startPeriodDate = date.AddDays(-date.Day + 1);
+                    var endPeriodDate = date.AddDays(-date.Day + 1).AddMonths(1).AddDays(-1);
+                    if (date.Day >= 25)
+                    {
+                        startPeriodDate = startPeriodDate.AddMonths(1);
+                        endPeriodDate = endPeriodDate.AddDays(1).AddMonths(1).AddDays(-1);
+                    }
                     var charge = registryContext.KumiCharges.AsNoTracking()
                         .FirstOrDefault(r => r.IdAccount == idObject && r.StartDate == startPeriodDate && r.EndDate == endPeriodDate);
 

@@ -100,6 +100,21 @@ namespace RegistryWeb.Controllers
             return View("AccountReports", viewModel);
         }
 
+        public IActionResult DetailsByAddress(int idAccount, string returnUrl)
+        {
+            if (!securityService.HasPrivilege(Privileges.AccountsRead))
+                return View("NotAccess");
+            var accounts = dataService.GetKumiAccountsOnSameAddress(idAccount);
+            ViewBag.Address = dataService.GetAccountAddress(idAccount);
+            ViewBag.IdAccountCurrent = idAccount;
+            ViewBag.ReturnUrl = returnUrl;
+            ViewBag.States = dataService.States;
+            ViewBag.SecurityService = securityService;
+            var tenancyInfo = dataService.GetTenancyInfo(accounts);
+            ViewBag.TenancyInfo = tenancyInfo;
+            return View("DetailsByAddress", accounts);
+        }
+
         private IActionResult GetView(int? idAccount, string returnUrl, ActionTypeEnum action, Privileges privilege)
         {
             if (!securityService.HasPrivilege(privilege))
