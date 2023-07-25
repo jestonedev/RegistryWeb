@@ -534,16 +534,19 @@
                 </div>
                 <div class="card-body p-0" id="Charges">
                     @{
-                        var currMonthEndDate = DateTime.Now.Date.AddDays(-DateTime.Now.Date.Day + 1).AddMonths(1).AddDays(-1);
-                        var prevMonthEndDate = currMonthEndDate.AddDays(-currMonthEndDate.Day);
-
-                        if (!Model.Charges.Any(r => r.EndDate == currMonthEndDate) && Model.Charges.Any(r => r.EndDate == prevMonthEndDate))
+                        var forecastCalcDate = DateTime.Now.Date.AddDays(-DateTime.Now.Day + 1).AddMonths(1).AddDays(-1);
+                        if (DateTime.Now.Day >= 25)
                         {
-                            KumiCharge prevCharge = Model.Charges.FirstOrDefault(r => r.EndDate == prevMonthEndDate);
+                            forecastCalcDate = forecastCalcDate.AddDays(1).AddMonths(1).AddDays(-1);
+                        }
+
+                        if (!Model.Charges.Any(r => r.EndDate == forecastCalcDate) && new int[] { 1, 3 }.Contains(Model.IdState))
+                        {
+                            KumiCharge prevCharge = Model.Charges.OrderByDescending(r => r.EndDate).FirstOrDefault(r => r.EndDate < forecastCalcDate);
                             Model.Charges.Add(new KumiCharge
                             {
-                                StartDate = currMonthEndDate.AddDays(1).AddMonths(-1),
-                                EndDate = currMonthEndDate,
+                                StartDate = forecastCalcDate.AddDays(1).AddMonths(-1),
+                                EndDate = forecastCalcDate,
                                 InputTenancy = prevCharge?.OutputTenancy ?? 0.00m,
                                 InputPenalty = prevCharge?.OutputPenalty ?? 0.00m,
                                 InputDgi = prevCharge?.OutputDgi ?? 0.00m,
@@ -659,12 +662,13 @@
 
                                     var totalPaymentTotalByAccount = 0.00m;
 
-                                    var currentPeriodCalced = Model.LastCalcDate == DateTime.Now.Date.AddDays(-DateTime.Now.Day+1).AddMonths(1).AddDays(-1)
+                                    var currentPeriodCalced = Model.LastCalcDate == forecastCalcDate
                                         && Model.Charges.Any(r => r.EndDate == Model.LastCalcDate && (r.ChargeTenancy != 0 || r.ChargePenalty != 0));
                                 }
                                 @foreach (var charge in Model.Charges.Where(r => r.Hidden == 0).OrderBy(r => r.EndDate))
                                 {
-                                    if (charge.EndDate <= DateTime.Now.Date || currentPeriodCalced)
+
+                                    if (charge.EndDate != forecastCalcDate || currentPeriodCalced)
                                     {
                                         totalChargeTenancy += charge.ChargeTenancy;
                                         totalChargePenalty += charge.ChargePenalty;
@@ -684,15 +688,15 @@
                                     totalPaymentPkk += charge.PaymentPkk;
                                     totalPaymentPadun += charge.PaymentPadun;
                                     i++;
-                                    <tr class="@(count - i + 1 > 12 ? "rr-charge-archive" : "") @(charge.EndDate == currMonthEndDate ? "rr-charge-current-month-row" : "") @(currentPeriodCalced ? "rr-charge-current-month-row-no-calc" : "")" data-charge-end-date="@charge.EndDate.ToString("yyyy-MM-dd")">
+                                    <tr class="@(count - i + 1 > 12 ? "rr-charge-archive" : "") @(charge.EndDate == forecastCalcDate ? "rr-charge-current-month-row" : "") @(currentPeriodCalced ? "rr-charge-current-month-row-no-calc" : "")" data-charge-end-date="@charge.EndDate.ToString("yyyy-MM-dd")">
 
                                         <td class="text-center p-1"><b>@charge.EndDate.ToString("dd.MM.yyyy")</b></td>
 
                                         @* Найм *@
                                         <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-input-tenancy">@charge.InputTenancy</td>
                                         <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-input-penalty">@charge.InputPenalty</td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-tenancy">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.ChargeTenancy : 0)</td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-penalty">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.ChargePenalty : 0)</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-tenancy">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.ChargeTenancy : 0)</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-penalty">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.ChargePenalty : 0)</td>
                                         <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-payment-tenancy">
                                             @{
                                                 var tenancyOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.TenancyValue) ?? 0m;
@@ -731,8 +735,8 @@
                                                 @charge.PaymentPenalty
                                             }
                                         </td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-recalc-tenancy">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.RecalcTenancy + charge.CorrectionTenancy : 0)</td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-recalc-penalty">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.RecalcPenalty + charge.CorrectionPenalty : 0)</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-recalc-tenancy">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.RecalcTenancy + charge.CorrectionTenancy : 0)</td>
+                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-recalc-penalty">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.RecalcPenalty + charge.CorrectionPenalty : 0)</td>
                                         <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-output-tenancy">@charge.OutputTenancy</td>
                                         <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-output-penalty">@charge.OutputPenalty</td>
 
@@ -740,7 +744,7 @@
                                         @if (hasDgiCharges)
                                         {
                                             <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-input-dgi">@charge.InputDgi</td>
-                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-dgi">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.ChargeDgi : 0)</td>
+                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-dgi">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.ChargeDgi : 0)</td>
                                             <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-payment-dgi">
                                                 @{
                                                     var dgiOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.DgiValue) ?? 0m;
@@ -761,14 +765,14 @@
                                                     @charge.PaymentDgi
                                                 }
                                             </td>
-                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-recalc-dgi">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.RecalcDgi + charge.CorrectionDgi : 0)</td>
+                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-recalc-dgi">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.RecalcDgi + charge.CorrectionDgi : 0)</td>
                                             <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-output-dgi">@charge.OutputDgi</td>
                                         }
                                         @* ПКК *@
                                         @if (hasPkkCharges)
                                         {
                                             <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-input-pkk">@charge.InputPkk</td>
-                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-pkk">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.ChargePkk : 0)</td>
+                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-pkk">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.ChargePkk : 0)</td>
                                             <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-payment-pkk">
                                                 @{
                                                     var pkkOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.PkkValue) ?? 0m;
@@ -789,14 +793,14 @@
                                                     @charge.PaymentPkk
                                                 }
                                             </td>
-                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-recalc-pkk">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.RecalcPkk + charge.CorrectionPkk : 0)</td>
+                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-recalc-pkk">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.RecalcPkk + charge.CorrectionPkk : 0)</td>
                                             <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-output-pkk">@charge.OutputPkk</td>
                                         }
                                         @* Падун *@
                                         @if (hasPadunCharges)
                                         {
                                             <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-input-padun">@charge.InputPadun</td>
-                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-padun">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.ChargePadun : 0)</td>
+                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-padun">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.ChargePadun : 0)</td>
                                             <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-payment-padun">
                                                 @{
                                                     var padunOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.PadunValue) ?? 0m;
@@ -817,17 +821,17 @@
                                                     @charge.PaymentPadun
                                                 }
                                             </td>
-                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-recalc-padun">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.RecalcPadun + charge.CorrectionPadun : 0)</td>
+                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-recalc-padun">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.RecalcPadun + charge.CorrectionPadun : 0)</td>
                                             <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-output-padun">@charge.OutputPadun</td>
                                         }
 
                                         @* Всего *@
                                         @if (hasDgiCharges || hasPkkCharges || hasPadunCharges)
                                         {
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-input-all">@(charge.InputTenancy+charge.InputDgi+charge.InputPkk+charge.InputPadun)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-input-all">@(charge.InputTenancy + charge.InputDgi + charge.InputPkk + charge.InputPadun)</td>
                                             <td class="text-center p-1 rr-charge-total rr-charge-period-input-all-penalty">@charge.InputPenalty</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-all">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? (charge.ChargeTenancy+charge.ChargeDgi+charge.ChargePkk + charge.ChargePadun) : 0)</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-all-penalty">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.ChargePenalty : 0)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-all">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? (charge.ChargeTenancy + charge.ChargeDgi + charge.ChargePkk + charge.ChargePadun) : 0)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-all-penalty">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.ChargePenalty : 0)</td>
                                             <td class="text-center p-1 rr-charge-total rr-charge-period-payment-all">
                                                 @{
                                                     var totalOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.TenancyValue + r.DgiValue + r.PkkValue + r.PadunValue) ?? 0m;
@@ -859,9 +863,9 @@
                                                     @charge.PaymentPenalty
                                                 }
                                             </td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? (charge.RecalcTenancy + charge.CorrectionTenancy + charge.RecalcDgi + charge.CorrectionDgi + charge.RecalcPkk + charge.CorrectionPkk + charge.RecalcPadun + charge.CorrectionPadun) : 0)</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all-penalty">@(charge.EndDate <= DateTime.Now.Date || currentPeriodCalced ? charge.RecalcPenalty + charge.CorrectionPenalty : 0)</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-output-all">@(charge.OutputTenancy+charge.OutputDgi+charge.OutputPkk+charge.OutputPadun)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? (charge.RecalcTenancy + charge.CorrectionTenancy + charge.RecalcDgi + charge.CorrectionDgi + charge.RecalcPkk + charge.CorrectionPkk + charge.RecalcPadun + charge.CorrectionPadun) : 0)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all-penalty">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.RecalcPenalty + charge.CorrectionPenalty : 0)</td>
+                                            <td class="text-center p-1 rr-charge-total rr-charge-period-output-all">@(charge.OutputTenancy + charge.OutputDgi + charge.OutputPkk + charge.OutputPadun)</td>
                                             <td class="text-center p-1 rr-charge-total rr-charge-period-output-all-penalty">@charge.OutputPenalty</td>
                                         }
                                     </tr>
@@ -878,7 +882,7 @@
                                         @if (totalPaymentTenancy > 0 || totalPaymentPenalty > 0)
                                         {
                                             <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentTenancy - totalPaymentTenancyByAccount) руб." asp-action="Index"
-                                                asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentTenancy</b></a>
+                                               asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentTenancy</b></a>
                                         }
                                         else
                                         {
@@ -890,7 +894,7 @@
                                         @if (totalPaymentTenancy > 0 || totalPaymentPenalty > 0)
                                         {
                                             <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPenalty - totalPaymentPenaltyByAccount) руб." asp-action="Index"
-                                                asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPenalty</b></a>
+                                               asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPenalty</b></a>
                                         }
                                         else
                                         {
@@ -913,7 +917,7 @@
                                             @if (totalPaymentDgi > 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentDgi - totalPaymentDgiByAccount) руб." asp-action="Index"
-                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentDgi</b></a>
+                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentDgi</b></a>
                                             }
                                             else
                                             {
@@ -934,7 +938,7 @@
                                             @if (totalPaymentPkk > 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPkk - totalPaymentPkkByAccount) руб." asp-action="Index"
-                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPkk</b></a>
+                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPkk</b></a>
                                             }
                                             else
                                             {
@@ -955,7 +959,7 @@
                                             @if (totalPaymentPadun > 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPadun - totalPaymentPadunByAccount) руб." asp-action="Index"
-                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPadun</b></a>
+                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPadun</b></a>
                                             }
                                             else
                                             {
@@ -972,16 +976,16 @@
                                     {
                                         <td class="text-center p-1 rr-charge-total"><b>-</b></td>
                                         <td class="text-center p-1 rr-charge-total"><b>-</b></td>
-                                        <td class="text-center p-1 rr-charge-total rr-charge-total-all"><b>@(totalChargeTenancy+totalChargePkk+totalChargeDgi+totalChargePadun)</b></td>
+                                        <td class="text-center p-1 rr-charge-total rr-charge-total-all"><b>@(totalChargeTenancy + totalChargePkk + totalChargeDgi + totalChargePadun)</b></td>
                                         <td class="text-center p-1 rr-charge-total rr-charge-total-all-penalty"><b>@totalChargePenalty</b></td>
                                         <td class="text-center p-1 rr-charge-total">
-                                            @{ 
+                                            @{
                                                 var totalPaymentTotal = totalPaymentTenancy + totalPaymentDgi + totalPaymentPkk + totalPaymentPadun;
                                             }
                                             @if (totalPaymentTotal > 0 || totalPaymentPenalty > 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentTotal - totalPaymentTotalByAccount) руб." asp-action="Index"
-                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentTotal</b></a>
+                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentTotal</b></a>
                                             }
                                             else
                                             {
@@ -993,7 +997,7 @@
                                             @if (totalPaymentTotal > 0 || totalPaymentPenalty > 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPenalty - totalPaymentPenaltyByAccount) руб." asp-action="Index"
-                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPenalty</b></a>
+                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPenalty</b></a>
                                             }
                                             else
                                             {
@@ -1019,62 +1023,9 @@
                     }
                     else
                     {
-                        @if (Model.IdState == 1)
-                        {
-                            var endDate = DateTime.Now.Date.AddDays(-DateTime.Now.Day+1).AddMonths(1).AddDays(-1);
-                            <table class="table table-bordered table-striped m-0">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center p-1" title="Дата последнего начисления">Дата</th>
-                                        <th class="text-center p-1" title="Входящее сальдо найм">Вх. найм</th>
-                                        <th class="text-center p-1" title="Входящее сальдо пени">Вх. пени</th>
-                                        <th class="text-center p-1" title="Начислено найм">Начислено найм</th>
-                                        <th class="text-center p-1" title="Начислено пени">Начислено пени</th>
-                                        <th class="text-center p-1" title="Оплачено найм">Оплата найм</th>
-                                        <th class="text-center p-1" title="Оплачено пени">Оплата пени</th>
-                                        <th class="text-center p-1" title="Перерасчет найм">Перерасчет найм</th>
-                                        <th class="text-center p-1" title="Перерасчет пени">Перерасчет пени</th>
-                                        <th class="text-center p-1" title="Исходящее сальдо найм">Исх. найм</th>
-                                        <th class="text-center p-1" title="Исходящее сальдо пени">Исх. пени</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="rr-charge-current-month-row" data-charge-end-date="@endDate.ToString("yyyy-MM-dd")">
-                                        <td class="text-center p-1"><b>@endDate.ToString("dd.MM.yyyy")</b></td>
-                                        <td class="text-center p-1 rr-charge-period-input-tenancy">0</td>
-                                        <td class="text-center p-1 rr-charge-period-input-penalty">0</td>
-                                        <td class="text-center p-1 rr-charge-period-tenancy">0</td>
-                                        <td class="text-center p-1 rr-charge-period-penalty">0</td>
-                                        <td class="text-center p-1 rr-charge-period-payment-tenancy">0</td>
-                                        <td class="text-center p-1 rr-charge-period-payment-penalty">0
-                                        </td>
-                                        <td class="text-center p-1 rr-charge-period-recalc-tenancy">0</td>
-                                        <td class="text-center p-1 rr-charge-period-recalc-penalty">0</td>
-                                        <td class="text-center p-1 rr-charge-period-output-tenancy">0</td>
-                                        <td class="text-center p-1 rr-charge-period-output-penalty">0</td>
-                                    </tr>
-                                    <tr class="rr-charge-total-row">
-                                        <td class="text-center p-1"><b>Итого</b></td>
-                                        <td class="text-center p-1"><b>-</b></td>
-                                        <td class="text-center p-1"><b>-</b></td>
-                                        <td class="text-center p-1 rr-charge-total-tenancy"><b>0</b></td>
-                                        <td class="text-center p-1 rr-charge-total-penalty"><b>0</b></td>
-                                        <td class="text-center p-1"><b>0</b></td>
-                                        <td class="text-center p-1"><b>0</b></td>
-                                        <td class="text-center p-1 rr-charge-total-recalc-tenancy"><b>0</b></td>
-                                        <td class="text-center p-1 rr-charge-total-recalc-penalty"><b>0</b></td>
-                                        <td class="text-center p-1"><b>-</b></td>
-                                        <td class="text-center p-1"><b>-</b></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        }
-                        else
-                        {
-                            <div class="text-center rr-list-group-item-empty mt-2 mb-2">
-                                <i>Начисления отсутствуют</i>
-                            </div>
-                        }
+                        <div class="text-center rr-list-group-item-empty mt-2 mb-2">
+                            <i>Начисления отсутствуют</i>
+                        </div>
                     }
                 </div>
             </div>
