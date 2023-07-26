@@ -94,6 +94,11 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("decimal(12,2)")
                 .IsRequired();
 
+            builder.Property(e => e.User)
+                .HasColumnName("user")
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
             builder.HasOne(e => e.Account)
                 .WithMany(e => e.Corrections)
                 .HasForeignKey(e => e.IdAccount);

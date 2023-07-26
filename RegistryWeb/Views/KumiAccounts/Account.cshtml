@@ -551,6 +551,9 @@
                             forecastCalcDate = forecastCalcDate.AddDays(1).AddMonths(1).AddDays(-1);
                         }
 
+
+                        var currentPeriodCalced = (Model.LastCalcDate == forecastCalcDate || new int[] { 2, 4 }.Contains(Model.IdState));
+
                         if (!Model.Charges.Any(r => r.EndDate == forecastCalcDate) && new int[] { 1, 3 }.Contains(Model.IdState))
                         {
                             KumiCharge prevCharge = Model.Charges.OrderByDescending(r => r.EndDate).FirstOrDefault(r => r.EndDate < forecastCalcDate);
@@ -672,9 +675,6 @@
                                     var totalRecalcPadun = 0.00m;
 
                                     var totalPaymentTotalByAccount = 0.00m;
-
-                                    var currentPeriodCalced = Model.LastCalcDate == forecastCalcDate
-                                        && Model.Charges.Any(r => r.EndDate == Model.LastCalcDate && (r.ChargeTenancy != 0 || r.ChargePenalty != 0));
                                 }
                                 @foreach (var charge in Model.Charges.Where(r => r.Hidden == 0).OrderBy(r => r.EndDate))
                                 {

@@ -422,13 +422,15 @@ namespace RegistryWeb.DataServices
 
                 // Если было начисление на текущий или будущий период, то сохранить его при перерасчете (по-умолчанию начислеяются только закрытыие периоды)
                 var forceCalcCurrentPeriod = saveCurrentPeriodCharge;
-                var lastDbCharge = dbChargingInfo.OrderByDescending(r => r.EndDate).FirstOrDefault();
-                if (lastDbCharge != null && lastDbCharge.EndDate >= DateTime.Now.Date && 
-                    (lastDbCharge.ChargeTenancy != 0 || lastDbCharge.ChargePenalty != 0 || lastDbCharge.ChargePkk != 0 || 
-                    lastDbCharge.ChargeDgi != 0 || lastDbCharge.ChargePadun != 0))
+                var futureChargesInDb = dbChargingInfo.Where(r => r.EndDate >= DateTime.Now.Date &&
+                    (r.ChargeTenancy != 0 || r.ChargePenalty != 0 || r.ChargePkk != 0 ||
+                    r.ChargeDgi != 0 || r.ChargePadun != 0));
+                if (futureChargesInDb.Any())
                 {
                     forceCalcCurrentPeriod = true;
-                    endCalcDate = lastDbCharge.EndDate;
+                    var futureChargesMaxDate = futureChargesInDb.Select(r => r.EndDate).Max();
+                    if (futureChargesMaxDate > endCalcDate)
+                        endCalcDate = futureChargesMaxDate;
                 }
 
                 startRewriteDate = CorrectStartRewriteDate(startRewriteDate.Value, startCalcDate.Value, dbChargingInfo);
@@ -438,7 +440,7 @@ namespace RegistryWeb.DataServices
                 if (chargingInfo.Any()) recalcInsertIntoCharge = chargingInfo.Last();
                 CalcRecalcInfo(account, chargingInfo, dbChargingInfo, recalcInsertIntoCharge, startCalcDate.Value, endCalcDate, startRewriteDate.Value);
                 UpdateChargesIntoDb(account, chargingInfo, dbChargingInfo, startCalcDate.Value, endCalcDate, startRewriteDate.Value, 
-                    saveCurrentPeriodCharge ? DateTime.Now.Date.AddDays(-DateTime.Now.Day+1).AddMonths(1).AddDays(-1)  : (DateTime?)null);
+                    saveCurrentPeriodCharge ? endCalcDate : (DateTime?)null);
             }
         }
 

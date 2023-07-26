@@ -117,7 +117,7 @@
                             Договор найма: № @item.RegistrationNum @(item.RegistrationDate.HasValue ? "от " + @item.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")
                         </div>
                     }
-                    @if (item.BeginDate != null || item.EndDate != null)
+                    @if ((item.BeginDate != null || item.EndDate != null) && item.IdRentType != 3)
                     {
                         <div>
                             @{

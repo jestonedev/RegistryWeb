@@ -179,7 +179,7 @@
                                         @(tenancy.RegistrationDate.HasValue ? " от " + tenancy.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")
                                     </div>
                                     <div>
-                                        @if (tenancy.BeginDate != null || tenancy.EndDate != null)
+                                        @if ((tenancy.BeginDate != null || tenancy.EndDate != null) && tenancy.IdRentType != 3)
                                         {
                                             <div class="text-success"><b>Период действия:</b></div>
                                             <div>

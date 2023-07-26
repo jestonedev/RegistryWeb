@@ -547,6 +547,14 @@ namespace RegistryWeb.DataServices
             registryContext.SaveChanges();
         }
 
+        public List<KumiMemorialOrder> GetKumiPaymentMemorialOrderPairs(int idOrder)
+        {
+            var order = registryContext.KumiMemorialOrders.FirstOrDefault(r => r.IdOrder == idOrder);
+            if (order == null) throw new Exception("Не удалось найти мемориальный ордер");
+            return registryContext.KumiMemorialOrders.Where(r => r.NumDocument == order.NumDocument && r.DateDocument == order.DateDocument
+                        && r.IdGroup == order.IdGroup).ToList();
+        }
+
         private void ClearMemorialOrderFieldsValues(KumiMemorialOrder mo)
         {
             if (string.IsNullOrEmpty(mo.InnAdb))

@@ -1,11 +1,75 @@
 ﻿var searchModal = function () {
-    $('input[name="FilterOptions.CommonFilter"]').val("");
-
     $("#FilterOptions_Sum").val($("#FilterOptions_Sum").val().replace(",", "."));
 
-    if ($("form.filterForm").valid()) {
-        $("form.filterForm").submit();
-        $("#filterModal").modal("hide");
+    if ($("#filterModal").data("idOrder") === undefined) {
+        $('input[name="FilterOptions.CommonFilter"]').val("");
+
+        if ($("form.filterForm").valid()) {
+            $("form.filterForm").submit();
+            $("#filterModal").modal("hide");
+        }
+    } else {
+        $("#searchModalBtn").prop("disabled", "disabled");
+        $("#filterModal .rr-search-mo-payment-result, #filterModal .rr-search-mo-payment-error").html("").addClass("d-none");
+        $("#filterModal #bindModalBtn").addClass("d-none");
+        var urlData = $("#filterModal").closest("form").serialize();
+        $.ajax({
+            type: 'GET',
+            url: window.location.origin + '/KumiPayments/SearchPaymentsForBindOrder?' + urlData,
+            dataType: 'json',
+            success: function (data) {
+                if (data.state === "Success") {
+                    $("#filterModal .rr-search-mo-payment-result").removeClass("d-none");
+                    if (data.payments.length > 0) {
+                        var html = "<table class='table table-bordered'><thead><th></th><th>Реквизиты</th><th>Назначение</th></thead><tbody>";
+                        for (var i = 0; i < data.payments.length; i++) {
+                            html += "<tr>";
+                            html += "<td style='vertical-align: middle'><input type='radio' name='paymentId' value='" + data.payments[i].idPayment + "'></td>";
+                            var requisits = "";
+                            if (data.payments[i].numDocument !== null) {
+                                requisits += "№ " + data.payments[i].numDocument;
+                            }
+                            if (data.payments[i].dateDocument !== null) {
+                                if (requisits !== "") requisits += " ";
+
+                                var dateDocument = new Date(data.payments[i].dateDocument);
+                                year = dateDocument.getFullYear();
+                                month = dateDocument.getMonth() + 1;
+                                day = dateDocument.getDate();
+                                dateDocumentStr = (day < 10 ? "0" + day : day) + "." + (month < 10 ? "0" + month : month) + "." + year;
+                                requisits += "от " + dateDocumentStr;
+                            }
+                            var sum = data.payments[i].sum;
+                            if (sum === null || sum === undefined)
+                                sum = "0,00";
+                            else {
+                                var sumParts = sum.toString().replace(".", ",").split(',');
+                                if (sumParts.length === 1)
+                                    sum = sumParts[0] + ",00";
+                                else
+                                    sum = sumParts[0] + "," + sumParts[1].padEnd(2, '0');
+                            }
+
+                            html += "<td><b>Платежный документ:</b> " + requisits +
+                                " <a class='btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn' target='_blank' href='/KumiPayments/Details?idPayment=" + data.payments[i].idPayment+"'></a><br><b>КБК:</b> " + data.payments[i].kbk + "<br><b>Сумма:</b> " + sum + " руб.</td>";
+                            html += "<td style='word-wrap: break-word'>" + data.payments[i].purpose + "</td>";
+                            html += "</tr>";
+                        }
+                        html += "</tbody></table>";
+                        $("#filterModal .rr-search-mo-payment-result").html(html);
+                        var radios = $("#filterModal .rr-search-mo-payment-result input[type='radio']");
+                        if (radios.length === 1) {
+                            $(radios[0]).prop("checked", true).change();
+                        }
+                    } else {
+                        $("#filterModal .rr-search-mo-payment-error").removeClass("d-none").html("<i>Платежи не найдены</i>");
+                    }
+                } else {
+                    $("#filterModal .rr-search-mo-payment-error").removeClass("d-none").text(data.error);
+                }
+                $("#searchModalBtn").prop("disabled", "");
+            }
+        });
     }
 };
 
@@ -13,7 +77,9 @@ var filterClearModal = function () {
     $("#filterModal input[type='text'], #filterModal input[type='date'], #filterModal input[type='hidden'], #filterModal select").val("");
     $('#filterModal').find("select").selectpicker('render');
     $("#filterModal input[type='checkbox']").prop("checked", false);
-    $("form.filterForm").valid();
+    $("#filterModal .rr-search-mo-payment-result, #filterModal .rr-search-mo-payment-error").html("").addClass("d-none");
+    $("#filterModal #bindModalBtn").addClass("d-none");
+    $("form.filterForm, form[name='DistributeMoSearchPaymentForm']").valid();
 };
 var filterClear = function () {
     filterClearModal();

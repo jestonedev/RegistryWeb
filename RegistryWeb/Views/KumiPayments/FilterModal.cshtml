@@ -1,0 +1,184 @@
+﻿@model RegistryServices.ViewModel.KumiAccounts.KumiPaymentsVM;
+
+<!-- Modal -->
+<div class="modal fade bd-example-modal-xl" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Фильтр платежей</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group col-12 mb-2">
+                        <label asp-for="FilterOptions.IdsSource" class="rr-payment-filter-label mb-1">Источник платежа</label>
+                        <select multiple class="selectpicker form-control" data-actions-box="true" title="Источник платежа" asp-for="FilterOptions.IdsSource" asp-items="@Model.PaymentSourcesList"></select>
+                    </div>
+                    <div class="form-group col-lg-3 col-6 mb-2">
+                        <label asp-for="FilterOptions.LoadDate" class="rr-payment-filter-label mb-1">Дата загрузки</label>
+                        <div class="input-group date">
+                            <input type="date" class="form-control" asp-for="FilterOptions.LoadDate" title="Дата загрузки" />
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-3 col-6 mb-2">
+                        <label asp-for="FilterOptions.IsPosted" class="rr-payment-filter-label mb-1">Платеж распределен</label>
+                        <select class="selectpicker  form-control" asp-for="FilterOptions.IsPosted" title="Платеж распределен">
+                            <option value=""></option>
+                            <option value="True">Да</option>
+                            <option value="False">Нет</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 col-6 mb-2">
+                        <label asp-for="FilterOptions.NumDocument" class="rr-payment-filter-label mb-1">№ ПД / распоряжения</label>
+                        <input type="text" class="form-control input-filter-numbers" maxlength="255" asp-for="FilterOptions.NumDocument" title="№ платежного документа / № распоряжения">
+                    </div>
+                    <div class="form-group col-lg-3 col-6 mb-2">
+                        <label asp-for="FilterOptions.DateDocument" class="rr-payment-filter-label mb-1">Дата ПД / распоряжения</label>
+                        <div class="input-group date">
+                            <input type="date" class="form-control" asp-for="FilterOptions.DateDocument" title="Дата платежного документа / Дата распоряжения" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-lg-3 col-6 mb-2">
+                        <label asp-for="FilterOptions.DateIn" class="rr-payment-filter-label mb-1">Дата поступления в банк</label>
+                        <div class="input-group date">
+                            <input type="date" class="form-control" asp-for="FilterOptions.DateIn" title="Дата поступления в банк плательщика" />
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-3 col-6 mb-2">
+                        <label asp-for="FilterOptions.DateExecute" class="rr-payment-filter-label mb-1">Дата списания / исполнения</label>
+                        <div class="input-group date">
+                            <input type="date" class="form-control" asp-for="FilterOptions.DateExecute" title="Дата списания со счета плательщика / Дата исполнения распоряжения" />
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-3 col-6 mb-2">
+                        <label asp-for="FilterOptions.DateEnrollUfk" class="rr-payment-filter-label mb-1">Дата выписки</label>
+                        <div class="input-group date">
+                            <input type="date" class="form-control" asp-for="FilterOptions.DateEnrollUfk" title="Дата списания со счета плательщика / Дата исполнения распоряжения" />
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-3 col-6 mb-2">
+                        <label asp-for="FilterOptions.Sum" class="rr-payment-filter-label mb-1">Сумма</label>
+                        <input type="text" class="form-control input-filter-decimal" maxlength="25" asp-for="FilterOptions.Sum" title="Сумма">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-lg-3 col-6 mb-2">
+                        <label asp-for="FilterOptions.Purpose" class="rr-payment-filter-label mb-1">Назначение платежа</label>
+                        <input type="text" class="form-control" maxlength="500" asp-for="FilterOptions.Purpose" title="Назначение платежа">
+                    </div>
+                    <div class="form-group col-lg-3 col-6 mb-2">
+                        <label asp-for="FilterOptions.Uin" class="rr-payment-filter-label mb-1">УИН</label>
+                        <input type="text" class="form-control input-filter-numbers" maxlength="25" asp-for="FilterOptions.Uin" title="УИН">
+                    </div>
+                    <div class="form-group col-lg-3 col-6 mb-2">
+                        <label asp-for="FilterOptions.Kbk" class="rr-payment-filter-label mb-1">КБК</label>
+                        <input type="text" class="form-control input-filter-numbers" maxlength="20" asp-for="FilterOptions.Kbk" value="@(Model.FilterOptions.Kbk == null ? "90111109044041000120" : Model.FilterOptions.Kbk)" title="КБК">
+                    </div>
+                    <div class="form-group col-lg-3 col-6 mb-2">
+                        <label asp-for="FilterOptions.Okato" class="rr-payment-filter-label mb-1">Код ОКТМО</label>
+                        <input type="text" class="form-control input-filter-numbers" maxlength="20" asp-for="FilterOptions.Okato" title="Код ОКТМО">
+                    </div>
+                </div>
+
+                <div class="card rr-payer-card mt-2">
+                    <div class="card-header d-flex justify-content-between pt-2 pb-2">
+                        <h4 class="mt-1">Фильтр по плательщику</h4>
+                        <div class="btn-group" role="group">
+                            <a href="#" id="PayerFiltersToggler" class="form-control btn btn-primary" title="Развернуть фильтр по плательщику" style="font-weight:bold;">∨</a>
+                        </div>
+                    </div>
+                    <div class="card-body toggle-hide pt-3 pb-3 pl-3 pr-3" id="PayerFilters">
+                        <div class="form-row">
+                            <div class="form-group col-lg-3 col-6 mb-2">
+                                <label asp-for="FilterOptions.PayerInn" class="rr-payment-filter-label mb-1">ИНН</label>
+                                <input type="text" class="form-control input-filter-numbers" maxlength="12" asp-for="FilterOptions.PayerInn" title="ИНН">
+                            </div>
+                            <div class="form-group col-lg-3 col-6 mb-2">
+                                <label asp-for="FilterOptions.PayerKpp" class="rr-payment-filter-label mb-1">КПП</label>
+                                <input type="text" class="form-control input-filter-numbers" maxlength="12" asp-for="FilterOptions.PayerKpp" title="ИНН">
+                            </div>
+                            <div class="form-group col-lg-3 col-6 mb-2">
+                                <label asp-for="FilterOptions.PayerName" class="rr-payment-filter-label mb-1">Наименование плательщика</label>
+                                <input type="text" class="form-control" maxlength="2000" asp-for="FilterOptions.PayerName" title="Наименование">
+                            </div>
+                            <div class="form-group col-lg-3 col-6 mb-2">
+                                <label asp-for="FilterOptions.PayerAccount" class="rr-payment-filter-label mb-1">Лицевой счет</label>
+                                <input type="text" class="form-control input-filter-numbers" maxlength="20" asp-for="FilterOptions.PayerAccount" title="Лицевой счет">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-lg-3 col-6 mb-2">
+                                <label asp-for="FilterOptions.PayerBankBik" class="rr-payment-filter-label mb-1">БИК банка</label>
+                                <input type="text" class="form-control input-filter-numbers" maxlength="9" asp-for="FilterOptions.PayerBankBik" title="БИК банка">
+                            </div>
+                            <div class="form-group col-lg-3 col-6 mb-2">
+                                <label asp-for="FilterOptions.PayerBankAccount" class="rr-payment-filter-label mb-1">Корр. счет банка</label>
+                                <input type="text" class="form-control input-filter-numbers" maxlength="20" asp-for="FilterOptions.PayerBankAccount" title="Корр. счет банка">
+                            </div>
+                            <div class="form-group col-lg-6 col-12 mb-2">
+                                <label asp-for="FilterOptions.PayerBankName" class="rr-payment-filter-label mb-1">Наименование банка</label>
+                                <input type="text" class="form-control" maxlength="160" asp-for="FilterOptions.PayerBankName" title="Наименование">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card rr-recipient-card mt-2 mb-0">
+                    <div class="card-header d-flex justify-content-between pt-2 pb-2">
+                        <h4 class="mt-1">Фильтр по получателю</h4>
+                        <div class="btn-group" role="group">
+                            <a href="#" id="RecipientFiltersToggler" class="form-control btn btn-primary" title="Развернуть фильтр по получателю" style="font-weight:bold;">∨</a>
+                        </div>
+                    </div>
+                    <div class="card-body toggle-hide pt-3 pb-3 pl-3 pr-3" id="RecipientFilters">
+                        <div class="form-row">
+                            <div class="form-group col-lg-3 col-6 mb-2">
+                                <label asp-for="FilterOptions.RecipientInn" class="rr-payment-filter-label mb-1">ИНН</label>
+                                <input type="text" class="form-control input-filter-numbers" maxlength="12" asp-for="FilterOptions.RecipientInn" title="ИНН">
+                            </div>
+                            <div class="form-group col-lg-3 col-6 mb-2">
+                                <label asp-for="FilterOptions.RecipientKpp" class="rr-payment-filter-label mb-1">КПП</label>
+                                <input type="text" class="form-control input-filter-numbers" maxlength="12" asp-for="FilterOptions.RecipientKpp" title="ИНН">
+                            </div>
+                            <div class="form-group col-lg-3 col-6 mb-2">
+                                <label asp-for="FilterOptions.RecipientName" class="rr-payment-filter-label mb-1">Наименование плательщика</label>
+                                <input type="text" class="form-control" maxlength="2000" asp-for="FilterOptions.RecipientName" title="Наименование">
+                            </div>
+                            <div class="form-group col-lg-3 col-6 mb-2">
+                                <label asp-for="FilterOptions.RecipientAccount" class="rr-payment-filter-label mb-1">Лицевой счет</label>
+                                <input type="text" class="form-control input-filter-numbers" maxlength="20" asp-for="FilterOptions.RecipientAccount" title="Лицевой счет">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-lg-3 col-6 mb-2">
+                                <label asp-for="FilterOptions.RecipientBankBik" class="rr-payment-filter-label mb-1">БИК банка</label>
+                                <input type="text" class="form-control input-filter-numbers" maxlength="9" asp-for="FilterOptions.RecipientBankBik" title="БИК банка">
+                            </div>
+                            <div class="form-group col-lg-3 col-6 mb-2">
+                                <label asp-for="FilterOptions.RecipientBankAccount" class="rr-payment-filter-label mb-1">Корр. счет банка</label>
+                                <input type="text" class="form-control input-filter-numbers" maxlength="20" asp-for="FilterOptions.RecipientBankAccount" title="Корр. счет банка">
+                            </div>
+                            <div class="form-group col-lg-6 col-12 mb-2">
+                                <label asp-for="FilterOptions.RecipientBankName" class="rr-payment-filter-label mb-1">Наименование банка</label>
+                                <input type="text" class="form-control" maxlength="160" asp-for="FilterOptions.RecipientBankName" title="Наименование">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rr-search-mo-payment-result mt-2 d-none">
+                </div>
+                <div class="rr-search-mo-payment-error mt-2 text-danger text-center d-none">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="filterClearModalBtn" type="button" class="btn btn-secondary">Очистить</button>
+                <button id="searchModalBtn" type="button" class="btn btn-secondary">Найти</button>
+                <button id="bindModalBtn" type="button" class="btn btn-success d-none">Связать с ордером</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -6,7 +6,16 @@
     ViewData["Title"] = "Результат загрузки платежей";
     var memorialOrderPayments = (Dictionary<Tuple<int, int>, KumiPayment>)ViewBag.MemorialOrderPayments;
     var kbkDescriptions = (List<KumiKbkDescription>)ViewBag.KbkDescriptions;
+}
 
+@section Scripts {
+    <script src="~/js/index.kumi.payments.js"></script>
+    <script src="~/js/kumiPayments.uploadLog.js"></script>
+}
+
+@section styles
+{
+    <link rel="stylesheet" href="~/css/kumi.payments.css" runat="server" />
 }
 
 <h1 class="mb-3">Результат загрузки платежей</h1>
@@ -159,10 +168,10 @@
             {
                 var kbk = moAssoc.Kbk;
                 var description = kbkDescriptions.FirstOrDefault(r => r.Kbk == kbk)?.Description;
-
+                var requisits = (moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "") + (moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "");
                 <tr>
                     <td>
-                        <b>Реквизиты:</b> @(moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "")@(moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "")
+                        <b>Реквизиты:</b> @requisits
                         <span class="badge bg-success text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
                               title="Новый мемориальный ордер">?</span>
                         <br /><b>КБК:</b> <span class="@(kbk == "90111109044041000120" ? "text-danger" : "")" title="@description">@kbk</span>
@@ -188,7 +197,8 @@
                                 }
                                 else
                                 {
-                                    <span class="text-danger"><i>Не связан с платежом</i></span>
+                                    <span class="text-danger"><i>Не связан с платежом</i></span><br />
+                                    <a href="#" data-id-order="@moAssoc.IdOrder" data-sum="@moAssoc.SumZach" data-requisits="@requisits" class="rr-ul-bind-mo-with-payment"><span class="oi oi-link-intact"></span> Связать</a>
                                 }
                             }
                         }
@@ -201,9 +211,10 @@
             {
                 var kbk = moAssoc.Kbk;
                 var description = kbkDescriptions.FirstOrDefault(r => r.Kbk == kbk)?.Description;
+                var requisits = (moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "") + (moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "");
                 <tr>
                     <td>
-                        <b>Реквизиты:</b> @(moAssoc.NumDocument != null ? moAssoc.NumDocument + " " : "")@(moAssoc.DateDocument != null ? " от " + moAssoc.DateDocument.ToString("dd.MM.yyyy") + " " : "")
+                        <b>Реквизиты:</b> @requisits
                         <span class="badge bg-warning text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
                               title="Присутствовавший в системе мемориальный ордер">?</span>
                         <br /><b>КБК:</b> <span class="@(kbk == "90111109044041000120" ? "text-danger" : "")" title="@description">@kbk</span>
@@ -230,6 +241,7 @@
                                 else
                                 {
                                     <span class="text-danger"><i>Не связан с платежом</i></span>
+                                    <a href="#" data-id-order="@moAssoc.IdOrder" data-sum="@moAssoc.SumZach" data-requisits="@requisits" class="rr-ul-bind-mo-with-payment"><span class="oi oi-link-intact"></span> Связать</a>
                                 }
                             }
                         }
@@ -285,3 +297,7 @@
         </tbody>
     </table>
 }
+
+<form name="DistributeMoSearchPaymentForm">
+    <partial name="FilterModal" model="@ViewBag.FilterOptionsVm" />
+</form>

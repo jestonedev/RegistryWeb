@@ -456,6 +456,30 @@ namespace RegistryWeb.Controllers
 
         }
 
+        public IActionResult ApplyMemorialOrderWithPair(int idPayment, int idOrder)
+        {
+            try
+            {
+                var orders = dataService.GetKumiPaymentMemorialOrderPairs(idOrder);
+                foreach (var order in orders)
+                {
+                    dataService.ApplyMemorialOrderToPayment(idPayment, order.IdOrder, out bool updatedExistsPayment);
+                }
+                return Json(new
+                {
+                    State = "Success"
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
+                });
+            }
+        }
+
         public IActionResult ApplyMemorialOrder(int idPayment, List<int> idOrders, string returnUrl)
         {
             try
@@ -667,13 +691,41 @@ namespace RegistryWeb.Controllers
                 ViewBag.MemorialOrderPayments = dataService.GetPaymentsByOrders(orders);
                 ViewBag.KbkDescriptions = dataService.KbkDescriptions;
 
+                ViewBag.FilterOptionsVm = dataService.InitializeViewModel(null, null, null);
+
                 return View("UploadPaymentsResult", loadstate);
             }
             catch( Exception e)
             {
                 return  Error(e.Message);
+            }       
+        }
+
+        public IActionResult SearchPaymentsForBindOrder(KumiPaymentsFilter filterOptions)
+        {
+            try
+            {
+                var payments = dataService.GetViewModel(null, new PageOptions { SizePage = 3 }, filterOptions, out List<int> filteredPaymentsIds);
+                return Json(new
+                {
+                    State = "Success",
+                    Payments = payments.Payments.Select(r => new {
+                        r.IdPayment,
+                        r.NumDocument,
+                        r.DateDocument,
+                        r.Kbk,
+                        r.Sum,
+                        r.Purpose
+                    })
+                });
+            } catch(Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
+                });
             }
-           
         }
 
         public IActionResult UpdateBksPaymentsDateEnrollUfkForm(DateTime dateDoc, DateTime dateEnrollUfk)

@@ -29,6 +29,8 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public decimal PadunValue { get; set; }
         public decimal PaymentPadunValue { get; set; }
 
+        public string User { get; set; }
+
         public virtual KumiAccount Account { get; set; }
     }
 }

@@ -251,14 +251,6 @@ namespace RegistryWeb.Controllers
         {
             try
             {
-                if (saveCurrentPeriodCharge && DateTime.Now.Day >= 25 && recalcType != KumiAccountRecalcTypeEnum.RewriteCharge)
-                {
-                    return Json(new
-                    {
-                        State = "Error",
-                        Error = "Текущий период блокируется начиная с 25 числа месяца. Для его принудительного начисления необходимо выбрать \"Перерасчет с переначислением (перезапись)\" и в периоде указать текущий год и текущий месяц"
-                    });
-                }
                 DateTime? recalcStartDate = null;
                 if (recalcStartYear != null && recalcStartMonth != null)
                     recalcStartDate = new DateTime(recalcStartYear.Value, recalcStartMonth.Value, 1);
