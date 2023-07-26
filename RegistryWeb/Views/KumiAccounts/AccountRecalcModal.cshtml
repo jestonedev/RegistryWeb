@@ -104,7 +104,7 @@
     }
 }
 
-<form id="accountAddCorrectionForm" autocomplete="off">
+<form id="accountAddCorrectionForm" autocomplete="off" method="post" enctype="multipart/form-data">
     <div class="modal fade" id="accountAddCorrectionModal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -123,6 +123,12 @@
                             <input type="date" class="form-control" title="Дата корректировки" value="@(DateTime.Now.Date.ToString("yyyy-MM-dd"))" name="AccountKumiChargeCorrection.AtDate"
                                    data-val="true" data-val-required="Укажите дату корректировки" id="AccountKumiChargeCorrection_AtDate" />
                             <span class="text-danger field-validation-valid" data-valmsg-for="AccountKumiChargeCorrection.AtDate" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group col-6">
+                            <input type="hidden" id="AccountKumiChargeCorrection_idAccountMirror" name="AccountKumiChargeCorrection.idAccountMirror" />
+                            <label for="AccountKumiChargeCorrection_idAccountMirrorVisible">Отразить оплату на ЛС</label>
+                            <input type="text" class="form-control" id="AccountKumiChargeCorrection_idAccountMirrorVisible" name="AccountKumiChargeCorrection.idAccountMirrorVisible" maxlength="255" title="Номер счета">
+                            <span data-valmsg-for="AccountKumiChargeCorrection.idAccountMirrorVisible" id="Span_idAccountMirrorVisible" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="form-row">

@@ -245,7 +245,7 @@ namespace RegistryWeb.DataServices
             decimal dgiValue, decimal pkkValue, decimal padunValue,
             decimal paymentTenancyValue, decimal paymentPenaltyValue, 
             decimal paymentDgiValue, decimal paymentPkkValue, decimal paymentPadunValue,
-            DateTime atDate, string description)
+            DateTime atDate, string description, int? idAccountMirror)
         {
             registryContext.KumiChargeCorrections.Add(new KumiChargeCorrection {
                 IdAccount = idAccount,
@@ -262,6 +262,25 @@ namespace RegistryWeb.DataServices
                 Date = atDate,
                 Description = description
             });
+
+            if(idAccountMirror.HasValue)
+                registryContext.KumiChargeCorrections.Add(new KumiChargeCorrection
+                {
+                    IdAccount = idAccountMirror.Value,
+                    TenancyValue = 0,
+                    PenaltyValue = 0,
+                    DgiValue = 0,
+                    PkkValue = 0,
+                    PadunValue = 0,
+                    PaymentTenancyValue = -paymentTenancyValue,
+                    PaymentPenaltyValue = -paymentPenaltyValue,
+                    PaymentDgiValue = -paymentDgiValue,
+                    PaymentPkkValue = -paymentPkkValue,
+                    PaymentPadunValue = -paymentPadunValue,
+                    Date = atDate,
+                    Description = description
+                });
+
             registryContext.SaveChanges();
         }
 
