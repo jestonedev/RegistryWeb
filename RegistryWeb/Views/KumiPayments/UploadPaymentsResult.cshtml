@@ -183,6 +183,7 @@
                             {
                                 var payment = bindMo.Item2;
                                 <span>@(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</span>
+                                <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" href="/KumiPayments/Details?idPayment=@payment.IdPayment"></a>
                             }
                             else
                             {
@@ -193,6 +194,7 @@
                                     {
                                         var payment = paymentPair.Value;
                                         <span>@(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</span>
+                                        <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" href="/KumiPayments/Details?idPayment=@payment.IdPayment"></a>
                                     }
                                 }
                                 else
@@ -226,6 +228,7 @@
                             {
                                 var payment = bindMo.Item2;
                                 <span>@(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</span>
+                                <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" href="/KumiPayments/Details?idPayment=@payment.IdPayment"></a>
                             }
                             else
                             {
@@ -236,6 +239,7 @@
                                     {
                                         var payment = paymentPair.Value;
                                         <span>@(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")</span>
+                                        <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" href="/KumiPayments/Details?idPayment=@payment.IdPayment"></a>
                                     }
                                 }
                                 else

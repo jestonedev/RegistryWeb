@@ -63,6 +63,7 @@ namespace RegistryWeb.ReportServices
                     { "id_account", invoice.IdAccount },
                     { "--address", invoice.Address },
                     { "--account", invoice.Account },
+                    { "--account-gis-zkh", invoice.AccountGisZkh },
                     { "--tenant", invoice.Tenant },
                     { "--on-date", invoice.OnDate.ToString("dd.MM.yyyy")},
                     { "--balance-input", invoice.BalanceInput },

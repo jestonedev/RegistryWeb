@@ -133,6 +133,7 @@ namespace RegistryWeb.DataServices
                     IdAccount = idAccount,
                     Address = address,
                     Account = account.Account,
+                    AccountGisZkh = account.AccountGisZkh,
                     Tenant = (string.IsNullOrEmpty(account.Owner) ? tenant?.Tenant : account.Owner) ?? "???",
                     OnDate = onDate,
                     BalanceInput = (charge?.InputTenancy + charge?.InputPenalty+ charge?.InputDgi + charge?.InputPkk + charge?.InputPadun).ToString().Replace(',', '.'),

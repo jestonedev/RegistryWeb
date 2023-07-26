@@ -8,6 +8,7 @@ namespace InvoiceGenerator
         public int IdAccount { get; set; }
         public string Address { get; set; }
         public string Account { get; set; }
+        public string AccountGisZkh { get; set; }
         public string Tenant { get; set; }
         public DateTime OnDate { get; set; }
         public string BalanceInput { get; set; }

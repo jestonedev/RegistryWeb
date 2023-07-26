@@ -29,6 +29,7 @@
         return {
             idAccount: $(invoiceWrapper).data("idAccount"),
             account: $(invoiceWrapper).data("account"),
+            accountGisZkh: $(invoiceWrapper).data("accountGisZkh"),
             address: $(invoiceWrapper).data("address"),
             tenant: $(invoiceWrapper).data("tenant"),
             totalArea: $(invoiceWrapper).data("totalArea").toString().replace(".", ","),

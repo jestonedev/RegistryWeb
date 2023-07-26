@@ -21,7 +21,7 @@
                 if (data.state === "Success") {
                     $("#filterModal .rr-search-mo-payment-result").removeClass("d-none");
                     if (data.payments.length > 0) {
-                        var html = "<table class='table table-bordered'><thead><th></th><th>Реквизиты</th><th>Назначение</th></thead><tbody>";
+                        var html = "<table class='table table-bordered'><thead><th></th><th>Реквизиты</th><th class='d-none d-lg-table-cell'>Назначение</th></thead><tbody>";
                         for (var i = 0; i < data.payments.length; i++) {
                             html += "<tr>";
                             html += "<td style='vertical-align: middle'><input type='radio' name='paymentId' value='" + data.payments[i].idPayment + "'></td>";
@@ -52,7 +52,7 @@
 
                             html += "<td><b>Платежный документ:</b> " + requisits +
                                 " <a class='btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn' target='_blank' href='/KumiPayments/Details?idPayment=" + data.payments[i].idPayment+"'></a><br><b>КБК:</b> " + data.payments[i].kbk + "<br><b>Сумма:</b> " + sum + " руб.</td>";
-                            html += "<td style='word-wrap: break-word'>" + data.payments[i].purpose + "</td>";
+                            html += "<td class='d-none d-lg-table-cell'><div class='rr-payment-purpose rr-bind-mo-payment-purpose'>" + data.payments[i].purpose + "</div></td>";
                             html += "</tr>";
                         }
                         html += "</tbody></table>";

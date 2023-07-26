@@ -486,5 +486,10 @@ namespace RegistryDb.Models
         {
             return KumiAccountActualTenancyProcessSearchInfos.Where(r => idAccounts.Contains(r.IdAccount)).ToList();
         }
+
+        public List<KumiAccountActualTenancyProcessSearchInfo> GetAccountIdsWithEmail()
+        {
+            return KumiAccountActualTenancyProcessSearchInfos.Where(r => r.Emails != null).ToList();
+        }
     }
 }

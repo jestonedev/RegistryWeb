@@ -40,7 +40,7 @@ namespace InvoiceGenerator
             html += "<p>ОТДЕЛЕНИЕ ИРКУТСКА БАНКА РОССИИ//УФК ПО ИРКУТСКОЙ ОБЛАСТИ г Иркутск</p>";
             html += "<p>Ед. каз. счет 40102810145370000026 КБК 901 1 11 09044 04 1000 120 ОКТМО 25714000</p>";
             html += string.Format("<p>Адрес: <b>{0}</b></p>", invoice.Address);
-            html += string.Format("<p>Лиц. счет: <b class=\"account\">{0}</b> ЕЛС ГИС ЖКХ:</p>", invoice.Account);
+            html += string.Format("<p>Лиц. счет: <b class=\"account\">{0}</b> ЕЛС ГИС ЖКХ: <b>{1}</b></p>", invoice.Account, invoice.AccountGisZkh);
             html += string.Format("<p>Потребитель: <b class=\"tenant\">{0}</b></p>", invoice.Tenant);
 
             html += "<table class=\"money-table\">";

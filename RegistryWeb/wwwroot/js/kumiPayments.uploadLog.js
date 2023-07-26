@@ -6,10 +6,9 @@
         var idOrder = $(this).data("idOrder");
         var requisits = $(this).data("requisits");
         var sum = $(this).data("sum");
+        modal.find("#filterClearModalBtn").click();
         modal.find("#FilterOptions_Sum").val(sum);
         modal.find(".modal-title").text("Поиск платежа для связки с ордером " + requisits);
-        modal.find("#bindModalBtn").addClass("d-none");
-        $("#filterModal .rr-search-mo-payment-result, #filterModal .rr-search-mo-payment-error").html("").addClass("d-none");
         modal.data("idOrder", idOrder);
         modal.modal('show');
         modal.find("#searchModalBtn").click();

@@ -42,6 +42,10 @@
     .rr-payment-purpose {
         width: 350px;
     }
+
+    .rr-payment-purpose.rr-bind-mo-payment-purpose {
+        width: 400px;
+    }
 }
 
 @media(min-width: 1200px) {
@@ -51,6 +55,10 @@
 
     .rr-payment-purpose.rr-distribute-form-payment-purpose {
         width: 450px;
+    }
+
+    .rr-payment-purpose.rr-bind-mo-payment-purpose {
+        width: 600px;
     }
 }
 

@@ -1853,18 +1853,14 @@ namespace RegistryWeb.DataServices
         public Dictionary<int, List<string>> GetTenantsEmails(List<KumiAccount> accounts)
         {
             var emailsDic = new Dictionary<int, List<string>>();
+            var emailsInfo = registryContext.GetTenantsByAccountIds(accounts.Select(r => r.IdAccount).ToList());
             foreach (var account in accounts)
             {
-                var processes = account.AccountsTenancyProcessesAssoc.Select(r => r.IdProcess);
-
+                var emailsStr = emailsInfo.FirstOrDefault(r => r.IdAccount == account.IdAccount)?.Emails;
                 List<string> emails = new List<string>();
-                foreach (var tp in processes)
+                if (!string.IsNullOrEmpty(emailsStr))
                 {
-                    var curEmails = registryContext.TenancyPersons
-                        .Where(per => per.IdProcess == tp && per.Email != null)
-                        .Select(per => per.Email)
-                        .ToList();
-                    emails.AddRange(curEmails);
+                    emails.AddRange(emailsStr.Split(','));
                 }
                 emails = emails.Distinct().ToList();
                 emailsDic.Add(account.IdAccount, emails);
@@ -2325,10 +2321,7 @@ namespace RegistryWeb.DataServices
             {
                 return query;
             }
-            var idAccounts = registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons).Include(tp => tp.AccountsTenancyProcessesAssoc)
-                    .Where(r => r.AnnualDate == null && r.TenancyPersons.Count(p => p.Email != null && p.ExcludeDate == null) > 0
-                            && r.AccountsTenancyProcessesAssoc.Count() > 0)
-                    .SelectMany(r => r.AccountsTenancyProcessesAssoc.Select(atpa => atpa.IdAccount));
+            var idAccounts = registryContext.GetAccountIdsWithEmail().Select(r => r.IdAccount);
 
 
             query = query.Where(r => idAccounts.Contains(r.IdAccount));
