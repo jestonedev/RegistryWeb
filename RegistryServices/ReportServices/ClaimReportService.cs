@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using RegistryDb.Models;
 using RegistryWeb.SecurityServices;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,13 @@ namespace RegistryWeb.ReportServices
 {
     public class ClaimReportService : ReportService
     {
+        private readonly RegistryContext registryContext;
         private readonly SecurityService securityService;
 
-        public ClaimReportService(IConfiguration config, IHttpContextAccessor httpContextAccessor, SecurityService securityService) : base(config, httpContextAccessor)
+        public ClaimReportService(RegistryContext registryContext, IConfiguration config, 
+            IHttpContextAccessor httpContextAccessor, SecurityService securityService) : base(config, httpContextAccessor)
         {
+            this.registryContext = registryContext;
             this.securityService = securityService;
         }
 
@@ -363,6 +367,23 @@ namespace RegistryWeb.ReportServices
             var fileName = "registry\\kumi_accounts\\balance_for_period";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
+        }
+
+        public byte[] SberbankFile(DateTime startDate)
+        {
+            var destFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", Guid.NewGuid().ToString() + ".csv");
+            if (!File.Exists(destFile)) File.Create(destFile).Close();
+
+            var rows = registryContext.GetSberbankFileRows(startDate);
+
+            var csv = "";
+            foreach(var row in rows)
+            {
+                csv +=  row.Account + ";" + row.Tenant + ";" + row.Address + ";" + row.Kbk + ";" + row.Okato + ";" + row.Sum + "\r\n";
+            }
+            File.WriteAllText(destFile, csv);
+            
+            return DownloadFile(new FileInfo(destFile).Name);
         }
     }
 }

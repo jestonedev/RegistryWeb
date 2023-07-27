@@ -326,6 +326,7 @@
                 standartWrapper.show();
                 break;
             case "BalanceForPeriod":
+            case "SberbankFile":
                 balanceWrapper.show();
                 break;
         }
@@ -365,6 +366,7 @@
                 url += "startDate=" + startDate + "&endDate=" + endDate;
                 break;
             case "BalanceForPeriod":
+            case "SberbankFile":
                 startDate = form.find("[name='StDate_Year']").val() + "-" + form.find("[name='StDate_Month']").val() + "-01";
                 url += "startDate=" + startDate;
                 break;

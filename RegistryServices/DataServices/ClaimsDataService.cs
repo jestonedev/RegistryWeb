@@ -503,7 +503,7 @@ namespace RegistryWeb.DataServices
                 {
                     Address = filterOptions.Address,
                     IdStreet = filterOptions.IdStreet,
-                    IdRegions = new List<string> { filterOptions.IdRegion },
+                    IdRegions = filterOptions.IdRegion != null ? new List<string> { filterOptions.IdRegion } : new List<string>(),
                     IdBuilding = filterOptions.IdBuilding,
                     IdPremises = filterOptions.IdPremises,
                     IdSubPremises = filterOptions.IdSubPremises,
