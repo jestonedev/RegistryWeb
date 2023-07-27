@@ -96,6 +96,79 @@
         e.preventDefault();
     });
 
+    $("#AccountKumiChargeCorrection_idAccountMirrorVisible").on("input", function () {
+        $("#AccountKumiChargeCorrection_idAccountMirror").val("");
+    });
+
+    $("#AccountKumiChargeCorrection_idAccountMirrorVisible").on("focusout", function () {
+        if ($('#AccountKumiChargeCorrection_idAccountMirror').val() === "")
+            $('#AccountKumiChargeCorrection_idAccountMirrorVisible').val("");
+    });
+
+    $("#AccountKumiChargeCorrection_idAccountMirrorVisible").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + '/Claims/GetAccounts',
+                dataType: 'json',
+                data: { text: request.term, type: "KUMI", excludeAnnual: true },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        let account = { label: item.account, value: item.account, idAccount: item.idAccount };
+                        if (data.length === 1) {
+                            $("#AccountKumiChargeCorrection_idAccountMirror").val(account.idAccount);
+                            $("#AccountKumiChargeCorrection_idAccountMirrorVisible").val(account.value);
+                        }
+                        return account;
+                    }));
+                }
+            });
+        },
+        select: function (event, ui) {
+            $("#AccountKumiChargeCorrection_idAccountMirror").val(ui.item.idAccount);
+            $("#AccountKumiChargeCorrection_idAccountMirrorVisible").val(ui.item.value);
+        },
+        minLength: 3,
+        appendTo: "#accountAddCorrectionModal"
+    });
+
+    function kumiAccountCustomValidations(validator) {
+        var isValid = true;
+        var isNotZero = false;
+        var accountKumi = $("#AccountKumiChargeCorrection_idAccountMirrorVisible");
+        var paymentsList = $("input[name*='Payment']");
+
+        accountKumi.val($.trim(accountKumi.val()));
+        paymentsList.each(function (idx, elem) {
+            if (elem.value !== "0.00" && elem.value !== "0,00") {
+                isNotZero = true;
+                return false;
+            }
+        });
+
+        if (accountKumi.val() === "" && isNotZero) {
+            let error = {};
+            error[accountKumi.attr("name")] = "Введите номер лицевого счета";
+            $("#Span_idAccountMirrorVisible").html(error[accountKumi.attr("name")]);
+            validator.element(accountKumi);
+            validator.showErrors(error);
+            isValid = false;
+        }
+        else {
+            clearValidationError(accountKumi);
+            accountKumi.removeClass("input-validation-error");
+            removeErrorFromValidator(validator, accountKumi);
+            $("#Span_idAccountMirrorVisible").html("");
+        }
+
+        return isValid;
+    }
+
+    $("#AccountKumiChargeCorrection_idAccountMirrorVisible, #AccountKumiChargeCorrection_PaymentTenancyValue, #AccountKumiChargeCorrection_PaymentPenaltyValue, #AccountKumiChargeCorrection_PaymentDgiValue, #AccountKumiChargeCorrection_PaymentPkkValue, #AccountKumiChargeCorrection_PaymentPadunValue").on("change", function () {
+        var validator = $("#accountAddCorrectionForm").validate();
+        kumiAccountCustomValidations(validator);
+    });
+
     $("#accountAddCorrectionForm .rr-report-submit").on("click", function (e) {
         addChargeCorrectionForm.find(".rr-recalc-account-error").addClass("d-none");
         var tenancyValueElem = addChargeCorrectionForm.find("#AccountKumiChargeCorrection_TenancyValue");
@@ -155,19 +228,29 @@
             if (paymentPadunValueElem.length > 0)
                 paymentPadunValue = paymentPadunValueElem.val().replace('.', ',');
             var idAccount = addChargeCorrectionForm.find("input[name='AccountKumiChargeCorrection.IdAccount']").val();
+            var idAccountMirror = addChargeCorrectionForm.find("input[name='AccountKumiChargeCorrection.idAccountMirror']").val();
 
-            $.ajax({
-                type: 'POST',
-                url: window.location.origin + '/KumiAccounts/AddChargeCorrection',
-                data: {
-                    idAccount, atDate, tenancyValue, penaltyValue, dgiValue, pkkValue, padunValue,
-                    paymentTenancyValue, paymentPenaltyValue, paymentDgiValue, paymentPkkValue, paymentPadunValue, description
-                },
-                dataType: 'json',
-                success: function () {
-                    recalcAccounts([idAccount], [], 0, null, null, false);
-                }
-            });
+
+            var validator = addChargeCorrectionForm.validate();
+            var isFormValid = addChargeCorrectionForm.valid();
+
+            if (kumiAccountCustomValidations(validator))
+                isFormValid = false;
+
+            if (!isFormValid)
+                $.ajax({
+                    type: 'POST',
+                    url: window.location.origin + '/KumiAccounts/AddChargeCorrection',
+                    data: {
+                        idAccount, atDate, tenancyValue, penaltyValue, dgiValue, pkkValue, padunValue,
+                        paymentTenancyValue, paymentPenaltyValue, paymentDgiValue, paymentPkkValue, paymentPadunValue, description, idAccountMirror
+                    },
+                    dataType: 'json',
+                    success: function () {
+                        var idAccountsList = idAccountMirror !== "" ? [idAccount, idAccountMirror] : [idAccount];
+                        recalcAccounts(idAccountsList, [], 0, null, null, false);
+                    }
+                });
         } else {
             fixBootstrapSelectHighlight(addChargeCorrectionForm);
         }

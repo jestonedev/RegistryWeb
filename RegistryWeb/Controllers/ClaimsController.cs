@@ -195,9 +195,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetAccounts(string text, string type)
+        public JsonResult GetAccounts(string text, string type, bool excludeAnnual)
         {
-            var accounts = dataService.GetAccounts(text, type);
+            var accounts = dataService.GetAccounts(text, type, excludeAnnual);
             return Json(accounts.Select(pa => new {
                 pa.IdAccount,
                 pa.Account

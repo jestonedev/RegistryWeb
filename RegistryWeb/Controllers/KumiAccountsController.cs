@@ -275,13 +275,13 @@ namespace RegistryWeb.Controllers
             decimal dgiValue, decimal pkkValue, decimal padunValue,
             decimal paymentTenancyValue, decimal paymentPenaltyValue, 
             decimal paymentDgiValue, decimal paymentPkkValue, decimal paymentPadunValue,
-            DateTime atDate, string description)
+            DateTime atDate, string description, int? idAccountMirror)
         {
             try
             {
                 dataService.AddChargeCorrection(idAccount, tenancyValue, penaltyValue, dgiValue, pkkValue, padunValue,
                     paymentTenancyValue, paymentPenaltyValue, paymentDgiValue, paymentPkkValue, paymentPadunValue,
-                    atDate, description);
+                    atDate, description, idAccountMirror);
                 return Json(new
                 {
                     State = "Success"

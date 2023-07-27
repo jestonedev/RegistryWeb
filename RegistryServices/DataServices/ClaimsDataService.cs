@@ -570,13 +570,14 @@ namespace RegistryWeb.DataServices
                 .FirstOrDefault(a => a.IdAccount == idAccount);
         }
 
-        public IList<AccountBase> GetAccounts(string text, string type)
+        public IList<AccountBase> GetAccounts(string text, string type, bool excludeAnnual)
         {
             if (type == "BKS")
                 return registryContext.PaymentAccounts.Where(pa => pa.Account.Contains(text)).Take(100).Select(r => (AccountBase)r).ToList();
             else
             if (type == "KUMI")
-                return registryContext.KumiAccounts.Where(pa => pa.Account.Contains(text)).Take(100).Select(r => (AccountBase)r).ToList();
+                return registryContext.KumiAccounts.Where(pa => pa.Account.Contains(text) && (!excludeAnnual || pa.IdState != 2))
+                    .Take(100).Select(r => (AccountBase)r).ToList();
             return null;
         }
 
