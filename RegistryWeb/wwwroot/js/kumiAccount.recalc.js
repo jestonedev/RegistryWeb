@@ -549,4 +549,22 @@
             }
         });
     }
+    
+    $("#OpenPenaltyCalc").on("click", function (e) {
+        e.preventDefault();
+        var form = $("form[name='OpenPenaltyCalculatorForm']");
+        var idAccount = $("#accountForm #IdAccount").val();
+        form.find("input[name='IdAccount']").val(idAccount);
+        form.find("input").prop("disabled", "");
+        var modal = form.find("#OpenPenaltyCalculatorModal");
+        modal.modal("show");
+    });
+
+    $("form[name='OpenPenaltyCalculatorForm'] .rr-report-submit").on("click", function () {
+        var form = $(this).closest("form");
+        if (form.valid()) {
+            downloadFile(form.attr("action") + "/?" + form.serialize());
+            form.find("#OpenPenaltyCalculatorModal").modal('hide');
+        }
+    });
 });

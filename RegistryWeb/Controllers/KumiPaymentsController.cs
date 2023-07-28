@@ -367,27 +367,27 @@ namespace RegistryWeb.Controllers
                         r.StartDeptPeriod,
                         r.EndDeptPeriod,
 
-                        AccountCurrentBalanceTenancy = (r.IdAccountKumiNavigation.LastChargeDate >= DateTime.Now.Date) ? 
+                        AccountCurrentBalanceTenancy = (r.IdAccountKumiNavigation.LastChargeDate > DateTime.Now.Date) ? 
                                 (r.IdAccountKumiNavigation.CurrentBalanceTenancy - (r.IdAccountKumiNavigation.Charges
                                 .FirstOrDefault(c => c.EndDate == r.IdAccountKumiNavigation.LastChargeDate)?.ChargeTenancy ?? 0)) : 
                                 r.IdAccountKumiNavigation.CurrentBalanceTenancy,
-                        AccountCurrentBalancePenalty = (r.IdAccountKumiNavigation.LastChargeDate >= DateTime.Now.Date) ? 
+                        AccountCurrentBalancePenalty = (r.IdAccountKumiNavigation.LastChargeDate > DateTime.Now.Date) ? 
                                 (r.IdAccountKumiNavigation.CurrentBalancePenalty - (r.IdAccountKumiNavigation.Charges
                                 .FirstOrDefault(c => c.EndDate == r.IdAccountKumiNavigation.LastChargeDate)?.ChargePenalty ?? 0)) : 
                                 r.IdAccountKumiNavigation.CurrentBalancePenalty,
-                        AccountCurrentBalanceDgi = (r.IdAccountKumiNavigation.LastChargeDate >= DateTime.Now.Date) ? 
+                        AccountCurrentBalanceDgi = (r.IdAccountKumiNavigation.LastChargeDate > DateTime.Now.Date) ? 
                                 (r.IdAccountKumiNavigation.CurrentBalanceDgi - (r.IdAccountKumiNavigation.Charges
                                 .FirstOrDefault(c => c.EndDate == r.IdAccountKumiNavigation.LastChargeDate)?.ChargeDgi ?? 0)) : 
                                 r.IdAccountKumiNavigation.CurrentBalanceDgi,
-                        AccountCurrentBalancePkk = (r.IdAccountKumiNavigation.LastChargeDate >= DateTime.Now.Date) ? 
+                        AccountCurrentBalancePkk = (r.IdAccountKumiNavigation.LastChargeDate > DateTime.Now.Date) ? 
                                 (r.IdAccountKumiNavigation.CurrentBalancePkk - (r.IdAccountKumiNavigation.Charges
                                 .FirstOrDefault(c => c.EndDate == r.IdAccountKumiNavigation.LastChargeDate)?.ChargePkk ?? 0)) : 
                                 r.IdAccountKumiNavigation.CurrentBalancePkk,
-                        AccountCurrentBalancePadun = (r.IdAccountKumiNavigation.LastChargeDate >= DateTime.Now.Date) ? 
+                        AccountCurrentBalancePadun = (r.IdAccountKumiNavigation.LastChargeDate > DateTime.Now.Date) ? 
                                 (r.IdAccountKumiNavigation.CurrentBalancePadun - (r.IdAccountKumiNavigation.Charges
                                 .FirstOrDefault(c => c.EndDate == r.IdAccountKumiNavigation.LastChargeDate)?.ChargePadun ?? 0)) : 
                                 r.IdAccountKumiNavigation.CurrentBalancePadun,
-                        AccountCurrentBalanceExcludeCharge = r.IdAccountKumiNavigation.LastChargeDate >= DateTime.Now.Date,
+                        AccountCurrentBalanceExcludeCharge = r.IdAccountKumiNavigation.LastChargeDate > DateTime.Now.Date,
                         AccountLastChargeDate = r.IdAccountKumiNavigation.LastChargeDate,
 
                         CourtOrderNum = r.ClaimStates.FirstOrDefault(cs => cs.IdStateType == 4 && cs.CourtOrderNum != null) == null ? null :
@@ -414,17 +414,17 @@ namespace RegistryWeb.Controllers
                         r.State.State,
                         r.State.IdState,
                         r.LastChargeDate,
-                        CurrentBalanceTenancy = (r.LastChargeDate >= DateTime.Now.Date) ? (r.CurrentBalanceTenancy - (r.Charges
+                        CurrentBalanceTenancy = (r.LastChargeDate > DateTime.Now.Date) ? (r.CurrentBalanceTenancy - (r.Charges
                                 .FirstOrDefault(c => c.EndDate == r.LastChargeDate)?.ChargeTenancy ?? 0)) : r.CurrentBalanceTenancy,
-                        CurrentBalancePenalty = (r.LastChargeDate >= DateTime.Now.Date) ? (r.CurrentBalancePenalty - (r.Charges
+                        CurrentBalancePenalty = (r.LastChargeDate > DateTime.Now.Date) ? (r.CurrentBalancePenalty - (r.Charges
                                 .FirstOrDefault(c => c.EndDate == r.LastChargeDate)?.ChargePenalty ?? 0)) : r.CurrentBalancePenalty,
-                        CurrentBalanceDgi = (r.LastChargeDate >= DateTime.Now.Date) ? (r.CurrentBalanceDgi - (r.Charges
+                        CurrentBalanceDgi = (r.LastChargeDate > DateTime.Now.Date) ? (r.CurrentBalanceDgi - (r.Charges
                                 .FirstOrDefault(c => c.EndDate == r.LastChargeDate)?.ChargeDgi ?? 0)) : r.CurrentBalanceDgi,
-                        CurrentBalancePkk = (r.LastChargeDate >= DateTime.Now.Date) ? (r.CurrentBalancePkk - (r.Charges
+                        CurrentBalancePkk = (r.LastChargeDate > DateTime.Now.Date) ? (r.CurrentBalancePkk - (r.Charges
                                 .FirstOrDefault(c => c.EndDate == r.LastChargeDate)?.ChargePkk ?? 0)) : r.CurrentBalancePkk,
-                        CurrentBalancePadun = (r.LastChargeDate >= DateTime.Now.Date) ? (r.CurrentBalancePadun - (r.Charges
+                        CurrentBalancePadun = (r.LastChargeDate > DateTime.Now.Date) ? (r.CurrentBalancePadun - (r.Charges
                                 .FirstOrDefault(c => c.EndDate == r.LastChargeDate)?.ChargePadun ?? 0)) : r.CurrentBalancePadun,
-                        CurrentBalanceExcludeCharge = r.LastChargeDate >= DateTime.Now.Date,
+                        CurrentBalanceExcludeCharge = r.LastChargeDate > DateTime.Now.Date,
                         Tenant = kumiAccountsDataService.GetTenantByIdAccount(r.IdAccount)
                     })
                 });

@@ -35,7 +35,7 @@ namespace RegistryPaymentsLoader.TffFileLoaders
                 for (var j = 0; j <= sheet.LastRowNum; j++)
                 {
                     var row = sheet.GetRow(j);
-                    if (row.Cells.Count < 6) continue;
+                    if (row == null || row.Cells.Count < 6) continue;
                     var account = "";
                     try
                     {
