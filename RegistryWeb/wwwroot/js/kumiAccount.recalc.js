@@ -139,12 +139,14 @@
         var paymentsList = $("input[name*='Payment']");
 
         accountKumi.val($.trim(accountKumi.val()));
-        paymentsList.each(function (idx, elem) {
-            if (elem.value !== "0.00" && elem.value !== "0,00") {
-                isNotZero = true;
-                return false;
-            }
-        });
+        var sum = paymentsList.map(
+            function (idx, elem) {
+                return parseFloat($(elem).val().replace(",", "."));
+            }).toArray().reduce(
+            function (acc, val) {
+                return acc + val;
+            });
+        isNotZero = Math.round(sum * 100) / 100 !== 0;
 
         if (accountKumi.val() === "" && isNotZero) {
             let error = {};

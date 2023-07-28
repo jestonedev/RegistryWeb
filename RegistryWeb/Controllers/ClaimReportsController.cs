@@ -22,6 +22,7 @@ namespace RegistryWeb.Controllers
         private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
         private const string xlsxMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private const string docxMime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        private const string csvMime = "text/csv";
 
         public ClaimReportsController(ClaimReportService reportService, ClaimReportsDataService dataService, SecurityService securityService,
              ClaimsDataService claimsDataService)
@@ -407,7 +408,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetUkInvoiceAggKumi()
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+            if (!securityService.HasPrivilege(Privileges.AccountsRead))
                 return View("NotAccess");
 
             try
@@ -423,7 +424,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetUkInvoiceDetailsKumi()
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+            if (!securityService.HasPrivilege(Privileges.AccountsRead))
                 return View("NotAccess");
 
             try
@@ -439,7 +440,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPaymentsForPeriod(DateTime startDate, DateTime endDate)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+            if (!securityService.HasPrivilege(Privileges.AccountsRead))
                 return View("NotAccess");
 
             try
@@ -455,7 +456,7 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetBalanceForPeriod(DateTime startDate)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+            if (!securityService.HasPrivilege(Privileges.AccountsRead))
                 return View("NotAccess");
 
             try
@@ -465,6 +466,26 @@ namespace RegistryWeb.Controllers
 
                 var file = reportService.BalanceForPeriod(paymentDate);
                 return File(file, odsMime, string.Format("Начисления ЛС КУМИ за период {0}-{1}.ods", startDate.ToString("dd.MM.yyyy"), paymentDate.ToString("dd.MM.yyyy")));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetSberbankFile(DateTime startDate)
+        {
+            if (!securityService.HasPrivilege(Privileges.AccountsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var paymentDate = new DateTime(startDate.Year, startDate.Month, 1);
+                paymentDate = paymentDate.AddMonths(1).AddDays(-1);
+
+                var file = reportService.SberbankFile(paymentDate);
+                var monthStr = (startDate.Month < 10 ? "0"  : "") + startDate.Month.ToString();
+                return File(file, csvMime, string.Format("18018001_3803201800_40101810900000010001_{0}_y{1}.csv", monthStr, (startDate.Year % 100).ToString()));
             }
             catch (Exception ex)
             {
