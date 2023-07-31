@@ -23,7 +23,8 @@
 @section Scripts {
     <script src="~/js/kumiAccount.common.js" asp-append-version="true"></script>
     <script src="~/js/kumiAccount.recalc.js" asp-append-version="true"></script>
-    <script src="~/js/kumiAccount.reports.js" asp-append-version="true"></script>}
+    <script src="~/js/kumiAccount.reports.js" asp-append-version="true"></script>
+}
 <div class="card">
     <div class="card-header d-flex flex-column flex-lg-row">
         <label class="form-check-label h2 col-sm-12 col-lg-6 col-xl-7 pl-0" title="@ViewData["Title"]"
@@ -520,24 +521,28 @@
                     }
 
                     <div class="btn-group" role="group">
-                        <a href="#" id="CopyChargesToClipboard" class="form-control btn btn-dark">
+                        <a href="#" id="OpenPenaltyCalc" title="Открыть калькулятор пени" class="form-control btn btn-info">
+                            <span style="top: 2px;" class="oi oi-list"></span>
+                        </a>
+                     
+                        <a href="#" id="CopyChargesToClipboard" title="Скопировать в буфер обмена" class="form-control btn btn-dark">
                             <span style="top: 2px;" class="oi oi-clipboard"></span>
                         </a>
                         
                         @if (Model.IdState == 2)
                         {
-                            <a asp-controller="KumiAccounts" target="_blank" asp-action="ChargeCorrectionsList" asp-route-idAccount="@Model.IdAccount" class="form-control btn btn-warning">
+                            <a asp-controller="KumiAccounts" target="_blank" title="Просмотреть список корректировок" asp-action="ChargeCorrectionsList" asp-route-idAccount="@Model.IdAccount" class="form-control btn btn-warning">
                                 <span style="top: 2px;" class="oi oi-pencil"></span>
                             </a>
                         }
                         else
                         {
-                            <a href="#" id="AddChargeCorrectionBtn" class="form-control btn btn-warning">
+                            <a href="#" id="AddChargeCorrectionBtn" title="Добавить корректировку" class="form-control btn btn-warning">
                                 <span style="top: 2px;" class="oi oi-pencil"></span>
                             </a>
                         }
 
-                        <a href="#" id="AccountRecalcBtn" class="form-control btn btn-success @(Model.IdState == 2 ? "disabled" : "")">
+                        <a href="#" id="AccountRecalcBtn" title="Выполнить перерасчет" class="form-control btn btn-success @(Model.IdState == 2 ? "disabled" : "")">
                             <span style="top: 2px;" class="oi oi-calculator"></span>
                         </a>
                         <a href="#" data-for="Charges" class="form-control btn btn-primary account-toggler" title="Развернуть панель сведений о начислениях" style="font-weight:bold;">∧</a>

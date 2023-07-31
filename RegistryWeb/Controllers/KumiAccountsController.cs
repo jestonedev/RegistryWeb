@@ -127,6 +127,14 @@ namespace RegistryWeb.Controllers
                 account = dataService.GetKumiAccount(idAccount.Value, true);
                 if (account == null)
                     return NotFound();
+            } else
+            {
+                while (true)
+                {
+                    account.Account = dataService.GetNextKumiAccountNumber();
+                    if (!dataService.AccountExists(account.Account))
+                        break;
+                }
             }
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.Action = action;
@@ -399,6 +407,11 @@ namespace RegistryWeb.Controllers
             ViewBag.AtDate = atDate;
             ViewBag.ReturnUrl = returnUrl;
             return View("ActCharge", actChargeVMs);
+        }
+
+        public IActionResult OpenPenaltyCalculator(int idAccount, DateTime? startDate, DateTime? endDate)
+        {
+            return RedirectPermanent("/wwwroot/peni_calc/mcalc.html#"+dataService.GetUrlForPenaltyCalculator(idAccount, startDate, endDate));
         }
     }
 }
