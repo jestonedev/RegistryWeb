@@ -1,0 +1,128 @@
+.urist-item {
+	overflow: hidden;
+	margin-top:12px;
+}
+
+.p-info {
+	width:330px;
+	float:left;
+	margin-top:6px;
+}
+
+.p-image {
+
+	padding: 4px;
+	border: 1px solid #ccc;
+	margin: 0 6px 6px 0;
+	background: white;
+	position: relative;
+}
+
+.p-left {
+	float:left;
+}
+
+.p-image .p-im {
+	position: absolute;
+	bottom:6px;
+	left:6px;
+	background: rgba(255,255,255,0.5);
+	border-radius: 2px;
+	border: 1px solid #ccc;
+	padding: 1px;
+}
+
+.p-image img {
+
+
+}
+
+.j-name {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.p-stats {
+	margin-top:4px;
+}
+
+
+
+.p-stats td {
+	padding:2px;
+}
+
+.j-city, .j-rating {
+	font-size: 14px;
+}
+
+.j-rating, .j-options {
+	margin-top:4px;
+}
+
+.jurist-page td {
+	padding: 4px;
+	font-size: 14px;
+}
+
+/*.jurist-page td.label {
+	width:150px;
+}*/
+
+.jurist-page table {
+	margin: 4px 0 0 8px;
+}
+
+.jurist-page h2 {
+	background: none;
+	border-bottom: 1px solid #DFDEDE;
+	color: #990000;
+	font-size: 16px;
+	font-weight: bold;
+	padding: 4px 10px;;
+}
+
+.p-stats td {
+	font-size:12px;
+}
+
+.jurist-page .p-stats table {
+	margin-top:0;
+}
+
+.jurist-page .p-image {
+	margin-top: 4px;
+}
+
+.jur-menu {
+	padding-left:4px;
+}
+
+.jur-menu a.letter {
+	background: url("letter2.png") no-repeat;
+	padding-left: 20px;
+	font-size: 14px;
+}
+
+.num-box {
+	position: absolute;
+	right:2px;
+	bottom:4px;
+	top:4px;
+	border: #90abc7 solid 1px;
+	padding: 4px 12px;
+	border-radius: 2px;
+	background: #E1E7ED;
+	color: #45688E;
+	font-weight: bold;
+}
+
+a:hover .num-box, .user-menu li.selected .num-box {
+	background: #475c8e;
+	color: #fff;
+	border: #99a4bd solid 1px;
+}
+
+.user-menu li {
+	position: relative;
+}
