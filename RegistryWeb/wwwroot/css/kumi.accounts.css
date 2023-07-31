@@ -97,3 +97,13 @@
 .rr-tenancy-type-selectors label {
     cursor: pointer;
 }
+
+.dopinfo-alt {
+    color: #212529;
+    font-size: 75%;
+}
+
+.dopinfo {
+    color: #888;
+    font-size: 75%;
+}
