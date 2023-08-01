@@ -1230,12 +1230,12 @@ namespace RegistryWeb.DataServices
                 if (aggCharges.Any())
                 {
                     var dbCharge = accountInfo.Charges.Where(r => r.StartDate <= sliceDate).OrderByDescending(r => r.StartDate).FirstOrDefault();
-                    if (dbCharge != null)
+                    if (dbCharge != null && dbCharge.InputTenancy - dbCharge.PaymentTenancy > 0)
                     {
                         resultChargesInfo.Add(new KumiSumDateInfo
                         {
                             Date = sliceDate,
-                            Value = dbCharge.InputTenancy
+                            Value = dbCharge.InputTenancy-dbCharge.PaymentTenancy
                         });
                         resultChargesInfo = resultChargesInfo.OrderBy(r => r.Date).ToList();
                     }
@@ -1362,12 +1362,12 @@ namespace RegistryWeb.DataServices
             if (aggCharges.Any())
             {
                 var dbCharge = dbCharges.Where(r => r.StartDate <= sliceDate).OrderByDescending(r => r.StartDate).FirstOrDefault();
-                if (dbCharge != null)
+                if (dbCharge != null && dbCharge.InputTenancy - dbCharge.PaymentTenancy > 0)
                 {
                     resultChargesInfo.Add(new KumiSumDateInfo
                     {
                         Date = sliceDate,
-                        Value = dbCharge.InputTenancy
+                        Value = dbCharge.InputTenancy-dbCharge.PaymentTenancy
                     });
                     resultChargesInfo = resultChargesInfo.OrderBy(r => r.Date).ToList();
                 }
