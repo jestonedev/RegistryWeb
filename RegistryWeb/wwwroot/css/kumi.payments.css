@@ -132,3 +132,8 @@
 #RunMassPaymentDistribution, #StopMassPaymentDistribution {
     overflow: hidden;
 }
+
+.dopinfo {
+    color: #888;
+    font-size: 75%;
+}

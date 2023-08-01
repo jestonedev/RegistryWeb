@@ -690,6 +690,7 @@ namespace RegistryWeb.Controllers
 
                 ViewBag.MemorialOrderPayments = dataService.GetPaymentsByOrders(orders);
                 ViewBag.KbkDescriptions = dataService.KbkDescriptions;
+                ViewBag.AccountsTenants = dataService.GetAccountsTenants(loadstate.AutoDistributedPayments.Select(r => r.Item2));
 
                 ViewBag.FilterOptionsVm = dataService.InitializeViewModel(null, null, null);
 

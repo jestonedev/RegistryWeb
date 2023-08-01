@@ -733,6 +733,20 @@ namespace RegistryWeb.DataServices
             };
         }
 
+        public Dictionary<int, string> GetAccountsTenants(IEnumerable<KumiAccount> accounts)
+        {
+            var tenants = registryContext.GetTenantsByAccountIds(accounts.Select(r => r.IdAccount).ToList());
+            var result = new Dictionary<int, string>();
+            foreach (var account in accounts)
+            {
+                var tenant = account.Owner;
+                if (string.IsNullOrWhiteSpace(tenant))
+                    tenant = tenants.FirstOrDefault(r => r.IdAccount == account.IdAccount)?.Tenant;
+                result.Add(account.IdAccount, tenant);
+            }
+            return result;
+        }
+
         public List<RegistryTuple<KumiPayment, KumiAccount>> AutoDistributeUploadedPayments(List<KumiPayment> insertedPayments)
         {
             var filteredPaymentsInfo = AutoDistributeFilterPayments(insertedPayments);

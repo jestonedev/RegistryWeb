@@ -808,7 +808,7 @@ namespace RegistryWeb.DataServices
                 // Если в БД есть начисления, которые не попали под перезапись, то берем сальдо из него
                 if (prevCharge != null)
                 {
-                    if (lastDbLockedCharge.StartDate >= prevCharge.StartDate)
+                    if (lastDbLockedCharge.StartDate >= prevCharge.StartDate || prevCharge.EndDate < startRewriteDate)
                     {
                         charge.InputTenancy = lastDbLockedCharge.OutputTenancy;
                         charge.InputPenalty = lastDbLockedCharge.OutputPenalty;

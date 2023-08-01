@@ -304,6 +304,8 @@
 
 @if (Model.AutoDistributedPayments.Count > 0)
 {
+    var accountTenants = (Dictionary<int, string>)ViewBag.AccountsTenants;
+
     <h3 class="text-success">Автоматически распределенные платежи</h3>
     <table class="table table-bordered mb-3">
         <thead>
@@ -319,11 +321,20 @@
             {
                 var payment = paymentAccountPair.Item1;
                 var account = paymentAccountPair.Item2;
+                var tenant = (string)null;
+                if (accountTenants.ContainsKey(account.IdAccount))
+                {
+                    tenant = accountTenants[account.IdAccount];
+                }
                 <tr>
                     <td>
                         @(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")
                         <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" href="/KumiPayments/Details?idPayment=@payment.IdPayment"></a>
-                    </td>
+                        
+                        <div class="rr-payment-purpose dopinfo">
+                            @payment.Purpose
+                        </div>
+                        </td>
                     <td>
                         @payment.Sum руб.
                     </td>
@@ -332,6 +343,10 @@
                     </td>
                     <td>
                         № @account.Account <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" href="/KumiAccounts/Details?idAccount=@account.IdAccount"></a>
+                        @if (tenant != null)
+                        {
+                            <div class="dopinfo">@tenant</div>
+                        }
                     </td>
                 </tr>
             }
