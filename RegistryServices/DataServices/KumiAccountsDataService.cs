@@ -21,6 +21,7 @@ using RegistryDb.Models.Entities.Common;
 using RegistryServices.Models.KumiAccounts;
 using RegistryWeb.DataHelpers;
 using RegistryServices.Classes;
+using RegistryDb.Models.Entities.Payments;
 
 namespace RegistryWeb.DataServices
 {
@@ -784,14 +785,17 @@ namespace RegistryWeb.DataServices
                 charge.PaymentCharges = null;
                 if (lastDbLockedCharge == null)
                 {
-                    if (prevCharge == null)
+                    // Если в БД нет начислений до даты перезаписи и предыдущее начисление не подпадает под перезапись, то считаем
+                    // что начисление первое и берем нулевое сальдо
+                    if (prevCharge == null || prevCharge.EndDate < startRewriteDate)
                     {
-                        charge.InputTenancy = firstDbRewriteCharge?.InputTenancy ?? charge.InputTenancy;
-                        charge.InputPenalty = firstDbRewriteCharge?.InputPenalty ?? charge.InputPenalty;
-                        charge.InputDgi = firstDbRewriteCharge?.InputDgi ?? charge.InputDgi;
-                        charge.InputPkk = firstDbRewriteCharge?.InputPkk ?? charge.InputPkk;
-                        charge.InputPadun = firstDbRewriteCharge?.InputPadun ?? charge.InputPadun;
+                        charge.InputTenancy = firstDbRewriteCharge?.InputTenancy ?? 0;
+                        charge.InputPenalty = firstDbRewriteCharge?.InputPenalty ?? 0;
+                        charge.InputDgi = firstDbRewriteCharge?.InputDgi ?? 0;
+                        charge.InputPkk = firstDbRewriteCharge?.InputPkk ?? 0;
+                        charge.InputPadun = firstDbRewriteCharge?.InputPadun ?? 0;
                     } else
+                    // Если предыдущее начисление подпадает под перезапись, то берем сальдо из него
                     {
                         charge.InputTenancy = prevCharge.OutputTenancy;
                         charge.InputPenalty = prevCharge.OutputPenalty;
@@ -799,10 +803,12 @@ namespace RegistryWeb.DataServices
                         charge.InputPkk = prevCharge.OutputPkk;
                         charge.InputPadun = prevCharge.OutputPadun;
                     }
-                } else
+                }
+                else
+                // Если в БД есть начисления, которые не попали под перезапись, то берем сальдо из него
                 if (prevCharge != null)
                 {
-                    if (lastDbLockedCharge.StartDate >= prevCharge.StartDate)
+                    if (lastDbLockedCharge.StartDate >= prevCharge.StartDate || prevCharge.EndDate < startRewriteDate)
                     {
                         charge.InputTenancy = lastDbLockedCharge.OutputTenancy;
                         charge.InputPenalty = lastDbLockedCharge.OutputPenalty;
@@ -1224,12 +1230,12 @@ namespace RegistryWeb.DataServices
                 if (aggCharges.Any())
                 {
                     var dbCharge = accountInfo.Charges.Where(r => r.StartDate <= sliceDate).OrderByDescending(r => r.StartDate).FirstOrDefault();
-                    if (dbCharge != null)
+                    if (dbCharge != null && dbCharge.InputTenancy - dbCharge.PaymentTenancy > 0)
                     {
                         resultChargesInfo.Add(new KumiSumDateInfo
                         {
                             Date = sliceDate,
-                            Value = dbCharge.InputTenancy
+                            Value = dbCharge.InputTenancy-dbCharge.PaymentTenancy
                         });
                         resultChargesInfo = resultChargesInfo.OrderBy(r => r.Date).ToList();
                     }
@@ -1356,12 +1362,12 @@ namespace RegistryWeb.DataServices
             if (aggCharges.Any())
             {
                 var dbCharge = dbCharges.Where(r => r.StartDate <= sliceDate).OrderByDescending(r => r.StartDate).FirstOrDefault();
-                if (dbCharge != null)
+                if (dbCharge != null && dbCharge.InputTenancy - dbCharge.PaymentTenancy > 0)
                 {
                     resultChargesInfo.Add(new KumiSumDateInfo
                     {
                         Date = sliceDate,
-                        Value = dbCharge.InputTenancy
+                        Value = dbCharge.InputTenancy-dbCharge.PaymentTenancy
                     });
                     resultChargesInfo = resultChargesInfo.OrderBy(r => r.Date).ToList();
                 }
@@ -1930,6 +1936,8 @@ namespace RegistryWeb.DataServices
             viewModel.TenancyInfo = GetTenancyInfo(viewModel.Accounts);
             viewModel.ClaimsInfo = GetClaimsInfo(viewModel.Accounts);
             viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "IdRegion", "Region");
+            viewModel.BksAccounts = GetBksAccounts(viewModel.Accounts);
+
             if (filterOptions?.IdRegions != null && filterOptions?.IdRegions.Count > 0)
             {
                 var streets = new List<KladrStreet>();
@@ -1943,6 +1951,12 @@ namespace RegistryWeb.DataServices
                 viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(null), "IdStreet", "StreetName");
 
             return viewModel;
+        }
+
+        private IEnumerable<PaymentAccount> GetBksAccounts(IEnumerable<KumiAccount> accounts)
+        {
+            var ids = accounts.Select(r => r.IdAccount).ToList();
+            return registryContext.PaymentAccounts.Where(pa => ids.Contains(pa.IdAccount)).ToList();
         }
 
         public KumiAccountsVM GetAccountsViewModelForMassReports(List<int> ids, PageOptions pageOptions)
@@ -2582,7 +2596,8 @@ namespace RegistryWeb.DataServices
                                        select assoc).ToList();
             var tenancyIds = accountTenancyAssocs.Select(r => r.IdProcess).Distinct();
             var tenancyProcesses = registryContext.TenancyProcesses.Include(r => r.TenancyRentPeriods)
-                .Include(r => r.TenancyPersons).Where(r => tenancyIds.Contains(r.IdProcess)).ToList();
+                .Include(r => r.TenancyPersons).Include(r => r.TenancyReasons)
+                .Where(r => tenancyIds.Contains(r.IdProcess)).ToList();
 
             var buildings = (from tbaRow in registryContext.TenancyBuildingsAssoc
                             join buildingRow in registryContext.Buildings.Include(r => r.IdStateNavigation)

@@ -2,6 +2,7 @@
 @using RegistryWeb.ViewOptions;
 @using RegistryWeb.SecurityServices;
 @using RegistryWeb.Enums;
+@using RegistryDb.Models.Entities.Payments;
 @model RegistryServices.ViewModel.KumiAccounts.KumiAccountsVM;
 @{
     var ids = Context.Session.Get<List<int>>("idKumiAccounts") ?? new List<int>();
@@ -43,6 +44,12 @@
     <tbody>
         @foreach (var item in Model.Accounts)
         {
+            PaymentAccount paymentAccount = null;
+            if (Model.BksAccounts.Any(r => r.IdAccount == item.IdAccount))
+            {
+                paymentAccount = Model.BksAccounts.First(r => r.IdAccount == item.IdAccount);
+            }
+
             var payment = 0m;
             var tenancyOutOfPeriod = true;
             var hasActiveTenanciesAndAnul = false;
@@ -184,6 +191,12 @@
                     <div>
                         <b>Плата за найм: </b>@payment руб.
                     </div>
+                    @if (!string.IsNullOrWhiteSpace(item.Description))
+                    {
+                        <div class="dopinfo">
+                            @item.Description
+                        </div>
+                    }
                 </td>
                 <td>
                     @if (Model.TenancyInfo.ContainsKey(item.IdAccount) && Model.TenancyInfo[item.IdAccount].Any())
@@ -200,6 +213,19 @@
                                         <span>
                                             № @tenancyInfo.TenancyProcess.RegistrationNum
                                             @(tenancyInfo.TenancyProcess.RegistrationDate.HasValue ? "от " + tenancyInfo.TenancyProcess.RegistrationDate.Value.ToString("dd.MM.yyyy") : "")
+                                        </span>
+                                    }
+                                    else
+                                   if (tenancyInfo.TenancyProcess?.TenancyReasons != null &&
+                                   (tenancyInfo.TenancyProcess?.TenancyReasons.Any(r => (new int[] { 1, 6, 7, 8, 29 }).Contains(r.IdReasonType)) ?? false))
+                                    {
+                                        var orders = tenancyInfo.TenancyProcess?.TenancyReasons.Where(r => (new int[] { 1, 6, 7, 8, 29 }).Contains(r.IdReasonType));
+                                        var lastOrder = orders.OrderByDescending(r => r.ReasonDate).First();
+
+                                        <b>Ордер:</b>
+                                        <span>
+                                            № @lastOrder.ReasonNumber
+                                            @(lastOrder.ReasonDate.HasValue ? "от " + lastOrder.ReasonDate.Value.ToString("dd.MM.yyyy") : "")
                                         </span>
                                     }
                                     else
@@ -309,7 +335,15 @@
                     }
                     else
                     {
-                        <span class="text-danger font-italic">н/а</span>
+                        <span class="text-danger font-italic">Связь с наймом отсутствует</span>
+                        if (paymentAccount != null)
+                        {
+                            <div class="dopinfo">
+                                <b><u>По данным БКС:</u></b><br />
+                                <b>Адрес: </b> @paymentAccount.RawAddress<br />
+                                <b>Наниматель: </b> @paymentAccount.Tenant
+                            </div>
+                        }
                     }
                 </td>
                 <td style="position: relative">
@@ -404,6 +438,11 @@
                                    asp-controller="Claims" asp-action="Index" asp-route-filterOptions.IdAccountKumi="@item.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Претензионно-исковые работы</a>
                                 <a class="dropdown-item" target="_blank" title="Информация по всем ЛС по адресу" aria-label="Информация по всем ЛС по адресу"
                                    asp-controller="KumiAccounts" asp-action="DetailsByAddress" asp-route-idAccount="@item.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Информация по всем ЛС по адресу</a>
+                                @if (paymentAccount != null)
+                                {
+                                    <a class="dropdown-item" target="_blank" title="Лицевой счет БКС" aria-label="Лицевой счет БКС"
+                                       asp-controller="PaymentAccounts" asp-action="PaymentAccountsTable" asp-route-idAccount="@paymentAccount.IdAccount" asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Лицевой счет БКС</a>
+                                }
                             </div>
                         </div>
                         <div class="btn-group" role="group" aria-label="Отчеты">

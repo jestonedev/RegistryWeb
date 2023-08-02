@@ -12,10 +12,10 @@
     while ((match = courtOrderMatches.next()).done !== true) {
         purposeInfo.court_order = match.value[2];
     }
-    var accountRegex = /ЛИЦ(\.?|ЕВОЙ)?[ ]+СЧЕТ[ ]*[:]?[ ]*([0-9]{6,})/gmiu;
+    var accountRegex = /(ЛИЦ(\.?|ЕВОЙ)?[ ]+СЧЕТ|ЛС)[ ]*[:]?[ ]*([0-9]{6,})/gmiu;
     var accountMatches = purpose.matchAll(accountRegex);
     while ((match = accountMatches.next()).done !== true) {
-        purposeInfo.account = match.value[2];
+        purposeInfo.account = match.value[3];
     }
 
     var addressRegex1 = /\/\/без НДС$/gmiu;
@@ -51,6 +51,8 @@ function extractAddressFromString(address) {
     }
     if (street.endsWith(" ПЕР"))
         street = street.replace(" ПЕР", "");
+    if (street.endsWith(" ПР-КТ"))
+        street = street.replace(" ПР-КТ", "");
     return {
         street: street.replace('XX ПАРТСЪЕЗДА', 'ХХ ПАРТСЪЕЗДА'),
         house: house,

@@ -14,7 +14,7 @@
 }
 
 @section styles
-{
+    {
     <link rel="stylesheet" href="~/css/kumi.payments.css" runat="server" />
 }
 
@@ -296,6 +296,58 @@
                 <tr>
                     <td>@(moAssoc.Item1.NumDocument != null ? moAssoc.Item1.NumDocument + " " : "")@(moAssoc.Item1.DateDocument != null ? " от " + moAssoc.Item1.DateDocument.ToString("dd.MM.yyyy") + " " : "")</td>
                     <td>@moAssoc.Item2</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.AutoDistributedPayments.Count > 0)
+{
+    var accountTenants = (Dictionary<int, string>)ViewBag.AccountsTenants;
+
+    <h3 class="text-success">Автоматически распределенные платежи</h3>
+    <table class="table table-bordered mb-3">
+        <thead>
+            <tr>
+                <th>Реквизиты платежа</th>
+                <th>Сумма</th>
+                <th>Идентификатор платежа</th>
+                <th>Лицевой счет</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var paymentAccountPair in Model.AutoDistributedPayments)
+            {
+                var payment = paymentAccountPair.Item1;
+                var account = paymentAccountPair.Item2;
+                var tenant = (string)null;
+                if (accountTenants.ContainsKey(account.IdAccount))
+                {
+                    tenant = accountTenants[account.IdAccount];
+                }
+                <tr>
+                    <td>
+                        @(payment.NumDocument != null ? payment.NumDocument + " " : "")@(payment.DateDocument != null ? " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy") + " " : "")
+                        <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" href="/KumiPayments/Details?idPayment=@payment.IdPayment"></a>
+                        
+                        <div class="rr-payment-purpose dopinfo">
+                            @payment.Purpose
+                        </div>
+                        </td>
+                    <td>
+                        @payment.Sum руб.
+                    </td>
+                    <td>
+                        @payment.Guid
+                    </td>
+                    <td>
+                        № @account.Account <a class="btn oi oi-eye p-0 text-primary rr-payment-list-eye-btn" target="_blank" href="/KumiAccounts/Details?idAccount=@account.IdAccount"></a>
+                        @if (tenant != null)
+                        {
+                            <div class="dopinfo">@tenant</div>
+                        }
+                    </td>
                 </tr>
             }
         </tbody>

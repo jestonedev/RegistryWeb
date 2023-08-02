@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.KumiAccounts;
+using RegistryDb.Models.Entities.Payments;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
 using System;
@@ -11,6 +12,7 @@ namespace RegistryServices.ViewModel.KumiAccounts
     public class KumiAccountsVM : ListVM<KumiAccountsFilter>
     {
         public IEnumerable<KumiAccount> Accounts { get; set; }
+        public IEnumerable<PaymentAccount> BksAccounts { get; set; }
         public Dictionary<int, List<KumiAccountTenancyInfoVM>> TenancyInfo { get; set; }
         public Dictionary<int, List<ClaimInfo>> ClaimsInfo { get; set; }
         public SelectList KladrRegionsList { get; set; }

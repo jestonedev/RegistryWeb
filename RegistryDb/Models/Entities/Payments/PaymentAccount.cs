@@ -16,6 +16,7 @@ namespace RegistryDb.Models.Entities.Payments
         public string Crn { get; set; }
         public string RawAddress { get; set; }
         public int? Prescribed { get; set; }
+        public string Tenant { get; set; }
         public virtual IList<Payment> Payments { get; set; }
         public virtual IList<PaymentAccountPremiseAssoc> PaymentAccountPremisesAssoc { get; set; }
         public virtual IList<PaymentAccountSubPremiseAssoc> PaymentAccountSubPremisesAssoc { get; set; }

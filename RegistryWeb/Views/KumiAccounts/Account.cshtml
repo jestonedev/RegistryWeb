@@ -135,6 +135,13 @@
                                     (tenancyInfo[i].TenancyProcess.RegistrationDate.HasValue ? "от " + tenancyInfo[i].TenancyProcess.RegistrationDate.Value.ToString("dd.MM.yyyy") : "");
                             }
                             else
+                            if (tenancyInfo[i].TenancyProcess?.TenancyReasons != null &&
+                                (tenancyInfo[i].TenancyProcess?.TenancyReasons.Any(r => (new int[] { 1, 6, 7, 8, 29 }).Contains(r.IdReasonType)) ?? false))
+                            {
+                                var orders = tenancyInfo[i].TenancyProcess?.TenancyReasons.Where(r => (new int[] { 1, 6, 7, 8, 29 }).Contains(r.IdReasonType));
+                                var lastOrder = orders.OrderByDescending(r => r.ReasonDate).First();
+                                tenancyRequisits = "Орд. №: " + lastOrder.ReasonNumber + " " + (lastOrder.ReasonDate.HasValue ? "от " + lastOrder.ReasonDate.Value.ToString("dd.MM.yyyy") : "");
+                            } else
                             if (tenancyInfo[i].TenancyProcess?.IdProcess != null)
                             {
                                 tenancyRequisits = "Рег. №: " + tenancyInfo[i].TenancyProcess?.IdProcess;
@@ -525,7 +532,7 @@
                             <span style="top: 2px;" class="oi oi-list"></span>
                         </a>
                      
-                        <a href="#" id="CopyChargesToClipboard" title="Скопировать в буфер обмена" class="form-control btn btn-dark">
+                        <a href="#" id="CopyChargesToClipboard" class="form-control btn btn-dark">
                             <span style="top: 2px;" class="oi oi-clipboard"></span>
                         </a>
                         
