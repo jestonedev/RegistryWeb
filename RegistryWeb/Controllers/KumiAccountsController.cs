@@ -411,7 +411,13 @@ namespace RegistryWeb.Controllers
 
         public IActionResult OpenPenaltyCalculator(int idAccount, DateTime? startDate, DateTime? endDate)
         {
-            return RedirectPermanent("/wwwroot/peni_calc/mcalc.html#"+dataService.GetUrlForPenaltyCalculator(idAccount, startDate, endDate));
+            return RedirectPermanent("/peni_calc/mcalc.html#"+dataService.GetUrlForPenaltyCalculator(idAccount, startDate, endDate));
+        }
+
+        public JsonResult GetKeyRates()
+        {
+            var kumiRates = dataService.GetKeyRates();
+            return Json(kumiRates);
         }
     }
 }
