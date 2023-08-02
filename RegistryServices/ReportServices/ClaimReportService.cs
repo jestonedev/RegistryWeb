@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace RegistryWeb.ReportServices
 {
@@ -381,7 +382,8 @@ namespace RegistryWeb.ReportServices
             {
                 csv +=  row.Account + ";" + row.Tenant + ";" + row.Address + ";" + row.Kbk + ";" + row.Okato + ";" + row.Sum + "\r\n";
             }
-            File.WriteAllText(destFile, csv);
+            var encoding = Encoding.GetEncoding("windows-1251");
+            File.WriteAllText(destFile, csv, encoding);
             
             return DownloadFile(new FileInfo(destFile).Name);
         }
