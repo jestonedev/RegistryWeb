@@ -320,7 +320,7 @@ namespace RegistryWeb.DataServices
                 Description = description
             });
 
-            if(idAccountMirror.HasValue)
+            if(idAccountMirror.HasValue && idAccountMirror.Value!=idAccount)
                 registryContext.KumiChargeCorrections.Add(new KumiChargeCorrection
                 {
                     IdAccount = idAccountMirror.Value,
@@ -3019,6 +3019,27 @@ namespace RegistryWeb.DataServices
                 return registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
                                 e.ExecutorLogin.ToLowerInvariant() == userName);
             }
+        }
+
+        public List<KumiKeyRate> GetKeyRates()
+        {
+            var keyRatesList = registryContext.KumiKeyRates
+                                    .Where(k=>k.StartDate<=DateTime.Parse("14.02.2022") || k.StartDate >= DateTime.Parse("19.09.2022"))
+                                    .ToList();
+
+            keyRatesList.Add(new KumiKeyRate
+            {
+                StartDate=DateTime.Parse("01.01.2999"),
+                Value=0
+            });
+
+            keyRatesList.Add(new KumiKeyRate
+            {
+                StartDate=DateTime.Parse("01.08.2022"),
+                Value=(Decimal)8.00
+            });
+
+            return keyRatesList.OrderByDescending(k=>k.StartDate).ToList();
         }
     }
 }
