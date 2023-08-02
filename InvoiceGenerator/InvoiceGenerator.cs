@@ -34,7 +34,7 @@ namespace InvoiceGenerator
 
             html += "<td class=\"main-content-td\">";
             html += "<p>Получатель: <b>УФК по Иркутской области (КУМИ г.Братска)</b></p>";
-            html += "<p>г. Братск, Ленина просп., д.37, тел.:349393, 349372 (по оплате), тел.:349390 (по начис.)</p>";
+            html += "<p>г. Братск, Ленина просп., д.37, тел.:349393, 349372 (по оплате), тел.:349632 (по начис.)</p>";
             html += "<p>Режим работы: Пн.-Пт. с 9.00-17.00, обед 13.00-14.00, сб.,вс-выходной</p>";
             html += "<p>Казн. счет 03100643000000013400 ИНН 3803201800 КПП 380401001 БИК 012520101</p>";
             html += "<p>ОТДЕЛЕНИЕ ИРКУТСКА БАНКА РОССИИ//УФК ПО ИРКУТСКОЙ ОБЛАСТИ г Иркутск</p>";
@@ -44,38 +44,37 @@ namespace InvoiceGenerator
             html += string.Format("<p>Потребитель: <b class=\"tenant\">{0}</b></p>", invoice.Tenant);
 
             html += "<table class=\"money-table\">";
-            html += string.Format("<tr><td class=\"money-header\">Недоплата на {0}г.</td><td class=\"money-td\">{1}</td></tr>",
+            html += string.Format("<tr><td class=\"money-header\">Недоплата на {0}</td><td class=\"money-td\">{1}</td></tr>",
                 new DateTime(invoice.OnDate.Year, invoice.OnDate.Month, 1).AddDays(-1).ToString("dd.MM.yyyy"),
                 invoice.BalanceInput.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")));
             html += string.Format("<tr><td class=\"money-header\">Начислено</td><td class=\"money-td\">{0}</td></tr>",
                 invoice.Charging.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")));
             html += string.Format("<tr><td class=\"money-header\">Оплачено</td><td class=\"money-td\">{0}</td></tr>",
                 invoice.Payed.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")));
-            html += string.Format("<tr><td class=\"money-header\"><b>К оплате за {0}г.</b></td><td class=\"money-td\"><b>{1}</b></td></tr>",
+            html += string.Format("<tr><td class=\"money-header\"><b>К оплате за {0}</b></td><td class=\"money-td\"><b>{1}</b></td></tr>",
                 invoice.OnDate.ToString("MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU")).ToLower(),
                 invoice.BalanceOutput.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")));
             html += "</table>";
 
-            html += string.Format("<p>Площадь общая: <b class=\"total-area\">{0}</b> количество проживающих: <b>{1}</b> чел.</p>",
-                invoice.TotalArea.ToString("N1", CultureInfo.GetCultureInfo("ru-RU")),
-                invoice.Prescribed);
+            html += string.Format("<p>Срок оплаты по квитанции до <b>{0}</b> (статья 155 ЖФ РФ)</p>",
+                 new DateTime(invoice.OnDate.Year, invoice.OnDate.Month, 1).AddMonths(1).AddDays(9).ToString("dd.MM.yyyy"));
 
             html += "<table class=\"service-table\">";
-            html += "<tr><td>Вид услуги</td><td>Ед. изм.</td><td>Норматив</td><td>Объем/Кол-во</td><td>Тариф, руб.</td><td>Размер платы</td><td>Пере-расчет</td><td>Итог за тек. мес.</td></tr>";
-            html += string.Format("<tr><td>Плата за наем</td><td>кв.м.</td><td></td><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",
+            html += "<tr><td>Вид услуги</td><td>Общая площадь, кв.м</td><td>Тариф, руб.</td><td>Размер платы</td><td>Пере-расчет</td><td>Итог за тек. мес.</td></tr>";
+            html += string.Format("<tr><td>Плата за наем</td><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",
                  invoice.TotalArea.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
                  invoice.TotalArea == 0 ? "0" : Math.Round(invoice.ChargingTenancy / (decimal)invoice.TotalArea, 3).ToString("N3", CultureInfo.GetCultureInfo("ru-RU")),
                  invoice.ChargingTenancy.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
                  invoice.RecalcTenancy.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
                  (invoice.ChargingTenancy + invoice.RecalcTenancy).ToString("N2", CultureInfo.GetCultureInfo("ru-RU")));
-            html += string.Format("<tr><td><b>Итого</b></td><td></td><td></td><td></td><td></td><td><b>{0}</b></td><td><b>{1}</b></td><td><b>{2}</b></td></tr>",
+            html += string.Format("<tr><td><b>Итого</b></td><td></td><td></td><td><b>{0}</b></td><td><b>{1}</b></td><td><b>{2}</b></td></tr>",
                  invoice.ChargingTenancy.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
                  invoice.RecalcTenancy.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
                  (invoice.ChargingTenancy + invoice.RecalcTenancy).ToString("N2", CultureInfo.GetCultureInfo("ru-RU"))
                 );
             if ((invoice.ChargingPenalty + invoice.RecalcPenalty) != 0)
             {
-                html += string.Format("<tr><td>Пени</td><td></td><td></td><td></td><td></td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
+                html += string.Format("<tr><td>Пени</td><td></td><td></td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
                     invoice.ChargingPenalty.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
                     invoice.RecalcTenancy.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
                     (invoice.ChargingPenalty + invoice.RecalcPenalty).ToString("N2", CultureInfo.GetCultureInfo("ru-RU")));
