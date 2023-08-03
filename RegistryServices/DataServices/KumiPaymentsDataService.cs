@@ -671,6 +671,12 @@ namespace RegistryWeb.DataServices
 
             IQueryable<KumiAccount> accounts = registryContext.KumiAccounts.Where(r => idAccountsLocal.Contains(r.IdAccount));
 
+            foreach(var account in accounts)
+            {
+                if (account.IdState == 2)
+                    throw new ApplicationException("Нельзя отменить распределение, т.к. лицевой счет, связанный с ПИР аннулирвоан");
+            }
+
             foreach(var paymentClaim in payment.PaymentClaims.GroupBy(r => r.IdClaim))
             {
                 if (!idClaims.Contains(paymentClaim.Key)) continue;
@@ -974,7 +980,13 @@ namespace RegistryWeb.DataServices
                     if (idAccount == null)
                         throw new ApplicationException(string.Format("Исковая работа {0} не привязана к лицевому счету КУМИ", idObject));
                     accounts = registryContext.KumiAccounts.Where(r => r.IdAccount == idAccount);
-                    var accountsIds = accounts.Select(r => r.IdAccount).ToList();
+                    
+                    if (accounts.Count() == 0)
+                        throw new ApplicationException(string.Format("Не найден лицевой счет с реестровым номером {0}", idAccount));
+
+                    account = accounts.First();
+                    if (accounts.First().IdState == 2)
+                        throw new ApplicationException(string.Format("Нельзя распределить платеж на исковую работу, привязанную к аннулированному лицевому счету {0}", account.Account));
 
                     claim.AmountTenancyRecovered = (claim.AmountTenancyRecovered ?? 0) + tenancySum;
                     claim.AmountPenaltiesRecovered = (claim.AmountPenaltiesRecovered ?? 0) + penaltySum;

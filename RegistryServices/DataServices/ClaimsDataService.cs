@@ -132,6 +132,9 @@ namespace RegistryWeb.DataServices
                 {
                     claim.AmountTenancyRecovered = claimDb.AmountTenancyRecovered;
                     claim.AmountPenaltiesRecovered = claimDb.AmountPenaltiesRecovered;
+                    claim.AmountDgiRecovered = claimDb.AmountDgiRecovered;
+                    claim.AmountPadun = claimDb.AmountPadun;
+                    claim.AmountPkk = claimDb.AmountPkk;
                 }
             }
             return claim;
