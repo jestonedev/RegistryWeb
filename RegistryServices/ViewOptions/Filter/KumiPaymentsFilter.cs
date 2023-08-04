@@ -49,6 +49,7 @@ namespace RegistryWeb.ViewOptions.Filter
 
         public KumiPaymentsFilter()
         {
+            Kbk = "90111109044041000120";
         }
 
         public bool IsEmpty()

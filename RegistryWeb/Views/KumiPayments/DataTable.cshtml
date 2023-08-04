@@ -126,7 +126,7 @@
 
                 @if (item.ChildPayments.Any() && item.IdPayment != Model.FilterOptions.IdParentPayment)
                 {
-                    <a asp-action="Index" asp-route-filterOptions.IdParentPayment="@item.IdPayment" title="Платеж был разбит при применении мемориального ордера. Для отображения связных платежей кликните по этой иконке">
+                    <a asp-action="Index" asp-route-filterOptions.IdParentPayment="@item.IdPayment" title="Платеж был разбит при применении мемориального ордера или является детализированным сводным платежным поручением. Для отображения связных платежей кликните по этой иконке">
                         <span class="oi oi-link-intact text-primary" style="font-size: 80%"></span>
                     </a>
                 }

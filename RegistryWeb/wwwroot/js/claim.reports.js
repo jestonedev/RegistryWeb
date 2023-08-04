@@ -312,10 +312,17 @@
         var standartWrapper = modal.find("input[name='StartDate']").closest(".form-row");
         var ukWrapper = modal.find("select[name='Uk']").closest(".form-row");
         var balanceWrapper = modal.find("select[name='StDate_Month']").closest(".form-row");
-
+        var excludeUploadedWrapper = modal.find("input[name='ExcludeUploaded']").closest('.form-row');
+        var saveUploadFactWrapper = modal.find("input[name='SaveUploadFact']").closest('.form-row');
+        var kbkWrapper = modal.find("select[name='Kbk']").closest('.form-row');
+        var balanceReportTypeWrapper = modal.find("select[name='BalanceReportType']").closest('.form-row');
         standartWrapper.hide();
         ukWrapper.hide();
         balanceWrapper.hide();
+        excludeUploadedWrapper.hide();
+        saveUploadFactWrapper.hide();
+        kbkWrapper.hide();
+        balanceReportTypeWrapper.hide();
 
         switch (action) {
             case "UkInvoiceAgg":
@@ -324,10 +331,19 @@
                 break;
             case "PaymentsForPeriod":
                 standartWrapper.show();
+                kbkWrapper.show();
                 break;
             case "BalanceForPeriod":
+                balanceWrapper.show();
+                balanceReportTypeWrapper.show();
+                break;
             case "SberbankFile":
                 balanceWrapper.show();
+                break;
+            case "FileForDoverie":
+                balanceWrapper.show();
+                excludeUploadedWrapper.show();
+                saveUploadFactWrapper.show();
                 break;
         }
 
@@ -364,11 +380,24 @@
                 var startDate = form.find("input[name='StartDate']").val();
                 var endDate = form.find("input[name='EndDate']").val();
                 url += "startDate=" + startDate + "&endDate=" + endDate;
+                var kbk = form.find("select[name='Kbk']").val();
+                url += "&kbk=" + kbk;
                 break;
             case "BalanceForPeriod":
             case "SberbankFile":
                 startDate = form.find("[name='StDate_Year']").val() + "-" + form.find("[name='StDate_Month']").val() + "-01";
                 url += "startDate=" + startDate;
+                if (action === "BalanceForPeriod") {
+                    var reportType = form.find("select[name='BalanceReportType']").val();
+                    url += "&reportType=" + reportType;
+                }
+                break;
+
+            case "FileForDoverie":
+                startDate = form.find("[name='StDate_Year']").val() + "-" + form.find("[name='StDate_Month']").val() + "-01";
+                url += "startDate=" + startDate;
+                url += "&excludeUploaded=" + form.find("[name='ExcludeUploaded']").is(":checked");
+                url += "&saveUploadFact=" + form.find("[name='SaveUploadFact']").is(":checked");
                 break;
         }
 

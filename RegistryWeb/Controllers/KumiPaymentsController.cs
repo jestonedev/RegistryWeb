@@ -21,6 +21,7 @@ using RegistryServices.Models.KumiPayments;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace RegistryWeb.Controllers
 {
@@ -566,7 +567,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult UploadPayments(List<IFormFile> files, DateTime? dateEnrollUfk)
+        public IActionResult UploadPayments(List<IFormFile> files, DateTime? dateEnrollUfk, int? idParentPayment)
         {
             var tffStrings = new List<TffString>();
             var kumiPaymentGroupFiles = new List<KumiPaymentGroupFile>();
@@ -633,7 +634,7 @@ namespace RegistryWeb.Controllers
             }
             try
             {
-                dataService.UploadInfoFromTff(tffStrings, kumiPaymentGroupFiles, out int idGroup);
+                dataService.UploadInfoFromTff(tffStrings, kumiPaymentGroupFiles, idParentPayment, out int idGroup);
                 return RedirectToAction("UploadLog", new { idGroup } );
             } catch(ApplicationException e)
             {
@@ -749,6 +750,48 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult SearchPaymentRaw(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return Content("0");
+            var payments = dataService.SearchPaymentsRaw(text);
 
+            if (!payments.Any()) return Content("0");
+
+            return Json(
+                payments.Select(r => new {
+                    idPayment = r.IdPayment,
+                    description = FormatPaymentRequisits(r),
+                    dateEnrollUfk = r.DateEnrollUfk.HasValue ? r.DateEnrollUfk.Value.ToString("yyyy-MM-dd") : null
+                }).ToArray()
+            );
+        }
+
+        private string FormatPaymentRequisits(KumiPayment payment)
+        {
+            var paymentRequisits = "";
+            if (!string.IsNullOrEmpty(payment.NumDocument) || payment.DateDocument != null)
+            {
+                if (!string.IsNullOrEmpty(payment.NumDocument))
+                {
+                    paymentRequisits += "№ " + payment.NumDocument;
+                }
+                if (payment.DateDocument != null)
+                {
+                    paymentRequisits += " от " + payment.DateDocument.Value.ToString("dd.MM.yyyy");
+                }
+            }
+            else
+            if (string.IsNullOrEmpty(payment.NumDocument) && payment.DateDocument == null && !string.IsNullOrEmpty(payment.Uin))
+            {
+                paymentRequisits += "УИН " + payment.Uin;
+            }
+            else
+            {
+                paymentRequisits += "ID " + payment.IdPayment;
+            }
+            paymentRequisits += " на сумму " + payment.Sum + " руб.";
+
+            return paymentRequisits;
+        }
     }
 }

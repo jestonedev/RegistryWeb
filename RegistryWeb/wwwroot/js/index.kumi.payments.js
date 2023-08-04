@@ -115,7 +115,14 @@ $(function () {
     $("#UploadPaymentsFiles").on("change", function (event) {
         event.preventDefault();
         if (this.files.length === 0) return;
-        if (this.files.length > 1 || !this.files[0].name.endsWith(".xlsx")) {
+        var onlyBksFiles = true;
+        for (var i = 0; i < this.files.length; i++) {
+            if (!this.files[i].name.endsWith(".xlsx")) {
+                onlyBksFiles = false;
+                break;
+            }
+        }
+        if (!onlyBksFiles) {
             $(this).closest("form").submit();
         } else {
             var modal = $("#UploadPaymentsDateEnrollUfkModal");
@@ -128,8 +135,10 @@ $(function () {
         var form = $(this).closest("form");
         if (!form.valid()) return;
         var dateEnrollUfk = form.find("#UploadPayments_DateEnrollUfk").val();
+        var idParentpayment = form.find("[name='UploadPayments_IdParentPayment']").val();
         var submitForm = $("form[name='UploadPaymentsForm']");
         submitForm.find("input[name='DateEnrollUfk']").val(dateEnrollUfk);
+        submitForm.find("input[name='IdParentPayment']").val(idParentpayment);
         submitForm.submit();
     });
 
@@ -192,5 +201,44 @@ $(function () {
                 $("#UpdateBksPaymentsDateEnrollUfkModal .rr-report-submit").prop("disabled", "");
             }
         });
+    });
+
+    $('input#UploadPayments_ParentPayment').autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + '/KumiPayments/SearchPaymentRaw',
+                dataType: 'json',
+                data: { text: request.term },
+                success: function (data) {
+                    if (data !== "0" && data !== undefined) {
+                        response($.map(data, function (payment) {
+                            return {
+                                label: payment.description,
+                                value: payment.description,
+                                idPayment: payment.idPayment,
+                                dateEnrollUfk: payment.dateEnrollUfk
+                            };
+                        }));
+                    }
+                }
+            });
+        },
+        select: function (event, ui) {
+            $("[name='UploadPayments_IdParentPayment']").val(ui.item.idPayment);
+            $("input#UploadPayments_DateEnrollUfk").val(ui.item.dateEnrollUfk);
+        },
+        delay: 300,
+        minLength: 3
+    });
+
+    $('input#UploadPayments_ParentPayment').focusout(function () {
+        if ($("[name='UploadPayments_IdParentPayment']").val() === "") {
+            $('input#UploadPayments_ParentPayment').val("");
+        }
+    });
+
+    $("#UploadPayments_ParentPayment").on("input", function () {
+        $("[name='UploadPayments_IdParentPayment']").val("");
     });
 });
