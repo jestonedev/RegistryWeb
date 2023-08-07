@@ -1308,15 +1308,18 @@ namespace RegistryWeb.DataServices
             List<KumiPayment> payments, DateTime? endDate)
         {
             var chargeIds = dbCharges.Select(r => r.IdCharge).ToList();
+            var claimIds = claims.Select(r => r.IdClaim).ToList();
 
             var calcPayments = payments.Where(r =>
                 r.DateExecute != null ? r.DateExecute <= endDate :
                 r.DateIn != null ? r.DateIn <= endDate :
-                r.DateDocument != null ? r.DateDocument <= endDate : false).Where(r => r.PaymentCharges.Any(pc => chargeIds.Contains(pc.IdCharge)));
+                r.DateDocument != null ? r.DateDocument <= endDate : false)
+                .Where(r => r.PaymentCharges.Any(pc => chargeIds.Contains(pc.IdCharge)) || r.PaymentClaims.Any(pc => claimIds.Contains(pc.IdClaim)));
+
 
             // Для ПИР, которые были до даты последнего начисления БКС:
             // Не учитывать в расчете пени, т.к. оплаты по ним отражены в движении от БКС
-            DateTime? bksChargeLastDate = null;
+            /*DateTime? bksChargeLastDate = null;
             if (dbCharges.Any(r => r.IsBksCharge == 1))
             {
                 bksChargeLastDate = dbCharges.Where(r => r.IsBksCharge == 1).Select(r => r.EndDate).Max();
@@ -1330,12 +1333,13 @@ namespace RegistryWeb.DataServices
                 {
                     Date = r.EndDeptPeriod.Value, //r.ClaimStates.FirstOrDefault(s => s.IdStateType == 4).CourtOrderDate.Value,
                     Value = (r.AmountTenancy + r.AmountPkk + r.AmountPadun + r.AmountDgi) ?? 0
-                });
+                });*/
 
             var preparedPayments = calcPayments.Select(r => new KumiSumDateInfo
             {
                 Date = (r.DateExecute ?? r.DateIn ?? r.DateDocument).Value,
-                Value = r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.TenancyValue)
+                Value = r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.TenancyValue) +
+                     r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Sum(pc => pc.TenancyValue)
             });
 
             var paymentCorrections = corrections.Where(r => r.PaymentTenancyValue != 0)
@@ -1345,7 +1349,7 @@ namespace RegistryWeb.DataServices
                     Value = r.PaymentTenancyValue
                 });
 
-            return preparedClaims.Union(preparedPayments).Union(paymentCorrections).ToList();
+            return /*preparedClaims.Union(preparedPayments)*/ preparedPayments.Union(paymentCorrections).ToList();
         }
 
         private decimal CalcPenalty(List<KumiChargeCorrection> corrections,  List<KumiCharge> dbCharges, List<KumiCharge> charges, List<Claim> claims, 
