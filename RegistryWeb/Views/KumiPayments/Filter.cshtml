@@ -93,6 +93,7 @@
 <form asp-action="UploadPayments" name="UploadPaymentsForm" style="visibility: hidden; position: absolute; left: -9999px; top: -9999px" method="post" enctype="multipart/form-data">
     <input name="Files" id="UploadPaymentsFiles" type="file" multiple />
     <input name="DateEnrollUfk" type="date" />
+    <input name="IdParentPayment" type="hidden" />
 </form>
 
 <form name="UploadPaymentsDateEnrollUfkForm">
@@ -100,12 +101,19 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Укажите дату зачисления на л\с УФК</h5>
+                    <h5 class="modal-title">Дополнительная информация</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
+                    <input name="UploadPayments_IdParentPayment" type="hidden" />
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label class="rr-account-filter-label" for="UploadPayments_ParentPayment">Сводное платежное поручение</label>
+                            <input type="text" class="form-control" id="UploadPayments_ParentPayment" placeholder="Введите номер, дату ПП или сумму в любой комбинации" name="UploadPayments_ParentPayment" title="Сводное платежное поручение">
+                        </div>
+                    </div>
                     <div class="form-row">
                         <div class="form-group col-12">
                             <label class="rr-account-filter-label" for="UploadPayments_DateEnrollUfk">Дата зачисления на л\с УФК</label>
