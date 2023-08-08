@@ -117,7 +117,7 @@ $(function () {
         if (this.files.length === 0) return;
         var onlyBksFiles = true;
         for (var i = 0; i < this.files.length; i++) {
-            if (!this.files[i].name.endsWith(".xlsx")) {
+            if (!this.files[i].name.endsWith(".xlsx") && !this.files[i].name.endsWith(".txt")) {
                 onlyBksFiles = false;
                 break;
             }

@@ -14,6 +14,10 @@ namespace RegistryPaymentsLoader.TffFileLoaders
             {
                 return new BKSV1FileLoader(dateEnrollUfk);
             }
+            if (fileInfo.Extension == ".txt")
+            {
+                return new BKSV2FileLoader(dateEnrollUfk);
+            }
 
             var streamReader = new StreamReader(dataStream, Encoding.GetEncoding(1251));
             if (streamReader.EndOfStream) return null;

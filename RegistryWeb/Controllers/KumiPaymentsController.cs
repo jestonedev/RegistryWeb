@@ -17,11 +17,6 @@ using RegistryWeb.ViewOptions;
 using RegistryWeb.Enums;
 using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Enums;
-using RegistryServices.Models.KumiPayments;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading;
-using System.Text.RegularExpressions;
 
 namespace RegistryWeb.Controllers
 {
