@@ -117,7 +117,10 @@
         var action = form.find("[name='AccountKumi.Action']").val();
         var controllerAction = "InvoiceToHtmlList";
 
-        if (action === "Send" || (idAccount !== "" && idAccount !== "0"))
+        if (action === "Send")
+            controllerAction = "InvoiceGenerator";
+
+        if (idAccount !== "" && idAccount !== "0")
             controllerAction = "InvoiceGenerator";
 
         if (action === "Send") {
@@ -134,7 +137,15 @@
                 accountsCount = ids.length;
                 invoiceGenerator(accountIdsForInvoiceGenerator, accountIdsOther, controllerAction, onDate, action, textmessage);
             }
-        } else {
+        } else
+        {
+            var accountsArr = [];
+
+            if (idAccount !== "" && idAccount !== "0")
+                accountsArr = [idAccount]
+
+            var url = window.location.origin + "/KumiAccountReports/" + controllerAction + "?onDate=" + onDate + "&invoiceAction=" + action + "&textmessage=" + textmessage + "&idAccounts="+accountsArr;
+
             $("#accountKumiRegInGenModal .rr-report-submit").prop("disabled", false);
             $("#gifforrig").css("display", "none");
             $("#accountKumiRegInGenModal").modal("hide");
