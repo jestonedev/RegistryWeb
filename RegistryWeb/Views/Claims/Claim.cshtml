@@ -431,14 +431,18 @@
                                                     {
                                                     <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
                                                        asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">
-                                                        @((Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered + Model.Claim.AmountDgiRecovered +
-                                                                Model.Claim.AmountPkkRecovered + Model.Claim.AmountPadunRecovered) ?? 0.00m)
+                                                        @((Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered + 
+                                                            (Model.Claim.AmountDgiRecovered ?? 0.00m) +
+                                                            (Model.Claim.AmountPkkRecovered ?? 0.00m) + 
+                                                            (Model.Claim.AmountPadunRecovered ?? 0.00m)) ?? 0.00m)
                                                     </a>
                                                     }
                                                     else
                                                     {
-                                                        @((Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered + Model.Claim.AmountDgiRecovered +
-                                                                    Model.Claim.AmountPkkRecovered + Model.Claim.AmountPadunRecovered) ?? 0.00m)
+                                                        @((Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered +
+                                                            (Model.Claim.AmountDgiRecovered ?? 0.00m) +
+                                                            (Model.Claim.AmountPkkRecovered ?? 0.00m) +
+                                                            (Model.Claim.AmountPadunRecovered ?? 0.00m)) ?? 0.00m)
                                                     }
                                                 </td>
                                             </tr>
@@ -461,7 +465,7 @@
                                                 </td>
                                                 <td class="text-center p-1">
                                                     @(((Model.Claim.AmountTenancy + Model.Claim.AmountPenalties + Model.Claim.AmountDgi + Model.Claim.AmountPkk + Model.Claim.AmountPadun) ?? 0.00m) - 
-                                                    ((Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered + Model.Claim.AmountDgiRecovered + Model.Claim.AmountPkkRecovered + Model.Claim.AmountPadunRecovered) ?? 0.00m))
+                                                    ((Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered + (Model.Claim.AmountDgiRecovered ?? 0.00m) + (Model.Claim.AmountPkkRecovered ?? 0.00m) + (Model.Claim.AmountPadunRecovered ?? 0.00m)) ?? 0.00m))
                                                 </td>
                                             </tr>
                                         }

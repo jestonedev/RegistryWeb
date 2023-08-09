@@ -13,6 +13,7 @@ namespace RegistryPaymentsLoader.TffFileLoaders
         public BKSV2FileLoader(DateTime? dateEnrollUfk)
         {
             DateEnrollUfk = dateEnrollUfk;
+            NoticeDate = dateEnrollUfk;
         }
 
         public override string Version => "BKSV2";
