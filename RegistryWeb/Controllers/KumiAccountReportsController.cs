@@ -88,19 +88,19 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        public IActionResult InvoiceToHtmlList(int? idAccount, DateTime onDate)
+        public IActionResult InvoiceToHtmlList(List<int> idAccounts, DateTime onDate)
         {
             var results = new Dictionary<int, IEnumerable<string>>();
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
                 return Json(new { ErrorCode = -8, results });
             List<int> ids = new List<int>();
-            if (idAccount == null)
+            if (idAccounts.Count() == 0 || idAccounts == null)
             {
                 ids = GetSessionIds();
             }
             else
             {
-                ids.Add(idAccount.Value);
+                ids.Add(idAccounts[0]);
             }
 
             if (!ids.Any())
@@ -124,20 +124,13 @@ namespace RegistryWeb.Controllers
             return View(correctInvoices);
         }
 
-        public IActionResult InvoiceGenerator(int? idAccount, DateTime onDate, string invoiceAction, string textmessage)
+        public IActionResult InvoiceGenerator(List<int> idAccounts, DateTime onDate, string invoiceAction, string textmessage)
         {
             var results = new Dictionary<int, IEnumerable<string>>();
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
                 return Json(new { ErrorCode = -8, results });
             List<int> ids = new List<int>();
-            if (idAccount == null)
-            {
-                ids = GetSessionIds();
-            }
-            else
-            {
-                ids.Add(idAccount.Value);
-            }
+            ids.AddRange(idAccounts);
 
             if (!ids.Any())
                 return Json(new { ErrorCode = -8, results });
