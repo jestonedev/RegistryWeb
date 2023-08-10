@@ -1,4 +1,5 @@
 ﻿using NPOI.HSSF.UserModel;
+using NPOI.HSSF.Util;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using System;
@@ -87,6 +88,49 @@ namespace RegistryServices.DataHelpers
             var cell = row.CreateCell(columnIndex, cellType);
             cell.SetCellValue(value);
             cell.CellStyle = style;
+        }
+
+        public static ICellStyle GetPaymentsKbkHeaderCellStyle(HSSFWorkbook workbook)
+        {
+            if (headerCellStyle != null) return headerCellStyle;
+            headerCellStyle = workbook.CreateCellStyle();
+            headerCellStyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.RoyalBlue.Index;
+            headerCellStyle.FillBackgroundColor = NPOI.HSSF.Util.HSSFColor.RoyalBlue.Index;
+            headerCellStyle.FillPattern = FillPattern.SolidForeground;
+            headerCellStyle.BorderTop = BorderStyle.Thin;
+            headerCellStyle.BorderBottom = BorderStyle.Thin;
+            headerCellStyle.BorderLeft = BorderStyle.Thin;
+            headerCellStyle.BorderRight = BorderStyle.Thin;
+            headerCellStyle.WrapText = true;
+            headerCellStyle.Alignment = HorizontalAlignment.Center;
+            var headerFont = workbook.CreateFont();
+            headerFont.IsBold = true;
+            headerFont.Color = HSSFColor.White.Index;
+            headerFont.FontHeightInPoints = 12;
+            headerFont.FontName = "Tahoma";
+            headerCellStyle.SetFont(headerFont);
+            return headerCellStyle;
+        }
+
+        public static ICellStyle GetPaymentsKbkBaseDataCellStyle(HSSFWorkbook workbook, HorizontalAlignment horizontal, VerticalAlignment vertical, bool isItalic = false, bool isBold = false)
+        {
+            var keyName = horizontal.ToString() + isItalic.ToString() + isBold.ToString();
+            if (baseDataCellStyles.ContainsKey(keyName))
+                return baseDataCellStyles[keyName];
+            var cellStyle = workbook.CreateCellStyle();
+            cellStyle.BorderTop = BorderStyle.Thin;
+            cellStyle.BorderBottom = BorderStyle.Thin;
+            cellStyle.BorderLeft = BorderStyle.Thin;
+            cellStyle.BorderRight = BorderStyle.Thin;
+            cellStyle.WrapText = true;
+            cellStyle.Alignment = horizontal;
+            cellStyle.VerticalAlignment = vertical;
+            var font = workbook.CreateFont();
+            font.IsItalic = isItalic;
+            font.IsBold = isBold;
+            cellStyle.SetFont(font);
+            baseDataCellStyles.Add(keyName, cellStyle);
+            return cellStyle;
         }
     }
 }

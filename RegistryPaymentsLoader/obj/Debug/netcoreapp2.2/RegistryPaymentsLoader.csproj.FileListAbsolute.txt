@@ -47,4 +47,5 @@ C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\obj\Debug\n
 C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.csproj.CopyComplete
 C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.dll
 C:\Users\belpe\Documents\registry\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.pdb
-D:\Projects\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.csprojAssemblyReference.cache
+D:\Projects\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.csproj.AssemblyReference.cache
+D:\Projects\RegistryWeb\RegistryPaymentsLoader\obj\Debug\netcoreapp2.2\RegistryPaymentsLoader.GeneratedMSBuildEditorConfig.editorconfig

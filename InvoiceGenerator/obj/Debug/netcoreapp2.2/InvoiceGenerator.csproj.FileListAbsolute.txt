@@ -11,8 +11,9 @@ D:\Projects\RegistryWeb\InvoiceGenerator\obj\Debug\netcoreapp2.2\InvoiceGenerato
 D:\Projects\RegistryWeb\InvoiceGenerator\bin\Debug\netcoreapp2.2\InvoiceGenerator.deps.json
 D:\Projects\RegistryWeb\InvoiceGenerator\bin\Debug\netcoreapp2.2\InvoiceGenerator.dll
 D:\Projects\RegistryWeb\InvoiceGenerator\bin\Debug\netcoreapp2.2\InvoiceGenerator.pdb
-D:\Projects\RegistryWeb\InvoiceGenerator\obj\Debug\netcoreapp2.2\InvoiceGenerator.csprojAssemblyReference.cache
 D:\Projects\RegistryWeb\InvoiceGenerator\obj\Debug\netcoreapp2.2\InvoiceGenerator.csproj.CoreCompileInputs.cache
 D:\Projects\RegistryWeb\InvoiceGenerator\obj\Debug\netcoreapp2.2\InvoiceGenerator.AssemblyInfoInputs.cache
 D:\Projects\RegistryWeb\InvoiceGenerator\obj\Debug\netcoreapp2.2\InvoiceGenerator.AssemblyInfo.cs
 D:\Projects\Visual Studio Projects\RegistryWeb\InvoiceGenerator\obj\Debug\netcoreapp2.2\InvoiceGenerator.csprojAssemblyReference.cache
+D:\Projects\RegistryWeb\InvoiceGenerator\obj\Debug\netcoreapp2.2\InvoiceGenerator.csproj.AssemblyReference.cache
+D:\Projects\RegistryWeb\InvoiceGenerator\obj\Debug\netcoreapp2.2\InvoiceGenerator.GeneratedMSBuildEditorConfig.editorconfig

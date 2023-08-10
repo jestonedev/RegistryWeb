@@ -69,8 +69,8 @@ namespace RegistryWeb.Controllers
                     }
                     if (errorIds.Any())
                     {
-                        return Error(string.Format("В исков{1} работ{2} {0} отсутствует стадия передачи в юридический отдел", 
-                            errorIds.Select(r => r.ToString()).Aggregate((acc, v) => acc+", "+v),
+                        return Error(string.Format("В исков{1} работ{2} {0} отсутствует стадия передачи в юридический отдел",
+                            errorIds.Select(r => r.ToString()).Aggregate((acc, v) => acc + ", " + v),
                             errorIds.Count == 1 ? "ой" : "ых", errorIds.Count == 1 ? "е" : "ах"));
                     }
                 }
@@ -438,6 +438,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        /*
         public IActionResult GetPaymentsForPeriod(DateTime startDate, DateTime endDate)
         {
             if (!securityService.HasPrivilege(Privileges.AccountsRead))
@@ -452,7 +453,7 @@ namespace RegistryWeb.Controllers
             {
                 return Error(ex.Message);
             }
-        }
+        }*/
 
         public IActionResult GetBalanceForPeriod(DateTime startDate)
         {
@@ -484,8 +485,24 @@ namespace RegistryWeb.Controllers
                 paymentDate = paymentDate.AddMonths(1).AddDays(-1);
 
                 var file = reportService.SberbankFile(paymentDate);
-                var monthStr = (startDate.Month < 10 ? "0"  : "") + startDate.Month.ToString();
+                var monthStr = (startDate.Month < 10 ? "0" : "") + startDate.Month.ToString();
                 return File(file, csvMime, string.Format("18018001_3803201800_40101810900000010001_{0}_y{1}.csv", monthStr, (startDate.Year % 100).ToString()));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetPaymentsForPeriod(DateTime startDate, DateTime endDate)
+        {
+            if (!securityService.HasPrivilege(Privileges.AccountsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var file = reportService.PaymentsForPeriod(startDate, endDate);
+                return File(file, "application/vnd.ms-excel", string.Format("Платежи КБК найма за период {0}-{1}.xls", startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")));
             }
             catch (Exception ex)
             {

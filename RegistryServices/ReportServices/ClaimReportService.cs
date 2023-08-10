@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using NPOI.HSSF.UserModel;
+using NPOI.HSSF.Util;
+using NPOI.SS.UserModel;
 using RegistryDb.Models;
+using RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts;
+using RegistryServices.DataHelpers;
 using RegistryWeb.SecurityServices;
 using System;
 using System.Collections.Generic;
@@ -345,6 +350,7 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
+        /*
         public byte[] PaymentsForPeriod(DateTime startDate, DateTime endDate)
         {
             var arguments = new Dictionary<string, object> {
@@ -354,7 +360,7 @@ namespace RegistryWeb.ReportServices
             var fileName = "registry\\kumi_accounts\\payments_for_period";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
-        }
+        }*/
 
         public byte[] BalanceForPeriod(DateTime startDate)
         {
@@ -385,5 +391,162 @@ namespace RegistryWeb.ReportServices
             
             return DownloadFile(new FileInfo(destFile).Name);
         }
+
+        public byte[] PaymentsForPeriod(DateTime startDate, DateTime endDate)
+        {
+            var paymentsKbk = registryContext.GetPaymentsForPeriods(startDate, endDate);
+
+            var workbook = new HSSFWorkbook();
+            var sheet = workbook.CreateSheet("Платежи КБК");
+            sheet.SetColumnWidth(0, 2000);
+            sheet.SetColumnWidth(1, 3000);
+            sheet.SetColumnWidth(2, 12000);
+            sheet.SetColumnWidth(3, 3000);
+            sheet.SetColumnWidth(4, 12000);
+            sheet.SetColumnWidth(5, 5000);
+            sheet.SetColumnWidth(6, 8000);
+
+            var headerStyle = NPOIHelper.GetPaymentsKbkHeaderCellStyle(workbook);
+
+            var head = workbook.CreateCellStyle();
+            var headerFont = workbook.CreateFont();
+            headerFont.IsBold = true;
+            headerFont.Color = HSSFColor.RoyalBlue.Index;
+            headerFont.FontName = "Tahoma";
+            headerFont.FontHeightInPoints = 20;
+            head.SetFont(headerFont);
+          
+
+            NPOIHelper.CreateActSpanedCell(sheet, 0, 0, 1, 7,
+                string.Format("КУМИ г.Братска"), head);
+            NPOIHelper.CreateActSpanedCell(sheet, 1, 0, 1, 7,
+                string.Format("Платежи за период с {0} по {1} по КБК найма", 
+                startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")), head);
+
+            NPOIHelper.CreateActSpanedCell(sheet, 2, 0, 1, 2, "Документ", headerStyle);
+            NPOIHelper.CreateActCell(sheet, 3, 0, "№", headerStyle);
+            NPOIHelper.CreateActCell(sheet, 3, 1, "Дата", headerStyle);
+
+            NPOIHelper.CreateActSpanedCell(sheet, 2, 2, 2 , 1, "Наименование", headerStyle);
+
+            NPOIHelper.CreateActSpanedCell(sheet, 2, 3, 1, 2, "Платеж", headerStyle);
+            NPOIHelper.CreateActCell(sheet, 3, 3, "Сумма", headerStyle);
+            NPOIHelper.CreateActCell(sheet, 3, 4, "Назначение платежа", headerStyle);
+
+            NPOIHelper.CreateActSpanedCell(sheet, 2, 5, 2, 1, "Примечание", headerStyle);
+            NPOIHelper.CreateActSpanedCell(sheet, 2, 6, 2, 1, "Распределен на", headerStyle);
+
+            var rowIndex = 4;
+            var groupIndex = 0;
+            var result = new List<PaymentsForPeriod>();
+            decimal totalSum = 0;
+            decimal superTotalSum = 0;
+
+            for (var i = 0; i < paymentsKbk.Count; i++)
+            {
+                if (paymentsKbk[i].group_index != groupIndex)
+                {
+                    if (groupIndex == 0)
+                    {
+                        groupIndex = paymentsKbk[i].group_index;
+                    }
+                    else
+                    {
+                        groupIndex = paymentsKbk[i].group_index;
+                        result.Add(new PaymentsForPeriod
+                        {
+                            num_d = null,
+                            date_d_str = null,
+                            payer_name = null,
+                            sum = Math.Round((decimal)totalSum * 100) / 100,
+                            purpose = null,
+                            note = null,
+                            account_info = null
+                        });
+                        totalSum = 0;
+                    }
+                }
+                var sumD =  paymentsKbk[i]?.sum == null ? 0 : paymentsKbk[i].sum;
+                var groupRow = new PaymentsForPeriod
+                {
+                    num_d = paymentsKbk[i].num_d,
+                    date_d_str = paymentsKbk[i].date_d_str,
+                    payer_name = paymentsKbk[i].payer_name,
+                    sum = sumD,
+                    purpose = paymentsKbk[i].purpose,
+                    note = paymentsKbk[i].note,
+                    account_info = paymentsKbk[i].account_info
+                };
+                result.Add(groupRow);
+                totalSum += sumD;
+                superTotalSum += sumD;
+            }
+            if (groupIndex != 0)
+            {
+                result.Add(new PaymentsForPeriod
+                {
+                    num_d = null,
+                    date_d_str = null,
+                    payer_name = null,
+                    sum = Math.Round((decimal)totalSum * 100) / 100,
+                    purpose = null,
+                    note = null,
+                    account_info = null
+                });
+            }
+
+            result.Add(new PaymentsForPeriod{
+                num_d = null,
+                date_d_str = null,
+                payer_name = "Итого",
+                sum = Math.Round((decimal)superTotalSum * 100) / 100,
+                purpose = null,
+                note = null,
+                account_info = null
+            }
+            );
+
+            foreach (var payment in result)
+            {
+                NPOIHelper.CreateActCell(sheet, rowIndex, 0, payment.num_d?.ToString(),
+                                            NPOIHelper.GetPaymentsKbkBaseDataCellStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center));
+                NPOIHelper.CreateActCell(sheet, rowIndex, 1, payment.date_d_str?.ToString(),
+                                            NPOIHelper.GetPaymentsKbkBaseDataCellStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center));
+               switch(payment.payer_name)
+                {
+                    case null:
+                        NPOIHelper.CreateActCell(sheet, rowIndex, 3, (double)payment.sum,
+                                           NPOIHelper.GetPaymentsKbkBaseDataCellStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, false, true));
+                        break;
+                    case "Итого":
+                        NPOIHelper.CreateActCell(sheet, rowIndex, 2, payment.payer_name?.ToString(),
+                                            NPOIHelper.GetPaymentsKbkBaseDataCellStyle(workbook, HorizontalAlignment.Left, VerticalAlignment.Center, false, true));
+                        NPOIHelper.CreateActCell(sheet, rowIndex, 3, (double)payment.sum,
+                                           NPOIHelper.GetPaymentsKbkBaseDataCellStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, false, true));
+                        break;
+                    default:
+                        NPOIHelper.CreateActCell(sheet, rowIndex, 2, payment.payer_name?.ToString(),
+                                       NPOIHelper.GetPaymentsKbkBaseDataCellStyle(workbook, HorizontalAlignment.Left, VerticalAlignment.Center));
+                        NPOIHelper.CreateActCell(sheet, rowIndex, 3, (double)payment.sum,
+                                            NPOIHelper.GetPaymentsKbkBaseDataCellStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center));
+                        break;
+                }
+               
+                NPOIHelper.CreateActCell(sheet, rowIndex, 4, payment.purpose?.ToString(),
+                                            NPOIHelper.GetPaymentsKbkBaseDataCellStyle(workbook, HorizontalAlignment.Left, VerticalAlignment.Center));
+                NPOIHelper.CreateActCell(sheet, rowIndex, 5, payment.note?.ToString(),
+                                            NPOIHelper.GetPaymentsKbkBaseDataCellStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center));
+                NPOIHelper.CreateActCell(sheet, rowIndex, 6, payment.account_info?.ToString(), 
+                                            NPOIHelper.GetPaymentsKbkBaseDataCellStyle(workbook, HorizontalAlignment.Left, VerticalAlignment.Center));
+                rowIndex++;
+            }
+
+            using (var exportData = new MemoryStream())
+            {
+                workbook.Write(exportData);
+                return exportData.GetBuffer();
+            }
+        }
+        
     }
 }
