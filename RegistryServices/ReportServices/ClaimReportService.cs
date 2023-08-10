@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace RegistryWeb.ReportServices
 {
@@ -350,27 +351,16 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
-        /*
-        public byte[] PaymentsForPeriod(DateTime startDate, DateTime endDate)
-        {
-            var arguments = new Dictionary<string, object> {
-                { "from_date", startDate.ToString("dd.MM.yyyy") },
-                { "to_date", endDate.ToString("dd.MM.yyyy") }
-            };
-            var fileName = "registry\\kumi_accounts\\payments_for_period";
-            var fileNameReport = GenerateReport(arguments, fileName);
-            return DownloadFile(fileNameReport);
-        }*/
-
-        public byte[] BalanceForPeriod(DateTime startDate)
+        public byte[] BalanceForPeriod(DateTime startDate, int reportType)
         {
             var paymentDate = new DateTime(startDate.Year, startDate.Month, 1);
             paymentDate = paymentDate.AddMonths(1).AddDays(-1);
 
             var arguments = new Dictionary<string, object> {
-                { "for_date", startDate.ToString("dd.MM.yyyy") }
+                { "for_date", startDate.ToString("dd.MM.yyyy") },
+                { "report_type", reportType }
             };
-            var fileName = "registry\\kumi_accounts\\balance_for_period";
+            var fileName = "registry\\kumi_accounts\\balance_for_period_with_report_type";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
         }
@@ -387,14 +377,16 @@ namespace RegistryWeb.ReportServices
             {
                 csv +=  row.Account + ";" + row.Tenant + ";" + row.Address + ";" + row.Kbk + ";" + row.Okato + ";" + row.Sum + "\r\n";
             }
-            File.WriteAllText(destFile, csv);
+            var encoding = Encoding.GetEncoding("windows-1251");
+            File.WriteAllText(destFile, csv, encoding);
             
             return DownloadFile(new FileInfo(destFile).Name);
         }
 
-        public byte[] PaymentsForPeriod(DateTime startDate, DateTime endDate)
+
+        public byte[] PaymentsForPeriod(DateTime startDate, DateTime endDate, string kbk)
         {
-            var paymentsKbk = registryContext.GetPaymentsForPeriods(startDate, endDate);
+            var paymentsKbk = registryContext.GetPaymentsForPeriods(startDate, endDate, kbk);
 
             var workbook = new HSSFWorkbook();
             var sheet = workbook.CreateSheet("Платежи КБК");
@@ -547,6 +539,16 @@ namespace RegistryWeb.ReportServices
                 return exportData.GetBuffer();
             }
         }
-        
-    }
+
+        public byte[] FileForDoverie(DateTime date, bool excludeUploaded, bool saveUploadFact)
+        {
+            var arguments = new Dictionary<string, object> {
+                { "for_date", date.ToString("dd.MM.yyyy") },
+                { "exclude_uploaded", excludeUploaded? 1 : 0 },
+                { "save_upload_fact", saveUploadFact ? 1 : 0 },
+            };
+            var fileName = "registry\\kumi_accounts\\export_for_doverie";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }    }
 }

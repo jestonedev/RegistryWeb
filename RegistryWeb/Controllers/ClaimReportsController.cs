@@ -438,24 +438,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
-        /*
-        public IActionResult GetPaymentsForPeriod(DateTime startDate, DateTime endDate)
-        {
-            if (!securityService.HasPrivilege(Privileges.AccountsRead))
-                return View("NotAccess");
-
-            try
-            {
-                var file = reportService.PaymentsForPeriod(startDate, endDate);
-                return File(file, xlsxMime, string.Format("Платежи КБК найма за период {0}-{1}.xlsx", startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
-        }*/
-
-        public IActionResult GetBalanceForPeriod(DateTime startDate)
+        public IActionResult GetBalanceForPeriod(DateTime startDate, int reportType)
         {
             if (!securityService.HasPrivilege(Privileges.AccountsRead))
                 return View("NotAccess");
@@ -465,7 +448,7 @@ namespace RegistryWeb.Controllers
                 var paymentDate = new DateTime(startDate.Year, startDate.Month, 1);
                 paymentDate = paymentDate.AddMonths(1).AddDays(-1);
 
-                var file = reportService.BalanceForPeriod(paymentDate);
+                var file = reportService.BalanceForPeriod(paymentDate, reportType);
                 return File(file, odsMime, string.Format("Начисления ЛС КУМИ за период {0}-{1}.ods", startDate.ToString("dd.MM.yyyy"), paymentDate.ToString("dd.MM.yyyy")));
             }
             catch (Exception ex)
@@ -493,15 +476,14 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
-
-        public IActionResult GetPaymentsForPeriod(DateTime startDate, DateTime endDate)
+        public IActionResult GetPaymentsForPeriod(DateTime startDate, DateTime endDate, string kbk)
         {
             if (!securityService.HasPrivilege(Privileges.AccountsRead))
                 return View("NotAccess");
 
             try
             {
-                var file = reportService.PaymentsForPeriod(startDate, endDate);
+                var file = reportService.PaymentsForPeriod(startDate, endDate, kbk);
                 return File(file, "application/vnd.ms-excel", string.Format("Платежи КБК найма за период {0}-{1}.xls", startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")));
             }
             catch (Exception ex)
@@ -509,5 +491,23 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
-    }
+
+        public IActionResult GetFileForDoverie(DateTime startDate, bool excludeUploaded, bool saveUploadFact)
+        {
+            if (!securityService.HasPrivilege(Privileges.AccountsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var date = new DateTime(startDate.Year, startDate.Month, 1);
+                date = date.AddMonths(1).AddDays(-1);
+
+                var file = reportService.FileForDoverie(date, excludeUploaded, saveUploadFact);
+                return File(file, odsMime, string.Format("Обменный файл для АИС \"Доверие\" от {0}.ods", DateTime.Now.ToString("dd.MM.yyyy")));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }    }
 }

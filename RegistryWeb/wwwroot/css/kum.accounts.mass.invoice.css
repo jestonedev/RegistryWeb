@@ -18,7 +18,7 @@ table.main-table .main-content-td {
 
 table.money-table .money-td {
     text-align: right;
-    padding-right: 30px;
+    padding-right: 127pt;
 }
 
 table.money-table .money-header, table.area-table .area-header {
@@ -147,5 +147,9 @@ body * {
 
     .rr-invoice-wrapper {
         height: 11.7cm;
+    }
+
+    table.money-table .money-td {
+        padding-right: 167pt;
     }
 }

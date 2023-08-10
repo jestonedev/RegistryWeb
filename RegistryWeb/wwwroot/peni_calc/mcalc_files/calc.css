@@ -1,0 +1,366 @@
+/*.judge-table .calc-footer td {
+	font-size: 20px;
+}*/
+
+.calc h4 {
+	color: #333;
+	background: #EAEAEA;
+	padding: 6px 10px;
+	margin: 2px 0;
+}
+
+.calc {
+	border: 1px solid #CCC;
+	background: #f6f6f6;
+	width:715px;
+	margin: 0 auto;
+}
+.edit-table-onsite {
+	width: 636px;
+	margin: 0 6px;
+}
+
+.edit-table-onsite td {
+	padding: 8px 4px;
+}
+
+.edit-table-onsite tr {
+	border-bottom: 1px dotted #ccc;
+}
+
+.edit-table-onsite input.custom-combobox-input {
+	width:250px;
+}
+
+.no-pading td {
+	padding:0 4px 0 0;
+}
+
+.no-pading tr {
+	border-bottom: none;
+}
+
+.judge-table td {
+    white-space: nowrap;
+	font-size:12px;
+    /*text-align: center;*/
+}
+
+.cbr-table .head td {
+	vertical-align: middle;
+	text-align: center;
+}
+
+.jt-2 .calc-footer td {
+	/*font-size: 20px;*/
+	/*font-size: 16px;*/
+}
+
+.jt-2 td {
+	padding: 4px 6px;
+	vertical-align: middle;
+}
+
+.jt-2 td, .jt-4 td {
+	text-align: right;
+}
+
+/*.calc h4 {
+	color: #444;
+	background: #EAEAEA;
+	padding: 6px 10px;
+	margin: 2px 0;
+}*/
+
+.calc h4 span, .calc form {
+	display: block; width:715px; margin: 0 auto
+}
+
+#calc-tabs {
+	width:100%;
+}
+
+#calc-tabs td {
+	padding: 4px;
+}
+
+#calc-tabs a {
+	display: block;
+	padding: 10px;
+	font-size: 16px;
+	color:#fff;
+	background: #7EA77E;
+	text-align: center;
+	text-decoration: none;
+	position: relative;
+}
+
+#calc-tabs a.calc-tabs1 {
+	background: #7EA77E;
+}
+
+#calc-tabs a.calc-tabs1:hover, #calc-tabs a.calc-tabs1.calc-tab-selected {
+	background: #2F862F;
+}
+
+#calc-tabs a.calc-tabs2 {
+	background: #A79B7E;
+}
+
+#calc-tabs a.calc-tabs2:hover, #calc-tabs a.calc-tabs2.calc-tab-selected {
+	background: #9E8036;
+}
+
+.calc-panos {
+	margin-top:20px;
+}
+
+.calc-panes-contents {
+
+}
+
+#calc-tabs a .ct-pin {
+	position: absolute;
+	left:50%;
+	bottom:-12px;
+	margin-left: -12px;
+	border-top: 12px solid #000;
+	border-left: 12px solid rgba(0,0,0,0);
+	border-right: 12px solid rgba(0,0,0,0);
+	display: none;
+}
+
+#calc-tabs a.calc-tab-selected span {
+	display: block;
+}
+
+#calc-tabs a.calc-tabs1.calc-tab-selected span {
+	border-top: 12px solid #2F862F;
+
+}
+
+#calc-tabs a.calc-tabs2.calc-tab-selected span {
+	border-top: 12px solid #9E8036;
+}
+
+#pays div {
+	vertical-align: middle;
+}
+#pays input {
+	vertical-align: middle;
+}
+
+.edit-table-onsite .payDate {
+	width: 90px;
+	margin-right: 2px;
+}
+
+.edit-table-onsite .paySum {
+	width: 96px;
+	margin: 0 2px;
+}
+
+.edit-table-onsite .payOrder {
+	width: 40px;
+	margin: 0 2px;
+}
+
+.edit-table-onsite .payAdd, .edit-table-onsite .payRemove {
+	width: 30px;
+}
+
+.jt-2 .head td {
+	text-align: center !important;
+	vertical-align: bottom;
+	white-space: normal;
+}
+
+.jt-payed {
+	background: #FFECB2;
+}
+
+.jt-loaned {
+	background: #DFFFEF;
+}
+
+.judge-table .label, .judge-table .du-label {
+	width:1px;
+	white-space: nowrap;
+}
+
+.jt-3 .label, .jt-3 .du-label {
+	background: #EEE;
+}
+
+#resultWrap {
+	width:715px;
+	margin:0 auto;
+}
+
+.djuJurist {
+	float: right;
+	width: 270px;
+	font-size: 14px;
+	border-left: #CACACA 18px solid;
+	padding: 8px 42px 10px 20px;
+	background: #F0F0F0;
+}
+
+.djuJurist a {
+	text-decoration: none;
+}
+
+.djuJurist a:hover {
+	text-decoration: underline;
+}
+
+#dateStart, #dateFinish {
+    width:200px;
+}
+
+#calc-notes {
+	margin: 10px;
+	padding:10px;
+	background: #fff;
+	border: 1px solid #ccc;
+}
+
+.paysImport {
+	position: fixed;
+	top:0;
+	left:0;
+	right:0;
+	bottom: 0;
+	background: rgba(0,0,0, 0.8);
+	z-index: 2;
+}
+
+.paysMiddle {
+	width:715px;
+	margin:10px auto 0;
+	padding: 10px;
+	background: #fafafa;
+	border:1px solid #ccc;
+}
+
+.paysText {
+	width: 270px;
+	height: 300px;
+}
+
+.paysTable td {
+	padding: 6px 10px;
+	font-size: 14px;
+}
+
+.paysTitle {
+	font-size:18px;
+	color:#000099;
+}
+
+/*.table-scroll {
+	width:100%; overflow-x: auto
+}*/
+
+#resInfo {
+	color:#999;
+}
+
+#center_column h1 span {
+	width:715px;
+	margin: 0 auto;
+	display: block;
+}
+.formula {
+	float:right;
+}
+.formula td {
+	vertical-align: middle;
+	border: none;
+	padding: 2px;
+	line-height: 100%;
+}
+
+.formula .f-big {
+	font-size:16px;
+}
+
+.formula .f-up {
+	border-bottom: 1px solid #000;
+}
+
+.formula td i {
+	font-style: normal;
+	font-size:22px;
+}
+
+
+/*******************************/
+
+#du-help {
+	position: absolute;
+	left: 50%;
+	top: 100px;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+	box-shadow: 0 0 10px #000;
+	width: 700px;
+	margin-left: -350px;
+	font-size: 14px;
+	line-height: 150%;
+	background: #fff
+}
+
+#du-help .close {
+	position: absolute;
+	top: 17px;
+	right: 10px;
+	color: #fff;
+	padding: 4px 8px;
+	background: #3d4b84;
+	border-radius: 2px;
+	line-height: 100%
+}
+
+#du-help ol b {
+	display: inline-block;
+	width: 150px;
+	text-align: center;
+
+	color: #fff;
+	font-weight: normal;
+}
+#duh-wrap {
+	position: fixed;
+	background: rgba(0,0,0, 0.6);
+	top:0;
+	left:0;
+	bottom: 0;
+	right:0;
+}
+
+@media screen and (max-width: 640px) {
+	.calc {
+		width:auto;
+	}
+
+	.calc .edit-table-onsite {
+		width:630px;
+	}
+
+	.calc .edit-table-onsite td {
+		display: block;
+	}
+}
+
+@media screen and (max-width: 415px) {
+	.calc .edit-table-onsite {
+		width:390px;
+	}
+}
+
+@media screen and (max-width: 360px) {
+	.calc .edit-table-onsite {
+		width:320px;
+	}
+}

@@ -21,6 +21,7 @@ using RegistryDb.Models.Entities.Common;
 using RegistryServices.Models.KumiAccounts;
 using RegistryWeb.DataHelpers;
 using RegistryServices.Classes;
+using RegistryDb.Models.Entities.Payments;
 
 namespace RegistryWeb.DataServices
 {
@@ -320,7 +321,7 @@ namespace RegistryWeb.DataServices
                 Description = description
             });
 
-            if(idAccountMirror.HasValue)
+            if(idAccountMirror.HasValue && idAccountMirror.Value!=idAccount)
                 registryContext.KumiChargeCorrections.Add(new KumiChargeCorrection
                 {
                     IdAccount = idAccountMirror.Value,
@@ -784,14 +785,17 @@ namespace RegistryWeb.DataServices
                 charge.PaymentCharges = null;
                 if (lastDbLockedCharge == null)
                 {
-                    if (prevCharge == null)
+                    // Если в БД нет начислений до даты перезаписи и предыдущее начисление не подпадает под перезапись, то считаем
+                    // что начисление первое и берем нулевое сальдо
+                    if (prevCharge == null || prevCharge.EndDate < startRewriteDate)
                     {
-                        charge.InputTenancy = firstDbRewriteCharge?.InputTenancy ?? charge.InputTenancy;
-                        charge.InputPenalty = firstDbRewriteCharge?.InputPenalty ?? charge.InputPenalty;
-                        charge.InputDgi = firstDbRewriteCharge?.InputDgi ?? charge.InputDgi;
-                        charge.InputPkk = firstDbRewriteCharge?.InputPkk ?? charge.InputPkk;
-                        charge.InputPadun = firstDbRewriteCharge?.InputPadun ?? charge.InputPadun;
+                        charge.InputTenancy = firstDbRewriteCharge?.InputTenancy ?? 0;
+                        charge.InputPenalty = firstDbRewriteCharge?.InputPenalty ?? 0;
+                        charge.InputDgi = firstDbRewriteCharge?.InputDgi ?? 0;
+                        charge.InputPkk = firstDbRewriteCharge?.InputPkk ?? 0;
+                        charge.InputPadun = firstDbRewriteCharge?.InputPadun ?? 0;
                     } else
+                    // Если предыдущее начисление подпадает под перезапись, то берем сальдо из него
                     {
                         charge.InputTenancy = prevCharge.OutputTenancy;
                         charge.InputPenalty = prevCharge.OutputPenalty;
@@ -799,10 +803,12 @@ namespace RegistryWeb.DataServices
                         charge.InputPkk = prevCharge.OutputPkk;
                         charge.InputPadun = prevCharge.OutputPadun;
                     }
-                } else
+                }
+                else
+                // Если в БД есть начисления, которые не попали под перезапись, то берем сальдо из него
                 if (prevCharge != null)
                 {
-                    if (lastDbLockedCharge.StartDate >= prevCharge.StartDate)
+                    if (lastDbLockedCharge.StartDate >= prevCharge.StartDate || prevCharge.EndDate < startRewriteDate)
                     {
                         charge.InputTenancy = lastDbLockedCharge.OutputTenancy;
                         charge.InputPenalty = lastDbLockedCharge.OutputPenalty;
@@ -1224,12 +1230,12 @@ namespace RegistryWeb.DataServices
                 if (aggCharges.Any())
                 {
                     var dbCharge = accountInfo.Charges.Where(r => r.StartDate <= sliceDate).OrderByDescending(r => r.StartDate).FirstOrDefault();
-                    if (dbCharge != null)
+                    if (dbCharge != null && dbCharge.InputTenancy - dbCharge.PaymentTenancy > 0)
                     {
                         resultChargesInfo.Add(new KumiSumDateInfo
                         {
                             Date = sliceDate,
-                            Value = dbCharge.InputTenancy
+                            Value = dbCharge.InputTenancy-dbCharge.PaymentTenancy
                         });
                         resultChargesInfo = resultChargesInfo.OrderBy(r => r.Date).ToList();
                     }
@@ -1302,15 +1308,18 @@ namespace RegistryWeb.DataServices
             List<KumiPayment> payments, DateTime? endDate)
         {
             var chargeIds = dbCharges.Select(r => r.IdCharge).ToList();
+            var claimIds = claims.Select(r => r.IdClaim).ToList();
 
             var calcPayments = payments.Where(r =>
                 r.DateExecute != null ? r.DateExecute <= endDate :
                 r.DateIn != null ? r.DateIn <= endDate :
-                r.DateDocument != null ? r.DateDocument <= endDate : false).Where(r => r.PaymentCharges.Any(pc => chargeIds.Contains(pc.IdCharge)));
+                r.DateDocument != null ? r.DateDocument <= endDate : false)
+                .Where(r => r.PaymentCharges.Any(pc => chargeIds.Contains(pc.IdCharge)) || r.PaymentClaims.Any(pc => claimIds.Contains(pc.IdClaim)));
+
 
             // Для ПИР, которые были до даты последнего начисления БКС:
             // Не учитывать в расчете пени, т.к. оплаты по ним отражены в движении от БКС
-            DateTime? bksChargeLastDate = null;
+            /*DateTime? bksChargeLastDate = null;
             if (dbCharges.Any(r => r.IsBksCharge == 1))
             {
                 bksChargeLastDate = dbCharges.Where(r => r.IsBksCharge == 1).Select(r => r.EndDate).Max();
@@ -1324,12 +1333,13 @@ namespace RegistryWeb.DataServices
                 {
                     Date = r.EndDeptPeriod.Value, //r.ClaimStates.FirstOrDefault(s => s.IdStateType == 4).CourtOrderDate.Value,
                     Value = (r.AmountTenancy + r.AmountPkk + r.AmountPadun + r.AmountDgi) ?? 0
-                });
+                });*/
 
             var preparedPayments = calcPayments.Select(r => new KumiSumDateInfo
             {
                 Date = (r.DateExecute ?? r.DateIn ?? r.DateDocument).Value,
-                Value = r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.TenancyValue)
+                Value = r.PaymentCharges.Where(pc => chargeIds.Contains(pc.IdCharge)).Sum(pc => pc.TenancyValue) +
+                     r.PaymentClaims.Where(pc => claimIds.Contains(pc.IdClaim)).Sum(pc => pc.TenancyValue)
             });
 
             var paymentCorrections = corrections.Where(r => r.PaymentTenancyValue != 0)
@@ -1339,7 +1349,7 @@ namespace RegistryWeb.DataServices
                     Value = r.PaymentTenancyValue
                 });
 
-            return preparedClaims.Union(preparedPayments).Union(paymentCorrections).ToList();
+            return /*preparedClaims.Union(preparedPayments)*/ preparedPayments.Union(paymentCorrections).ToList();
         }
 
         private decimal CalcPenalty(List<KumiChargeCorrection> corrections,  List<KumiCharge> dbCharges, List<KumiCharge> charges, List<Claim> claims, 
@@ -1356,12 +1366,12 @@ namespace RegistryWeb.DataServices
             if (aggCharges.Any())
             {
                 var dbCharge = dbCharges.Where(r => r.StartDate <= sliceDate).OrderByDescending(r => r.StartDate).FirstOrDefault();
-                if (dbCharge != null)
+                if (dbCharge != null && dbCharge.InputTenancy - dbCharge.PaymentTenancy > 0)
                 {
                     resultChargesInfo.Add(new KumiSumDateInfo
                     {
                         Date = sliceDate,
-                        Value = dbCharge.InputTenancy
+                        Value = dbCharge.InputTenancy-dbCharge.PaymentTenancy
                     });
                     resultChargesInfo = resultChargesInfo.OrderBy(r => r.Date).ToList();
                 }
@@ -1930,6 +1940,8 @@ namespace RegistryWeb.DataServices
             viewModel.TenancyInfo = GetTenancyInfo(viewModel.Accounts);
             viewModel.ClaimsInfo = GetClaimsInfo(viewModel.Accounts);
             viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "IdRegion", "Region");
+            viewModel.BksAccounts = GetBksAccounts(viewModel.Accounts);
+
             if (filterOptions?.IdRegions != null && filterOptions?.IdRegions.Count > 0)
             {
                 var streets = new List<KladrStreet>();
@@ -1943,6 +1955,12 @@ namespace RegistryWeb.DataServices
                 viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(null), "IdStreet", "StreetName");
 
             return viewModel;
+        }
+
+        private IEnumerable<PaymentAccount> GetBksAccounts(IEnumerable<KumiAccount> accounts)
+        {
+            var ids = accounts.Select(r => r.IdAccount).ToList();
+            return registryContext.PaymentAccounts.Where(pa => ids.Contains(pa.IdAccount)).ToList();
         }
 
         public KumiAccountsVM GetAccountsViewModelForMassReports(List<int> ids, PageOptions pageOptions)
@@ -2582,7 +2600,8 @@ namespace RegistryWeb.DataServices
                                        select assoc).ToList();
             var tenancyIds = accountTenancyAssocs.Select(r => r.IdProcess).Distinct();
             var tenancyProcesses = registryContext.TenancyProcesses.Include(r => r.TenancyRentPeriods)
-                .Include(r => r.TenancyPersons).Where(r => tenancyIds.Contains(r.IdProcess)).ToList();
+                .Include(r => r.TenancyPersons).Include(r => r.TenancyReasons)
+                .Where(r => tenancyIds.Contains(r.IdProcess)).ToList();
 
             var buildings = (from tbaRow in registryContext.TenancyBuildingsAssoc
                             join buildingRow in registryContext.Buildings.Include(r => r.IdStateNavigation)
@@ -3019,6 +3038,27 @@ namespace RegistryWeb.DataServices
                 return registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
                                 e.ExecutorLogin.ToLowerInvariant() == userName);
             }
+        }
+
+        public List<KumiKeyRate> GetKeyRates()
+        {
+            var keyRatesList = registryContext.KumiKeyRates
+                                    .Where(k=>k.StartDate<=DateTime.Parse("14.02.2022") || k.StartDate >= DateTime.Parse("19.09.2022"))
+                                    .ToList();
+
+            keyRatesList.Add(new KumiKeyRate
+            {
+                StartDate=DateTime.Parse("01.01.2999"),
+                Value=0
+            });
+
+            keyRatesList.Add(new KumiKeyRate
+            {
+                StartDate=DateTime.Parse("01.08.2022"),
+                Value=(Decimal)8.00
+            });
+
+            return keyRatesList.OrderByDescending(k=>k.StartDate).ToList();
         }
     }
 }

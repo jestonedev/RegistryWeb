@@ -26,6 +26,7 @@ using RegistryServices.Models.KumiPayments;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using RegistryServices.Classes;
+using System.Text.RegularExpressions;
 
 namespace RegistryWeb.DataServices
 {
@@ -42,7 +43,9 @@ namespace RegistryWeb.DataServices
             this.securityService = securityService;
         }
 
-        public KumiPaymentsUploadStateModel UploadInfoFromTff(List<TffString> tffStrings, List<KumiPaymentGroupFile> kumiPaymentGroupFiles, out int idGroup)
+        public KumiPaymentsUploadStateModel UploadInfoFromTff(List<TffString> tffStrings, List<KumiPaymentGroupFile> kumiPaymentGroupFiles,
+            int? idParentPayment,
+            out int idGroup)
         {
             var loadState = new KumiPaymentsUploadStateModel();
 
@@ -69,10 +72,26 @@ namespace RegistryWeb.DataServices
             };
             registryContext.KumiPaymentGroups.Add(group);
 
+            if (idParentPayment != null)
+            {
+                var parentPayment = registryContext.KumiPayments.FirstOrDefault(r => r.IdPayment == idParentPayment);
+                var paymentsTotalSum = payments.Select(r => r.Sum).Sum();
+                if (parentPayment == null || parentPayment.Sum != paymentsTotalSum)
+                    throw new ApplicationException("Сумма, указанная в сводном платежном поручении не соответствует общей сумме загружаемых платежей");
+
+                foreach(var payment in payments)
+                {
+                    payment.IdParentPayment = idParentPayment;
+                }
+            }
+
             UploadPayments(payments, group, extracts, loadState);
             UploadMemorialOrders(memorialOrders, group, loadState);
 
             registryContext.SaveChanges();
+            registryContext.DetachAllEntities();
+
+            loadState.AutoDistributedPayments = AutoDistributeUploadedPayments(loadState.InsertedPayments);
 
             var loadStateSerializeObject = JsonSerializer.Serialize(loadState, typeof(KumiPaymentsUploadStateModel), new JsonSerializerOptions
             {
@@ -667,6 +686,12 @@ namespace RegistryWeb.DataServices
 
             IQueryable<KumiAccount> accounts = registryContext.KumiAccounts.Where(r => idAccountsLocal.Contains(r.IdAccount));
 
+            foreach(var account in accounts)
+            {
+                if (account.IdState == 2)
+                    throw new ApplicationException("Нельзя отменить распределение, т.к. связанный лицевой счет аннулирован");
+            }
+
             foreach(var paymentClaim in payment.PaymentClaims.GroupBy(r => r.IdClaim))
             {
                 if (!idClaims.Contains(paymentClaim.Key)) continue;
@@ -729,6 +754,170 @@ namespace RegistryWeb.DataServices
             };
         }
 
+        public List<KumiPayment> SearchPaymentsRaw(string text)
+        {
+            var terms = text.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            DateTime? docDate = null;
+            decimal? sum = null;
+            string docNum = null;
+            foreach (var term in terms)
+            {
+                var termPrepared = term.Trim(new char[] { '№', '#', '.', ',' });
+                if (termPrepared.Length == 10 && new Regex(@"^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$").IsMatch(termPrepared))
+                {
+                    // Дата документа
+                    var dateParts = termPrepared.Split('.');
+                    docDate = new DateTime(int.Parse(dateParts[2]), int.Parse(dateParts[1]), int.Parse(dateParts[0]));
+                } else
+                if (int.TryParse(termPrepared, out int digBuffer))
+                {
+                    // Номер документа
+                    docNum = digBuffer.ToString();
+                } else
+                if (decimal.TryParse(termPrepared.Replace(".", ","), out decimal sumBuffer))
+                {
+                    // Сумма платежа
+                    sum = sumBuffer;
+                }
+            }
+            if (docDate == null && sum == null && string.IsNullOrEmpty(docNum)) return new List<KumiPayment>();
+            return registryContext.KumiPayments.Where(r => 
+                (docNum == null || r.NumDocument == docNum) &&
+                (docDate == null || r.DateDocument == docDate) &&
+                (sum == null || r.Sum == sum)).Take(10).ToList();
+        }
+
+        public Dictionary<int, string> GetAccountsTenants(IEnumerable<KumiAccount> accounts)
+        {
+            var tenants = registryContext.GetTenantsByAccountIds(accounts.Select(r => r.IdAccount).ToList());
+            var result = new Dictionary<int, string>();
+            foreach (var account in accounts)
+            {
+                var tenant = account.Owner;
+                if (string.IsNullOrWhiteSpace(tenant))
+                    tenant = tenants.FirstOrDefault(r => r.IdAccount == account.IdAccount)?.Tenant;
+                result.Add(account.IdAccount, tenant);
+            }
+            return result;
+        }
+
+        public List<RegistryTuple<KumiPayment, KumiAccount>> AutoDistributeUploadedPayments(List<KumiPayment> insertedPayments)
+        {
+            var filteredPaymentsInfo = AutoDistributeFilterPayments(insertedPayments);
+            var accountsInfo = new Dictionary<int, KumiAccount>();
+            foreach (var paymentInfo in filteredPaymentsInfo)
+            {
+                var account = (from aRow in registryContext.KumiAccounts.Include(r => r.Charges).AsNoTracking()
+                              where aRow.Account == paymentInfo.Key.Item1
+                               select aRow).FirstOrDefault();
+                if (account != null) accountsInfo.Add(paymentInfo.Value.IdPayment, account);
+            }
+            var accountIds = accountsInfo.Select(r => r.Value.IdAccount).ToList();
+            var tenantsInfo = registryContext.GetTenantsByAccountIds(accountIds);
+            var result = new List<RegistryTuple<KumiPayment, KumiAccount>>();
+            foreach (var paymentInfo in filteredPaymentsInfo)
+            {
+                var accounts = accountsInfo.Where(r => r.Key == paymentInfo.Value.IdPayment);
+                if (!accounts.Any()) continue;
+                var account = accounts.First();
+                var tenantInfo = tenantsInfo.FirstOrDefault(r => r.IdAccount == account.Value.IdAccount);
+                var tenant = string.IsNullOrWhiteSpace(account.Value.Owner) ? tenantInfo?.Tenant : account.Value.Owner;
+                if (tenant == null) continue;
+                var paymentTenant = paymentInfo.Key.Item2;
+                var paymentTenantParts = paymentTenant.ToLowerInvariant().Split(new char[] { '.', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var tenantParts = tenant.ToLowerInvariant().Split(" ");
+                if (paymentTenantParts.Length != tenantParts.Length) continue;
+                var tenantEqual = true;
+                for(var i = 0; i < paymentTenantParts.Length; i++)
+                {
+                    var initial = paymentTenantParts[i];
+                    if (!(paymentTenantParts[i] == tenantParts[i] ||
+                        (initial.Length == 1 && initial == tenantParts[i].Substring(0, 1))))
+                        tenantEqual = false;
+                }
+                if (!tenantEqual) continue;
+
+                var chargeTenancy = (account.Value.LastCalcDate > DateTime.Now.Date) ? (account.Value.CurrentBalanceTenancy - (account.Value.Charges
+                                .FirstOrDefault(c => c.EndDate == account.Value.LastChargeDate)?.ChargeTenancy ?? 0)) : account.Value.CurrentBalanceTenancy ?? 0;
+                var chargePenalty = (account.Value.LastCalcDate > DateTime.Now.Date) ? (account.Value.CurrentBalancePenalty - (account.Value.Charges
+                                .FirstOrDefault(c => c.EndDate == account.Value.LastChargeDate)?.ChargePenalty ?? 0)) : account.Value.CurrentBalancePenalty ?? 0;
+                var chargeDgi = (account.Value.LastCalcDate > DateTime.Now.Date) ? (account.Value.CurrentBalanceDgi - (account.Value.Charges
+                                .FirstOrDefault(c => c.EndDate == account.Value.LastChargeDate)?.ChargeDgi ?? 0)) : account.Value.CurrentBalanceDgi ?? 0;
+                var chargePkk = (account.Value.LastCalcDate > DateTime.Now.Date) ? (account.Value.CurrentBalancePkk - (account.Value.Charges
+                                .FirstOrDefault(c => c.EndDate == account.Value.LastChargeDate)?.ChargePkk ?? 0)) : account.Value.CurrentBalancePkk ?? 0;
+                var chargePadun = (account.Value.LastCalcDate > DateTime.Now.Date) ? (account.Value.CurrentBalancePadun - (account.Value.Charges
+                                .FirstOrDefault(c => c.EndDate == account.Value.LastChargeDate)?.ChargePadun ?? 0)) : account.Value.CurrentBalancePadun ?? 0;
+
+                try
+                {
+                    if (paymentInfo.Value.Kbk == "90111109044041000120" && paymentInfo.Value.Sum == chargeTenancy + chargePenalty + chargePkk + chargePadun)
+                    {
+                        DistributePaymentToAccount(paymentInfo.Value.IdPayment, account.Value.IdAccount, KumiPaymentDistributeToEnum.ToKumiAccount,
+                        chargeTenancy ?? 0, chargePenalty ?? 0, 0, chargePkk ?? 0, chargePadun ?? 0);
+                    }
+                    else
+
+                    if (paymentInfo.Value.Kbk == "90111705040041111180" && paymentInfo.Value.Sum == chargeDgi)
+                    {
+                        DistributePaymentToAccount(paymentInfo.Value.IdPayment, account.Value.IdAccount, 
+                            KumiPaymentDistributeToEnum.ToKumiAccount, 0, 0, chargeDgi ?? 0, 0, 0);
+                    }
+                    else continue;
+                    
+                } catch {
+                    continue;
+                }
+                result.Add(new RegistryTuple<KumiPayment, KumiAccount> { Item1 = paymentInfo.Value, Item2 = account.Value });
+            }
+            return result;
+        }
+
+        private Dictionary<Tuple<string, string>, KumiPayment> AutoDistributeFilterPayments(List<KumiPayment> insertedPayments)
+        {
+            var result = new Dictionary<Tuple<string, string>, KumiPayment>();
+            foreach (var payment in insertedPayments)
+            {
+                if (!new[] { "90111109044041000120", "90111705040041111180" }.Contains(payment.Kbk)) continue;
+                if (payment.Sum == 0) continue;
+                var purpose = payment.Purpose;
+                if (string.IsNullOrEmpty(purpose)) continue;
+                var courtOrderRegex = new Regex(@"(ИД)[ ]*([0-9][-][0-9]{1,6}[ ]?[\/][ ]?([0-9]{4}|[0-9]{2}))");
+                if (courtOrderRegex.IsMatch(purpose)) continue;
+
+                var tenant = (string)null;
+                var account = (string)null;
+                var accountRegex = new Regex(@"(ЛИЦ(\.?|ЕВОЙ)?[ ]+СЧЕТ|ЛС)[ ]*[:]?[ ]*([0-9]{6,})");
+                var accountMatch = accountRegex.Match(purpose);
+                if (accountMatch.Success)
+                    account = accountMatch.Groups[3].Value;
+
+                var payerRegExp1 = new Regex(@"ФИО_ПЛАТЕЛЬЩИКА:([а-яА-Я ]+)");
+                if (payment.IdSource == 6)
+                    tenant = payment.PayerName;
+                else
+                if (new Regex(@"\/\/без НДС$").IsMatch(purpose))
+                {
+                    var purposeParts = purpose.Split("//");
+                    if (purposeParts.Length > 3)
+                        tenant = purposeParts[purposeParts.Length - 3];
+                }
+                else
+                if (payerRegExp1.IsMatch(purpose))
+                {
+                    var payerMatch = payerRegExp1.Match(purpose);
+                    tenant = payerMatch.Groups[1].Value;
+                }
+                else
+                if (payment.PayerName != null && new Regex("^[а-яА-Я]+[ ][а-яА-Я]+([ ][а-яА-Я]+)?$").IsMatch(payment.PayerName))
+                {
+                    tenant = payment.PayerName;
+                }
+                if (account == null || tenant == null) continue;
+                result.Add(new Tuple<string, string>(account, tenant), payment);
+            }
+            return result;
+        }
+
         public KumiPaymentDistributionInfo DistributePaymentToAccount(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo, 
             decimal tenancySum, decimal penaltySum, decimal dgiSum, decimal pkkSum, decimal padunSum)
         {
@@ -754,8 +943,8 @@ namespace RegistryWeb.DataServices
             if (payment == null)
                 throw new ApplicationException("Не найдена платеж в базе данных");
 
-            if (!new[] { "90111109044041000120" }.Contains(payment.Kbk))
-                throw new ApplicationException(string.Format("Нельзя распределить платеж с КБК {0}. Допускаются только платежи с КБК 90111109044041000120 (плата за наем)", payment.Kbk));
+            if (!new[] { "90111109044041000120", "90111705040041111180" }.Contains(payment.Kbk))
+                throw new ApplicationException(string.Format("Нельзя распределить платеж с КБК {0}. Допускаются только платежи с КБК 90111109044041000120 (плата за наем) и 90111705040041111180 (возмещение ДГИ)", payment.Kbk));
 
             var distributedTenancySum = payment.PaymentCharges.Select(r => r.TenancyValue).Sum() +
                 payment.PaymentClaims.Select(r => r.TenancyValue).Sum();
@@ -774,11 +963,11 @@ namespace RegistryWeb.DataServices
                     tenancySum + penaltySum + dgiSum + pkkSum + padunSum,
                     payment.Sum - distributedTenancySum - distributedPenaltySum - distributedDgiSum - distributedPkkSum - distributedPadunSum));
 
-            /*var isPl = payment.IdSource == 3 || payment.IdSource == 5;
-            var date = payment.DateExecute ?? payment.DateIn ?? payment.DateDocument;
-            if (date == null)
-                throw new ApplicationException("В платеже не указана " + (isPl ? "дата исполнения распоряжения" : "дата списания со счета"));*/
-            
+            if (payment.Kbk == "90111705040041111180" && (tenancySum != 0 || penaltySum != 0 || pkkSum != 0 || padunSum != 0))
+                throw new ApplicationException("Платежи с КБК 90111705040041111180 (возмещение ДГИ) можно распределять только на задолженность ДГИ");
+
+            if (payment.Kbk == "90111109044041000120" && (dgiSum != 0))
+                throw new ApplicationException("Платежи с КБК 90111109044041000120 (плата за наем) нельзя распределять на задолженность ДГИ");
 
             IQueryable<KumiAccount> accounts = null;
 
@@ -851,7 +1040,13 @@ namespace RegistryWeb.DataServices
                     if (idAccount == null)
                         throw new ApplicationException(string.Format("Исковая работа {0} не привязана к лицевому счету КУМИ", idObject));
                     accounts = registryContext.KumiAccounts.Where(r => r.IdAccount == idAccount);
-                    var accountsIds = accounts.Select(r => r.IdAccount).ToList();
+                    
+                    if (accounts.Count() == 0)
+                        throw new ApplicationException(string.Format("Не найден лицевой счет с реестровым номером {0}", idAccount));
+
+                    account = accounts.First();
+                    if (accounts.First().IdState == 2)
+                        throw new ApplicationException(string.Format("Нельзя распределить платеж на исковую работу, привязанную к аннулированному лицевому счету {0}", account.Account));
 
                     claim.AmountTenancyRecovered = (claim.AmountTenancyRecovered ?? 0) + tenancySum;
                     claim.AmountPenaltiesRecovered = (claim.AmountPenaltiesRecovered ?? 0) + penaltySum;

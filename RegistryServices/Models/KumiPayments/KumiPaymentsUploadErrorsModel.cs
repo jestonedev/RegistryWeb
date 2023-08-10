@@ -25,6 +25,7 @@ namespace RegistryServices.Models.KumiPayments
         public List<KumiPayment> UpdatedPayments { get; set; }
         public List<KumiPayment> BindedExtractsToDbPayments { get; set; }
         public List<KumiPaymentExtract> UnknownPaymentExtracts { get; set; }
+        public List<RegistryTuple<KumiPayment, KumiAccount>> AutoDistributedPayments { get; set; }
 
         public KumiPaymentsUploadStateModel()
         {
@@ -43,6 +44,7 @@ namespace RegistryServices.Models.KumiPayments
             BindedExtractsToDbPayments = new List<KumiPayment>();
             UnknownPaymentExtracts = new List<KumiPaymentExtract>();
             MemorialOrdersDicitionaryBindErrors = new List<RegistryTuple<KumiMemorialOrder, string>>();
+            AutoDistributedPayments = new List<RegistryTuple<KumiPayment, KumiAccount>>();
         }
     }
 }

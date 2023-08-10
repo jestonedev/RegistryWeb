@@ -9,7 +9,7 @@
 @{
     ViewData["Title"] = "Лог загрузки файлов ФК";
     var TotalRows = "Количество записей: " + Model.PageOptions.TotalRows;
-} 
+}
 
 <h2>@ViewData["Title"]</h2>
 <h4>@TotalRows</h4>
@@ -55,7 +55,7 @@
                 <td>
                     @{
                         var notices = @item.PaymentGroupFiles?.Where(c => c.NoticeDate != null).Select(c => c.NoticeDate).Distinct();
-                        
+
                         if (notices.Count() > 1)
                         {
                             <div><b>Несколько выписок: </b></div>
@@ -77,3 +77,12 @@
 
 
 <page-link page-model="Model.PageOptions" page-action="Index"></page-link>
+
+<form asp-action="PaymentLog" method="get" class="filterForm" autocomplete="off">
+    <input type="hidden" asp-for="PageOptions.CurrentPage" />
+    <input type="hidden" asp-for="PageOptions.SizePage" />
+</form>
+
+@section Scripts {
+    <script src="~/js/index.common.js" asp-append-version="true"></script>
+}

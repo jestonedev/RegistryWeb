@@ -61,6 +61,10 @@
     font-size: 35%;
 }
 
+.rr-account-tenancy-address {
+    flex: 3 !important;
+}
+
 @media(min-width: 768px) {
     #Charges {
         font-size: 50%;
@@ -69,17 +73,29 @@
      #ClaimsInfo {
         font-size: 65%;
     }
+
+    .rr-account-tenancy-address {
+        flex: 5 !important;
+    }
 }
 
 @media(min-width: 992px) {
     #Charges, #ClaimsInfo {
         font-size: 70%;
     }
+
+    .rr-account-tenancy-address {
+        flex: 9 !important;
+    }
 }
 
 @media(min-width: 1200px) {
     #Charges, #ClaimsInfo {
         font-size: 80%;
+    }
+
+    .rr-account-tenancy-address {
+        flex: 10 !important;
     }
 }
 
@@ -96,4 +112,14 @@
 
 .rr-tenancy-type-selectors label {
     cursor: pointer;
+}
+
+.dopinfo-alt {
+    color: #212529;
+    font-size: 75%;
+}
+
+.dopinfo {
+    color: #888;
+    font-size: 75%;
 }

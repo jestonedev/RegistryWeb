@@ -132,3 +132,12 @@
 #RunMassPaymentDistribution, #StopMassPaymentDistribution {
     overflow: hidden;
 }
+
+.dopinfo {
+    color: #888;
+    font-size: 75%;
+}
+
+.ui-autocomplete {
+    z-index: 99999;
+}

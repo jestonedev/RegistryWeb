@@ -1,0 +1,40 @@
+.jt-4 {
+	border:2px solid #666;
+}
+
+.jt-4 .head {
+	background: none;
+	font-weight: bold;
+
+}
+
+.jt-4 .head td {
+	text-align: center;
+	vertical-align: middle;
+	white-space: normal;
+}
+
+.jt-4 td {
+	padding: 2px 4px;
+}
+
+.jt-4 tr:hover {
+	background: none;
+}
+
+.jtb-first td {
+	border-top: #666 solid 2px;
+}
+
+.jt-4 .jt-payed {
+	background: #fff6d7;
+	font-size:12px;
+	font-style: italic;
+	padding-left: 14px;
+}
+
+.jtb-first td:nth-child(1), .jtb-first td:nth-child(2) {
+	font-weight: bold;
+	vertical-align: middle;
+	text-align: center;
+}

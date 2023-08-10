@@ -503,10 +503,10 @@ namespace RegistryDb.Models
             return result.ToList();
         }
 
-        public List<PaymentsForPeriod> GetPaymentsForPeriods(DateTime from_date, DateTime to_date)
+        public List<PaymentsForPeriod> GetPaymentsForPeriods(DateTime from_date, DateTime to_date, string kbk)
         {
             var query = $"CALL  get_payments_for_period(STR_TO_DATE('{from_date.ToString("dd.MM.yyyy")}', '%d.%m.%Y')," +
-                                                      $"STR_TO_DATE('{to_date.ToString("dd.MM.yyyy")}', '%d.%m.%Y'))";
+                                                      $"STR_TO_DATE('{to_date.ToString("dd.MM.yyyy")}', '%d.%m.%Y'), {kbk})";
 #pragma warning disable EF1000 // Possible SQL injection vulnerability.
             var result = PaymentsForPeriods.FromSql(query);
 #pragma warning restore EF1000 // Possible SQL injection vulnerability.
