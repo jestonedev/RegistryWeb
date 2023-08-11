@@ -34,5 +34,6 @@ C:\Users\belpe\Documents\registry\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2
 C:\Users\belpe\Documents\registry\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csproj.CoreCompileInputs.cache
 C:\Users\belpe\Documents\registry\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.dll
 C:\Users\belpe\Documents\registry\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.pdb
-D:\Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csprojAssemblyReference.cache
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csprojAssemblyReference.cache
+D:\Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.csproj.AssemblyReference.cache
+D:\Projects\RegistryWeb\RegistryDb\obj\Debug\netcoreapp2.2\RegistryDb.GeneratedMSBuildEditorConfig.editorconfig

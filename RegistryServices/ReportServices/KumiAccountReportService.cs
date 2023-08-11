@@ -344,7 +344,5 @@ namespace RegistryWeb.ReportServices
                 return exportData.GetBuffer();
             }
         }
-
-        
     }
 }

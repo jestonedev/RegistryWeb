@@ -245,6 +245,7 @@ namespace RegistryDb.Models
         public virtual DbSet<KumiPaymentSettingSet> KumiPaymentSettingSets { get; set; }
         public virtual DbSet<KumiKeyRate> KumiKeyRates { get; set; }
         private DbSet<SberbankFileRow> SberbankFileRows { get; set; }
+        private DbSet<PaymentsForPeriod> PaymentsForPeriods { get; set; }
 
         //SQL-Views
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
@@ -498,6 +499,16 @@ namespace RegistryDb.Models
             var query = $"CALL get_charges_for_sberbank(STR_TO_DATE('{onDate.ToString("dd.MM.yyyy")}', '%d.%m.%Y'))";
 #pragma warning disable EF1000 // Possible SQL injection vulnerability.
             var result = SberbankFileRows.FromSql(query);
+#pragma warning restore EF1000 // Possible SQL injection vulnerability.
+            return result.ToList();
+        }
+
+        public List<PaymentsForPeriod> GetPaymentsForPeriods(DateTime from_date, DateTime to_date, string kbk)
+        {
+            var query = $"CALL  get_payments_for_period(STR_TO_DATE('{from_date.ToString("dd.MM.yyyy")}', '%d.%m.%Y')," +
+                                                      $"STR_TO_DATE('{to_date.ToString("dd.MM.yyyy")}', '%d.%m.%Y'), {kbk})";
+#pragma warning disable EF1000 // Possible SQL injection vulnerability.
+            var result = PaymentsForPeriods.FromSql(query);
 #pragma warning restore EF1000 // Possible SQL injection vulnerability.
             return result.ToList();
         }

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {}
+    "D:\\Projects\\RegistryWeb\\InvoiceGenerator\\InvoiceGenerator.csproj": {}
   },
   "projects": {
-    "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj": {
+    "D:\\Projects\\RegistryWeb\\InvoiceGenerator\\InvoiceGenerator.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
-        "projectName": "RegistryDb",
-        "projectPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\RegistryDb.csproj",
+        "projectUniqueName": "D:\\Projects\\RegistryWeb\\InvoiceGenerator\\InvoiceGenerator.csproj",
+        "projectName": "InvoiceGenerator",
+        "projectPath": "D:\\Projects\\RegistryWeb\\InvoiceGenerator\\InvoiceGenerator.csproj",
         "packagesPath": "C:\\Users\\TutGA\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects\\RegistryWeb\\RegistryDb\\obj\\",
+        "outputPath": "D:\\Projects\\RegistryWeb\\InvoiceGenerator\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -49,13 +49,9 @@
               "version": "[2.2.0, )",
               "autoReferenced": true
             },
-            "MySql.Data.EntityFrameworkCore": {
+            "QRCoder": {
               "target": "Package",
-              "version": "[8.0.19, )"
-            },
-            "System.Text.Json": {
-              "target": "Package",
-              "version": "[5.0.0, )"
+              "version": "[1.4.3, )"
             }
           },
           "imports": [
