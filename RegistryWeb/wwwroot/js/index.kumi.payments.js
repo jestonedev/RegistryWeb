@@ -126,7 +126,52 @@ $(function () {
             $(this).closest("form").submit();
         } else {
             var modal = $("#UploadPaymentsDateEnrollUfkModal");
-            modal.modal('show');
+            if (window.FileReader && window.Promise) {
+                var promises = [];
+                for (var j = 0; j < this.files.length; j++) {
+                    var filePromise = new Promise(resolve => {
+                        if (!this.files[j].name.endsWith(".txt")) {
+                            resolve(true);
+                            return;
+                        }
+                        var reader = new FileReader();
+                        reader.readAsText(this.files[j], "UTF-8");
+                        reader.onload = function (evt) {
+                            var showDateEnroll = false;
+                            var lines = evt.target.result.split('\r\n');
+                            for (var i = 0; i < lines.length; i++) {
+                                if (lines[i].startsWith("- - -;")) {
+                                    showDateEnroll = true;
+                                    break;
+                                }
+                            }
+                            resolve(showDateEnroll);
+                        };
+                        reader.onerror = function () {
+                            resolve(true);
+                        };
+                    });
+                    promises.push(filePromise);
+                }
+                Promise.all(promises).then(function (showDateEnrollAll) {
+                    var showDateEnroll = false;
+                    for (var i = 0; i < showDateEnrollAll.length; i++) {
+                        if (showDateEnrollAll[i]) {
+                            showDateEnroll = true;
+                            break;
+                        }
+                    }
+                    if (!showDateEnroll) {
+                        modal.find("#UploadPayments_DateEnrollUfk").closest(".form-row").hide();
+                    } else
+                        modal.find("#UploadPayments_DateEnrollUfk").closest(".form-row").show();
+                    modal.modal('show');
+                });
+            } else {
+                modal.modal('show');
+            }
+
+
         }
     });
 

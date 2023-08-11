@@ -1274,6 +1274,7 @@ namespace RegistryWeb.DataServices
                         case 2:
                         case 3:
                         case 6:
+                        case 7:
                             loadState.KnownPayments.Add(paymentLocal);
                             break;
                         default:

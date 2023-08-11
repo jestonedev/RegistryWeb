@@ -90,14 +90,19 @@
             </td>
             <td style="vertical-align: middle; text-align: center" class="@(sumPosted == sum ? "table-success" : "")" title="@(sumPosted == sum ? "Платеж полностью распределен" : "")">
 
-                @if (item.IdSource == 6)
+                @if (item.IdSource == 7)
                 {
-                    <span class="badge badge-danger">БКС</span>
+                    <span class="badge badge-primary">ВТБ</span>
                 }
                 else
-            if (new int[] { 2, 3, 4, 5 }.Contains(item.IdSource))
+                if (item.IdSource == 6)
                 {
-                    <span class="badge badge-success">УФК</span>
+                <span class="badge badge-danger">БКС</span>
+                }
+                else
+                if (new int[] { 2, 3, 4, 5 }.Contains(item.IdSource))
+                {
+                <span class="badge badge-success">УФК</span>
                 }
 
                 @{

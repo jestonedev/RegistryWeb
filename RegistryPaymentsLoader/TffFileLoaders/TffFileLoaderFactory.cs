@@ -14,13 +14,19 @@ namespace RegistryPaymentsLoader.TffFileLoaders
             {
                 return new BKSV1FileLoader(dateEnrollUfk);
             }
-            if (fileInfo.Extension == ".txt")
-            {
-                return new BKSV2FileLoader(dateEnrollUfk);
-            }
-
             var streamReader = new StreamReader(dataStream, Encoding.GetEncoding(1251));
             if (streamReader.EndOfStream) return null;
+
+            if (fileInfo.Extension == ".txt")
+            {
+                var content = streamReader.ReadToEnd();
+                var lines = content.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+                if (lines.Any(r => r.StartsWith("- - -;")))
+                    return new BKSV2FileLoader(dateEnrollUfk);
+                else
+                    return new VTBV1FileLoader();
+            }
+            
             var str = streamReader.ReadLine();
             if (string.IsNullOrWhiteSpace(str)) return null;
             var strParts = str.Split("|");

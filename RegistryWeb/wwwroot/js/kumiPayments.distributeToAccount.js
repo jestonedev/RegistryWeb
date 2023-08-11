@@ -27,12 +27,21 @@
             purposeInfo.address = extractAddressFromString(address);
         }
     }
-
+    var addressRegex2 = /^[а-яА-Я ]+;([^;]+)$/gmiu;
+    if (addressRegex2.test(purpose)) {
+        // ВТБ
+        purposeParts = purpose.split(';');
+        if (purposeParts.length === 2) {
+            address = purposeParts[1];
+            purposeInfo.address = extractAddressFromString(address);
+        }
+    }
     return purposeInfo;
 }
 
 function extractAddressFromString(address) {
-    var addressParts = $.trim(address).split('.');
+    var addressParts = $.trim(address.replace(", ул. ", ".").replace(", д. ", ".").replace(", кв. ", ".")).split('.');
+    if (addressParts.length < 3) addressParts = $.trim(address).split('.');
     if (addressParts.length < 3) addressParts = $.trim(address).split(',');
     if (addressParts.length < 3) return null;
     var premise = addressParts[addressParts.length - 1];
@@ -47,7 +56,7 @@ function extractAddressFromString(address) {
         street = "К.МАРКСА";
     }
     if (street === null) {
-        street = addressParts[addressParts.length - 3];
+        street = $.trim(addressParts[addressParts.length - 3]);
     }
     if (street.endsWith(" ПЕР"))
         street = street.replace(" ПЕР", "");
@@ -67,7 +76,7 @@ function getIdStreetForStreetName(street, array) {
         var optStreetName = optStreetParts[optStreetParts.length - 1];
         optStreetName = optStreetName.replace('ул.', '').replace('пер.', '').replace('пр-кт.', '').replace('б-р.', '').replace('гск.', '').replace('туп.', '');
         optStreetName = $.trim(optStreetName).toUpperCase();
-        if (optStreetName === street) return optStreet.idStreet;
+        if (optStreetName === street.toUpperCase()) return optStreet.idStreet;
     }
 }
 
