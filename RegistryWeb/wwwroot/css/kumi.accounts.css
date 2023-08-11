@@ -123,3 +123,13 @@
     color: #888;
     font-size: 75%;
 }
+
+#Charges thead {
+    top: 0;
+    position: sticky;
+    background: white;
+}
+
+#Charges thead th, #Charges tbody td {
+    outline: 1px solid #dee2e6;
+}
