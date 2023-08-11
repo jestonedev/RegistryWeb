@@ -87,6 +87,8 @@ D:\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPayment
 D:\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.genruntimeconfig.cache
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\InvoiceGenerator.dll
 D:\Projects\Visual Studio Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\InvoiceGenerator.pdb
-D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.csprojAssemblyReference.cache
 D:\Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\InvoiceGenerator.dll
 D:\Projects\RegistryWeb\RegistryPaymentCalculator\bin\Debug\netcoreapp2.2\InvoiceGenerator.pdb
+D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.csproj.AssemblyReference.cache
+D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\RegistryWeb\RegistryPaymentCalculator\obj\Debug\netcoreapp2.2\RegistryPaymentCalculator.genruntimeconfig.cache

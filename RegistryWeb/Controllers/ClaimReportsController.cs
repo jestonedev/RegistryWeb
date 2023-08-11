@@ -484,7 +484,17 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.PaymentsForPeriod(startDate, endDate, kbk);
-                return File(file, "application/vnd.ms-excel", string.Format("Платежи КБК найма за период {0}-{1}.xls", startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")));
+                var kbkName = "";
+                switch(kbk)
+                {
+                    case "90111109044041000120":
+                        kbkName= "найма";
+                        break;
+                    case "90111705040041111180":
+                        kbkName = "ДГИ";
+                        break;
+                }
+                return File(file, "application/vnd.ms-excel", string.Format("Платежи КБК {0} за период {1}-{2}.xls", kbkName, startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")));
             }
             catch (Exception ex)
             {

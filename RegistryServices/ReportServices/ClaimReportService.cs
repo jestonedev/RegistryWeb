@@ -407,13 +407,22 @@ namespace RegistryWeb.ReportServices
             headerFont.FontName = "Tahoma";
             headerFont.FontHeightInPoints = 20;
             head.SetFont(headerFont);
-          
+            var kbkName = "";
+            switch (kbk)
+            {
+                case "90111109044041000120":
+                    kbkName = "найма";
+                    break;
+                case "90111705040041111180":
+                    kbkName = "ДГИ";
+                    break;
+            }
 
             NPOIHelper.CreateActSpanedCell(sheet, 0, 0, 1, 7,
                 string.Format("КУМИ г.Братска"), head);
             NPOIHelper.CreateActSpanedCell(sheet, 1, 0, 1, 7,
-                string.Format("Платежи за период с {0} по {1} по КБК найма", 
-                startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")), head);
+                string.Format("Платежи за период с {0} по {1} по КБК {2}", 
+                startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy"), kbkName), head);
 
             NPOIHelper.CreateActSpanedCell(sheet, 2, 0, 1, 2, "Документ", headerStyle);
             NPOIHelper.CreateActCell(sheet, 3, 0, "№", headerStyle);
