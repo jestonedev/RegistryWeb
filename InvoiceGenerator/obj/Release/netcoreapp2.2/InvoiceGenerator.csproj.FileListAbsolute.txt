@@ -1,9 +1,0 @@
-D:\Projects\Visual Studio Projects\RegistryWeb\InvoiceGenerator\bin\Release\netcoreapp2.2\InvoiceGenerator.deps.json
-D:\Projects\Visual Studio Projects\RegistryWeb\InvoiceGenerator\bin\Release\netcoreapp2.2\InvoiceGenerator.dll
-D:\Projects\Visual Studio Projects\RegistryWeb\InvoiceGenerator\bin\Release\netcoreapp2.2\InvoiceGenerator.pdb
-D:\Projects\Visual Studio Projects\RegistryWeb\InvoiceGenerator\obj\Release\netcoreapp2.2\InvoiceGenerator.csprojAssemblyReference.cache
-D:\Projects\Visual Studio Projects\RegistryWeb\InvoiceGenerator\obj\Release\netcoreapp2.2\InvoiceGenerator.csproj.CoreCompileInputs.cache
-D:\Projects\Visual Studio Projects\RegistryWeb\InvoiceGenerator\obj\Release\netcoreapp2.2\InvoiceGenerator.AssemblyInfoInputs.cache
-D:\Projects\Visual Studio Projects\RegistryWeb\InvoiceGenerator\obj\Release\netcoreapp2.2\InvoiceGenerator.AssemblyInfo.cs
-D:\Projects\Visual Studio Projects\RegistryWeb\InvoiceGenerator\obj\Release\netcoreapp2.2\InvoiceGenerator.dll
-D:\Projects\Visual Studio Projects\RegistryWeb\InvoiceGenerator\obj\Release\netcoreapp2.2\InvoiceGenerator.pdb

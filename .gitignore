@@ -18,3 +18,7 @@ RegistryReformaGKH/bin/
 RegistryReformaGKH/obj/
 RegistryPaymentCalculator/bin/
 RegistryPaymentCalculator/obj/
+InvoiceGenerator/bin/
+InvoiceGenerator/obj/
+RegistryPaymentsLoader/bin/
+RegistryPaymentsLoader/obj/
