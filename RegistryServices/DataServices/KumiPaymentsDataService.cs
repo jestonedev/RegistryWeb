@@ -74,7 +74,10 @@ namespace RegistryWeb.DataServices
 
             if (idParentPayment != null)
             {
-                var parentPayment = registryContext.KumiPayments.FirstOrDefault(r => r.IdPayment == idParentPayment);
+                var parentPayment = registryContext.KumiPayments.Include(r => r.PaymentCharges)
+                    .Include(r => r.PaymentClaims).FirstOrDefault(r => r.IdPayment == idParentPayment);
+                if (parentPayment.PaymentCharges.Any() || parentPayment.PaymentClaims.Any())
+                    throw new ApplicationException("Платеж, указанный как сводное платежное поручение частично или полностью распределен. Необходимо сначала отменить распределение выбранного сводного платежного поручения");
                 var paymentsTotalSum = payments.Select(r => r.Sum).Sum();
                 if (parentPayment == null || parentPayment.Sum != paymentsTotalSum)
                     throw new ApplicationException("Сумма, указанная в сводном платежном поручении не соответствует общей сумме загружаемых платежей");
@@ -83,6 +86,8 @@ namespace RegistryWeb.DataServices
                 {
                     payment.IdParentPayment = idParentPayment;
                 }
+                parentPayment.IsConsolidated = 1;
+                registryContext.KumiPayments.Update(parentPayment);
             }
 
             UploadPayments(payments, group, extracts, loadState);
@@ -153,8 +158,32 @@ namespace RegistryWeb.DataServices
 
         private List<KumiPaymentDistributionInfoToObject> GetDistributionInfoToObjects(List<int> idPayments)
         {
+            var consolidatedPaymentsIds = registryContext.KumiPayments.Where(r => idPayments.Contains(r.IdPayment) && r.IsConsolidated == 1).Select(r => r.IdPayment).ToList();
+            var childPayments = registryContext.KumiPayments
+                .Where(r => r.IdParentPayment != null && consolidatedPaymentsIds.Contains(r.IdParentPayment.Value)).ToList();
+            var consolidatedPayments = new Dictionary<int, List<KumiPayment>>();
+            if (childPayments.Any())
+            {
+                foreach (var group in childPayments.GroupBy(r => r.IdParentPayment.Value))
+                {
+                    consolidatedPayments.Add(group.Key, group.Select(r => r).ToList());
+                    var subChildPayments = group.ToList();
+                    while (true)
+                    {
+                        var newParentIds = subChildPayments.Select(r => r.IdPayment);
+                        subChildPayments = registryContext.KumiPayments.Where(r => r.IdParentPayment != null &&
+                            newParentIds.Contains(r.IdParentPayment.Value)).ToList();
+                        if (!subChildPayments.Any())
+                            break;
+                        consolidatedPayments[group.Key].AddRange(subChildPayments);
+                    }
+                }
+            }
+
+            var idPaymentsAll = idPayments.Union(consolidatedPayments.SelectMany(r => r.Value).Select(r => r.IdPayment)).ToList();
+
             var kpc = (from kpcRow in registryContext.KumiPaymentCharges
-                      where idPayments.Contains(kpcRow.IdPayment)
+                      where idPaymentsAll.Contains(kpcRow.IdPayment)
                       select kpcRow).ToList();
 
             var cIds = kpc.Select(r => r.IdCharge);
@@ -212,7 +241,7 @@ namespace RegistryWeb.DataServices
                 }).ToList();
 
             var kpcClaims = (from kpcRow in registryContext.KumiPaymentClaims
-                             where idPayments.Contains(kpcRow.IdPayment)
+                             where idPaymentsAll.Contains(kpcRow.IdPayment)
                              select kpcRow).ToList();
 
             cIds = kpcClaims.Select(r => r.IdClaim);
@@ -269,6 +298,50 @@ namespace RegistryWeb.DataServices
                 Tenant = tenantsClaims.Where(t => t.IdAccount == r.cRow.IdAccountKumi).OrderByDescending(t => t.IdProcess)
                                 .Select(t => t.Tenant).FirstOrDefault()
             }).ToList();
+
+            foreach(var consolidatedPayment in consolidatedPayments)
+            {
+                var childPaymentsIds = consolidatedPayment.Value.Select(r => r.IdPayment).ToList();
+                var comparedPaymentChargesInfo = paymentChargesInfo.Where(r => childPaymentsIds.Contains(r.IdPayment)).ToList();
+                foreach(var paymentChargeInfo in comparedPaymentChargesInfo)
+                {
+                    paymentChargesInfo.Add(new KumiPaymentDistributionInfoToAccount {
+                        ObjectType = paymentChargeInfo.ObjectType,
+                        IdPayment = consolidatedPayment.Key,
+                        IdAccount = paymentChargeInfo.IdAccount,
+                        IdCharge = paymentChargeInfo.IdCharge,
+                        Account = paymentChargeInfo.Account,
+                        DistrubutedToPenaltySum = paymentChargeInfo.DistrubutedToPenaltySum,
+                        DistrubutedToTenancySum = paymentChargeInfo.DistrubutedToTenancySum,
+                        DistrubutedToDgiSum = paymentChargeInfo.DistrubutedToDgiSum,
+                        DistrubutedToPkkSum = paymentChargeInfo.DistrubutedToPkkSum,
+                        DistrubutedToPadunSum = paymentChargeInfo.DistrubutedToPadunSum,
+                        Sum = paymentChargeInfo.Sum,
+                        Tenant = paymentChargeInfo.Tenant
+                    });
+                }
+
+                var comparedPaymentClaimsInfo = paymentClaimsInfo.Where(r => childPaymentsIds.Contains(r.IdPayment)).ToList();
+                foreach (var paymentClaimInfo in comparedPaymentClaimsInfo)
+                {
+                    paymentClaimsInfo.Add(new KumiPaymentDistributionInfoToClaim
+                    {
+                        ObjectType = paymentClaimInfo.ObjectType,
+                        IdPayment = consolidatedPayment.Key,
+                        IdClaim = paymentClaimInfo.IdClaim,
+                        IdCharge = paymentClaimInfo.IdCharge,
+                        IdAccountKumi = paymentClaimInfo.IdAccountKumi,
+                        Account = paymentClaimInfo.Account,
+                        DistrubutedToPenaltySum = paymentClaimInfo.DistrubutedToPenaltySum,
+                        DistrubutedToTenancySum = paymentClaimInfo.DistrubutedToTenancySum,
+                        DistrubutedToDgiSum = paymentClaimInfo.DistrubutedToDgiSum,
+                        DistrubutedToPkkSum = paymentClaimInfo.DistrubutedToPkkSum,
+                        DistrubutedToPadunSum = paymentClaimInfo.DistrubutedToPadunSum,
+                        Sum = paymentClaimInfo.Sum,
+                        Tenant = paymentClaimInfo.Tenant
+                    });
+                }
+            }
 
             return paymentChargesInfo.Select(r => (KumiPaymentDistributionInfoToObject)r).Union(paymentClaimsInfo).ToList();
         }
@@ -526,6 +599,9 @@ namespace RegistryWeb.DataServices
             if ((payment.PaymentCharges != null && payment.PaymentCharges.Any()) || (payment.PaymentClaims != null && payment.PaymentClaims.Any()))
                 throw new ApplicationException("Платеж распределен. Для привязки мемориального ордера необходимо отменить распределение платежа");
 
+            if (payment.IsConsolidated != 0)
+                throw new ApplicationException("Платеж является сводным платежным поручением. Нельзя уточнять сводные платежные поручения после подругзки детализирующего реестра платежей");
+
             var idParentPayment = payment.IdPayment;
 
             var copyPayment = false;
@@ -722,6 +798,27 @@ namespace RegistryWeb.DataServices
             }
 
             payment.IsPosted = 0;
+
+            var parentPayment = registryContext.KumiPayments.FirstOrDefault(r => r.IdPayment == payment.IdParentPayment);
+            KumiPayment consolidatedParentPayment = null;
+            while (parentPayment != null)
+            {
+                if (parentPayment.IsConsolidated != 0)
+                {
+                    consolidatedParentPayment = parentPayment;
+                    break;
+                }
+                else
+                if (parentPayment.IdParentPayment != null)
+                    parentPayment = registryContext.KumiPayments.FirstOrDefault(r => r.IdPayment == parentPayment.IdParentPayment);
+                else
+                    break;
+            }
+            if (consolidatedParentPayment != null)
+            {
+                consolidatedParentPayment.IsPosted = 0;
+                registryContext.KumiPayments.Update(consolidatedParentPayment);
+            }
 
             registryContext.SaveChanges();
             registryContext.DetachAllEntities();
@@ -946,6 +1043,9 @@ namespace RegistryWeb.DataServices
             if (!new[] { "90111109044041000120", "90111705040041111180" }.Contains(payment.Kbk))
                 throw new ApplicationException(string.Format("Нельзя распределить платеж с КБК {0}. Допускаются только платежи с КБК 90111109044041000120 (плата за наем) и 90111705040041111180 (возмещение ДГИ)", payment.Kbk));
 
+            if (payment.IsConsolidated != 0)
+                throw new ApplicationException("Платеж помечен как сводное платежное поручение и не может быть распределен. Вместо него необходимо распределять детализирующие платежи");
+
             var distributedTenancySum = payment.PaymentCharges.Select(r => r.TenancyValue).Sum() +
                 payment.PaymentClaims.Select(r => r.TenancyValue).Sum();
             var distributedPenaltySum = payment.PaymentCharges.Select(r => r.PenaltyValue).Sum() +
@@ -1074,6 +1174,44 @@ namespace RegistryWeb.DataServices
             {
                 payment.IsPosted = 1;
                 registryContext.KumiPayments.Update(payment);
+                
+                if (payment.IdParentPayment != null)
+                {
+                    var parentPayment = registryContext.KumiPayments.FirstOrDefault(r => r.IdPayment == payment.IdParentPayment);
+                    KumiPayment consolidatedParentPayment = null;
+                    while (parentPayment != null)
+                    {
+                        if (parentPayment.IsConsolidated != 0)
+                        {
+                            consolidatedParentPayment = parentPayment;
+                            break;
+                        } else
+                        if (parentPayment.IdParentPayment != null)
+                            parentPayment = registryContext.KumiPayments.FirstOrDefault(r => r.IdPayment == parentPayment.IdParentPayment);
+                        else
+                            break;
+                    }
+                    if (consolidatedParentPayment != null)
+                    {
+                        var childPayments = registryContext.KumiPayments.Where(r => r.IdParentPayment == consolidatedParentPayment.IdPayment).ToList();
+                        var resultChildPayments = new List<KumiPayment>();
+                        while (true)
+                        {
+                            if (!childPayments.Any())
+                                break;
+                            resultChildPayments.AddRange(childPayments);
+                            var childPaymentsIds = childPayments.Select(r => r.IdPayment).ToList();
+                            childPayments = registryContext.KumiPayments.Where(r => r.IdParentPayment != null && 
+                                childPaymentsIds.Contains(r.IdParentPayment.Value)).ToList();
+                        }
+                        var childPaymentsSum = resultChildPayments.Where(r => r.IsPosted == 1).Select(r => r.Sum).Sum();
+                        if (consolidatedParentPayment.Sum == childPaymentsSum)
+                        {
+                            consolidatedParentPayment.IsPosted = 1;
+                            registryContext.KumiPayments.Update(consolidatedParentPayment);
+                        }
+                    }
+                }
             }
 
             registryContext.SaveChanges();

@@ -63,6 +63,7 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public string Description { get; set; } 
         public DateTime? DateEnrollUfk { get; set; }
         public byte IsPosted { get; set; }
+        public byte IsConsolidated { get; set; }
         public byte Deleted { get; set; }
         public virtual IList<KumiPaymentCharge> PaymentCharges { get; set; }
         public virtual IList<KumiPaymentClaim> PaymentClaims { get; set; }

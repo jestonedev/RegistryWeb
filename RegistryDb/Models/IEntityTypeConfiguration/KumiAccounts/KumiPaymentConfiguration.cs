@@ -219,6 +219,11 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasColumnType("tinyint(1)")
                 .IsRequired();
 
+            builder.Property(e => e.IsConsolidated)
+                .HasColumnName("is_consolidated")
+                .HasColumnType("tinyint(1)")
+                .IsRequired();
+
             builder.Property(e => e.Deleted)
                 .HasColumnName("deleted")
                 .HasColumnType("tinyint(1)")
