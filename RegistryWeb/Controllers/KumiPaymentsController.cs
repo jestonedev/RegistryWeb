@@ -17,9 +17,11 @@ using RegistryWeb.ViewOptions;
 using RegistryWeb.Enums;
 using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Enums;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RegistryWeb.Controllers
 {
+    [Authorize]
     public class KumiPaymentsController : ListController<KumiPaymentsDataService, KumiPaymentsFilter>
     {
         private readonly KumiAccountsDataService kumiAccountsDataService;
