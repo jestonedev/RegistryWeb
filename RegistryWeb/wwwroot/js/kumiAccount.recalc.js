@@ -549,6 +549,10 @@
             }
         });
     }
+
+    if ($("#Charges tbody tr").not(".rr-charge-archive, .rr-charge-total-row").length <= 1)
+        $("#OpenPenaltyCalc").addClass("disabled");
+    else $("#OpenPenaltyCalc").removeClass("disabled");
     
     $("#OpenPenaltyCalc").on("click", function (e) {
         e.preventDefault();
