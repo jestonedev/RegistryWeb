@@ -21,11 +21,13 @@ namespace RegistryWeb.SecurityServices
                     connPersonal.Open();
                     connPersonal.Close();
                     context.Succeed(requirement);
+                    return Task.CompletedTask;
                 } catch(Exception)
                 {
 
                 }
             }
+            context.Fail();
             return Task.CompletedTask;
         }
     }

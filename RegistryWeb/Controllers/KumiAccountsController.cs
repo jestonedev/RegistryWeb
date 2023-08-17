@@ -14,9 +14,11 @@ using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryServices.Enums;
 using System;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RegistryWeb.Controllers
 {
+    [Authorize]
     public class KumiAccountsController :  ListController<KumiAccountsDataService, KumiAccountsFilter>
     {
         private TenancyProcessesDataService tenancyProcessesDataService { get; }

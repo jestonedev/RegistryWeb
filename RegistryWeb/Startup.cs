@@ -16,6 +16,12 @@ using Microsoft.AspNetCore.Http.Features;
 using RegistryDb.Interfaces;
 using RegistryDb.Models;
 using RegistryReformaGKH;
+using System.Security.Principal;
+using System.Security.Claims;
+using RegistryWeb.Controllers;
+using System.Net;
+using System.IO;
+using Microsoft.AspNetCore.Authentication;
 
 namespace RegistryWeb
 {
@@ -73,6 +79,7 @@ namespace RegistryWeb
             });
 
 
+            services.AddTransient<AccountsDataService>();
             services.AddTransient<BuildingsDataService>();
             services.AddTransient<DocumentIssuerService>();
             services.AddTransient<PremisesDataService>();
@@ -131,7 +138,47 @@ namespace RegistryWeb
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = async context =>
+                {
+                    if (context.Context.User.Identity != null)
+                    {
+                        var accountDataService = context.Context.RequestServices.GetService<AccountsDataService>();
+                        if (accountDataService == null)
+                        {
+                            context.Context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                        }
+                        else
+                        {
+                            var userName = context.Context.User.Identity.Name.ToUpper();
+                            if (userName == "PWR\\IGNATOV")
+                            {
+                                userName = "PWR\\IGNVV";
+                            }
+                            var connectionString = accountDataService.ConfigureConnectionString(userName);
+                            if (connectionString == null)
+                            {
+                                context.Context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                                context.Context.Response.ContentLength = 0;
+                                context.Context.Response.Body = Stream.Null;
+                            } else
+                            {
+                                // создаем один claim
+                                var claims = new List<Claim>
+                                {
+                                    new Claim(ClaimsIdentity.DefaultNameClaimType, userName),
+                                    new Claim("connString", connectionString, ClaimValueTypes.String)
+                                };
+                                // создаем объект ClaimsIdentity
+                                ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+                                // установка аутентификационных куки
+                                await context.Context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+                            }
+                        }
+                    }
+                }
+            });
             app.UseAuthentication();
             app.UseSession();
 
