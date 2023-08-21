@@ -107,6 +107,7 @@ namespace RegistryServices.DataHelpers
             {
                 baseDataCellStyles = new Dictionary<string, ICellStyle>();
                 headerCellStyle = null;
+                NPOIHelper.workbook = workbook;
             }
             if (headerCellStyle != null) return headerCellStyle;
             headerCellStyle = workbook.CreateCellStyle();
@@ -134,6 +135,7 @@ namespace RegistryServices.DataHelpers
             {
                 baseDataCellStyles = new Dictionary<string, ICellStyle>();
                 headerCellStyle = null;
+                NPOIHelper.workbook = workbook;
             }
             var keyName = horizontal.ToString() + isItalic.ToString() + isBold.ToString();
             if (baseDataCellStyles.ContainsKey(keyName))
