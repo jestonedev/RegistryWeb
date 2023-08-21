@@ -532,7 +532,7 @@
                     }
 
                     <div class="btn-group" role="group">
-                        <a href="#" id="OpenPenaltyCalc" title="Открыть калькулятор пени" class="form-control btn btn-info">
+                        <a href="#" id="OpenPenaltyCalc" title="Открыть калькулятор пени" class="form-control btn btn-info @(!Model.Charges.Any() ? "disabled" : "")">
                             <span style="top: 2px;" class="oi oi-list"></span>
                         </a>
                      
