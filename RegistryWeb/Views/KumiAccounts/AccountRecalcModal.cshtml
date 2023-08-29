@@ -253,6 +253,12 @@
                             <input type="date" class="form-control" title="Период (по)" name="EndDate" value="@(DateTime.Now.Date.ToString("yyyy-MM-dd"))"
                                    id="OpenPenaltyCalculator_EndDate"/>
                         </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="OpenPenaltyCalculator_CheckPayment">
+                            <label class="form-check-label" for="OpenPenaltyCalculator_CheckPayment">
+                               Не включать начисления за предыдущий период
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

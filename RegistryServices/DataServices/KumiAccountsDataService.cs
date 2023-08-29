@@ -1208,7 +1208,7 @@ namespace RegistryWeb.DataServices
 
 
 
-        public string GetUrlForPenaltyCalculator(int idAccount, DateTime? startDate, DateTime? endDate)
+        public string GetUrlForPenaltyCalculator(int idAccount, DateTime? startDate, DateTime? endDate, bool checkPayment)
         {
             var accounts = registryContext.KumiAccounts.Where(r => r.IdAccount == idAccount);
             var accountsPrepare = GetAccountsPrepareForPaymentCalculator(accounts);
@@ -1224,10 +1224,11 @@ namespace RegistryWeb.DataServices
             {
                 var sliceDate = startDate.Value.AddDays(-11);
                 resultPayments = resultPayments.Where(r => r.Date > sliceDate).ToList();
+                
                 var aggCharges = resultChargesInfo.Where(r => r.Date <= sliceDate);
                 resultChargesInfo = resultChargesInfo.Where(r => r.Date > sliceDate).ToList();
 
-                if (aggCharges.Any())
+                if (aggCharges.Any() && !checkPayment)
                 {
                     var dbCharge = accountInfo.Charges.Where(r => r.StartDate <= sliceDate).OrderByDescending(r => r.StartDate).FirstOrDefault();
                     if (dbCharge != null && dbCharge.InputTenancy - dbCharge.PaymentTenancy > 0)
@@ -1276,6 +1277,7 @@ namespace RegistryWeb.DataServices
                 }
                 url += "&loans=" + loansStr;
             }
+            
             return url;
         }
 

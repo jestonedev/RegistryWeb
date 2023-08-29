@@ -410,9 +410,10 @@ namespace RegistryWeb.Controllers
             ViewBag.ReturnUrl = returnUrl;
             return View("ActCharge", actChargeVMs);
         }
-        public IActionResult OpenPenaltyCalculator(int idAccount, DateTime? startDate, DateTime? endDate)
+        public IActionResult OpenPenaltyCalculator(int idAccount, DateTime? startDate, DateTime? endDate, bool checkPayment)
         {
-            return RedirectPermanent("/peni_calc/mcalc.html#" + dataService.GetUrlForPenaltyCalculator(idAccount, startDate, endDate));
+            var url = dataService.GetUrlForPenaltyCalculator(idAccount, startDate, endDate, checkPayment);
+            return RedirectPermanent("/peni_calc/mcalc.html#" + url);
         }
 
         public JsonResult GetKeyRates()
