@@ -549,7 +549,7 @@
             }
         });
     }
-    
+
     $("#OpenPenaltyCalc").on("click", function (e) {
         e.preventDefault();
         var form = $("form[name='OpenPenaltyCalculatorForm']");
