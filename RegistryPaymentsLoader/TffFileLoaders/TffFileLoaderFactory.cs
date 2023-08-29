@@ -24,7 +24,12 @@ namespace RegistryPaymentsLoader.TffFileLoaders
                 if (lines.Any(r => r.StartsWith("- - -;")))
                     return new BKSV2FileLoader(dateEnrollUfk);
                 else
-                    return new VTBV1FileLoader();
+                {
+                    if (lines.Count() > 0 && lines[0].Split(';').Length == 12)
+                        return new VTBV2FileLoader();
+                    else
+                        return new VTBV1FileLoader();
+                }
             }
             
             var str = streamReader.ReadLine();
