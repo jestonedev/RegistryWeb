@@ -563,7 +563,13 @@
     $("form[name='OpenPenaltyCalculatorForm'] .rr-report-submit").on("click", function () {
         var form = $(this).closest("form");
         if (form.valid()) {
-            downloadFile(form.attr("action") + "/?" + form.serialize());
+            var idAccount = form.find("input[name='IdAccount']").val();
+            var checkPayment = $('#OpenPenaltyCalculator_CheckPayment').prop("checked");
+            var startDate = $('#OpenPenaltyCalculator_StartDate').val();
+            var endDate = $('#OpenPenaltyCalculator_EndDate').val();
+
+            var url = "/KumiAccounts/OpenPenaltyCalculator?idAccount=" + idAccount +"&startDate="+ startDate +"&endDate="  + endDate +  "&checkPayment="+ checkPayment;
+            downloadFile(url);
             form.find("#OpenPenaltyCalculatorModal").modal('hide');
         }
     });

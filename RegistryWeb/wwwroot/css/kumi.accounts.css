@@ -133,3 +133,7 @@
 #Charges thead th, #Charges tbody td {
     outline: 1px solid #dee2e6;
 }
+
+.form-check{
+    padding-left: 1.7rem;
+}
