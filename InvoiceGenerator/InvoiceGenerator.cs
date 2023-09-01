@@ -71,7 +71,7 @@ namespace InvoiceGenerator
             {
                 html += string.Format("<tr><td>Пени</td><td></td><td></td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
                     invoice.ChargingPenalty.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
-                    invoice.RecalcTenancy.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
+                    invoice.RecalcPenalty.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
                     (invoice.ChargingPenalty + invoice.RecalcPenalty).ToString("N2", CultureInfo.GetCultureInfo("ru-RU")));
             }
             html += string.Format("<tr><td><b>Итого</b></td><td></td><td></td><td><b>{0}</b></td><td><b>{1}</b></td><td><b>{2}</b></td></tr>",
