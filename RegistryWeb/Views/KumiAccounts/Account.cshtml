@@ -744,7 +744,7 @@
                                             @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentTenancy - tenancyOnAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge" )">@charge.PaymentTenancy</a>
+                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge"  asp-route-filterOptions.Kbk=" ">@charge.PaymentTenancy</a>
                                             }
                                             else
                                             {
@@ -755,7 +755,7 @@
                                             @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge">@charge.PaymentPenalty</a>
+                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge"  asp-route-filterOptions.Kbk=" ">@charge.PaymentPenalty</a>
                                             }
                                             else
                                             {
@@ -785,7 +785,7 @@
                                                 @if (charge.PaymentDgi != 0)
                                                 {
                                                     <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentDgi - dgiOnAccount) руб." asp-action="Index"
-                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" )">@charge.PaymentDgi</a>
+                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge"  asp-route-filterOptions.Kbk=" ">@charge.PaymentDgi</a>
                                                 }
                                                 else
                                                 {
@@ -813,7 +813,7 @@
                                                 @if (charge.PaymentPkk != 0)
                                                 {
                                                     <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPkk - pkkOnAccount) руб." asp-action="Index"
-                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" )">@charge.PaymentPkk</a>
+                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge"  asp-route-filterOptions.Kbk=" ">@charge.PaymentPkk</a>
                                                 }
                                                 else
                                                 {
@@ -841,7 +841,7 @@
                                                 @if (charge.PaymentPadun != 0)
                                                 {
                                                     <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPadun - padunOnAccount) руб." asp-action="Index"
-                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" )">@charge.PaymentPadun</a>
+                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge"  asp-route-filterOptions.Kbk=" ">@charge.PaymentPadun</a>
                                                 }
                                                 else
                                                 {
@@ -872,7 +872,7 @@
                                                 @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0 || charge.PaymentDgi != 0 || charge.PaymentPkk != 0 || charge.PaymentPadun != 0)
                                                 {
                                                     <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @((charge.PaymentTenancy+charge.PaymentDgi+charge.PaymentPkk+charge.PaymentPadun) - totalOnAccount) руб." asp-action="Index"
-                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" )">@(charge.PaymentTenancy + charge.PaymentDgi + charge.PaymentPkk + charge.PaymentPadun)</a>
+                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge"  asp-route-filterOptions.Kbk=" ">@(charge.PaymentTenancy + charge.PaymentDgi + charge.PaymentPkk + charge.PaymentPadun)</a>
                                                 }
                                                 else
                                                 {
@@ -883,7 +883,7 @@
                                                 @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0 || charge.PaymentDgi != 0 || charge.PaymentPkk != 0 || charge.PaymentPadun != 0)
                                                 {
                                                     <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index"
-                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge">@charge.PaymentPenalty</a>
+                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@charge.PaymentPenalty</a>
                                                 }
                                                 else
                                                 {

@@ -355,7 +355,7 @@
                                                         Model.Claim.AmountDgiRecovered > 0 || Model.Claim.AmountPkkRecovered > 0 || Model.Claim.AmountPadunRecovered > 0)
                                                     {
                                                     <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
-                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">@(Model.Claim.AmountTenancyRecovered ?? 0.00m)</a>
+                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim" asp-route-filterOptions.Kbk=" ">@(Model.Claim.AmountTenancyRecovered ?? 0.00m)</a>
                                                     }
                                                     else
                                                     {
@@ -370,7 +370,7 @@
                                                         (Model.Claim.AmountPadunRecovered != null && Model.Claim.AmountPadunRecovered != 0))
                                                     {
                                                     <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
-                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">@(Model.Claim.AmountPenaltiesRecovered ?? 0.00m)</a>
+                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim" asp-route-filterOptions.Kbk=" ">@(Model.Claim.AmountPenaltiesRecovered ?? 0.00m)</a>
                                                     }
                                                     else
                                                     {
@@ -385,7 +385,7 @@
                                                        (Model.Claim.AmountPadunRecovered != null && Model.Claim.AmountPadunRecovered != 0))
                                                     {
                                                     <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
-                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">@(Model.Claim.AmountDgiRecovered ?? 0.00m)</a>
+                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim" asp-route-filterOptions.Kbk=" ">@(Model.Claim.AmountDgiRecovered ?? 0.00m)</a>
                                                     }
                                                     else
                                                     {
@@ -400,7 +400,7 @@
                                                        (Model.Claim.AmountPadunRecovered != null && Model.Claim.AmountPadunRecovered != 0))
                                                     {
                                                     <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
-                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">@(Model.Claim.AmountPkkRecovered ?? 0.00m)</a>
+                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim" asp-route-filterOptions.Kbk=" ">@(Model.Claim.AmountPkkRecovered ?? 0.00m)</a>
                                                     }
                                                     else
                                                     {
@@ -415,7 +415,7 @@
                                                        (Model.Claim.AmountPadunRecovered != null && Model.Claim.AmountPadunRecovered != 0))
                                                     {
                                                     <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
-                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">@(Model.Claim.AmountPadunRecovered ?? 0.00m)</a>
+                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim" asp-route-filterOptions.Kbk=" ">@(Model.Claim.AmountPadunRecovered ?? 0.00m)</a>
                                                     }
                                                     else
                                                     {
@@ -430,7 +430,7 @@
                                                        (Model.Claim.AmountPadunRecovered != null && Model.Claim.AmountPadunRecovered != 0))
                                                     {
                                                     <a asp-controller="KumiPayments" target="_blank" asp-action="Index"
-                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim">
+                                                       asp-route-filterOptions.IdClaim="@Model.Claim.IdClaim" asp-route-filterOptions.Kbk=" ">
                                                         @((Model.Claim.AmountTenancyRecovered + Model.Claim.AmountPenaltiesRecovered + 
                                                             (Model.Claim.AmountDgiRecovered ?? 0.00m) +
                                                             (Model.Claim.AmountPkkRecovered ?? 0.00m) + 
