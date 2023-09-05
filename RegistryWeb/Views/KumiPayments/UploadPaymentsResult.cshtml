@@ -219,7 +219,7 @@
                         <b>Реквизиты:</b> @requisits
                         <span class="badge bg-warning text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
                               title="Присутствовавший в системе мемориальный ордер">?</span>
-                        <br /><b>КБК:</b> <span class="@(kbk == "90111109044041000120" ? "text-danger" : "")" title="@description">@kbk</span>
+                        <br /><b>КБК:</b> <span class="@(kbk == "90111109044041000120" ? "text-danger" : (kbk == "90111705040041111180" ? "text-primary" : ""))" title="@description">@kbk</span>
                     </td>
                     <td>
                         @{
