@@ -13,7 +13,7 @@ namespace RegistryPaymentsLoader.TffStrings
         {
         }
 
-        private string GenerateConstantGuid()
+        protected virtual string GenerateConstantGuid()
         {
             var datePart = tffStringParts[3].Replace(".", "").Trim();
             var sumPart = tffStringParts[2].Replace(".", "").Replace(",", "").Trim().PadLeft(12, '0').Substring(0, 12);

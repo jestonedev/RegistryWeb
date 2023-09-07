@@ -65,7 +65,8 @@ namespace RegistryPaymentsLoader.TffFileLoaders
                     tenant,
                     address,
                     sum,
-                    payDate
+                    payDate,
+                    cells[3]
                 }));
             }
             if (tffStrings.Count == 0) throw new BDFormatException("Не найдено ни одной строки с платежом. Возможно формат представления данных не соответсвуте ожидаемому");
