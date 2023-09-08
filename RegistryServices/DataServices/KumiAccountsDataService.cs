@@ -2849,6 +2849,7 @@ namespace RegistryWeb.DataServices
                 foreach(var currentAssoc in currentAccountTenancyAssoc)
                 {
                     var tenancyProcess = tenancyProcesses.FirstOrDefault(r => r.IdProcess == currentAssoc.IdProcess);
+                    if (tenancyProcess == null) continue;
                     var rentObjects = objects.Where(r => r.IdProcess == tenancyProcess.IdProcess).Select(r => r.RentObject).ToList();
                     var tenancyInfo = new KumiAccountTenancyInfoVM
                     {
