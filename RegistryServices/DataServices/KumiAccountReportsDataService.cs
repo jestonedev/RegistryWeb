@@ -116,8 +116,9 @@ namespace RegistryWeb.DataServices
                                select aRow).ToList();
 
             var addresses = registryContext.GetAddressByAccountIds(idAccounts);
-            var tenants = registryContext.GetTenantsByAccountIds(idAccounts);
-          
+            var tenants = registryContext.GetTenantsByAccountIds(idAccounts).ToList();
+            var tenantsAccountIds = tenants.Select(r => r.IdAccount).ToList();
+            var fractions = registryContext.KumiAccountsTenancyProcessesAssocs.Where(r => tenantsAccountIds.Contains(r.IdAccount)).ToList();
 
             var result = new List<InvoiceGeneratorParam>();
             foreach(var idAccount in idAccounts)
@@ -128,6 +129,7 @@ namespace RegistryWeb.DataServices
                 var addressList = addresses.Where(r => r.IdAccount == idAccount).ToList() ?? new List<KumiAccountAddressInfix>();
                 var address = AddressHelper.JoinAddresses(addressList.Select(r => r.Address).ToList());
                 var tenant = tenants.FirstOrDefault(r => r.IdAccount == idAccount);
+                var fraction = fractions.FirstOrDefault(r => r.IdAccount == idAccount && r.IdProcess == tenant.IdProcess);
                 var ob = new InvoiceGeneratorParam
                 {
                     IdAccount = idAccount,
@@ -147,7 +149,7 @@ namespace RegistryWeb.DataServices
                     RecalcPenalty = (charge?.RecalcPenalty + charge?.CorrectionPenalty).ToString().Replace(',', '.'),
                     BalanceOutput = (charge?.OutputTenancy + charge?.OutputPenalty + charge?.OutputDgi + charge?.OutputPkk + charge?.OutputPadun)
                         .ToString().Replace(',', '.'),
-                    TotalArea = addressList.Sum(r => r.TotalArea).ToString().Replace(',', '.'),
+                    TotalArea = Math.Round(addressList.Sum(r => r.TotalArea) * (double)(fraction?.Fraction ?? 1), 2).ToString().Replace(',', '.'),
                     Prescribed = ((bksAccount != null && bksAccount.Prescribed != null && bksAccount.Prescribed != 0) ? bksAccount.Prescribed :  tenant?.Prescribed) ?? 0,
                     Emails = string.IsNullOrEmpty(tenant?.Emails) ? new List<string>() : tenant.Emails.Split(",").ToList(),
                     TextMessage = textmessage
