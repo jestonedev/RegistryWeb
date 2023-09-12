@@ -359,9 +359,12 @@
                             <div>
                                 Пени: @(item.AmountPenalties ?? 0) руб.
                             </div>
-                            <div>
-                                ДГИ: @(item.AmountDgi ?? 0) руб.
-                            </div>
+                            @if (item.AmountDgi != null && item.AmountDgi != 0)
+                            {
+                                <div>
+                                    ДГИ: @(item.AmountDgi ?? 0) руб.
+                                </div>
+                            }
                             @if (item.AmountPadun != null && item.AmountPadun != 0)
                             {
                                 <div>
@@ -389,50 +392,71 @@
                                         <div>
                                             Пени: @item.IdAccountKumiNavigation.CurrentBalancePenalty руб.
                                         </div>
-                                        <div>
-                                            ДГИ: @item.IdAccountKumiNavigation.CurrentBalanceDgi руб.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                        else if (lastPaymentInfo != null)
-                        {
-                            <div class="mt-2">
-                                <b>Текущая задолженность:</b><br />
-                                <div class="row ml-0 mr-0">
-                                    <div class="@(lastPaymentInfoAdditional != null ? "col-6 pl-0 pr-1" : "")">
-                                        @if (lastPaymentInfoAdditional != null)
+                                        @if (item.IdAccountKumiNavigation.CurrentBalanceDgi != null &&
+                                            item.IdAccountKumiNavigation.CurrentBalanceDgi != 0)
                                         {
-                                            <b>Осн. ЛС:</b><br />
+                                            <div>
+                                                ДГИ: @item.IdAccountKumiNavigation.CurrentBalanceDgi руб.
+                                            </div>
                                         }
-                                        <div>
-                                            Найм: @lastPaymentInfo.BalanceOutputTenancy руб.
-                                        </div>
-                                        <div>
-                                            Пени: @lastPaymentInfo.BalanceOutputPenalties руб.
-                                        </div>
-                                        <div>
-                                            ДГИ: @lastPaymentInfo.BalanceOutputDgi руб.
-                                        </div>
+                                        @if (item.IdAccountKumiNavigation.CurrentBalancePkk != null &&
+                                            item.IdAccountKumiNavigation.CurrentBalancePkk != 0)
+                                        {
+                                            <div>
+                                                ПКК: @item.IdAccountKumiNavigation.CurrentBalancePkk руб.
+                                            </div>
+                                        }
+                                        @if (item.IdAccountKumiNavigation.CurrentBalancePadun != null &&
+                                            item.IdAccountKumiNavigation.CurrentBalancePadun != 0)
+                                        {
+                                            <div>
+                                                Падун: @item.IdAccountKumiNavigation.CurrentBalancePadun руб.
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
                         }
-                        @if (lastPaymentInfoAdditional != null)
+                        else
                         {
-                            <div class="col-6 pl-1 pr-0">
-                                <b>Доп. ЛС:</b><br />
-                                <div>
-                                    Найм: @lastPaymentInfoAdditional.BalanceOutputTenancy руб.
+                            if (lastPaymentInfo != null)
+                            {
+                                <div class="mt-2">
+                                    <b>Текущая задолженность:</b><br />
+                                    <div class="row ml-0 mr-0">
+                                        <div class="@(lastPaymentInfoAdditional != null ? "col-6 pl-0 pr-1" : "")">
+                                            @if (lastPaymentInfoAdditional != null)
+                                            {
+                                                <b>Осн. ЛС:</b><br />
+                                            }
+                                            <div>
+                                                Найм: @lastPaymentInfo.BalanceOutputTenancy руб.
+                                            </div>
+                                            <div>
+                                                Пени: @lastPaymentInfo.BalanceOutputPenalties руб.
+                                            </div>
+                                            <div>
+                                                ДГИ: @lastPaymentInfo.BalanceOutputDgi руб.
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    Пени: @lastPaymentInfoAdditional.BalanceOutputPenalties руб.
+                            }
+                            @if (lastPaymentInfoAdditional != null)
+                            {
+                                <div class="col-6 pl-1 pr-0">
+                                    <b>Доп. ЛС:</b><br />
+                                    <div>
+                                        Найм: @lastPaymentInfoAdditional.BalanceOutputTenancy руб.
+                                    </div>
+                                    <div>
+                                        Пени: @lastPaymentInfoAdditional.BalanceOutputPenalties руб.
+                                    </div>
+                                    <div>
+                                        ДГИ: @lastPaymentInfoAdditional.BalanceOutputDgi руб.
+                                    </div>
                                 </div>
-                                <div>
-                                    ДГИ: @lastPaymentInfoAdditional.BalanceOutputDgi руб.
-                                </div>
-                            </div>
+                            }
                         }
                     </div>
 
