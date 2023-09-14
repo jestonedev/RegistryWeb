@@ -38,7 +38,7 @@ namespace RegistryPaymentCalculator
 
                     if (massChargeInfo.LastCalcDate == lastCalcDate) return;
 
-                    var accounts = db.KumiAccounts.Where(r => (r.IdState == 1 || r.IdState == 3) && r.LastCalcDate < lastCalcDate);
+                    var accounts = db.KumiAccounts.Where(r => (r.IdState == 1 || r.IdState == 3) && (r.LastCalcDate == null || r.LastCalcDate < lastCalcDate));
                     Logger.Log(string.Format("Найдено {0} лицевых счетов", accounts.Count()));
                     Logger.Log("Подготовка лицевых счетов");
                     var accountsPrepare = service.GetAccountsPrepareForPaymentCalculator(accounts);

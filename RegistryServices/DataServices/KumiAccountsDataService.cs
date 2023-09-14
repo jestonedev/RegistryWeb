@@ -1183,7 +1183,7 @@ namespace RegistryWeb.DataServices
                 ChargePkk = chargePkk,
                 ChargePadun = chargePadun,
                 RecalcTenancy = recalcTenancy,
-                RecalcPenalty = recalcPenalty,
+                RecalcPenalty = (currentSavedCharge != null && currentSavedCharge.IsBksCharge == 1) ? recalcPenalty : 0, //recalcPenalty,
                 RecalcDgi = recalcDgi,
                 RecalcPkk = recalcPkk,
                 RecalcPadun = recalcPadun,
@@ -1231,14 +1231,40 @@ namespace RegistryWeb.DataServices
                 if (aggCharges.Any() && !checkPayment)
                 {
                     var dbCharge = accountInfo.Charges.Where(r => r.StartDate <= sliceDate).OrderByDescending(r => r.StartDate).FirstOrDefault();
-                    if (dbCharge != null && dbCharge.InputTenancy - dbCharge.PaymentTenancy > 0)
+                    if (dbCharge != null)
                     {
-                        resultChargesInfo.Add(new KumiSumDateInfo
+                        if (dbCharge.InputTenancy - dbCharge.PaymentTenancy > 0)
                         {
-                            Date = sliceDate,
-                            Value = dbCharge.InputTenancy-dbCharge.PaymentTenancy
-                        });
-                        resultChargesInfo = resultChargesInfo.OrderBy(r => r.Date).ToList();
+                            resultChargesInfo.Add(new KumiSumDateInfo
+                            {
+                                Date = sliceDate,
+                                Value = dbCharge.InputTenancy - dbCharge.PaymentTenancy
+                            });
+                            resultChargesInfo = resultChargesInfo.OrderBy(r => r.Date).ToList();
+                        }
+                        else
+                        if (dbCharge.InputTenancy - dbCharge.PaymentTenancy < 0)
+                        {
+                            var bufSum = Math.Abs(dbCharge.InputTenancy - dbCharge.PaymentTenancy);
+                            while (!(bufSum == 0 || !resultChargesInfo.Any(r => r.Value > 0)))
+                            {
+                                var charge = resultChargesInfo.Where(r => r.Value > 0).OrderBy(r => r.Date).FirstOrDefault();
+                                if (charge != null)
+                                {
+                                    if (bufSum < charge.Value)
+                                    {
+                                        charge.Value = charge.Value - bufSum;
+                                        bufSum = 0;
+                                    }
+                                    else
+                                    {
+                                        bufSum = bufSum - charge.Value;
+                                        charge.Value = 0;
+                                    }
+                                }
+                            }
+                            resultChargesInfo = resultChargesInfo.Where(r => r.Value > 0).OrderBy(r => r.Date).ToList();
+                        }
                     }
                 }
             }
@@ -1368,14 +1394,38 @@ namespace RegistryWeb.DataServices
             if (aggCharges.Any())
             {
                 var dbCharge = dbCharges.Where(r => r.StartDate <= sliceDate).OrderByDescending(r => r.StartDate).FirstOrDefault();
-                if (dbCharge != null && dbCharge.InputTenancy - dbCharge.PaymentTenancy > 0)
+                if (dbCharge != null)
                 {
-                    resultChargesInfo.Add(new KumiSumDateInfo
+                    if (dbCharge.InputTenancy - dbCharge.PaymentTenancy > 0)
                     {
-                        Date = sliceDate,
-                        Value = dbCharge.InputTenancy-dbCharge.PaymentTenancy
-                    });
-                    resultChargesInfo = resultChargesInfo.OrderBy(r => r.Date).ToList();
+                        resultChargesInfo.Add(new KumiSumDateInfo
+                        {
+                            Date = sliceDate,
+                            Value = dbCharge.InputTenancy - dbCharge.PaymentTenancy
+                        });
+                        resultChargesInfo = resultChargesInfo.OrderBy(r => r.Date).ToList();
+                    } else
+                    if (dbCharge.InputTenancy - dbCharge.PaymentTenancy < 0)
+                    {
+                        var bufSum = Math.Abs(dbCharge.InputTenancy - dbCharge.PaymentTenancy);
+                        while (!(bufSum == 0 || !resultChargesInfo.Any(r => r.Value > 0)))
+                        {
+                            var charge = resultChargesInfo.Where(r => r.Value > 0).OrderBy(r => r.Date).FirstOrDefault();
+                            if (charge != null)
+                            {
+                                if (bufSum < charge.Value)
+                                {
+                                    charge.Value = charge.Value - bufSum;
+                                    bufSum = 0;
+                                } else
+                                {
+                                    bufSum = bufSum - charge.Value;
+                                    charge.Value = 0;
+                                }
+                            }
+                        }
+                        resultChargesInfo = resultChargesInfo.Where(r => r.Value > 0).OrderBy(r => r.Date).ToList();
+                    }
                 }
             }
 
