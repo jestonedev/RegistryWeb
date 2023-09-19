@@ -14,6 +14,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public string IdStreet { get; set; }
         public string House { get; set; }
         public string PremisesNum { get; set; }
+        public string PostIndex { get; set; }
         public int? IdSubPremises { get; set; }
         public int? IdPremises { get; set; }
         public int? IdBuilding { get; set; }
@@ -105,7 +106,7 @@ namespace RegistryWeb.ViewOptions.Filter
         public bool IsModalEmpty()
         {
             return Account == null && AccountGisZkh == null && Tenant == null &&
-                (IdRegions == null || IdRegions.Count == 0) && IdStreet == null && House == null && PremisesNum == null && IdPreset == null && IdClaimsBehavior == null &&
+                (IdRegions == null || IdRegions.Count == 0) && IdStreet == null && House == null && PremisesNum == null && PostIndex == null && IdPreset == null && IdClaimsBehavior == null &&
                 IsBalanceEmpty() && !Emails && (IdsAccountState == null || IdsAccountState.Count == 0);
         }
     }
