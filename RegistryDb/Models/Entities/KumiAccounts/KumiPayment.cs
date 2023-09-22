@@ -125,6 +125,8 @@ namespace RegistryDb.Models.Entities.KumiAccounts
             if (obj == null) return false;
             if (!(obj is KumiPayment)) return false;
             if (ReferenceEquals(this, obj)) return true;
+            if (IdPayment != 0 && ((KumiPayment)obj).IdPayment != 0)
+                return IdPayment == ((KumiPayment)obj).IdPayment;
             return Guid == ((KumiPayment)obj).Guid;
         }
 
