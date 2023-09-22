@@ -744,7 +744,7 @@
                                             @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentTenancy - tenancyOnAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge"  asp-route-filterOptions.Kbk=" ">@charge.PaymentTenancy</a>
+                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@charge.PaymentTenancy</a>
                                             }
                                             else
                                             {
@@ -909,7 +909,7 @@
                                         @if (totalPaymentTenancy > 0 || totalPaymentPenalty > 0)
                                         {
                                             <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentTenancy - totalPaymentTenancyByAccount) руб." asp-action="Index"
-                                               asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentTenancy</b></a>
+                                               asp-route-filterOptions.IdAccount="@Model.IdAccount" asp-route-filterOptions.Kbk=" "><b>@totalPaymentTenancy</b></a>
                                         }
                                         else
                                         {
@@ -921,7 +921,7 @@
                                         @if (totalPaymentTenancy > 0 || totalPaymentPenalty > 0)
                                         {
                                             <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPenalty - totalPaymentPenaltyByAccount) руб." asp-action="Index"
-                                               asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPenalty</b></a>
+                                               asp-route-filterOptions.IdAccount="@Model.IdAccount" asp-route-filterOptions.Kbk=" "><b>@totalPaymentPenalty</b></a>
                                         }
                                         else
                                         {
@@ -944,7 +944,7 @@
                                             @if (totalPaymentDgi > 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentDgi - totalPaymentDgiByAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentDgi</b></a>
+                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount" asp-route-filterOptions.Kbk=" "><b>@totalPaymentDgi</b></a>
                                             }
                                             else
                                             {
@@ -965,7 +965,7 @@
                                             @if (totalPaymentPkk > 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPkk - totalPaymentPkkByAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPkk</b></a>
+                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount" asp-route-filterOptions.Kbk=" "><b>@totalPaymentPkk</b></a>
                                             }
                                             else
                                             {
@@ -986,7 +986,7 @@
                                             @if (totalPaymentPadun > 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPadun - totalPaymentPadunByAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPadun</b></a>
+                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount" asp-route-filterOptions.Kbk=" "><b>@totalPaymentPadun</b></a>
                                             }
                                             else
                                             {
@@ -1012,7 +1012,7 @@
                                             @if (totalPaymentTotal > 0 || totalPaymentPenalty > 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentTotal - totalPaymentTotalByAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentTotal</b></a>
+                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"  asp-route-filterOptions.Kbk=" "><b>@totalPaymentTotal</b></a>
                                             }
                                             else
                                             {
@@ -1024,7 +1024,7 @@
                                             @if (totalPaymentTotal > 0 || totalPaymentPenalty > 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPenalty - totalPaymentPenaltyByAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"><b>@totalPaymentPenalty</b></a>
+                                                   asp-route-filterOptions.IdAccount="@Model.IdAccount"  asp-route-filterOptions.Kbk=" "><b>@totalPaymentPenalty</b></a>
                                             }
                                             else
                                             {
