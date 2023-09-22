@@ -893,7 +893,8 @@ namespace RegistryWeb.DataServices
                 var tenant = account.Owner;
                 if (string.IsNullOrWhiteSpace(tenant))
                     tenant = tenants.FirstOrDefault(r => r.IdAccount == account.IdAccount)?.Tenant;
-                result.Add(account.IdAccount, tenant);
+                if (!result.ContainsKey(account.IdAccount))
+                    result.Add(account.IdAccount, tenant);
             }
             return result;
         }
@@ -920,7 +921,7 @@ namespace RegistryWeb.DataServices
                 var tenantInfo = tenantsInfo.FirstOrDefault(r => r.IdAccount == account.Value.IdAccount);
                 var tenant = string.IsNullOrWhiteSpace(account.Value.Owner) ? tenantInfo?.Tenant : account.Value.Owner;
                 if (tenant == null) continue;
-                var paymentTenant = paymentInfo.Key.Item2;
+                var paymentTenant = (paymentInfo.Key.Item2 ?? "").Split("$$", 2)[0];
                 var paymentTenantParts = paymentTenant.ToLowerInvariant().Split(new char[] { '.', ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 var tenantParts = tenant.ToLowerInvariant().Split(" ");
                 if (paymentTenantParts.Length != tenantParts.Length) continue;
@@ -972,6 +973,7 @@ namespace RegistryWeb.DataServices
         private Dictionary<Tuple<string, string>, KumiPayment> AutoDistributeFilterPayments(List<KumiPayment> insertedPayments)
         {
             var result = new Dictionary<Tuple<string, string>, KumiPayment>();
+            var i = 0;
             foreach (var payment in insertedPayments)
             {
                 if (!new[] { "90111109044041000120", "90111705040041111180" }.Contains(payment.Kbk)) continue;
@@ -1010,7 +1012,8 @@ namespace RegistryWeb.DataServices
                     tenant = payment.PayerName;
                 }
                 if (account == null || tenant == null) continue;
-                result.Add(new Tuple<string, string>(account, tenant), payment);
+                result.Add(new Tuple<string, string>(account, tenant+"$$"+i.ToString()), payment);
+                i++;
             }
             return result;
         }
@@ -1018,34 +1021,34 @@ namespace RegistryWeb.DataServices
         public KumiPaymentDistributionInfo DistributePaymentToAccount(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo, 
             decimal tenancySum, decimal penaltySum, decimal dgiSum, decimal pkkSum, decimal padunSum)
         {
-            if (tenancySum < 0)
-                throw new ApplicationException("Указана отрицательная сумма, распределяемая на найм");
-
-            if (penaltySum < 0)
-                throw new ApplicationException("Указана отрицательная сумма, распределяемая на пени");
-
-            if (dgiSum < 0)
-                throw new ApplicationException("Указана отрицательная сумма, распределяемая на ДГИ");
-
-            if (pkkSum < 0)
-                throw new ApplicationException("Указана отрицательная сумма, распределяемая на ПКК");
-
-            if (padunSum < 0)
-                throw new ApplicationException("Указана отрицательная сумма, распределяемая на Падун");
-
-            if (tenancySum + penaltySum + dgiSum + pkkSum + padunSum == 0)
-                throw new ApplicationException("Не указана распределяемая сумма");
-
             var payment = registryContext.KumiPayments.Include(r => r.PaymentClaims).Include(r => r.PaymentCharges).FirstOrDefault(r => r.IdPayment == idPayment);
             if (payment == null)
                 throw new ApplicationException("Не найдена платеж в базе данных");
 
-            if (!new[] { "90111109044041000120", "90111705040041111180" }.Contains(payment.Kbk))
-                throw new ApplicationException(string.Format("Нельзя распределить платеж с КБК {0}. Допускаются только платежи с КБК 90111109044041000120 (плата за наем) и 90111705040041111180 (возмещение ДГИ)", payment.Kbk));
-
             if (payment.IsConsolidated != 0)
                 throw new ApplicationException("Платеж помечен как сводное платежное поручение и не может быть распределен. Вместо него необходимо распределять детализирующие платежи");
 
+            if (tenancySum + penaltySum + dgiSum + pkkSum + padunSum == 0)
+                throw new ApplicationException("Не указана распределяемая сумма");
+
+            if (payment.IdSource != 8 && tenancySum < 0)
+                throw new ApplicationException("Указана отрицательная сумма, распределяемая на найм. Указание отрицательной суммы разрешено только для возвратов");
+
+            if (payment.IdSource != 8 && penaltySum < 0)
+                throw new ApplicationException("Указана отрицательная сумма, распределяемая на пени. Указание отрицательной суммы разрешено только для возвратов");
+
+            if (payment.IdSource != 8 && dgiSum < 0)
+                throw new ApplicationException("Указана отрицательная сумма, распределяемая на ДГИ. Указание отрицательной суммы разрешено только для возвратов");
+
+            if (payment.IdSource != 8 && pkkSum < 0)
+                throw new ApplicationException("Указана отрицательная сумма, распределяемая на ПКК. Указание отрицательной суммы разрешено только для возвратов");
+
+            if (payment.IdSource != 8 && padunSum < 0)
+                throw new ApplicationException("Указана отрицательная сумма, распределяемая на Падун. Указание отрицательной суммы разрешено только для возвратов");
+
+            if (!new[] { "90111109044041000120", "90111705040041111180" }.Contains(payment.Kbk))
+                throw new ApplicationException(string.Format("Нельзя распределить платеж с КБК {0}. Допускаются только платежи с КБК 90111109044041000120 (плата за наем) и 90111705040041111180 (возмещение ДГИ)", payment.Kbk));
+       
             var distributedTenancySum = payment.PaymentCharges.Select(r => r.TenancyValue).Sum() +
                 payment.PaymentClaims.Select(r => r.TenancyValue).Sum();
             var distributedPenaltySum = payment.PaymentCharges.Select(r => r.PenaltyValue).Sum() +
@@ -1057,8 +1060,8 @@ namespace RegistryWeb.DataServices
             var distributedPadunSum = payment.PaymentCharges.Select(r => r.PadunValue).Sum() +
                 payment.PaymentClaims.Select(r => r.PadunValue).Sum();
 
-            if (payment.Sum < distributedTenancySum + distributedPenaltySum + distributedDgiSum + distributedPkkSum + distributedPadunSum 
-                + tenancySum + penaltySum + dgiSum + pkkSum + padunSum)
+            if (Math.Abs(payment.Sum) < Math.Abs(distributedTenancySum + distributedPenaltySum + distributedDgiSum + distributedPkkSum + distributedPadunSum 
+                + tenancySum + penaltySum + dgiSum + pkkSum + padunSum))
                 throw new ApplicationException(string.Format("Распределяемая сумма {0} превышает остаток по платежу {1}", 
                     tenancySum + penaltySum + dgiSum + pkkSum + padunSum,
                     payment.Sum - distributedTenancySum - distributedPenaltySum - distributedDgiSum - distributedPkkSum - distributedPadunSum));
@@ -1415,6 +1418,9 @@ namespace RegistryWeb.DataServices
                         case 7:
                             loadState.KnownPayments.Add(paymentLocal);
                             break;
+                        case 8:
+                            loadState.ReturnPayments.Add(paymentLocal);
+                            break;
                         default:
                             throw new KumiPaymentBindDictionaryException(string.Format("Неподдерживаемый источник платежа {0} - {1}", payment.Guid, payment.IdSource));
                     }
@@ -1604,7 +1610,12 @@ namespace RegistryWeb.DataServices
             if (extract.Guid != payment.Guid)
                 throw new KumiPaymentCheckVtOperException(string.Format("Попытка привязать к платежу {0} строку выписки {1}", payment.Guid, extract.Guid));
 
-            if (extract.SumIn != payment.Sum)
+            if (extract.CodeDocAdp == "ZV" && extract.SumOut == payment.Sum)
+            {
+                payment.Sum = -payment.Sum;
+                payment.IdSource = 8;
+            }
+            else if (extract.SumIn != payment.Sum)
                 throw new KumiPaymentCheckVtOperException(string.Format("Несоответствие суммы в расчетном документе {0} ({1}) и выписке {2} ({3})",
                     payment.Guid, payment.Sum, extract.Guid, extract.SumIn));
             if (extract.NumDoc != payment.NumDocument)

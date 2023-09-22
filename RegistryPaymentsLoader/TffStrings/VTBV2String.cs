@@ -16,9 +16,9 @@ namespace RegistryPaymentsLoader.TffStrings
         {
             var datePart = tffStringParts[3].Replace(".", "").Trim();
             var sumPart = tffStringParts[2].Replace(".", "").Replace(",", "").Trim().PadLeft(12, '0').Substring(0, 12);
-            var k1 = tffStringParts[4].Substring(0, 4).PadLeft(4, '0');
-            var k2 = tffStringParts[4].Substring(4, 4).PadLeft(4, '0');
-            var k3 = tffStringParts[4].Substring(8, 4).PadLeft(4, '0');
+            var k1 = tffStringParts[4].PadRight(12, '0').Substring(0, 4);
+            var k2 = tffStringParts[4].PadRight(12, '0').Substring(4, 4);
+            var k3 = tffStringParts[4].PadRight(12, '0').Substring(8, 4);
             if (NoticeDate == null || NoticeDate < new DateTime(2023, 9, 1))
             {
                 k1 = "0000";

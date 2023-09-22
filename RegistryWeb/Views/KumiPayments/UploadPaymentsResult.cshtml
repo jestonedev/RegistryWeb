@@ -28,6 +28,10 @@
     @if (Model.InsertedPayments.Count > 0)
     {
         <div class="text-success font-weight-bold">Добавлено новых: @Model.InsertedPayments.Count</div>
+        if (Model.InsertedPayments.Where(r => r.IdSource == 8).Any())
+        {
+            <div class="text-warning font-weight-bold">Из них возвратов: @Model.InsertedPayments.Where(r => r.IdSource == 8).Count()</div>
+        }
     }
     @if (Model.UpdatedPayments.Count > 0)
     {
@@ -36,6 +40,10 @@
             <span class="badge bg-primary text-white ml-1" data-bs-toggle="tooltip" data-bs-placement="right"
                   title="К обновленным относятся платежи, ранее присутствовавшие в системе, но не разнесенные и не связанные с уведомлением об уточнении или мемориальным ордером">?</span>
         </div>
+        if (Model.UpdatedPayments.Where(r => r.IdSource == 8).Any())
+        {
+            <div class="text-warning font-weight-bold">Из них возвратов: @Model.UpdatedPayments.Where(r => r.IdSource == 8).Count()</div>
+        }
     }
     @if (Model.SkipedPayments.Count > 0)
     {

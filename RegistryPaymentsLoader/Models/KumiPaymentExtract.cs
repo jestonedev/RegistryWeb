@@ -10,7 +10,9 @@ namespace RegistryPaymentsLoader.Models
         public string CodeDoc { get; set; }
         public string NumDoc { get; set; }
         public DateTime DateDoc { get; set; }
+        public string CodeDocAdp { get; set; }
         public decimal SumIn { get; set; }
+        public decimal SumOut { get; set; }
         public decimal SumZach { get; set; }
         public string Kbk { get; set; }
         public string KbkType { get; set; }

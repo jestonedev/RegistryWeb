@@ -449,11 +449,18 @@
         var sum = parseFloat((paymentRow.data("paymentSum") + "").replace(",", "."));
         var sumPosted = parseFloat((paymentRow.data("paymentSumPosted") + "").replace(",", "."));
         var sumForDistribute = sum - sumPosted;
+        var negativPayment = false;
+        if (sumForDistribute < 0)
+            negativPayment = true;
         var penaltySum = parseFloat(paymentRow.find(".rr-distribution-penalty-sum").val().replace(",", "."));
         var dgiSum = parseFloat(paymentRow.find(".rr-distribution-dgi-sum").val().replace(",", "."));
         var pkkSum = parseFloat(paymentRow.find(".rr-distribution-pkk-sum").val().replace(",", "."));
         var padunSum = parseFloat(paymentRow.find(".rr-distribution-padun-sum").val().replace(",", "."));
-        var tenancySum = Math.round(Math.max(0, sumForDistribute - penaltySum - dgiSum - pkkSum - padunSum) * 100) / 100;
+        var tenancySum =
+            Math.round(
+                (negativPayment ?
+                    Math.min(0, sumForDistribute - penaltySum - dgiSum - pkkSum - padunSum) :
+                    Math.max(0, sumForDistribute - penaltySum - dgiSum - pkkSum - padunSum)) * 100) / 100;
         paymentRow.find(".rr-distribution-tenancy-sum").val((tenancySum + "").replace(".", ","));
         e.preventDefault();
     });
@@ -463,11 +470,18 @@
         var sum = parseFloat((paymentRow.data("paymentSum") + "").replace(",", "."));
         var sumPosted = parseFloat((paymentRow.data("paymentSumPosted") + "").replace(",", "."));
         var sumForDistribute = sum - sumPosted;
+        var negativPayment = false;
+        if (sumForDistribute < 0)
+            negativPayment = true;
         var tenancySum = parseFloat(paymentRow.find(".rr-distribution-tenancy-sum").val().replace(",", "."));
         var dgiSum = parseFloat(paymentRow.find(".rr-distribution-dgi-sum").val().replace(",", "."));
         var pkkSum = parseFloat(paymentRow.find(".rr-distribution-pkk-sum").val().replace(",", "."));
         var padunSum = parseFloat(paymentRow.find(".rr-distribution-padun-sum").val().replace(",", "."));
-        var penaltySum = Math.round(Math.max(0, sumForDistribute - tenancySum - dgiSum - pkkSum - padunSum) * 100) / 100;
+        var penaltySum =
+            Math.round(
+                (negativPayment ?
+                    Math.min(0, sumForDistribute - tenancySum - dgiSum - pkkSum - padunSum) :
+                    Math.max(0, sumForDistribute - tenancySum - dgiSum - pkkSum - padunSum)) * 100) / 100;
         paymentRow.find(".rr-distribution-penalty-sum").val((penaltySum + "").replace(".", ","));
         e.preventDefault();
     });
@@ -477,11 +491,18 @@
         var sum = parseFloat((paymentRow.data("paymentSum") + "").replace(",", "."));
         var sumPosted = parseFloat((paymentRow.data("paymentSumPosted") + "").replace(",", "."));
         var sumForDistribute = sum - sumPosted;
+        var negativPayment = false;
+        if (sumForDistribute < 0)
+            negativPayment = true;
         var tenancySum = parseFloat(paymentRow.find(".rr-distribution-tenancy-sum").val().replace(",", "."));
         var penaltySum = parseFloat(paymentRow.find(".rr-distribution-penalty-sum").val().replace(",", "."));
         var pkkSum = parseFloat(paymentRow.find(".rr-distribution-pkk-sum").val().replace(",", "."));
         var padunSum = parseFloat(paymentRow.find(".rr-distribution-padun-sum").val().replace(",", "."));
-        var dgiSum = Math.round(Math.max(0, sumForDistribute - tenancySum - penaltySum - pkkSum - padunSum) * 100) / 100;
+        var dgiSum =
+            Math.round(
+                (negativPayment ?
+                    Math.min(0, sumForDistribute - tenancySum - penaltySum - pkkSum - padunSum) :
+                    Math.max(0, sumForDistribute - tenancySum - penaltySum - pkkSum - padunSum)) * 100) / 100;
         paymentRow.find(".rr-distribution-dgi-sum").val((dgiSum + "").replace(".", ","));
         e.preventDefault();
     });
@@ -491,11 +512,18 @@
         var sum = parseFloat((paymentRow.data("paymentSum") + "").replace(",", "."));
         var sumPosted = parseFloat((paymentRow.data("paymentSumPosted") + "").replace(",", "."));
         var sumForDistribute = sum - sumPosted;
+        var negativPayment = false;
+        if (sumForDistribute < 0)
+            negativPayment = true;
         var tenancySum = parseFloat(paymentRow.find(".rr-distribution-tenancy-sum").val().replace(",", "."));
         var penaltySum = parseFloat(paymentRow.find(".rr-distribution-penalty-sum").val().replace(",", "."));
         var dgiSum = parseFloat(paymentRow.find(".rr-distribution-dgi-sum").val().replace(",", "."));
         var padunSum = parseFloat(paymentRow.find(".rr-distribution-padun-sum").val().replace(",", "."));
-        var pkkSum = Math.round(Math.max(0, sumForDistribute - tenancySum - penaltySum - dgiSum - padunSum) * 100) / 100;
+        var pkkSum =
+            Math.round(
+                (negativPayment ?
+                    Math.min(0, sumForDistribute - tenancySum - penaltySum - dgiSum - padunSum) :
+                    Math.max(0, sumForDistribute - tenancySum - penaltySum - dgiSum - padunSum)) * 100) / 100;
         paymentRow.find(".rr-distribution-pkk-sum").val((pkkSum + "").replace(".", ","));
         e.preventDefault();
     });
@@ -505,11 +533,18 @@
         var sum = parseFloat((paymentRow.data("paymentSum") + "").replace(",", "."));
         var sumPosted = parseFloat((paymentRow.data("paymentSumPosted") + "").replace(",", "."));
         var sumForDistribute = sum - sumPosted;
+        var negativPayment = false;
+        if (sumForDistribute < 0)
+            negativPayment = true;
         var tenancySum = parseFloat(paymentRow.find(".rr-distribution-tenancy-sum").val().replace(",", "."));
         var penaltySum = parseFloat(paymentRow.find(".rr-distribution-penalty-sum").val().replace(",", "."));
         var dgiSum = parseFloat(paymentRow.find(".rr-distribution-dgi-sum").val().replace(",", "."));
         var pkkSum = parseFloat(paymentRow.find(".rr-distribution-pkk-sum").val().replace(",", "."));
-        var padunSum = Math.round(Math.max(0, sumForDistribute - tenancySum - penaltySum - dgiSum - pkkSum) * 100) / 100;
+        var padunSum =
+            Math.round(
+                (negativPayment ?
+                    Math.min(0, sumForDistribute - tenancySum - penaltySum - dgiSum - pkkSum) :
+                    Math.max(0, sumForDistribute - tenancySum - penaltySum - dgiSum - pkkSum)) * 100) / 100;
         paymentRow.find(".rr-distribution-padun-sum").val((padunSum + "").replace(".", ","));
         e.preventDefault();
     });
