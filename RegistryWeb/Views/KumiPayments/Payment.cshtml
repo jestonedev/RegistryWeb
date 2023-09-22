@@ -112,8 +112,8 @@
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="objectsBtn_@Model.IdPayment" x-placement="bottom-end" style="position: absolute; transform: translate3d(-179px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
                                 <a class="dropdown-item rr-apply-memorial-order @(sumPosted == 0 ? "" : "d-none")" href="#" title="Привязать мемориальный ордер" aria-label="Привязать мемориальный ордер" data-id-payment="@Model.IdPayment">Привязать мемориальный ордер</a>
-                                <a class="dropdown-item rr-distribute-payment @(Model.Sum > sumPosted ? "" : "d-none")" href="#" title="Распределить платеж" aria-label="Распределить платеж" data-id-payment="@Model.IdPayment" data-payment-sum="@Model.Sum" data-payment-sum-posted="@sumPosted">Распределить платеж</a>
-                                <a class="dropdown-item rr-cancel-distribute-payment @(sumPosted > 0 ? "" : "d-none")" href="#" title="Отменить распределение платежа" aria-label="Отменить распределение платежа" data-id-payment="@Model.IdPayment"
+                                <a class="dropdown-item rr-distribute-payment @(Model.Sum != sumPosted ? "" : "d-none")" href="#" title="Распределить платеж" aria-label="Распределить платеж" data-id-payment="@Model.IdPayment" data-payment-sum="@Model.Sum" data-payment-sum-posted="@sumPosted">Распределить платеж</a>
+                                <a class="dropdown-item rr-cancel-distribute-payment @(sumPosted != 0 ? "" : "d-none")" href="#" title="Отменить распределение платежа" aria-label="Отменить распределение платежа" data-id-payment="@Model.IdPayment"
                                    data-payment-sum="@Model.Sum" data-payment-sum-posted="@sumPosted" data-payment-title="@subTitle">Отменить распределение платежа</a>
                             </div>
                         </div>

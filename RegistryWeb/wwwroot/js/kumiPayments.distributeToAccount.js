@@ -183,28 +183,36 @@ function distributionModalInitiate(purpose, account, paymentSum, paymentSumPoste
 }
 
 function redistributePayments(sums, distributeToIndex, sumForDistrubution) {
+    var negativePayment = false;
+    if (sumForDistrubution < 0) {
+        negativePayment = true;
+    }
     do {
         var totalSum = 0;
         for (var i = 0; i < sums.length; i++) {
             if (isNaN(sums[i])) {
                 sums[i] = 0;
             }
+            if ((!negativePayment && sums[i] < 0) || (negativePayment && sums[i] > 0)) {
+                sums[i] = 0;
+            }
             totalSum += sums[i];
         }
-        if (totalSum > sumForDistrubution) {
+        if ((totalSum > sumForDistrubution && !negativePayment) || (totalSum < sumForDistrubution && negativePayment)) {
             var notNullIndex = sums.length - 1;
-            while (sums[notNullIndex] <= 0 || notNullIndex === distributeToIndex) {
+            while ((sums[notNullIndex] <= 0 && !negativePayment) || (sums[notNullIndex] >= 0 && negativePayment) || notNullIndex === distributeToIndex) {
                 notNullIndex -= 1;
                 if (notNullIndex === 0) break;
             }
             var diffSum = totalSum - sumForDistrubution;
-            var subSum = Math.min(diffSum, sums[notNullIndex]);
+            var subSum = negativePayment ? Math.max(diffSum, sums[notNullIndex]) : Math.min(diffSum, sums[notNullIndex]);
             sums[notNullIndex] = Math.round((sums[notNullIndex] - subSum) * 100) / 100;
             totalSum -= subSum;
         }
-    } while (totalSum > sumForDistrubution && notNullIndex !== 0);
+    } while (((totalSum > sumForDistrubution && !negativePayment) || (totalSum < sumForDistrubution && negativePayment))
+        && notNullIndex !== 0);
 
-    if (totalSum > sumForDistrubution) {
+    if ((totalSum > sumForDistrubution && !negativePayment) || (totalSum < sumForDistrubution && negativePayment)) {
         sums[distributeToIndex] = sumForDistrubution;
     }
     return sums;
@@ -854,11 +862,18 @@ $(function () {
 
     $("#DistributePaymentToAccountTenancyLeftovers").on("click", function (e) {
         var sumForDistribute = parseFloat($("#DistributePaymentToAccount_SumForDistribution").val().replace(",", "."));
+        var negativPayment = false;
+        if (sumForDistribute < 0)
+            negativPayment = true;
         var penaltySum = parseFloat($("#DistributePaymentToAccount_PenaltySum").val().replace(",", "."));
         var dgiSum = parseFloat($("#DistributePaymentToAccount_DgiSum").val().replace(",", "."));
         var pkkSum = parseFloat($("#DistributePaymentToAccount_PkkSum").val().replace(",", "."));
         var padunSum = parseFloat($("#DistributePaymentToAccount_PadunSum").val().replace(",", "."));
-        var tenancySum = Math.round(Math.max(0, sumForDistribute - penaltySum - dgiSum - pkkSum - padunSum) * 100) / 100;
+        var tenancySum = 
+            Math.round(
+                (negativPayment ?
+                    Math.min(0, sumForDistribute - penaltySum - dgiSum - pkkSum - padunSum) :
+                    Math.max(0, sumForDistribute - penaltySum - dgiSum - pkkSum - padunSum)) * 100) / 100;
         if (tenancySum === 0) tenancySum = "0,00";
         $("#DistributePaymentToAccount_TenancySum").val((tenancySum + "").replace(".", ","));
         e.preventDefault();
@@ -866,11 +881,18 @@ $(function () {
 
     $("#DistributePaymentToAccountPenaltyLeftovers").on("click", function (e) {
         var sumForDistribute = parseFloat($("#DistributePaymentToAccount_SumForDistribution").val().replace(",", "."));
+        var negativPayment = false;
+        if (sumForDistribute < 0)
+            negativPayment = true;
         var tenancySum = parseFloat($("#DistributePaymentToAccount_TenancySum").val().replace(",", "."));
         var dgiSum = parseFloat($("#DistributePaymentToAccount_DgiSum").val().replace(",", "."));
         var pkkSum = parseFloat($("#DistributePaymentToAccount_PkkSum").val().replace(",", "."));
         var padunSum = parseFloat($("#DistributePaymentToAccount_PadunSum").val().replace(",", "."));
-        var penaltySum = Math.round(Math.max(0, sumForDistribute - tenancySum - dgiSum - pkkSum - padunSum) * 100) / 100;
+        var penaltySum =
+            Math.round(
+                (negativPayment ?
+                    Math.min(0, sumForDistribute - tenancySum - dgiSum - pkkSum - padunSum) :
+                    Math.max(0, sumForDistribute - tenancySum - dgiSum - pkkSum - padunSum)) * 100) / 100;
         if (penaltySum === 0) penaltySum = "0,00";
         $("#DistributePaymentToAccount_PenaltySum").val((penaltySum + "").replace(".", ","));
         e.preventDefault();
@@ -878,11 +900,18 @@ $(function () {
 
     $("#DistributePaymentToAccountDgiLeftovers").on("click", function (e) {
         var sumForDistribute = parseFloat($("#DistributePaymentToAccount_SumForDistribution").val().replace(",", "."));
+        var negativPayment = false;
+        if (sumForDistribute < 0)
+            negativPayment = true;
         var tenancySum = parseFloat($("#DistributePaymentToAccount_TenancySum").val().replace(",", "."));
         var penaltySum = parseFloat($("#DistributePaymentToAccount_PenaltySum").val().replace(",", "."));
         var pkkSum = parseFloat($("#DistributePaymentToAccount_PkkSum").val().replace(",", "."));
         var padunSum = parseFloat($("#DistributePaymentToAccount_PadunSum").val().replace(",", "."));
-        var dgiSum = Math.round(Math.max(0, sumForDistribute - tenancySum - penaltySum - pkkSum - padunSum) * 100) / 100;
+        var dgiSum =
+            Math.round(
+                (negativPayment ?
+                    Math.min(0, sumForDistribute - tenancySum - penaltySum - pkkSum - padunSum) :
+                    Math.max(0, sumForDistribute - tenancySum - penaltySum - pkkSum - padunSum)) * 100) / 100;
         if (dgiSum === 0) dgiSum = "0,00";
         $("#DistributePaymentToAccount_DgiSum").val((dgiSum + "").replace(".", ","));
         e.preventDefault();
@@ -890,11 +919,18 @@ $(function () {
 
     $("#DistributePaymentToAccountPkkLeftovers").on("click", function (e) {
         var sumForDistribute = parseFloat($("#DistributePaymentToAccount_SumForDistribution").val().replace(",", "."));
+        var negativPayment = false;
+        if (sumForDistribute < 0)
+            negativPayment = true;
         var tenancySum = parseFloat($("#DistributePaymentToAccount_TenancySum").val().replace(",", "."));
         var penaltySum = parseFloat($("#DistributePaymentToAccount_PenaltySum").val().replace(",", "."));
         var dgiSum = parseFloat($("#DistributePaymentToAccount_DgiSum").val().replace(",", "."));
         var padunSum = parseFloat($("#DistributePaymentToAccount_PadunSum").val().replace(",", "."));
-        var pkkSum = Math.round(Math.max(0, sumForDistribute - tenancySum - penaltySum - dgiSum - padunSum) * 100) / 100;
+        var pkkSum =
+            Math.round(
+                (negativPayment ?
+                    Math.min(0, sumForDistribute - tenancySum - penaltySum - dgiSum - padunSum) :
+                    Math.max(0, sumForDistribute - tenancySum - penaltySum - dgiSum - padunSum)) * 100) / 100;
         if (pkkSum === 0) pkkSum = "0,00";
         $("#DistributePaymentToAccount_PkkSum").val((pkkSum + "").replace(".", ","));
         e.preventDefault();
@@ -902,11 +938,18 @@ $(function () {
 
     $("#DistributePaymentToAccountPadunLeftovers").on("click", function (e) {
         var sumForDistribute = parseFloat($("#DistributePaymentToAccount_SumForDistribution").val().replace(",", "."));
+        var negativPayment = false;
+        if (sumForDistribute < 0)
+            negativPayment = true;
         var tenancySum = parseFloat($("#DistributePaymentToAccount_TenancySum").val().replace(",", "."));
         var penaltySum = parseFloat($("#DistributePaymentToAccount_PenaltySum").val().replace(",", "."));
         var dgiSum = parseFloat($("#DistributePaymentToAccount_DgiSum").val().replace(",", "."));
         var pkkSum = parseFloat($("#DistributePaymentToAccount_PkkSum").val().replace(",", "."));
-        var padunSum = Math.round(Math.max(0, sumForDistribute - tenancySum - penaltySum - dgiSum - pkkSum) * 100) / 100;
+        var padunSum =
+            Math.round(
+                (negativPayment ?
+                    Math.min(0, sumForDistribute - tenancySum - penaltySum - dgiSum - pkkSum) :
+                    Math.max(0, sumForDistribute - tenancySum - penaltySum - dgiSum - pkkSum)) * 100) / 100;
         if (padunSum === 0) padunSum = "0,00";
         $("#DistributePaymentToAccount_PadunSum").val((padunSum + "").replace(".", ","));
         e.preventDefault();

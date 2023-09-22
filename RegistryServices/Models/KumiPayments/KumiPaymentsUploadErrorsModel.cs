@@ -20,6 +20,7 @@ namespace RegistryServices.Models.KumiPayments
         public List<KumiPayment> PaymentsWithoutExtract { get; set; }
         public List<KumiPayment> KnownPayments { get; set; }
         public List<KumiPayment> UnknownPayments { get; set; }
+        public List<KumiPayment> ReturnPayments { get; set; }
         public List<KumiPayment> SkipedPayments { get; set; }
         public List<KumiPayment> InsertedPayments { get; set; }
         public List<KumiPayment> UpdatedPayments { get; set; }
@@ -38,6 +39,7 @@ namespace RegistryServices.Models.KumiPayments
             PaymentsWithoutExtract = new List<KumiPayment>();
             KnownPayments = new List<KumiPayment>();
             UnknownPayments = new List<KumiPayment>();
+            ReturnPayments = new List<KumiPayment>();
             SkipedPayments = new List<KumiPayment>();
             InsertedPayments = new List<KumiPayment>();
             UpdatedPayments = new List<KumiPayment>();
