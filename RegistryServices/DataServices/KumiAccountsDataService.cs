@@ -2120,6 +2120,7 @@ namespace RegistryWeb.DataServices
                 string.IsNullOrEmpty(filterOptions.IdStreet) &&
                 string.IsNullOrEmpty(filterOptions.House) &&
                 string.IsNullOrEmpty(filterOptions.PremisesNum) &&
+                string.IsNullOrEmpty(filterOptions.PostIndex) &&
                 (filterOptions.IdRegions == null || !filterOptions.IdRegions.Any()) &&
                 filterOptions.IdBuilding == null &&
                 filterOptions.IdPremises == null &&
@@ -2218,6 +2219,18 @@ namespace RegistryWeb.DataServices
                               on buildingBow.IdBuilding equals premisesRow.IdBuilding
                               where premisesRow.PremisesNum.ToLower().Equals(filterOptions.PremisesNum.ToLowerInvariant())
                               select string.Concat("s", buildingBow.IdStreet, "b", buildingBow.IdBuilding.ToString(), "p", premisesRow.IdPremises.ToString());
+                var idAccountsBuf = registryContext.GetKumiAccountIdsByAddressInfixes(infixes.ToList());
+                if (filtered)
+                    idAccounts = idAccounts.Intersect(idAccountsBuf);
+                else
+                    idAccounts = idAccountsBuf;
+                filtered = true;
+            }
+            if (!string.IsNullOrEmpty(filterOptions.PostIndex))
+            {
+                var infixes = from buildingBow in registryContext.Buildings
+                              where buildingBow.PostIndex.Equals(filterOptions.PostIndex)
+                              select string.Concat("s", buildingBow.IdStreet, "b", buildingBow.IdBuilding.ToString());
                 var idAccountsBuf = registryContext.GetKumiAccountIdsByAddressInfixes(infixes.ToList());
                 if (filtered)
                     idAccounts = idAccounts.Intersect(idAccountsBuf);
