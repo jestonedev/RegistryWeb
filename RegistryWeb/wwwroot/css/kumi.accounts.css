@@ -26,6 +26,10 @@
     margin-top: 12px;
 }
 
+.rr-split-account-string-btns {
+    margin-top: 29px;
+}
+
 @media(min-width: 576px) {
     .account-open-claim-btn {
         margin-top: 23px;
@@ -35,6 +39,10 @@
 @media(min-width: 768px) {
     .account-open-claim-btn {
         margin-top: 27px;
+    }
+
+    .rr-split-account-string-btns {
+        margin-top: 33px;
     }
 }
 

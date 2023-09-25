@@ -56,7 +56,7 @@ namespace InvoiceGenerator
                 invoice.BalanceOutput.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")));
             html += "</table>";
 
-            html += string.Format("<p>Срок оплаты по квитанции до <b>{0}</b> (статья 155 ЖФ РФ)</p>",
+            html += string.Format("<p>Срок оплаты по квитанции до <b>{0}</b> (статья 155 ЖК РФ)</p>",
                  new DateTime(invoice.OnDate.Year, invoice.OnDate.Month, 1).AddMonths(1).AddDays(9).ToString("dd.MM.yyyy"));
 
             html += "<table class=\"service-table\">";

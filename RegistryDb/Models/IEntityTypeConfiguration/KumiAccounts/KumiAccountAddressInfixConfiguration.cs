@@ -45,6 +45,11 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
             builder.Property(e => e.TotalArea)
                 .HasColumnName("total_area")
                 .HasColumnType("double");
+
+            builder.Property(e => e.PostIndex)
+                .HasColumnName("post_index")
+                .HasColumnType("varchar(6)")
+                .HasMaxLength(6);
         }
     }
 }

@@ -10,5 +10,6 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public string Infix { get; set; }
         public string Address { get; set; }
         public double TotalArea { get; set; }
+        public string PostIndex { get; set; }
     }
 }

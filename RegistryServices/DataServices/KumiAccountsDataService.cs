@@ -2249,6 +2249,10 @@ namespace RegistryWeb.DataServices
 
         private IQueryable<KumiAccount> AccountFilter(IQueryable<KumiAccount> query, KumiAccountsFilter filterOptions)
         {
+            if (filterOptions.IdsAccount != null && filterOptions.IdsAccount.Any())
+            {
+                query = query.Where(a => filterOptions.IdsAccount.Contains(a.IdAccount));
+            }
             if (!string.IsNullOrEmpty(filterOptions.FrontSideAccount))
             {
                 query = query.Where(a => a.Account.Contains(filterOptions.FrontSideAccount));

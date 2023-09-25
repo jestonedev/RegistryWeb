@@ -5,6 +5,7 @@ namespace RegistryWeb.ViewOptions.Filter
 {
     public class KumiAccountsFilter : FilterAddressOptions
     {
+        public List<int> IdsAccount { get; set; }
         public string FrontSideAccount { get; set; }
         public string Account { get; set; }
         public string AccountGisZkh { get; set; }
@@ -91,7 +92,8 @@ namespace RegistryWeb.ViewOptions.Filter
 
         public bool IsEmpty()
         {
-            return IsAddressEmpty() && IsModalEmpty() && IdBuilding == null && IdPremises == null && IdSubPremises == null && FrontSideAccount == null;
+            return IsAddressEmpty() && IsModalEmpty() && IdBuilding == null && IdPremises == null && IdSubPremises == null && FrontSideAccount == null
+                && (IdsAccount == null || IdsAccount.Count == 0);
         }
 
         public bool IsBalanceEmpty()

@@ -452,7 +452,7 @@
     $(".rr-tenancy-info-archive-btn").on("click", toggleTenancyInfoArchive);
 
     $("#accountForm").on("change", "[id^='Fraction_']", function () {
-        var val = $(this).val();
+        var val = $.trim($(this).val());
         if (val === "" || val === undefined) {
             $(this).val("0,0000");
             return;

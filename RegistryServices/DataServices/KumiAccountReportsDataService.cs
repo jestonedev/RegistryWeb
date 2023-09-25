@@ -128,12 +128,18 @@ namespace RegistryWeb.DataServices
                 var bksAccount = bksAccounts.FirstOrDefault(r => r.IdAccount == idAccount);
                 var addressList = addresses.Where(r => r.IdAccount == idAccount).ToList() ?? new List<KumiAccountAddressInfix>();
                 var address = AddressHelper.JoinAddresses(addressList.Select(r => r.Address).ToList());
+                var postIndex = addressList.FirstOrDefault()?.PostIndex;
+                if (!string.IsNullOrEmpty(postIndex))
+                {
+                    address += ", " + postIndex;
+                }
                 var tenant = tenants.FirstOrDefault(r => r.IdAccount == idAccount);
                 var fraction = fractions.FirstOrDefault(r => r.IdAccount == idAccount && r.IdProcess == tenant.IdProcess);
                 var ob = new InvoiceGeneratorParam
                 {
                     IdAccount = idAccount,
                     Address = address,
+                    PostIndex = postIndex,
                     Account = account.Account,
                     AccountGisZkh = account.AccountGisZkh,
                     Tenant = (string.IsNullOrEmpty(account.Owner) ? tenant?.Tenant : account.Owner) ?? "???",
@@ -159,7 +165,7 @@ namespace RegistryWeb.DataServices
             }
             var cnt = result.Count;
             var tripleCount = (int)Math.Ceiling((decimal)cnt / 3);
-            result = result.OrderBy(r => r.Address).ThenBy(r => r.Account).ToList();
+            result = result.OrderBy(r => r.PostIndex).ThenBy(r => r.Address).ThenBy(r => r.Account).ToList();
             for (var i = 0; i < tripleCount; i++)
             {
                 result[i].OrderGroup = i;
