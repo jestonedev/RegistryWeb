@@ -13,6 +13,8 @@ namespace RegistryWeb.ViewModel
         public int IdState { get; set; }
         public string Account { get; set; }
         public DateTime? LastChargeDate { get; set; }
+        public DateTime? StartChargeDate { get; set; }
+        public DateTime? StopChargeDate { get; set; }
         public decimal CurrentBalanceTenancy { get; set; }
         public decimal CurrentBalancePenalty { get; set; }
         public decimal CurrentBalanceDgi { get; set; }

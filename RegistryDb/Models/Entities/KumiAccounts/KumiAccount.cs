@@ -32,6 +32,8 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public decimal? CurrentBalancePadun { get; set; }
         public string Owner { get; set; }
         public string Description { get; set; }
+        public DateTime? StartChargeDate { get; set; }
+        public DateTime? StopChargeDate { get; set; }
         public byte Deleted { get; set; }
         public virtual KumiAccountState State { get; set; }
         public virtual KumiAccountAddress KumiAccountAddressNavigation { get; set; }

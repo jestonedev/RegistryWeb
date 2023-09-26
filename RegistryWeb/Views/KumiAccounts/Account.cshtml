@@ -288,30 +288,42 @@
             }
 
             <div class="form-row">
-                <div class="form-group col-6 col-lg-4 mb-2">
+                <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-account-label mb-1" asp-for="Account">Лицевой счет</label>
                     <input type="text" asp-for="Account" data-val="true" data-val-required="Укажите лицевой счет" title="Лицевой счет" class="form-control input-numbers" maxlength="255" />
                     <span class="text-danger" asp-validation-for="Account"></span>
                 </div>
-                <div class="form-group col-6 col-lg-4 mb-2">
+                <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-account-label mb-1" asp-for="AccountGisZkh">Лицевой счет ГИС ЖКХ</label>
                     <input type="text" asp-for="AccountGisZkh" title="Лицевой сче ГИС ЖКХ" class="form-control input-account-zkh" maxlength="255" />
                 </div>
-                <div class="form-group col-6 col-lg-4 mb-2">
+                <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-account-label mb-1">Состояние</label>
                     <select class="selectpicker form-control" asp-for="IdState" title="Состояние"
                             asp-items="@(new SelectList(ViewBag.States, "IdState", "State", Model.IdState))"></select>
                     <span class="text-danger" asp-validation-for="IdState"></span>
                 </div>
-                <div class="form-group col-6 col-lg-4 mb-2">
+                <div class="form-group col-6 col-lg-3 mb-2">
                     <label class="rr-account-label mb-1" asp-for="CreateDate">Дата создания</label>
                     <input type="date" asp-for="CreateDate" value="@(ViewBag.Action == ActionTypeEnum.Create ?
                             DateTime.Now.Date.ToString("yyyy-MM-dd") : Model.CreateDate.ToString("yyyy-MM-dd"))"
                            title="Дата создания" class="form-control" disabled />
                 </div>
-                <div class="form-group col-6 col-lg-4 mb-2">
-                    <label class="rr-account-label mb-1" asp-for="LastChargeDate">Дата начисления</label>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-account-label mb-1" asp-for="StartChargeDate">Дата начала начисления</label>
+                    <input type="date" asp-for="StartChargeDate" title="Дата начала начисления. Если не установлена, то расчитывается на основании связанных наймов и даты создания" class="form-control" />
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-account-label mb-1" asp-for="StopChargeDate">Дата окончания начисления</label>
+                    <input type="date" asp-for="StopChargeDate" title="Дата окончания начисления. Если не установлена, то расчитывается на основании связанных наймов и даты аннулирования" class="form-control" />
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-account-label mb-1" asp-for="LastChargeDate">Дата последнего начисления</label>
                     <input type="date" asp-for="LastChargeDate" title="Дата последнего начисления" class="form-control" disabled />
+                </div>
+                <div class="form-group col-6 col-lg-3 mb-2">
+                    <label class="rr-account-label mb-1" asp-for="AnnualDate">Дата аннулирования</label>
+                    <input type="date" asp-for="AnnualDate" title="Дата аннулирования" class="form-control" disabled />
                 </div>
 
                 @{
@@ -387,10 +399,6 @@
                         }
                     }
                 }
-                <div class="form-group col-6 col-lg-4 mb-2">
-                    <label class="rr-account-label mb-1" asp-for="AnnualDate">Дата аннулирования</label>
-                    <input type="date" asp-for="AnnualDate" title="Дата аннулирования" class="form-control" disabled />
-                </div>
 
                 <div class="form-group col-6 col-lg-4 mb-2">
                     <label class="rr-account-label mb-1" asp-for="CurrentBalanceTenancy">Сальдо найм</label>

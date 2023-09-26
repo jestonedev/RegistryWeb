@@ -98,6 +98,14 @@ namespace RegistryDb.Models.IEntityTypeConfiguration.KumiAccounts
                 .HasMaxLength(1024)
                 .IsUnicode(false);
 
+            builder.Property(e => e.StartChargeDate)
+                .HasColumnName("start_charge_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.StopChargeDate)
+                .HasColumnName("stop_charge_date")
+                .HasColumnType("date");
+
             builder.Property(e => e.Deleted)
                 .HasColumnName("deleted")
                 .HasColumnType("tinyint(1)")

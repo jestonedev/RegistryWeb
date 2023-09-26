@@ -347,6 +347,44 @@ namespace RegistryWeb.DataServices
             return registryContext.KumiChargeCorrections.Where(r => r.IdCorrection == idCorrection).FirstOrDefault()?.IdAccount ?? 0;
         }
 
+        public int[] SplitAccount(int idAccount, DateTime onDate, List<SplitAccountModel> splitAccounts)
+        {
+            var resultAccounts = new List<KumiAccount>();
+            var oldAccount = registryContext.KumiAccounts.Include(r => r.AccountsTenancyProcessesAssoc)
+                .Where(r => r.IdAccount == idAccount).FirstOrDefault();
+            if (oldAccount == null) throw new ApplicationException("Не удалось найти лицевой счет с идентификатором "+idAccount);
+            foreach(var newAccount in splitAccounts)
+            {
+                var account = new KumiAccount
+                {
+                    CreateDate = DateTime.Now.Date,
+                    Account = newAccount.Account,
+                    AccountsTenancyProcessesAssoc = (oldAccount?.AccountsTenancyProcessesAssoc ?? new List<KumiAccountsTenancyProcessesAssoc>())
+                        .Select(r => new KumiAccountsTenancyProcessesAssoc {
+                            IdProcess = r.IdProcess,
+                            Fraction = newAccount.Fraction
+                        }).ToList(),
+                    IdState = 1,
+                    Owner = newAccount.Owner,
+                    StartChargeDate = onDate
+                };
+                registryContext.KumiAccounts.Add(account);
+                resultAccounts.Add(account);
+            }
+            oldAccount.StopChargeDate = onDate.AddDays(-1);
+            registryContext.KumiAccounts.Update(oldAccount);
+            registryContext.SaveChanges();
+
+            var resultAccountIds = resultAccounts.Select(r => r.IdAccount).ToList();
+            RecalculateAccounts(resultAccountIds.Union(new List<int> { oldAccount.IdAccount }).ToList(), KumiAccountRecalcTypeEnum.AddRecalc, null, true);
+            oldAccount.IdState = 3;
+            registryContext.KumiAccounts.Update(oldAccount);
+            registryContext.SaveChanges();
+
+            return resultAccountIds.ToArray();
+            // Проверить таблицы денормализации после создания ЛС (если они автоматом не обновились, то доработать код)
+        }
+
         public void DeleteChargeCorrection(int idCorrection)
         {
             var correction = registryContext.KumiChargeCorrections.FirstOrDefault(r => r.IdCorrection == idCorrection);
@@ -1121,11 +1159,20 @@ namespace RegistryWeb.DataServices
             {
                 if (account.IdState == 1 && (currentSavedCharge == null || currentSavedCharge.IsBksCharge != 1))
                 {
-                    foreach (var tenancy in account.TenancyInfo)
+                    var chargeStartDate = startDate;
+                    var chargeEndDate = endDate;
+                    if (account.StartChargeDate != null && account.StartChargeDate > chargeStartDate)
+                        chargeStartDate = account.StartChargeDate.Value;
+                    if (account.StopChargeDate != null && account.StopChargeDate < chargeEndDate)
+                        chargeEndDate = account.StopChargeDate.Value;
+                    if (chargeStartDate <= chargeEndDate)
                     {
-                        chargeTenancy += CalcChargeByTenancy(tenancy, startDate, endDate);
+                        foreach (var tenancy in account.TenancyInfo)
+                        {
+                            chargeTenancy += CalcChargeByTenancy(tenancy, chargeStartDate, chargeEndDate);
+                        }
+                        chargeTenancy = Math.Round(chargeTenancy, 2);
                     }
-                    chargeTenancy = Math.Round(chargeTenancy, 2);
                 }
 
                 if (account.IdState == 1 || account.IdState == 3)
@@ -1722,6 +1769,8 @@ namespace RegistryWeb.DataServices
                     IdState = account.Account.IdState,
                     Account = account.Account.Account,
                     LastChargeDate = account.Account.LastChargeDate,
+                    StartChargeDate = account.Account.StartChargeDate,
+                    StopChargeDate = account.Account.StopChargeDate,
                     CurrentBalanceTenancy = account.Account.CurrentBalanceTenancy ?? 0,
                     CurrentBalancePenalty = account.Account.CurrentBalancePenalty ?? 0,
                     CurrentBalanceDgi = account.Account.CurrentBalanceDgi ?? 0,

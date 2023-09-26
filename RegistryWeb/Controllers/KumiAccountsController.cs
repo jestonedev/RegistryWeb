@@ -430,23 +430,22 @@ namespace RegistryWeb.Controllers
 
         public IActionResult SplitAccount(int idAccount, DateTime onDate, List<SplitAccountModel> splitAccounts)
         {
-            // TODO 
-            // Создать поля даты старта начисления и даты окончания начисления
-            // Создать лицевые счета по образу и подобию, скопировать найм, но не доли, 
-            // доли и владельцев выставить из переданных данных
-            // Сделать перерасчет новых ЛС с записью текущего периода
-            // Проверить таблицы денормализации после создания ЛС (если они автоматом не обновились, то доработать код)
-            // В текущем ЛС проставить дату окончания и сделать перерасчет с перезаписью текущего периода, после чего проставить статус "Не начислять плату за найм"
-
-            /*return Json(new {
-                State = "Error",
-                Error = "Проверка формирования ошибки"
-            });*/
-
-            return Json(new {
-                State = "Success",
-                Accounts = new int[] { 2, 10, 11 }
-            });
+            try
+            {
+                var accountIds = dataService.SplitAccount(idAccount, onDate, splitAccounts);
+                return Json(new
+                {
+                    State = "Success",
+                    Accounts = accountIds
+                });
+            } catch(Exception e)
+            {
+                return Json(new
+                {
+                    State = "Error",
+                    Error = e.Message
+                });
+            }
         }
     }
 }
