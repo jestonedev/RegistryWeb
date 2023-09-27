@@ -77,6 +77,8 @@ namespace RegistryWeb.Controllers
                 viewModel.PageOptions,
                 viewModel.FilterOptions, out List<int> filteredPaymentsIds);
 
+            ViewBag.UntiedPayments = dataService.GetUntiedPayments(viewModel.FilterOptions?.IdAccount, viewModel.FilterOptions?.IdClaim, viewModel.FilterOptions?.IdCharge);
+
             AddSearchIdsToSession(vm.FilterOptions, filteredPaymentsIds);
 
             return View(vm);

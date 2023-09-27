@@ -150,7 +150,12 @@ namespace RegistryWeb.DataServices
                 {
                     viewModel.StartDate = charge.StartDate;
                     viewModel.EndDate = charge.EndDate;
+                    viewModel.Account = registryContext.KumiAccounts.FirstOrDefault(r => r.IdAccount == charge.IdAccount)?.Account;
                 }
+            }
+            if (filterOptions?.IdAccount != null)
+            {
+                viewModel.Account = registryContext.KumiAccounts.FirstOrDefault(r => r.IdAccount == filterOptions.IdAccount)?.Account;
             }
 
             return viewModel;
@@ -407,7 +412,11 @@ namespace RegistryWeb.DataServices
             if (filterOptions.IdClaim != null)
             {
                 var ids = registryContext.KumiPaymentClaims
-                           .Where(r => r.IdClaim == filterOptions.IdClaim).Select(r => r.IdPayment);
+                           .Where(r => r.IdClaim == filterOptions.IdClaim).Select(r => r.IdPayment).ToList();
+
+                var untiedIds = GetUntiedPayments(null, filterOptions.IdClaim, null).Select(r => r.IdPayment);
+
+                ids = ids.Union(untiedIds).ToList();
 
                 query = query.Where(r => ids.Contains(r.IdPayment));
             }
@@ -415,19 +424,57 @@ namespace RegistryWeb.DataServices
             {
                 var ids = registryContext.KumiPaymentCharges.Where(r => r.IdDisplayCharge == filterOptions.IdCharge).Select(r => r.IdPayment)
                     .Union(registryContext.KumiPaymentClaims.Where(r => r.IdDisplayCharge == filterOptions.IdCharge).Select(r => r.IdPayment)).ToList();
+
+                var untiedIds = GetUntiedPayments(null, null, filterOptions.IdCharge).Select(r => r.IdPayment);
+
+                ids = ids.Union(untiedIds).ToList();
+
                 query = query.Where(r => ids.Contains(r.IdPayment));
             }
             if (filterOptions.IdAccount != null)
             {
-                var ids = registryContext.KumiPaymentCharges.Include(r => r.Charge).Where(r => r.Charge.IdAccount == filterOptions.IdAccount).Select(r => r.IdPayment)
+                var idCharges = registryContext.KumiCharges.Where(r => r.IdAccount == filterOptions.IdAccount).Select(r => r.IdCharge).ToList();
+                var idClaims = registryContext.Claims.Where(r => r.IdAccountKumi != null && r.IdAccountKumi == filterOptions.IdAccount).Select(r => r.IdClaim).ToList();
+
+                var ids = registryContext.KumiPaymentCharges.Where(r => idCharges.Contains(r.IdCharge)).Select(r => r.IdPayment)
                     .Union(
-                        registryContext.KumiPaymentClaims.Include(r => r.Claim)
-                            .Where(r => r.Claim.IdAccountKumi != null && r.Claim.IdAccountKumi == filterOptions.IdAccount).Select(r => r.IdPayment)
+                        registryContext.KumiPaymentClaims.Where(r => idClaims.Contains(r.IdClaim))
+                        .Select(r => r.IdPayment)
                     ).Distinct().ToList();
+
+                var untiedIds = GetUntiedPayments(filterOptions.IdAccount, null, null).Select(r => r.IdPayment);
+
+                ids = ids.Union(untiedIds).ToList();
 
                 query = query.Where(r => ids.Contains(r.IdPayment));
             }
             return query;
+        }
+
+        public IList<KumiPaymentUntied> GetUntiedPayments(int? idAccount, int? idClaim, int? idCharge)
+        {
+            if (idCharge != null)
+            {
+                return registryContext.KumiPaymentsUntied
+                    .Where(r => r.IdCharge == idCharge).ToList();
+            }
+            if (idClaim != null)
+            {
+                return registryContext.KumiPaymentsUntied
+                    .Where(r => r.IdClaim != null && r.IdClaim == idClaim).ToList();
+            }
+            if (idAccount != null)
+            {
+                var idCharges = registryContext.KumiCharges.Where(r => r.IdAccount == idAccount).Select(r => r.IdCharge).ToList();
+                var idClaims = registryContext.Claims.Where(r => r.IdAccountKumi != null && r.IdAccountKumi == idAccount)
+                    .Select(r => r.IdClaim).ToList();
+
+                return registryContext.KumiPaymentsUntied.Where(r => idCharges.Contains(r.IdCharge))
+                    .Union(
+                        registryContext.KumiPaymentsUntied.Where(r => r.IdClaim != null && idClaims.Contains(r.IdClaim.Value))
+                    ).Distinct().ToList();
+            }
+            return new List<KumiPaymentUntied>();
         }
 
         public void UpdateDescription(int idPayment, string description)

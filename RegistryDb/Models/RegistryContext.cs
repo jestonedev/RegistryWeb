@@ -227,6 +227,7 @@ namespace RegistryDb.Models
         public virtual DbSet<KumiPayment> KumiPayments { get; set; }
         public virtual DbSet<KumiPaymentCharge> KumiPaymentCharges { get; set; }
         public virtual DbSet<KumiPaymentClaim> KumiPaymentClaims { get; set; }
+        public virtual DbSet<KumiPaymentUntied> KumiPaymentsUntied { get; set; }
         public virtual DbSet<KumiKbkType> KumiKbkTypes { get; set; }
         public virtual DbSet<KumiKbkDescription> KumiKbkDescriptions { get; set; }
         public virtual DbSet<KumiMemorialOrder> KumiMemorialOrders { get; set; }
@@ -425,6 +426,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new KumiChargeCorrectionConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiChargeMassCalcInfoConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new KumiPaymentUntiedConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentChargeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiPaymentClaimConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new KumiKbkTypeConfiguration(nameDatebase));

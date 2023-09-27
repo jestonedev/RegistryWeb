@@ -59,6 +59,7 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public virtual IList<KumiPaymentCharge> PaymentCharges { get; set; }
         public virtual IList<KumiPaymentCharge> DisplayPaymentCharges { get; set; }
         public virtual IList<KumiPaymentClaim> DisplayPaymentClaims { get; set; }
+        public virtual IList<KumiPaymentUntied> UntiedPaymentsInfo { get; set; }
 
         public static bool operator==(KumiCharge first, KumiCharge second)
         {

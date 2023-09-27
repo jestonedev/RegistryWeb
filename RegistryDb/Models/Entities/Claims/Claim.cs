@@ -55,5 +55,6 @@ namespace RegistryDb.Models.Entities.Claims
         public virtual IList<ClaimFile> ClaimFiles { get; set; }
         public virtual IList<ClaimCourtOrder> ClaimCourtOrders { get; set; }
         public virtual IList<KumiPaymentClaim> PaymentClaims { get; set; }
+        public virtual IList<KumiPaymentUntied> UntiedPaymentsInfo { get; set; }
     }
 }

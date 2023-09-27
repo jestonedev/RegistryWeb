@@ -753,7 +753,7 @@
                                                 totalPaymentTenancyByAccount += tenancyOnAccount;
                                                 totalPaymentPenaltyByAccount += penaltyOnAccount;
                                             }
-                                            @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0)
+                                            @if (charge.IsBksCharge == 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentTenancy - tenancyOnAccount) руб." asp-action="Index"
                                                    asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@charge.PaymentTenancy</a>
@@ -764,7 +764,7 @@
                                             }
                                         </td>
                                         <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-payment-penalty">
-                                            @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0)
+                                            @if (charge.IsBksCharge == 0)
                                             {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index"
                                                    asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@charge.PaymentPenalty</a>
@@ -822,7 +822,7 @@
                                                     }
                                                     totalPaymentPkkByAccount += pkkOnAccount;
                                                 }
-                                                @if (charge.PaymentPkk != 0)
+                                                @if (charge.IsBksCharge == 0)
                                                 {
                                                     <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPkk - pkkOnAccount) руб." asp-action="Index"
                                                        asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@charge.PaymentPkk</a>
@@ -850,7 +850,7 @@
                                                     }
                                                     totalPaymentPadunByAccount += padunOnAccount;
                                                 }
-                                                @if (charge.PaymentPadun != 0)
+                                                @if (charge.IsBksCharge == 0)
                                                 {
                                                     <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPadun - padunOnAccount) руб." asp-action="Index"
                                                        asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@charge.PaymentPadun</a>
@@ -881,7 +881,7 @@
                                                     }
                                                     totalPaymentTotalByAccount += totalOnAccount;
                                                 }
-                                                @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0 || charge.PaymentDgi != 0 || charge.PaymentPkk != 0 || charge.PaymentPadun != 0)
+                                                @if (charge.IsBksCharge == 0)
                                                 {
                                                     <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @((charge.PaymentTenancy+charge.PaymentDgi+charge.PaymentPkk+charge.PaymentPadun) - totalOnAccount) руб." asp-action="Index"
                                                        asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@(charge.PaymentTenancy + charge.PaymentDgi + charge.PaymentPkk + charge.PaymentPadun)</a>
@@ -892,7 +892,7 @@
                                                 }
                                             </td>
                                             <td class="text-center p-1 rr-charge-total rr-charge-period-payment-all-penalty">
-                                                @if (charge.PaymentTenancy != 0 || charge.PaymentPenalty != 0 || charge.PaymentDgi != 0 || charge.PaymentPkk != 0 || charge.PaymentPadun != 0)
+                                                @if (charge.IsBksCharge == 0)
                                                 {
                                                     <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index"
                                                        asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@charge.PaymentPenalty</a>
@@ -918,28 +918,12 @@
                                     <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-total-tenancy"><b>@totalChargeTenancy</b></td>
                                     <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-total-penalty"><b>@totalChargePenalty</b></td>
                                     <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")">
-                                        @if (totalPaymentTenancy > 0 || totalPaymentPenalty > 0)
-                                        {
-                                            <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentTenancy - totalPaymentTenancyByAccount) руб." asp-action="Index"
-                                               asp-route-filterOptions.IdAccount="@Model.IdAccount" asp-route-filterOptions.Kbk=" "><b>@totalPaymentTenancy</b></a>
-                                        }
-                                        else
-                                        {
-                                            <b>@totalPaymentTenancy</b>
-                                        }
-
+                                        <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentTenancy - totalPaymentTenancyByAccount) руб." asp-action="Index"
+                                            asp-route-filterOptions.IdAccount="@Model.IdAccount" asp-route-filterOptions.Kbk=" "><b>@totalPaymentTenancy</b></a>
                                     </td>
                                     <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")">
-                                        @if (totalPaymentTenancy > 0 || totalPaymentPenalty > 0)
-                                        {
                                             <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPenalty - totalPaymentPenaltyByAccount) руб." asp-action="Index"
                                                asp-route-filterOptions.IdAccount="@Model.IdAccount" asp-route-filterOptions.Kbk=" "><b>@totalPaymentPenalty</b></a>
-                                        }
-                                        else
-                                        {
-                                            <b>@totalPaymentPenalty</b>
-                                        }
-
 
                                     </td>
                                     <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-total-recalc-tenancy"><b>@totalRecalcTenancy</b></td>
@@ -953,16 +937,8 @@
                                         <td class="text-center p-1 rr-charge-dgi d-none"><b>-</b></td>
                                         <td class="text-center p-1 rr-charge-dgi d-none"><b>@totalChargeDgi</b></td>
                                         <td class="text-center p-1 rr-charge-dgi d-none">
-                                            @if (totalPaymentDgi > 0)
-                                            {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentDgi - totalPaymentDgiByAccount) руб." asp-action="Index"
                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount" asp-route-filterOptions.Kbk=" "><b>@totalPaymentDgi</b></a>
-                                            }
-                                            else
-                                            {
-                                                <b>@totalPaymentDgi</b>
-                                            }
-
                                         </td>
                                         <td class="text-center p-1 rr-charge-dgi d-none"><b>@totalRecalcDgi</b></td>
                                         <td class="text-center p-1 rr-charge-dgi d-none"><b>-</b></td>
@@ -974,16 +950,8 @@
                                         <td class="text-center p-1 rr-charge-pkk d-none"><b>-</b></td>
                                         <td class="text-center p-1 rr-charge-pkk d-none"><b>@totalChargePkk</b></td>
                                         <td class="text-center p-1 rr-charge-pkk d-none">
-                                            @if (totalPaymentPkk > 0)
-                                            {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPkk - totalPaymentPkkByAccount) руб." asp-action="Index"
                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount" asp-route-filterOptions.Kbk=" "><b>@totalPaymentPkk</b></a>
-                                            }
-                                            else
-                                            {
-                                                <b>@totalPaymentPkk</b>
-                                            }
-
                                         </td>
                                         <td class="text-center p-1 rr-charge-pkk d-none"><b>@totalRecalcPkk</b></td>
                                         <td class="text-center p-1 rr-charge-pkk d-none"><b>-</b></td>
@@ -995,16 +963,8 @@
                                         <td class="text-center p-1 rr-charge-padun d-none"><b>-</b></td>
                                         <td class="text-center p-1 rr-charge-padun d-none"><b>@totalChargePadun</b></td>
                                         <td class="text-center p-1 rr-charge-padun d-none">
-                                            @if (totalPaymentPadun > 0)
-                                            {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPadun - totalPaymentPadunByAccount) руб." asp-action="Index"
                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount" asp-route-filterOptions.Kbk=" "><b>@totalPaymentPadun</b></a>
-                                            }
-                                            else
-                                            {
-                                                <b>@totalPaymentPadun</b>
-                                            }
-
                                         </td>
                                         <td class="text-center p-1 rr-charge-padun d-none"><b>@totalRecalcPadun</b></td>
                                         <td class="text-center p-1 rr-charge-padun d-none"><b>-</b></td>
@@ -1021,29 +981,12 @@
                                             @{
                                                 var totalPaymentTotal = totalPaymentTenancy + totalPaymentDgi + totalPaymentPkk + totalPaymentPadun;
                                             }
-                                            @if (totalPaymentTotal > 0 || totalPaymentPenalty > 0)
-                                            {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentTotal - totalPaymentTotalByAccount) руб." asp-action="Index"
                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount" asp-route-filterOptions.Kbk=" "><b>@totalPaymentTotal</b></a>
-                                            }
-                                            else
-                                            {
-                                                <b>@totalPaymentTotal</b>
-                                            }
-
                                         </td>
                                         <td class="text-center p-1 rr-charge-total">
-                                            @if (totalPaymentTotal > 0 || totalPaymentPenalty > 0)
-                                            {
                                                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(totalPaymentPenalty - totalPaymentPenaltyByAccount) руб." asp-action="Index"
                                                    asp-route-filterOptions.IdAccount="@Model.IdAccount" asp-route-filterOptions.Kbk=" "><b>@totalPaymentPenalty</b></a>
-                                            }
-                                            else
-                                            {
-                                                <b>@totalPaymentPenalty</b>
-                                            }
-
-
                                         </td>
                                         <td class="text-center p-1 rr-charge-total rr-charge-total-recalc-all"><b>@(totalRecalcTenancy + totalRecalcDgi + totalRecalcPkk + totalRecalcPadun)</b></td>
                                         <td class="text-center p-1 rr-charge-total rr-charge-total-recalc-all-penalty"><b>@totalRecalcPenalty</b></td>

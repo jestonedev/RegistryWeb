@@ -16,6 +16,7 @@ namespace RegistryServices.ViewModel.KumiAccounts
         public SelectList PaymentSourcesList { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public string Account { get; set; }
         public List<KumiPaymentDistributionInfoToObject> DistributionInfoToObjects { get; set; }
     }
 }

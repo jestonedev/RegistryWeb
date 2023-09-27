@@ -80,6 +80,7 @@ namespace RegistryDb.Models.Entities.KumiAccounts
         public virtual KumiPayerStatus PayerStatus { get; set; }
         public virtual KumiPayment ParentPayment { get; set; }
         public virtual IList<KumiPayment> ChildPayments { get; set; }
+        public virtual IList<KumiPaymentUntied> UntiedPaymentsInfo { get; set; }
 
         public KumiPayment Copy(bool childPayment)
         {
