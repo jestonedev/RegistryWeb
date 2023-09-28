@@ -39,6 +39,20 @@
         e.preventDefault();
     });
 
+    $("body").on('click', ".rr-report-act-free-use", function (e) {
+        var idProcess = $(this).data("id-process");
+        url = "/TenancyReports/GetFreeUseAct?idProcess=" + idProcess;
+        downloadFile(url);
+        e.preventDefault();
+    });
+
+    $("body").on('click', ".rr-report-free-use-contract", function (e) {
+        var idProcess = $(this).data("id-process");
+        url = "/TenancyReports/GetFreeUseContract?idProcess=" + idProcess;
+        downloadFile(url);
+        e.preventDefault();
+    });
+
     $("body").on('click', ".rr-report-resettle", function (e) {
         var idProcess = $(this).data("id-process");
         url = "/TenancyReports/GetStatementResettle?idProcess=" + idProcess;

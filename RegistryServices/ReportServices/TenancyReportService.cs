@@ -39,6 +39,26 @@ namespace RegistryWeb.ReportServices
             return DownloadFile(fileNameReport);
         }
 
+        public byte[] FreeUseContract(int idProcess)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "id_process", idProcess }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\contract_free_use");
+            return DownloadFile(fileNameReport);
+        }
+
+        public byte[] FreeUseAct(int idProcess)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                { "id_process", idProcess }
+            };
+            var fileNameReport = GenerateReport(arguments, "registry\\tenancy\\act_free_use");
+            return DownloadFile(fileNameReport);
+        }
+
         public byte[] StatementResettleSecondary(int idProcess)
         {
             var arguments = new Dictionary<string, object>

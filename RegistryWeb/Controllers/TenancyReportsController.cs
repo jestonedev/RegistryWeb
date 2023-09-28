@@ -74,6 +74,52 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        public IActionResult GetFreeUseContract(int idProcess)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+            try
+            {
+                if (!dataService.HasRentObjects(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
+                }
+                if (!dataService.HasTenant(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
+                }
+                var file = reportService.FreeUseContract(idProcess);
+                return File(file, odtMime, string.Format(@"Договор БП № {0}.odt", idProcess));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult GetFreeUseAct(int idProcess)
+        {
+            if (!securityService.HasPrivilege(Privileges.TenancyRead))
+                return View("NotAccess");
+            try
+            {
+                if (!dataService.HasRentObjects(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
+                }
+                if (!dataService.HasTenant(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
+                }
+                var file = reportService.FreeUseAct(idProcess);
+                return File(file, odtMime, string.Format(@"Акт приема-передачи БП № {0}.odt", idProcess));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
         public IActionResult GetStatementResettle(int idProcess)
         {
             if (!securityService.HasPrivilege(Privileges.TenancyRead))

@@ -48,7 +48,7 @@ namespace RegistryPaymentsLoader.TffFileLoaders
                 payDate = payDate.Replace("/", ".");
 
                 if (!Regex.IsMatch(account, "^[0-9]+$") ||
-                    !Regex.IsMatch(sum, "^[0-9]+([.,][0-9]{1,2})?$") || 
+                    !Regex.IsMatch(sum, "^[-]?[0-9]+([.,][0-9]{1,2})?$") || 
                     !Regex.IsMatch(payDate, "^[0-9]{2}[.][0-9]{2}[.][0-9]{4}$"))
                     continue;
                 tffStrings.Add(new BKSV2String(new string[] {

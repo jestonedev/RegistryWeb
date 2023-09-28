@@ -1357,7 +1357,7 @@ namespace RegistryWeb.DataServices
         private List<KumiSumDateInfo> GetChargesInfoForCalcPenalty(List<KumiChargeCorrection> corrections,
             List<KumiCharge> dbCharges, List<KumiCharge> charges, DateTime? endDate, DateTime startRewriteDate)
         {
-            var chargeCorrections = corrections.Where(r => r.TenancyValue != 0)
+            var chargeCorrections = corrections.Where(r => r.TenancyValue > 0)
                 .Select(r => new KumiSumDateInfo
                 {
                     Date = r.Date,
@@ -1391,25 +1391,6 @@ namespace RegistryWeb.DataServices
                 r.DateDocument != null ? r.DateDocument <= endDate : false)
                 .Where(r => r.PaymentCharges.Any(pc => chargeIds.Contains(pc.IdCharge)) || r.PaymentClaims.Any(pc => claimIds.Contains(pc.IdClaim)));
 
-
-            // Для ПИР, которые были до даты последнего начисления БКС:
-            // Не учитывать в расчете пени, т.к. оплаты по ним отражены в движении от БКС
-            /*DateTime? bksChargeLastDate = null;
-            if (dbCharges.Any(r => r.IsBksCharge == 1))
-            {
-                bksChargeLastDate = dbCharges.Where(r => r.IsBksCharge == 1).Select(r => r.EndDate).Max();
-            }
-
-            var preparedClaims = claims.Where(r =>
-                    r.EndDeptPeriod <= endDate && (bksChargeLastDate == null || r.AtDate > bksChargeLastDate) &&
-                    r.ClaimStates.Any(s => s.IdStateType == 4 && s.CourtOrderDate != null) &&
-                    !r.ClaimStates.Any(s => s.IdStateType == 6 && s.CourtOrderCancelDate != null))
-                .Select(r => new KumiSumDateInfo
-                {
-                    Date = r.EndDeptPeriod.Value, //r.ClaimStates.FirstOrDefault(s => s.IdStateType == 4).CourtOrderDate.Value,
-                    Value = (r.AmountTenancy + r.AmountPkk + r.AmountPadun + r.AmountDgi) ?? 0
-                });*/
-
             var preparedPayments = calcPayments.Select(r => new KumiSumDateInfo
             {
                 Date = (r.DateExecute ?? r.DateIn ?? r.DateDocument).Value,
@@ -1424,7 +1405,14 @@ namespace RegistryWeb.DataServices
                     Value = r.PaymentTenancyValue
                 });
 
-            return /*preparedClaims.Union(preparedPayments)*/ preparedPayments.Union(paymentCorrections).ToList();
+            var negativeCharges = corrections.Where(r => r.TenancyValue < 0)
+                .Select(r => new KumiSumDateInfo
+                {
+                    Date = r.Date,
+                    Value = -r.TenancyValue
+                });
+
+            return preparedPayments.Union(paymentCorrections).Union(negativeCharges).ToList();
         }
 
         private decimal CalcPenalty(List<KumiChargeCorrection> corrections,  List<KumiCharge> dbCharges, List<KumiCharge> charges, List<Claim> claims, 

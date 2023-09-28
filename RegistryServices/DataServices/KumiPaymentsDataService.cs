@@ -1078,19 +1078,19 @@ namespace RegistryWeb.DataServices
             if (tenancySum + penaltySum + dgiSum + pkkSum + padunSum == 0)
                 throw new ApplicationException("Не указана распределяемая сумма");
 
-            if (payment.IdSource != 8 && tenancySum < 0)
+            if (payment.Sum > 0 && tenancySum < 0)
                 throw new ApplicationException("Указана отрицательная сумма, распределяемая на найм. Указание отрицательной суммы разрешено только для возвратов");
 
-            if (payment.IdSource != 8 && penaltySum < 0)
+            if (payment.Sum > 0 && penaltySum < 0)
                 throw new ApplicationException("Указана отрицательная сумма, распределяемая на пени. Указание отрицательной суммы разрешено только для возвратов");
 
-            if (payment.IdSource != 8 && dgiSum < 0)
+            if (payment.Sum > 0 && dgiSum < 0)
                 throw new ApplicationException("Указана отрицательная сумма, распределяемая на ДГИ. Указание отрицательной суммы разрешено только для возвратов");
 
-            if (payment.IdSource != 8 && pkkSum < 0)
+            if (payment.Sum > 0 && pkkSum < 0)
                 throw new ApplicationException("Указана отрицательная сумма, распределяемая на ПКК. Указание отрицательной суммы разрешено только для возвратов");
 
-            if (payment.IdSource != 8 && padunSum < 0)
+            if (payment.Sum > 0 && padunSum < 0)
                 throw new ApplicationException("Указана отрицательная сумма, распределяемая на Падун. Указание отрицательной суммы разрешено только для возвратов");
 
             if (!new[] { "90111109044041000120", "90111705040041111180" }.Contains(payment.Kbk))
