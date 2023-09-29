@@ -445,6 +445,24 @@ namespace RegistryWeb.ReportServices
 
             for (var i = 0; i < paymentsKbk.Count; i++)
             {
+                var exclude = false;
+                for(var j = 0; j < paymentsKbk.Count; j++)
+                {
+                    if (paymentsKbk[i].Id != paymentsKbk[j].Id &&
+                        paymentsKbk[i].num_d == paymentsKbk[j].num_d &&
+                        paymentsKbk[i].date_d_str == paymentsKbk[j].date_d_str &&
+                        paymentsKbk[i].payer_name == paymentsKbk[j].payer_name &&
+                        paymentsKbk[i].purpose == paymentsKbk[j].purpose &&
+                        paymentsKbk[i].group_index == paymentsKbk[j].group_index &&
+                        paymentsKbk[i].sum == -paymentsKbk[j].sum &&
+                        string.IsNullOrEmpty(paymentsKbk[i].account_info) && string.IsNullOrEmpty(paymentsKbk[j].account_info))
+                    {
+                        exclude = true;
+                        break;
+                    }
+                }
+                if (exclude) continue;
+
                 if (paymentsKbk[i].group_index != groupIndex)
                 {
                     if (groupIndex == 0)

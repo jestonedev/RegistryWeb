@@ -712,12 +712,17 @@ namespace RegistryWeb.DataServices
             tenancyProcess.AccountsTenancyProcessesAssoc = null;
             registryContext.TenancyProcesses.Add(tenancyProcess);
             registryContext.SaveChanges();
-            if (!assocs.Any(r => r.IdAccount != 0 || !string.IsNullOrEmpty(r.AccountNavigation.Account)))
+
+            // Если догово не безвозмездного пользования, то сделать связку с лицевым счетом
+            if (tenancyProcess.IdRentType != 5)
             {
-                assocs = FindAccountFromPrevTenancyOrCreateNew(assocs, tenancyProcess);
+                if (!assocs.Any(r => r.IdAccount != 0 || !string.IsNullOrEmpty(r.AccountNavigation.Account)))
+                {
+                    assocs = FindAccountFromPrevTenancyOrCreateNew(assocs, tenancyProcess);
+                }
+                AddAndBindAccounts(assocs, tenancyProcess.IdProcess);
+                registryContext.SaveChanges();
             }
-            AddAndBindAccounts(assocs, tenancyProcess.IdProcess);
-            registryContext.SaveChanges();
         }
 
         private IList<KumiAccountsTenancyProcessesAssoc> FindAccountFromPrevTenancyOrCreateNew(IList<KumiAccountsTenancyProcessesAssoc> accountsAssoc, TenancyProcess tenancyProcess)
@@ -839,35 +844,38 @@ namespace RegistryWeb.DataServices
         public void AddAndBindAccounts(IList<KumiAccountsTenancyProcessesAssoc> accountsAssoc, int idProcess)
         {
             var assocsForUpdate = new List<KumiAccountsTenancyProcessesAssoc>();
-            foreach (var assoc in accountsAssoc)
+            if (accountsAssoc != null)
             {
-                var account = assoc.AccountNavigation.Account;
-                assoc.AccountNavigation = null;
-                if (assoc.IdAccount != 0)
+                foreach (var assoc in accountsAssoc)
                 {
-                    assocsForUpdate.Add(assoc);
-                    continue;
-                }
-                if (!string.IsNullOrEmpty(account))
-                {
-                    account = account.Trim();
-                    var kumiAccount = registryContext.KumiAccounts.FirstOrDefault(r => r.Account == account);
-                    if (kumiAccount == null)
+                    var account = assoc.AccountNavigation.Account;
+                    assoc.AccountNavigation = null;
+                    if (assoc.IdAccount != 0)
                     {
-                        kumiAccount = new KumiAccount
-                        {
-                            Account = account,
-                            IdState = 1,
-                            CurrentBalanceTenancy = 0,
-                            CurrentBalancePenalty = 0,
-                            CreateDate = DateTime.Now.Date,
-                            RecalcMarker = 0
-                        };
-                        registryContext.KumiAccounts.Add(kumiAccount);
-                        registryContext.SaveChanges();
+                        assocsForUpdate.Add(assoc);
+                        continue;
                     }
-                    assoc.IdAccount = kumiAccount.IdAccount;
-                    assocsForUpdate.Add(assoc);
+                    if (!string.IsNullOrEmpty(account))
+                    {
+                        account = account.Trim();
+                        var kumiAccount = registryContext.KumiAccounts.FirstOrDefault(r => r.Account == account);
+                        if (kumiAccount == null)
+                        {
+                            kumiAccount = new KumiAccount
+                            {
+                                Account = account,
+                                IdState = 1,
+                                CurrentBalanceTenancy = 0,
+                                CurrentBalancePenalty = 0,
+                                CreateDate = DateTime.Now.Date,
+                                RecalcMarker = 0
+                            };
+                            registryContext.KumiAccounts.Add(kumiAccount);
+                            registryContext.SaveChanges();
+                        }
+                        assoc.IdAccount = kumiAccount.IdAccount;
+                        assocsForUpdate.Add(assoc);
+                    }
                 }
             }
 

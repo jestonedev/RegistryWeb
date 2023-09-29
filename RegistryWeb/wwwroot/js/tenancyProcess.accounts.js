@@ -59,6 +59,7 @@
         template.clone(true).insertAfter($(".rr-account").last());
         var account = $(".rr-account").last();
         account.removeClass("d-none");
+        account.find("input, button").removeAttr("disabled");
         updateAccountIndexes();
         initAutocomplete(account);
     }

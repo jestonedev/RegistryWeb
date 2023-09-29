@@ -37,6 +37,12 @@ $(function () {
             employerWrapper.addClass("d-none");
             rentTypeWrapper.addClass("mb-3").removeClass("mb-2").addClass("col-md-12").removeClass("col-md-6");
         }
+        if (idRentType === "5") {
+            $(".rr-account .rr-tenancy-account-delete-btn").click();
+            $(".rr-account input, .rr-account button").attr("disabled", "disabled");
+        } else {
+            $(".rr-account input, .rr-account button").removeAttr("disabled");
+        }
         $("#TenancyProcess_IdRentTypeCategory").change();
     });
 
@@ -87,7 +93,7 @@ $(function () {
             validator.showErrors(error);
             isValid = false;
         } else
-        if (action === "Create" && $.trim(regNum.val()) !== "" && !/^[0-9]+\/[0-9]{2}\/[0-9]{2}н?$/.test(regNum.val()) && regNum.val() !== "н") {
+            if (action === "Create" && $.trim(regNum.val()) !== "" && !/^[0-9]+\/[0-9]{2}\/[0-9]{2}н?$/.test(regNum.val()) && !/^[0-9]+-БПн?$/.test(regNum.val()) && regNum.val() !== "н") {
             let error = {};
             error[regNum.attr("name")] = "Задан некорректный формат номера договора";
             validator.showErrors(error);
