@@ -305,6 +305,22 @@ namespace RegistryWeb.DataServices
             decimal paymentDgiValue, decimal paymentPkkValue, decimal paymentPadunValue,
             DateTime atDate, string description, int? idAccountMirror)
         {
+            var currentDay = DateTime.Now.Date;
+            var periodStartDate = currentDay.AddDays(-currentDay.Day + 1);
+            if (currentDay.Day >= 25)
+            {
+                periodStartDate = periodStartDate.AddMonths(1);
+            }
+            var dbCharge = registryContext.KumiCharges.FirstOrDefault(r => r.IdAccount == idAccount && r.StartDate == periodStartDate);
+            if (dbCharge == null)
+                registryContext.KumiCharges.Add(new KumiCharge {
+                    IdAccount = idAccount,
+                    StartDate = periodStartDate,
+                    EndDate = periodStartDate.AddMonths(1).AddDays(-1),
+                    IsBksCharge = 0,
+                    Hidden = 0
+                });
+
             registryContext.KumiChargeCorrections.Add(new KumiChargeCorrection {
                 IdAccount = idAccount,
                 TenancyValue = tenancyValue,
@@ -1365,8 +1381,8 @@ namespace RegistryWeb.DataServices
                 });
 
             var resultCharges =
-                dbCharges.Where(r => r.StartDate < startRewriteDate && r.EndDate <= endDate)
-                .Union(charges.Where(r => r.StartDate >= startRewriteDate && r.EndDate <= endDate));
+                dbCharges.Where(r => r.StartDate <= new DateTime(2023, 6, 1) && r.EndDate <= endDate)
+                .Union(charges.Where(r => r.StartDate >= new DateTime(2023, 7, 1) && r.EndDate <= endDate));
             var firstChargeInputInfo = resultCharges.OrderBy(r => r.EndDate).FirstOrDefault();
 
             return resultCharges
@@ -1374,7 +1390,8 @@ namespace RegistryWeb.DataServices
                 {
                     Date = r.EndDate,
                     Value = firstChargeInputInfo != null && firstChargeInputInfo.EndDate == r.EndDate ?
-                        r.ChargeTenancy + r.RecalcTenancy + firstChargeInputInfo.InputTenancy : r.ChargeTenancy + r.RecalcTenancy
+                        r.ChargeTenancy + (r.IsBksCharge == 1 ? r.RecalcTenancy : 0) + firstChargeInputInfo.InputTenancy : 
+                        r.ChargeTenancy + (r.IsBksCharge == 1 ? r.RecalcTenancy : 0)
                 }).Union(chargeCorrections).ToList();
         }
 
@@ -1963,6 +1980,10 @@ namespace RegistryWeb.DataServices
                 if (prevPeriod == null && nextPeriod == null && currentPeriod.FromDate == null)
                 {
                     currentPeriod.FromDate = accountCreateDate;
+                }
+                if (nextPeriod == null && process.AnnualDate != null && (currentPeriod.ToDate == null || currentPeriod.ToDate > process.AnnualDate))
+                {
+                    currentPeriod.ToDate = process.AnnualDate;
                 }
             }
         }
