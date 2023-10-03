@@ -3073,6 +3073,8 @@ namespace RegistryWeb.DataServices
             {
                 var paymentCharges = registryContext.KumiPaymentCharges.Where(r => r.IdCharge == charge.IdCharge);
                 charge.PaymentCharges = paymentCharges.ToList();
+                charge.DisplayPaymentClaims = registryContext.KumiPaymentClaims.Where(r => r.IdDisplayCharge == charge.IdCharge).ToList();
+                charge.UntiedPaymentsInfo = registryContext.KumiPaymentsUntied.Where(r => r.IdCharge == charge.IdCharge).ToList();
             }
 
             return account;
