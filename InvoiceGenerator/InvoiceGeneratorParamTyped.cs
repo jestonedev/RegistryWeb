@@ -16,6 +16,7 @@ namespace InvoiceGenerator
         public decimal Charging { get { return ChargingTenancy + ChargingPenalty; } }
         public decimal Payed { get; set; }
         public decimal BalanceOutput { get; set; }
+        public decimal Tariff { get; set; }
         public float TotalArea { get; set; }
         public int Prescribed { get; set; }
         public string Email { get; set; }

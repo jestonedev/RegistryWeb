@@ -110,7 +110,7 @@ namespace RegistryWeb.DataServices
                           select cRow).ToList();
             var accounts = (from aRow in registryContext.KumiAccounts
                             where idAccounts.Contains(aRow.IdAccount)
-                            select aRow).ToList();
+                            select aRow);
             var bksAccounts = (from aRow in registryContext.PaymentAccounts
                                where idAccounts.Contains(aRow.IdAccount)
                                select aRow).ToList();
@@ -119,6 +119,11 @@ namespace RegistryWeb.DataServices
             var tenants = registryContext.GetTenantsByAccountIds(idAccounts).ToList();
             var tenantsAccountIds = tenants.Select(r => r.IdAccount).ToList();
             var fractions = registryContext.KumiAccountsTenancyProcessesAssocs.Where(r => tenantsAccountIds.Contains(r.IdAccount)).ToList();
+
+            var accountsPrepare = accountDataService.GetAccountsPrepareForPaymentCalculator(accounts);
+            var accountsInfo = accountDataService.GetAccountInfoForPaymentCalculator(accountsPrepare);
+
+            accounts = accounts.ToList().AsQueryable();
 
             var result = new List<InvoiceGeneratorParam>();
             foreach(var idAccount in idAccounts)
@@ -129,12 +134,32 @@ namespace RegistryWeb.DataServices
                 var addressList = addresses.Where(r => r.IdAccount == idAccount).ToList() ?? new List<KumiAccountAddressInfix>();
                 var address = AddressHelper.JoinAddresses(addressList.Select(r => r.Address).ToList());
                 var postIndex = addressList.FirstOrDefault()?.PostIndex;
+
+                var accountInfo = accountsInfo.FirstOrDefault(r => r.IdAccount == idAccount);
+                if (accountInfo == null)
+                {
+                    accountInfo = new KumiAccountInfoForPaymentCalculator {
+                        TenancyInfo = new List<KumiTenancyInfoForPaymentCalculator>()
+                    };
+                }
+                var tenancyInfo = accountInfo.TenancyInfo;
+                var endDate = onDate.AddMonths(1).AddDays(-1);
+                var actualTenancies = tenancyInfo.Where(r => r.RentPeriods.Any(rp => rp.FromDate <= endDate && rp.ToDate >= onDate));
+                var actualPayments = actualTenancies.SelectMany(r => 
+                    r.RentPayments.Where(rp => rp.FromDate <= endDate).GroupBy(rp => rp.IdObject)
+                        .Select(rp => rp.OrderByDescending(o => o.FromDate).FirstOrDefault())).Where(r => r != null);
+                var payment = actualPayments.Aggregate(0m, (acc, v) => acc + v.Payment);
+
+                var tenant = tenants.FirstOrDefault(r => r.IdAccount == idAccount);
+                var fraction = fractions.FirstOrDefault(r => r.IdAccount == idAccount && r.IdProcess == tenant.IdProcess);
+
+                var totalArea = (decimal)Math.Round(addressList.Sum(r => r.TotalArea) * (double)(fraction?.Fraction ?? 1), 2);
+                var tariff = Math.Round(payment / (totalArea == 0 ? 1 : totalArea), 3);
+
                 if (!string.IsNullOrEmpty(postIndex))
                 {
                     address += ", " + postIndex;
                 }
-                var tenant = tenants.FirstOrDefault(r => r.IdAccount == idAccount);
-                var fraction = fractions.FirstOrDefault(r => r.IdAccount == idAccount && r.IdProcess == tenant.IdProcess);
                 var ob = new InvoiceGeneratorParam
                 {
                     IdAccount = idAccount,
@@ -155,7 +180,8 @@ namespace RegistryWeb.DataServices
                     RecalcPenalty = (charge?.RecalcPenalty + charge?.CorrectionPenalty).ToString().Replace(',', '.'),
                     BalanceOutput = (charge?.OutputTenancy + charge?.OutputPenalty + charge?.OutputDgi + charge?.OutputPkk + charge?.OutputPadun)
                         .ToString().Replace(',', '.'),
-                    TotalArea = Math.Round(addressList.Sum(r => r.TotalArea) * (double)(fraction?.Fraction ?? 1), 2).ToString().Replace(',', '.'),
+                    TotalArea = totalArea.ToString().Replace(',', '.'),
+                    Tariff = tariff.ToString().Replace(',', '.'),
                     Prescribed = ((bksAccount != null && bksAccount.Prescribed != null && bksAccount.Prescribed != 0) ? bksAccount.Prescribed :  tenant?.Prescribed) ?? 0,
                     Emails = string.IsNullOrEmpty(tenant?.Emails) ? new List<string>() : tenant.Emails.Split(",").ToList(),
                     TextMessage = textmessage

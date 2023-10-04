@@ -19,6 +19,7 @@ namespace InvoiceGenerator
         public string RecalcTenancy { get; set; }
         public string RecalcPenalty { get; set; }
         public string BalanceOutput { get; set; }
+        public string Tariff { get; set; }
         public string TotalArea { get; set; }
         public string TextMessage { get; set; }
         public int Prescribed { get; set; }

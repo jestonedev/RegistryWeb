@@ -74,6 +74,7 @@ namespace RegistryWeb.ReportServices
                     { "--recalc-penalty", invoice.RecalcPenalty },
                     { "--balance-output", invoice.BalanceOutput },
                     { "--total-area", invoice.TotalArea },
+                    { "--tariff", invoice.Tariff },
                     { "--prescribed", invoice.Prescribed },
                     { "--message", invoice.TextMessage },
                 };

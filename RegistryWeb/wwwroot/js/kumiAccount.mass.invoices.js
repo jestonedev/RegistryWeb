@@ -33,6 +33,7 @@
             address: $(invoiceWrapper).data("address"),
             tenant: $(invoiceWrapper).data("tenant"),
             totalArea: $(invoiceWrapper).data("totalArea").toString().replace(".", ","),
+            tariff: $(invoiceWrapper).data("tariff").toString().replace(".", ","),
             prescribed: $(invoiceWrapper).data("prescribed"),
             balanceInput: $(invoiceWrapper).data("balanceInput").toString().replace(".", ","),
             balanceOutput: $(invoiceWrapper).data("balanceOutput").toString().replace(".", ","),

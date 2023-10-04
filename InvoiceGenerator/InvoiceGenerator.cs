@@ -63,7 +63,7 @@ namespace InvoiceGenerator
             html += "<tr><td>Вид услуги</td><td>Общая площадь, кв.м</td><td>Тариф, руб.</td><td>Размер платы</td><td>Перерасчет</td><td>Итог за тек. мес.</td></tr>";
             html += string.Format("<tr><td>Плата за наем</td><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",
                  invoice.TotalArea.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
-                 invoice.TotalArea == 0 ? "0" : Math.Round(invoice.ChargingTenancy / (decimal)invoice.TotalArea, 3).ToString("N3", CultureInfo.GetCultureInfo("ru-RU")),
+                 invoice.Tariff.ToString("N3", CultureInfo.GetCultureInfo("ru-RU")),
                  invoice.ChargingTenancy.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
                  invoice.RecalcTenancy.ToString("N2", CultureInfo.GetCultureInfo("ru-RU")),
                  (invoice.ChargingTenancy + invoice.RecalcTenancy).ToString("N2", CultureInfo.GetCultureInfo("ru-RU")));
