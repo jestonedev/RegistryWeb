@@ -1500,7 +1500,7 @@ namespace RegistryWeb.DataServices
                 {
                     var dbPayment = dbPayments.First();
                     if (dbPayment.PaymentClaims.Any() || dbPayment.PaymentCharges.Any() || dbPayment.PaymentCorrections.Any() ||
-                            dbPayment.MemorialOrderPaymentAssocs.Any() || dbPayment.PaymentUfs.Any())
+                            dbPayment.MemorialOrderPaymentAssocs.Any() || dbPayment.PaymentUfs.Any() || dbPayment.IsConsolidated == 1)
                     {
                         loadState.SkipedPayments.Add(payment);
                     }
