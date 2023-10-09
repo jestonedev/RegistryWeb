@@ -1516,6 +1516,7 @@ namespace RegistryWeb.DataServices
             // Учет итогового пени за все периоды (включая нерасчетного пени от БКС) для последующего вычитания предыдущих периодов
             var prevPenalty = charges.Where(r => r.EndDate < endDate && r.IsBksCharge == 0).Sum(r => r.ChargePenalty + r.RecalcPenalty);
             prevPenalty += bksPenaltyMustBeInfo.Where(r => r.EndDate < endDate).Select(r => r.MustBePenalty).Sum();
+            prevPenalty += corrections.Where(r => r.Date < endDate).Select(r => r.PenaltyValue).Sum();
             return penalty - prevPenalty;
         }
 

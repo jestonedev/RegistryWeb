@@ -64,6 +64,11 @@ namespace RegistryWeb.DataServices
                 .Where(r => r.TenancyPersons.Any(p => p.ExcludeDate == null || p.ExcludeDate > DateTime.Now)
                 && (r.RegistrationNum == null || !r.RegistrationNum.EndsWith("н")));
             
+            if (!activeProcesses.Any())
+            {
+                activeProcesses = new List<TenancyProcess> { processes.OrderBy(r => r.IdProcess).LastOrDefault() };
+            }
+
             var rentObjects = tenancyProcessesData.GetRentObjects(activeProcesses);
             var totalArea = 0.0;
             var address = "";
