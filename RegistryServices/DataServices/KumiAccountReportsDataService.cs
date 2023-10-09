@@ -161,10 +161,6 @@ namespace RegistryWeb.DataServices
                 var totalArea = (decimal)Math.Round(addressList.Sum(r => r.TotalArea) * (double)(fraction?.Fraction ?? 1), 2);
                 var tariff = Math.Round(payment / (totalArea == 0 ? 1 : totalArea), 3);
 
-                if (!string.IsNullOrEmpty(postIndex))
-                {
-                    address += ", " + postIndex;
-                }
                 var ob = new InvoiceGeneratorParam
                 {
                     IdAccount = idAccount,

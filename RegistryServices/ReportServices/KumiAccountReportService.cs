@@ -62,6 +62,7 @@ namespace RegistryWeb.ReportServices
                 {
                     { "id_account", invoice.IdAccount },
                     { "--address", invoice.Address },
+                    { "--post-index", invoice.PostIndex },
                     { "--account", invoice.Account },
                     { "--account-gis-zkh", invoice.AccountGisZkh },
                     { "--tenant", invoice.Tenant },

@@ -31,6 +31,7 @@
             account: $(invoiceWrapper).data("account"),
             accountGisZkh: $(invoiceWrapper).data("accountGisZkh"),
             address: $(invoiceWrapper).data("address"),
+            postIndex: $(invoiceWrapper).data("postIndex"),
             tenant: $(invoiceWrapper).data("tenant"),
             totalArea: $(invoiceWrapper).data("totalArea").toString().replace(".", ","),
             tariff: $(invoiceWrapper).data("tariff").toString().replace(".", ","),
