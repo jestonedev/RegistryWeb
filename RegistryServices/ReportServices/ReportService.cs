@@ -40,7 +40,7 @@ namespace RegistryWeb.ReportServices
                 arguments.Add("config", configXml);
                 arguments.Add("destFileName", destFileName);
                 arguments.Add("force-move-to", destFileName);
-                arguments.Add("connectionString", "Driver={" + sqlDriver + "};" + connString);                
+                arguments.Add("connectionString", "Driver={" + sqlDriver + "};" + connString);
 
                 using (var p = new Process())
                 {
