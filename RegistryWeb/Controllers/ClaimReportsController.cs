@@ -519,5 +519,34 @@ namespace RegistryWeb.Controllers
             {
                 return Error(ex.Message);
             }
-        }    }
+        }
+
+        public IActionResult GetReconciliationPaymentsForPeriod(DateTime startDate, DateTime endDate, DateTime forPeriod)
+        {
+            if (!securityService.HasPrivilege(Privileges.AccountsRead))
+                return View("NotAccess");
+
+            try
+            {
+                var kbk = "90111109044041000120";
+                var file = reportService.ReconciliationPaymentsForPeriod(startDate, endDate, forPeriod, kbk);
+                var kbkName = "";
+                switch (kbk)
+                {
+                    case "90111109044041000120":
+                        kbkName = "найма";
+                        break;
+                    case "90111705040041111180":
+                        kbkName = "ДГИ";
+                        break;
+                }
+
+                return File(file, "application/vnd.ms-excel", string.Format("Отчет-сверка по платежам {0} за {3} за период с {1}-{2}.xls", kbkName, startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy"), forPeriod.ToString("MMMM")));
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+    }
 }

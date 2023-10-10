@@ -345,6 +345,10 @@
                 excludeUploadedWrapper.show();
                 saveUploadFactWrapper.show();
                 break;
+            case "ReconciliationPaymentsForPeriod":
+                standartWrapper.show();
+                balanceWrapper.show();
+                break;
         }
 
         modal.modal("show");
@@ -392,12 +396,18 @@
                     url += "&reportType=" + reportType;
                 }
                 break;
-
             case "FileForDoverie":
                 startDate = form.find("[name='StDate_Year']").val() + "-" + form.find("[name='StDate_Month']").val() + "-01";
                 url += "startDate=" + startDate;
                 url += "&excludeUploaded=" + form.find("[name='ExcludeUploaded']").is(":checked");
                 url += "&saveUploadFact=" + form.find("[name='SaveUploadFact']").is(":checked");
+                break;
+            case "ReconciliationPaymentsForPeriod":
+                var startDate = form.find("input[name='StartDate']").val();
+                var endDate = form.find("input[name='EndDate']").val();
+                url += "startDate=" + startDate + "&endDate=" + endDate;
+                var forPeriod = form.find("[name='StDate_Year']").val() + "-" + form.find("[name='StDate_Month']").val().padStart(2, '0') + "-01";
+                url += "&forPeriod=" + forPeriod;
                 break;
         }
 

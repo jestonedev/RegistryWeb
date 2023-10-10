@@ -577,5 +577,26 @@ namespace RegistryWeb.ReportServices
             var fileName = "registry\\kumi_accounts\\export_for_doverie";
             var fileNameReport = GenerateReport(arguments, fileName);
             return DownloadFile(fileNameReport);
-        }    }
+        }
+
+        public byte[] ReconciliationPaymentsForPeriod(DateTime startDate, DateTime endDate, DateTime forPeriod, string kbk)
+        {
+            var paymentDate = new DateTime(forPeriod.Year, forPeriod.Month, 1);
+            paymentDate = paymentDate.AddMonths(1).AddDays(-1);
+
+            var paymentNextDate = new DateTime(forPeriod.Year, forPeriod.Month+1, 1);
+            paymentNextDate = paymentNextDate.AddMonths(1).AddDays(-1);
+
+            var arguments = new Dictionary<string, object> {
+                { "start_date", startDate.ToString("dd.MM.yyyy") },
+                { "end_date", endDate.ToString("dd.MM.yyyy") },
+                { "for_date", paymentDate.ToString("dd.MM.yyyy") },
+                { "next_period", paymentNextDate.ToString("dd.MM.yyyy") },
+                { "kbk", kbk }
+            };
+            var fileName = "registry\\kumi_accounts\\reconciliation_of_payments_for_period";
+            var fileNameReport = GenerateReport(arguments, fileName);
+            return DownloadFile(fileNameReport);
+        }
+    }
 }
