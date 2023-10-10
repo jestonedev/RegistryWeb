@@ -541,7 +541,7 @@ namespace RegistryWeb.Controllers
                         break;
                 }
 
-                return File(file, "application/vnd.ms-excel", string.Format("Отчет-сверка по платежам {0} за {3} за период с {1}-{2}.xls", kbkName, startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy"), forPeriod.ToString("MMMM")));
+                return File(file, odsMime, string.Format("Отчет-сверка по платежам {0} за {3} за период с {1}-{2}.ods", kbkName, startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy"), forPeriod.ToString("MMMM")));
             }
             catch (Exception ex)
             {
