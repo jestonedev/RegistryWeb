@@ -264,7 +264,7 @@ namespace RegistryWeb.DataServices
         {
             var addresses = registryContext.GetAddressByAccountIds(new List<int> { idAccount });
             if (addresses.Count == 0) return new List<KumiAccount> { GetKumiAccount(idAccount) };
-            var accountIds = registryContext.GetKumiAccountIdsByAddressInfixes(addresses.Select(r => r.Infix).ToList());
+            var accountIds = registryContext.GetKumiAccountIdsByAddressInfixes(addresses.Select(r => r.Infix).ToList()).Distinct();
             var result = new List<KumiAccount>();
             foreach(var accountId in accountIds)
             {
