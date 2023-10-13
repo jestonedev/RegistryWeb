@@ -44,6 +44,8 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public void CheckIdToSession(int id, bool isCheck)
         {
+            if ("idKumiAccounts" == nameIds && id == 96066) return;
+
             List<int> ids = GetSessionIds();
 
             if (isCheck)
@@ -82,6 +84,12 @@ namespace RegistryWeb.Controllers
             if (filteredIdsDict.Keys.Contains(filterOptionsSerialized))
             {
                 List<int> filterOptionsIds = filteredIdsDict[filterOptionsSerialized];
+
+                if ("idKumiAccounts" == nameIds)
+                {
+                    filterOptionsIds = filterOptionsIds.Where(r => r != 96066).ToList();
+                }
+
                 List<int> ids = GetSessionIds();
                 ids.AddRange(filterOptionsIds);
                 ids = ids.Distinct().ToList();

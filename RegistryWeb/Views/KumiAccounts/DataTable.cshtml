@@ -138,7 +138,10 @@
                     check = "";
                 }
                 <td class="align-middle">
-                    <input type="checkbox" class="idCheckbox" data-id="@item.IdAccount" @Html.Raw(check) />
+                    @if (item.IdAccount != 96066)
+                    {
+                        <input type="checkbox" class="idCheckbox" data-id="@item.IdAccount" @Html.Raw(check) />
+                    }
                     @if ((tenancyOutOfPeriod && item.IdState != 2) || hasActiveTenanciesAndAnul || hasNoActiveTenanciesAndActive)
                     {
                         var warning = "";
