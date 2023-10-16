@@ -119,6 +119,7 @@
         <form autocomplete="off" asp-action="@ViewBag.Action" id="accountForm" data-action="@ViewBag.Action" method="post">
             <input type="hidden" value="@ViewBag.ReturnUrl" name="returnUrl" />
             <input type="hidden" asp-for="IdAccount" />
+            <input type="hidden" asp-for="LastCalcDate" />
 
             <div id="TenancyInfo">
                 @{
