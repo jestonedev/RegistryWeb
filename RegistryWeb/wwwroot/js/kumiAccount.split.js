@@ -16,6 +16,10 @@
             modal.find(".rr-split-accounts-wrapper").append(result);
             modal.find(".rr-split-accounts-wrapper .rr-split-account-loading").addClass("d-none");
             var row = modal.find(".rr-split-accounts-wrapper .rr-split-account-string").last();
+            $(row).find('.input-numbers').inputFilter(function (value) {
+                return /^\d*$/.test(value);
+            });
+
             if ($(row).index() === 1) {
                 $(row).find(".rr-add-split-account-string").removeClass("d-none");
                 $(row).find(".rr-remove-split-account-string").remove();
@@ -83,10 +87,12 @@
             $(this).addClass("disabled").text("Разделить...");
             var onDate = form.find("#SplitAccount_OnDate").val();
             var idAccount = form.find("input[name='IdAccount']").val();
+            var description = form.find("#SplitAccount_Description").val();
             var rows = form.find(".rr-split-account-string");
             var formData = new FormData();
             formData.append("IdAccount", idAccount);
             formData.append("OnDate", onDate);
+            formData.append("Description", description);
             for (var i = 0; i < rows.length; i++) {
                 formData.append("SplitAccounts[" + i + "].Account", $(rows[i]).find("input[id^='SplitAccount_Account_']").val());
                 formData.append("SplitAccounts[" + i + "].Fraction", $(rows[i]).find("input[id^='SplitAccount_Fraction_']").val());

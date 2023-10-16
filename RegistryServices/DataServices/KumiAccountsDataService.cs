@@ -363,7 +363,7 @@ namespace RegistryWeb.DataServices
             return registryContext.KumiChargeCorrections.Where(r => r.IdCorrection == idCorrection).FirstOrDefault()?.IdAccount ?? 0;
         }
 
-        public int[] SplitAccount(int idAccount, DateTime onDate, List<SplitAccountModel> splitAccounts)
+        public int[] SplitAccount(int idAccount, DateTime onDate, string description, List<SplitAccountModel> splitAccounts)
         {
             var resultAccounts = new List<KumiAccount>();
             var oldAccount = registryContext.KumiAccounts.Include(r => r.AccountsTenancyProcessesAssoc)
@@ -382,20 +382,33 @@ namespace RegistryWeb.DataServices
                         }).ToList(),
                     IdState = 1,
                     Owner = newAccount.Owner,
-                    StartChargeDate = onDate
+                    StartChargeDate = onDate,
+                    Description = description
                 };
                 registryContext.KumiAccounts.Add(account);
                 resultAccounts.Add(account);
             }
             oldAccount.StopChargeDate = onDate.AddDays(-1);
+            if (!string.IsNullOrEmpty(description))
+            {
+                if (!string.IsNullOrEmpty(oldAccount.Description))
+                {
+                    oldAccount.Description += "\r\n";
+                }
+                oldAccount.Description += description;
+            }
             registryContext.KumiAccounts.Update(oldAccount);
             registryContext.SaveChanges();
 
             var resultAccountIds = resultAccounts.Select(r => r.IdAccount).ToList();
             RecalculateAccounts(resultAccountIds.Union(new List<int> { oldAccount.IdAccount }).ToList(), KumiAccountRecalcTypeEnum.AddRecalc, null, true);
-            oldAccount.IdState = 3;
-            registryContext.KumiAccounts.Update(oldAccount);
-            registryContext.SaveChanges();
+
+            if (onDate <= DateTime.Now.Date)
+            {
+                oldAccount.IdState = 3;
+                registryContext.KumiAccounts.Update(oldAccount);
+                registryContext.SaveChanges();
+            }
 
             return resultAccountIds.ToArray();
             // Проверить таблицы денормализации после создания ЛС (если они автоматом не обновились, то доработать код)
@@ -1516,7 +1529,7 @@ namespace RegistryWeb.DataServices
             // Учет итогового пени за все периоды (включая нерасчетного пени от БКС) для последующего вычитания предыдущих периодов
             var prevPenalty = charges.Where(r => r.EndDate < endDate && r.IsBksCharge == 0).Sum(r => r.ChargePenalty + r.RecalcPenalty);
             prevPenalty += bksPenaltyMustBeInfo.Where(r => r.EndDate < endDate).Select(r => r.MustBePenalty).Sum();
-            prevPenalty += corrections.Where(r => r.Date < endDate).Select(r => r.PenaltyValue).Sum();
+            //prevPenalty += corrections.Where(r => r.Date < endDate).Select(r => r.PenaltyValue).Sum();
             return penalty - prevPenalty;
         }
 

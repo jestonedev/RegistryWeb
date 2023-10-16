@@ -428,11 +428,11 @@ namespace RegistryWeb.Controllers
             return View("SplitAccountString", account);
         }
 
-        public IActionResult SplitAccount(int idAccount, DateTime onDate, List<SplitAccountModel> splitAccounts)
+        public IActionResult SplitAccount(int idAccount, DateTime onDate, string description, List<SplitAccountModel> splitAccounts)
         {
             try
             {
-                var accountIds = dataService.SplitAccount(idAccount, onDate, splitAccounts);
+                var accountIds = dataService.SplitAccount(idAccount, onDate, description, splitAccounts);
                 return Json(new
                 {
                     State = "Success",
