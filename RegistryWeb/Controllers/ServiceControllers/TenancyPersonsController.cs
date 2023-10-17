@@ -147,5 +147,33 @@ namespace RegistryWeb.Controllers.ServiceControllers
                 Code = 0
             });
         }
+
+        [HttpPost]
+        public IActionResult UpdateSurname(int? idPerson, string surname)
+        {
+            if (idPerson == null || idPerson == 0)
+            {
+                return Json(new
+                {
+                    Code = -1,
+                    Text = "Не удалось найти участника найма"
+                });
+            }
+            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
+            {
+                return Json(new
+                {
+                    Code = -1,
+                    Text = "У вас нет прав на редактирование найма жилья"
+                });
+            }
+            var person = registryContext.TenancyPersons.FirstOrDefault(p => p.IdPerson == idPerson);
+            person.Surname = surname;
+            registryContext.SaveChanges();
+            return Json(new
+            {
+                Code = 0
+            });
+        }
     }
 }

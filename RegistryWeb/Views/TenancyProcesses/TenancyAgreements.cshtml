@@ -93,6 +93,7 @@
                                     <option value="6">Сменить нанимателя</option>
                                     <option value="7">Члены семьи в новой редакции</option>
                                     <option value="8">Раздел о расторжении в новой редакции</option>
+                                    <option value="9">Смена фамилии нанимателя</option>
                                 </select>
                             </div>
                             <div class="col-1 text-right" style="margin-top: 32px">
@@ -192,7 +193,7 @@
                                 <label for="Agreement_Type_PointExclude">Пункт исключить</label>
                                 <input type="text" class="form-control" id="Agreement_Type_PointExclude" name="Agreement_Type_PointExclude" title="Пункт исключить">
                             </div>
-                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="6">
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="6,9">
                                 <label for="Agreement_Type_Tenant">Текущий наниматель</label>
                                 <input type="text" class="form-control" id="Agreement_Type_Tenant" name="Agreement_Type_Tenant" title="Текущий наниматель">
                             </div>
@@ -246,6 +247,10 @@
                                         <option value="@kinship.IdKinship">@kinship.KinshipName</option>
                                     }
                                 </select>
+                            </div>
+                            <div class="form-group col-md-6 rr-agreement-type-field" data-agreement-types="9">
+                                <label for="Agreement_Type_NewSurname">Новая фамилия</label>
+                                <input type="text" class="form-control input-chars" id="Agreement_Type_NewSurname" maxlength="50" title="Новая фамилия">
                             </div>
                         }
                         <hr class="col-md-12 p-0" />

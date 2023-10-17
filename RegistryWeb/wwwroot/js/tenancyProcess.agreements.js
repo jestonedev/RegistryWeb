@@ -386,6 +386,11 @@ $(function () {
         idKinshipDateElem.val(currentOperation.Info.IdKinship).selectpicker("refresh");
     }
 
+    function updateSurnamePersonOnClient(currentOperation) {
+        var surnameDateElem = $("#TenancyProcessPersons").find("input[id='Surname_" + currentOperation.Info.Guid + "']");
+        surnameDateElem.val(currentOperation.Info.NewTenantSurname).selectpicker("refresh");
+    }
+
     function executeAutomateOperationChangeKinship(currentOperation, action, operations, onSuccess, onError) {
         if (action === "Create") {
             updateIdKinshipPersonOnClient(currentOperation);
@@ -411,6 +416,31 @@ $(function () {
         executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
     }
 
+    function executeAutomateOperationChangeSurname(currentOperation, action, operations, onSuccess, onError) {
+        if (action === "Create") {
+            updateSurnamePersonOnClient(currentOperation);
+            currentOperation.Checkbox.prop("checked", false);
+            executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+            return;
+        }
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/TenancyPersons/UpdateSurname',
+            data: { idPerson: currentOperation.Info.IdPerson, surname: currentOperation.Info.NewTenantSurname },
+            async: false,
+            success: function (error) {
+                if (error.code === 0) {
+                    updateSurnamePersonOnClient(currentOperation);
+                    currentOperation.Checkbox.prop("checked", false);
+                    executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+                } else {
+                    onError("Во время исключения участника найма произошла ошибка: " + error.text);
+                }
+            }
+        });
+        executeAutomateOperationsRecursive(action, operations, onSuccess, onError);
+    }
+
     function executeAutomateOperationsRecursive(action, operations, onSuccess, onError) {
         if (operations.length === 0) {
             onSuccess();
@@ -429,6 +459,9 @@ $(function () {
                 break;
             case "ChangeKinship":
                 executeAutomateOperationChangeKinship(operation, action, operations, onSuccess, onError);
+                break;
+            case "ChangeSurname":
+                executeAutomateOperationChangeSurname(operation, action, operations, onSuccess, onError);
                 break;
             default:
                 onError("Неизвестный тип автоматической операции");
@@ -846,6 +879,11 @@ $(function () {
             case "8":
                 addNewTerminateChapterToContent();
                 break;
+            case "9":
+                var changeTenantSurnameInfo = getChangeTenantSurnameInfo();
+                addChangeTenantSurnameInfoToContent(changeTenantSurnameInfo);
+                addChangeTenantSurnameInfoToModifications(changeTenantSurnameInfo);
+                break;
         }
     });
 
@@ -1262,6 +1300,20 @@ $(function () {
             });
     }
 
+    function getChangeTenantSurnameInfo() {
+        var tenantElem = $("#agreementModal #Agreement_Type_Tenant");
+        var newTenantSurname = $("#Agreement_Type_NewSurname").val();
+        if (newTenantSurname !== "")
+            newTenantSurname = newTenantSurname.substring(0, 1).toUpperCase() + newTenantSurname.substring(1);
+        return {
+            CurrentTenantIdPerson: tenantElem.attr("data-id"),
+            CurrentTenantGuid: tenantElem.attr("data-guid"),
+            CurrentTenant: tenantElem.val(),
+            CurrentTenantBirthDate: tenantElem.data("birthdate"),
+            NewTenantSurname: newTenantSurname
+        };
+    }
+
     function addChangeTenantInfoToContent(changeTenantInfo) {
         var contentElem = $("#agreementModal #Agreement_AgreementContent");
         var contentLines = [];
@@ -1313,6 +1365,49 @@ $(function () {
             contentLines.push(agreementDefaultText);
             contentLines.push(text);
         }
+        contentElem.val(contentLines.join("\n"));
+    }
+
+    function addChangeTenantSurnameInfoToContent(changeTenantSurnameInfo) {
+        var contentElem = $("#agreementModal #Agreement_AgreementContent");
+        var contentLines = [];
+        var text = "";
+        var agreementDefaultText = getDefaultAgreementText();
+        contentLines.push(agreementDefaultText);
+        var oldTenant = changeTenantSurnameInfo.CurrentTenant;
+        if (changeTenantSurnameInfo.CurrentTenant !== "") {
+            var padeg = "RODITLN";
+            $.ajax({
+                type: "GET",
+                url: "/TenancyAgreements/GetSnpCase?snp=" + changeTenantSurnameInfo.CurrentTenant + "&padeg=" + padeg,
+                async: false,
+                success: function (data) {
+                    oldTenant = data.snpAccusative;
+                }
+            });
+            oldTenant = "«" + oldTenant + "»";
+        }
+        var oldTenantSnpParts = changeTenantSurnameInfo.CurrentTenant.split(" ");
+        if (oldTenantSnpParts.length > 0)
+            oldTenantSnpParts[0] = changeTenantSurnameInfo.NewTenantSurname;
+        var tenant = oldTenantSnpParts.join(" ");
+
+        $.ajax({
+            type: "GET",
+            url: "/TenancyAgreements/GetSnpCase?snp=" + tenant + "&padeg=VINITELN",
+            async: false,
+            success: function (data) {
+                tenant = data.snpAccusative;
+            }
+        });
+        
+        if (changeTenantSurnameInfo.CurrentTenantBirthDate !== "") {
+            tenant += ", " + changeTenantSurnameInfo.CurrentTenantBirthDate + " г.р.";
+        }
+
+        tenant = "«" + tenant + "»";
+        text = "1) в связи cо сменой фамилии нанимателя " + oldTenant + " считать стороной по договору - нанимателем - " + tenant + ".";
+        contentLines.push(text);
         contentElem.val(contentLines.join("\n"));
     }
 
@@ -1404,6 +1499,23 @@ $(function () {
                 IdKinship: "1"
             }
         });
+    }
+
+    function addChangeTenantSurnameInfoToModifications(changeTenantSurnameInfo) {
+        if (changeTenantSurnameInfo.CurrentTenantGuid !== "") {
+            var tenant = changeTenantSurnameInfo.CurrentTenant;
+            if (changeTenantSurnameInfo.CurrentTenantBirthDate !== "") {
+                tenant += ", " + changeTenantSurnameInfo.CurrentTenantBirthDate + " г.р.";
+            }
+            let checkbox = insertAutomateOperationsCheckBox("Сменить фамилию нанимателя «" + tenant + "» на «" + changeTenantSurnameInfo.NewTenantSurname + "»");
+            modifications.push({
+                Checkbox: checkbox, Operation: "ChangeSurname", Info: {
+                    IdPerson: changeTenantSurnameInfo.CurrentTenantIdPerson,
+                    Guid: changeTenantSurnameInfo.CurrentTenantGuid,
+                    NewTenantSurname: changeTenantSurnameInfo.NewTenantSurname
+                }
+            });
+        }
     }
 
     function addChangeKinshipTenantsInfoToModifications(changeKinshipsInfo) {
