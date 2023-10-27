@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
-namespace RegistryWeb.ViewComponents
+namespace RegistryWeb.ViewComponents.Common
 {
     public class DatabaseNameComponent : ViewComponent
     {

@@ -1,0 +1,110 @@
+﻿@model IEnumerable<Claim>
+
+<table class="table table-bordered table-striped m-0">
+    <thead>
+        <tr>
+            @{
+                var colSpan = 2 + ViewBag.AdditionalChargesCount;
+            }
+            <th class="text-center p-1" rowspan="2" title="Период взыскания">Период взыскания</th>
+            <th class="text-center p-1" rowspan="2" title="Состояние">Состояние</th>
+            <th class="text-center p-1" colspan="@colSpan" title="Предъявленная сумма">Предъявленная сумма</th>
+            <th class="text-center p-1" colspan="@colSpan" title="Взысканная сумма">Взысканная сумма</th>
+            <th class="text-center p-1" colspan="@colSpan" title="Остаток">Остаток</th>
+        </tr>
+        <tr>
+            @for (var i = 0; i < 3; i++)
+            {
+                <th class="text-center p-1" title="Найм">Найм</th>
+                <th class="text-center p-1" title="Пени">Пени</th>
+                @if (ViewBag.HasDgiCharges)
+                {
+                    <th class="text-center p-1" title="ДГИ">ДГИ</th>
+                }
+                @if (ViewBag.HasPkkCharges)
+                {
+                    <th class="text-center p-1" title="ПКК">ПКК</th>
+                }
+                @if (ViewBag.HasPadunCharges)
+                {
+                    <th class="text-center p-1" title="Падун">Падун</th>
+                }
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var claim in Model)
+        {
+            var lastState = claim.ClaimStates.OrderByDescending(r => r.IdState).FirstOrDefault();
+            var prepareCourtOrderState = claim.ClaimStates.Where(r => r.IdStateType == 4).FirstOrDefault();
+            var winOrderClaim = false;
+            var canceledClaim = false;
+            if (lastState != null && lastState.IdStateType == 6 && lastState.CourtOrderCancelDate != null)
+            {
+                canceledClaim = true;
+            }
+            if (prepareCourtOrderState != null && prepareCourtOrderState.CourtOrderDate != null && !canceledClaim && claim.EndDeptPeriod != null)
+            {
+                winOrderClaim = true;
+            }
+            <tr class="@(canceledClaim ? "table-danger" : winOrderClaim ? "table-success" : "")" title="@(canceledClaim ? "Отмененная исковая работа" :
+                                        winOrderClaim ? "Вынесен судебный приказ №"+(prepareCourtOrderState.CourtOrderNum ?? "б/н")+" от "+prepareCourtOrderState.CourtOrderDate.Value.ToString("dd.MM.yyyy") : "")">
+                <td class="text-center p-1">
+                    @await  Component.InvokeAsync("RentPeriodComponent", new { from = claim.StartDeptPeriod, to = claim.EndDeptPeriod })
+                    <a class="btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn" target="_blank"
+                       asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.IdClaim"
+                       asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
+                    </a>
+                </td>
+                <td class="text-center p-1">@(lastState != null ? lastState.IdStateTypeNavigation.StateType : "")</td>
+                <td class="text-center p-1">@(claim.AmountTenancy?.ToString() ?? "0,00")</td>
+                <td class="text-center p-1">@(claim.AmountPenalties?.ToString() ?? "0,00")</td>
+                @if (ViewBag.HasDgiCharges)
+                {
+                    <td class="text-center p-1">@(claim.AmountDgi?.ToString() ?? "0,00")</td>
+                }
+                @if (ViewBag.HasPkkCharges)
+                {
+                    <td class="text-center p-1">@(claim.AmountPkk?.ToString() ?? "0,00")</td>
+                }
+                @if (ViewBag.HasPadunCharges)
+                {
+                    <td class="text-center p-1">@(claim.AmountPadun?.ToString() ?? "0,00")</td>
+                }
+                <td class="text-center p-1">@(claim.AmountTenancyRecovered?.ToString() ?? "0,00")</td>
+                <td class="text-center p-1">@(claim.AmountPenaltiesRecovered?.ToString() ?? "0,00")</td>
+                @if (ViewBag.HasDgiCharges)
+                {
+                    <td class="text-center p-1">@(claim.AmountDgiRecovered?.ToString() ?? "0,00")</td>
+                }
+                @if (ViewBag.HasPkkCharges)
+                {
+                    <td class="text-center p-1">@(claim.AmountPkkRecovered?.ToString() ?? "0,00")</td>
+                }
+                @if (ViewBag.HasPadunCharges)
+                {
+                    <td class="text-center p-1">@(claim.AmountPadunRecovered?.ToString() ?? "0,00")</td>
+                }
+
+                <td class="text-center p-1">@((claim.AmountTenancy - claim.AmountTenancyRecovered)?.ToString() ?? "0,00")</td>
+                <td class="text-center p-1">@((claim.AmountPenalties - claim.AmountPenaltiesRecovered)?.ToString() ?? "0,00")</td>
+                @if (ViewBag.HasDgiCharges)
+                {
+                    <td class="text-center p-1">@((claim.AmountDgi - claim.AmountDgiRecovered)?.ToString() ?? "0,00")</td>
+                }
+                @if (ViewBag.HasPkkCharges)
+                {
+                    <td class="text-center p-1">@((claim.AmountPkk - claim.AmountPkkRecovered)?.ToString() ?? "0,00")</td>
+                }
+                @if (ViewBag.HasPadunCharges)
+                {
+                    <td class="text-center p-1">@((claim.AmountPadun - claim.AmountPadunRecovered)?.ToString() ?? "0,00")</td>
+                }
+            </tr>
+        }
+    </tbody>
+    @await  Component.InvokeAsync("ClaimsTotalComponent", new { Claims = Model,
+        HasDgiCharges = ViewBag.HasDgiCharges,
+        HasPkkCharges = ViewBag.HasPkkCharges,
+        HasPadunCharges = ViewBag.HasPadunCharges })
+</table>

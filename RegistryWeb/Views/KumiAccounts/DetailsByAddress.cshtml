@@ -363,55 +363,12 @@
                             @{
                                 var i = 0;
                                 var count = Model.SelectMany(r => r.Charges).Where(r => r.Hidden == 0).Count();
-                                var totalChargeTenancy = 0.00m;
-                                var totalChargePenalty = 0.00m;
-                                var totalPaymentTenancy = 0.00m;
-                                var totalPaymentPenalty = 0.00m;
-                                var totalPaymentTenancyByAccount = 0.00m;
-                                var totalPaymentPenaltyByAccount = 0.00m;
-                                var totalRecalcTenancy = 0.00m;
-                                var totalRecalcPenalty = 0.00m;
-
-                                var totalChargeDgi = 0.00m;
-                                var totalPaymentDgi = 0.00m;
-                                var totalPaymentDgiByAccount = 0.00m;
-                                var totalRecalcDgi = 0.00m;
-
-                                var totalChargePkk = 0.00m;
-                                var totalPaymentPkk = 0.00m;
-                                var totalPaymentPkkByAccount = 0.00m;
-                                var totalRecalcPkk = 0.00m;
-
-                                var totalChargePadun = 0.00m;
-                                var totalPaymentPadun = 0.00m;
-                                var totalPaymentPadunByAccount = 0.00m;
-                                var totalRecalcPadun = 0.00m;
-
-                                var totalPaymentTotalByAccount = 0.00m;
                             }
                             @foreach (var charge in Model.SelectMany(r => r.Charges).Where(r => r.Hidden == 0).OrderBy(r => r.EndDate))
                             {
                                 var hasPayments = (charge.PaymentCharges != null && charge.PaymentCharges.Any()) ||
                                     (charge.DisplayPaymentClaims != null && charge.DisplayPaymentClaims.Any()) ||
                                         (charge.UntiedPaymentsInfo != null && charge.UntiedPaymentsInfo.Any());
-
-                                totalChargeTenancy += charge.ChargeTenancy;
-                                totalChargePenalty += charge.ChargePenalty;
-                                totalChargeDgi += charge.ChargeDgi;
-                                totalChargePkk += charge.ChargePkk;
-                                totalChargePadun += charge.ChargePadun;
-
-                                totalRecalcTenancy += charge.RecalcTenancy + charge.CorrectionTenancy;
-                                totalRecalcPenalty += charge.RecalcPenalty + charge.CorrectionPenalty;
-                                totalRecalcDgi += charge.RecalcDgi + charge.CorrectionDgi;
-                                totalRecalcPkk += charge.RecalcPkk + charge.CorrectionPkk;
-                                totalRecalcPadun += charge.RecalcPadun + charge.CorrectionPadun;
-
-                                totalPaymentTenancy += charge.PaymentTenancy;
-                                totalPaymentPenalty += charge.PaymentPenalty;
-                                totalPaymentDgi += charge.PaymentDgi;
-                                totalPaymentPkk += charge.PaymentPkk;
-                                totalPaymentPadun += charge.PaymentPadun;
                                 i++;
                                 <tr class="@(count - i + 1 > 12 ? "rr-charge-archive" : "")" data-charge-end-date="@charge.EndDate.ToString("yyyy-MM-dd")">
 
@@ -443,8 +400,6 @@
                                             {
                                                 penaltyOnAccount = charge.PaymentPenalty;
                                             }
-                                            totalPaymentTenancyByAccount += tenancyOnAccount;
-                                            totalPaymentPenaltyByAccount += penaltyOnAccount;
                                         }
                                         @if (hasPayments)
                                         {
@@ -485,7 +440,6 @@
                                                 {
                                                     dgiOnAccount = charge.PaymentDgi;
                                                 }
-                                                totalPaymentDgiByAccount += dgiOnAccount;
                                             }
                                             @if (hasPayments)
                                             {
@@ -513,7 +467,6 @@
                                                 {
                                                     pkkOnAccount = charge.PaymentPkk;
                                                 }
-                                                totalPaymentPkkByAccount += pkkOnAccount;
                                             }
                                             @if (hasPayments)
                                             {
@@ -541,7 +494,6 @@
                                                 {
                                                     padunOnAccount = charge.PaymentPadun;
                                                 }
-                                                totalPaymentPadunByAccount += padunOnAccount;
                                             }
                                             @if (hasPayments)
                                             {
@@ -572,7 +524,6 @@
                                                 {
                                                     totalOnAccount = charge.PaymentTenancy + charge.PaymentDgi + charge.PaymentPkk + charge.PaymentPadun;
                                                 }
-                                                totalPaymentTotalByAccount += totalOnAccount;
                                             }
                                             @if (hasPayments)
                                             {
@@ -602,84 +553,11 @@
                                     }
                                 </tr>
                             }
-                            <tr class="rr-charge-total-row">
-                                <td class="text-center p-1"><b>Итого</b></td>
-                                <td class="text-center p-1">-</td>
 
-                                @* Найм *@
-                                <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")"><b>-</b></td>
-                                <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")"><b>-</b></td>
-                                <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-total-tenancy"><b>@totalChargeTenancy</b></td>
-                                <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-total-penalty"><b>@totalChargePenalty</b></td>
-                                <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")">
-                                    <b>@totalPaymentTenancy</b>
-                                </td>
-                                <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")">
-                                    <b>@totalPaymentPenalty</b>
-                                </td>
-                                <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-total-recalc-tenancy"><b>@totalRecalcTenancy</b></td>
-                                <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-total-recalc-penalty"><b>@totalRecalcPenalty</b></td>
-                                <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")"><b>-</b></td>
-                                <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "")"><b>-</b></td>
-
-                                @* ДГИ *@
-                                @if (hasDgiCharges)
-                                {
-                                    <td class="text-center p-1 rr-charge-dgi d-none"><b>-</b></td>
-                                    <td class="text-center p-1 rr-charge-dgi d-none"><b>@totalChargeDgi</b></td>
-                                    <td class="text-center p-1 rr-charge-dgi d-none">
-                                        <b>@totalPaymentDgi</b>
-                                    </td>
-                                    <td class="text-center p-1 rr-charge-dgi d-none"><b>@totalRecalcDgi</b></td>
-                                    <td class="text-center p-1 rr-charge-dgi d-none"><b>-</b></td>
-                                }
-
-                                @* ПКК *@
-                                @if (hasPkkCharges)
-                                {
-                                    <td class="text-center p-1 rr-charge-pkk d-none"><b>-</b></td>
-                                    <td class="text-center p-1 rr-charge-pkk d-none"><b>@totalChargePkk</b></td>
-                                    <td class="text-center p-1 rr-charge-pkk d-none">
-                                        <b>@totalPaymentPkk</b>
-                                    </td>
-                                    <td class="text-center p-1 rr-charge-pkk d-none"><b>@totalRecalcPkk</b></td>
-                                    <td class="text-center p-1 rr-charge-pkk d-none"><b>-</b></td>
-                                }
-
-                                @* Падун *@
-                                @if (hasPadunCharges)
-                                {
-                                    <td class="text-center p-1 rr-charge-padun d-none"><b>-</b></td>
-                                    <td class="text-center p-1 rr-charge-padun d-none"><b>@totalChargePadun</b></td>
-                                    <td class="text-center p-1 rr-charge-padun d-none">
-                                        <b>@totalPaymentPadun</b>
-                                    </td>
-                                    <td class="text-center p-1 rr-charge-padun d-none"><b>@totalRecalcPadun</b></td>
-                                    <td class="text-center p-1 rr-charge-padun d-none"><b>-</b></td>
-                                }
-
-                                @* Всего *@
-                                @if (hasDgiCharges || hasPkkCharges || hasPadunCharges)
-                                {
-                                    <td class="text-center p-1 rr-charge-total"><b>-</b></td>
-                                    <td class="text-center p-1 rr-charge-total"><b>-</b></td>
-                                    <td class="text-center p-1 rr-charge-total rr-charge-total-all"><b>@(totalChargeTenancy + totalChargePkk + totalChargeDgi + totalChargePadun)</b></td>
-                                    <td class="text-center p-1 rr-charge-total rr-charge-total-all-penalty"><b>@totalChargePenalty</b></td>
-                                    <td class="text-center p-1 rr-charge-total">
-                                        @{
-                                            var totalPaymentTotal = totalPaymentTenancy + totalPaymentDgi + totalPaymentPkk + totalPaymentPadun;
-                                        }
-                                        <b>@totalPaymentTotal</b>
-                                    </td>
-                                    <td class="text-center p-1 rr-charge-total">
-                                        <b>@totalPaymentPenalty</b>
-                                    </td>
-                                    <td class="text-center p-1 rr-charge-total rr-charge-total-recalc-all"><b>@(totalRecalcTenancy + totalRecalcDgi + totalRecalcPkk + totalRecalcPadun)</b></td>
-                                    <td class="text-center p-1 rr-charge-total rr-charge-total-recalc-all-penalty"><b>@totalRecalcPenalty</b></td>
-                                    <td class="text-center p-1 rr-charge-total"><b>-</b></td>
-                                    <td class="text-center p-1 rr-charge-total"><b>-</b></td>
-                                }
-                            </tr>
+                            @await  Component.InvokeAsync("ChargesTotalComponent", new { Charges = Model.SelectMany(r => r.Charges), Corrections = Model.SelectMany(r => r.Corrections),
+                                IdAccount = (int?)null,
+                                HasDgiCharges = hasDgiCharges, HasPkkCharges = hasPkkCharges, HasPadunCharges = hasPadunCharges,
+                                ForecastCalcDate = (DateTime?)null })
                         </tbody>
                     </table>
                     if (count > 12)
@@ -708,157 +586,11 @@
             <div class="card-body p-0" id="ClaimsInfo">
                 @if (Model.SelectMany(r => r.Claims).Any())
                 {
-                    <table class="table table-bordered table-striped m-0">
-                        <thead>
-                            <tr>
-                                @{
-                                    var colSpan = 2 + additionalChargesCount;
-                                }
-                                <th class="text-center p-1" rowspan="2" title="Период взыскания">Период взыскания</th>
-                                <th class="text-center p-1" rowspan="2" title="Состояние">Состояние</th>
-                                <th class="text-center p-1" colspan="@colSpan" title="Предъявленная сумма">Предъявленная сумма</th>
-                                <th class="text-center p-1" colspan="@colSpan" title="Взысканная сумма">Взысканная сумма</th>
-                                <th class="text-center p-1" colspan="@colSpan" title="Остаток">Остаток</th>
-                            </tr>
-                            <tr>
-                                @for (var i = 0; i < 3; i++)
-                                {
-                                    <th class="text-center p-1" title="Найм">Найм</th>
-                                    <th class="text-center p-1" title="Пени">Пени</th>
-                                    @if (hasDgiCharges)
-                                    {
-                                        <th class="text-center p-1" title="ДГИ">ДГИ</th>
-                                    }
-                                    @if (hasPkkCharges)
-                                    {
-                                        <th class="text-center p-1" title="ПКК">ПКК</th>
-                                    }
-                                    @if (hasPadunCharges)
-                                    {
-                                        <th class="text-center p-1" title="Падун">Падун</th>
-                                    }
-                                }
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @{
-                                var totals = new decimal[15];
-                            }
-                            @foreach (var claim in Model.SelectMany(r => r.Claims))
-                            {
-                                var lastState = claim.ClaimStates.OrderByDescending(r => r.IdState).FirstOrDefault();
-                                var prepareCourtOrderState = claim.ClaimStates.Where(r => r.IdStateType == 4).FirstOrDefault();
-                                var winOrderClaim = false;
-                                var canceledClaim = false;
-                                if (lastState != null && lastState.IdStateType == 6 && lastState.CourtOrderCancelDate != null)
-                                {
-                                    canceledClaim = true;
-                                }
-                                if (prepareCourtOrderState != null && prepareCourtOrderState.CourtOrderDate != null && !canceledClaim && claim.EndDeptPeriod != null)
-                                {
-                                    winOrderClaim = true;
-                                }
-                                var rentPeriod = "";
-                                if (claim.StartDeptPeriod != null)
-                                {
-                                    rentPeriod += "с " + claim.StartDeptPeriod.Value.ToString("dd.MM.yyyy");
-                                }
-                                if (claim.StartDeptPeriod != null && claim.EndDeptPeriod != null)
-                                {
-                                    rentPeriod += " ";
-                                }
-                                if (claim.EndDeptPeriod != null)
-                                {
-                                    rentPeriod += "по " + claim.EndDeptPeriod.Value.ToString("dd.MM.yyyy");
-                                }
-                                if (rentPeriod == "")
-                                {
-                                    rentPeriod = "н/а";
-                                }
-                                totals[0] += claim.AmountTenancy ?? 0m;
-                                totals[1] += claim.AmountPenalties ?? 0m;
-                                totals[6] += claim.AmountDgi ?? 0m;
-                                totals[9] += claim.AmountPkk ?? 0m;
-                                totals[12] += claim.AmountPadun ?? 0m;
-                                totals[2] += claim.AmountTenancyRecovered ?? 0m;
-                                totals[3] += claim.AmountPenaltiesRecovered ?? 0m;
-                                totals[7] += claim.AmountDgiRecovered ?? 0m;
-                                totals[10] += claim.AmountPkkRecovered ?? 0m;
-                                totals[13] += claim.AmountPadunRecovered ?? 0m;
-                                totals[4] += (claim.AmountTenancy - claim.AmountTenancyRecovered) ?? 0m;
-                                totals[5] += (claim.AmountPenalties - claim.AmountPenaltiesRecovered) ?? 0m;
-                                totals[8] += (claim.AmountDgi - claim.AmountDgiRecovered) ?? 0m;
-                                totals[11] += (claim.AmountPkk - claim.AmountPkkRecovered) ?? 0m;
-                                totals[14] += (claim.AmountPadun - claim.AmountPadunRecovered) ?? 0m;
-
-                                <tr class="@(canceledClaim ? "table-danger" : winOrderClaim ? "table-success" : "")" title="@(canceledClaim ? "Отмененная исковая работа" :
-                                        winOrderClaim ? "Вынесен судебный приказ №"+(prepareCourtOrderState.CourtOrderNum ?? "б/н")+" от "+prepareCourtOrderState.CourtOrderDate.Value.ToString("dd.MM.yyyy") : "")">
-                                    <td class="text-center p-1">
-                                        @rentPeriod
-                                        <a class="btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn" target="_blank"
-                                           asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.IdClaim"
-                                           asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">
-                                        </a>
-                                    </td>
-                                    <td class="text-center p-1">@(lastState != null ? lastState.IdStateTypeNavigation.StateType : "")</td>
-                                    <td class="text-center p-1">@(claim.AmountTenancy?.ToString() ?? "0,00")</td>
-                                    <td class="text-center p-1">@(claim.AmountPenalties?.ToString() ?? "0,00")</td>
-                                    @if (hasDgiCharges)
-                                    {
-                                        <td class="text-center p-1">@(claim.AmountDgi?.ToString() ?? "0,00")</td>
-                                    }
-                                    @if (hasPkkCharges)
-                                    {
-                                        <td class="text-center p-1">@(claim.AmountPkk?.ToString() ?? "0,00")</td>
-                                    }
-                                    @if (hasPadunCharges)
-                                    {
-                                        <td class="text-center p-1">@(claim.AmountPadun?.ToString() ?? "0,00")</td>
-                                    }
-                                    <td class="text-center p-1">@(claim.AmountTenancyRecovered?.ToString() ?? "0,00")</td>
-                                    <td class="text-center p-1">@(claim.AmountPenaltiesRecovered?.ToString() ?? "0,00")</td>
-                                    @if (hasDgiCharges)
-                                    {
-                                        <td class="text-center p-1">@(claim.AmountDgiRecovered?.ToString() ?? "0,00")</td>
-                                    }
-                                    @if (hasPkkCharges)
-                                    {
-                                        <td class="text-center p-1">@(claim.AmountPkkRecovered?.ToString() ?? "0,00")</td>
-                                    }
-                                    @if (hasPadunCharges)
-                                    {
-                                        <td class="text-center p-1">@(claim.AmountPadunRecovered?.ToString() ?? "0,00")</td>
-                                    }
-
-                                    <td class="text-center p-1">@((claim.AmountTenancy - claim.AmountTenancyRecovered)?.ToString() ?? "0,00")</td>
-                                    <td class="text-center p-1">@((claim.AmountPenalties - claim.AmountPenaltiesRecovered)?.ToString() ?? "0,00")</td>
-                                    @if (hasDgiCharges)
-                                    {
-                                        <td class="text-center p-1">@((claim.AmountDgi - claim.AmountDgiRecovered)?.ToString() ?? "0,00")</td>
-                                    }
-                                    @if (hasPkkCharges)
-                                    {
-                                        <td class="text-center p-1">@((claim.AmountPkk - claim.AmountPkkRecovered)?.ToString() ?? "0,00")</td>
-                                    }
-                                    @if (hasPadunCharges)
-                                    {
-                                        <td class="text-center p-1">@((claim.AmountPadun - claim.AmountPadunRecovered)?.ToString() ?? "0,00")</td>
-                                    }
-                                </tr>
-                            }
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th class="text-right p-1" colspan="2">Итого</th>
-                                <th class="text-center p-1">@totals[0]</th>
-                                <th class="text-center p-1">@totals[1]</th>
-                                <th class="text-center p-1">@totals[2]</th>
-                                <th class="text-center p-1">@totals[3]</th>
-                                <th class="text-center p-1">@totals[4]</th>
-                                <th class="text-center p-1">@totals[5]</th>
-                            </tr>
-                        </tfoot>
-                    </table>
+                    ViewBag.AdditionalChargesCount = additionalChargesCount;
+                    ViewBag.HasDgiCharges = hasDgiCharges;
+                    ViewBag.HasPkkCharges = hasPkkCharges;
+                    ViewBag.HasPadunCharges = hasPadunCharges;
+                    <partial name="AccountClaims" model="Model.SelectMany(r => r.Claims)" />
                 }
                 else
                 {
