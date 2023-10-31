@@ -6,13 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
-using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
-using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryServices.ViewModel.Claims;
-using RegistryServices.ViewModel.KumiAccounts;
 using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Enums;
 

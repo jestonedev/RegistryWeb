@@ -5,7 +5,6 @@ using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using RegistryDb.Models.Entities;
 using System.Collections.Generic;
 using RegistryDb.Models.SqlViews;
 using RegistryWeb.Enums;

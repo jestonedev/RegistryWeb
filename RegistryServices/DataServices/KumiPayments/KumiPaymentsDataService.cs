@@ -22,6 +22,7 @@ using RegistryServices.Classes;
 using RegistryServices.DataFilterServices;
 using RegistryWeb.DataServices;
 using System.Text.RegularExpressions;
+using RegistryServices.DataServices.KumiAccounts;
 
 namespace RegistryServices.DataServices.KumiPayments
 {

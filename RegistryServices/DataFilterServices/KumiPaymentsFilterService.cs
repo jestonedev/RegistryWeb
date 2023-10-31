@@ -1,14 +1,9 @@
 ﻿using RegistryDb.Models;
-using RegistryDb.Models.Entities.RegistryObjects.Buildings;
-using RegistryWeb.DataServices;
 using RegistryWeb.ViewOptions.Filter;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using RegistryWeb.Enums;
 using RegistryWeb.ViewOptions;
-using RegistryDb.Models.Entities.Tenancies;
 using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryServices.DataServices.KumiPayments;
 

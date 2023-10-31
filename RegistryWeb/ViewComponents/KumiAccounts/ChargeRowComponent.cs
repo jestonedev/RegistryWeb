@@ -3,7 +3,6 @@ using RegistryDb.Models.Entities.KumiAccounts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace RegistryWeb.ViewComponents.KumiAccounts
 {

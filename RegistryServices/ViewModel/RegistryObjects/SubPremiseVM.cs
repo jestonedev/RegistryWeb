@@ -1,5 +1,4 @@
-﻿using RegistryDb.Models.Entities;
-using RegistryDb.Models.Entities.RegistryObjects.Premises;
+﻿using RegistryDb.Models.Entities.RegistryObjects.Premises;
 using RegistryWeb.ViewModel;
 using System.Linq;
 

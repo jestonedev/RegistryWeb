@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RegistryWeb.DataServices;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;

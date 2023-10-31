@@ -1,5 +1,4 @@
 ﻿using RegistryServices.Enums;
-using System;
 
 namespace RegistryServices.Models.KumiPayments
 {

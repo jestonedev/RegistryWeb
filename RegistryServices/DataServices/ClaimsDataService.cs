@@ -1,5 +1,4 @@
 ﻿using RegistryDb.Models;
-using RegistryDb.Models.Entities;
 using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
@@ -21,6 +20,7 @@ using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryDb.Models.Entities.Payments;
 using RegistryDb.Models.Entities.Tenancies;
 using RegistryServices.Enums;
+using RegistryServices.DataServices.KumiAccounts;
 
 namespace RegistryWeb.DataServices
 {
@@ -28,13 +28,18 @@ namespace RegistryWeb.DataServices
     {
         private readonly SecurityServices.SecurityService securityService;
         private readonly KumiAccountsDataService kumiAccountsDataService;
+        private readonly KumiAccountsTenanciesService kumiAccountsTenanciesService;
         private readonly IConfiguration config;
 
         public ClaimsDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService,
-            AddressesDataService addressesDataService, KumiAccountsDataService kumiAccountsDataService, IConfiguration config) : base(registryContext, addressesDataService)
+            AddressesDataService addressesDataService, 
+            KumiAccountsDataService kumiAccountsDataService,
+            KumiAccountsTenanciesService kumiAccountsTenanciesService,
+            IConfiguration config) : base(registryContext, addressesDataService)
         {
             this.securityService = securityService;
             this.kumiAccountsDataService = kumiAccountsDataService;
+            this.kumiAccountsTenanciesService = kumiAccountsTenanciesService;
             this.config = config;
         }
 
@@ -1132,7 +1137,7 @@ namespace RegistryWeb.DataServices
         public Dictionary<int, List<KumiAccountTenancyInfoVM>> GetTenancyInfoKumi(IEnumerable<Claim> claims)
         {
             var accounts = claims.Where(r => r.IdAccountKumi != null).Select(r => r.IdAccountKumiNavigation).Distinct();
-            return kumiAccountsDataService.GetTenancyInfo(accounts);
+            return kumiAccountsTenanciesService.GetTenancyInfo(accounts);
         }
 
         public Dictionary<int, List<KumiAccountTenancyInfoVM>> GetTenancyInfoKumi(IEnumerable<int> idAccounts)
@@ -1141,7 +1146,7 @@ namespace RegistryWeb.DataServices
             {
                 IdAccount = r
             }).Distinct();
-            return kumiAccountsDataService.GetTenancyInfo(accounts);
+            return kumiAccountsTenanciesService.GetTenancyInfo(accounts);
         }
 
         public Dictionary<int, Payment> GetLastPaymentsInfo(IEnumerable<Claim> claims)

@@ -8,20 +8,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
-using RegistryWeb.DataServices;
+using RegistryServices.DataServices.KumiAccounts;
 
 namespace RegistryServices.DataServices.KumiPayments
 {
     public class KumiPaymentsDistributionsService
     {
         private readonly RegistryContext registryContext;
-        private readonly KumiAccountsDataService kumiAccountsDataService;
+        private readonly KumiAccountsCalculationService calculationService;
 
         public KumiPaymentsDistributionsService(
-            RegistryContext registryContext, KumiAccountsDataService kumiAccountsDataService)
+            RegistryContext registryContext, KumiAccountsCalculationService calculationService)
         {
             this.registryContext = registryContext;
-            this.kumiAccountsDataService = kumiAccountsDataService;
+            this.calculationService = calculationService;
         }
 
         internal List<KumiPaymentDistributionInfoToObject> GetDistributionInfoToObjects(List<int> idPayments)
@@ -424,7 +424,7 @@ namespace RegistryServices.DataServices.KumiPayments
                 endCalcDate = endCalcDate.AddDays(1).AddMonths(1).AddDays(-1);
             }
 
-            kumiAccountsDataService.RecalculateAccounts(accounts, startRewriteDate, endCalcDate, false);
+            calculationService.RecalculateAccounts(accounts, startRewriteDate, endCalcDate, false);
 
             return new KumiPaymentDistributionInfo
             {
@@ -657,7 +657,7 @@ namespace RegistryServices.DataServices.KumiPayments
                 endCalcDate = endCalcDate.AddDays(1).AddMonths(1).AddDays(-1);
             }
 
-            kumiAccountsDataService.RecalculateAccounts(accounts, startRewriteDate, endCalcDate, false);
+            calculationService.RecalculateAccounts(accounts, startRewriteDate, endCalcDate, false);
 
             return new KumiPaymentDistributionInfo
             {

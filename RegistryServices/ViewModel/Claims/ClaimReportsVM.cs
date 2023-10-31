@@ -1,5 +1,4 @@
-﻿using RegistryDb.Models.Entities;
-using RegistryDb.Models.Entities.Claims;
+﻿using RegistryDb.Models.Entities.Claims;
 using RegistryDb.Models.Entities.Common;
 using RegistryDb.Models.Entities.RegistryObjects.Buildings;
 using System;

@@ -1,9 +1,7 @@
-﻿using RegistryDb.Models.Entities;
-using RegistryDb.Models.Entities.Claims;
+﻿using RegistryDb.Models.Entities.Claims;
 using RegistryDb.Models.Entities.KumiAccounts;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace RegistryWeb.ViewModel
 {

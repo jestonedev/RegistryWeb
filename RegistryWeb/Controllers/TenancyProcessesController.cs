@@ -10,7 +10,6 @@ using RegistryWeb.ViewModel;
 using RegistryWeb.Extensions;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
-using RegistryDb.Models.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.Tenancies;

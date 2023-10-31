@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RegistryDb.Models;
-using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
 using RegistryWeb.Enums;

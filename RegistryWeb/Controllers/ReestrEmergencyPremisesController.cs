@@ -8,7 +8,6 @@ using RegistryServices.ViewModel.RegistryObjects;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.SecurityServices;
-using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 

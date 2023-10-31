@@ -1,5 +1,4 @@
-﻿using RegistryDb.Models.Entities;
-using RegistryDb.Models.Entities.Owners;
+﻿using RegistryDb.Models.Entities.Owners;
 using RegistryWeb.Enums;
 
 namespace RegistryServices.ViewModel.Owners

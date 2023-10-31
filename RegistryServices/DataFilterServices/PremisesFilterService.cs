@@ -1,5 +1,4 @@
 ﻿using RegistryDb.Models;
-using RegistryDb.Models.Entities.RegistryObjects.Buildings;
 using RegistryWeb.DataServices;
 using RegistryWeb.ViewOptions.Filter;
 using System;

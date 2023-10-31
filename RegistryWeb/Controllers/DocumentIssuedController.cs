@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryDb.Models;
-using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions;
 using RegistryDb.Models.Entities.Tenancies;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
-using RegistryDb.Models.Entities;
 using RegistryDb.Models.SqlViews;
 using RegistryDb.Models;
 using RegistryWeb.Enums;

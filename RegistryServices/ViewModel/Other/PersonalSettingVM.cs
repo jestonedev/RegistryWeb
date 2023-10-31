@@ -1,5 +1,4 @@
-﻿using RegistryDb.Models.Entities;
-using RegistryDb.Models.Entities.Acl;
+﻿using RegistryDb.Models.Entities.Acl;
 using System.Collections.Generic;
 
 namespace RegistryServices.ViewModel.Other

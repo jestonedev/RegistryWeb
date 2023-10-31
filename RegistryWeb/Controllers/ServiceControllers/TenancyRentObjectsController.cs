@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using RegistryDb.Models;
-using RegistryDb.Models.Entities;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.Enums;
 using RegistryDb.Models.Entities.RegistryObjects.Buildings;

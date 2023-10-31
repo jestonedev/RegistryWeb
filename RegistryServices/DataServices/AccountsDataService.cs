@@ -1,34 +1,7 @@
-﻿using RegistryDb.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using RegistryDb.Models.Entities;
-using RegistryDb.Models.SqlViews;
-using RegistryWeb.ViewOptions.Filter;
-using RegistryWeb.ViewModel;
-using RegistryWeb.ViewOptions;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using RegistryWeb.Enums;
-using RegistryServices.ViewModel.KumiAccounts;
-using RegistryDb.Models.Entities.KumiAccounts;
-using RegistryDb.Models.Entities.RegistryObjects.Kladr;
-using RegistryDb.Models.Entities.Tenancies;
-using RegistryServices.Enums;
-using RegistryServices.Models;
-using RegistryDb.Models.Entities.Common;
-using RegistryServices.Models.KumiAccounts;
+﻿using System;
 using RegistryWeb.DataHelpers;
-using RegistryServices.Classes;
-using RegistryDb.Models.Entities.Payments;
-using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Microsoft.Extensions.Configuration;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 
 namespace RegistryWeb.DataServices
 {

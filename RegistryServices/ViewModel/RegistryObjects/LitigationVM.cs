@@ -1,5 +1,4 @@
-﻿using RegistryDb.Models.Entities;
-using RegistryDb.Models.Entities.RegistryObjects.Buildings.Litigations;
+﻿using RegistryDb.Models.Entities.RegistryObjects.Buildings.Litigations;
 using RegistryWeb.Enums;
 
 namespace RegistryServices.ViewModel.RegistryObjects

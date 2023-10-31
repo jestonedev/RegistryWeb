@@ -1,5 +1,4 @@
-﻿using System;
-using RegistryDb.Models.Entities.Common;
+﻿using RegistryDb.Models.Entities.Common;
 using RegistryDb.Models.Entities.Payments;
 using RegistryServices.ViewModel.KumiAccounts;
 using RegistryWeb.ViewModel;

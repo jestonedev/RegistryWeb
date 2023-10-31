@@ -1,9 +1,7 @@
 ﻿using InvoiceGenerator;
 using Microsoft.EntityFrameworkCore;
 using RegistryDb.Models;
-using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.Payments;
-using RegistryWeb.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

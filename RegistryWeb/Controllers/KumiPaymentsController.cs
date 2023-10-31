@@ -19,6 +19,7 @@ using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Enums;
 using Microsoft.AspNetCore.Authorization;
 using RegistryServices.DataServices.KumiPayments;
+using RegistryServices.DataServices.KumiAccounts;
 
 namespace RegistryWeb.Controllers
 {

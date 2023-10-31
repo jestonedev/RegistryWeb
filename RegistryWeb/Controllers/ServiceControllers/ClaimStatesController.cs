@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RegistryDb.Models;
-using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.Claims;
 using RegistryWeb.SecurityServices;
 

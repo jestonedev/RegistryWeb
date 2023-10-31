@@ -1,7 +1,10 @@
 ﻿using RegistryDb.Models;
 using RegistryDb.Models.Entities.KumiAccounts;
+using RegistryServices.DataFilterServices;
+using RegistryServices.DataServices.KumiAccounts;
 using RegistryWeb.DataServices;
 using RegistryWeb.ViewModel;
+using RegistryWeb.ViewOptions.Filter;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -27,7 +30,7 @@ namespace RegistryPaymentCalculator
                 var massChargeInfo = db.KumiChargeMassChargeInfos.First();
                 var lastCalcDate = DateTime.Now.Date;
 
-                var service = new KumiAccountsDataService(db, new AddressesDataService(db), new RegistryWeb.SecurityServices.SecurityService(db, null));
+                var service = new KumiAccountsCalculationService(db, new KumiAccountsTenanciesService(db));
                 var sender = new SmtpSender(Configuration.SmtpHost, Configuration.SmtpPort);
                 var accountsInfo = new List<KumiAccountInfoForPaymentCalculator>();
                 try

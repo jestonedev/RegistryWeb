@@ -1,11 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using RegistryDb.Models;
-using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.KumiAccounts;
-using RegistryDb.Models.Entities.Tenancies;
 using RegistryWeb.SecurityServices;
 
 namespace RegistryWeb.Controllers.ServiceControllers

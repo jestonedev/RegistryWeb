@@ -1,10 +1,8 @@
 ﻿using InvoiceGenerator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.Payments;
 using RegistryWeb.SecurityServices;
-using RegistryWeb.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;

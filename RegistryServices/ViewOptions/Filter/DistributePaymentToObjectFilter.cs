@@ -1,6 +1,5 @@
 ﻿using RegistryServices.Enums;
 using System;
-using System.Collections.Generic;
 
 namespace RegistryWeb.ViewOptions.Filter
 {

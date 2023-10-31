@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RegistryServices.ViewModel.KumiAccounts
+﻿namespace RegistryServices.ViewModel.KumiAccounts
 {
     public interface IChargePaymentEventVM: IChargeEventVM
     {

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using RegistryDb.Models;
 using RegistryServices.ViewModel.Tenancies;
 using RegistryWeb.SecurityServices;
-using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
 using System;
 using System.Collections.Generic;

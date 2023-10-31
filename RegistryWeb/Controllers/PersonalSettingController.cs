@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using RegistryServices.ViewModel.Other;
 using RegistryWeb.SecurityServices;
-using RegistryWeb.ViewModel;
 
 namespace RegistryWeb.Controllers
 {

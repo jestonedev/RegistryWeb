@@ -1,5 +1,4 @@
-﻿using RegistryDb.Models.Entities;
-using RegistryDb.Models.Entities.Common;
+﻿using RegistryDb.Models.Entities.Common;
 using RegistryDb.Models.Entities.RegistryObjects.Kladr;
 using RegistryDb.Models.SqlViews;
 using System.Collections.Generic;

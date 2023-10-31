@@ -1,5 +1,4 @@
-﻿using RegistryDb.Models.Entities;
-using RegistryDb.Models.Entities.Privatization;
+﻿using RegistryDb.Models.Entities.Privatization;
 using RegistryWeb.Enums;
 
 namespace RegistryServices.ViewModel.Privatization

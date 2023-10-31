@@ -1,5 +1,4 @@
-﻿using RegistryDb.Models.Entities;
-using RegistryDb.Models.Entities.Tenancies;
+﻿using RegistryDb.Models.Entities.Tenancies;
 using RegistryWeb.ViewOptions;
 using System.Collections.Generic;
 

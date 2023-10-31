@@ -22,6 +22,7 @@ using System.IO;
 using Microsoft.AspNetCore.Authentication;
 using RegistryServices.DataFilterServices;
 using RegistryServices.DataServices.KumiPayments;
+using RegistryServices.DataServices.KumiAccounts;
 
 namespace RegistryWeb
 {
@@ -112,6 +113,9 @@ namespace RegistryWeb
             services.AddTransient<PrivatizationReportService>();
             services.AddTransient<PrivRealtorService>();
             services.AddTransient<KumiAccountsDataService>();
+            services.AddTransient<KumiAccountsClaimsService>();
+            services.AddTransient<KumiAccountsTenanciesService>();
+            services.AddTransient<KumiAccountsCalculationService>();
             services.AddTransient<KumiAccountReportService>();
             services.AddTransient<KumiAccountReportsDataService>();
             services.AddTransient<KumiPaymentsDataService>();

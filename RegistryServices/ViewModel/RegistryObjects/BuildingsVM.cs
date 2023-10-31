@@ -1,5 +1,4 @@
-﻿using RegistryDb.Models.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryDb.Models.SqlViews;
 using Microsoft.AspNetCore.Mvc.Rendering;

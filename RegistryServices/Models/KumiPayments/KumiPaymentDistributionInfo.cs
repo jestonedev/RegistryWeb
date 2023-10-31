@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RegistryServices.Models.KumiPayments
+﻿namespace RegistryServices.Models.KumiPayments
 {
     public class KumiPaymentDistributionInfo
     {

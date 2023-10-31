@@ -1,8 +1,5 @@
-﻿using RegistryDb.Models.Entities;
-using RegistryWeb.Enums;
+﻿using RegistryWeb.Enums;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RegistryWeb.ViewModel
 {

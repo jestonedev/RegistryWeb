@@ -4,8 +4,6 @@ using RegistryDb.Models.Entities.RegistryObjects.Buildings;
 using RegistryDb.Models.Entities.RegistryObjects.Premises;
 using RegistryDb.Models.Entities.Tenancies;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RegistryServices.DataFilterServices
 {
@@ -33,6 +31,8 @@ namespace RegistryServices.DataFilterServices
                     return (T)ActivatorUtilities.CreateInstance(provider, typeof(DocumentIssuedByFilterService));
                 if (entityType == typeof(KumiPayment))
                     return (T)ActivatorUtilities.CreateInstance(provider, typeof(KumiPaymentsFilterService));
+                if (entityType == typeof(KumiAccount))
+                    return (T)ActivatorUtilities.CreateInstance(provider, typeof(KumiAccountsFilterService));
             }
             throw new ArgumentException("Не удалось инициализировать класс, реализующий IFilterSerivce<>");
         }

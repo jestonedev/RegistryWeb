@@ -1,10 +1,10 @@
 ﻿using InvoiceGenerator;
 using Microsoft.EntityFrameworkCore;
 using RegistryDb.Models;
-using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryDb.Models.Entities.Payments;
 using RegistryDb.Models.Entities.Tenancies;
+using RegistryServices.DataServices.KumiAccounts;
 using RegistryServices.ViewModel.KumiAccounts;
 using RegistryWeb.DataHelpers;
 using RegistryWeb.ViewModel;
@@ -19,13 +19,15 @@ namespace RegistryWeb.DataServices
         private readonly RegistryContext registryContext;
         private readonly TenancyProcessesDataService tenancyProcessesData;
         private readonly KumiAccountsDataService accountDataService;
+        private readonly KumiAccountsCalculationService calculationService;
 
         public KumiAccountReportsDataService(RegistryContext registryContext, TenancyProcessesDataService tenancyProcessesData,
-            KumiAccountsDataService accountDataService)
+            KumiAccountsDataService accountDataService, KumiAccountsCalculationService calculationService)
         {
             this.registryContext = registryContext;
             this.tenancyProcessesData = tenancyProcessesData;
             this.accountDataService = accountDataService;
+            this.calculationService = calculationService;
         }
         public KumiCharge GetLastPayment(int idAccount)
         {
@@ -125,8 +127,8 @@ namespace RegistryWeb.DataServices
             var tenantsAccountIds = tenants.Select(r => r.IdAccount).ToList();
             var fractions = registryContext.KumiAccountsTenancyProcessesAssocs.Where(r => tenantsAccountIds.Contains(r.IdAccount)).ToList();
 
-            var accountsPrepare = accountDataService.GetAccountsPrepareForPaymentCalculator(accounts);
-            var accountsInfo = accountDataService.GetAccountInfoForPaymentCalculator(accountsPrepare);
+            var accountsPrepare = calculationService.GetAccountsPrepareForPaymentCalculator(accounts);
+            var accountsInfo = calculationService.GetAccountInfoForPaymentCalculator(accountsPrepare);
 
             accounts = accounts.ToList().AsQueryable();
 

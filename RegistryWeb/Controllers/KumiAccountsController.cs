@@ -3,11 +3,9 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.SecurityServices;
-using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.Extensions;
 using RegistryWeb.ViewOptions;
-using RegistryDb.Models.Entities;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.KumiAccounts;
 using RegistryDb.Models.Entities.KumiAccounts;
@@ -16,20 +14,32 @@ using System;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 using RegistryServices.Models.KumiAccounts;
+using RegistryServices.DataServices.KumiAccounts;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
     public class KumiAccountsController :  ListController<KumiAccountsDataService, KumiAccountsFilter>
     {
+        private readonly KumiAccountsClaimsService claimsService;
+        private readonly KumiAccountsTenanciesService tenanciesService;
+        private readonly KumiAccountsCalculationService calculationService;
+
         private TenancyProcessesDataService tenancyProcessesDataService { get; }
 
-        public KumiAccountsController(KumiAccountsDataService dataService, TenancyProcessesDataService tenancyProcessesDataService, SecurityService securityService)
+        public KumiAccountsController(KumiAccountsDataService dataService, 
+            KumiAccountsClaimsService claimsService,
+            KumiAccountsTenanciesService tenanciesService,
+            KumiAccountsCalculationService calculationService,
+            TenancyProcessesDataService tenancyProcessesDataService, SecurityService securityService)
             :base(dataService, securityService)
         {
             nameFilteredIdsDict = "filteredKumiAccountsIdsDict";
             nameIds = "idKumiAccounts";
             nameMultimaster = "KumiAccountsReports";
+            this.claimsService = claimsService;
+            this.tenanciesService = tenanciesService;
+            this.calculationService = calculationService;
             this.tenancyProcessesDataService = tenancyProcessesDataService;
         }
 
@@ -113,7 +123,7 @@ namespace RegistryWeb.Controllers
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.States = dataService.States;
             ViewBag.SecurityService = securityService;
-            var tenancyInfo = dataService.GetTenancyInfo(accounts);
+            var tenancyInfo = tenanciesService.GetTenancyInfo(accounts);
             ViewBag.TenancyInfo = tenancyInfo;
             return View("DetailsByAddress", accounts);
         }
@@ -145,7 +155,7 @@ namespace RegistryWeb.Controllers
             ViewBag.States = dataService.States;
             ViewBag.Streets = dataService.Streets;
             ViewBag.Regions = dataService.Regions;
-            var tenancyInfo = dataService.GetTenancyInfo(new List<KumiAccount> { account });
+            var tenancyInfo = tenanciesService.GetTenancyInfo(new List<KumiAccount> { account });
             if (tenancyInfo.ContainsKey(account.IdAccount))
                 ViewBag.TenancyInfo = tenancyInfo[account.IdAccount];
             else
@@ -265,7 +275,7 @@ namespace RegistryWeb.Controllers
                 DateTime? recalcStartDate = null;
                 if (recalcStartYear != null && recalcStartMonth != null)
                     recalcStartDate = new DateTime(recalcStartYear.Value, recalcStartMonth.Value, 1);
-                dataService.RecalculateAccounts(idAccounts, recalcType, recalcStartDate, saveCurrentPeriodCharge);
+                calculationService.RecalculateAccounts(idAccounts, recalcType, recalcStartDate, saveCurrentPeriodCharge);
 
                 return Json(new
                 {
@@ -318,7 +328,7 @@ namespace RegistryWeb.Controllers
             {
                 var idAccount = dataService.GetIdAccountByCorrection(idCorrection);
                 dataService.DeleteChargeCorrection(idCorrection);
-                dataService.RecalculateAccounts(new List<int> { idAccount }, 0, null, false);
+                calculationService.RecalculateAccounts(new List<int> { idAccount }, 0, null, false);
                 return Json(new
                 {
                     State = "Success"
@@ -336,7 +346,7 @@ namespace RegistryWeb.Controllers
 
         [HttpPost]
         public IActionResult CalcForecastPeriod(int idAccount, DateTime calcToDate) {
-            var charge = dataService.CalcForecastChargeInfo(idAccount, calcToDate);
+            var charge = calculationService.CalcForecastChargeInfo(idAccount, calcToDate);
             return Json(charge);
         }
 
@@ -395,7 +405,7 @@ namespace RegistryWeb.Controllers
                 }
             }
 
-            dataService.CreateClaimMass(processingIds, atDate);
+            claimsService.CreateClaimMass(dataService.GetAccountsForMassReports(processingIds).ToList(), atDate);
 
             TempData["ErrorAccountsIds"] = JsonConvert.SerializeObject(errorIds);
             TempData["ErrorReason"] = "по указанным лицевым счетам уже имеются незавершенные исковые работы";

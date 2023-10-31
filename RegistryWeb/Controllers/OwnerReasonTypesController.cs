@@ -4,11 +4,9 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryDb.Models;
-using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.Owners;
 using RegistryServices.ViewModel.Owners;
 using RegistryWeb.SecurityServices;
-using RegistryWeb.ViewModel;
 using RegistryWeb.ViewOptions;
 
 namespace RegistryWeb.Controllers

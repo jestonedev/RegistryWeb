@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using RegistryDb.Models.Entities;
 using RegistryDb.Models.Entities.Owners;
 using RegistryWeb.ViewOptions;
 

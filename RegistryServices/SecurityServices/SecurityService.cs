@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using RegistryDb.Models;
-using RegistryDb.Models.Entities;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;

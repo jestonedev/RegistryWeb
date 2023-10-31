@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.DataHelpers;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
-using RegistryDb.Models.Entities;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewModel;
