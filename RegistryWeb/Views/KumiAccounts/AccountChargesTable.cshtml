@@ -1,0 +1,115 @@
+﻿@model KumiAccountChargesVM
+@{ 
+    var initTenancyTabClass = ViewBag.HasDgiCharges || ViewBag.HasPadunCharges || ViewBag.HasPkkCharges ? "d-none" : "";
+    var initTotalTabClass = ViewBag.HasDgiCharges || ViewBag.HasPadunCharges || ViewBag.HasPkkCharges ? "" : "d-none";
+}
+
+<table class="table table-bordered table-striped m-0">
+    <thead>
+        <tr>
+            <th class="text-center p-1" title="Дата последнего начисления">Дата</th>
+            @if (ViewBag.IdAccountCurrent != null)
+            {
+                <th class="text-center p-1" title="Номер лицевого счета">ЛС</th>
+            }
+            @* Найм *@
+            <th class="text-center p-1 rr-charge-tenancy @initTenancyTabClass" title="Входящее сальдо найм">Вх. найм</th>
+            <th class="text-center p-1 rr-charge-tenancy @initTenancyTabClass" title="Входящее сальдо пени">Вх. пени</th>
+            <th class="text-center p-1 rr-charge-tenancy @initTenancyTabClass" title="Начислено найм">Начислено найм</th>
+            <th class="text-center p-1 rr-charge-tenancy @initTenancyTabClass" title="Начислено пени">Начислено пени</th>
+            <th class="text-center p-1 rr-charge-tenancy @initTenancyTabClass" title="Оплачено найм">Оплата найм</th>
+            <th class="text-center p-1 rr-charge-tenancy @initTenancyTabClass" title="Оплачено пени">Оплата пени</th>
+            <th class="text-center p-1 rr-charge-tenancy @initTenancyTabClass" title="Перерасчет найм">Перерасчет найм</th>
+            <th class="text-center p-1 rr-charge-tenancy @initTenancyTabClass" title="Перерасчет пени">Перерасчет пени</th>
+            <th class="text-center p-1 rr-charge-tenancy @initTenancyTabClass" title="Исходящее сальдо найм">Исх. найм</th>
+            <th class="text-center p-1 rr-charge-tenancy @initTenancyTabClass" title="Исходящее сальдо пени">Исх. пени</th>
+
+            @* ДГИ *@
+            @if (ViewBag.HasDgiCharges)
+            {
+                <th class="text-center p-1 rr-charge-dgi d-none" title="Входящее сальдо ДГИ">Вх. ДГИ</th>
+                <th class="text-center p-1 rr-charge-dgi d-none" title="Начислено ДГИ">Начислено ДГИ</th>
+                <th class="text-center p-1 rr-charge-dgi d-none" title="Оплачено ДГИ">Оплата ДГИ</th>
+                <th class="text-center p-1 rr-charge-dgi d-none" title="Перерасчет ДГИ">Перерасчет ДГИ</th>
+                <th class="text-center p-1 rr-charge-dgi d-none" title="Исходящее сальдо ДГИ">Исх. ДГИ</th>
+            }
+            @* ПКК *@
+            @if (ViewBag.HasPkkCharges)
+            {
+                <th class="text-center p-1 rr-charge-pkk d-none" title="Входящее сальдо ПКК">Вх. ПКК</th>
+                <th class="text-center p-1 rr-charge-pkk d-none" title="Начислено ПКК">Начислено ПКК</th>
+                <th class="text-center p-1 rr-charge-pkk d-none" title="Оплачено ПКК">Оплата ПКК</th>
+                <th class="text-center p-1 rr-charge-pkk d-none" title="Перерасчет ПКК">Перерасчет ПКК</th>
+                <th class="text-center p-1 rr-charge-pkk d-none" title="Исходящее сальдо ПКК">Исх. ПКК</th>
+            }
+            @* Падун *@
+            @if (ViewBag.HasPadunCharges)
+            {
+                <th class="text-center p-1 rr-charge-padun d-none" title="Входящее сальдо Падун">Вх. Падун</th>
+                <th class="text-center p-1 rr-charge-padun d-none" title="Начислено Падун">Начислено Падун</th>
+                <th class="text-center p-1 rr-charge-padun d-none" title="Оплачено Падун">Оплата Падун</th>
+                <th class="text-center p-1 rr-charge-padun d-none" title="Перерасчет Падун">Перерасчет Падун</th>
+                <th class="text-center p-1 rr-charge-padun d-none" title="Исходящее сальдо Падун">Исх. Падун</th>
+            }
+
+            @* Всего *@
+            @if (ViewBag.HasDgiCharges || ViewBag.HasPadunCharges || ViewBag.HasPkkCharges)
+            {
+                var title = "найм";
+                if (ViewBag.HasDgiCharges)
+                {
+                    title += "+ДГИ";
+                }
+                if (ViewBag.HasPkkCharges)
+                {
+                    title += "+ПКК";
+                }
+                if (ViewBag.HasPadunCharges)
+                {
+                    title += "+Падун";
+                }
+                <th class="text-center p-1 rr-charge-total @initTotalTabClass" title="Входящее сальдо @title">Вх. @title</th>
+                <th class="text-center p-1 rr-charge-total @initTotalTabClass" title="Входящее сальдо пени">Вх. пени</th>
+                <th class="text-center p-1 rr-charge-total @initTotalTabClass" title="Начислено @title">Начислено @title</th>
+                <th class="text-center p-1 rr-charge-total @initTotalTabClass" title="Начислено пени">Начислено пени</th>
+                <th class="text-center p-1 rr-charge-total @initTotalTabClass" title="Оплачено @title">Оплата @title</th>
+                <th class="text-center p-1 rr-charge-total @initTotalTabClass" title="Оплачено пени">Оплата пени</th>
+                <th class="text-center p-1 rr-charge-total @initTotalTabClass" title="Перерасчет @title">Перерасчет @title</th>
+                <th class="text-center p-1 rr-charge-total @initTotalTabClass" title="Перерасчет пени">Перерасчет пени</th>
+                <th class="text-center p-1 rr-charge-total @initTotalTabClass" title="Исходящее сальдо @title">Исх. @title</th>
+                <th class="text-center p-1 rr-charge-total @initTotalTabClass" title="Исходящее сальдо пени">Исх. пени</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @{ 
+            var sortedCharges = Model.Charges.Where(r => r.Hidden == 0).OrderBy(r => r.EndDate);
+
+        }
+        @foreach (var charge in sortedCharges)
+        {
+            @await Component.InvokeAsync("ChargeRowComponent", new {
+               Charges = sortedCharges, 
+               Corrections = Model.Corrections,
+               Charge = charge,
+               ViewBag.HasDgiCharges, ViewBag.HasPadunCharges, ViewBag.HasPkkCharges,
+               ViewBag.ForecastCalcDate,
+               ViewBag.CurrentPeriodCalced,
+               ViewBag.IdAccountCurrent,
+               initTenancyTabClass,
+               initTotalTabClass
+           })
+            
+        }
+
+        @await  Component.InvokeAsync("ChargesTotalComponent", new { Charges = Model.Charges, Corrections = Model.Corrections,
+            IdAccount = (int?)ViewBag.IdAccountCurrent, ViewBag.HasDgiCharges, ViewBag.HasPkkCharges, ViewBag.HasPadunCharges,
+            ForecastCalcDate = (DateTime?)ViewBag.ForecastCalcDate, CurrentPeriodCalced = ViewBag.CurrentPeriodCalced })
+    </tbody>
+</table>
+@if (Model.Charges.Where(r => r.Hidden == 0).Count() > 12)
+{
+    <div class="text-center mt-1 mb-1">
+        <a class="text-dark rr-charge-archive-btn" title="Архив начислений" href="#"><span class="oi oi-chevron-bottom"></span></a>
+    </div>
+}

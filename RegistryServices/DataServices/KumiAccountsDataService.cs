@@ -2327,7 +2327,7 @@ namespace RegistryWeb.DataServices
             if (!string.IsNullOrEmpty(filterOptions.PostIndex))
             {
                 var infixes = from buildingBow in registryContext.Buildings
-                              where buildingBow.PostIndex.Equals(filterOptions.PostIndex)
+                              where buildingBow.PostIndex != null && buildingBow.PostIndex.Equals(filterOptions.PostIndex)
                               select string.Concat("s", buildingBow.IdStreet, "b", buildingBow.IdBuilding.ToString());
                 var idAccountsBuf = registryContext.GetKumiAccountIdsByAddressInfixes(infixes.ToList());
                 if (filtered)

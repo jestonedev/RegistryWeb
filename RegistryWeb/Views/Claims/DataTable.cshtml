@@ -270,26 +270,8 @@
 
                         @if (item.StartDeptPeriod != null || item.EndDeptPeriod != null)
                         {
-                            var period = "";
-                            if (item.StartDeptPeriod != null)
-                            {
-                                period += "с " + item.StartDeptPeriod.Value.ToString("dd.MM.yyyy");
-                            }
-                            if (item.StartDeptPeriod != null)
-                            {
-                                period += " ";
-                            }
-                            if (item.EndDeptPeriod != null)
-                            {
-                                period += "по " + item.EndDeptPeriod.Value.ToString("dd.MM.yyyy");
-                            }
-                            else
-                            {
-                                period += "бессрочно";
-                            }
-
                             <div>
-                                Период: @period
+                                Период: <str-period from="@item.StartDeptPeriod" to="@item.EndDeptPeriod"/>
                             </div>
                         }
 

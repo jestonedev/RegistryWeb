@@ -4,14 +4,14 @@
     @* Найм *@
     <td class="text-center p-1 rr-charge-tenancy @(ViewBag.HasDgiCharges || ViewBag.HasPkkCharges || ViewBag.HasPadunCharges ? "d-none" : "")"><b>-</b></td>
     <td class="text-center p-1 rr-charge-tenancy @(ViewBag.HasDgiCharges || ViewBag.HasPkkCharges || ViewBag.HasPadunCharges ? "d-none" : "")"><b>-</b></td>
-    @if (ViewBag.IdAccount == null)
+    @if (ViewBag.IdAccount != null)
     {
         <td class="text-center p-1 rr-charge-tenancy @(ViewBag.HasDgiCharges || ViewBag.HasPkkCharges || ViewBag.HasPadunCharges ? "d-none" : "")"><b>-</b></td>
     }
     <td class="text-center p-1 rr-charge-tenancy @(ViewBag.HasDgiCharges || ViewBag.HasPkkCharges || ViewBag.HasPadunCharges ? "d-none" : "") rr-charge-total-tenancy"><b>@ViewBag.TotalChargeTenancy</b></td>
     <td class="text-center p-1 rr-charge-tenancy @(ViewBag.HasDgiCharges || ViewBag.HasPkkCharges || ViewBag.HasPadunCharges ? "d-none" : "") rr-charge-total-penalty"><b>@ViewBag.TotalChargePenalty</b></td>
     <td class="text-center p-1 rr-charge-tenancy @(ViewBag.HasDgiCharges || ViewBag.HasPkkCharges || ViewBag.HasPadunCharges ? "d-none" : "")">
-        @if (ViewBag.IdAccount != null)
+        @if (ViewBag.IdAccount == null)
         {
             <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(ViewBag.TotalPaymentTenancy - ViewBag.TotalPaymentTenancyByAccount) руб." asp-action="Index"
                asp-route-filterOptions.IdAccount="@ViewBag.IdAccount" asp-route-filterOptions.Kbk=" "><b>@ViewBag.TotalPaymentTenancy</b></a>
@@ -22,7 +22,7 @@
         }
     </td>
     <td class="text-center p-1 rr-charge-tenancy @(ViewBag.HasDgiCharges || ViewBag.HasPkkCharges || ViewBag.HasPadunCharges ? "d-none" : "")">
-        @if (ViewBag.IdAccount != null)
+        @if (ViewBag.IdAccount == null)
         {
             <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(ViewBag.TotalPaymentPenalty - ViewBag.TotalPaymentPenaltyByAccount) руб." asp-action="Index"
                asp-route-filterOptions.IdAccount="@ViewBag.IdAccount" asp-route-filterOptions.Kbk=" "><b>@ViewBag.TotalPaymentPenalty</b></a>
@@ -43,7 +43,7 @@
         <td class="text-center p-1 rr-charge-dgi d-none"><b>-</b></td>
         <td class="text-center p-1 rr-charge-dgi d-none"><b>@ViewBag.TotalChargeDgi</b></td>
         <td class="text-center p-1 rr-charge-dgi d-none">
-            @if (ViewBag.IdAccount != null)
+            @if (ViewBag.IdAccount == null)
             {
                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(ViewBag.TotalPaymentDgi - ViewBag.TotalPaymentDgiByAccount) руб." asp-action="Index"
                    asp-route-filterOptions.IdAccount="@ViewBag.IdAccount" asp-route-filterOptions.Kbk=" "><b>@ViewBag.TotalPaymentDgi</b></a>
@@ -63,7 +63,7 @@
         <td class="text-center p-1 rr-charge-pkk d-none"><b>-</b></td>
         <td class="text-center p-1 rr-charge-pkk d-none"><b>@ViewBag.TotalChargePkk</b></td>
         <td class="text-center p-1 rr-charge-pkk d-none">
-            @if (ViewBag.IdAccount != null)
+            @if (ViewBag.IdAccount == null)
             {
                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(ViewBag.TotalPaymentPkk - ViewBag.TotalPaymentPkkByAccount) руб." asp-action="Index"
                    asp-route-filterOptions.IdAccount="@ViewBag.IdAccount" asp-route-filterOptions.Kbk=" "><b>@ViewBag.TotalPaymentPkk</b></a>
@@ -83,7 +83,7 @@
         <td class="text-center p-1 rr-charge-padun d-none"><b>-</b></td>
         <td class="text-center p-1 rr-charge-padun d-none"><b>@ViewBag.TotalChargePadun</b></td>
         <td class="text-center p-1 rr-charge-padun d-none">
-            @if (ViewBag.IdAccount != null)
+            @if (ViewBag.IdAccount == null)
             {
                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(ViewBag.TotalPaymentPadun - ViewBag.TotalPaymentPadunByAccount) руб." asp-action="Index"
                    asp-route-filterOptions.IdAccount="@ViewBag.IdAccount" asp-route-filterOptions.Kbk=" "><b>@ViewBag.TotalPaymentPadun</b></a>
@@ -102,10 +102,14 @@
     {
         <td class="text-center p-1 rr-charge-total"><b>-</b></td>
         <td class="text-center p-1 rr-charge-total"><b>-</b></td>
+        @if (ViewBag.IdAccount != null)
+        {
+            <td class="text-center p-1 rr-charge-total"><b>-</b></td>
+        }
         <td class="text-center p-1 rr-charge-total rr-charge-total-all"><b>@(ViewBag.TotalChargeTenancy + ViewBag.TotalChargePkk + ViewBag.TotalChargeDgi + ViewBag.TotalChargePadun)</b></td>
         <td class="text-center p-1 rr-charge-total rr-charge-total-all-penalty"><b>@ViewBag.TotalChargePenalty</b></td>
         <td class="text-center p-1 rr-charge-total">
-            @if (ViewBag.IdAccount != null)
+            @if (ViewBag.IdAccount == null)
             {
                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(ViewBag.TotalPaymentTotal - ViewBag.TotalPaymentTotalByAccount) руб." asp-action="Index"
                    asp-route-filterOptions.IdAccount="@ViewBag.IdAccount" asp-route-filterOptions.Kbk=" "><b>@ViewBag.TotalPaymentTotal</b></a>
@@ -116,7 +120,7 @@
             }
         </td>
         <td class="text-center p-1 rr-charge-total">
-            @if (ViewBag.IdAccount != null)
+            @if (ViewBag.IdAccount == null)
             {
                 <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(ViewBag.TotalPaymentPenalty - ViewBag.TotalPaymentPenaltyByAccount) руб." asp-action="Index"
                    asp-route-filterOptions.IdAccount="@ViewBag.IdAccount" asp-route-filterOptions.Kbk=" "><b>@ViewBag.TotalPaymentPenalty</b></a>

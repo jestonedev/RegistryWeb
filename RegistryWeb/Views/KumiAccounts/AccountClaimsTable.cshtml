@@ -50,7 +50,7 @@
             <tr class="@(canceledClaim ? "table-danger" : winOrderClaim ? "table-success" : "")" title="@(canceledClaim ? "Отмененная исковая работа" :
                                         winOrderClaim ? "Вынесен судебный приказ №"+(prepareCourtOrderState.CourtOrderNum ?? "б/н")+" от "+prepareCourtOrderState.CourtOrderDate.Value.ToString("dd.MM.yyyy") : "")">
                 <td class="text-center p-1">
-                    @await  Component.InvokeAsync("RentPeriodComponent", new { from = claim.StartDeptPeriod, to = claim.EndDeptPeriod })
+                    <str-period from="@claim.StartDeptPeriod" to="@claim.EndDeptPeriod"/>
                     <a class="btn oi oi-eye p-0 ml-1 text-primary rr-account-list-eye-btn" target="_blank"
                        asp-action="Details" asp-controller="Claims" asp-route-idClaim="@claim.IdClaim"
                        asp-route-returnUrl="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">

@@ -16,6 +16,10 @@
     additionalChargesCount += hasDgiCharges ? 1 : 0;
     additionalChargesCount += hasPkkCharges ? 1 : 0;
     additionalChargesCount += hasPadunCharges ? 1 : 0;
+    ViewBag.AdditionalChargesCount = additionalChargesCount;
+    ViewBag.HasDgiCharges = hasDgiCharges;
+    ViewBag.HasPkkCharges = hasPkkCharges;
+    ViewBag.HasPadunCharges = hasPadunCharges;
 }
 @section Styles {
     <link rel="stylesheet" href="~/css/kumi.accounts.css" asp-append-version="true" />
@@ -602,278 +606,12 @@
                     }
                     @if (Model.Charges.Any())
                     {
-                        <table class="table table-bordered table-striped m-0">
-                            <thead>
-                                <tr>
-                                    <th class="text-center p-1" title="Дата последнего начисления">Дата</th>
-                                    @* Найм *@
-                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Входящее сальдо найм">Вх. найм</th>
-                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Входящее сальдо пени">Вх. пени</th>
-                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Начислено найм">Начислено найм</th>
-                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Начислено пени">Начислено пени</th>
-                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Оплачено найм">Оплата найм</th>
-                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Оплачено пени">Оплата пени</th>
-                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Перерасчет найм">Перерасчет найм</th>
-                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Перерасчет пени">Перерасчет пени</th>
-                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Исходящее сальдо найм">Исх. найм</th>
-                                    <th class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "d-none" : "")" title="Исходящее сальдо пени">Исх. пени</th>
+                        ViewBag.ForecastCalcDate = forecastCalcDate;
+                        ViewBag.CurrentPeriodCalced = currentPeriodCalced;
 
-                                    @* ДГИ *@
-                                    @if (hasDgiCharges)
-                                    {
-                                        <th class="text-center p-1 rr-charge-dgi d-none" title="Входящее сальдо ДГИ">Вх. ДГИ</th>
-                                        <th class="text-center p-1 rr-charge-dgi d-none" title="Начислено ДГИ">Начислено ДГИ</th>
-                                        <th class="text-center p-1 rr-charge-dgi d-none" title="Оплачено ДГИ">Оплата ДГИ</th>
-                                        <th class="text-center p-1 rr-charge-dgi d-none" title="Перерасчет ДГИ">Перерасчет ДГИ</th>
-                                        <th class="text-center p-1 rr-charge-dgi d-none" title="Исходящее сальдо ДГИ">Исх. ДГИ</th>
-                                    }
-                                    @* ПКК *@
-                                    @if (hasPkkCharges)
-                                    {
-                                        <th class="text-center p-1 rr-charge-pkk d-none" title="Входящее сальдо ПКК">Вх. ПКК</th>
-                                        <th class="text-center p-1 rr-charge-pkk d-none" title="Начислено ПКК">Начислено ПКК</th>
-                                        <th class="text-center p-1 rr-charge-pkk d-none" title="Оплачено ПКК">Оплата ПКК</th>
-                                        <th class="text-center p-1 rr-charge-pkk d-none" title="Перерасчет ПКК">Перерасчет ПКК</th>
-                                        <th class="text-center p-1 rr-charge-pkk d-none" title="Исходящее сальдо ПКК">Исх. ПКК</th>
-                                    }
-                                    @* Падун *@
-                                    @if (hasPadunCharges)
-                                    {
-                                        <th class="text-center p-1 rr-charge-padun d-none" title="Входящее сальдо Падун">Вх. Падун</th>
-                                        <th class="text-center p-1 rr-charge-padun d-none" title="Начислено Падун">Начислено Падун</th>
-                                        <th class="text-center p-1 rr-charge-padun d-none" title="Оплачено Падун">Оплата Падун</th>
-                                        <th class="text-center p-1 rr-charge-padun d-none" title="Перерасчет Падун">Перерасчет Падун</th>
-                                        <th class="text-center p-1 rr-charge-padun d-none" title="Исходящее сальдо Падун">Исх. Падун</th>
-                                    }
-
-                                    @* Всего *@
-                                    @if (hasDgiCharges || hasPadunCharges || hasPkkCharges)
-                                    {
-                                        var title = "найм";
-                                        if (hasDgiCharges)
-                                        {
-                                            title += "+ДГИ";
-                                        }
-                                        if (hasPkkCharges)
-                                        {
-                                            title += "+ПКК";
-                                        }
-                                        if (hasPadunCharges)
-                                        {
-                                            title += "+Падун";
-                                        }
-                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Входящее сальдо @title">Вх. @title</th>
-                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Входящее сальдо пени">Вх. пени</th>
-                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Начислено @title">Начислено @title</th>
-                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Начислено пени">Начислено пени</th>
-                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Оплачено @title">Оплата @title</th>
-                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Оплачено пени">Оплата пени</th>
-                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Перерасчет @title">Перерасчет @title</th>
-                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Перерасчет пени">Перерасчет пени</th>
-                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Исходящее сальдо @title">Исх. @title</th>
-                                        <th class="text-center p-1 rr-charge-total @(hasDgiCharges || hasPadunCharges || hasPkkCharges ? "" : "d-none")" title="Исходящее сальдо пени">Исх. пени</th>
-                                    }
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @{
-                                    var i = 0;
-                                    var count = Model.Charges.Where(r => r.Hidden == 0).Count();
-                                }
-                                @foreach (var charge in Model.Charges.Where(r => r.Hidden == 0).OrderBy(r => r.EndDate))
-                                {
-                                    var hasPayments = (charge.PaymentCharges != null && charge.PaymentCharges.Any()) ||
-                                        (charge.DisplayPaymentClaims != null && charge.DisplayPaymentClaims.Any()) ||
-                                        (charge.UntiedPaymentsInfo != null && charge.UntiedPaymentsInfo.Any());
-                                    i++;
-                                    <tr class="@(count - i + 1 > 12 ? "rr-charge-archive" : "") @(charge.EndDate == forecastCalcDate ? "rr-charge-current-month-row" : "") @(currentPeriodCalced ? "rr-charge-current-month-row-no-calc" : "")" data-charge-end-date="@charge.EndDate.ToString("yyyy-MM-dd")">
-
-                                        <td class="text-center p-1"><b>@charge.EndDate.ToString("dd.MM.yyyy")</b></td>
-
-                                        @* Найм *@
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-input-tenancy">@charge.InputTenancy</td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-input-penalty">@charge.InputPenalty</td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-tenancy">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.ChargeTenancy : 0)</td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-penalty">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.ChargePenalty : 0)</td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-payment-tenancy">
-                                            @{
-                                                var tenancyOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.TenancyValue) ?? 0m;
-                                                tenancyOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentTenancyValue);
-                                                if (charge.IsBksCharge == 1)
-                                                {
-                                                    tenancyOnAccount = charge.PaymentTenancy;
-                                                }
-                                                var penaltyOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.PenaltyValue) ?? 0m;
-                                                penaltyOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentPenaltyValue);
-                                                if (charge.IsBksCharge == 1)
-                                                {
-                                                    penaltyOnAccount = charge.PaymentPenalty;
-                                                }
-                                            }
-                                            @if (hasPayments)
-                                            {
-                                                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentTenancy - tenancyOnAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@charge.PaymentTenancy</a>
-                                            }
-                                            else
-                                            {
-                                                @charge.PaymentTenancy
-                                            }
-                                        </td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-payment-penalty">
-                                            @if (hasPayments)
-                                            {
-                                                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index"
-                                                   asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@charge.PaymentPenalty</a>
-                                            }
-                                            else
-                                            {
-                                                @charge.PaymentPenalty
-                                            }
-                                        </td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-recalc-tenancy">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.RecalcTenancy + charge.CorrectionTenancy : 0)</td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-recalc-penalty">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.RecalcPenalty + charge.CorrectionPenalty : 0)</td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-output-tenancy">@charge.OutputTenancy</td>
-                                        <td class="text-center p-1 rr-charge-tenancy @(hasDgiCharges || hasPkkCharges || hasPadunCharges ? "d-none" : "") rr-charge-period-output-penalty">@charge.OutputPenalty</td>
-
-                                        @* ДГИ *@
-                                        @if (hasDgiCharges)
-                                        {
-                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-input-dgi">@charge.InputDgi</td>
-                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-dgi">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.ChargeDgi : 0)</td>
-                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-payment-dgi">
-                                                @{
-                                                    var dgiOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.DgiValue) ?? 0m;
-                                                    dgiOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentDgiValue);
-                                                    if (charge.IsBksCharge == 1)
-                                                    {
-                                                        dgiOnAccount = charge.PaymentDgi;
-                                                    }
-                                                }
-                                                @if (hasPayments)
-                                                {
-                                                    <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentDgi - dgiOnAccount) руб." asp-action="Index"
-                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@charge.PaymentDgi</a>
-                                                }
-                                                else
-                                                {
-                                                    @charge.PaymentDgi
-                                                }
-                                            </td>
-                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-recalc-dgi">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.RecalcDgi + charge.CorrectionDgi : 0)</td>
-                                            <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-output-dgi">@charge.OutputDgi</td>
-                                        }
-                                        @* ПКК *@
-                                        @if (hasPkkCharges)
-                                        {
-                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-input-pkk">@charge.InputPkk</td>
-                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-pkk">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.ChargePkk : 0)</td>
-                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-payment-pkk">
-                                                @{
-                                                    var pkkOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.PkkValue) ?? 0m;
-                                                    pkkOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentPkkValue);
-                                                    if (charge.IsBksCharge == 1)
-                                                    {
-                                                        pkkOnAccount = charge.PaymentPkk;
-                                                    }
-                                                }
-                                                @if (hasPayments)
-                                                {
-                                                    <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPkk - pkkOnAccount) руб." asp-action="Index"
-                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@charge.PaymentPkk</a>
-                                                }
-                                                else
-                                                {
-                                                    @charge.PaymentPkk
-                                                }
-                                            </td>
-                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-recalc-pkk">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.RecalcPkk + charge.CorrectionPkk : 0)</td>
-                                            <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-output-pkk">@charge.OutputPkk</td>
-                                        }
-                                        @* Падун *@
-                                        @if (hasPadunCharges)
-                                        {
-                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-input-padun">@charge.InputPadun</td>
-                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-padun">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.ChargePadun : 0)</td>
-                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-payment-padun">
-                                                @{
-                                                    var padunOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.PadunValue) ?? 0m;
-                                                    padunOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentPadunValue);
-                                                    if (charge.IsBksCharge == 1)
-                                                    {
-                                                        padunOnAccount = charge.PaymentPadun;
-                                                    }
-                                                }
-                                                @if (hasPayments)
-                                                {
-                                                    <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPadun - padunOnAccount) руб." asp-action="Index"
-                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@charge.PaymentPadun</a>
-                                                }
-                                                else
-                                                {
-                                                    @charge.PaymentPadun
-                                                }
-                                            </td>
-                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-recalc-padun">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.RecalcPadun + charge.CorrectionPadun : 0)</td>
-                                            <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-output-padun">@charge.OutputPadun</td>
-                                        }
-
-                                        @* Всего *@
-                                        @if (hasDgiCharges || hasPkkCharges || hasPadunCharges)
-                                        {
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-input-all">@(charge.InputTenancy + charge.InputDgi + charge.InputPkk + charge.InputPadun)</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-input-all-penalty">@charge.InputPenalty</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-all">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? (charge.ChargeTenancy + charge.ChargeDgi + charge.ChargePkk + charge.ChargePadun) : 0)</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-all-penalty">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.ChargePenalty : 0)</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-payment-all">
-                                                @{
-                                                    var totalOnAccount = Model.Charges.SelectMany(r => r.PaymentCharges).Where(r => r.IdDisplayCharge == charge.IdCharge)?.Sum(r => r.TenancyValue + r.DgiValue + r.PkkValue + r.PadunValue) ?? 0m;
-                                                    totalOnAccount += Model.Corrections.Where(r => r.Date >= charge.StartDate && r.Date <= charge.EndDate).Sum(r => r.PaymentTenancyValue + r.PaymentDgiValue + r.PaymentPkkValue + r.PaymentPadunValue);
-                                                    if (charge.IsBksCharge == 1)
-                                                    {
-                                                        totalOnAccount = charge.PaymentTenancy + charge.PaymentDgi + charge.PaymentPkk + charge.PaymentPadun;
-                                                    }
-                                                }
-                                                @if (hasPayments)
-                                                {
-                                                    <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @((charge.PaymentTenancy+charge.PaymentDgi+charge.PaymentPkk+charge.PaymentPadun) - totalOnAccount) руб." asp-action="Index"
-                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@(charge.PaymentTenancy + charge.PaymentDgi + charge.PaymentPkk + charge.PaymentPadun)</a>
-                                                }
-                                                else
-                                                {
-                                                    @(charge.PaymentTenancy + charge.PaymentDgi + charge.PaymentPkk + charge.PaymentPadun)
-                                                }
-                                            </td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-payment-all-penalty">
-                                                @if (hasPayments)
-                                                {
-                                                    <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @(charge.PaymentPenalty - penaltyOnAccount) руб." asp-action="Index"
-                                                       asp-route-filterOptions.IdCharge="@charge.IdCharge" asp-route-filterOptions.Kbk=" ">@charge.PaymentPenalty</a>
-                                                }
-                                                else
-                                                {
-                                                    @charge.PaymentPenalty
-                                                }
-                                            </td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? (charge.RecalcTenancy + charge.CorrectionTenancy + charge.RecalcDgi + charge.CorrectionDgi + charge.RecalcPkk + charge.CorrectionPkk + charge.RecalcPadun + charge.CorrectionPadun) : 0)</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all-penalty">@(charge.EndDate != forecastCalcDate || currentPeriodCalced ? charge.RecalcPenalty + charge.CorrectionPenalty : 0)</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-output-all">@(charge.OutputTenancy + charge.OutputDgi + charge.OutputPkk + charge.OutputPadun)</td>
-                                            <td class="text-center p-1 rr-charge-total rr-charge-period-output-all-penalty">@charge.OutputPenalty</td>
-                                        }
-                                    </tr>
-                                }
-
-                                @await  Component.InvokeAsync("ChargesTotalComponent", new { Charges = Model.Charges, Corrections = Model.Corrections, IdAccount = Model.IdAccount,
-                                    HasDgiCharges = hasDgiCharges, HasPkkCharges = hasPkkCharges, HasPadunCharges = hasPadunCharges,
-                                    ForecastCalcDate = forecastCalcDate, CurrentPeriodCalced = currentPeriodCalced })
-                            </tbody>
-                        </table>
-                        if (count > 12)
-                        {
-                            <div class="text-center mt-1 mb-1">
-                                <a class="text-dark rr-charge-archive-btn" title="Архив начислений" href="#"><span class="oi oi-chevron-bottom"></span></a>
-                            </div>
-                        }
+                        <partial name="AccountChargesTable" model="@(new KumiAccountChargesVM {
+                        Charges = Model.Charges,
+                        Corrections = Model.Corrections })" />
                     }
                     else
                     {
@@ -894,11 +632,7 @@
                 <div class="card-body p-0" id="ClaimsInfo">
                     @if (Model.Claims.Any())
                     {
-                        ViewBag.AdditionalChargesCount = additionalChargesCount;
-                        ViewBag.HasDgiCharges = hasDgiCharges;
-                        ViewBag.HasPkkCharges = hasPkkCharges;
-                        ViewBag.HasPadunCharges = hasPadunCharges;
-                        <partial name="AccountClaims" model="Model.Claims"/>
+                        <partial name="AccountClaimsTable" model="Model.Claims"/>
                     }
                     else
                     {
@@ -914,10 +648,3 @@
 
 <partial name="AccountAdvModals">
 <partial name="AccountCommonModals">
-
-    @{
-        ViewBag.HasDgiCharges = hasDgiCharges;
-        ViewBag.HasPkkCharges = hasPkkCharges;
-        ViewBag.HasPadunCharges = hasPadunCharges;
-        ViewBag.AdditionalChargesCount = additionalChargesCount;
-    }

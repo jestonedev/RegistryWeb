@@ -41,6 +41,7 @@ using RegistryDb.Models.Entities.Tenancies;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Text.RegularExpressions;
 
 namespace RegistryDb.Models
 {
@@ -469,10 +470,29 @@ namespace RegistryDb.Models
             var query = "SELECT * FROM kumi_accounts_address_infix WHERE ";
             for (var i = 0; i < infixes.Count; i++)
             {
-                query += string.Format(" infix LIKE '{0}%'", infixes[i]);
-                if (i < infixes.Count - 1)
+                var match = Regex.Match(infixes[i], @"^(?:(s)\d+)(?:(?:(b)\d+)(?:(?:(p)\d+)(?:(sp)\d+)?)?)?$");
+                if (match.Success)
                 {
-                    query += " OR ";
+                    var lastGroup = match.Groups.Where(r => r.Success).Last();
+                    var postFix = "";
+                    switch(lastGroup.Value)
+                    {
+                        case "s":
+                            postFix = "b";
+                            break;
+                        case "b":
+                            postFix = "p";
+                            break;
+                        case "p":
+                            break;
+                    }
+                    query += string.Format(" infix = '{0}'", infixes[i]);
+                    if (!string.IsNullOrWhiteSpace(postFix))
+                        query += string.Format(" OR infix LIKE '{0}{1}%'", infixes[i], postFix);
+                    if (i < infixes.Count - 1)
+                    {
+                        query += " OR ";
+                    }
                 }
             }
 #pragma warning disable EF1000 // Possible SQL injection vulnerability.

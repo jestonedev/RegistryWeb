@@ -1,32 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using System;
-using System.Collections.Generic;
 
 namespace RegistryWeb.TagHelpers
 {
     public class PageLinkTagHelper : TagHelper
     {
-        private IUrlHelperFactory urlHelperFactory;
-        public PageLinkTagHelper(IUrlHelperFactory helperFactory)
-        {
-            urlHelperFactory = helperFactory;
-        }
-        [ViewContext]
-        [HtmlAttributeNotBound]
-        public ViewContext ViewContext { get; set; }
         public ViewOptions.PageOptions PageModel { get; set; }
         public string PageAction { get; set; }
 
-        [HtmlAttributeName(DictionaryAttributePrefix = "page-url-")]
-        public Dictionary<string, object> PageUrlValues { get; set; } = new Dictionary<string, object>();
-
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            IUrlHelper urlHelper = urlHelperFactory.GetUrlHelper(ViewContext);
             output.TagName = "nav";
 
             TagBuilder tag = new TagBuilder("ul");
@@ -39,24 +23,24 @@ namespace RegistryWeb.TagHelpers
 
             if (firstDisplayedPageIndex != 1)
             {
-                var startNumber = CreateLinkTag(1, urlHelper);
+                var startNumber = CreateLinkTag(1);
                 tag.InnerHtml.AppendHtml(startNumber);
             }
             for (var i = firstDisplayedPageIndex; i <= lastDisplayedPageIndex; i++)
             {
-                var numberLink = CreateLinkTag(i, urlHelper);
+                var numberLink = CreateLinkTag(i);
                 tag.InnerHtml.AppendHtml(numberLink);
             }
             if (lastDisplayedPageIndex != PageModel.TotalPages)
             {
-                var endNumber = CreateLinkTag(PageModel.TotalPages, urlHelper);
+                var endNumber = CreateLinkTag(PageModel.TotalPages);
                 tag.InnerHtml.AppendHtml(endNumber);
             }
 
             output.Content.AppendHtml(tag);
         }
 
-        TagBuilder CreateLinkTag(int page, IUrlHelper urlHelper)
+        TagBuilder CreateLinkTag(int page)
         {
             TagBuilder link = new TagBuilder("a");
             if (page == 1)

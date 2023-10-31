@@ -1,0 +1,142 @@
+﻿@model KumiCharge
+
+<tr class="@(ViewBag.Count - ViewBag.Index + 1 > 12 ? "rr-charge-archive" : "") @(Model.EndDate == ViewBag.ForecastCalcDate ? "rr-charge-current-month-row" : "") @(ViewBag.CurrentPeriodCalced ? "rr-charge-current-month-row-no-calc" : "")" data-charge-end-date="@Model.EndDate.ToString("yyyy-MM-dd")">
+
+    <td class="text-center p-1"><b>@Model.EndDate.ToString("dd.MM.yyyy")</b></td>
+
+    @if (ViewBag.IdAccountCurrent != null)
+    {
+        if (Model.IdAccount == ViewBag.IdAccountCurrent)
+        {
+            <td class="text-center p-1" title="Текущий лицевой счет"><b>@Model.Account.Account</b></td>
+        }
+        else
+        {
+            <td class="text-center p-1">@Model.Account.Account</td>
+        }
+    }
+    @* Найм *@
+    <td class="text-center p-1 rr-charge-tenancy @ViewBag.InitTenancyTabClass rr-charge-period-input-tenancy">@Model.InputTenancy</td>
+    <td class="text-center p-1 rr-charge-tenancy @ViewBag.InitTenancyTabClass rr-charge-period-input-penalty">@Model.InputPenalty</td>
+    <td class="text-center p-1 rr-charge-tenancy @ViewBag.InitTenancyTabClass rr-charge-period-tenancy">@Model.ChargeTenancy</td>
+    <td class="text-center p-1 rr-charge-tenancy @ViewBag.InitTenancyTabClass rr-charge-period-penalty">@Model.ChargePenalty</td>
+    <td class="text-center p-1 rr-charge-tenancy @ViewBag.InitTenancyTabClass rr-charge-period-payment-tenancy">
+        @if (ViewBag.HasPayments)
+        {
+            <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @ViewBag.TenancyOnClaim руб." asp-action="Index"
+               asp-route-filterOptions.IdCharge="@Model.IdCharge" )">@Model.PaymentTenancy</a>
+        }
+        else
+        {
+            @Model.PaymentTenancy
+        }
+    </td>
+    <td class="text-center p-1 rr-charge-tenancy @ViewBag.InitTenancyTabClass rr-charge-period-payment-penalty">
+        @if (ViewBag.HasPayments)
+        {
+            <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @ViewBag.PenaltyOnClaim руб." asp-action="Index"
+               asp-route-filterOptions.IdCharge="@Model.IdCharge">@Model.PaymentPenalty</a>
+        }
+        else
+        {
+            @Model.PaymentPenalty
+        }
+    </td>
+    <td class="text-center p-1 rr-charge-tenancy @ViewBag.InitTenancyTabClass rr-charge-period-recalc-tenancy">@(Model.RecalcTenancy + Model.CorrectionTenancy)</td>
+    <td class="text-center p-1 rr-charge-tenancy @ViewBag.InitTenancyTabClass rr-charge-period-recalc-penalty">@(Model.RecalcPenalty + Model.CorrectionPenalty)</td>
+    <td class="text-center p-1 rr-charge-tenancy @ViewBag.InitTenancyTabClass rr-charge-period-output-tenancy">@Model.OutputTenancy</td>
+    <td class="text-center p-1 rr-charge-tenancy @ViewBag.InitTenancyTabClass rr-charge-period-output-penalty">@Model.OutputPenalty</td>
+
+    @* ДГИ *@
+    @if (ViewBag.HasDgiCharges)
+    {
+        <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-input-dgi">@Model.InputDgi</td>
+        <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-dgi">@(Model.EndDate != ViewBag.ForecastCalcDate || ViewBag.CurrentPeriodCalced ? Model.ChargeDgi : 0)</td>
+        <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-payment-dgi">
+            @if (ViewBag.HasPayments)
+            {
+                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @ViewBag.DgiOnClaim руб." asp-action="Index"
+                   asp-route-filterOptions.IdCharge="@Model.IdCharge" )">@Model.PaymentDgi</a>
+            }
+            else
+            {
+                @Model.PaymentDgi
+            }
+        </td>
+        <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-recalc-dgi">@(Model.EndDate != ViewBag.ForecastCalcDate || ViewBag.CurrentPeriodCalced ? Model.RecalcDgi + Model.CorrectionDgi : 0)</td>
+        <td class="text-center p-1 rr-charge-dgi d-none rr-charge-period-output-dgi">@Model.OutputDgi</td>
+    }
+    @* ПКК *@
+    @if (ViewBag.HasPkkCharges)
+    {
+        <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-input-pkk">@Model.InputPkk</td>
+        <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-pkk">@(Model.EndDate != ViewBag.ForecastCalcDate || ViewBag.CurrentPeriodCalced ? Model.ChargePkk : 0)</td>
+        <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-payment-pkk">
+            @if (ViewBag.HasPayments)
+            {
+                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @ViewBag.PkkOnClaim руб." asp-action="Index"
+                   asp-route-filterOptions.IdCharge="@Model.IdCharge" )">@Model.PaymentPkk</a>
+            }
+            else
+            {
+                @Model.PaymentPkk
+            }
+        </td>
+        <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-recalc-pkk">(Model.EndDate != ViewBag.ForecastCalcDate || ViewBag.CurrentPeriodCalced ? Model.RecalcPkk + Model.CorrectionPkk : 0)</td>
+        <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-output-pkk">@Model.OutputPkk</td>
+    }
+    @* Падун *@
+    @if (ViewBag.HasPadunCharges)
+    {
+        <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-input-padun">@Model.InputPadun</td>
+        <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-padun">@(Model.EndDate != ViewBag.ForecastCalcDate || ViewBag.CurrentPeriodCalced ? Model.ChargePadun : 0)</td>
+        <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-payment-padun">
+            @if (ViewBag.HasPayments)
+            {
+                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @ViewBag.PadunOnClaim руб." asp-action="Index"
+                   asp-route-filterOptions.IdCharge="@Model.IdCharge" )">@Model.PaymentPadun</a>
+            }
+            else
+            {
+                @Model.PaymentPadun
+            }
+        </td>
+        <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-recalc-padun">@(Model.EndDate != ViewBag.ForecastCalcDate || ViewBag.CurrentPeriodCalced ? Model.RecalcPadun + Model.CorrectionPadun : 0)</td>
+        <td class="text-center p-1 rr-charge-padun d-none rr-charge-period-output-padun">@Model.OutputPadun</td>
+    }
+
+    @* Всего *@
+    @if (ViewBag.HasDgiCharges || ViewBag.HasPkkCharges || ViewBag.HasPadunCharges)
+    {
+        <td class="text-center p-1 rr-charge-total rr-charge-period-input-all">@(Model.InputTenancy + Model.InputDgi + Model.InputPkk + Model.InputPadun)</td>
+        <td class="text-center p-1 rr-charge-total rr-charge-period-input-all-penalty">@Model.InputPenalty</td>
+        <td class="text-center p-1 rr-charge-total rr-charge-period-all">@(Model.EndDate != ViewBag.ForecastCalcDate || ViewBag.CurrentPeriodCalced ? (Model.ChargeTenancy + Model.ChargeDgi + Model.ChargePkk + Model.ChargePadun) : 0)</td>
+        <td class="text-center p-1 rr-charge-total rr-charge-period-all-penalty">@(Model.EndDate != ViewBag.ForecastCalcDate || ViewBag.CurrentPeriodCalced ? Model.ChargePenalty : 0)</td>
+        <td class="text-center p-1 rr-charge-total rr-charge-period-payment-all">
+            @if (ViewBag.HasPayments)
+            {
+                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @ViewBag.TotalOnClaim руб." asp-action="Index"
+                   asp-route-filterOptions.IdCharge="@Model.IdCharge" )">@(Model.PaymentTenancy + Model.PaymentDgi + Model.PaymentPkk + Model.PaymentPadun)</a>
+            }
+            else
+            {
+                @(Model.PaymentTenancy + Model.PaymentDgi + Model.PaymentPkk + Model.PaymentPadun)
+            }
+        </td>
+        <td class="text-center p-1 rr-charge-total rr-charge-period-payment-all-penalty">
+            @if (ViewBag.HasPayments)
+            {
+                <a asp-controller="KumiPayments" target="_blank" title="Из них по исковым работам @ViewBag.PenaltyOnClaim руб." asp-action="Index"
+                   asp-route-filterOptions.IdCharge="@Model.IdCharge">@Model.PaymentPenalty</a>
+            }
+            else
+            {
+                @Model.PaymentPenalty
+            }
+        </td>
+        <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all">@(Model.EndDate != ViewBag.ForecastCalcDate || ViewBag.CurrentPeriodCalced ? (Model.RecalcTenancy + Model.CorrectionTenancy + Model.RecalcDgi + Model.CorrectionDgi + Model.RecalcPkk + Model.CorrectionPkk + Model.RecalcPadun + Model.CorrectionPadun) : 0)</td>
+        <td class="text-center p-1 rr-charge-total rr-charge-period-recalc-all-penalty">@(Model.EndDate != ViewBag.ForecastCalcDate || ViewBag.CurrentPeriodCalced ? Model.RecalcPenalty + Model.CorrectionPenalty : 0)</td>
+        <td class="text-center p-1 rr-charge-total rr-charge-period-output-all">@(Model.OutputTenancy + Model.OutputDgi + Model.OutputPkk + Model.OutputPadun)</td>
+        <td class="text-center p-1 rr-charge-total rr-charge-period-output-all-penalty">@Model.OutputPenalty</td>
+    }
+</tr>
