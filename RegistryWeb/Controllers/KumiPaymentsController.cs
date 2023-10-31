@@ -18,6 +18,7 @@ using RegistryWeb.Enums;
 using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Enums;
 using Microsoft.AspNetCore.Authorization;
+using RegistryServices.DataServices.KumiPayments;
 
 namespace RegistryWeb.Controllers
 {
@@ -25,18 +26,27 @@ namespace RegistryWeb.Controllers
     public class KumiPaymentsController : ListController<KumiPaymentsDataService, KumiPaymentsFilter>
     {
         private readonly KumiAccountsDataService kumiAccountsDataService;
+        private readonly KumiPaymentsDistributionsService distributionsService;
+        private readonly KumiPaymentsMemorialOrdersService memorialOrdersService;
+        private readonly KumiUntiedPaymentsService untiedPaymentsService;
         private readonly ClaimsDataService claimsDataService;
         private readonly TenancyProcessesDataService tenancyProcessesDataService;
         private readonly ZipArchiveDataService zipArchiveDataService;
 
         public KumiPaymentsController(KumiPaymentsDataService dataService, 
             KumiAccountsDataService kumiAccountsDataService,
+            KumiPaymentsDistributionsService distributionsService,
+            KumiPaymentsMemorialOrdersService memorialOrdersService,
+            KumiUntiedPaymentsService untiedPaymentsService,
             ClaimsDataService claimsDataService,
             TenancyProcessesDataService tenancyProcessesDataService, 
             SecurityService securityService, ZipArchiveDataService zipArchiveDataService)
             : base(dataService, securityService)
         {
             this.kumiAccountsDataService = kumiAccountsDataService;
+            this.distributionsService = distributionsService;
+            this.memorialOrdersService = memorialOrdersService;
+            this.untiedPaymentsService = untiedPaymentsService;
             this.claimsDataService = claimsDataService;
             this.tenancyProcessesDataService = tenancyProcessesDataService;
             this.zipArchiveDataService = zipArchiveDataService;
@@ -77,7 +87,7 @@ namespace RegistryWeb.Controllers
                 viewModel.PageOptions,
                 viewModel.FilterOptions, out List<int> filteredPaymentsIds);
 
-            ViewBag.UntiedPayments = dataService.GetUntiedPayments(viewModel.FilterOptions?.IdAccount, viewModel.FilterOptions?.IdClaim, viewModel.FilterOptions?.IdCharge);
+            ViewBag.UntiedPayments = untiedPaymentsService.GetUntiedPayments(viewModel.FilterOptions?.IdAccount, viewModel.FilterOptions?.IdClaim, viewModel.FilterOptions?.IdCharge);
 
             AddSearchIdsToSession(vm.FilterOptions, filteredPaymentsIds);
 
@@ -209,7 +219,7 @@ namespace RegistryWeb.Controllers
 
             if (dbPayment == null) return Json(-4);
 
-            var numUf = dataService.GetKumiPaymentUfsLastNumber();
+            var numUf = memorialOrdersService.GetKumiPaymentUfsLastNumber();
 
             var paymentUf = new KumiPaymentUf {
                 NumUf = numUf == null ? "" : (numUf + 1).ToString(),
@@ -233,26 +243,26 @@ namespace RegistryWeb.Controllers
 
         public IActionResult DownloadPaymentUf(int idPaymentUf, int idSigner, DateTime? signDate)
         {
-            var paymentUf = dataService.GetKumiPaymentUf(idPaymentUf);
+            var paymentUf = memorialOrdersService.GetKumiPaymentUf(idPaymentUf);
             var paymentSettings = dataService.GetKumiPaymentSettings();
             var signer = dataService.GetSigner(idSigner);
-            var file = dataService.GetPaymentUfsFile(new List<KumiPaymentUf> { paymentUf }, paymentSettings, signer, signDate ?? DateTime.Now.Date);
+            var file = memorialOrdersService.GetPaymentUfsFile(new List<KumiPaymentUf> { paymentUf }, paymentSettings, signer, signDate ?? DateTime.Now.Date);
             return File(file, "application/octet-stream", string.Format("{0}-{1} (уведомление).uf", paymentSettings.CodeUbp, paymentUf.NumUf));
         }
 
         public IActionResult DownloadPaymentUfs(int idSigner, DateTime? signDate, DateTime? dateUf)
         {
-            var paymentUfs = dataService.GetKumiPaymentUfs(dateUf ?? DateTime.Now.Date);
+            var paymentUfs = memorialOrdersService.GetKumiPaymentUfs(dateUf ?? DateTime.Now.Date);
             if (paymentUfs.Count == 0) return Error(string.Format("Уведомления на дату {0} не найдены", (dateUf ?? DateTime.Now.Date).ToString("dd.MM.yyyy")));
             var paymentSettings = dataService.GetKumiPaymentSettings();
             var signer = dataService.GetSigner(idSigner);
-            var file = dataService.GetPaymentUfsFile(paymentUfs, paymentSettings, signer, signDate ?? DateTime.Now.Date);
+            var file = memorialOrdersService.GetPaymentUfsFile(paymentUfs, paymentSettings, signer, signDate ?? DateTime.Now.Date);
             return File(file, "application/octet-stream", string.Format("{0}-{1} (уведомления).uf", paymentSettings.CodeUbp, paymentUfs.Count));
         }
 
         public IActionResult GetMemorialOrders(MemorialOrderFilter filterOptions)
         {
-            var mo = dataService.GetMemorialOrders(filterOptions);
+            var mo = memorialOrdersService.GetMemorialOrders(filterOptions);
             var count = mo.Count();
             var moLimit = mo.Take(5).ToList();
             return Json(new
@@ -439,7 +449,7 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             try
             {
-                var payment = dataService.CreateByMemorialOrder(idOrder);
+                var payment = memorialOrdersService.CreatePaymentByMemorialOrder(idOrder);
                 return Json(new
                 {
                     State = "Success",
@@ -460,10 +470,11 @@ namespace RegistryWeb.Controllers
         {
             try
             {
-                var orders = dataService.GetKumiPaymentMemorialOrderPairs(idOrder);
+                var orders = memorialOrdersService.GetKumiPaymentMemorialOrderPairs(idOrder);
                 foreach (var order in orders)
                 {
-                    dataService.ApplyMemorialOrderToPayment(idPayment, order.IdOrder, out bool updatedExistsPayment);
+                    var payment = dataService.GetKumiPaymentForApplyMemorialOrder(idPayment);
+                    memorialOrdersService.ApplyMemorialOrderToPayment(payment, order.IdOrder, out bool updatedExistsPayment);
                 }
                 return Json(new
                 {
@@ -488,7 +499,8 @@ namespace RegistryWeb.Controllers
                 var redirectToList = false;
                 foreach (var idOrder in idOrders)
                 {
-                    dataService.ApplyMemorialOrderToPayment(idPayment, idOrder, out updatedExistsPayment);
+                    var payment = dataService.GetKumiPaymentForApplyMemorialOrder(idPayment);
+                    memorialOrdersService.ApplyMemorialOrderToPayment(payment, idOrder, out updatedExistsPayment);
                     if (!updatedExistsPayment)
                         redirectToList = true;
                 }
@@ -520,7 +532,7 @@ namespace RegistryWeb.Controllers
         {
             try
             {
-                var paymentDistributionInfo = dataService.DistributePaymentToAccount(idPayment, idObject, distributeTo, tenancySum, penaltySum,
+                var paymentDistributionInfo = distributionsService.DistributePaymentToAccount(idPayment, idObject, distributeTo, tenancySum, penaltySum,
                     dgiSum, pkkSum, padunSum);
                 return Json(new
                 {
@@ -547,7 +559,7 @@ namespace RegistryWeb.Controllers
         {
             try
             {
-                var paymentDistributionInfo = dataService.CancelDistributePaymentToAccount(idPayment, idClaims, idAccounts);
+                var paymentDistributionInfo = distributionsService.CancelDistributePaymentToAccount(idPayment, idClaims, idAccounts);
                 return Json(new
                 {
                     State = "Success",
@@ -688,7 +700,7 @@ namespace RegistryWeb.Controllers
                 var loadstate = dataService.UploadLogPaymentGroups(idGroup);
                 var orders = loadstate.InsertedMemorialOrders.Union(loadstate.SkipedMemorialOrders).ToList();
 
-                ViewBag.MemorialOrderPayments = dataService.GetPaymentsByOrders(orders);
+                ViewBag.MemorialOrderPayments = memorialOrdersService.GetPaymentsByOrders(orders);
                 ViewBag.KbkDescriptions = dataService.KbkDescriptions;
                 ViewBag.AccountsTenants = dataService.GetAccountsTenants(loadstate.AutoDistributedPayments.Select(r => r.Item2));
 

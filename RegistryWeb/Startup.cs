@@ -16,12 +16,12 @@ using Microsoft.AspNetCore.Http.Features;
 using RegistryDb.Interfaces;
 using RegistryDb.Models;
 using RegistryReformaGKH;
-using System.Security.Principal;
 using System.Security.Claims;
-using RegistryWeb.Controllers;
 using System.Net;
 using System.IO;
 using Microsoft.AspNetCore.Authentication;
+using RegistryServices.DataFilterServices;
+using RegistryServices.DataServices.KumiPayments;
 
 namespace RegistryWeb
 {
@@ -115,9 +115,14 @@ namespace RegistryWeb
             services.AddTransient<KumiAccountReportService>();
             services.AddTransient<KumiAccountReportsDataService>();
             services.AddTransient<KumiPaymentsDataService>();
+            services.AddTransient<KumiPaymentsDistributionsService>();
+            services.AddTransient<KumiPaymentsMemorialOrdersService>();
             services.AddTransient<KumiPaymentsReportService>();
+            services.AddTransient<KumiUntiedPaymentsService>();
             services.AddTransient<ZipArchiveDataService>();
             services.AddTransient<IDbConnectionSettings, DbConnectionSettings>();
+            services.AddTransient(typeof(FilterServiceFactory<>));
+
             services.AddHttpContextAccessor();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<TokenApiStorage>();

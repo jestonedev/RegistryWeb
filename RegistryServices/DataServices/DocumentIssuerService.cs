@@ -7,16 +7,20 @@ using System.Collections.Generic;
 using System;
 using RegistryServices.ViewModel.Tenancies;
 using RegistryDb.Models.Entities.Tenancies;
+using RegistryServices.DataFilterServices;
 
 namespace RegistryWeb.DataServices
 {
     public class DocumentIssuerService
     {
         private readonly RegistryContext rc;
+        private readonly IFilterService<DocumentIssuedBy, FilterOptions> filterService;
 
-        public DocumentIssuerService(RegistryContext rc)
+        public DocumentIssuerService(RegistryContext rc,
+            FilterServiceFactory<IFilterService<DocumentIssuedBy, FilterOptions>> filterServiceFactory)
         {
             this.rc = rc;
+            filterService = filterServiceFactory.CreateInstance();
         }
 
         public DocumentIssueVM<DocumentIssuedBy> GetViewModel(PageOptions pageOptions)
@@ -33,16 +37,8 @@ namespace RegistryWeb.DataServices
 
             if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
                 viewModel.PageOptions.CurrentPage = 1;
-            viewModel.DocumentIssues = GetQueryPage(query, viewModel.PageOptions).ToList();
+            viewModel.DocumentIssues = filterService.GetQueryPage(query, viewModel.PageOptions).ToList();
             return viewModel;
-        }
-
-        public List<DocumentIssuedBy> GetQueryPage(IQueryable<DocumentIssuedBy> query, PageOptions pageOptions)
-        {
-            var result = query;
-            result = result.Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage);
-            result = result.Take(pageOptions.SizePage);
-            return result.ToList();
         }
 
         public DocumentIssueVM<DocumentIssuedBy> GetDocumentIssuerView(DocumentIssuedBy documentIssuer)
