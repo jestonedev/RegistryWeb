@@ -20,6 +20,7 @@ using RegistryServices.Enums;
 using Microsoft.AspNetCore.Authorization;
 using RegistryServices.DataServices.KumiPayments;
 using RegistryServices.DataServices.KumiAccounts;
+using RegistryWeb.DataServices.Claims;
 
 namespace RegistryWeb.Controllers
 {

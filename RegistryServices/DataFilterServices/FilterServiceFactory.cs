@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using RegistryDb.Models.Entities.Claims;
 using RegistryDb.Models.Entities.KumiAccounts;
+using RegistryDb.Models.Entities.Owners;
 using RegistryDb.Models.Entities.RegistryObjects.Buildings;
 using RegistryDb.Models.Entities.RegistryObjects.Premises;
 using RegistryDb.Models.Entities.Tenancies;
@@ -33,6 +35,10 @@ namespace RegistryServices.DataFilterServices
                     return (T)ActivatorUtilities.CreateInstance(provider, typeof(KumiPaymentsFilterService));
                 if (entityType == typeof(KumiAccount))
                     return (T)ActivatorUtilities.CreateInstance(provider, typeof(KumiAccountsFilterService));
+                if (entityType == typeof(Claim))
+                    return (T)ActivatorUtilities.CreateInstance(provider, typeof(ClaimsFilterService));
+                if (entityType == typeof(OwnerProcess))
+                    return (T)ActivatorUtilities.CreateInstance(provider, typeof(OwnerProcessesFilterService));
             }
             throw new ArgumentException("Не удалось инициализировать класс, реализующий IFilterSerivce<>");
         }

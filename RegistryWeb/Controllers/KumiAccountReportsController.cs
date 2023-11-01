@@ -12,6 +12,7 @@ using RegistryWeb.ViewOptions.Filter;
 using RegistryDb.Models.Entities.Payments;
 using InvoiceGenerator;
 using Microsoft.Extensions.Configuration;
+using RegistryWeb.DataServices.KumiAccounts;
 
 namespace RegistryWeb.Controllers
 {

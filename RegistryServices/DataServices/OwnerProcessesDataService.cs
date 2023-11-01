@@ -13,45 +13,23 @@ using RegistryWeb.Enums;
 using RegistryServices.ViewModel.Owners;
 using RegistryDb.Models.Entities.Owners;
 using RegistryDb.Models.Entities.Owners.Log;
+using RegistryServices.DataFilterServices;
 
 namespace RegistryWeb.DataServices
 {
     public class OwnerProcessesDataService : ListDataService<OwnerProcessesVM, OwnerProcessesFilter>
     {
-        private readonly IQueryable<OwnerBuildingAssoc> ownerBuildingsAssoc;
-        private readonly IQueryable<OwnerPremiseAssoc> ownerPremisesAssoc;
-        private readonly IQueryable<OwnerSubPremiseAssoc> ownerSubPremisesAssoc;
+        private readonly IFilterService<OwnerProcess, OwnerProcessesFilter> filterService;
 
         public string AttachmentsPath { get; private set; }
 
         public OwnerProcessesDataService(RegistryContext registryContext, AddressesDataService addressesDataService,
-            IConfiguration config) : base(registryContext, addressesDataService)
+            IConfiguration config,
+            FilterServiceFactory<IFilterService<OwnerProcess, OwnerProcessesFilter>> filterServiceFactory
+            ) : base(registryContext, addressesDataService)
         {
             AttachmentsPath = Path.Combine(config.GetValue<string>("AttachmentsPath"), @"OwnerProcesses");
-
-            ownerBuildingsAssoc = registryContext.OwnerBuildingsAssoc
-                .Include(oba => oba.BuildingNavigation)
-                    .ThenInclude(b => b.IdStreetNavigation)
-                .Include(oba => oba.IdProcessNavigation)
-                .AsNoTracking();
-            ownerPremisesAssoc = registryContext.OwnerPremisesAssoc
-                .Include(opa => opa.PremiseNavigation)
-                    .ThenInclude(p => p.IdBuildingNavigation)
-                        .ThenInclude(b => b.IdStreetNavigation)
-                .Include(opa => opa.PremiseNavigation)
-                    .ThenInclude(p => p.IdPremisesTypeNavigation)
-                .Include(oba => oba.IdProcessNavigation)
-                .AsNoTracking();
-            ownerSubPremisesAssoc = registryContext.OwnerSubPremisesAssoc
-                .Include(ospa => ospa.SubPremiseNavigation)
-                    .ThenInclude(sp => sp.IdPremisesNavigation)
-                        .ThenInclude(p => p.IdBuildingNavigation)
-                            .ThenInclude(b => b.IdStreetNavigation)
-                .Include(ospa => ospa.SubPremiseNavigation)
-                    .ThenInclude(sp => sp.IdPremisesNavigation)
-                        .ThenInclude(p => p.IdPremisesTypeNavigation)
-                .Include(oba => oba.IdProcessNavigation)
-                .AsNoTracking();
+            filterService = filterServiceFactory.CreateInstance();
         }
 
         public override OwnerProcessesVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, OwnerProcessesFilter filterOptions)
@@ -70,14 +48,14 @@ namespace RegistryWeb.DataServices
             var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
             var ownerProcesses = GetQuery();
             viewModel.PageOptions.TotalRows = ownerProcesses.Count();
-            var query = GetQueryFilter(ownerProcesses, viewModel.FilterOptions);
-            query = GetQueryOrder(query, viewModel.OrderOptions);
+            var query = filterService.GetQueryFilter(ownerProcesses, viewModel.FilterOptions);
+            query = filterService.GetQueryOrder(query, viewModel.OrderOptions);
             var count = query.Count();
             viewModel.PageOptions.Rows = count;
             viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
             if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
                 viewModel.PageOptions.CurrentPage = 1;
-            viewModel.OwnerProcesses = GetQueryPage(query, viewModel.PageOptions).ToList();
+            viewModel.OwnerProcesses = filterService.GetQueryPage(query, viewModel.PageOptions).ToList();
             viewModel.Addresses = GetAddresses(viewModel.OwnerProcesses);
             return viewModel;
         }
@@ -109,6 +87,30 @@ namespace RegistryWeb.DataServices
 
         private Dictionary<int, List<Address>> GetAddresses(IEnumerable<OwnerProcess> ownerProcesses)
         {
+            var ownerBuildingsAssoc = registryContext.OwnerBuildingsAssoc
+                .Include(oba => oba.BuildingNavigation)
+                    .ThenInclude(b => b.IdStreetNavigation)
+                .Include(oba => oba.IdProcessNavigation)
+                .AsNoTracking();
+            var ownerPremisesAssoc = registryContext.OwnerPremisesAssoc
+                .Include(opa => opa.PremiseNavigation)
+                    .ThenInclude(p => p.IdBuildingNavigation)
+                        .ThenInclude(b => b.IdStreetNavigation)
+                .Include(opa => opa.PremiseNavigation)
+                    .ThenInclude(p => p.IdPremisesTypeNavigation)
+                .Include(oba => oba.IdProcessNavigation)
+                .AsNoTracking();
+            var ownerSubPremisesAssoc = registryContext.OwnerSubPremisesAssoc
+                .Include(ospa => ospa.SubPremiseNavigation)
+                    .ThenInclude(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdBuildingNavigation)
+                            .ThenInclude(b => b.IdStreetNavigation)
+                .Include(ospa => ospa.SubPremiseNavigation)
+                    .ThenInclude(sp => sp.IdPremisesNavigation)
+                        .ThenInclude(p => p.IdPremisesTypeNavigation)
+                .Include(oba => oba.IdProcessNavigation)
+                .AsNoTracking();
+
             var addresses = new Dictionary<int, List<Address>>();
             var buildingsAssoc = ownerBuildingsAssoc.ToList();
             var premisesAssoc = ownerPremisesAssoc.ToList();
@@ -144,215 +146,7 @@ namespace RegistryWeb.DataServices
                 addresses.Add(ownerProcess.IdProcess, curOwnerProcessAddresses);
             }
             return addresses;
-        }        
-
-        private IQueryable<OwnerProcess> GetQueryFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
-        {
-            if (!filterOptions.IsEmpty())
-            {
-                query = AddressFilter(query, filterOptions);
-                query = OwnerTypeFilter(query, filterOptions);
-                query = IdProcessFilter(query, filterOptions);
-                query = IdProcessTypeFilter(query, filterOptions);
-                query = GetModalAddressFilter(query, filterOptions);
-            }
-            return query;
-        }
-
-        private IQueryable<OwnerProcess> GetModalAddressFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
-        {
-            if (filterOptions.IdStreet == null && filterOptions.House == null && filterOptions.PremisesNum == null)
-                return query;
-            IEnumerable<int> idsProcess = null;
-            var buildingsAssoc = ownerBuildingsAssoc.ToList();
-            var premisesAssoc = ownerPremisesAssoc.ToList();
-            var subPremisesAssoc = ownerSubPremisesAssoc.ToList();
-            if (!string.IsNullOrEmpty(filterOptions.IdStreet))
-            {
-                var ids = buildingsAssoc
-                    .Where(r => r.BuildingNavigation.IdStreet == filterOptions.IdStreet)
-                    .Select(r => r.IdProcess)
-                    .Union(premisesAssoc
-                        .Where(r => r.PremiseNavigation.IdBuildingNavigation.IdStreet == filterOptions.IdStreet)
-                        .Select(r => r.IdProcess))
-                    .Union(subPremisesAssoc
-                        .Where(r => r.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet == filterOptions.IdStreet)
-                        .Select(r => r.IdProcess));
-                idsProcess = ids;
-            }
-            if (!string.IsNullOrEmpty(filterOptions.House))
-            {
-                var ids = buildingsAssoc
-                    .Where(r => r.BuildingNavigation.House == filterOptions.House)
-                    .Select(r => r.IdProcess)
-                    .Union(premisesAssoc
-                        .Where(r => r.PremiseNavigation.IdBuildingNavigation.House == filterOptions.House)
-                        .Select(r => r.IdProcess))
-                    .Union(subPremisesAssoc
-                        .Where(r => r.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.House == filterOptions.House)
-                        .Select(r => r.IdProcess));
-                if (idsProcess == null)
-                {
-                    idsProcess = ids;
-                }
-                else
-                {
-                    idsProcess = idsProcess.Intersect(ids);
-                }
-            }
-            if (!string.IsNullOrEmpty(filterOptions.PremisesNum))
-            {
-                var ids = premisesAssoc
-                    .Where(r => r.PremiseNavigation.PremisesNum == filterOptions.PremisesNum)
-                    .Select(r => r.IdProcess)
-                    .Union(subPremisesAssoc
-                        .Where(r => r.SubPremiseNavigation.IdPremisesNavigation.PremisesNum == filterOptions.PremisesNum)
-                        .Select(r => r.IdProcess));
-                if (idsProcess == null)
-                {
-                    idsProcess = ids;
-                }
-                else
-                {
-                    idsProcess = idsProcess.Intersect(ids);
-                }
-            }
-            if (idsProcess != null)
-            {
-                query = (from row in query
-                         join id in idsProcess
-                         on row.IdProcess equals id
-                         select row).Distinct();
-            }
-            return query;
-        }
-
-        private IQueryable<OwnerProcess> AddressFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
-        {
-            if (filterOptions.IsAddressEmpty())
-                return query;
-            var addresses = addressesDataService.GetAddressesByText(filterOptions.Address.Text).Select(r => r.Id);
-            if (filterOptions.Address.Id != null)
-            {
-                addresses = new List<string> { filterOptions.Address.Id };
-            }
-
-            if (filterOptions.Address.AddressType == AddressTypes.Street)
-            {
-                var idBuildingProcesses = ownerBuildingsAssoc
-                    .Where(oba => addresses.Contains(oba.BuildingNavigation.IdStreet))
-                    .Select(oba => oba.IdProcess);
-                var idPremiseProcesses = ownerPremisesAssoc
-                    .Where(opa => addresses.Contains(opa.PremiseNavigation.IdBuildingNavigation.IdStreet))
-                    .Select(opa => opa.IdProcess);
-                var idSubPremiseProcesses = ownerSubPremisesAssoc
-                    .Where(ospa => addresses.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreet))
-                    .Select(ospa => ospa.IdProcess);
-                var idProcesses = idBuildingProcesses.Union(idPremiseProcesses).Union(idSubPremiseProcesses);
-                //query.Join(idProcesses, q => q.IdProcess, idProc => idProc, (q, idProc) => q);
-                return
-                    from q in query
-                    join idProcess in idProcesses on q.IdProcess equals idProcess
-                    select q;
-            }
-            var addressesInt = addresses.Where(a => int.TryParse(a, out int aInt)).Select(a => int.Parse(a));
-            if (!addressesInt.Any())
-                return query;
-
-            if (filterOptions.Address.AddressType == AddressTypes.Building)
-            {
-                var idBuildingProcesses = ownerBuildingsAssoc
-                    .Where(oba => addressesInt.Contains(oba.IdBuilding))
-                    .Select(oba => oba.IdProcess);
-                var idPremiseProcesses = ownerPremisesAssoc
-                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdBuilding))
-                    .Select(opa => opa.IdProcess);
-                var idSubPremiseProcesses = ownerSubPremisesAssoc
-                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdBuilding))
-                    .Select(ospa => ospa.IdProcess);
-                var idProcesses = idBuildingProcesses.Union(idPremiseProcesses).Union(idSubPremiseProcesses);
-                return
-                    from q in query
-                    join idProcess in idProcesses on q.IdProcess equals idProcess
-                    select q;
-            }
-            if (filterOptions.Address.AddressType == AddressTypes.Premise)
-            {
-                var idPremiseProcesses = ownerPremisesAssoc
-                    .Where(opa => addressesInt.Contains(opa.PremiseNavigation.IdPremises))
-                    .Select(opa => opa.IdProcess);
-                var idSubPremiseProcesses = ownerSubPremisesAssoc
-                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdPremisesNavigation.IdPremises))
-                    .Select(ospa => ospa.IdProcess);
-                var idProcesses = idPremiseProcesses.Union(idSubPremiseProcesses);
-                return
-                    from q in query
-                    join idProcess in idProcesses on q.IdProcess equals idProcess
-                    select q;
-            }
-            if (filterOptions.Address.AddressType == AddressTypes.SubPremise)
-            {
-                var idProcesses = ownerSubPremisesAssoc
-                    .Where(ospa => addressesInt.Contains(ospa.SubPremiseNavigation.IdSubPremises))
-                    .Select(ospa => ospa.IdProcess);
-                return
-                    from q in query
-                    join idProcess in idProcesses on q.IdProcess equals idProcess
-                    select q;
-            }
-            return query;
-        }
-
-        private IQueryable<OwnerProcess> OwnerTypeFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
-        {
-            if (filterOptions.IdOwnerType == null || filterOptions.IdOwnerType.Value == 0)
-                return query;
-            var result =
-                from process in query
-                join owner in registryContext.Owners
-                    on process.IdProcess equals owner.IdProcess
-                where owner.IdOwnerType == filterOptions.IdOwnerType.Value
-                select process;
-            return result.Distinct();
-        }
-
-        private IQueryable<OwnerProcess> IdProcessFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
-        {
-            if (filterOptions.IdProcess == null || filterOptions.IdProcess.Value == 0)
-                return query;
-            return query.Where(p => p.IdProcess == filterOptions.IdProcess.Value);
-        }
-
-        private IQueryable<OwnerProcess> IdProcessTypeFilter(IQueryable<OwnerProcess> query, OwnerProcessesFilter filterOptions)
-        {
-            //Все
-            if (filterOptions.IdProcessType == null || filterOptions.IdProcessType.Value == 0)
-                return query;
-            // Действующие
-            if (filterOptions.IdProcessType == 1)
-                return query.Where(p => p.AnnulDate == null);
-            // 2 Аннулированные
-            return query.Where(p => p.AnnulDate != null);
-        }
-
-        private IQueryable<OwnerProcess> GetQueryOrder(IQueryable<OwnerProcess> query, OrderOptions orderOptions)
-        {
-            if (string.IsNullOrEmpty(orderOptions.OrderField) || orderOptions.OrderField == "IdProcess")
-            {
-                if (orderOptions.OrderDirection == OrderDirection.Ascending)
-                    return query.OrderBy(p => p.IdProcess);
-                else
-                    return query.OrderByDescending(p => p.IdProcess);
-            }
-            return query;
-        }
-
-        private IQueryable<OwnerProcess> GetQueryPage(IQueryable<OwnerProcess> query, PageOptions pageOptions)
-        {
-            return query
-                .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
-                .Take(pageOptions.SizePage);
-        }
+        }      
 
         public OwnerProcess CreateOwnerProcess(OwnerProcessesFilter filterOptions)
         {

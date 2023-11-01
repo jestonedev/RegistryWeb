@@ -17,6 +17,7 @@ using RegistryDb.Models.Entities.Common;
 using RegistryDb.Models.Entities.Payments;
 using RegistryDb.Models.Entities.RegistryObjects.Premises;
 using RegistryServices.Enums;
+using RegistryWeb.DataServices.Claims;
 
 namespace RegistryWeb.DataServices
 {

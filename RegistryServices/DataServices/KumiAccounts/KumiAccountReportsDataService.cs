@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RegistryWeb.DataServices
+namespace RegistryWeb.DataServices.KumiAccounts
 {
     public class KumiAccountReportsDataService
     {

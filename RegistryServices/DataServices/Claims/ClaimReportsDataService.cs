@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RegistryWeb.DataServices
+namespace RegistryWeb.DataServices.Claims
 {
     public class ClaimReportsDataService
     {

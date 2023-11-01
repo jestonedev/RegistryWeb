@@ -23,6 +23,9 @@ using Microsoft.AspNetCore.Authentication;
 using RegistryServices.DataFilterServices;
 using RegistryServices.DataServices.KumiPayments;
 using RegistryServices.DataServices.KumiAccounts;
+using RegistryWeb.DataServices.Claims;
+using RegistryWeb.DataServices.KumiAccounts;
+using RegistryServices.DataServices.Claims;
 
 namespace RegistryWeb
 {
@@ -106,6 +109,7 @@ namespace RegistryWeb
             services.AddTransient<TenancyReportsDataService>();
             services.AddTransient<ClaimReportsDataService>();
             services.AddTransient<PaymentAccountReportsDataService>();
+            services.AddTransient<ClaimsAssignedAccountsDataService>();
             services.AddTransient<ReestrEmergencyPremisesDataService>();
             services.AddTransient<AddressesDataService>();
             services.AddTransient<PrivatizationDataService>();

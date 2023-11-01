@@ -484,6 +484,7 @@ namespace RegistryDb.Models
                             postFix = "p";
                             break;
                         case "p":
+                            postFix = "sp";
                             break;
                     }
                     query += string.Format(" infix = '{0}'", infixes[i]);

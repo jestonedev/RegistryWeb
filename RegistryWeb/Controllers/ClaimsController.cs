@@ -12,18 +12,24 @@ using RegistryWeb.ViewOptions.Filter;
 using RegistryServices.ViewModel.Claims;
 using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Enums;
+using RegistryWeb.DataServices.Claims;
+using RegistryServices.DataServices.Claims;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
     public class ClaimsController : ListController<ClaimsDataService, ClaimsFilter>
     {
-        public ClaimsController(ClaimsDataService dataService, SecurityService securityService)
+        private readonly ClaimsAssignedAccountsDataService assignedAccountsService;
+
+        public ClaimsController(ClaimsDataService dataService,
+            ClaimsAssignedAccountsDataService assignedAccountsService, SecurityService securityService)
             : base(dataService, securityService)
         {
             nameFilteredIdsDict = "filteredClaimsIdsDict";
             nameIds = "idClaims";
             nameMultimaster = "ClaimsReports";
+            this.assignedAccountsService = assignedAccountsService;
         }
 
         public IActionResult Index(ClaimsVM viewModel, bool isBack = false)
@@ -194,7 +200,7 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public JsonResult GetAccounts(string text, string type, bool excludeAnnual)
         {
-            var accounts = dataService.GetAccounts(text, type, excludeAnnual);
+            var accounts = assignedAccountsService.GetAccounts(text, type, excludeAnnual);
             return Json(accounts.Select(pa => new {
                 pa.IdAccount,
                 pa.Account
@@ -206,9 +212,9 @@ namespace RegistryWeb.Controllers
         {
             if (type == "BKS")
             {
-                var account = dataService.GetAccountBks(idAccount);
-                var rentObjects = dataService.GetRentObjectsBks(new List<int> { idAccount });
-                var lastPaymentInfo = dataService.GetLastPaymentsInfo(new List<int> { idAccount }).Select(v => v.Value).FirstOrDefault();
+                var account = assignedAccountsService.GetAccountBks(idAccount);
+                var rentObjects = assignedAccountsService.GetRentObjectsBks(new List<int> { idAccount });
+                var lastPaymentInfo = assignedAccountsService.GetLastPaymentsInfo(new List<int> { idAccount }).Select(v => v.Value).FirstOrDefault();
                 return Json(new
                 {
                     PaymentAccount = account?.Account,
@@ -223,8 +229,8 @@ namespace RegistryWeb.Controllers
             } else
             if (type == "KUMI")
             {
-                var account = dataService.GetAccountKumi(idAccount);
-                var address = dataService.GetAccountAddress(idAccount);
+                var account = assignedAccountsService.GetAccountKumi(idAccount);
+                var address = assignedAccountsService.GetAccountAddress(idAccount);
                 
                 return Json(new
                 {
