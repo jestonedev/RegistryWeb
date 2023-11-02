@@ -12,18 +12,30 @@ using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.Payments;
+using RegistryServices.DataServices.BksAccounts;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
     public class PaymentAccountsController : ListController<PaymentAccountsDataService, PaymentsFilter>
     {
-        public PaymentAccountsController(PaymentAccountsDataService dataService, SecurityService securityService)
+        private readonly PaymentAccountsCommonService commonService;
+        private readonly PaymentAccountsTenanciesService tenanciesService;
+        private readonly PaymentAccountsClaimsService claimsService;
+
+        public PaymentAccountsController(PaymentAccountsDataService dataService, 
+            PaymentAccountsCommonService commonService,
+            PaymentAccountsTenanciesService tenanciesService,
+            PaymentAccountsClaimsService claimsService,
+            SecurityService securityService)
             : base(dataService, securityService)
         {
             nameFilteredIdsDict = "filteredAccountsIdsDict";
             nameIds = "idAccounts";
             nameMultimaster = "AccountsReports";
+            this.commonService = commonService;
+            this.tenanciesService = tenanciesService;
+            this.claimsService = claimsService;
         }
 
         public IActionResult Index(PaymentsVM viewModel, bool isBack = false)
@@ -151,16 +163,16 @@ namespace RegistryWeb.Controllers
                 ViewBag.ErrorReason = "неизвестно";
             }
 
-            ViewBag.ErrorPayments = dataService.GetPaymentsForMassReports(errorIds).ToList();
+            ViewBag.ErrorPayments = commonService.GetPaymentsForMassReports(errorIds).ToList();
 
             var ids = GetSessionIds();
             var viewModel = dataService.GetPaymentsViewModelForMassReports(ids, pageOptions);
             ViewBag.Count = viewModel.Payments.Count();
             ViewBag.SignersReports = dataService.Signers.Where(r => r.IdSignerGroup == 2).ToList();
-            ViewBag.CurrentExecutor = dataService.CurrentExecutor?.ExecutorName;
+            ViewBag.CurrentExecutor = securityService.CurrentExecutor?.ExecutorName;
             ViewBag.CanEdit = securityService.HasPrivilege(Privileges.ClaimsWrite);
-            ViewBag.Emails = dataService.GetTenantsEmails(viewModel.Payments.Select(r => r.IdAccount).ToList());
-            ViewBag.EmailsModified = dataService.GetTenantsEmailsModified(viewModel.Payments.Select(r => r.IdAccount).ToList());
+            ViewBag.Emails = tenanciesService.GetTenantsEmails(viewModel.Payments.Select(r => r.IdAccount).ToList());
+            ViewBag.EmailsModified = tenanciesService.GetTenantsEmailsModified(viewModel.Payments.Select(r => r.IdAccount).ToList());
             return View("AccountReports", viewModel);
         }
 
@@ -183,7 +195,7 @@ namespace RegistryWeb.Controllers
             var paymentsVM = dataService.GetPaymentsViewModelForMassReports(ids, new PageOptions { SizePage = int.MaxValue });
             var processingIds = new List<int>();
             var errorIds = new List<int>();
-            var accountsIdsAssoc = dataService.GetAccountIdsAssocs(paymentsVM.Payments);
+            var accountsIdsAssoc = commonService.GetAccountIdsAssocs(paymentsVM.Payments);
             foreach (var payment in paymentsVM.Payments)
             {
                 var hasOpenedClaims = false;
@@ -215,7 +227,7 @@ namespace RegistryWeb.Controllers
                 }
             }
 
-            dataService.CreateClaimMass(processingIds, atDate);
+            claimsService.CreateClaimMass(processingIds, atDate);
 
             TempData["ErrorAccountsIds"] = JsonConvert.SerializeObject(errorIds);
             TempData["ErrorReason"] = "по указанным лицевым счетам уже имеются незавершенные исковые работы";

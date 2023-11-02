@@ -2,6 +2,8 @@
 using RegistryDb.Models.Entities.Claims;
 using RegistryDb.Models.Entities.KumiAccounts;
 using RegistryDb.Models.Entities.Owners;
+using RegistryDb.Models.Entities.Payments;
+using RegistryDb.Models.Entities.Privatization;
 using RegistryDb.Models.Entities.RegistryObjects.Buildings;
 using RegistryDb.Models.Entities.RegistryObjects.Premises;
 using RegistryDb.Models.Entities.Tenancies;
@@ -39,6 +41,10 @@ namespace RegistryServices.DataFilterServices
                     return (T)ActivatorUtilities.CreateInstance(provider, typeof(ClaimsFilterService));
                 if (entityType == typeof(OwnerProcess))
                     return (T)ActivatorUtilities.CreateInstance(provider, typeof(OwnerProcessesFilterService));
+                if (entityType == typeof(Payment))
+                    return (T)ActivatorUtilities.CreateInstance(provider, typeof(PaymentAccountsFilterService));
+                if (entityType == typeof(PrivContract))
+                    return (T)ActivatorUtilities.CreateInstance(provider, typeof(PrivatizationFilterService));
             }
             throw new ArgumentException("Не удалось инициализировать класс, реализующий IFilterSerivce<>");
         }

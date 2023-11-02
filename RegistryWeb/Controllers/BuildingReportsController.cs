@@ -1,12 +1,14 @@
 ﻿using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RegistryWeb.Filters;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.RegistryRead)]
     public class BuildingReportsController : RegistryBaseController
     {
         private readonly BuildingReportService reportService;
@@ -22,8 +24,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetExcerptBuilding(int idBuilding, string excerptNumber, DateTime excerptDateFrom, int signer)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.ExcerptBuilding(idBuilding, excerptNumber, excerptDateFrom, signer);

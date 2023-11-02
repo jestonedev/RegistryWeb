@@ -1,119 +1,33 @@
 ﻿using RegistryDb.Models;
-using RegistryWeb.ViewModel;
-using RegistryWeb.ViewOptions;
-using RegistryWeb.ViewOptions.Filter;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using RegistryWeb.Enums;
-using RegistryServices.ViewModel.Payments;
-using RegistryDb.Models.Entities.Acl;
-using RegistryDb.Models.Entities.Claims;
-using RegistryDb.Models.Entities.Common;
+using RegistryWeb.ViewOptions;
 using RegistryDb.Models.Entities.Payments;
-using RegistryDb.Models.Entities.RegistryObjects.Premises;
-using RegistryServices.Enums;
-using RegistryWeb.DataServices.Claims;
+using RegistryWeb.ViewOptions.Filter;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using RegistryWeb.Enums;
+using RegistryWeb.DataServices;
+using System;
+using RegistryWeb.ViewModel;
+using RegistryServices.DataServices.BksAccounts;
 
-namespace RegistryWeb.DataServices
+namespace RegistryServices.DataFilterServices
 {
-    public class PaymentAccountsDataService : ListDataService<PaymentsVM, PaymentsFilter>
+    class PaymentAccountsFilterService : AbstractFilterService<Payment, PaymentsFilter>
     {
-        private readonly SecurityServices.SecurityService securityService;
-        private readonly ClaimsDataService claimsDataService;
-        private readonly IConfiguration config;
+        private readonly RegistryContext registryContext;
+        private readonly AddressesDataService addressesDataService;
+        private readonly PaymentAccountsClaimsService claimsService;
 
-        public PaymentAccountsDataService(RegistryContext registryContext, SecurityServices.SecurityService securityService,
-            ClaimsDataService claimsDataService,
-            AddressesDataService addressesDataService, IConfiguration config) : base(registryContext, addressesDataService)
+        public PaymentAccountsFilterService(RegistryContext registryContext,
+            AddressesDataService addressesDataService, PaymentAccountsClaimsService claimsService)
         {
-            this.securityService = securityService;
-            this.claimsDataService = claimsDataService;
-            this.config = config;
+            this.registryContext = registryContext;
+            this.addressesDataService = addressesDataService;
+            this.claimsService = claimsService;
         }
 
-        public override PaymentsVM InitializeViewModel(OrderOptions orderOptions, PageOptions pageOptions, PaymentsFilter filterOptions)
-        {
-            var viewModel = base.InitializeViewModel(orderOptions, pageOptions, filterOptions);
-            viewModel.Streets = addressesDataService.KladrStreets;
-            return viewModel;
-        }
-
-        public PaymentsVM GetViewModel(
-            OrderOptions orderOptions,
-            PageOptions pageOptions,
-            PaymentsFilter filterOptions, out List<int> filteredIds)
-        {
-            
-            var viewModel = InitializeViewModel(orderOptions, pageOptions, filterOptions);
-            viewModel.KladrRegionsList = new SelectList(addressesDataService.KladrRegions, "IdRegion", "Region");
-            viewModel.KladrStreetsList = new SelectList(addressesDataService.GetKladrStreets(filterOptions?.IdRegion), "IdStreet", "StreetName");
-            viewModel.BuildingManagmentOrgsList = new SelectList(registryContext.BuildingManagmentOrgs , "IdOrganization", "Name");
-
-            if (viewModel.FilterOptions.IsEmpty())
-            {
-                viewModel.PageOptions.Rows = 0;
-                viewModel.PageOptions.TotalPages = 0;
-                filteredIds = null;
-                viewModel.Payments = new List<Payment>();
-                viewModel.MonthsList = new Dictionary<int, DateTime>();
-                return viewModel;
-            }
-
-            var payments = GetQuery();
-            viewModel.PageOptions.TotalRows = payments.Count();
-            var query = GetQueryFilter(payments, viewModel.FilterOptions);
-            
-            query = GetQueryOrder(query, viewModel.OrderOptions);
-            query = GetQueryIncludes(query);
-            var count = query.Count();
-            viewModel.PageOptions.Rows = count;
-            viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
-            filteredIds = query.Select(c => c.IdAccount).ToList();
-            if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
-                viewModel.PageOptions.CurrentPage = 1;
-            query = GetQueryPage(query, viewModel.PageOptions);
-            viewModel.Payments = query.ToList();
-            viewModel.RentObjects = GetRentObjects(viewModel.Payments);
-            viewModel.ClaimsByAddresses = GetClaimsByAddresses(viewModel.Payments);
-
-            var monthsList = registryContext.Payments
-                                .Select(p => p.Date).Distinct()
-                                .OrderByDescending(p => p.Date).Take(6)
-                                .ToList();
-            viewModel.MonthsList = new Dictionary<int, DateTime>();
-            for (var i = 0; i < monthsList.Count(); i++)
-                viewModel.MonthsList.Add(monthsList[i].Month, monthsList[i].Date);
-            return viewModel;
-        }
-
-        private IQueryable<Payment> GetQuery()
-        {
-            var maxDatePayments = from row in registryContext.Payments
-                                  group row.Date by row.IdAccount into gs
-                                  select new
-                                  {
-                                      IdAccount = gs.Key,
-                                      Date = gs.Max()
-                                  };
-
-            return (from row in registryContext.Payments
-                    join maxDatePaymentsRow in maxDatePayments
-                    on new { row.IdAccount, row.Date } equals new { maxDatePaymentsRow.IdAccount, maxDatePaymentsRow.Date }
-                    select row).Include(p => p.PaymentAccountNavigation);
-        }
-
-        private IQueryable<Payment> GetQueryIncludes(IQueryable<Payment> query)
-        {
-            return query
-                .Include(p => p.PaymentAccountNavigation);
-        }
-
-        private IQueryable<Payment> GetQueryFilter(IQueryable<Payment> query, PaymentsFilter filterOptions)
+        public override IQueryable<Payment> GetQueryFilter(IQueryable<Payment> query, PaymentsFilter filterOptions)
         {
             if (!filterOptions.IsEmpty())
             {
@@ -124,17 +38,94 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
+        public override IQueryable<Payment> GetQueryIncludes(IQueryable<Payment> query)
+        {
+
+            return query
+                .Include(p => p.PaymentAccountNavigation);
+        }
+
+        public override IQueryable<Payment> GetQueryOrder(IQueryable<Payment> query, OrderOptions orderOptions)
+        {
+
+            if (string.IsNullOrEmpty(orderOptions.OrderField))
+            {
+                return query.OrderByDescending(p => p.Date);
+            }
+            if (orderOptions.OrderField == "Date")
+            {
+                if (orderOptions.OrderDirection == OrderDirection.Ascending)
+                    return query.OrderBy(p => p.Date);
+                else
+                    return query.OrderByDescending(p => p.Date);
+            }
+            if (orderOptions.OrderField == "Account")
+            {
+                if (orderOptions.OrderDirection == OrderDirection.Ascending)
+                    return query.OrderBy(p => p.PaymentAccountNavigation.Account);
+                else
+                    return query.OrderByDescending(p => p.PaymentAccountNavigation.Account);
+            }
+            if (orderOptions.OrderField == "Address")
+            {
+                var addresses =
+                    registryContext.PaymentAccountPremisesAssoc
+                    .Include(r => r.PremiseNavigation)
+                    .ThenInclude(r => r.IdBuildingNavigation)
+                    .ThenInclude(r => r.IdStreetNavigation)
+                    .Select(
+                    p => new
+                    {
+                        p.IdAccount,
+                        Address = string.Concat(p.PremiseNavigation.IdBuildingNavigation.IdStreetNavigation.StreetName, ", ",
+                            p.PremiseNavigation.IdBuildingNavigation.House, ", ", p.PremiseNavigation.PremisesNum)
+                    })
+                .Union(registryContext.PaymentAccountSubPremisesAssoc
+                    .Include(r => r.SubPremiseNavigation)
+                    .ThenInclude(r => r.IdPremisesNavigation)
+                    .ThenInclude(r => r.IdBuildingNavigation)
+                    .ThenInclude(r => r.IdStreetNavigation)
+                    .Select(
+                    sp => new
+                    {
+                        sp.IdAccount,
+                        Address = string.Concat(sp.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation.StreetName, ", ",
+                            sp.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.House, ", ",
+                            sp.SubPremiseNavigation.IdPremisesNavigation.PremisesNum, ", ", sp.SubPremiseNavigation.SubPremisesNum)
+                    }));
+                if (orderOptions.OrderDirection == OrderDirection.Ascending)
+                {
+                    return (from row in query
+                            join addr in addresses
+                             on row.IdAccount equals addr.IdAccount into aq
+                            from aqRow in aq.DefaultIfEmpty()
+                            orderby aqRow.Address
+                            select row).Distinct();
+                }
+                else
+                {
+                    return (from row in query
+                            join addr in addresses
+                             on row.IdAccount equals addr.IdAccount into aq
+                            from aqRow in aq.DefaultIfEmpty()
+                            orderby aqRow.Address descending
+                            select row).Distinct();
+                }
+            }
+            return query;
+        }
+
         private IQueryable<Payment> BuildingOrgManagmentFilter(IQueryable<Payment> query, List<int> idBuildingManagmentOrg)
         {
             if (!idBuildingManagmentOrg.Any()) return query;
             var premisesIds = (from buildingRow in registryContext.Buildings
-                              join premiseRow in registryContext.Premises
-                              on buildingRow.IdBuilding equals premiseRow.IdBuilding
-                              where buildingRow.IdOrganization != null && idBuildingManagmentOrg.Contains(buildingRow.IdOrganization.Value)
-                              select premiseRow.IdPremises).ToList();
+                               join premiseRow in registryContext.Premises
+                               on buildingRow.IdBuilding equals premiseRow.IdBuilding
+                               where buildingRow.IdOrganization != null && idBuildingManagmentOrg.Contains(buildingRow.IdOrganization.Value)
+                               select premiseRow.IdPremises).ToList();
             var accountsIds = (from accountRow in registryContext.PaymentAccountPremisesAssoc
-                              where premisesIds.Contains(accountRow.IdPremise)
-                              select accountRow.IdAccount).ToList();
+                               where premisesIds.Contains(accountRow.IdPremise)
+                               select accountRow.IdAccount).ToList();
             accountsIds = accountsIds.Union(
                     from accountRow in registryContext.PaymentAccountSubPremisesAssoc
                     join subPremisesRow in registryContext.SubPremises
@@ -271,128 +262,6 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
-        public Dictionary<int, List<string>> GetTenantsEmails(List<int> ids)
-        {
-            var emailsDic = new Dictionary<int, List<string>>();
-            foreach (var id in ids)
-            {
-                int? idSubPremise = null;
-                var idPremise = registryContext.PaymentAccountPremisesAssoc
-                    .Where(papa => papa.IdAccount == id)
-                    .FirstOrDefault()
-                    ?.IdPremise;
-                if (idPremise == null)
-                {
-                    idSubPremise = registryContext.PaymentAccountSubPremisesAssoc
-                        .Where(paspa => paspa.IdAccount == id)
-                        .FirstOrDefault()
-                        ?.IdSubPremise;
-                }
-
-                var processes = registryContext.TenancyActiveProcesses
-                    .Where(tap => tap.IdPremises == idPremise && tap.IdSubPremises == idSubPremise);
-
-                var paymentTenant = registryContext.Payments.Where(r => r.IdAccount == id).OrderByDescending(r => r.Date)
-                    .Select(r => r.Tenant).FirstOrDefault();
-
-                List<string> emails = new List<string>();
-                foreach (var tp in processes)
-                {
-                    var hasPerson = registryContext.TenancyPersons.Count(r => tp.IdProcess == r.IdProcess && 
-                        (r.Surname + " " + r.Name+" "+r.Patronymic).Trim() == paymentTenant) > 0;
-                    if (!hasPerson)
-                        continue;
-                    var curEmails = registryContext.TenancyPersons
-                        .Where(per => per.IdProcess == tp.IdProcess && per.Email != null)
-                        .Select(per => per.Email)
-                        .ToList();
-                    emails.AddRange(curEmails);
-                }
-                emails = emails.Distinct().ToList();
-                emailsDic.Add(id, emails);
-            }
-            return emailsDic;
-        }
-
-        public Dictionary<int, List<string>> GetTenantsEmailsModified(List<int> ids)
-        {
-            var emailsDic = new Dictionary<int, List<string>>();
-            foreach (var id in ids)
-            {
-                int? idSubPremise = null;
-                var idPremise = registryContext.PaymentAccountPremisesAssoc
-                    .Where(papa => papa.IdAccount == id)
-                    .FirstOrDefault()
-                    ?.IdPremise;
-                if (idPremise == null)
-                {
-                    idSubPremise = registryContext.PaymentAccountSubPremisesAssoc
-                        .Where(paspa => paspa.IdAccount == id)
-                        .FirstOrDefault()
-                        ?.IdSubPremise;
-                }
-
-                var processes = registryContext.TenancyActiveProcesses
-                    .Where(tap => tap.IdPremises == idPremise && tap.IdSubPremises == idSubPremise);
-
-                var paymentTenant = registryContext.Payments.Where(r => r.IdAccount == id).OrderByDescending(r => r.Date)
-                    .Select(r => r.Tenant).FirstOrDefault();
-
-                List<string> emails = new List<string>();
-                foreach (var tp in processes)
-                {
-                    var hasPerson = registryContext.TenancyPersons.Count(r => tp.IdProcess == r.IdProcess &&
-                        (r.Surname + " " + r.Name + " " + r.Patronymic).Trim() == paymentTenant) > 0;
-                    if (!hasPerson)
-                        continue;
-                    var curEmails = registryContext.TenancyPersons
-                        .Where(per => per.IdProcess == tp.IdProcess && per.Email != null)
-                        .Select(per => new { per.PaymentAccount, per.Email })
-                        .ToList();
-                    foreach (var curE in curEmails) {
-                        if (curE.PaymentAccount == id) {
-                            emails.Add(curE.Email);
-                        }
-                    }
-                }
-                emails = emails.Distinct().ToList();
-                emailsDic.Add(id, emails);
-            }
-            return emailsDic;
-        }
-
-        public void CreateClaimMass(List<int> accountIds, DateTime atDate)        {
-            var payments = GetPaymentsForMassReports(accountIds).ToList();
-            foreach(var payment in payments)
-            {
-                var claim = new Claim {
-                    AtDate = atDate,
-                    IdAccount = payment.IdAccount,
-                    AmountTenancy = payment.BalanceOutputTenancy,
-                    AmountPenalties = payment.BalanceOutputPenalties,
-                    AmountDgi = payment.BalanceOutputDgi,
-                    AmountPadun = payment.BalanceOutputPadun,
-                    AmountPkk = payment.BalanceOutputPkk,
-                    ClaimStates = new List<ClaimState> {
-                        new ClaimState {
-                            IdStateType = registryContext.ClaimStateTypes.Where(r => r.IsStartStateType).First().IdStateType,
-                            BksRequester = CurrentExecutor?.ExecutorName,
-                            DateStartState = DateTime.Now.Date,
-                            Executor = CurrentExecutor?.ExecutorName
-                        }
-                    },
-                    ClaimPersons = new List<ClaimPerson>()
-                };
-                claim.ClaimPersons = claimsDataService.GetClaimPersonsFromTenancy(claim.IdAccount, null);
-                if (claim.ClaimPersons.Count == 0)
-                {
-                    claim.ClaimPersons = claimsDataService.GetClaimPersonsFromPrevClaim(claim.IdAccount, null);
-                }
-
-                claimsDataService.Create(claim, new List<Microsoft.AspNetCore.Http.IFormFile>(), LoadPersonsSourceEnum.None);
-            }
-        }
-
         private IQueryable<Payment> PaymentAccountFilter(IQueryable<Payment> query, PaymentsFilter filterOptions)
         {
             if (!string.IsNullOrEmpty(filterOptions.FrontSideAccount))
@@ -422,7 +291,7 @@ namespace RegistryWeb.DataServices
             if (filterOptions.HasPayPrevPeriod)
             {
                 var prevMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddDays(-1);
-                query = query.Where(q=>q.Date==prevMonth);
+                query = query.Where(q => q.Date == prevMonth);
             }
             if (!string.IsNullOrEmpty(filterOptions.RawAddress))
             {
@@ -444,7 +313,7 @@ namespace RegistryWeb.DataServices
             {
                 var filterIdAccounts = registryContext.Claims.Where(r => r.EndedForFilter)
                     .Select(r => r.IdAccount).Distinct().ToList();
-                switch(filterOptions.IdClaimsBehavior)
+                switch (filterOptions.IdClaimsBehavior)
                 {
                     case 1:
                         query = query.Where(r => !filterIdAccounts.Contains(r.IdAccount));
@@ -912,7 +781,7 @@ namespace RegistryWeb.DataServices
             var claimsInfo = new Dictionary<int, List<ClaimInfo>>();
             if (filterOptions.IdPreset != null)
             {
-                claimsInfo = GetClaimsByAddresses(query.ToList());
+                claimsInfo = claimsService.GetClaimsByAddresses(query.ToList());
             }
             switch (filterOptions.IdPreset)
             {
@@ -932,7 +801,8 @@ namespace RegistryWeb.DataServices
                         query = from row in query
                                 where !ids.Contains(row.IdAccount)
                                 select row;
-                    } else
+                    }
+                    else
                     {
                         // Лицевые счета с исковыми работами (включая завершенные)
                         query = from row in query
@@ -964,7 +834,8 @@ namespace RegistryWeb.DataServices
                         query = from row in query
                                 where ids.Contains(row.IdAccount)
                                 select row;
-                    } else
+                    }
+                    else
                     {
                         // Лицевые счета, в которых отсутствуют незавершенные исковые работы
                         query = from row in query
@@ -1000,7 +871,7 @@ namespace RegistryWeb.DataServices
 
                 var idAccounts = registryContext.PaymentAccountPremisesAssoc
                                 .Where(papa => idPremises.Contains(papa.IdPremise))
-                                .Select(p => p.IdAccount )
+                                .Select(p => p.IdAccount)
                             .Union(registryContext.PaymentAccountSubPremisesAssoc
                                 .Where(papa => idSubPremises.Contains(papa.IdSubPremise))
                                 .Select(p => p.IdAccount))
@@ -1008,7 +879,7 @@ namespace RegistryWeb.DataServices
 
                 foreach (var id in idAccounts)
                 {
-                    var paymentTenant = registryContext.Payments.Where(r => r.IdAccount==id).OrderByDescending(r => r.Date)
+                    var paymentTenant = registryContext.Payments.Where(r => r.IdAccount == id).OrderByDescending(r => r.Date)
                         .Select(r => r.Tenant).FirstOrDefault();
 
                     foreach (var tp in anyEmails)
@@ -1027,490 +898,5 @@ namespace RegistryWeb.DataServices
             return query;
         }
 
-        private IQueryable<Payment> GetQueryOrder(IQueryable<Payment> query, OrderOptions orderOptions)
-        {
-            if (string.IsNullOrEmpty(orderOptions.OrderField))
-            {
-                return query.OrderByDescending(p => p.Date);
-            }
-            if (orderOptions.OrderField == "Date")
-            {
-                if (orderOptions.OrderDirection == OrderDirection.Ascending)
-                    return query.OrderBy(p => p.Date);
-                else
-                    return query.OrderByDescending(p => p.Date);
-            }
-            if (orderOptions.OrderField == "Account")
-            {
-                if (orderOptions.OrderDirection == OrderDirection.Ascending)
-                    return query.OrderBy(p => p.PaymentAccountNavigation.Account);
-                else
-                    return query.OrderByDescending(p => p.PaymentAccountNavigation.Account);
-            }
-            if (orderOptions.OrderField == "Address")
-            {
-                var addresses =
-                    registryContext.PaymentAccountPremisesAssoc
-                    .Include(r => r.PremiseNavigation)
-                    .ThenInclude(r => r.IdBuildingNavigation)
-                    .ThenInclude(r => r.IdStreetNavigation)
-                    .Select(
-                    p => new
-                    {
-                        p.IdAccount,
-                        Address = string.Concat(p.PremiseNavigation.IdBuildingNavigation.IdStreetNavigation.StreetName, ", ",
-                            p.PremiseNavigation.IdBuildingNavigation.House, ", ", p.PremiseNavigation.PremisesNum)
-                    })
-                .Union(registryContext.PaymentAccountSubPremisesAssoc
-                    .Include(r => r.SubPremiseNavigation)
-                    .ThenInclude(r => r.IdPremisesNavigation)
-                    .ThenInclude(r => r.IdBuildingNavigation)
-                    .ThenInclude(r => r.IdStreetNavigation)
-                    .Select(
-                    sp => new
-                    {
-                        sp.IdAccount,
-                        Address = string.Concat(sp.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.IdStreetNavigation.StreetName, ", ",
-                            sp.SubPremiseNavigation.IdPremisesNavigation.IdBuildingNavigation.House, ", ",
-                            sp.SubPremiseNavigation.IdPremisesNavigation.PremisesNum, ", ", sp.SubPremiseNavigation.SubPremisesNum)
-                    }));
-                if (orderOptions.OrderDirection == OrderDirection.Ascending)
-                {
-                    return (from row in query
-                            join addr in addresses
-                             on row.IdAccount equals addr.IdAccount into aq
-                            from aqRow in aq.DefaultIfEmpty()
-                            orderby aqRow.Address
-                            select row).Distinct();
-                }
-                else
-                {
-                    return (from row in query
-                            join addr in addresses
-                             on row.IdAccount equals addr.IdAccount into aq
-                            from aqRow in aq.DefaultIfEmpty()
-                            orderby aqRow.Address descending
-                            select row).Distinct();
-                }
-            }
-            return query;
-        }
-
-        private IQueryable<Payment> GetQueryPage(IQueryable<Payment> query, PageOptions pageOptions)
-        {
-            return query
-                .Skip((pageOptions.CurrentPage - 1) * pageOptions.SizePage)
-                .Take(pageOptions.SizePage);
-        }
-
-        private Dictionary<int, List<Address>> GetRentObjects(IEnumerable<Payment> payments)
-        {
-            var ids = payments.Select(r => r.IdAccount);
-            var premises = from paRow in registryContext.PaymentAccountPremisesAssoc
-                           join premiseRow in registryContext.Premises.Include(r => r.IdStateNavigation)
-                           on paRow.IdPremise equals premiseRow.IdPremises
-                           join buildingRow in registryContext.Buildings
-                           on premiseRow.IdBuilding equals buildingRow.IdBuilding
-                           join streetRow in registryContext.KladrStreets
-                           on buildingRow.IdStreet equals streetRow.IdStreet
-                           join premiseTypesRow in registryContext.PremisesTypes
-                           on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
-                           where ids.Contains(paRow.IdAccount)
-                           select new
-                           {
-                               paRow.IdAccount,
-                               Address = new Address
-                               {
-                                   AddressType = AddressTypes.Premise,
-                                   Id = premiseRow.IdPremises.ToString(),
-                                   ObjectState = premiseRow.IdStateNavigation,
-                                   IdParents = new Dictionary<string, string>
-                                       {
-                                           { AddressTypes.Street.ToString(), buildingRow.IdStreet },
-                                           { AddressTypes.Building.ToString(), buildingRow.IdBuilding.ToString() }
-                                       },
-                                   Text = string.Concat(streetRow.StreetName, ", д.", buildingRow.House, ", ",
-                                        premiseTypesRow.PremisesTypeShort, premiseRow.PremisesNum)
-                               }
-                           };
-            var subPremises = from paRow in registryContext.PaymentAccountSubPremisesAssoc
-                              join subPremiseRow in registryContext.SubPremises.Include(r => r.IdStateNavigation)
-                              on paRow.IdSubPremise equals subPremiseRow.IdSubPremises
-                              join premiseRow in registryContext.Premises
-                              on subPremiseRow.IdPremises equals premiseRow.IdPremises
-                              join buildingRow in registryContext.Buildings
-                              on premiseRow.IdBuilding equals buildingRow.IdBuilding
-                              join streetRow in registryContext.KladrStreets
-                              on buildingRow.IdStreet equals streetRow.IdStreet
-                              join premiseTypesRow in registryContext.PremisesTypes
-                              on premiseRow.IdPremisesType equals premiseTypesRow.IdPremisesType
-                              where ids.Contains(paRow.IdAccount)
-                              select new
-                              {
-                                  paRow.IdAccount,
-                                  Address = new Address
-                                  {
-                                      AddressType = AddressTypes.SubPremise,
-                                      Id = subPremiseRow.IdSubPremises.ToString(),
-                                      ObjectState = subPremiseRow.IdStateNavigation,
-                                      IdParents = new Dictionary<string, string>
-                                           {
-                                              { AddressTypes.Street.ToString(), buildingRow.IdStreet },
-                                              { AddressTypes.Building.ToString(), buildingRow.IdBuilding.ToString() },
-                                              { AddressTypes.Premise.ToString(), premiseRow.IdPremises.ToString() }
-                                           },
-                                      Text = string.Concat(streetRow.StreetName, ", д.", buildingRow.House, ", ",
-                                            premiseTypesRow.PremisesTypeShort, premiseRow.PremisesNum, ", к.", subPremiseRow.SubPremisesNum)
-                                  }
-                              };
-
-            var objects = premises.Union(subPremises).ToList();
-
-            var result =
-                objects.GroupBy(r => r.IdAccount)
-                .Select(r => new { IdAccount = r.Key, Addresses = r.Select(v => v.Address) })
-                .ToDictionary(v => v.IdAccount, v => v.Addresses.ToList());
-            return result;
-        }
-
-        public List<AccountIdsAssoc> GetAccountIdsAssocs(IEnumerable<Payment> payments)
-        {
-            var ids = payments.Select(r => r.IdAccount);
-            var filteredObjects = (from row in
-                           (from row in registryContext.PaymentAccountPremisesAssoc
-                            where ids.Contains(row.IdAccount)
-                            select new
-                            {
-                                row.IdAccount,
-                                Infix = string.Concat("p", row.IdPremise)
-                            }).Union(from row in registryContext.PaymentAccountSubPremisesAssoc
-                                     where ids.Contains(row.IdAccount)
-                                     select new
-                                     {
-                                         row.IdAccount,
-                                         Infix = string.Concat("sp", row.IdSubPremise)
-                                     })
-                                   orderby row.Infix
-                                   group row.Infix by row.IdAccount into gs
-                                   select new
-                                   {
-                                       IdAccount = gs.Key,
-                                       AddressCode = string.Join("", gs)
-                                   }).AsEnumerable();
-            filteredObjects = from paymentsRow in payments
-                              join filteredObjectsRow in filteredObjects
-                              on paymentsRow.IdAccount equals filteredObjectsRow.IdAccount into fo
-                              from foRow in fo.DefaultIfEmpty()
-                              select new
-                              {
-                                  paymentsRow.IdAccount,
-                                  AddressCode = foRow != null ? foRow.AddressCode : paymentsRow.PaymentAccountNavigation.RawAddress
-                              };
-
-            var allObjects = (from row in (from row in registryContext.PaymentAccountPremisesAssoc
-                                           select new PaymentAddressInfix
-                                           {
-                                               IdAccount = row.IdAccount,
-                                               Infix = string.Concat("p", row.IdPremise)
-                                           }).Union(from row in registryContext.PaymentAccountSubPremisesAssoc
-                                                    select new PaymentAddressInfix
-                                                    {
-                                                        IdAccount = row.IdAccount,
-                                                        Infix = string.Concat("sp", row.IdSubPremise)
-                                                    })
-                              orderby row.Infix
-                              group row.Infix by row.IdAccount into gs
-                              select new
-                              {
-                                  IdAccount = gs.Key,
-                                  AddressCode = string.Join("", gs)
-                              }).AsEnumerable();
-            allObjects = from paymentsRow in registryContext.PaymentAccounts
-                         join allObjectsRow in allObjects
-                         on paymentsRow.IdAccount equals allObjectsRow.IdAccount into ao
-                         from aoRow in ao.DefaultIfEmpty()
-                         select new
-                         {
-                             paymentsRow.IdAccount,
-                             AddressCode = aoRow != null ? aoRow.AddressCode : paymentsRow.RawAddress
-                         };
-            var result = (from filteredRow in filteredObjects
-                                 join allRow in allObjects
-                                 on filteredRow.AddressCode equals allRow.AddressCode
-                                 select new AccountIdsAssoc
-                                 {
-                                     IdAccountFiltered = filteredRow.IdAccount,
-                                     IdAccountActual = allRow.IdAccount
-                                 }).ToList();
-            return result;
-        }
-
-        public PaymentsAccountTableVM GetPaymentHistoryTable(AclUser user, int idAccount)
-        {
-            var viewModel = new PaymentsAccountTableVM();
-            viewModel.LastPayment = GetQuery().Single(r => r.IdAccount == idAccount);
-            viewModel.Payments = (from row in registryContext.Payments.Include(r => r.PaymentAccountNavigation)
-                                  where row.IdAccount == idAccount
-                                  orderby row.Date
-                                  select row).ToList();
-            viewModel.Comment = registryContext.PaymentAccountComments.FirstOrDefault(c => c.IdAccount == idAccount);
-            var lastPaymentList = new List<Payment>();
-            lastPaymentList.Add(viewModel.LastPayment);
-            viewModel.RentObjects = GetRentObjects(lastPaymentList);
-
-            var json = registryContext.PersonalSettings
-                .SingleOrDefault(ps => ps.IdUser == user.IdUser)
-                ?.PaymentAccauntTableJson;
-            if (json != null)
-            {
-                viewModel.PaymentAccountTableJson =
-                    JsonSerializer.Deserialize<PaymentAccountTableJson>(json);
-            }
-            return viewModel;
-        }
-
-        public PaymentsAccountTableVM GetPaymentHistoryRentObjectTable(AclUser user, int idAccount)
-        {
-            var viewModel = new PaymentsAccountTableVM();
-            var lastPayment = GetQuery().Where(r => r.IdAccount == idAccount).ToList();
-            var accountIds = GetAccountIdsAssocs(lastPayment).Select(r => r.IdAccountActual);
-            viewModel.Payments = (from row in registryContext.Payments.Include(r => r.PaymentAccountNavigation)
-                                  where accountIds.Contains(row.IdAccount)
-                                  orderby row.Date ascending
-                                  select row).ToList();
-            viewModel.RentObjects = GetRentObjects(lastPayment);
-            viewModel.LastPayment = viewModel.Payments.LastOrDefault();
-
-            var accounts = registryContext.PaymentAccounts.Where(r => accountIds.Contains(r.IdAccount)).ToList();
-            var comments = registryContext.PaymentAccountComments.Where(r => accountIds.Contains(r.IdAccount)).ToList();
-            
-            if (comments.Any())
-            {
-                viewModel.Comment = new PaymentAccountComment
-                {
-                    IdAccount = idAccount,
-                    Comment = (from row in accounts
-                                                join com in comments
-                                                   on row.IdAccount equals com.IdAccount into a
-                                                from b in a.DefaultIfEmpty()
-                                                where b != null
-                                                group new { b, row } by b.Comment into g
-                                                select comments.Select(r => r.Comment).Distinct().Count() > 1 ?
-                                                              g.Aggregate("", (acc, v) => acc + "ЛС №:" + v.row.Account + ", ").Trim(new char[] { ' ', ',' }) + ": " + g.Key
-                                                                  : g.Key)
-                           .Aggregate((x, y) => x + "\r\n" + y)
-                };
-            }
-            
-            var json = registryContext.PersonalSettings
-                .SingleOrDefault(ps => ps.IdUser == user.IdUser)
-                ?.PaymentAccauntTableJson;
-            if (json != null)
-            {
-                viewModel.PaymentAccountTableJson =
-                    JsonSerializer.Deserialize<PaymentAccountTableJson>(json);
-            }
-            return viewModel;
-        }
-
-        public bool SavePaymentAccountTableJson(AclUser user, PaymentAccountTableJson vm)
-        {
-            try
-            {
-                var json = JsonSerializer.Serialize(vm);
-                var personalSetting = registryContext.PersonalSettings
-                    .SingleOrDefault(ps => ps.IdUser == user.IdUser);
-                if (personalSetting == null)
-                {
-                    var newPersonalSetting = new PersonalSetting()
-                    {
-                        IdUser = user.IdUser,
-                        PaymentAccauntTableJson = json
-                    };
-                    registryContext.PersonalSettings.Add(newPersonalSetting);
-                }
-                else
-                {
-                    personalSetting.PaymentAccauntTableJson = json;
-                }
-                registryContext.SaveChanges();
-                return true;
-            }
-            catch(Exception ex)
-            {
-                return false;
-            }
-        }
-
-        private Dictionary<int, List<ClaimInfo>> GetClaimsByAddresses(IEnumerable<Payment> payments)
-        {
-            var accountsAssoc = GetAccountIdsAssocs(payments);
-            var accountsIds = accountsAssoc.Select(r => r.IdAccountActual);
-            var claims = registryContext.Claims.Where(c => c.IdAccount != null && accountsIds.Contains(c.IdAccount.Value));
-            var claimIds = claims.Select(r => r.IdClaim);
-
-            var claimLastStatesIds = from row in registryContext.ClaimStates
-                                     where claimIds.Contains(row.IdClaim)
-                                     group row.IdState by row.IdClaim into gs
-                                     select new
-                                     {
-                                         IdClaim = gs.Key,
-                                         IdState = gs.Max()
-                                     };
-
-            var claimsInfo = from claimLastStateRow in claimLastStatesIds
-                             join claimStateRow in registryContext.ClaimStates.Where(cs => claimIds.Contains(cs.IdClaim))
-                             on claimLastStateRow.IdState equals claimStateRow.IdState
-                             join claimStateTypeRow in registryContext.ClaimStateTypes
-                             on claimStateRow.IdStateType equals claimStateTypeRow.IdStateType
-                             select new ClaimInfo
-                             {
-                                 IdClaim = claimStateRow.IdClaim,
-                                 IdClaimCurrentState = claimStateTypeRow.IdStateType,
-                                 ClaimCurrentState = claimStateTypeRow.StateType,
-                                 ClaimCurrentStateDate = claimStateRow.DateStartState
-                             };
-
-            claimsInfo = from claimRow in claims
-                         join accountsAssocRow in accountsAssoc
-                         on claimRow.IdAccount equals accountsAssocRow.IdAccountActual
-                         join claimsInfoRow in claimsInfo
-                         on claimRow.IdClaim equals claimsInfoRow.IdClaim into c
-                         from cRow in c.DefaultIfEmpty()
-                         select new ClaimInfo
-                         {
-                             IdClaim = claimRow.IdClaim,
-                             StartDeptPeriod = claimRow.StartDeptPeriod,
-                             EndDeptPeriod = claimRow.EndDeptPeriod,
-                             IdAccount = accountsAssocRow.IdAccountFiltered,
-                             IdClaimCurrentState = cRow.IdClaimCurrentState,
-                             ClaimCurrentState = cRow.ClaimCurrentState,
-                             EndedForFilter = claimRow.EndedForFilter,
-                             ClaimDescription = claimRow.Description,
-                             ClaimCurrentStateDate = cRow.ClaimCurrentStateDate
-                         };
-
-
-            var result =
-                    claimsInfo
-                    .Select(c => new ClaimInfo {
-                        ClaimCurrentState = c.ClaimCurrentState,
-                        ClaimCurrentStateDate = c.ClaimCurrentStateDate,
-                        IdClaimCurrentState =c.IdClaimCurrentState,
-                        IdClaim = c.IdClaim,
-                        StartDeptPeriod = c.StartDeptPeriod,
-                        EndDeptPeriod = c.EndDeptPeriod,
-                        ClaimDescription = c.ClaimDescription,
-                        EndedForFilter = c.EndedForFilter,
-                        IdAccount = c.IdAccount
-                    })
-                    .GroupBy(r => r.IdAccount)
-                    .Select(r => new { IdAccount = r.Key, Claims = r.OrderByDescending(v => v.IdClaim).Select(v => v) })
-                    .ToDictionary(v => v.IdAccount, v => v.Claims.ToList());
-            return result;
-        }
-
-        public PaymentsVM GetPaymentsViewModelForMassReports(List<int> ids, PageOptions pageOptions)
-        {
-            var viewModel = InitializeViewModel(null, pageOptions, null);
-            var payments = GetPaymentsForMassReports(ids);
-            viewModel.PageOptions.TotalRows = payments.Count();
-            var count = payments.Count();
-            viewModel.PageOptions.Rows = count;
-            viewModel.PageOptions.TotalPages = (int)Math.Ceiling(count / (double)viewModel.PageOptions.SizePage);
-
-            if (viewModel.PageOptions.TotalPages < viewModel.PageOptions.CurrentPage)
-                viewModel.PageOptions.CurrentPage = 1;
-            viewModel.Payments = GetQueryPage(payments, viewModel.PageOptions).ToList();
-            viewModel.RentObjects = GetRentObjects(viewModel.Payments);
-            viewModel.ClaimsByAddresses = GetClaimsByAddresses(viewModel.Payments);
-                       
-            var monthsList = registryContext.Payments
-                            .Select(p => p.Date).Distinct()
-                            .OrderByDescending(p => p.Date).Take(6)
-                            .ToList();
-
-            viewModel.MonthsList = new Dictionary<int, DateTime>();
-            for (var i = 0; i < monthsList.Count(); i++)
-                viewModel.MonthsList.Add(monthsList[i].Month, monthsList[i].Date);
-
-
-            return viewModel;
-        }
-
-        public IQueryable<Payment> GetPaymentsForMassReports(List<int> ids)
-        {
-            return GetQuery().Where(p => ids.Contains(p.IdAccount)).Include(p => p.PaymentAccountNavigation).AsNoTracking();
-        }
-
-        public Premise GetPremiseJson(int idPremise)
-        {
-            var premise = registryContext.Premises
-                .Include(p => p.IdStateNavigation)
-                .AsNoTracking()
-                .SingleOrDefault(p => p.IdPremises == idPremise);
-            return premise;
-        }
-
-        public List<SelectableSigner> Signers => registryContext.SelectableSigners.ToList();
-
-        public Executor CurrentExecutor
-        {
-            get
-            {
-                var userName = securityService.User.UserName.ToLowerInvariant();
-                return registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
-                                e.ExecutorLogin.ToLowerInvariant() == userName);
-            }
-        }
-
-        public bool AddCommentsForPaymentAccount(int idAccount, string comment, string path)
-        {
-            try
-            {
-                switch(path)
-                {
-                    case "PaymentAccountsTable":
-                        SaveComment(idAccount, comment);
-                        registryContext.SaveChanges();
-                        break;
-                    case "PaymentAccountsRentObjectTable":
-                        var lastPayment = GetQuery().Where(r => r.IdAccount == idAccount).ToList();
-                        var accounts = GetAccountIdsAssocs(lastPayment).Select(c=> c.IdAccountActual).ToList();
-                        foreach(var item in accounts)
-                        {
-                            SaveComment(item, comment);
-                        }
-                        registryContext.SaveChanges();
-                        break;
-                }
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        public void SaveComment(int idAccount, string comment)
-        {
-            var savedComment = registryContext.PaymentAccountComments
-                                                            .Where(c => c.IdAccount == idAccount)
-                                                            .FirstOrDefault();
-            if (savedComment != null)
-            {
-                savedComment.Comment = comment;
-                registryContext.PaymentAccountComments.Update(savedComment);
-            }
-            else
-            {
-                var newComment = new PaymentAccountComment()
-                {
-                    IdAccount = idAccount,
-                    Comment = comment
-                };
-                registryContext.PaymentAccountComments.Add(newComment);
-            }
-        }
     }
 }

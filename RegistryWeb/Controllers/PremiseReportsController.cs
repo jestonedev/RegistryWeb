@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
+using RegistryWeb.Filters;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;
@@ -12,6 +13,7 @@ using RegistryWeb.ViewOptions.Filter;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.RegistryRead)]
     public class PremiseReportsController : SessionController<PremisesListFilter>
     {
         private readonly PremiseReportService reportService;
@@ -33,8 +35,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetExcerptPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.ExcerptPremise(idPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
@@ -48,8 +48,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetExcerptSubPremise(int idSubPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.ExcerptSubPremise(idSubPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
@@ -63,8 +61,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetExcerptMunSubPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             try
             {
                 if (!dataService.HasMunicipalSubPrmieses(idPremise))
@@ -82,8 +78,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPremiseNoticeToBks(int idPremise, string actionText, int paymentType, int signer)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.PremiseNoticeToBks(idPremise, actionText, paymentType, signer);
@@ -97,8 +91,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPremiseNoticeToIes(int idPremise, string actionText, int signer)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.PremiseNoticeToIes(idPremise, actionText, signer);
@@ -112,8 +104,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetSubPremiseNoticeToIes(int idSubPremise, string actionText, int signer)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.SubPremiseNoticeToIes(idSubPremise, actionText, signer);
@@ -127,8 +117,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetSubPremiseNoticeToBks(int idSubPremise, string actionText, int paymentType, int signer)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.SubPremiseNoticeToBks(idSubPremise, actionText, paymentType, signer);
@@ -163,8 +151,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPremiseArea(int idPremise)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.PremisesArea(new List<int> { idPremise });
@@ -183,9 +169,6 @@ namespace RegistryWeb.Controllers
 
             if (!ids.Any())
                 return NotFound();
-
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
 
             try
             {
@@ -211,9 +194,6 @@ namespace RegistryWeb.Controllers
             if (!ids.Any())
                 return NotFound();
 
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.PkBksPremises(ids, signer);
@@ -231,9 +211,6 @@ namespace RegistryWeb.Controllers
 
             if (!ids.Any())
                 return NotFound();
-
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
 
             try
             {
@@ -253,9 +230,6 @@ namespace RegistryWeb.Controllers
             if (!ids.Any())
                 return NotFound();
 
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.ExportPremises(ids);
@@ -267,6 +241,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.RegistryRead, Privileges.TenancyRead)]
         public IActionResult GetPremisesTenancyHistory()
         {
             List<int> ids = GetSessionIds();
@@ -276,9 +251,6 @@ namespace RegistryWeb.Controllers
 
             var idsString = ids
                 .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
-
-            if (!securityService.HasPrivilege(Privileges.RegistryRead) || !securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
 
             try
             {

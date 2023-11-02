@@ -19,10 +19,12 @@ using RegistryDb.Models.Entities.RegistryObjects.Common.Ownerships;
 using RegistryDb.Models.Entities.RegistryObjects.Common.Funds;
 using RegistryDb.Models.Entities.RegistryObjects.Common;
 using RegistryDb.Models.Entities.RegistryObjects.Common.Restrictions;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.RegistryRead)]
     public class PremisesController : ListController<PremisesDataService, PremisesListFilter>
     {
         private readonly IConfiguration config;
@@ -40,8 +42,6 @@ namespace RegistryWeb.Controllers
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
 
             if (isBack)
             {
@@ -74,8 +74,6 @@ namespace RegistryWeb.Controllers
             ViewBag.SecurityService = securityService;
             if (idPremises == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             var premise = dataService.GetPremise(idPremises.Value);
             if (premise == null)
                 return NotFound();
@@ -87,12 +85,11 @@ namespace RegistryWeb.Controllers
             return View("Premise", dataService.GetPremiseView(premise, canEditBaseInfo: false));
         }
 
+        [HasPrivileges(Privileges.RegistryWriteMunicipal, Privileges.RegistryWriteNotMunicipal, PrivilegesComparator = Filters.Common.PrivilegesComparator.Or)]
         public IActionResult Create(int? idBuilding, int? idPremises)
         {
             ViewBag.Action = ActionTypeEnum.Create;
             ViewBag.SecurityService = securityService;
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal))
-                return View("NotAccess");
             ViewBag.CanEditBaseInfo = true;
             ViewBag.CanEditResettleInfo = securityService.HasPrivilege(Privileges.RegistryWriteResettleInfo);
             ViewBag.CanEditLitigationInfo = securityService.HasPrivilege(Privileges.RegistryWriteLitigationInfo);
@@ -280,8 +277,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult PremiseReports(PageOptions pageOptions)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             var canEditBaseInfo =   
                 securityService.HasPrivilege(Privileges.RegistryReadWriteNotMunicipal) ||
                 securityService.HasPrivilege(Privileges.RegistryReadWriteMunicipal);

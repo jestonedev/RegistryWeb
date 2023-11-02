@@ -16,10 +16,12 @@ using System.Runtime.CompilerServices;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.RegistryObjects;
 using RegistryDb.Models.Entities.RegistryObjects.Buildings;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.RegistryRead)]
     public class BuildingsController : ListController<BuildingsDataService, BuildingsFilter>
     {
         OwnerReportService reportService;
@@ -38,8 +40,6 @@ namespace RegistryWeb.Controllers
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             if (isBack)
             {
                 viewModel.OrderOptions = HttpContext.Session.Get<OrderOptions>("OrderOptions");
@@ -65,8 +65,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult BuildingReports()
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             if (HttpContext.Session.Keys.Contains("idBuildings"))
             {
                 var ids = HttpContext.Session.Get<List<int>>("idBuildings");
@@ -81,8 +79,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Forma1()
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             if (!HttpContext.Session.Keys.Contains("idBuildings"))
                 return Error("Не выбрано ни одного здания.");
             var ids = HttpContext.Session.Get<List<int>>("idBuildings");
@@ -137,18 +133,18 @@ namespace RegistryWeb.Controllers
             return BuildingReports();
         }
 
+        [HasPrivileges(Privileges.RegistryWriteNotMunicipal, Privileges.RegistryReadWriteMunicipal, PrivilegesComparator = Filters.Common.PrivilegesComparator.Or)]
         public IActionResult Create()
         {
             canEditBaseInfo = securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal);
             canEditLandInfo = canEditBaseInfo;
             canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
             canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
-            if (!canEditBaseInfo)
-                return View("NotAccess");
             return GetBuildingView(null);
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.RegistryWriteNotMunicipal, Privileges.RegistryReadWriteMunicipal, PrivilegesComparator = Filters.Common.PrivilegesComparator.Or)]
         public IActionResult Create(Building building)
         {
             if (building == null)
@@ -156,8 +152,6 @@ namespace RegistryWeb.Controllers
             canEditBaseInfo = securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) || securityService.HasPrivilege(Privileges.RegistryWriteMunicipal);
             canEditDemolishingInfo = securityService.HasPrivilege(Privileges.RegistryWriteDemolishingInfo);
             canAttachAdditionalFiles = securityService.HasPrivilege(Privileges.RegistryAttachAdditionalFiles);
-            if (!canEditBaseInfo)
-                return View("NotAccess");
             if (!canEditDemolishingInfo)
             {
                 building.BuildingDemolitionActFiles = null;
@@ -179,8 +173,6 @@ namespace RegistryWeb.Controllers
             ViewBag.ReturnUrl = returnUrl;
             if (idBuilding == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             var building = dataService.GetBuilding(idBuilding.Value);
             if (building == null)
                 return NotFound();

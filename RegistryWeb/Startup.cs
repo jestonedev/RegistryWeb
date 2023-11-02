@@ -26,6 +26,7 @@ using RegistryServices.DataServices.KumiAccounts;
 using RegistryWeb.DataServices.Claims;
 using RegistryWeb.DataServices.KumiAccounts;
 using RegistryServices.DataServices.Claims;
+using RegistryServices.DataServices.BksAccounts;
 
 namespace RegistryWeb
 {
@@ -90,6 +91,10 @@ namespace RegistryWeb
             services.AddTransient<OwnerProcessesDataService>();
             services.AddTransient<TenancyProcessesDataService>();
             services.AddTransient<PaymentAccountsDataService>();
+            services.AddTransient<PaymentAccountReportsDataService>();
+            services.AddTransient<PaymentAccountsClaimsService>();
+            services.AddTransient<PaymentAccountsCommonService>();
+            services.AddTransient<PaymentAccountsTenanciesService>();
             services.AddTransient<ClaimsDataService>();
             services.AddTransient<SecurityService>();
             services.AddTransient<FundsHistoryDataService>();
@@ -108,7 +113,6 @@ namespace RegistryWeb
             services.AddTransient<PremiseReportsDataService>();
             services.AddTransient<TenancyReportsDataService>();
             services.AddTransient<ClaimReportsDataService>();
-            services.AddTransient<PaymentAccountReportsDataService>();
             services.AddTransient<ClaimsAssignedAccountsDataService>();
             services.AddTransient<ReestrEmergencyPremisesDataService>();
             services.AddTransient<AddressesDataService>();

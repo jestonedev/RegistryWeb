@@ -79,5 +79,15 @@ namespace RegistryWeb.SecurityServices
                      select rolePrivilage.IdAclPrivilegeNavigation;
             return p1.Union(p2).ToList();
         }
+
+        public Executor CurrentExecutor
+        {
+            get
+            {
+                var userName = User.UserName.ToLowerInvariant();
+                return registryContext.Executors.FirstOrDefault(e => e.ExecutorLogin != null &&
+                                e.ExecutorLogin.ToLowerInvariant() == userName);
+            }
+        }
     }
 }
