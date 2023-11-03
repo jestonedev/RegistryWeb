@@ -1,10 +1,10 @@
 ﻿@{
     ViewData["Title"] = "Ошибка";
-    @if (ViewData["Controller"].ToString() == "PaymentAccountReports")
+    @if (ViewData["Controller"]?.ToString() == "PaymentAccountReports")
     {
         ViewData["Controller"] = "PaymentAccounts";
     }
-    if (ViewData["Controller"].ToString() == "Account")
+    if (ViewData["Controller"]?.ToString() == "Account")
     {
         <div class="container mt-4 text-center">
             <h2 class="text-danger">Ошибка авторизации!</h2>
@@ -18,7 +18,7 @@
     {
         <div class="container mt-4 text-center">
             <h2 class="text-danger">Ошибка!</h2>
-            <h5 class="text-danger text-break offset-md-1 col-md-10">@ViewData["TextError"]</h5>
+            <h5 class="text-danger text-break offset-md-1 col-md-10">@(ViewData["TextError"] ?? Model)</h5>
         </div>
     }
 }

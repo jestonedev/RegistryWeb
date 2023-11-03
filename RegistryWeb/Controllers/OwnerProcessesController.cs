@@ -10,10 +10,12 @@ using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.Owners;
 using RegistryDb.Models.Entities.Owners;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.OwnerRead)]
     public class OwnerProcessesController : ListController<OwnerProcessesDataService, OwnerProcessesFilter>
     {        
         public OwnerProcessesController(OwnerProcessesDataService dataService, SecurityService securityService)
@@ -25,8 +27,6 @@ namespace RegistryWeb.Controllers
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             ViewBag.SecurityService = securityService;
             return View(dataService.GetViewModel(
                 viewModel.OrderOptions,
@@ -35,20 +35,18 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.OwnerWrite)]
         public IActionResult Create(OwnerProcessesFilter filterOptions, string returnUrl)
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
-                return View("NotAccess");
             return GetOwnerProcessView(dataService.CreateOwnerProcess(filterOptions), returnUrl);
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.OwnerWrite)]
         public IActionResult Create(OwnerProcess ownerProcess, string returnUrl, IFormFileCollection attachmentFiles)
         {
             if (ownerProcess == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
-                return View("NotAccess");
             if (ModelState.IsValid)
             {
                 dataService.Create(ownerProcess, attachmentFiles);
@@ -133,8 +131,6 @@ namespace RegistryWeb.Controllers
         {
             if (idProcess == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
             if (ownerProcess == null)
                 return NotFound();
@@ -142,12 +138,11 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.OwnerWrite)]
         public IActionResult Delete(int? idProcess, string returnUrl)
         {
             if (idProcess == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
-                return View("NotAccess");
             var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
             if (ownerProcess == null)
                 return NotFound();
@@ -155,23 +150,21 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.OwnerWrite)]
         public IActionResult Delete(OwnerProcess ownerProcess, string returnUrl)
         {
             if (ownerProcess == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
-                return View("NotAccess");
             dataService.Delete(ownerProcess.IdProcess);
             return Redirect(returnUrl);            
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.OwnerWrite)]
         public IActionResult Edit(int? idProcess, string returnUrl)
         {
             if (idProcess == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
-                return View("NotAccess");
             var ownerProcess = dataService.GetOwnerProcess(idProcess.Value);
             if (ownerProcess == null)
                 return NotFound();
@@ -179,13 +172,12 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.OwnerWrite)]
         public IActionResult Edit(OwnerProcess ownerProcess, string returnUrl, IFormFileCollection attachmentFiles, bool[] removeFiles)
         {
             var r = Request;
             if (ownerProcess == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerWrite))
-                return View("NotAccess");
             if (ModelState.IsValid)
             {                
                 dataService.Edit(ownerProcess, attachmentFiles, removeFiles);

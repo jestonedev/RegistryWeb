@@ -21,10 +21,12 @@ using Microsoft.AspNetCore.Authorization;
 using RegistryServices.DataServices.KumiPayments;
 using RegistryServices.DataServices.KumiAccounts;
 using RegistryWeb.DataServices.Claims;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.AccountsRead)]
     public class KumiPaymentsController : ListController<KumiPaymentsDataService, KumiPaymentsFilter>
     {
         private readonly KumiAccountsDataService kumiAccountsDataService;
@@ -62,8 +64,6 @@ namespace RegistryWeb.Controllers
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.AccountsRead))
-                return View("NotAccess");
             if (isBack)
             {
                 viewModel.OrderOptions = HttpContext.Session.Get<OrderOptions>("OrderOptions");
@@ -96,10 +96,8 @@ namespace RegistryWeb.Controllers
             return View(vm);
         }
 
-        private IActionResult GetView(int? idPayment, string returnUrl, ActionTypeEnum action, Privileges privilege)
+        private IActionResult GetView(int? idPayment, string returnUrl, ActionTypeEnum action)
         {
-            if (!securityService.HasPrivilege(privilege))
-                return View("NotAccess");
             KumiPayment payment = new KumiPayment {
                 IdSource = 1
             };
@@ -133,33 +131,37 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult Create(string returnUrl)
         {
-            return GetView(null, returnUrl, ActionTypeEnum.Create, Privileges.AccountsReadWrite);
+            return GetView(null, returnUrl, ActionTypeEnum.Create);
         }
 
         [HttpGet]
         public IActionResult Details(int? idPayment, string returnUrl)
         {
-            return GetView(idPayment, returnUrl, ActionTypeEnum.Details, Privileges.AccountsRead);
+            return GetView(idPayment, returnUrl, ActionTypeEnum.Details);
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult Edit(int? idPayment, string returnUrl)
         {
-            return GetView(idPayment, returnUrl, ActionTypeEnum.Edit, Privileges.AccountsReadWrite);
+            return GetView(idPayment, returnUrl, ActionTypeEnum.Edit);
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult Delete(int? idPayment, string returnUrl)
         {
-            return GetView(idPayment, returnUrl, ActionTypeEnum.Delete, Privileges.AccountsReadWrite);
+            return GetView(idPayment, returnUrl, ActionTypeEnum.Delete);
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult Create(KumiPayment kumiPayment)
         {
-            var canEdit = securityService.HasPrivilege(Privileges.AccountsReadWrite) && kumiPayment.IdSource == 1;
+            var canEdit = kumiPayment.IdSource == 1;
             if (!canEdit)
                 return View("NotAccess");
             if (kumiPayment == null)
@@ -173,10 +175,11 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult Delete(KumiPayment kumiPayment)
         {
             var dbPayment = dataService.GetKumiPayment(kumiPayment.IdPayment);
-            var canEdit = securityService.HasPrivilege(Privileges.AccountsReadWrite) && dbPayment.IdSource == 1;
+            var canEdit = dbPayment.IdSource == 1;
             if (!canEdit)
                 return View("NotAccess");
             if (kumiPayment == null)
@@ -190,15 +193,13 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult Edit(KumiPayment kumiPayment)
         {
             var dbPayment = dataService.GetKumiPayment(kumiPayment.IdPayment);
-            var canEditAll = securityService.HasPrivilege(Privileges.AccountsReadWrite) && dbPayment.IdSource == 1;
+            var canEditAll = dbPayment.IdSource == 1;
             if (kumiPayment == null)
                 return NotFound();
-            var canEditDescription = securityService.HasPrivilege(Privileges.AccountsReadWrite);
-            if (!(canEditDescription || canEditAll))
-                return View("NotAccess");
             if (ModelState.IsValid)
             {
                 if (canEditAll && !(dbPayment.PaymentClaims.Any() || dbPayment.PaymentCharges.Any()))
@@ -211,10 +212,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.AccountsWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public IActionResult AddPaymentUf(int? IdPayment)
         {
-            if (!securityService.HasPrivilege(Privileges.AccountsWrite))
-                return Json(-2);
             if (IdPayment == null) return Json(-3);
 
             var dbPayment = dataService.GetKumiPayment(IdPayment.Value);
@@ -444,11 +444,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult CreateByMemorialOrder(int idOrder, string returnUrl)
         {
-            var canEdit = securityService.HasPrivilege(Privileges.AccountsReadWrite);
-            if (!canEdit)
-                return View("NotAccess");
             try
             {
                 var payment = memorialOrdersService.CreatePaymentByMemorialOrder(idOrder);
@@ -468,6 +466,7 @@ namespace RegistryWeb.Controllers
 
         }
 
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult ApplyMemorialOrderWithPair(int idPayment, int idOrder)
         {
             try
@@ -493,6 +492,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult ApplyMemorialOrder(int idPayment, List<int> idOrders, string returnUrl)
         {
             try
@@ -529,6 +529,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult DistributePaymentToAccount(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo,
             decimal tenancySum, decimal penaltySum, decimal dgiSum, decimal pkkSum, decimal padunSum)
         {
@@ -557,6 +558,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult CancelDistributePaymentToAccount(int idPayment, List<int> idClaims, List<int> idAccounts)
         {
             try
@@ -580,6 +582,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult UploadPayments(List<IFormFile> files, DateTime? dateEnrollUfk, int? idParentPayment)
         {
             var tffStrings = new List<TffString>();
@@ -670,10 +673,9 @@ namespace RegistryWeb.Controllers
             });
         }
 
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult PaymentsMassDistributeForm()
         {
-            if (!securityService.HasPrivilege(Privileges.AccountsReadWrite))
-                return View("NotAccess");
             
             var ids =  GetSessionIds();
             var viewModel = dataService.GetKumiPaymentViewModelForMassDistribution(ids);
@@ -743,6 +745,7 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult UpdateBksPaymentsDateEnrollUfkForm(DateTime dateDoc, DateTime dateEnrollUfk)
         {
             try

@@ -18,6 +18,10 @@ namespace RegistryWeb.Filters
         private SecurityService securityService;
         private readonly Privileges[] privileges;
 
+        public Type ViewResultType { get; set; }
+        public object Model { get; set; }
+        public string ViewName { get; set; }
+
         public HasPrivileges(params Privileges[] privileges) {
             this.privileges = privileges;
         }
@@ -48,12 +52,30 @@ namespace RegistryWeb.Filters
             }
             if (!allowAccess)
             {
-                context.Result = new ViewResult()
+                if (ViewResultType == null)
                 {
-                    ViewName = "NotAccess",
-                    ViewData = new Microsoft.AspNetCore.Mvc.ViewFeatures.ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-                };
+                    context.Result = new ViewResult()
+                    {
+                        ViewName = "NotAccess",
+                        ViewData = new Microsoft.AspNetCore.Mvc.ViewFeatures.ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                    };
+                }
+                else
+                    context.Result = ViewResultBuilder(ViewResultType, Model, context);
             }
+        }
+
+        private IActionResult ViewResultBuilder(Type type, object model, AuthorizationFilterContext context)
+        {
+            if (type == typeof(ViewResult)) return new ViewResult()
+            {
+                ViewName = ViewName ?? context.RouteData.Values["action"].ToString(),
+                ViewData = new Microsoft.AspNetCore.Mvc.ViewFeatures.ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { Model = model }
+            };
+            if (type == typeof(ContentResult)) return new ContentResult { Content = model.ToString() };
+            if (type.FindInterfaces(new System.Reflection.TypeFilter((t, o) => true), null).Any(i => i == typeof(IActionResult)))
+                return (IActionResult)Activator.CreateInstance(type, model);
+            return null;
         }
     }
 }

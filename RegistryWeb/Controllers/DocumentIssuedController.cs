@@ -6,10 +6,12 @@ using RegistryDb.Models;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions;
 using RegistryDb.Models.Entities.Tenancies;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.TenancyRead)]
     public class DocumentIssuedController: RegistryBaseController
     {
         private readonly RegistryContext rc;
@@ -28,6 +30,7 @@ namespace RegistryWeb.Controllers
             return View(dataService.GetViewModel(pageOptions));
         }
 
+        [HasPrivileges(Privileges.TenancyWrite)]
         public IActionResult Create()
         {
             ViewBag.Action = "Create";
@@ -35,6 +38,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.TenancyWrite)]
         public IActionResult Create(DocumentIssuedBy documentIssue)
         {
             if (documentIssue == null)
@@ -47,6 +51,7 @@ namespace RegistryWeb.Controllers
             return View("DocumentIssue", dataService.GetDocumentIssuerView(documentIssue));
         }
 
+        [HasPrivileges(Privileges.TenancyWrite)]
         public IActionResult Edit(int? idDocumentIssue)
         {
             ViewBag.Action = "Edit";
@@ -59,6 +64,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.TenancyWrite)]
         public IActionResult Edit(DocumentIssuedBy documentIssue)
         {
             if (documentIssue == null)
@@ -87,6 +93,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.TenancyWrite)]
         public IActionResult Delete(DocumentIssuedBy documentIssue)
         {
             if (documentIssue == null)

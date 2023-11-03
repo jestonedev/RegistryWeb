@@ -15,10 +15,12 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 using RegistryServices.Models.KumiAccounts;
 using RegistryServices.DataServices.KumiAccounts;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.AccountsRead)]
     public class KumiAccountsController :  ListController<KumiAccountsDataService, KumiAccountsFilter>
     {
         private readonly KumiAccountsClaimsService claimsService;
@@ -47,8 +49,6 @@ namespace RegistryWeb.Controllers
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.AccountsRead))
-                return View("NotAccess");
             if (isBack)
             {
                 viewModel.OrderOptions = HttpContext.Session.Get<OrderOptions>("OrderOptions");
@@ -74,12 +74,9 @@ namespace RegistryWeb.Controllers
 
             return View(vm);
         }
-
+        
         public IActionResult KumiAccountsReports(PageOptions pageOptions)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             var errorIds = new List<int>();
             if (TempData.ContainsKey("ErrorAccountsIds"))
             {
@@ -115,8 +112,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult DetailsByAddress(int idAccount, string returnUrl)
         {
-            if (!securityService.HasPrivilege(Privileges.AccountsRead))
-                return View("NotAccess");
             var accounts = dataService.GetKumiAccountsOnSameAddress(idAccount);
             ViewBag.Address = dataService.GetAccountAddress(idAccount);
             ViewBag.IdAccountCurrent = idAccount;
@@ -128,10 +123,8 @@ namespace RegistryWeb.Controllers
             return View("DetailsByAddress", accounts);
         }
 
-        private IActionResult GetView(int? idAccount, string returnUrl, ActionTypeEnum action, Privileges privilege)
+        private IActionResult GetView(int? idAccount, string returnUrl, ActionTypeEnum action)
         {
-            if (!securityService.HasPrivilege(privilege))
-                return View("NotAccess");
             KumiAccount account = new KumiAccount();
             if (action != ActionTypeEnum.Create)
             {
@@ -164,35 +157,37 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult Create(string returnUrl)
         {
-            return GetView(null, returnUrl, ActionTypeEnum.Create, Privileges.AccountsReadWrite);
+            return GetView(null, returnUrl, ActionTypeEnum.Create);
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult Details(int? idAccount, string returnUrl)
         {
-            return GetView(idAccount, returnUrl, ActionTypeEnum.Details, Privileges.AccountsRead);
+            return GetView(idAccount, returnUrl, ActionTypeEnum.Details);
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult Edit(int? idAccount, string returnUrl)
         {
-            return GetView(idAccount, returnUrl, ActionTypeEnum.Edit, Privileges.AccountsReadWrite);
+            return GetView(idAccount, returnUrl, ActionTypeEnum.Edit);
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult Delete(int? idAccount, string returnUrl)
         {
-            return GetView(idAccount, returnUrl, ActionTypeEnum.Delete, Privileges.AccountsReadWrite);
+            return GetView(idAccount, returnUrl, ActionTypeEnum.Delete);
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult Create(KumiAccount kumiAccount)
         {
-            var canEdit = securityService.HasPrivilege(Privileges.AccountsReadWrite);
-            if (!canEdit)
-                return View("NotAccess");
             if (kumiAccount == null)
                 return NotFound();
             if (ModelState.IsValid)
@@ -204,11 +199,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult Delete(KumiAccount kumiAccount)
         {
-            var canEdit = securityService.HasPrivilege(Privileges.AccountsReadWrite);
-            if (!canEdit)
-                return View("NotAccess");
             if (kumiAccount == null)
                 return NotFound();
             dataService.Delete(kumiAccount.IdAccount);
@@ -216,11 +209,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult Edit(KumiAccount kumiAccount)
         {
-            var canEdit = securityService.HasPrivilege(Privileges.AccountsReadWrite);
-            if (!canEdit)
-                return View("NotAccess");
             if (kumiAccount == null)
                 return NotFound();
             if (ModelState.IsValid)
@@ -267,6 +258,7 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult RecalcAccounts(List<int> idAccounts, KumiAccountRecalcTypeEnum recalcType, int? recalcStartYear, int? recalcStartMonth,
             bool saveCurrentPeriodCharge)
         {
@@ -292,6 +284,8 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HttpPost]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult AddChargeCorrection(int idAccount, decimal tenancyValue, decimal penaltyValue, 
             decimal dgiValue, decimal pkkValue, decimal padunValue,
             decimal paymentTenancyValue, decimal paymentPenaltyValue, 
@@ -322,6 +316,8 @@ namespace RegistryWeb.Controllers
             return View(dataService.GetAccountCorrectionsVm(idAccount));
         }
 
+        [HttpPost]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult DeleteCorrection(int idCorrection)
         {
             try
@@ -350,6 +346,8 @@ namespace RegistryWeb.Controllers
             return Json(charge);
         }
 
+        [HttpPost]
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult SaveDescriptionForAddress(int idAccount, string description) {
             try
             {
@@ -369,11 +367,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsWrite, Model = "У вас нет прав на выполнение данной операции", ViewResultType = typeof(ViewResult), ViewName = "Error")]
         public IActionResult CreateClaimMass(DateTime atDate)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
-                return Error("У вас нет прав на выполнение данной операции");
-
             var ids = GetSessionIds();
 
             if (!ids.Any())
@@ -438,6 +434,7 @@ namespace RegistryWeb.Controllers
             return View("SplitAccountString", account);
         }
 
+        [HasPrivileges(Privileges.AccountsReadWrite)]
         public IActionResult SplitAccount(int idAccount, DateTime onDate, string description, List<SplitAccountModel> splitAccounts)
         {
             try

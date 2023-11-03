@@ -14,10 +14,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.Tenancies;
 using RegistryDb.Models.Entities.Tenancies;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.TenancyRead)]
     public class TenancyProcessesController : ListController<TenancyProcessesDataService, TenancyProcessesFilter>
     {
         public TenancyProcessesController(TenancyProcessesDataService dataService, SecurityService securityService)
@@ -33,8 +35,6 @@ namespace RegistryWeb.Controllers
         {
             if(viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             if (isBack)
             {
                 viewModel.OrderOptions = HttpContext.Session.Get<OrderOptions>("OrderOptions");
@@ -89,19 +89,16 @@ namespace RegistryWeb.Controllers
         {
             if (idProcess == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             var process = dataService.GetTenancyProcess(idProcess.Value);
             if (process == null)
                 return NotFound();
             InitializeViewBag("Details", returnUrl, securityService.HasPrivilege(Privileges.TenancyWrite), securityService.HasPrivilege(Privileges.TenancyWriteEmailsOnly));
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(process));
         }
-        
+
+        [HasPrivileges(Privileges.TenancyWrite)]
         public ActionResult Create(int? idProcess, int? idObject, AddressTypes addressType = AddressTypes.None)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
-                return View("NotAccess");
             InitializeViewBag("Create", null, true, true);
             var vm = dataService.CreateTenancyProcessEmptyViewModel(idObject, addressType);
             if (idProcess != null)
@@ -112,12 +109,11 @@ namespace RegistryWeb.Controllers
         }
         
         [HttpPost]
+        [HasPrivileges(Privileges.TenancyWrite)]
         public ActionResult Create(TenancyProcessVM tenancyProcessVM)
         {
             if (tenancyProcessVM == null || tenancyProcessVM.TenancyProcess == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
-                return View("NotAccess");
             if (ModelState.IsValid)
             {
                 dataService.Create(tenancyProcessVM.TenancyProcess, tenancyProcessVM.RentObjects,
@@ -127,7 +123,8 @@ namespace RegistryWeb.Controllers
             InitializeViewBag("Create", null, true, true);
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcessVM.TenancyProcess));
         }
-        
+
+        [HasPrivileges(Privileges.TenancyWrite, Privileges.TenancyWriteEmailsOnly, PrivilegesComparator = Filters.Common.PrivilegesComparator.Or)]
         public ActionResult Edit(int? idProcess, string returnUrl)
         {
             if (idProcess == null)
@@ -140,14 +137,12 @@ namespace RegistryWeb.Controllers
             var canEditBaseInfo = securityService.HasPrivilege(Privileges.TenancyWrite);
             var canEditEmailsOnly = securityService.HasPrivilege(Privileges.TenancyWriteEmailsOnly);
 
-            if (!canEditBaseInfo && !canEditEmailsOnly)
-                return View("NotAccess");
-
             InitializeViewBag("Edit", returnUrl, canEditBaseInfo, canEditEmailsOnly);
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcess));
         }
         
         [HttpPost]
+        [HasPrivileges(Privileges.TenancyWrite)]
         public ActionResult Edit(TenancyProcessVM tenancyProcessVM, string returnUrl)
         {
             if (tenancyProcessVM == null || tenancyProcessVM.TenancyProcess == null)
@@ -155,9 +150,6 @@ namespace RegistryWeb.Controllers
 
             var canEditBaseInfo = securityService.HasPrivilege(Privileges.TenancyWrite);
             var canEditEmailsOnly = securityService.HasPrivilege(Privileges.TenancyWriteEmailsOnly);
-
-            if (!canEditBaseInfo)
-                return View("NotAccess");
 
             if (ModelState.IsValid)
             {
@@ -168,7 +160,8 @@ namespace RegistryWeb.Controllers
             InitializeViewBag("Edit", returnUrl, canEditBaseInfo, canEditEmailsOnly);
             return View("TenancyProcess", dataService.GetTenancyProcessViewModel(tenancyProcessVM.TenancyProcess));
         }
-        
+
+        [HasPrivileges(Privileges.TenancyWrite)]
         public ActionResult Delete(int? idProcess, string returnUrl)
         {
             if (idProcess == null)
@@ -177,9 +170,6 @@ namespace RegistryWeb.Controllers
             var tenancyProcess = dataService.GetTenancyProcess(idProcess.Value);
             if (tenancyProcess == null)
                 return NotFound();
-
-            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
-                return View("NotAccess");
             
             InitializeViewBag("Delete", returnUrl, false, false);
 
@@ -187,19 +177,18 @@ namespace RegistryWeb.Controllers
         }
         
         [HttpPost]
+        [HasPrivileges(Privileges.TenancyWrite)]
         public ActionResult Delete(TenancyProcessVM tenancyProcessVM)
         {
             if (tenancyProcessVM == null || tenancyProcessVM.TenancyProcess == null)
                 return NotFound();
-
-            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
-                return View("NotAccess");
 
             dataService.Delete(tenancyProcessVM.TenancyProcess.IdProcess);
             return RedirectToAction("Index");
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.TenancyWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public IActionResult AddRentPeriod(string action)
         {
             if (!securityService.HasPrivilege(Privileges.TenancyWrite))
@@ -209,16 +198,14 @@ namespace RegistryWeb.Controllers
             ViewBag.SecurityService = securityService;
             ViewBag.Action = action;
             ViewBag.CanEditBaseInfo = true;
-
+            
             return PartialView("RentPeriod", rentPeriod);
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.TenancyWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public IActionResult AddTenancyReason(string action)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
-                return Json(-2);
-
             var reason = new TenancyReason { };
             ViewBag.SecurityService = securityService;
             ViewBag.Action = action;
@@ -229,11 +216,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.TenancyWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public IActionResult AddTenancyPerson(string action)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
-                return Json(-2);
-
             var person = new TenancyPerson { };
             ViewBag.SecurityService = securityService;
             ViewBag.Action = action;
@@ -244,11 +229,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.TenancyWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public IActionResult AddTenancyAgreement(string action)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
-                return Json(-2);
-
             var agreement = new TenancyAgreement {
                 IdExecutor = dataService.ActiveExecutors.FirstOrDefault(e => e.ExecutorLogin != null &&
                         e.ExecutorLogin.ToLowerInvariant() == securityService.User.UserName.ToLowerInvariant())?.IdExecutor,
@@ -264,11 +247,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.TenancyWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public IActionResult AddRentObject(string action)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
-                return Json(-2);
-
             var rentObject = new TenancyRentObject { Address = new Address {
                 AddressType = AddressTypes.None
             } };
@@ -281,11 +262,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.TenancyWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public IActionResult AddTenancyFile(string action)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
-                return Json(-2);
-
             var file = new TenancyFile { };
             ViewBag.SecurityService = securityService;
             ViewBag.Action = action;
@@ -330,12 +309,11 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.TenancyWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public IActionResult AddEmployer(string employerName)
         {
             if (string.IsNullOrEmpty(employerName))
                 return Json(-1);
-            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
-                return Json(-2);
             var duplicate = dataService.GetEmploeyerByName(employerName);
                           
             if (duplicate != null)
@@ -349,8 +327,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult TenancyProcessesReports(PageOptions pageOptions)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             var ids = GetSessionIds();
             var viewModel = dataService.GetTenancyProcessesViewModelForMassReports(ids, pageOptions);
             ViewBag.Count = viewModel.TenancyProcesses.Count();

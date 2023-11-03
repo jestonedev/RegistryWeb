@@ -13,10 +13,12 @@ using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.Payments;
 using RegistryServices.DataServices.BksAccounts;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.ClaimsRead)]
     public class PaymentAccountsController : ListController<PaymentAccountsDataService, PaymentsFilter>
     {
         private readonly PaymentAccountsCommonService commonService;
@@ -42,8 +44,6 @@ namespace RegistryWeb.Controllers
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
             if (isBack)
             {
                 viewModel.OrderOptions = HttpContext.Session.Get<OrderOptions>("OrderOptions");
@@ -71,8 +71,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult PaymentAccountsTable(int idAccount, string returnUrl)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
             if (idAccount == 0)
                 return NotFound();
             ViewBag.IdAccount = idAccount;
@@ -85,8 +83,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult PaymentAccountsRentObjectTable(int idAccount, string returnUrl)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
             if (idAccount == 0)
                 return NotFound();
             ViewBag.IdAccount = idAccount;
@@ -101,8 +97,6 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public JsonResult SavePaymentAccountTableJson(PaymentAccountTableJson vm)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return Json(false);
             var result =
                 dataService.SavePaymentAccountTableJson(securityService.User, vm);
             return Json(result);
@@ -111,7 +105,7 @@ namespace RegistryWeb.Controllers
         [HttpGet]
         public JsonResult GetPrimisesInfo(int? idPremise)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead) || (idPremise == null) || (idPremise == 0))
+            if ((idPremise == null) || (idPremise == 0))
                 return Json(false);
             var premise = dataService.GetPremiseJson(idPremise.Value);
             if (premise == null)
@@ -130,17 +124,12 @@ namespace RegistryWeb.Controllers
         [HttpPost]
         public IActionResult GetTenanciesInfo(int id, AddressTypes type, string returnUrl)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return Content("");
             var address = new Address() { Id = id.ToString(), AddressType = type };
             return ViewComponent("TenancyProcessesComponent", new { address, returnUrl });
         }
 
         public IActionResult AccountsReports(PageOptions pageOptions)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             var errorIds = new List<int>();
             if (TempData.ContainsKey("ErrorAccountsIds"))
             {
@@ -176,17 +165,9 @@ namespace RegistryWeb.Controllers
             return View("AccountReports", viewModel);
         }
 
-        /*public IActionResult CreateClaimMassCustom()
-        {
-            dataService.CreateClaimMassCustom();
-            return Content("Complete");
-        }*/
-
+        [HasPrivileges(Privileges.ClaimsWrite, Model = "У вас нет прав на выполнение данной операции", ViewName = "Error", ViewResultType = typeof(ViewResult))]
         public IActionResult CreateClaimMass(DateTime atDate)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
-                return Error("У вас нет прав на выполнение данной операции");
-
             var ids = GetSessionIds();
 
             if (!ids.Any())
@@ -233,6 +214,8 @@ namespace RegistryWeb.Controllers
             TempData["ErrorReason"] = "по указанным лицевым счетам уже имеются незавершенные исковые работы";
             return RedirectToAction("AccountsReports");
         }
+
+        [HasPrivileges(Privileges.ClaimsWrite)]
         public JsonResult AddComment(int idAccount,  string textComment, string path)
         {
             return Json(dataService.AddCommentsForPaymentAccount(idAccount, textComment, path));

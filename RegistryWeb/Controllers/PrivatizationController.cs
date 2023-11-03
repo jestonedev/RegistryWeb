@@ -6,10 +6,12 @@ using RegistryWeb.ViewOptions.Filter;
 using RegistryWeb.Enums;
 using RegistryServices.ViewModel.Privatization;
 using RegistryDb.Models.Entities.Privatization;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.PrivRead)]
     public class PrivatizationController : ListController<PrivatizationDataService, PrivatizationFilter>
     {
         public PrivatizationController(PrivatizationDataService dataService, SecurityService securityService)
@@ -19,8 +21,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Index(PrivatizationListVM viewModel)
         {
-            if (!securityService.HasPrivilege(Privileges.PrivRead))
-                return View("NotAccess");
             ViewBag.SecurityService = securityService;
             ViewBag.Regions = dataService.Regions;
             ViewBag.Streets = dataService.Streets;
@@ -32,10 +32,8 @@ namespace RegistryWeb.Controllers
                 viewModel.FilterOptions));
         }
 
-        private IActionResult GetView(int? idContract, string returnUrl, ActionTypeEnum action, Privileges privilege)
+        private IActionResult GetView(int? idContract, string returnUrl, ActionTypeEnum action)
         {
-            if (!securityService.HasPrivilege(privilege))
-                    return View("NotAccess");
             PrivContract contract = new PrivContract();
             if (action != ActionTypeEnum.Create)
             {
@@ -68,35 +66,36 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.PrivReadWrite)]
         public IActionResult Create(string returnUrl)
         {
-            return GetView(null, returnUrl, ActionTypeEnum.Create, Privileges.PrivReadWrite);
+            return GetView(null, returnUrl, ActionTypeEnum.Create);
         }
 
         [HttpGet]
         public IActionResult Details(int? idContract, string returnUrl)
         {
-            return GetView(idContract, returnUrl, ActionTypeEnum.Details, Privileges.PrivRead);
+            return GetView(idContract, returnUrl, ActionTypeEnum.Details);
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.PrivReadWrite)]
         public IActionResult Edit(int? idContract, string returnUrl)
         {
-            return GetView(idContract, returnUrl, ActionTypeEnum.Edit, Privileges.PrivReadWrite);
+            return GetView(idContract, returnUrl, ActionTypeEnum.Edit);
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.PrivReadWrite)]
         public IActionResult Delete(int? idContract, string returnUrl)
         {
-            return GetView(idContract, returnUrl, ActionTypeEnum.Delete, Privileges.PrivReadWrite);
+            return GetView(idContract, returnUrl, ActionTypeEnum.Delete);
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.PrivReadWrite)]
         public IActionResult Create(PrivContract contract)
         {
-            var canEdit = securityService.HasPrivilege(Privileges.PrivReadWrite);
-            if (!canEdit)
-                return View("NotAccess");
             if (contract == null)
                 return NotFound();
             if (ModelState.IsValid)
@@ -108,11 +107,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.PrivReadWrite)]
         public IActionResult Delete(PrivContract contract)
         {
-            var canEdit = securityService.HasPrivilege(Privileges.PrivReadWrite);
-            if (!canEdit)
-                return View("NotAccess");
             if (contract == null)
                 return NotFound();
             dataService.Delete(contract.IdContract);
@@ -120,11 +117,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.PrivReadWrite)]
         public IActionResult Edit(PrivContract contract)
         {
-            var canEdit = securityService.HasPrivilege(Privileges.PrivReadWrite);
-            if (!canEdit)
-                return View("NotAccess");
             if (contract == null)
                 return NotFound();
             if (ModelState.IsValid)
@@ -136,10 +131,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.PrivReadWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public JsonResult PrivContractorAdd(ActionTypeEnum action)
         {
-            if (!securityService.HasPrivilege(Privileges.PrivReadWrite))
-                return Json(-2);
             var contractor = new PrivContractor()
             {
                 IdKinship = 64
@@ -150,10 +144,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.PrivReadWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public IActionResult PrivContractorElemAdd(PrivContractor contractor, ActionTypeEnum action)
         {
-            if (!securityService.HasPrivilege(Privileges.PrivReadWrite))
-                return Json(-2);
             ViewBag.Action = action;
             ViewBag.Kinships = dataService.Kinships;
             ViewBag.Executors = dataService.Executors;

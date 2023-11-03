@@ -82,7 +82,7 @@
                 @Model.PaymentPkk
             }
         </td>
-        <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-recalc-pkk">(Model.EndDate != ViewBag.ForecastCalcDate || ViewBag.CurrentPeriodCalced ? Model.RecalcPkk + Model.CorrectionPkk : 0)</td>
+        <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-recalc-pkk">@(Model.EndDate != ViewBag.ForecastCalcDate || ViewBag.CurrentPeriodCalced ? Model.RecalcPkk + Model.CorrectionPkk : 0)</td>
         <td class="text-center p-1 rr-charge-pkk d-none rr-charge-period-output-pkk">@Model.OutputPkk</td>
     }
     @* Падун *@

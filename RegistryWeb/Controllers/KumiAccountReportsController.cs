@@ -13,10 +13,12 @@ using RegistryDb.Models.Entities.Payments;
 using InvoiceGenerator;
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.DataServices.KumiAccounts;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.AccountsRead)]
     public class KumiAccountReportsController : SessionController<PaymentsFilter>
     {
         private readonly KumiAccountReportService reportService;
@@ -42,8 +44,6 @@ namespace RegistryWeb.Controllers
         }
         public IActionResult GetCalDept(int idAccount, DateTime dateFrom, DateTime dateTo, int fileFormat)
         {
-              if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
               try
               {
                 var payment = dataService.GetLastPayment(idAccount);
@@ -126,7 +126,7 @@ namespace RegistryWeb.Controllers
         public IActionResult InvoiceGenerator(List<int> idAccounts, DateTime onDate, string invoiceAction, string textmessage)
         {
             var results = new Dictionary<int, IEnumerable<string>>();
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
+            if (!securityService.HasPrivilege(Privileges.AccountsRead))
                 return Json(new { ErrorCode = -8, results });
             List<int> ids = new List<int>();
             ids.AddRange(idAccounts);
@@ -278,9 +278,6 @@ namespace RegistryWeb.Controllers
 
             if (!ids.Any())
                 return NotFound();
-
-            if (!securityService.HasPrivilege(Privileges.AccountsRead))
-                return View("NotAccess");
 
             try
             {

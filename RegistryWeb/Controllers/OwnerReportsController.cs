@@ -7,10 +7,12 @@ using RegistryWeb.SecurityServices;
 using RegistryWeb.ReportServices;
 using RegistryWeb.DataServices;
 using RegistryServices.ViewModel.Owners;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.OwnerRead)]
     public class OwnerReportsController : RegistryBaseController
     {
         private readonly OwnerReportService reportService;
@@ -26,8 +28,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Index()
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             return View();
         }
 
@@ -38,15 +38,11 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Forma1(Forma1VM forma1VM)
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             return View("~/Views/OwnerReports/Forma1/Index.cshtml", dataService.GetForma1VM(forma1VM.FilterOptions));
         }
 
         public IActionResult GetForma1(int? idBuilding)
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             if (idBuilding == null)
                 return Error("id здания не указан.");
             var ids = new List<int> { idBuilding.Value };
@@ -64,15 +60,11 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Forma2And3(Forma2VM forma2VM)
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             return View("~/Views/OwnerReports/Forma2And3/Index.cshtml", dataService.GetForma2VM(forma2VM.FilterOptions));
         }
 
         public IActionResult GetForma2(int? idPremise)
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             if (idPremise == null)
                 return Error("Помещение не выбрано.");
             try
@@ -89,8 +81,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult MultiForma2(List<int> ids)
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             if (!ids.Any())
                 return Error("Не выбрано ни одного помещения. Либо в здании таковые отсутствуют.");
             try
@@ -106,8 +96,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetMultiForma2(string fileNameReport)
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.DownloadFile(fileNameReport);
@@ -122,8 +110,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetForma3(int? idPremise)
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             if (idPremise == null)
                 return Error("Помещение не выбрано.");
             try
@@ -140,8 +126,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult MultiForma3(List<int> ids)
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             if (!ids.Any())
                 return Error("Не выбрано ни одного помещения. Либо в здании таковые отсутствуют.");
             try
@@ -157,8 +141,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetMultiForma3(string fileNameReport)
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.DownloadFile(fileNameReport);
@@ -173,8 +155,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetAzfAreaAnalize()
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.AzfAreaAnalize();
@@ -189,8 +169,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetAzfRoomsAnalize()
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.AzfRoomsAnalize();
@@ -205,8 +183,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetAzfRegionsAnalize()
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.AzfRegionsAnalize();
@@ -221,8 +197,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetAzfWithoutPrivAnalize()
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.AzfWithoutPrivAnalize();

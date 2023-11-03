@@ -14,10 +14,12 @@ using RegistryDb.Models.Entities.Claims;
 using RegistryServices.Enums;
 using RegistryWeb.DataServices.Claims;
 using RegistryServices.DataServices.Claims;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.ClaimsRead)]
     public class ClaimsController : ListController<ClaimsDataService, ClaimsFilter>
     {
         private readonly ClaimsAssignedAccountsDataService assignedAccountsService;
@@ -36,8 +38,6 @@ namespace RegistryWeb.Controllers
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
             if (isBack)
             {
                 viewModel.OrderOptions = HttpContext.Session.Get<OrderOptions>("OrderOptions");
@@ -67,8 +67,6 @@ namespace RegistryWeb.Controllers
         {
             if (idClaim == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
             var claim = dataService.GetClaim(idClaim.Value);
             if (claim == null)
                 return NotFound();
@@ -77,21 +75,19 @@ namespace RegistryWeb.Controllers
             return View("Claim", claimVM);
         }
 
+        [HasPrivileges(Privileges.ClaimsWrite)]
         public ActionResult Create(int? idAccountBks, int? idAccountKumi)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
-                return View("NotAccess");
             InitializeViewBag("Create", null, true);
             return View("Claim", dataService.CreateClaimEmptyViewModel(idAccountBks, idAccountKumi));
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.ClaimsWrite)]
         public ActionResult Create(ClaimVM claimVM)
         {
             if (claimVM == null || claimVM.Claim == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
-                return View("NotAccess");
             if (ModelState.IsValid)
             {
                 dataService.Create( claimVM.Claim,
@@ -117,6 +113,7 @@ namespace RegistryWeb.Controllers
             return PartialView("ClaimPersonsPreview", persons);
         }
 
+        [HasPrivileges(Privileges.ClaimsWrite)]
         public ActionResult Edit(int? idClaim, string returnUrl)
         {
             if (idClaim == null)
@@ -126,35 +123,27 @@ namespace RegistryWeb.Controllers
             if (claim == null)
                 return NotFound();
 
-            var canEditBaseInfo = securityService.HasPrivilege(Privileges.ClaimsWrite);
-
-            if (!canEditBaseInfo)
-                return View("NotAccess");
-
-            InitializeViewBag("Edit", returnUrl, canEditBaseInfo);
+            InitializeViewBag("Edit", returnUrl, true);
             return View("Claim", dataService.GetClaimViewModel(claim));
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.ClaimsWrite)]
         public ActionResult Edit(ClaimVM claimVM, string returnUrl)
         {
             if (claimVM == null || claimVM.Claim == null)
                 return NotFound();
-
-            var canEditBaseInfo = securityService.HasPrivilege(Privileges.ClaimsWrite);
-
-            if (!canEditBaseInfo)
-                return View("NotAccess");
 
             if (ModelState.IsValid)
             {
                 dataService.Edit(claimVM.Claim);
                 return RedirectToAction("Details", new { claimVM.Claim.IdClaim });
             }
-            InitializeViewBag("Edit", returnUrl, canEditBaseInfo);
+            InitializeViewBag("Edit", returnUrl, true);
             return View("Claim", dataService.GetClaimViewModel(claimVM.Claim));
         }
 
+        [HasPrivileges(Privileges.ClaimsWrite)]
         public ActionResult Delete(int? idClaim, string returnUrl)
         {
             if (idClaim == null)
@@ -164,22 +153,16 @@ namespace RegistryWeb.Controllers
             if (claim == null)
                 return NotFound();
 
-            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
-                return View("NotAccess");
-
             InitializeViewBag("Delete", returnUrl, false);
-
             return View("Claim", dataService.GetClaimViewModel(claim));
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.ClaimsWrite)]
         public ActionResult Delete(ClaimVM claimVM)
         {
             if (claimVM == null || claimVM.Claim == null)
                 return NotFound();
-
-            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
-                return View("NotAccess");
 
             dataService.Delete(claimVM.Claim.IdClaim);
             return RedirectToAction("Index");
@@ -246,11 +229,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.ClaimsWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public IActionResult AddClaimState(string action, int idClaim)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
-                return Json(-2);
-
             var claim= dataService.GetClaim(idClaim) ?? new Claim { ClaimStates = new List<ClaimState>(), ClaimCourtOrders = new List<ClaimCourtOrder>() };
             var claimStates = claim.ClaimStates;
             ViewBag.SecurityService = securityService;
@@ -274,10 +255,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.ClaimsWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public IActionResult AddCourtOrder(string action, int idAccount)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
-                return Json(-2);
             var courtOrder = new ClaimCourtOrder {
                 IdExecutor = dataService.CurrentExecutor?.IdExecutor ?? 0,
                 CreateDate = DateTime.Now.Date,
@@ -293,11 +273,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.ClaimsWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public IActionResult AddClaimFile(string action)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
-                return Json(-2);
-
             var file = new ClaimFile { };
             ViewBag.SecurityService = securityService;
             ViewBag.Action = action;
@@ -307,11 +285,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.ClaimsWrite, Model = -2, ViewResultType = typeof(JsonResult))]
         public IActionResult AddClaimPerson(string action)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
-                return Json(-2);
-
             var file = new ClaimPerson { };
             ViewBag.SecurityService = securityService;
             ViewBag.Action = action;
@@ -322,9 +298,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult ClaimsReports(PageOptions pageOptions)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             var errorIds = new List<int>();
             if (TempData.ContainsKey("ErrorClaimsIds"))
             {
@@ -358,11 +331,9 @@ namespace RegistryWeb.Controllers
             return View("ClaimsReports", viewModel);
         }
 
+        [HasPrivileges(Privileges.ClaimsWrite, Model = "У вас нет прав на выполнение данной операции", ViewResultType = typeof(ViewResult), ViewName = "Error")]
         public IActionResult UpdateDeptPeriod(DateTime? startDeptPeriod, DateTime? endDeptPeriod)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
-                return Error("У вас нет прав на выполнение данной операции");
-
             var ids = GetSessionIds();
 
             if (!ids.Any())
@@ -373,11 +344,9 @@ namespace RegistryWeb.Controllers
             return RedirectToAction("ClaimsReports");
         }
 
+        [HasPrivileges(Privileges.ClaimsWrite, Model = "У вас нет прав на выполнение данной операции", ViewResultType = typeof(ViewResult), ViewName = "Error")]
         public IActionResult AddClaimStateMass(ClaimState claimState)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsWrite))
-                return Error("У вас нет прав на выполнение данной операции");
-
             var ids = GetSessionIds();
 
             if (!ids.Any())

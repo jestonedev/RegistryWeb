@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 using RegistryDb.Models;
 using RegistryDb.Models.Entities.Owners;
 using RegistryServices.ViewModel.Owners;
+using RegistryWeb.Filters;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.OwnerRead)]
     public class OwnerReasonTypesController : RegistryBaseController
     {
         private readonly RegistryContext rc;
@@ -25,9 +27,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Index(PageOptions pageOptions)
         {
-            if (!securityService.HasPrivilege(Privileges.OwnerRead))
-                return View("NotAccess");
-
             var viewModel = new OwnerReasonTypesVM<OwnerReasonType>
             {
                 PageOptions = pageOptions ?? new PageOptions()
@@ -55,11 +54,10 @@ namespace RegistryWeb.Controllers
             return result.ToList();
         }
 
+        [HasPrivileges(Privileges.OwnerDirectoriesReadWrite)]
         public IActionResult Create()
         {
             ViewBag.Action = "Create";
-            if (!securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
-                return View("NotAccess");
             return View();
         }
 
@@ -73,12 +71,11 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.OwnerDirectoriesReadWrite)]
         public IActionResult Create(OwnerReasonType ownerReasonType)
         {
             if (ownerReasonType == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
-                return View("NotAccess");
             if (ModelState.IsValid)
             {
                 rc.OwnerReasonTypes.Add(ownerReasonType);
@@ -88,13 +85,12 @@ namespace RegistryWeb.Controllers
             return View(GetDocumentIssuerView(ownerReasonType));
         }
 
+        [HasPrivileges(Privileges.OwnerDirectoriesReadWrite)]
         public IActionResult Edit(int? idReasonType)
         {
             ViewBag.Action = "Edit";
             if (idReasonType == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
-                return View("NotAccess");
             var ownerReasonTypes = rc.OwnerReasonTypes.FirstOrDefault(ort => ort.IdReasonType == idReasonType);
             if (ownerReasonTypes == null)
                 return NotFound();
@@ -102,13 +98,11 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.OwnerDirectoriesReadWrite)]
         public IActionResult Edit(OwnerReasonType ownerReasonType)
         {
             if (ownerReasonType == null)
                 return NotFound();
-
-            if (!securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
-                return View("NotAccess");
 
             if (ModelState.IsValid)
             {
@@ -121,13 +115,12 @@ namespace RegistryWeb.Controllers
 
         [HttpGet]
         [ActionName("Delete")]
+        [HasPrivileges(Privileges.OwnerDirectoriesReadWrite)]
         public IActionResult ConfirmDelete(int? idReasonType)
         {
             ViewBag.Action = "Delete";
             if (idReasonType == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
-                return View("NotAccess");
             var ownerReasonTypes = rc.OwnerReasonTypes.FirstOrDefault(ort => ort.IdReasonType == idReasonType);
             if (ownerReasonTypes == null)
                 return NotFound();
@@ -135,12 +128,11 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.OwnerDirectoriesReadWrite)]
         public IActionResult Delete(OwnerReasonType ownerReasonType)
         {
             if (ownerReasonType == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.OwnerDirectoriesReadWrite))
-                return View("NotAccess");
             var ownerReason = rc.OwnerReasons.FirstOrDefault(or => or.IdReasonType == ownerReasonType.IdReasonType);
             if (ownerReason == null)
             {

@@ -6,10 +6,12 @@ using RegistryWeb.DataHelpers;
 using RegistryDb.Models;
 using RegistryWeb.SecurityServices;
 using RegistryServices.ViewModel.RegistryObjects;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.RegistryRead)]
     public class FundsHistoryController : RegistryBaseController
     {
         private readonly FundsHistoryDataService dataService;
@@ -27,9 +29,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Index(int idObject, string typeObject, string returnUrl, bool isBack = false)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
-                        
             ViewBag.Action = "Index";
             ViewBag.ReturnUrl = returnUrl;
             var viewModel = dataService.GetListViewModel(idObject, typeObject);
@@ -45,23 +44,20 @@ namespace RegistryWeb.Controllers
             return View(viewModel);
         }
 
+        [HasPrivileges(Privileges.RegistryWriteNotMunicipal, Privileges.RegistryWriteMunicipal, PrivilegesComparator = Filters.Common.PrivilegesComparator.Or)]
         public IActionResult Details(int idFund)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
-                return View("NotAccess");
-
             var fund = dataService.GetFundHistory(idFund);
             return Json(fund);
         }
 
+        [HasPrivileges(Privileges.RegistryWriteNotMunicipal, Privileges.RegistryWriteMunicipal, PrivilegesComparator = Filters.Common.PrivilegesComparator.Or)]
         public IActionResult Create(int IdObject, string typeObject, string returnUrl)
         {
             ViewBag.Action = "Create";
             ViewBag.idObject = IdObject;
             ViewBag.typeObject = typeObject;
             ViewBag.ReturnUrl = returnUrl;
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
-                return View("NotAccess");
 
             if (!CanEditFundHistory(IdObject, typeObject))
                 return View("NotAccess");
@@ -76,12 +72,12 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.RegistryWriteNotMunicipal, Privileges.RegistryWriteMunicipal, PrivilegesComparator = Filters.Common.PrivilegesComparator.Or)]
+
         public IActionResult Create(FundHistoryVM fh, int IdObject, string typeObject, string returnUrl)
         {
             if (fh.FundHistory == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
-                return View("NotAccess");
 
             if (!CanEditFundHistory(IdObject, typeObject))
                 return View("NotAccess");
@@ -97,14 +93,13 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.RegistryWriteNotMunicipal, Privileges.RegistryWriteMunicipal, PrivilegesComparator = Filters.Common.PrivilegesComparator.Or)]
         public IActionResult Edit(int? idFund, int IdObject, string typeObject, string returnUrl)
         {
             ViewBag.Action = "Edit";
             ViewBag.ReturnUrl = returnUrl;
             if (idFund == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
-                return View("NotAccess");
 
             if (!CanEditFundHistory(IdObject, typeObject))
                 return View("NotAccess");
@@ -123,12 +118,11 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.RegistryWriteNotMunicipal, Privileges.RegistryWriteMunicipal, PrivilegesComparator = Filters.Common.PrivilegesComparator.Or)]
         public IActionResult Edit(FundHistoryVM fh, int IdObject, string typeObject, string returnUrl)
         {
             if (fh.FundHistory == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
-                return View("NotAccess");
 
             if (!CanEditFundHistory(IdObject, typeObject))
                 return View("NotAccess");
@@ -144,14 +138,13 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.RegistryWriteNotMunicipal, Privileges.RegistryWriteMunicipal, PrivilegesComparator = Filters.Common.PrivilegesComparator.Or)]
         public IActionResult Delete(int? idFund, int IdObject, string typeObject, string returnUrl)
         {
             ViewBag.Action = "Delete";
             ViewBag.ReturnUrl = returnUrl;
             if (idFund == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
-                return View("NotAccess");
 
             if (!CanEditFundHistory(IdObject, typeObject))
                 return View("NotAccess");
@@ -164,14 +157,13 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpPost]
+        [HasPrivileges(Privileges.RegistryWriteNotMunicipal, Privileges.RegistryWriteMunicipal, PrivilegesComparator = Filters.Common.PrivilegesComparator.Or)]
         public IActionResult Delete(FundHistoryVM fh, int IdObject, string typeObject, string returnUrl)
         {
             ViewBag.Action = "Delete";
             ViewBag.ReturnUrl = returnUrl;
             if (fh.FundHistory == null)
                 return NotFound();
-            if (!securityService.HasPrivilege(Privileges.RegistryWriteNotMunicipal) && !securityService.HasPrivilege(Privileges.RegistryWriteMunicipal))    //если будет необх., то RegistryWriteMunicipal надо убрать
-                return View("NotAccess");
 
             if (!CanEditFundHistory(IdObject, typeObject))
                 return View("NotAccess");
@@ -182,7 +174,7 @@ namespace RegistryWeb.Controllers
                 return Redirect(returnUrl);
             }
             return View("FundHistory", dataService.GetFundHistoryView(fh.FundHistory, 0, ""));
-        }/**/
+        }
 
         public bool CanEditFundHistory(int IdObject, string typeObject)
         {

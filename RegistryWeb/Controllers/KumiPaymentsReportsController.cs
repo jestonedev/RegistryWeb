@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RegistryWeb.Filters;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;
@@ -8,6 +9,7 @@ using RegistryWeb.ViewOptions.Filter;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.AccountsRead)]
     public class KumiPaymentsReportsController : SessionController<TenancyProcessesFilter>
     {
         private readonly KumiPaymentsReportService reportService;
@@ -23,8 +25,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPaymentOrder(int idPayment)
         {
-            if (!securityService.HasPrivilege(Privileges.AccountsRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.GetPaymentOrder(idPayment);

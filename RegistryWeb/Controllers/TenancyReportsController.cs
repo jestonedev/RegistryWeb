@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
+using RegistryWeb.Filters;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;
@@ -11,6 +12,7 @@ using RegistryWeb.ViewOptions.Filter;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.TenancyRead)]
     public class TenancyReportsController : SessionController<TenancyProcessesFilter>
     {
         private readonly TenancyReportService reportService;
@@ -34,8 +36,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPreContract(int idProcess, int idPreamble, int idCommittee)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 if (!dataService.HasRentObjects(idProcess))
@@ -53,8 +53,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetDksrContract(int idProcess)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 if (!dataService.HasRentObjects(idProcess))
@@ -76,8 +74,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetFreeUseContract(int idProcess)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 if (!dataService.HasRentObjects(idProcess))
@@ -99,8 +95,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetFreeUseAct(int idProcess)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 if (!dataService.HasRentObjects(idProcess))
@@ -122,8 +116,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetStatementResettle(int idProcess)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 if (!dataService.HasRentObjects(idProcess))
@@ -145,8 +137,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetContract(int idProcess, int idRentType, int contractType, bool openDate)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 if (!dataService.HasRegistrationDateAndNum(idProcess))
@@ -172,8 +162,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetActToTenant(int idProcess, bool openDate)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 if (!dataService.HasRegistrationDateAndNum(idProcess))
@@ -199,8 +187,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetActFromTenant(int idProcess, bool openDate)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 if (!dataService.HasRegistrationDateAndNum(idProcess))
@@ -230,8 +216,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetActAf(int idProcess, int idPreparer)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 if (!dataService.HasRentObjects(idProcess))
@@ -253,8 +237,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetAgreement(int idAgreement)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 var idProcess = dataService.GetProcessIdForAgreement(idAgreement);
@@ -281,8 +263,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetAgreementReady(int idAgreement)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 var idProcess = dataService.GetProcessIdForAgreement(idAgreement);
@@ -309,8 +289,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetNotifySingleDocument(int idProcess, int reportType, string reportTitle)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 if (new int[] { 1, 7 }.Contains(reportType) && !dataService.HasRegistrationDateAndNum(idProcess))
@@ -336,8 +314,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetRequestToMvd(int requestType, int idProcess = 0)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 List<int> ids = new List<int>();
@@ -396,8 +372,6 @@ namespace RegistryWeb.Controllers
 
         private IActionResult GetNotifies(TenancyNotifiesReportTypeEnum reportType, string fileName)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 var ids = GetSessionIds();
@@ -431,8 +405,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetTenancyWarning(int idPreparer, bool isMultipageDocument)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 var ids = GetSessionIds();
@@ -448,11 +420,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.TenancyWrite)]
         public IActionResult SetTenancyContractRegDate(DateTime regDate)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
-                return View("NotAccess");
-
             try
             {
                 var ids = GetSessionIds();
@@ -476,11 +446,9 @@ namespace RegistryWeb.Controllers
         }
 
         [HttpGet]
+        [HasPrivileges(Privileges.TenancyWrite)]
         public IActionResult SetTenancyReason(string reasonNumber, DateTime reasonDate, int idReasonType, bool isDeletePrevReasons)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyWrite))
-                return View("NotAccess");
-
             try
             {
                 var ids = GetSessionIds();
@@ -495,8 +463,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetExportReasonsForGisZkh()
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 var ids = GetSessionIds();
@@ -511,8 +477,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetGisZkhExport()
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 var ids = GetSessionIds();
@@ -532,9 +496,6 @@ namespace RegistryWeb.Controllers
             if (!ids.Any())
                 return NotFound();
 
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.TenanciesExport(ids);
@@ -548,8 +509,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetNoticeToBks(int idProcess, string actionText, int paymentType, int signer)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.NoticeToBks(idProcess, actionText, paymentType, signer);
@@ -563,8 +522,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetNoticeToIes(int idProcess, string actionText, int signer)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.NoticeToIes(idProcess, actionText, signer);

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.Enums;
+using RegistryWeb.Filters;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions;
@@ -11,6 +12,7 @@ using RegistryWeb.ViewOptions.Filter;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.PrivRead)]
     public class PrivatizationReportsController : SessionController<ClaimsFilter>
     {
         private readonly PrivatizationReportService reportService;
@@ -35,18 +37,12 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Index()
         {
-            if (!securityService.HasPrivilege(Privileges.PrivRead))
-                return View("NotAccess");
-
             var viewModel = dataService.GetViewModel();
-
             return View("Index", viewModel);
         }
 
         public IActionResult MonthQuarterReport(PrivQuarterReportSettings settings)
         {
-            if (!securityService.HasPrivilege(Privileges.PrivRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.GetMonthQuarterReport(settings);
@@ -62,8 +58,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult CommonReport(PrivCommonReportSettings settings)
         {
-            if (!securityService.HasPrivilege(Privileges.PrivRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.GetCommonReport(settings);
@@ -77,8 +71,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetContract(PrivContractReportSettings settings)
         {
-            if (!securityService.HasPrivilege(Privileges.PrivRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.GetContract(settings);
@@ -92,8 +84,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetContractorWarrant(PrivContractorWarrantReportSettings settings)
         {
-            if (!securityService.HasPrivilege(Privileges.PrivRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.GetContractorWarrant(settings);

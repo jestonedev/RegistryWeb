@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.DataServices;
 using RegistryWeb.DataServices.Claims;
+using RegistryWeb.Filters;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;
@@ -12,6 +13,7 @@ using RegistryWeb.ViewOptions.Filter;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.ClaimsRead, Privileges.AccountsRead, PrivilegesComparator = Filters.Common.PrivilegesComparator.Or)]
     public class ClaimReportsController : SessionController<ClaimsFilter>
     {
         private readonly ClaimReportService reportService;
@@ -39,18 +41,14 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Index()
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             var viewModel = dataService.GetViewModel();
 
             return View("Index", viewModel);
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetTransferToLegal(int idClaim, int idSigner, DateTime dateValue)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
             try
             {
                 List<int> ids = new List<int>();
@@ -92,10 +90,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetRequestToBks(int idClaim, int idSigner, DateTime dateValue, int idReportBKSType)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
             try
             {
                 List<int> ids = new List<int>();
@@ -138,10 +135,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetCourtOrderStatement(int idClaim, int idOrder)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.CourtOrderStatement(idClaim, idOrder);
@@ -153,15 +149,13 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimsExport()
         {
             List<int> ids = GetSessionIds();
 
             if (!ids.Any())
                 return NotFound();
-
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
 
             try
             {
@@ -174,16 +168,14 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimsForDoverie(int statusSending)
         {
             List<int> ids = GetSessionIds();
 
             if (!ids.Any())
                 return NotFound();
-
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
+            
             try
             {
                 var file = reportService.ClaimsForDoverie(ids, statusSending);
@@ -195,11 +187,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetSplitAccountsReport()
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.SplitAccountsReport();
@@ -211,11 +201,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimStatesReport(DateTime startDate, DateTime endDate, int idStateType, bool isCurrentState)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.ClaimStatesReport(startDate, endDate, idStateType, isCurrentState);
@@ -227,11 +215,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimStatesAllDatesReport(DateTime startDate, DateTime endDate, int idStateType, bool isCurrentState)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.ClaimStatesAllDatesReport(startDate, endDate, idStateType, isCurrentState);
@@ -243,11 +229,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimExecutorsReport(DateTime startDate, DateTime endDate, int idExecutor)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             try
             {
                 var executor = dataService.GetExecutor(idExecutor);
@@ -260,11 +244,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimCourtReport(DateTime startDate, DateTime endDate)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.ClaimCourtReport(startDate, endDate);
@@ -276,11 +258,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetCourtOspStatement(int idClaim, DateTime createDate, int idSigner)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             try
             {
                 claimsDataService.ClaimLogCourtOsp(idClaim);
@@ -295,11 +275,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetCourtSpiStatement(int idClaim, int idCourtType)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.ClaimCourtSpiReport(idClaim, idCourtType);
@@ -311,11 +289,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimEmergencyTariffReport(DateTime startDate, DateTime endDate)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.ClaimEmergencyTariffReport(startDate, endDate);
@@ -327,11 +303,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimFactMailing(int flag, DateTime startDate, DateTime endDate)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.ClaimFactMailingReport(flag, startDate, endDate);
@@ -343,11 +317,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimDateReferralCcoBailiffs(DateTime startDate, DateTime endDate)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.ClaimDateReferralCcoBailiffs(startDate, endDate);
@@ -359,11 +331,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimExecutedWork(DateTime startDate, DateTime endDate)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.ClaimExecutedWork(startDate, endDate);
@@ -375,11 +345,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetUkInvoiceAgg(List<int> idsOrganization)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.UkInvoiceAgg(idsOrganization);
@@ -391,11 +359,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetUkInvoiceDetails(List<int> idsOrganization)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.UkInvoiceDetails(idsOrganization);
@@ -407,11 +373,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetUkInvoiceAggKumi()
         {
-            if (!securityService.HasPrivilege(Privileges.AccountsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.UkInvoiceAggKumi();
@@ -423,11 +387,10 @@ namespace RegistryWeb.Controllers
             }
         }
 
+
+        [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetUkInvoiceDetailsKumi()
         {
-            if (!securityService.HasPrivilege(Privileges.AccountsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.UkInvoiceDetailsKumi();
@@ -439,11 +402,10 @@ namespace RegistryWeb.Controllers
             }
         }
 
+
+        [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetBalanceForPeriod(DateTime startDate, int reportType)
         {
-            if (!securityService.HasPrivilege(Privileges.AccountsRead))
-                return View("NotAccess");
-
             try
             {
                 var paymentDate = new DateTime(startDate.Year, startDate.Month, 1);
@@ -458,11 +420,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetSberbankFile(DateTime startDate)
         {
-            if (!securityService.HasPrivilege(Privileges.AccountsRead))
-                return View("NotAccess");
-
             try
             {
                 var paymentDate = new DateTime(startDate.Year, startDate.Month, 1);
@@ -477,11 +437,11 @@ namespace RegistryWeb.Controllers
                 return Error(ex.Message);
             }
         }
+
+
+        [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetPaymentsForPeriod(DateTime startDate, DateTime endDate, string kbk)
         {
-            if (!securityService.HasPrivilege(Privileges.AccountsRead))
-                return View("NotAccess");
-
             try
             {
                 var file = reportService.PaymentsForPeriod(startDate, endDate, kbk);
@@ -503,11 +463,10 @@ namespace RegistryWeb.Controllers
             }
         }
 
+
+        [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetFileForDoverie(DateTime startDate, bool excludeUploaded, bool saveUploadFact)
         {
-            if (!securityService.HasPrivilege(Privileges.AccountsRead))
-                return View("NotAccess");
-
             try
             {
                 var date = new DateTime(startDate.Year, startDate.Month, 1);
@@ -522,11 +481,9 @@ namespace RegistryWeb.Controllers
             }
         }
 
+        [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetReconciliationPaymentsForPeriod(DateTime startDate, DateTime endDate, DateTime forPeriod)
         {
-            if (!securityService.HasPrivilege(Privileges.AccountsRead))
-                return View("NotAccess");
-
             try
             {
                 var kbk = "90111109044041000120";

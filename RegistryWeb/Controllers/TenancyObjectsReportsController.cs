@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RegistryWeb.Filters;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;
@@ -8,6 +9,7 @@ using RegistryWeb.ViewOptions.Filter;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.TenancyRead)]
     public class TenancyObjectsReportsController : RegistryBaseController
     {
         private readonly TenancyObjectsReportService reportService;
@@ -23,16 +25,12 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Index()
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             var vm = reportService.GetViewModel();
             return View("Index", vm);
         }
 
         public IActionResult GetTenancyStatistic(TenancyStatisticModalFilter modalFilter)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 byte[] file;
@@ -52,8 +50,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetTenancyOrder(TenancyOrderModalFilter modalFilter)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.GetTenancyOrder(modalFilter);
@@ -67,8 +63,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetTenancyNotifiesList(DateTime? dateFrom, DateTime? dateTo)
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.GetTenancyNotifiesList(dateFrom, dateTo);
@@ -82,8 +76,6 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPayment()
         {
-            if (!securityService.HasPrivilege(Privileges.TenancyRead))
-                return View("NotAccess");
             try
             {
                 var file = reportService.GetPayment();
