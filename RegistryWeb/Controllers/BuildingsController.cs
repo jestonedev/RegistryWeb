@@ -22,6 +22,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.RegistryRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class BuildingsController : ListController<BuildingsDataService, BuildingsFilter>
     {
         OwnerReportService reportService;
@@ -36,6 +37,7 @@ namespace RegistryWeb.Controllers
             this.reportService = reportService;
         }
 
+        [DefaultResponseOnException(typeof(ApplicationException))]
         public IActionResult Index(BuildingsVM viewModel, bool isBack = false)
         {
             if (viewModel.PageOptions != null && viewModel.PageOptions.CurrentPage < 1)
@@ -84,16 +86,9 @@ namespace RegistryWeb.Controllers
             var ids = HttpContext.Session.Get<List<int>>("idBuildings");
             if (!ids.Any())
                 return Error("Не выбрано ни одного здания.");
-            try
-            {
-                var file = reportService.Forma1(ids);
-                return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    @"Форма 1. Общие сведения об аварийном многоквартирном доме г. Братск.docx");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.Forma1(ids);
+            return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                @"Форма 1. Общие сведения об аварийном многоквартирном доме г. Братск.docx");
         }
 
         [HttpPost]

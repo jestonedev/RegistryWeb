@@ -5,17 +5,19 @@ using System.IO.Compression;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RegistryWeb.DataServices;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions.Filter;
 using RegistryDb.Models.Entities.Payments;
 using InvoiceGenerator;
 using RegistryServices.DataServices.BksAccounts;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.ClaimsRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class PaymentAccountReportsController : SessionController<PaymentsFilter>
     {
         private readonly PaymentAccountReportService reportService;
@@ -41,50 +43,32 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetRequestToBks(int idAccount, int idSigner, DateTime dateValue)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-            try
+            List<int> ids = new List<int>();
+            if (idAccount == 0)
             {
-                List<int> ids = new List<int>();
-                if (idAccount == 0)
-                {
-                    ids = GetSessionIds();
-                }
-                else
-                {
-                    ids.Add(idAccount);
-                }
+                ids = GetSessionIds();
+            }
+            else
+            {
+                ids.Add(idAccount);
+            }
 
-                var file = reportService.RequestToBks(ids, idSigner, dateValue);
-                return File(file, odtMime, string.Format(@"Запрос в БКС{0}.odt", idAccount == 0 ? "" : string.Format(" (лицевой счет № {0})", idAccount)));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.RequestToBks(ids, idSigner, dateValue);
+            return File(file, odtMime, string.Format(@"Запрос в БКС{0}.odt", idAccount == 0 ? "" : string.Format(" (лицевой счет № {0})", idAccount)));
         }
 
         public IActionResult GetCalDept(int idAccount, DateTime dateFrom, DateTime dateTo, int fileFormat)
         {
-            if (!securityService.HasPrivilege(Privileges.ClaimsRead))
-                return View("NotAccess");
-            try
+            var payment = dataService.GetLastPayment(idAccount);
+            if (payment == null)
             {
-                var payment = dataService.GetLastPayment(idAccount);
-                if (payment == null)
-                {
-                    return Error(string.Format("Отсутствуют начисления по лицевому счету № {0}", idAccount));
-                }
-                var file = reportService.CalDept(payment, dateFrom, dateTo, fileFormat);
-               return File(file, fileFormat == 1 ? xlsxMime : odsMime, 
-                   string.Format(@"Расчет суммы задолженности (лицевой счет № {0}).{1}", idAccount, fileFormat == 1 ? "xlsx" : "ods"));
+                return Error(string.Format("Отсутствуют начисления по лицевому счету № {0}", idAccount));
             }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.CalDept(payment, dateFrom, dateTo, fileFormat);
+            return File(file, fileFormat == 1 ? xlsxMime : odsMime, 
+                string.Format(@"Расчет суммы задолженности (лицевой счет № {0}).{1}", idAccount, fileFormat == 1 ? "xlsx" : "ods"));
         }
-
+        
         public IActionResult InvoiceGenerator(int? idAccount, DateTime onDate, string invoiceAction, string textmessage)
         {
             var results = new Dictionary<int, IEnumerable<string>>();
@@ -181,7 +165,7 @@ namespace RegistryWeb.Controllers
                     if (invoiceAction == "Export")
                         return InvoiceExport(destDirectory);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return Json(new { ErrorCode = -9 });
                 }
@@ -268,16 +252,9 @@ namespace RegistryWeb.Controllers
 
             if (!securityService.HasPrivilege(Privileges.ClaimsRead))
                 return View("NotAccess");
-
-            try
-            {
-                var file = reportService.ExportPayments(ids);
-                return File(file, odsMime, "Экспорт данных.ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            
+            var file = reportService.ExportPayments(ids);
+            return File(file, odsMime, "Экспорт данных.ods");
         }
     }
 }

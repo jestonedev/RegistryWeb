@@ -13,6 +13,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.TenancyRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class TenancyReportsController : SessionController<TenancyProcessesFilter>
     {
         private readonly TenancyReportService reportService;
@@ -36,209 +37,144 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPreContract(int idProcess, int idPreamble, int idCommittee)
         {
-            try
+            if (!dataService.HasRentObjects(idProcess))
             {
-                if (!dataService.HasRentObjects(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
-                }
-                var file = reportService.PreContract(idProcess, idPreamble, idCommittee);
-                return File(file, odtMime, string.Format(@"Предварительный договор № {0}.odt", idProcess));
+                return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
             }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.PreContract(idProcess, idPreamble, idCommittee);
+            return File(file, odtMime, string.Format(@"Предварительный договор № {0}.odt", idProcess));
         }
 
         public IActionResult GetDksrContract(int idProcess)
         {
-            try
+            if (!dataService.HasRentObjects(idProcess))
             {
-                if (!dataService.HasRentObjects(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
-                }
-                if (!dataService.HasTenant(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
-                }
-                var file = reportService.DksrContract(idProcess);
-                return File(file, odtMime, string.Format(@"Договор (ДКСР) № {0}.odt", idProcess));
+                return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
             }
-            catch (Exception ex)
+            if (!dataService.HasTenant(idProcess))
             {
-                return Error(ex.Message);
+                return Error(string.Format("В найме {0} не указан наниматель", idProcess));
             }
+            var file = reportService.DksrContract(idProcess);
+            return File(file, odtMime, string.Format(@"Договор (ДКСР) № {0}.odt", idProcess));
         }
 
         public IActionResult GetFreeUseContract(int idProcess)
         {
-            try
+            if (!dataService.HasRentObjects(idProcess))
             {
-                if (!dataService.HasRentObjects(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
-                }
-                if (!dataService.HasTenant(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
-                }
-                var file = reportService.FreeUseContract(idProcess);
-                return File(file, odtMime, string.Format(@"Договор БП № {0}.odt", idProcess));
+                return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
             }
-            catch (Exception ex)
+            if (!dataService.HasTenant(idProcess))
             {
-                return Error(ex.Message);
+                return Error(string.Format("В найме {0} не указан наниматель", idProcess));
             }
+            var file = reportService.FreeUseContract(idProcess);
+            return File(file, odtMime, string.Format(@"Договор БП № {0}.odt", idProcess));
         }
 
         public IActionResult GetFreeUseAct(int idProcess)
         {
-            try
+            if (!dataService.HasRentObjects(idProcess))
             {
-                if (!dataService.HasRentObjects(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
-                }
-                if (!dataService.HasTenant(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
-                }
-                var file = reportService.FreeUseAct(idProcess);
-                return File(file, odtMime, string.Format(@"Акт приема-передачи БП № {0}.odt", idProcess));
+                return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
             }
-            catch (Exception ex)
+            if (!dataService.HasTenant(idProcess))
             {
-                return Error(ex.Message);
+                return Error(string.Format("В найме {0} не указан наниматель", idProcess));
             }
+            var file = reportService.FreeUseAct(idProcess);
+            return File(file, odtMime, string.Format(@"Акт приема-передачи БП № {0}.odt", idProcess));
         }
 
         public IActionResult GetStatementResettle(int idProcess)
         {
-            try
+            if (!dataService.HasRentObjects(idProcess))
             {
-                if (!dataService.HasRentObjects(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
-                }
-                if (!dataService.HasTenant(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
-                }
-                var file = reportService.StatementResettleSecondary(idProcess);
-                return File(file, odtMime, string.Format(@"Заявление на переселение Вторичка № {0}.odt", idProcess));
+                return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
             }
-            catch (Exception ex)
+            if (!dataService.HasTenant(idProcess))
             {
-                return Error(ex.Message);
+                return Error(string.Format("В найме {0} не указан наниматель", idProcess));
             }
+            var file = reportService.StatementResettleSecondary(idProcess);
+            return File(file, odtMime, string.Format(@"Заявление на переселение Вторичка № {0}.odt", idProcess));
         }
 
         public IActionResult GetContract(int idProcess, int idRentType, int contractType, bool openDate)
         {
-            try
+            if (!dataService.HasRegistrationDateAndNum(idProcess))
             {
-                if (!dataService.HasRegistrationDateAndNum(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан номер и/или дата договора найма", idProcess));
-                }
-                if (!dataService.HasRentObjects(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
-                }
-                if (!dataService.HasTenant(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
-                }
-                var file = reportService.Contract(idProcess, idRentType, contractType, openDate);
-                return File(file, odtMime, string.Format(@"Договор № {0}.odt", idProcess));
+                return Error(string.Format("В найме {0} не указан номер и/или дата договора найма", idProcess));
             }
-            catch (Exception ex)
+            if (!dataService.HasRentObjects(idProcess))
             {
-                return Error(ex.Message);
+                return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
             }
+            if (!dataService.HasTenant(idProcess))
+            {
+                return Error(string.Format("В найме {0} не указан наниматель", idProcess));
+            }
+            var file = reportService.Contract(idProcess, idRentType, contractType, openDate);
+            return File(file, odtMime, string.Format(@"Договор № {0}.odt", idProcess));
         }
 
         public IActionResult GetActToTenant(int idProcess, bool openDate)
         {
-            try
+            if (!dataService.HasRegistrationDateAndNum(idProcess))
             {
-                if (!dataService.HasRegistrationDateAndNum(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан номер и/или дата договора найма", idProcess));
-                }
-                if (!dataService.HasRentObjects(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
-                }
-                if (!dataService.HasTenant(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
-                }
-                var file = reportService.Act(idProcess, openDate, 2);
-                return File(file, odtMime, string.Format(@"Акт передачи в найм № {0}.odt", idProcess));
+                return Error(string.Format("В найме {0} не указан номер и/или дата договора найма", idProcess));
             }
-            catch (Exception ex)
+            if (!dataService.HasRentObjects(idProcess))
             {
-                return Error(ex.Message);
+                return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
             }
+            if (!dataService.HasTenant(idProcess))
+            {
+                return Error(string.Format("В найме {0} не указан наниматель", idProcess));
+            }
+            var file = reportService.Act(idProcess, openDate, 2);
+            return File(file, odtMime, string.Format(@"Акт передачи в найм № {0}.odt", idProcess));
         }
 
         public IActionResult GetActFromTenant(int idProcess, bool openDate)
         {
-            try
+            if (!dataService.HasRegistrationDateAndNum(idProcess))
             {
-                if (!dataService.HasRegistrationDateAndNum(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан номер и/или дата договора найма", idProcess));
-                }
-                if (!dataService.HasRentObjects(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
-                }
-                if (!dataService.HasTenant(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
-                }
-                if (!dataService.HasAgreement(idProcess))
-                {
-                    return Error(string.Format("В найме {0} отсутствует соглашение", idProcess));
-                }
-                var file = reportService.Act(idProcess, openDate, 1);
-                return File(file, odtMime, string.Format(@"Акт передачи в найм № {0}.odt", idProcess));
+                return Error(string.Format("В найме {0} не указан номер и/или дата договора найма", idProcess));
             }
-            catch (Exception ex)
+            if (!dataService.HasRentObjects(idProcess))
             {
-                return Error(ex.Message);
+                return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
             }
+            if (!dataService.HasTenant(idProcess))
+            {
+                return Error(string.Format("В найме {0} не указан наниматель", idProcess));
+            }
+            if (!dataService.HasAgreement(idProcess))
+            {
+                return Error(string.Format("В найме {0} отсутствует соглашение", idProcess));
+            }
+            var file = reportService.Act(idProcess, openDate, 1);
+            return File(file, odtMime, string.Format(@"Акт передачи в найм № {0}.odt", idProcess));
         }
 
         public IActionResult GetActAf(int idProcess, int idPreparer)
         {
-            try
+            if (!dataService.HasRentObjects(idProcess))
             {
-                if (!dataService.HasRentObjects(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
-                }
-                if (!dataService.HasTenant(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
-                }
-                var file = reportService.ActAf(idProcess, idPreparer);
-                return File(file, odtMime, string.Format(@"Акт приема-передачи (АФ) № {0}.odt", idProcess));
+                return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
             }
-            catch (Exception ex)
+            if (!dataService.HasTenant(idProcess))
             {
-                return Error(ex.Message);
+                return Error(string.Format("В найме {0} не указан наниматель", idProcess));
             }
+            var file = reportService.ActAf(idProcess, idPreparer);
+            return File(file, odtMime, string.Format(@"Акт приема-передачи (АФ) № {0}.odt", idProcess));
         }
 
         public IActionResult GetAgreement(int idAgreement)
         {
-            try
-            {
                 var idProcess = dataService.GetProcessIdForAgreement(idAgreement);
                 if (!dataService.HasRegistrationDateAndNum(idProcess))
                 {
@@ -254,134 +190,101 @@ namespace RegistryWeb.Controllers
                 }
                 var file = reportService.Agreement(idAgreement);
                 return File(file, odtMime, string.Format(@"Соглашение найма № {0}.odt", idProcess));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
         }
 
         public IActionResult GetAgreementReady(int idAgreement)
         {
-            try
+            var idProcess = dataService.GetProcessIdForAgreement(idAgreement);
+            if (!dataService.HasRegistrationDateAndNum(idProcess))
             {
-                var idProcess = dataService.GetProcessIdForAgreement(idAgreement);
-                if (!dataService.HasRegistrationDateAndNum(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан номер и/или дата договора найма", idProcess));
-                }
-                if (!dataService.HasRentObjects(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
-                }
-                if (!dataService.HasTenant(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
-                }
-                var file = reportService.AgreementReady(idProcess);
-                return File(file, odtMime, string.Format(@"Уведомление о готовности соглашения найма № {0}.odt", idProcess));
+                return Error(string.Format("В найме {0} не указан номер и/или дата договора найма", idProcess));
             }
-            catch (Exception ex)
+            if (!dataService.HasRentObjects(idProcess))
             {
-                return Error(ex.Message);
+                return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
             }
+            if (!dataService.HasTenant(idProcess))
+            {
+                return Error(string.Format("В найме {0} не указан наниматель", idProcess));
+            }
+            var file = reportService.AgreementReady(idProcess);
+            return File(file, odtMime, string.Format(@"Уведомление о готовности соглашения найма № {0}.odt", idProcess));
         }
 
         public IActionResult GetNotifySingleDocument(int idProcess, int reportType, string reportTitle)
         {
-            try
+            if (new int[] { 1, 7 }.Contains(reportType) && !dataService.HasRegistrationDateAndNum(idProcess))
             {
-                if (new int[] { 1, 7 }.Contains(reportType) && !dataService.HasRegistrationDateAndNum(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан номер и/или дата договора найма", idProcess));
-                }
-                if (!dataService.HasRentObjects(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
-                }
-                if (!dataService.HasTenant(idProcess))
-                {
-                    return Error(string.Format("В найме {0} не указан наниматель", idProcess));
-                }
-                var file = reportService.NotifySingleDocument(idProcess, reportType);
-                return File(file, odtMime, string.Format(@reportTitle+" (найм № {0}).odt", idProcess));
+                return Error(string.Format("В найме {0} не указан номер и/или дата договора найма", idProcess));
             }
-            catch (Exception ex)
+            if (!dataService.HasRentObjects(idProcess))
             {
-                return Error(ex.Message);
+                return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
             }
+            if (!dataService.HasTenant(idProcess))
+            {
+                return Error(string.Format("В найме {0} не указан наниматель", idProcess));
+            }
+            var file = reportService.NotifySingleDocument(idProcess, reportType);
+            return File(file, odtMime, string.Format(@reportTitle+" (найм № {0}).odt", idProcess));
         }
 
         public IActionResult GetRequestToMvd(int requestType, int idProcess = 0)
         {
-            try
+            List<int> ids = new List<int>();
+            var processingIds = new List<int>();
+            var errorIds = new List<int>();
+            var fileName = @"Запрос в МВД";
+            if (requestType == 2)
             {
-                List<int> ids = new List<int>();
-                var processingIds = new List<int>();
-                var errorIds = new List<int>();
-                var fileName = @"Запрос в МВД";
-                if (requestType == 2)
-                {
-                    fileName = @"Запрос в МВД - новый шаблон";
-                }
-                if (idProcess == 0)
-                {
-                    ids = GetSessionIds();
-                    foreach (var id in ids)
-                    {
-                        if (!dataService.HasRentObjects(id))
-                        {
-                            errorIds.Add(id);
-                            continue;
-                        }
-                        if (!dataService.HasTenancies(id))
-                        {
-                            errorIds.Add(id);
-                            continue;
-                        }
-                        processingIds.Add(id);
-                    }
-                    if (errorIds.Any())
-                    {
-                        return Error(string.Format("В найм{1} {0} не указан адрес нанимаемого жилья или отсутствуют участники",
-                            errorIds.Select(r => r.ToString()).Aggregate((acc, v) => acc + ", " + v),
-                            errorIds.Count == 1 ? "е" : "ах"));
-                    }
-                }
-                else
-                {
-                    if (!dataService.HasRentObjects(idProcess))
-                    {
-                        return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
-                    }
-                    if (!dataService.HasTenancies(idProcess))
-                    {
-                        return Error(string.Format("В найме {0} отсутствуют участники", idProcess));
-                    }
-                    processingIds.Add(idProcess);
-                    fileName += string.Format(" (найм № {0}).odt", idProcess);
-                }
-                var file = reportService.RequestToMvd(processingIds, requestType);
-                return File(file, odtMime, fileName);
+                fileName = @"Запрос в МВД - новый шаблон";
             }
-            catch (Exception ex)
+            if (idProcess == 0)
             {
-                return Error(ex.Message);
+                ids = GetSessionIds();
+                foreach (var id in ids)
+                {
+                    if (!dataService.HasRentObjects(id))
+                    {
+                        errorIds.Add(id);
+                        continue;
+                    }
+                    if (!dataService.HasTenancies(id))
+                    {
+                        errorIds.Add(id);
+                        continue;
+                    }
+                    processingIds.Add(id);
+                }
+                if (errorIds.Any())
+                {
+                    return Error(string.Format("В найм{1} {0} не указан адрес нанимаемого жилья или отсутствуют участники",
+                        errorIds.Select(r => r.ToString()).Aggregate((acc, v) => acc + ", " + v),
+                        errorIds.Count == 1 ? "е" : "ах"));
+                }
             }
+            else
+            {
+                if (!dataService.HasRentObjects(idProcess))
+                {
+                    return Error(string.Format("В найме {0} не указан адрес нанимаемого жилья", idProcess));
+                }
+                if (!dataService.HasTenancies(idProcess))
+                {
+                    return Error(string.Format("В найме {0} отсутствуют участники", idProcess));
+                }
+                processingIds.Add(idProcess);
+                fileName += string.Format(" (найм № {0}).odt", idProcess);
+            }
+            var file = reportService.RequestToMvd(processingIds, requestType);
+            return File(file, odtMime, fileName);
         }
 
         private IActionResult GetNotifies(TenancyNotifiesReportTypeEnum reportType, string fileName)
         {
-            try
-            {
-                var ids = GetSessionIds();
-                var file = reportService.Notifies(ids, reportType);
-                return File(file, odtMime, string.Format("{0}.odt", fileName));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var ids = GetSessionIds();
+            var file = reportService.Notifies(ids, reportType);
+            return File(file, odtMime, string.Format("{0}.odt", fileName));
         }
 
         public IActionResult GetNotifiesPrimary()
@@ -405,88 +308,55 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetTenancyWarning(int idPreparer, bool isMultipageDocument)
         {
-            try
-            {
-                var ids = GetSessionIds();
-                var file = reportService.TenancyWarning(ids, idPreparer, isMultipageDocument);
-                if (isMultipageDocument)
-                    return File(file, odtMime, @"Предупреждения.odt");
-                return File(file, zipMime, @"Предупреждения.zip"); 
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var ids = GetSessionIds();
+            var file = reportService.TenancyWarning(ids, idPreparer, isMultipageDocument);
+            if (isMultipageDocument)
+                return File(file, odtMime, @"Предупреждения.odt");
+            return File(file, zipMime, @"Предупреждения.zip"); 
         }
 
         [HttpGet]
         [HasPrivileges(Privileges.TenancyWrite)]
+        [DefaultResponseOnException(typeof(Exception), ViewResultType = typeof(JsonResult))]
         public IActionResult SetTenancyContractRegDate(DateTime regDate)
         {
-            try
-            {
-                var ids = GetSessionIds();
-                var noValidateContracts = dataService.GetNoValidateContracts(ids);
+            var ids = GetSessionIds();
+            var noValidateContracts = dataService.GetNoValidateContracts(ids);
 
-                if (noValidateContracts.Any())
-                {
-                    var message = @"Для процессов найма №" +
-                        noValidateContracts.Select(id => id.ToString()).Aggregate((x, y) => x + ", " + y) +
-                        "не проставлен номер договора. Для проставления даты регистрации номер должен быть присвоен!";
-                    return Json(message);
-                }
-
-                dataService.SetTenancyContractRegDate(ids, regDate);
-                return Json("Для всех процессов найма дата регистрации была успешно присвоена!");
-            }
-            catch (Exception ex)
+            if (noValidateContracts.Any())
             {
-                return Json(ex.Message);
+                var message = @"Для процессов найма №" +
+                    noValidateContracts.Select(id => id.ToString()).Aggregate((x, y) => x + ", " + y) +
+                    "не проставлен номер договора. Для проставления даты регистрации номер должен быть присвоен!";
+                return Json(message);
             }
+
+            dataService.SetTenancyContractRegDate(ids, regDate);
+            return Json("Для всех процессов найма дата регистрации была успешно присвоена!");
         }
 
         [HttpGet]
         [HasPrivileges(Privileges.TenancyWrite)]
+        [DefaultResponseOnException(typeof(Exception), ViewResultType = typeof(JsonResult))]
         public IActionResult SetTenancyReason(string reasonNumber, DateTime reasonDate, int idReasonType, bool isDeletePrevReasons)
         {
-            try
-            {
-                var ids = GetSessionIds();
-                dataService.SetTenancyReason(ids, reasonNumber, reasonDate, idReasonType, isDeletePrevReasons);
-                return Json("Для всех процессов найма проставление документа-основания успешно завершено!");
-            }
-            catch (Exception ex)
-            {
-                return Json(ex.Message);
-            }
+            var ids = GetSessionIds();
+            dataService.SetTenancyReason(ids, reasonNumber, reasonDate, idReasonType, isDeletePrevReasons);
+            return Json("Для всех процессов найма проставление документа-основания успешно завершено!");
         }
 
         public IActionResult GetExportReasonsForGisZkh()
         {
-            try
-            {
-                var ids = GetSessionIds();
-                var file = reportService.ExportReasonsForGisZkh(ids);
-                return File(file, zipMime, "Документ-основания для ГИС \"ЖКХ\".zip");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var ids = GetSessionIds();
+            var file = reportService.ExportReasonsForGisZkh(ids);
+            return File(file, zipMime, "Документ-основания для ГИС \"ЖКХ\".zip");
         }
 
         public IActionResult GetGisZkhExport()
         {
-            try
-            {
-                var ids = GetSessionIds();
-                var file = reportService.GisZkhExport(ids);
-                return File(file, xlsxMime, "Экспорт для ГИС \"ЖКХ\".xlsx"); 
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var ids = GetSessionIds();
+            var file = reportService.GisZkhExport(ids);
+            return File(file, xlsxMime, "Экспорт для ГИС \"ЖКХ\".xlsx"); 
         }
 
         public IActionResult GetTenanciesExport()
@@ -496,41 +366,20 @@ namespace RegistryWeb.Controllers
             if (!ids.Any())
                 return NotFound();
 
-            try
-            {
-                var file = reportService.TenanciesExport(ids);
-                return File(file, odsMime, string.Format(@"Экспорт данных.ods"));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.TenanciesExport(ids);
+            return File(file, odsMime, string.Format(@"Экспорт данных.ods"));
         }
 
         public IActionResult GetNoticeToBks(int idProcess, string actionText, int paymentType, int signer)
         {
-            try
-            {
-                var file = reportService.NoticeToBks(idProcess, actionText, paymentType, signer);
-                return File(file, odtMime, string.Format(@"Извещение в БКС по найму № {0}.odt", idProcess));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.NoticeToBks(idProcess, actionText, paymentType, signer);
+            return File(file, odtMime, string.Format(@"Извещение в БКС по найму № {0}.odt", idProcess));
         }
 
         public IActionResult GetNoticeToIes(int idProcess, string actionText, int signer)
         {
-            try
-            {
-                var file = reportService.NoticeToIes(idProcess, actionText, signer);
-                return File(file, odtMime, string.Format(@"Извещение в ИЭСБК по найму № {0}.odt", idProcess));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.NoticeToIes(idProcess, actionText, signer);
+            return File(file, odtMime, string.Format(@"Извещение в ИЭСБК по найму № {0}.odt", idProcess));
         }
     }
 }

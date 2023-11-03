@@ -27,6 +27,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.AccountsRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class KumiPaymentsController : ListController<KumiPaymentsDataService, KumiPaymentsFilter>
     {
         private readonly KumiAccountsDataService kumiAccountsDataService;
@@ -445,141 +446,92 @@ namespace RegistryWeb.Controllers
 
         [HttpPost]
         [HasPrivileges(Privileges.AccountsReadWrite)]
+        [JsonWithStateErrorOnException(typeof(Exception))]
         public IActionResult CreateByMemorialOrder(int idOrder, string returnUrl)
         {
-            try
+            var payment = memorialOrdersService.CreatePaymentByMemorialOrder(idOrder);
+            return Json(new
             {
-                var payment = memorialOrdersService.CreatePaymentByMemorialOrder(idOrder);
+                State = "Success",
+                RedirectUrl = Url.Action("Details", new { payment.IdPayment, returnUrl })
+            });
+        }
+
+        [HasPrivileges(Privileges.AccountsReadWrite)]
+        [JsonWithStateErrorOnException(typeof(Exception))]
+        public IActionResult ApplyMemorialOrderWithPair(int idPayment, int idOrder)
+        {
+            var orders = memorialOrdersService.GetKumiPaymentMemorialOrderPairs(idOrder);
+            foreach (var order in orders)
+            {
+                var payment = dataService.GetKumiPaymentForApplyMemorialOrder(idPayment);
+                memorialOrdersService.ApplyMemorialOrderToPayment(payment, order.IdOrder, out bool updatedExistsPayment);
+            }
+            return Json(new
+            {
+                State = "Success"
+            });
+        }
+
+        [HasPrivileges(Privileges.AccountsReadWrite)]
+        [JsonWithStateErrorOnException(typeof(Exception))]
+        public IActionResult ApplyMemorialOrder(int idPayment, List<int> idOrders, string returnUrl)
+        {
+            var updatedExistsPayment = true;
+            var redirectToList = false;
+            foreach (var idOrder in idOrders)
+            {
+                var payment = dataService.GetKumiPaymentForApplyMemorialOrder(idPayment);
+                memorialOrdersService.ApplyMemorialOrderToPayment(payment, idOrder, out updatedExistsPayment);
+                if (!updatedExistsPayment)
+                    redirectToList = true;
+            }
+            if (!redirectToList)
+            {
                 return Json(new
                 {
                     State = "Success",
-                    RedirectUrl = Url.Action("Details", new { payment.IdPayment, returnUrl })
+                    RedirectUrl = Url.Action("Details", new { IdPayment = idPayment, returnUrl })
                 });
-            } catch (Exception e)
-            {
+            } else
                 return Json(new
                 {
-                    State = "Error",
-                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
+                    State = "Success",
+                    RedirectUrl = "/KumiPayments/Index?FilterOptions.IdParentPayment=" + idPayment
                 });
-            }
-
         }
 
         [HasPrivileges(Privileges.AccountsReadWrite)]
-        public IActionResult ApplyMemorialOrderWithPair(int idPayment, int idOrder)
-        {
-            try
-            {
-                var orders = memorialOrdersService.GetKumiPaymentMemorialOrderPairs(idOrder);
-                foreach (var order in orders)
-                {
-                    var payment = dataService.GetKumiPaymentForApplyMemorialOrder(idPayment);
-                    memorialOrdersService.ApplyMemorialOrderToPayment(payment, order.IdOrder, out bool updatedExistsPayment);
-                }
-                return Json(new
-                {
-                    State = "Success"
-                });
-            }
-            catch (Exception e)
-            {
-                return Json(new
-                {
-                    State = "Error",
-                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
-                });
-            }
-        }
-
-        [HasPrivileges(Privileges.AccountsReadWrite)]
-        public IActionResult ApplyMemorialOrder(int idPayment, List<int> idOrders, string returnUrl)
-        {
-            try
-            {
-                var updatedExistsPayment = true;
-                var redirectToList = false;
-                foreach (var idOrder in idOrders)
-                {
-                    var payment = dataService.GetKumiPaymentForApplyMemorialOrder(idPayment);
-                    memorialOrdersService.ApplyMemorialOrderToPayment(payment, idOrder, out updatedExistsPayment);
-                    if (!updatedExistsPayment)
-                        redirectToList = true;
-                }
-                if (!redirectToList)
-                {
-                    return Json(new
-                    {
-                        State = "Success",
-                        RedirectUrl = Url.Action("Details", new { IdPayment = idPayment, returnUrl })
-                    });
-                } else
-                    return Json(new
-                    {
-                        State = "Success",
-                        RedirectUrl = "/KumiPayments/Index?FilterOptions.IdParentPayment=" + idPayment
-                    });
-            } catch(Exception e)
-            {
-                return Json(new
-                {
-                    State = "Error",
-                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
-                });
-            }
-        }
-
-        [HasPrivileges(Privileges.AccountsReadWrite)]
+        [JsonWithStateErrorOnException(typeof(Exception))]
         public IActionResult DistributePaymentToAccount(int idPayment, int idObject, KumiPaymentDistributeToEnum distributeTo,
             decimal tenancySum, decimal penaltySum, decimal dgiSum, decimal pkkSum, decimal padunSum)
         {
-            try
+            var paymentDistributionInfo = distributionsService.DistributePaymentToAccount(idPayment, idObject, distributeTo, tenancySum, penaltySum,
+                dgiSum, pkkSum, padunSum);
+            return Json(new
             {
-                var paymentDistributionInfo = distributionsService.DistributePaymentToAccount(idPayment, idObject, distributeTo, tenancySum, penaltySum,
-                    dgiSum, pkkSum, padunSum);
-                return Json(new
-                {
-                    State = "Success",
-                    paymentDistributionInfo.Sum,
-                    paymentDistributionInfo.DistrubutedToTenancySum,
-                    paymentDistributionInfo.DistrubutedToPenaltySum,
-                    paymentDistributionInfo.DistrubutedToDgiSum,
-                    paymentDistributionInfo.DistrubutedToPkkSum,
-                    paymentDistributionInfo.DistrubutedToPadunSum
-                });
-            }
-            catch (Exception e)
-            {
-                return Json(new
-                {
-                    State = "Error",
-                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
-                });
-            }
+                State = "Success",
+                paymentDistributionInfo.Sum,
+                paymentDistributionInfo.DistrubutedToTenancySum,
+                paymentDistributionInfo.DistrubutedToPenaltySum,
+                paymentDistributionInfo.DistrubutedToDgiSum,
+                paymentDistributionInfo.DistrubutedToPkkSum,
+                paymentDistributionInfo.DistrubutedToPadunSum
+            });
         }
 
         [HasPrivileges(Privileges.AccountsReadWrite)]
+        [JsonWithStateErrorOnException(typeof(Exception))]
         public IActionResult CancelDistributePaymentToAccount(int idPayment, List<int> idClaims, List<int> idAccounts)
         {
-            try
+            var paymentDistributionInfo = distributionsService.CancelDistributePaymentToAccount(idPayment, idClaims, idAccounts);
+            return Json(new
             {
-                var paymentDistributionInfo = distributionsService.CancelDistributePaymentToAccount(idPayment, idClaims, idAccounts);
-                return Json(new
-                {
-                    State = "Success",
-                    paymentDistributionInfo.Sum,
-                    paymentDistributionInfo.DistrubutedToTenancySum,
-                    paymentDistributionInfo.DistrubutedToPenaltySum
-                });
-            }
-            catch (Exception e)
-            {
-                return Json(new
-                {
-                    State = "Error",
-                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
-                });
-            }
+                State = "Success",
+                paymentDistributionInfo.Sum,
+                paymentDistributionInfo.DistrubutedToTenancySum,
+                paymentDistributionInfo.DistrubutedToPenaltySum
+            });
         }
 
         [HasPrivileges(Privileges.AccountsReadWrite)]
@@ -590,35 +542,28 @@ namespace RegistryWeb.Controllers
             List<Tuple<Stream, string>> resultFiles = new List<Tuple<Stream, string>>();
             foreach (var file in files)
             {
-                try
+                var fileInfo = new FileInfo(file.FileName);
+                if (new string[] { ".zip", ".7z" }.Contains(fileInfo.Extension?.ToLowerInvariant()))
                 {
-                    var fileInfo = new FileInfo(file.FileName);
-                    if (new string[] { ".zip", ".7z" }.Contains(fileInfo.Extension?.ToLowerInvariant()))
+                    var tmpFile = Path.GetTempFileName();
+                    using (var zipStream = new FileStream(tmpFile, FileMode.Truncate))
                     {
-                        var tmpFile = Path.GetTempFileName();
-                        using (var zipStream = new FileStream(tmpFile, FileMode.Truncate))
-                        {
-                            file.OpenReadStream().CopyTo(zipStream);
-                            zipStream.Flush();
-                            zipStream.Close();
-                        }
-                        var archiveFiles = zipArchiveDataService.UnpackRecursive(tmpFile);
-                        if (archiveFiles == null) continue;
-                        foreach(var archiveFile in archiveFiles)
-                        {
-                            var archiveFileInfo = new FileInfo(archiveFile);
-                            var stream = new FileStream(archiveFile, FileMode.Open);
-                            resultFiles.Add(new Tuple<Stream, string>(stream, archiveFileInfo.Name));
-                        }
-                    } else
+                        file.OpenReadStream().CopyTo(zipStream);
+                        zipStream.Flush();
+                        zipStream.Close();
+                    }
+                    var archiveFiles = zipArchiveDataService.UnpackRecursive(tmpFile);
+                    if (archiveFiles == null) continue;
+                    foreach(var archiveFile in archiveFiles)
                     {
-                        resultFiles.Add(new Tuple<Stream, string>(file.OpenReadStream(), file.FileName));
-                    }                    
-                }
-                catch (Exception e)
+                        var archiveFileInfo = new FileInfo(archiveFile);
+                        var stream = new FileStream(archiveFile, FileMode.Open);
+                        resultFiles.Add(new Tuple<Stream, string>(stream, archiveFileInfo.Name));
+                    }
+                } else
                 {
-                    return Error(e.Message);
-                }
+                    resultFiles.Add(new Tuple<Stream, string>(file.OpenReadStream(), file.FileName));
+                }   
             }
 
             foreach(var file in resultFiles)
@@ -641,21 +586,11 @@ namespace RegistryWeb.Controllers
                 }
                 catch (BDFormatException e)
                 {
-                    return Error(string.Format("Файл {0}. " + e.Message, file.Item2));
-                }
-                catch (Exception e)
-                {
-                    return Error(e.Message);
+                    throw new BDFormatException(string.Format("Файл {0}. " + e.Message, file.Item2));
                 }
             }
-            try
-            {
-                dataService.UploadInfoFromTff(tffStrings, kumiPaymentGroupFiles, idParentPayment, out int idGroup);
-                return RedirectToAction("UploadLog", new { idGroup } );
-            } catch(ApplicationException e)
-            {
-                return Error(e.Message);
-            }
+            dataService.UploadInfoFromTff(tffStrings, kumiPaymentGroupFiles, idParentPayment, out int idGroup);
+            return RedirectToAction("UploadLog", new { idGroup } );
         }
 
         public IActionResult DistributePaymentDetails(int idPayment)
@@ -699,71 +634,45 @@ namespace RegistryWeb.Controllers
 
         public IActionResult UploadLog(int idGroup)
         {
-            try
-            {
-                var loadstate = dataService.UploadLogPaymentGroups(idGroup);
-                var orders = loadstate.InsertedMemorialOrders.Union(loadstate.SkipedMemorialOrders).ToList();
+            var loadstate = dataService.UploadLogPaymentGroups(idGroup);
+            var orders = loadstate.InsertedMemorialOrders.Union(loadstate.SkipedMemorialOrders).ToList();
 
-                ViewBag.MemorialOrderPayments = memorialOrdersService.GetPaymentsByOrders(orders);
-                ViewBag.KbkDescriptions = dataService.KbkDescriptions;
-                ViewBag.AccountsTenants = dataService.GetAccountsTenants(loadstate.AutoDistributedPayments.Select(r => r.Item2));
+            ViewBag.MemorialOrderPayments = memorialOrdersService.GetPaymentsByOrders(orders);
+            ViewBag.KbkDescriptions = dataService.KbkDescriptions;
+            ViewBag.AccountsTenants = dataService.GetAccountsTenants(loadstate.AutoDistributedPayments.Select(r => r.Item2));
 
-                ViewBag.FilterOptionsVm = dataService.InitializeViewModel(null, null, null);
+            ViewBag.FilterOptionsVm = dataService.InitializeViewModel(null, null, null);
 
-                return View("UploadPaymentsResult", loadstate);
-            }
-            catch( Exception e)
-            {
-                return  Error(e.Message);
-            }       
+            return View("UploadPaymentsResult", loadstate);   
         }
 
+        [JsonWithStateErrorOnException(typeof(Exception))]
         public IActionResult SearchPaymentsForBindOrder(KumiPaymentsFilter filterOptions)
         {
-            try
+            var payments = dataService.GetViewModel(null, new PageOptions { SizePage = 3 }, filterOptions, out List<int> filteredPaymentsIds);
+            return Json(new
             {
-                var payments = dataService.GetViewModel(null, new PageOptions { SizePage = 3 }, filterOptions, out List<int> filteredPaymentsIds);
-                return Json(new
-                {
-                    State = "Success",
-                    Payments = payments.Payments.Select(r => new {
-                        r.IdPayment,
-                        r.NumDocument,
-                        r.DateDocument,
-                        r.Kbk,
-                        r.Sum,
-                        r.Purpose
-                    })
-                });
-            } catch(Exception e)
-            {
-                return Json(new
-                {
-                    State = "Error",
-                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
-                });
-            }
+                State = "Success",
+                Payments = payments.Payments.Select(r => new {
+                    r.IdPayment,
+                    r.NumDocument,
+                    r.DateDocument,
+                    r.Kbk,
+                    r.Sum,
+                    r.Purpose
+                })
+            });
         }
 
         [HasPrivileges(Privileges.AccountsReadWrite)]
+        [JsonWithStateErrorOnException(typeof(Exception))]
         public IActionResult UpdateBksPaymentsDateEnrollUfkForm(DateTime dateDoc, DateTime dateEnrollUfk)
         {
-            try
+            dataService.UpdateBksPaymentsDateEnrollUfkForm(dateDoc, dateEnrollUfk);
+            return Json(new
             {
-                dataService.UpdateBksPaymentsDateEnrollUfkForm(dateDoc, dateEnrollUfk);
-                return Json(new
-                {
-                    State = "Success"
-                });
-            }
-            catch (Exception e)
-            {
-                return Json(new
-                {
-                    State = "Error",
-                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
-                });
-            }
+                State = "Success"
+            });
         }
 
         public IActionResult SearchPaymentRaw(string text)

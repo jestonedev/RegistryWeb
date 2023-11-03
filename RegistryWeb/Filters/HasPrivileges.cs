@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using RegistryWeb.Filters.Common;
 using RegistryWeb.SecurityServices;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace RegistryWeb.Filters
 {

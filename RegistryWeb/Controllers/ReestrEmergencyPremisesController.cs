@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using RegistryServices.ViewModel.RegistryObjects;
 using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
+using RegistryWeb.Filters;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions;
 using RegistryWeb.ViewOptions.Filter;
@@ -14,6 +15,7 @@ using RegistryWeb.ViewOptions.Filter;
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [DefaultResponseOnException(typeof(Exception))]
     public class ReestrEmergencyPremisesController : RegistryBaseController
     {
         private readonly ReestrEmergencyPremisesDataService dataService;
@@ -51,16 +53,10 @@ namespace RegistryWeb.Controllers
         {
             if (!securityService.HasPrivilege(Privileges.OwnerRead))
                 return View("NotAccess");
-            try
-            {
-                var file = dataService.GetFileReestr();
-                return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    @"Реестр жилых и (или) не жилых помещений МКД, признанных аварийными на " + DateTime.Now.ToString("dd.MM.yyyy") + ".docx");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+
+            var file = dataService.GetFileReestr();
+            return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                @"Реестр жилых и (или) не жилых помещений МКД, признанных аварийными на " + DateTime.Now.ToString("dd.MM.yyyy") + ".docx");
         }
 
         [HttpPost]

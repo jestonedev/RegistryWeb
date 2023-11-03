@@ -14,6 +14,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.OwnerRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class OwnerReasonTypesController : RegistryBaseController
     {
         private readonly RegistryContext rc;

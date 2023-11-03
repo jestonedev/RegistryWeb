@@ -10,6 +10,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.AccountsRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class KumiPaymentsReportsController : SessionController<TenancyProcessesFilter>
     {
         private readonly KumiPaymentsReportService reportService;
@@ -25,15 +26,8 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetPaymentOrder(int idPayment)
         {
-            try
-            {
-                var file = reportService.GetPaymentOrder(idPayment);
-                return File(file, xlsxMime, string.Format(@"Платежное поручение № {0}.xlsx", idPayment));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.GetPaymentOrder(idPayment);
+            return File(file, xlsxMime, string.Format(@"Платежное поручение № {0}.xlsx", idPayment));
         }
     }
 }

@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using RegistryWeb.DataServices;
 using RegistryWeb.Extensions;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions;
@@ -20,6 +19,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.ClaimsRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class ClaimsController : ListController<ClaimsDataService, ClaimsFilter>
     {
         private readonly ClaimsAssignedAccountsDataService assignedAccountsService;

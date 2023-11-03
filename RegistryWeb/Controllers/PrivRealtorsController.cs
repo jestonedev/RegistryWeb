@@ -6,10 +6,13 @@ using RegistryDb.Models;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions;
 using RegistryDb.Models.Entities.Privatization;
+using RegistryWeb.Filters;
+using System;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [DefaultResponseOnException(typeof(Exception))]
     public class PrivRealtorsController : RegistryBaseController
     {
         private readonly RegistryContext rc;

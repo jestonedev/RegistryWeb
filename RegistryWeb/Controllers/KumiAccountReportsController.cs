@@ -19,6 +19,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.AccountsRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class KumiAccountReportsController : SessionController<PaymentsFilter>
     {
         private readonly KumiAccountReportService reportService;
@@ -44,24 +45,17 @@ namespace RegistryWeb.Controllers
         }
         public IActionResult GetCalDept(int idAccount, DateTime dateFrom, DateTime dateTo, int fileFormat)
         {
-              try
-              {
-                var payment = dataService.GetLastPayment(idAccount);
-                var personInfo = dataService.GetInfoForReport(idAccount);
+            var payment = dataService.GetLastPayment(idAccount);
+            var personInfo = dataService.GetInfoForReport(idAccount);
 
-                if (payment == null)
-                  {
-                      return Error(string.Format("Отсутствуют начисления по лицевому счету № {0}", idAccount));
-                  }
+            if (payment == null)
+                {
+                    return Error(string.Format("Отсутствуют начисления по лицевому счету № {0}", idAccount));
+                }
 
-                   var file = reportService.CalDept(payment, personInfo, dateFrom, dateTo, fileFormat);
-                  return File(file, fileFormat == 1 ? xlsxMime : odsMime,
-                      string.Format(@"Расчет суммы задолженности (лицевой счет № {0}).{1}", idAccount, fileFormat == 1 ? "xlsx" : "ods"));
-              }
-              catch (Exception ex)
-              {
-                  return Error(ex.Message);
-              }
+                var file = reportService.CalDept(payment, personInfo, dateFrom, dateTo, fileFormat);
+                return File(file, fileFormat == 1 ? xlsxMime : odsMime,
+                    string.Format(@"Расчет суммы задолженности (лицевой счет № {0}).{1}", idAccount, fileFormat == 1 ? "xlsx" : "ods"));
         }
 
         public IActionResult GenerateInvoice(InvoiceGeneratorParamTyped invoice)

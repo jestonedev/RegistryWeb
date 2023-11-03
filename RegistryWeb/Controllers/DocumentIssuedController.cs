@@ -7,11 +7,13 @@ using RegistryWeb.SecurityServices;
 using RegistryWeb.ViewOptions;
 using RegistryDb.Models.Entities.Tenancies;
 using RegistryWeb.Filters;
+using System;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.TenancyRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class DocumentIssuedController: RegistryBaseController
     {
         private readonly RegistryContext rc;

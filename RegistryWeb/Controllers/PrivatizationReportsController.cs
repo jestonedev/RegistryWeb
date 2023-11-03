@@ -13,6 +13,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.PrivRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class PrivatizationReportsController : SessionController<ClaimsFilter>
     {
         private readonly PrivatizationReportService reportService;
@@ -43,57 +44,29 @@ namespace RegistryWeb.Controllers
 
         public IActionResult MonthQuarterReport(PrivQuarterReportSettings settings)
         {
-            try
-            {
-                var file = reportService.GetMonthQuarterReport(settings);
+            var file = reportService.GetMonthQuarterReport(settings);
 
-                var nameReport = settings.Month.HasValue ? "Месячный отчет.odt" : "Квартальный отчет.odt";
-                return File(file, odtMime, nameReport);
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var nameReport = settings.Month.HasValue ? "Месячный отчет.odt" : "Квартальный отчет.odt";
+            return File(file, odtMime, nameReport);
         }
 
         public IActionResult CommonReport(PrivCommonReportSettings settings)
         {
-            try
-            {
-                var file = reportService.GetCommonReport(settings);
-                return File(file, odtMime, string.Format("{0}.odt", settings.ReportName));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.GetCommonReport(settings);
+            return File(file, odtMime, string.Format("{0}.odt", settings.ReportName));
         }
 
         public IActionResult GetContract(PrivContractReportSettings settings)
         {
-            try
-            {
-                var file = reportService.GetContract(settings);
-                return File(file, odtMime, string.Format(@"Договор № {0}.odt", settings.IdContract));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.GetContract(settings);
+            return File(file, odtMime, string.Format(@"Договор № {0}.odt", settings.IdContract));
         }
 
         public IActionResult GetContractorWarrant(PrivContractorWarrantReportSettings settings)
         {
-            try
-            {
-                var file = reportService.GetContractorWarrant(settings);
-                return File(file, odtMime, string.Format(@"Доверенность {1} № {0}.odt", 
-                    settings.IdContractor, settings.WarrantType == PrivContractorWarrantTypeEnum.Realtor ? "(риелтор)" : "в УЮ"));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.GetContractorWarrant(settings);
+            return File(file, odtMime, string.Format(@"Доверенность {1} № {0}.odt", 
+                settings.IdContractor, settings.WarrantType == PrivContractorWarrantTypeEnum.Realtor ? "(риелтор)" : "в УЮ"));
         }
     }
 }

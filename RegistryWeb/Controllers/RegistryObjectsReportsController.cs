@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using RegistryWeb.SecurityServices;
 using RegistryWeb.ReportServices;
 using RegistryWeb.DataServices;
+using RegistryWeb.Filters;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
+    [HasPrivileges(Privileges.RegistryRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class RegistryObjectsReportsController: RegistryBaseController
     {
         private readonly RegistryObjectsReportService reportService;
@@ -27,75 +30,32 @@ namespace RegistryWeb.Controllers
 
         public IActionResult Index()
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
-
-            var viewModel = dataService.GetViewModel();
-            
+            var viewModel = dataService.GetViewModel();           
             return View("Index", viewModel);
         }
 
         public IActionResult GetResettle_2019_2025()
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
-            try
-            {
-                var file = reportService.GetResettle_2019_2025();
-                return File(file, odsMime, "Реестр ЖП, подлежащих переселению из АЖФ до 1 января 2017 года, подлежащих переселению в 2019-2025 года.ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.GetResettle_2019_2025();
+            return File(file, odsMime, "Реестр ЖП, подлежащих переселению из АЖФ до 1 января 2017 года, подлежащих переселению в 2019-2025 года.ods");
         }
 
         public IActionResult GetEmergencyJP(string JFType, string regions)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
-            try
-            {
-                var file = reportService.GetJFReport(JFType, regions, out string NameReport);
-                return File(file, odsMime, NameReport);
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.GetJFReport(JFType, regions, out string NameReport);
+            return File(file, odsMime, NameReport);
         }
 
         public IActionResult GetMunicipalBuilding(string typeReport)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
-            try
-            {
-                var file = reportService.GetStatisticBuildingReport(typeReport);
-                return File(file, odsMime, "Статистика по муниципальным жилым зданиям.ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.GetStatisticBuildingReport(typeReport);
+            return File(file, odsMime, "Статистика по муниципальным жилым зданиям.ods");
         }
 
         public IActionResult GetMunicipalPremise(string typeReport)
         {
-            if (!securityService.HasPrivilege(Privileges.RegistryRead))
-                return View("NotAccess");
-            try
-            {
-                var file = reportService.GetStatisticPremiseReport(typeReport);
-                return File(file, odsMime, "Статистика по муниципальным жилым помещениям.ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.GetStatisticPremiseReport(typeReport);
+            return File(file, odsMime, "Статистика по муниципальным жилым помещениям.ods");
         }
-
-
-
     }
 }

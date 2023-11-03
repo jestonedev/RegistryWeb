@@ -21,6 +21,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.AccountsRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class KumiAccountsController :  ListController<KumiAccountsDataService, KumiAccountsFilter>
     {
         private readonly KumiAccountsClaimsService claimsService;
@@ -259,56 +260,37 @@ namespace RegistryWeb.Controllers
 
         [HttpPost]
         [HasPrivileges(Privileges.AccountsReadWrite)]
+        [JsonWithStateErrorOnException(typeof(Exception))]
         public IActionResult RecalcAccounts(List<int> idAccounts, KumiAccountRecalcTypeEnum recalcType, int? recalcStartYear, int? recalcStartMonth,
             bool saveCurrentPeriodCharge)
         {
-            try
-            {
-                DateTime? recalcStartDate = null;
-                if (recalcStartYear != null && recalcStartMonth != null)
-                    recalcStartDate = new DateTime(recalcStartYear.Value, recalcStartMonth.Value, 1);
-                calculationService.RecalculateAccounts(idAccounts, recalcType, recalcStartDate, saveCurrentPeriodCharge);
+            DateTime? recalcStartDate = null;
+            if (recalcStartYear != null && recalcStartMonth != null)
+                recalcStartDate = new DateTime(recalcStartYear.Value, recalcStartMonth.Value, 1);
+            calculationService.RecalculateAccounts(idAccounts, recalcType, recalcStartDate, saveCurrentPeriodCharge);
 
-                return Json(new
-                {
-                    State = "Success"
-                });
-            }
-            catch(Exception e)
+            return Json(new
             {
-                return Json(new
-                {
-                    State = "Error",
-                    Error = e.Message
-                });
-            }
+                State = "Success"
+            });
         }
 
         [HttpPost]
         [HasPrivileges(Privileges.AccountsReadWrite)]
+        [JsonWithStateErrorOnException(typeof(Exception))]
         public IActionResult AddChargeCorrection(int idAccount, decimal tenancyValue, decimal penaltyValue, 
             decimal dgiValue, decimal pkkValue, decimal padunValue,
             decimal paymentTenancyValue, decimal paymentPenaltyValue, 
             decimal paymentDgiValue, decimal paymentPkkValue, decimal paymentPadunValue,
             DateTime atDate, string description, int? idAccountMirror)
         {
-            try
+            dataService.AddChargeCorrection(idAccount, tenancyValue, penaltyValue, dgiValue, pkkValue, padunValue,
+                paymentTenancyValue, paymentPenaltyValue, paymentDgiValue, paymentPkkValue, paymentPadunValue,
+                atDate, description, idAccountMirror);
+            return Json(new
             {
-                dataService.AddChargeCorrection(idAccount, tenancyValue, penaltyValue, dgiValue, pkkValue, padunValue,
-                    paymentTenancyValue, paymentPenaltyValue, paymentDgiValue, paymentPkkValue, paymentPadunValue,
-                    atDate, description, idAccountMirror);
-                return Json(new
-                {
-                    State = "Success"
-                });
-            } catch(Exception e)
-            {
-                return Json(new
-                {
-                    State = "Error",
-                    Error = e.Message
-                });
-            }
+                State = "Success"
+            });
         }
 
         public IActionResult ChargeCorrectionsList(int idAccount)
@@ -318,26 +300,16 @@ namespace RegistryWeb.Controllers
 
         [HttpPost]
         [HasPrivileges(Privileges.AccountsReadWrite)]
+        [JsonWithStateErrorOnException(typeof(Exception))]
         public IActionResult DeleteCorrection(int idCorrection)
         {
-            try
+            var idAccount = dataService.GetIdAccountByCorrection(idCorrection);
+            dataService.DeleteChargeCorrection(idCorrection);
+            calculationService.RecalculateAccounts(new List<int> { idAccount }, 0, null, false);
+            return Json(new
             {
-                var idAccount = dataService.GetIdAccountByCorrection(idCorrection);
-                dataService.DeleteChargeCorrection(idCorrection);
-                calculationService.RecalculateAccounts(new List<int> { idAccount }, 0, null, false);
-                return Json(new
-                {
-                    State = "Success"
-                });
-            }
-            catch (Exception e)
-            {
-                return Json(new
-                {
-                    State = "Error",
-                    Error = e.Message
-                });
-            }
+                State = "Success"
+            });
         }
 
         [HttpPost]
@@ -348,23 +320,13 @@ namespace RegistryWeb.Controllers
 
         [HttpPost]
         [HasPrivileges(Privileges.AccountsReadWrite)]
+        [JsonWithStateErrorOnException(typeof(Exception))]
         public IActionResult SaveDescriptionForAddress(int idAccount, string description) {
-            try
+            dataService.SaveDescriptionForAddress(idAccount, description);
+            return Json(new
             {
-                dataService.SaveDescriptionForAddress(idAccount, description);
-                return Json(new
-                {
-                    State = "Success"
-                });
-            }
-            catch (Exception e)
-            {
-                return Json(new
-                {
-                    State = "Error",
-                    Error = e.Message
-                });
-            }
+                State = "Success"
+            });
         }
 
         [HasPrivileges(Privileges.ClaimsWrite, Model = "У вас нет прав на выполнение данной операции", ViewResultType = typeof(ViewResult), ViewName = "Error")]
@@ -435,24 +397,15 @@ namespace RegistryWeb.Controllers
         }
 
         [HasPrivileges(Privileges.AccountsReadWrite)]
+        [JsonWithStateErrorOnException(typeof(Exception))]
         public IActionResult SplitAccount(int idAccount, DateTime onDate, string description, List<SplitAccountModel> splitAccounts)
         {
-            try
+            var accountIds = dataService.SplitAccount(idAccount, onDate, description, splitAccounts);
+            return Json(new
             {
-                var accountIds = dataService.SplitAccount(idAccount, onDate, description, splitAccounts);
-                return Json(new
-                {
-                    State = "Success",
-                    Accounts = accountIds
-                });
-            } catch(Exception e)
-            {
-                return Json(new
-                {
-                    State = "Error",
-                    Error = e.Message
-                });
-            }
+                State = "Success",
+                Accounts = accountIds
+            });
         }
     }
 }

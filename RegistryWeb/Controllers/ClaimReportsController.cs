@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RegistryWeb.DataServices;
 using RegistryWeb.DataServices.Claims;
 using RegistryWeb.Filters;
 using RegistryWeb.ReportServices;
@@ -14,6 +13,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.ClaimsRead, Privileges.AccountsRead, PrivilegesComparator = Filters.Common.PrivilegesComparator.Or)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class ClaimReportsController : SessionController<ClaimsFilter>
     {
         private readonly ClaimReportService reportService;
@@ -49,104 +49,83 @@ namespace RegistryWeb.Controllers
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetTransferToLegal(int idClaim, int idSigner, DateTime dateValue)
         {
-            try
+            List<int> ids = new List<int>();
+            var processingIds = new List<int>();
+            var errorIds = new List<int>();
+            if (idClaim == 0)
             {
-                List<int> ids = new List<int>();
-                var processingIds = new List<int>();
-                var errorIds = new List<int>();
-                if (idClaim == 0)
+                ids = GetSessionIds();
+                foreach (var id in ids)
                 {
-                    ids = GetSessionIds();
-                    foreach (var id in ids)
+                    if (!dataService.HasClaimState(id, 2))
                     {
-                        if (!dataService.HasClaimState(id, 2))
-                        {
-                            errorIds.Add(id);
-                            continue;
-                        }
-                        processingIds.Add(id);
+                        errorIds.Add(id);
+                        continue;
                     }
-                    if (errorIds.Any())
-                    {
-                        return Error(string.Format("В исков{1} работ{2} {0} отсутствует стадия передачи в юридический отдел",
-                            errorIds.Select(r => r.ToString()).Aggregate((acc, v) => acc + ", " + v),
-                            errorIds.Count == 1 ? "ой" : "ых", errorIds.Count == 1 ? "е" : "ах"));
-                    }
+                    processingIds.Add(id);
                 }
-                else
+                if (errorIds.Any())
                 {
-                    if (!dataService.HasClaimState(idClaim, 2))
-                    {
-                        return Error(string.Format("В исковой работе {0} отсутствует стадия передачи в юридический отдел", idClaim));
-                    }
-                    processingIds.Add(idClaim);
+                    return Error(string.Format("В исков{1} работ{2} {0} отсутствует стадия передачи в юридический отдел",
+                        errorIds.Select(r => r.ToString()).Aggregate((acc, v) => acc + ", " + v),
+                        errorIds.Count == 1 ? "ой" : "ых", errorIds.Count == 1 ? "е" : "ах"));
                 }
-                var file = reportService.TransferToLegal(processingIds, idSigner, dateValue);
-                return File(file, docxMime, string.Format(@"Передача в юр. отдел{0}.docx", idClaim == 0 ? "" : string.Format(" (исковой работы № {0})", idClaim)));
             }
-            catch (Exception ex)
+            else
             {
-                return Error(ex.Message);
+                if (!dataService.HasClaimState(idClaim, 2))
+                {
+                    return Error(string.Format("В исковой работе {0} отсутствует стадия передачи в юридический отдел", idClaim));
+                }
+                processingIds.Add(idClaim);
             }
+            var file = reportService.TransferToLegal(processingIds, idSigner, dateValue);
+            return File(file, docxMime, string.Format(@"Передача в юр. отдел{0}.docx", idClaim == 0 ? "" : string.Format(" (исковой работы № {0})", idClaim)));
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetRequestToBks(int idClaim, int idSigner, DateTime dateValue, int idReportBKSType)
         {
-            try
+            List<int> ids = new List<int>();
+            var processingIds = new List<int>();
+            var errorIds = new List<int>();
+            if (idClaim == 0)
             {
-                List<int> ids = new List<int>();
-                var processingIds = new List<int>();
-                var errorIds = new List<int>();
-                if (idClaim == 0)
+                ids = GetSessionIds();
+                foreach (var id in ids)
                 {
-                    ids = GetSessionIds();
-                    foreach (var id in ids)
+                    if (!dataService.HasClaimState(id, 1))
                     {
-                        if (!dataService.HasClaimState(id, 1))
-                        {
-                            errorIds.Add(id);
-                            continue;
-                        }
-                        processingIds.Add(id);
+                        errorIds.Add(id);
+                        continue;
                     }
-                    if (errorIds.Any())
-                    {
-                        return Error(string.Format("В исков{1} работ{2} {0} отсутствует стадия запроса в БКС",
-                            errorIds.Select(r => r.ToString()).Aggregate((acc, v) => acc + ", " + v),
-                            errorIds.Count == 1 ? "ой" : "ых", errorIds.Count == 1 ? "е" : "ах"));
-                    }
+                    processingIds.Add(id);
                 }
-                else
+                if (errorIds.Any())
                 {
-                    if (!dataService.HasClaimState(idClaim, 1))
-                    {
-                        return Error(string.Format("В исковой работе {0} отсутствует стадия запроса в БКС", idClaim));
-                    }
-                    processingIds.Add(idClaim);
+                    return Error(string.Format("В исков{1} работ{2} {0} отсутствует стадия запроса в БКС",
+                        errorIds.Select(r => r.ToString()).Aggregate((acc, v) => acc + ", " + v),
+                        errorIds.Count == 1 ? "ой" : "ых", errorIds.Count == 1 ? "е" : "ах"));
                 }
+            }
+            else
+            {
+                if (!dataService.HasClaimState(idClaim, 1))
+                {
+                    return Error(string.Format("В исковой работе {0} отсутствует стадия запроса в БКС", idClaim));
+                }
+                processingIds.Add(idClaim);
+            }
 
-                var file = reportService.RequestToBks(processingIds, idSigner, dateValue, idReportBKSType);
-                return File(file, odtMime, string.Format(@"Запрос в БКС{0}.odt", idClaim == 0 ? "" : string.Format(" (иск. работа № {0})", idClaim)));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.RequestToBks(processingIds, idSigner, dateValue, idReportBKSType);
+            return File(file, odtMime, string.Format(@"Запрос в БКС{0}.odt", idClaim == 0 ? "" : string.Format(" (иск. работа № {0})", idClaim)));
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetCourtOrderStatement(int idClaim, int idOrder)
         {
-            try
-            {
-                var file = reportService.CourtOrderStatement(idClaim, idOrder);
-                return File(file, odtMime, string.Format(@"Заявление о выдаче судебного приказа (иск. работа № {0}).odt", idClaim));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.CourtOrderStatement(idClaim, idOrder);
+            return File(file, odtMime, string.Format(@"Заявление о выдаче судебного приказа (иск. работа № {0}).odt", idClaim));
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
@@ -157,15 +136,8 @@ namespace RegistryWeb.Controllers
             if (!ids.Any())
                 return NotFound();
 
-            try
-            {
-                var file = reportService.ExportClaims(ids);
-                return File(file, odsMime, "Экспорт данных.ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.ExportClaims(ids);
+            return File(file, odsMime, "Экспорт данных.ods");
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
@@ -175,336 +147,188 @@ namespace RegistryWeb.Controllers
 
             if (!ids.Any())
                 return NotFound();
-            
-            try
-            {
-                var file = reportService.ClaimsForDoverie(ids, statusSending);
-                return File(file, odsMime, "обменный файл АИС 'Доверие'.ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+
+            var file = reportService.ClaimsForDoverie(ids, statusSending);
+            return File(file, odsMime, "обменный файл АИС 'Доверие'.ods");
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetSplitAccountsReport()
         {
-            try
-            {
-                var file = reportService.SplitAccountsReport();
-                return File(file, odsMime, "Статистика по разделенным лицевым счетам.ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.SplitAccountsReport();
+            return File(file, odsMime, "Статистика по разделенным лицевым счетам.ods");
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimStatesReport(DateTime startDate, DateTime endDate, int idStateType, bool isCurrentState)
         {
-            try
-            {
-                var file = reportService.ClaimStatesReport(startDate, endDate, idStateType, isCurrentState);
-                return File(file, odsMime, "Отчет по стадиям исковых работ.ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.ClaimStatesReport(startDate, endDate, idStateType, isCurrentState);
+            return File(file, odsMime, "Отчет по стадиям исковых работ.ods");
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimStatesAllDatesReport(DateTime startDate, DateTime endDate, int idStateType, bool isCurrentState)
         {
-            try
-            {
-                var file = reportService.ClaimStatesAllDatesReport(startDate, endDate, idStateType, isCurrentState);
-                return File(file, odsMime, "Отчет по стадиям исковых работ.ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.ClaimStatesAllDatesReport(startDate, endDate, idStateType, isCurrentState);
+            return File(file, odsMime, "Отчет по стадиям исковых работ.ods");
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimExecutorsReport(DateTime startDate, DateTime endDate, int idExecutor)
         {
-            try
-            {
-                var executor = dataService.GetExecutor(idExecutor);
-                var file = reportService.ClaimExecutorReport(startDate, endDate, executor);
-                return File(file, odsMime, "Отчет по исполнителям исковой работы.ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var executor = dataService.GetExecutor(idExecutor);
+            var file = reportService.ClaimExecutorReport(startDate, endDate, executor);
+            return File(file, odsMime, "Отчет по исполнителям исковой работы.ods");
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimCourtReport(DateTime startDate, DateTime endDate)
         {
-            try
-            {
-                var file = reportService.ClaimCourtReport(startDate, endDate);
-                return File(file, odsMime, "Подготовленные судебные приказы.ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.ClaimCourtReport(startDate, endDate);
+            return File(file, odsMime, "Подготовленные судебные приказы.ods");
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetCourtOspStatement(int idClaim, DateTime createDate, int idSigner)
         {
-            try
-            {
-                claimsDataService.ClaimLogCourtOsp(idClaim);
-                var personsCount = claimsDataService.ReceivePersonCount(idClaim);
-                var file = reportService.ClaimCourtOspReport(idClaim, createDate, personsCount, idSigner);
-
-                return File(file, odtMime, string.Format("Заявление о возбуждении ИП (иск. работа № {0}).odt", idClaim));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            claimsDataService.ClaimLogCourtOsp(idClaim);
+            var personsCount = claimsDataService.ReceivePersonCount(idClaim);
+            var file = reportService.ClaimCourtOspReport(idClaim, createDate, personsCount, idSigner);
+            return File(file, odtMime, string.Format("Заявление о возбуждении ИП (иск. работа № {0}).odt", idClaim));
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetCourtSpiStatement(int idClaim, int idCourtType)
         {
-            try
-            {
-                var file = reportService.ClaimCourtSpiReport(idClaim, idCourtType);
-                return File(file, odtMime, string.Format("Заявление о прекращении ИП (иск. работа № {0}).odt", idClaim));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.ClaimCourtSpiReport(idClaim, idCourtType);
+            return File(file, odtMime, string.Format("Заявление о прекращении ИП (иск. работа № {0}).odt", idClaim));
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimEmergencyTariffReport(DateTime startDate, DateTime endDate)
         {
-            try
-            {
-                var file = reportService.ClaimEmergencyTariffReport(startDate, endDate);
-                return File(file, xlsxMime, "Отчет по тарифам аварийных помещений.xlsx");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.ClaimEmergencyTariffReport(startDate, endDate);
+            return File(file, xlsxMime, "Отчет по тарифам аварийных помещений.xlsx");
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimFactMailing(int flag, DateTime startDate, DateTime endDate)
         {
-            try
-            {
-                var file = reportService.ClaimFactMailingReport(flag, startDate, endDate);
-                return File(file, odsMime, "Отчет по факту рассылки.ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.ClaimFactMailingReport(flag, startDate, endDate);
+            return File(file, odsMime, "Отчет по факту рассылки.ods");
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimDateReferralCcoBailiffs(DateTime startDate, DateTime endDate)
         {
-            try
-            {
-                var file = reportService.ClaimDateReferralCcoBailiffs(startDate, endDate);
-                return File(file, odsMime, "Отчет по дате направления с/п приставам.ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.ClaimDateReferralCcoBailiffs(startDate, endDate);
+            return File(file, odsMime, "Отчет по дате направления с/п приставам.ods");
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetClaimExecutedWork(DateTime startDate, DateTime endDate)
         {
-            try
-            {
-                var file = reportService.ClaimExecutedWork(startDate, endDate);
-                return File(file, xlsxMime, string.Format("Отчет о проделанной работе {0}-{1}.xlsx", startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.ClaimExecutedWork(startDate, endDate);
+            return File(file, xlsxMime, string.Format("Отчет о проделанной работе {0}-{1}.xlsx", startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")));
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetUkInvoiceAgg(List<int> idsOrganization)
         {
-            try
-            {
-                var file = reportService.UkInvoiceAgg(idsOrganization);
-                return File(file, docxMime, string.Format("Накладная на отправку счетов от {0}.docx", DateTime.Now.ToString("dd.MM.yyyy")));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.UkInvoiceAgg(idsOrganization);
+            return File(file, docxMime, string.Format("Накладная на отправку счетов от {0}.docx", DateTime.Now.ToString("dd.MM.yyyy")));
         }
 
         [HasPrivileges(Privileges.ClaimsRead)]
         public IActionResult GetUkInvoiceDetails(List<int> idsOrganization)
         {
-            try
-            {
-                var file = reportService.UkInvoiceDetails(idsOrganization);
-                return File(file, xlsxMime, string.Format("Детализация по накладной на отправку счетов от {0}.xlsx", DateTime.Now.ToString("dd.MM.yyyy")));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.UkInvoiceDetails(idsOrganization);
+            return File(file, xlsxMime, string.Format("Детализация по накладной на отправку счетов от {0}.xlsx", DateTime.Now.ToString("dd.MM.yyyy")));
         }
 
         [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetUkInvoiceAggKumi()
         {
-            try
-            {
-                var file = reportService.UkInvoiceAggKumi();
-                return File(file, docxMime, string.Format("Накладная на отправку счетов от {0}.docx", DateTime.Now.ToString("dd.MM.yyyy")));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.UkInvoiceAggKumi();
+            return File(file, docxMime, string.Format("Накладная на отправку счетов от {0}.docx", DateTime.Now.ToString("dd.MM.yyyy")));
         }
 
 
         [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetUkInvoiceDetailsKumi()
         {
-            try
-            {
-                var file = reportService.UkInvoiceDetailsKumi();
-                return File(file, xlsxMime, string.Format("Детализация по накладной на отправку счетов от {0}.xlsx", DateTime.Now.ToString("dd.MM.yyyy")));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.UkInvoiceDetailsKumi();
+            return File(file, xlsxMime, string.Format("Детализация по накладной на отправку счетов от {0}.xlsx", DateTime.Now.ToString("dd.MM.yyyy")));
         }
 
 
         [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetBalanceForPeriod(DateTime startDate, int reportType)
         {
-            try
-            {
-                var paymentDate = new DateTime(startDate.Year, startDate.Month, 1);
-                paymentDate = paymentDate.AddMonths(1).AddDays(-1);
+            var paymentDate = new DateTime(startDate.Year, startDate.Month, 1);
+            paymentDate = paymentDate.AddMonths(1).AddDays(-1);
 
-                var file = reportService.BalanceForPeriod(paymentDate, reportType);
-                return File(file, odsMime, string.Format("Начисления ЛС КУМИ за период {0}-{1}.ods", startDate.ToString("dd.MM.yyyy"), paymentDate.ToString("dd.MM.yyyy")));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.BalanceForPeriod(paymentDate, reportType);
+            return File(file, odsMime, string.Format("Начисления ЛС КУМИ за период {0}-{1}.ods", startDate.ToString("dd.MM.yyyy"), paymentDate.ToString("dd.MM.yyyy")));
         }
 
         [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetSberbankFile(DateTime startDate)
         {
-            try
-            {
-                var paymentDate = new DateTime(startDate.Year, startDate.Month, 1);
-                paymentDate = paymentDate.AddMonths(1).AddDays(-1);
+            var paymentDate = new DateTime(startDate.Year, startDate.Month, 1);
+            paymentDate = paymentDate.AddMonths(1).AddDays(-1);
 
-                var file = reportService.SberbankFile(paymentDate);
-                var monthStr = (startDate.Month < 10 ? "0" : "") + startDate.Month.ToString();
-                return File(file, csvMime, string.Format("18018001_3803201800_40101810900000010001_{0}_y{1}.csv", monthStr, (startDate.Year % 100).ToString()));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.SberbankFile(paymentDate);
+            var monthStr = (startDate.Month < 10 ? "0" : "") + startDate.Month.ToString();
+            return File(file, csvMime, string.Format("18018001_3803201800_40101810900000010001_{0}_y{1}.csv", monthStr, (startDate.Year % 100).ToString()));
         }
 
 
         [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetPaymentsForPeriod(DateTime startDate, DateTime endDate, string kbk)
         {
-            try
+            var file = reportService.PaymentsForPeriod(startDate, endDate, kbk);
+            var kbkName = "";
+            switch(kbk)
             {
-                var file = reportService.PaymentsForPeriod(startDate, endDate, kbk);
-                var kbkName = "";
-                switch(kbk)
-                {
-                    case "90111109044041000120":
-                        kbkName= "найма";
-                        break;
-                    case "90111705040041111180":
-                        kbkName = "ДГИ";
-                        break;
-                }
-                return File(file, "application/vnd.ms-excel", string.Format("Платежи КБК {0} за период {1}-{2}.xls", kbkName, startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")));
+                case "90111109044041000120":
+                    kbkName= "найма";
+                    break;
+                case "90111705040041111180":
+                    kbkName = "ДГИ";
+                    break;
             }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            return File(file, "application/vnd.ms-excel", string.Format("Платежи КБК {0} за период {1}-{2}.xls", kbkName, startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy")));
         }
 
 
         [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetFileForDoverie(DateTime startDate, bool excludeUploaded, bool saveUploadFact)
         {
-            try
-            {
-                var date = new DateTime(startDate.Year, startDate.Month, 1);
-                date = date.AddMonths(1).AddDays(-1);
+            var date = new DateTime(startDate.Year, startDate.Month, 1);
+            date = date.AddMonths(1).AddDays(-1);
 
-                var file = reportService.FileForDoverie(date, excludeUploaded, saveUploadFact);
-                return File(file, odsMime, string.Format("Обменный файл для АИС \"Доверие\" от {0}.ods", DateTime.Now.ToString("dd.MM.yyyy")));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.FileForDoverie(date, excludeUploaded, saveUploadFact);
+            return File(file, odsMime, string.Format("Обменный файл для АИС \"Доверие\" от {0}.ods", DateTime.Now.ToString("dd.MM.yyyy")));
         }
 
         [HasPrivileges(Privileges.AccountsRead)]
         public IActionResult GetReconciliationPaymentsForPeriod(DateTime startDate, DateTime endDate, DateTime forPeriod)
         {
-            try
+            var kbk = "90111109044041000120";
+            var file = reportService.ReconciliationPaymentsForPeriod(startDate, endDate, forPeriod, kbk);
+            var kbkName = "";
+            switch (kbk)
             {
-                var kbk = "90111109044041000120";
-                var file = reportService.ReconciliationPaymentsForPeriod(startDate, endDate, forPeriod, kbk);
-                var kbkName = "";
-                switch (kbk)
-                {
-                    case "90111109044041000120":
-                        kbkName = "найма";
-                        break;
-                    case "90111705040041111180":
-                        kbkName = "ДГИ";
-                        break;
-                }
+                case "90111109044041000120":
+                    kbkName = "найма";
+                    break;
+                case "90111705040041111180":
+                    kbkName = "ДГИ";
+                    break;
+            }
 
-                return File(file, odsMime, string.Format("Отчет-сверка по платежам {0} за {3} за период с {1}-{2}.ods", kbkName, startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy"), forPeriod.ToString("MMMM")));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            return File(file, odsMime, string.Format("Отчет-сверка по платежам {0} за {3} за период с {1}-{2}.ods", kbkName, startDate.ToString("dd.MM.yyyy"), endDate.ToString("dd.MM.yyyy"), forPeriod.ToString("MMMM")));
         }
     }
 }

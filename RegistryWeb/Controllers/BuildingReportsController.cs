@@ -9,6 +9,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.RegistryRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class BuildingReportsController : RegistryBaseController
     {
         private readonly BuildingReportService reportService;
@@ -24,15 +25,8 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetExcerptBuilding(int idBuilding, string excerptNumber, DateTime excerptDateFrom, int signer)
         {
-            try
-            {
-                var file = reportService.ExcerptBuilding(idBuilding, excerptNumber, excerptDateFrom, signer);
-                return File(file, odtMime, string.Format(@"Выписка на здание № {0}.odt", idBuilding));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.ExcerptBuilding(idBuilding, excerptNumber, excerptDateFrom, signer);
+            return File(file, odtMime, string.Format(@"Выписка на здание № {0}.odt", idBuilding));
         }
     }
 }

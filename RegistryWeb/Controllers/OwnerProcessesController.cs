@@ -16,6 +16,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.OwnerRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class OwnerProcessesController : ListController<OwnerProcessesDataService, OwnerProcessesFilter>
     {        
         public OwnerProcessesController(OwnerProcessesDataService dataService, SecurityService securityService)

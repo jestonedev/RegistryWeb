@@ -7,11 +7,13 @@ using RegistryWeb.Enums;
 using RegistryServices.ViewModel.Privatization;
 using RegistryDb.Models.Entities.Privatization;
 using RegistryWeb.Filters;
+using System;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.PrivRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class PrivatizationController : ListController<PrivatizationDataService, PrivatizationFilter>
     {
         public PrivatizationController(PrivatizationDataService dataService, SecurityService securityService)

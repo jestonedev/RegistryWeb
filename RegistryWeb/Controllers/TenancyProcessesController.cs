@@ -20,6 +20,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.TenancyRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class TenancyProcessesController : ListController<TenancyProcessesDataService, TenancyProcessesFilter>
     {
         public TenancyProcessesController(TenancyProcessesDataService dataService, SecurityService securityService)

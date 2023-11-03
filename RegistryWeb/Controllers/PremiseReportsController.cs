@@ -14,6 +14,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.RegistryRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class PremiseReportsController : SessionController<PremisesListFilter>
     {
         private readonly PremiseReportService reportService;
@@ -35,97 +36,48 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetExcerptPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
-            try
-            {
-                var file = reportService.ExcerptPremise(idPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
-                return File(file, odtMime, string.Format(@"Выписка на помещение № {0}.odt", idPremise));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.ExcerptPremise(idPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
+            return File(file, odtMime, string.Format(@"Выписка на помещение № {0}.odt", idPremise));
         }
 
         public IActionResult GetExcerptSubPremise(int idSubPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
-            try
-            {
-                var file = reportService.ExcerptSubPremise(idSubPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
-                return File(file, odtMime, string.Format(@"Выписка на комнату № {0}.odt", idSubPremise));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.ExcerptSubPremise(idSubPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
+            return File(file, odtMime, string.Format(@"Выписка на комнату № {0}.odt", idSubPremise));
         }
 
         public IActionResult GetExcerptMunSubPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
-            try
+            if (!dataService.HasMunicipalSubPrmieses(idPremise))
             {
-                if (!dataService.HasMunicipalSubPrmieses(idPremise))
-                {
-                    return Error(string.Format("В помещении № {0} отсутствуют муниципальные комнаты", idPremise));
-                }
-                var file = reportService.ExcerptMunSubPremises(idPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
-                return File(file, odtMime, string.Format(@"Выписка на мун. комнаты помещения № {0}.odt", idPremise));
+                return Error(string.Format("В помещении № {0} отсутствуют муниципальные комнаты", idPremise));
             }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.ExcerptMunSubPremises(idPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
+            return File(file, odtMime, string.Format(@"Выписка на мун. комнаты помещения № {0}.odt", idPremise));
         }
 
         public IActionResult GetPremiseNoticeToBks(int idPremise, string actionText, int paymentType, int signer)
         {
-            try
-            {
-                var file = reportService.PremiseNoticeToBks(idPremise, actionText, paymentType, signer);
-                return File(file, odtMime, string.Format(@"Извещение в БКС на помещение № {0}.odt", idPremise));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.PremiseNoticeToBks(idPremise, actionText, paymentType, signer);
+            return File(file, odtMime, string.Format(@"Извещение в БКС на помещение № {0}.odt", idPremise));
         }
 
         public IActionResult GetPremiseNoticeToIes(int idPremise, string actionText, int signer)
         {
-            try
-            {
-                var file = reportService.PremiseNoticeToIes(idPremise, actionText, signer);
-                return File(file, odtMime, string.Format(@"Извещение в ИЭСБК на помещение № {0}.odt", idPremise));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.PremiseNoticeToIes(idPremise, actionText, signer);
+            return File(file, odtMime, string.Format(@"Извещение в ИЭСБК на помещение № {0}.odt", idPremise));
         }
 
         public IActionResult GetSubPremiseNoticeToIes(int idSubPremise, string actionText, int signer)
         {
-            try
-            {
-                var file = reportService.SubPremiseNoticeToIes(idSubPremise, actionText, signer);
-                return File(file, odtMime, string.Format(@"Извещение в ИЭСБК на комнату № {0}.odt", idSubPremise));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.SubPremiseNoticeToIes(idSubPremise, actionText, signer);
+            return File(file, odtMime, string.Format(@"Извещение в ИЭСБК на комнату № {0}.odt", idSubPremise));
         }
 
         public IActionResult GetSubPremiseNoticeToBks(int idSubPremise, string actionText, int paymentType, int signer)
         {
-            try
-            {
-                var file = reportService.SubPremiseNoticeToBks(idSubPremise, actionText, paymentType, signer);
-                return File(file, odtMime, string.Format(@"Извещение в БКС на комнату № {0}.odt", idSubPremise));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.SubPremiseNoticeToBks(idSubPremise, actionText, paymentType, signer);
+            return File(file, odtMime, string.Format(@"Извещение в БКС на комнату № {0}.odt", idSubPremise));
         }
 
         public IActionResult GetPremisesArea()
@@ -138,28 +90,14 @@ namespace RegistryWeb.Controllers
             if (!securityService.HasPrivilege(Privileges.RegistryRead))
                 return View("NotAccess");
 
-            try
-            {
-                var file = reportService.PremisesArea(ids);
-                return File(file, odtMime, string.Format(@"Справка о площади помещений.odt"));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.PremisesArea(ids);
+            return File(file, odtMime, string.Format(@"Справка о площади помещений.odt"));
         }
 
         public IActionResult GetPremiseArea(int idPremise)
         {
-            try
-            {
-                var file = reportService.PremisesArea(new List<int> { idPremise });
-                return File(file, odtMime, string.Format(@"Справка о площади помещения № {0}.odt", idPremise));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.PremisesArea(new List<int> { idPremise });
+            return File(file, odtMime, string.Format(@"Справка о площади помещения № {0}.odt", idPremise));
         }
 
         //_________________Для массовых____________________ 
@@ -169,16 +107,9 @@ namespace RegistryWeb.Controllers
 
             if (!ids.Any())
                 return NotFound();
-
-            try
-            {
-                var file = reportService.ExcerptPremises(ids, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
-                return File(file, odtMime, string.Format(@"Массовая выписка.odt"));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            
+            var file = reportService.ExcerptPremises(ids, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
+            return File(file, odtMime, string.Format(@"Массовая выписка.odt"));
         }
 
         public IActionResult GetPkBks(int signer, int? idPremise)
@@ -193,16 +124,9 @@ namespace RegistryWeb.Controllers
 
             if (!ids.Any())
                 return NotFound();
-
-            try
-            {
-                var file = reportService.PkBksPremises(ids, signer);
-                return File(file, odtMime, string.Format(@"Запрос ПК в БКС.odt"));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            
+            var file = reportService.PkBksPremises(ids, signer);
+            return File(file, odtMime, string.Format(@"Запрос ПК в БКС.odt"));
         }
 
         public IActionResult GetPremisesAct(DateTime actDate, string isNotResides, string commision, int clerk)
@@ -212,15 +136,8 @@ namespace RegistryWeb.Controllers
             if (!ids.Any())
                 return NotFound();
 
-            try
-            {
-                var file = reportService.MassActPremises(ids, actDate, isNotResides, commision, clerk);
-                return File(file, odtMime, string.Format(@"Акт о факте проживания.odt"));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.MassActPremises(ids, actDate, isNotResides, commision, clerk);
+            return File(file, odtMime, string.Format(@"Акт о факте проживания.odt"));
         }
 
         public IActionResult GetPremisesExport()
@@ -229,16 +146,9 @@ namespace RegistryWeb.Controllers
 
             if (!ids.Any())
                 return NotFound();
-
-            try
-            {
-                var file = reportService.ExportPremises(ids);
-                return File(file, odsMime, string.Format(@"Экспорт данных.ods"));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            
+            var file = reportService.ExportPremises(ids);
+            return File(file, odsMime, string.Format(@"Экспорт данных.ods"));
         }
 
         [HasPrivileges(Privileges.RegistryRead, Privileges.TenancyRead)]
@@ -252,15 +162,8 @@ namespace RegistryWeb.Controllers
             var idsString = ids
                 .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
 
-            try
-            {
-                var file = reportService.TenancyHistoryPremises(ids);
-                return File(file, odsMime, string.Format(@"История найма помещений.ods"));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.TenancyHistoryPremises(ids);
+            return File(file, odsMime, string.Format(@"История найма помещений.ods"));
         }
     }
 }

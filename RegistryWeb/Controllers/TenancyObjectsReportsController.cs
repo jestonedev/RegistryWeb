@@ -10,6 +10,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.TenancyRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class TenancyObjectsReportsController : RegistryBaseController
     {
         private readonly TenancyObjectsReportService reportService;
@@ -31,60 +32,32 @@ namespace RegistryWeb.Controllers
 
         public IActionResult GetTenancyStatistic(TenancyStatisticModalFilter modalFilter)
         {
-            try
+            byte[] file;
+            if (modalFilter.IdReportType == 0)
             {
-                byte[] file;
-                if (modalFilter.IdReportType == 0)
-                {
-                    file = reportService.GetTenancyStatistic(modalFilter);
-                    return File(file, odsMime, "Статистика");
-                }
-                file = reportService.GetTenancyStatisticForCoMSReporter(modalFilter);
-                return File(file, odtMime, "Статистика для МКУ ЦПМУ.odt");
+                file = reportService.GetTenancyStatistic(modalFilter);
+                return File(file, odsMime, "Статистика");
             }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            file = reportService.GetTenancyStatisticForCoMSReporter(modalFilter);
+            return File(file, odtMime, "Статистика для МКУ ЦПМУ.odt");
         }
 
         public IActionResult GetTenancyOrder(TenancyOrderModalFilter modalFilter)
         {
-            try
-            {
-                var file = reportService.GetTenancyOrder(modalFilter);
-                return File(file, odtMime, "Распоряжения на найм жилья.odt");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.GetTenancyOrder(modalFilter);
+            return File(file, odtMime, "Распоряжения на найм жилья.odt");
         }
 
         public IActionResult GetTenancyNotifiesList(DateTime? dateFrom, DateTime? dateTo)
         {
-            try
-            {
-                var file = reportService.GetTenancyNotifiesList(dateFrom, dateTo);
-                return File(file, odsMime, "Уведомление по счетчикам (пер).ods");
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.GetTenancyNotifiesList(dateFrom, dateTo);
+            return File(file, odsMime, "Уведомление по счетчикам (пер).ods");
         }
 
         public IActionResult GetPayment()
         {
-            try
-            {
-                var file = reportService.GetPayment();
-                return File(file, odsMime, string.Format("Плата за найм на {0}.ods", DateTime.Now.ToString("dd.MM.yyyy")));
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
+            var file = reportService.GetPayment();
+            return File(file, odsMime, string.Format("Плата за найм на {0}.ods", DateTime.Now.ToString("dd.MM.yyyy")));
         }
     }
 }

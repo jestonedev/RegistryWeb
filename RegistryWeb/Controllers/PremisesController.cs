@@ -25,6 +25,7 @@ namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.RegistryRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class PremisesController : ListController<PremisesDataService, PremisesListFilter>
     {
         private readonly IConfiguration config;

@@ -7,11 +7,13 @@ using RegistryDb.Models;
 using RegistryWeb.SecurityServices;
 using RegistryServices.ViewModel.RegistryObjects;
 using RegistryWeb.Filters;
+using System;
 
 namespace RegistryWeb.Controllers
 {
     [Authorize]
     [HasPrivileges(Privileges.RegistryRead)]
+    [DefaultResponseOnException(typeof(Exception))]
     public class FundsHistoryController : RegistryBaseController
     {
         private readonly FundsHistoryDataService dataService;
