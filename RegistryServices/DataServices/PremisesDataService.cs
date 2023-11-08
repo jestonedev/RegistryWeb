@@ -25,6 +25,7 @@ using RegistryDb.Models.Entities.RegistryObjects.Common;
 using RegistryDb.Models.Entities.RegistryObjects.Common.Restrictions;
 using RegistryDb.Models.Entities.Tenancies;
 using RegistryServices.DataFilterServices;
+using RegistryServices.DataServices.Tenancies;
 
 namespace RegistryWeb.DataServices
 {
@@ -32,13 +33,15 @@ namespace RegistryWeb.DataServices
     {
         private readonly IConfiguration config;
         private readonly SecurityService securityService;
+        private readonly TenancyPaymentsDataService tenancyPayments;
         private readonly IFilterService<Premise, PremisesListFilter> filterService;
 
         public PremisesDataService(RegistryContext registryContext, SecurityService securityService, 
-            AddressesDataService addressesDataService, IConfiguration config,
+            AddressesDataService addressesDataService, TenancyPaymentsDataService tenancyPayments, IConfiguration config,
             FilterServiceFactory<IFilterService<Premise, PremisesListFilter>> filterServiceFactory) : base(registryContext, addressesDataService)
         {
             this.securityService = securityService;
+            this.tenancyPayments = tenancyPayments;
             this.config = config;
             filterService = filterServiceFactory.CreateInstance();
         }
@@ -399,84 +402,55 @@ namespace RegistryWeb.DataServices
         {
             var ids = premises.Select(p => p.IdPremises).ToList();
             var paymentsInfo = new List<PaymentsInfo>();
-            var payments = (from paymentRow in registryContext.TenancyPayments
-                           where paymentRow.IdPremises != null && ids.Contains(paymentRow.IdPremises.Value)
-                           select paymentRow).ToList();
-            var tenanciesIds = payments.Select(p => p.IdProcess);
 
-            var activeTenancies = (from tpRow in registryContext.TenancyProcesses
-                                   join personRow in registryContext.TenancyPersons
-                                   on tpRow.IdProcess equals personRow.IdProcess
-                                    where tenanciesIds.Contains(tpRow.IdProcess) && (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н"))
-                                       select tpRow.IdProcess).Distinct().ToList();
+            var payments18272014 = tenancyPayments.GetPayments18272014(premises.AsQueryable()).ToList();
 
-            var prePaymentsAfter28082019Premises = from tpaRow in registryContext.TenancyPremisesAssoc
-                                                    join paymentRow in registryContext.TenancyPaymentsAfter28082019
-                                                    on tpaRow.IdPremise equals paymentRow.IdPremises
-                                                    where paymentRow.IdSubPremises == null &&
-                                                          paymentRow.IdPremises != null && ids.Contains(paymentRow.IdPremises.Value)
-                                                    select new
-                                                    {
-                                                        tpaRow.IdProcess,
-                                                        paymentRow.IdPremises,
-                                                        paymentRow.Hb,
-                                                        paymentRow.K1,
-                                                        paymentRow.K2,
-                                                        paymentRow.K3,
-                                                        paymentRow.KC,
-                                                        RentArea = tpaRow.RentTotalArea == null ? paymentRow.RentArea : tpaRow.RentTotalArea
-                                                    };
+            var tenanciesIds = payments18272014.Select(p => p.IdProcess);
 
-            var paymentsAfter28082019Premises = (from paymentRow in prePaymentsAfter28082019Premises
-                                                 join tpRow in registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons)
-                                                     on paymentRow.IdProcess equals tpRow.IdProcess
-                                                 where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
-                                                   tpRow.TenancyPersons.Any()
-                                                 select paymentRow).ToList();
+            var activeTenancies = (from tpRow in registryContext.TenancyProcesses.Include(p => p.TenancyPersons)
+                                   where tenanciesIds.Contains(tpRow.IdProcess) && (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н"))
+                                   select tpRow).Distinct().ToList();
 
-            var prePaymentsAfter28082019SubPremises = from tspaRow in registryContext.TenancySubPremisesAssoc
-                                                       join paymentRow in registryContext.TenancyPaymentsAfter28082019
-                                                    on tspaRow.IdSubPremise equals paymentRow.IdSubPremises
-                                                       where paymentRow.IdPremises != null && ids.Contains(paymentRow.IdPremises.Value)
-                                                       select new
-                                                       {
-                                                           tspaRow.IdProcess,
-                                                           paymentRow.IdSubPremises,
-                                                           paymentRow.Hb,
-                                                           paymentRow.K1,
-                                                           paymentRow.K2,
-                                                           paymentRow.K3,
-                                                           paymentRow.KC,
-                                                           RentArea = tspaRow.RentTotalArea == null ? paymentRow.RentArea : tspaRow.RentTotalArea
-                                                       };
+            var activeTenanciesIds = activeTenancies.Select(r => r.IdProcess);
 
-            var paymentsAfter28082019SubPremises = (from paymentRow in prePaymentsAfter28082019SubPremises
-                                                    join tpRow in registryContext.TenancyProcesses.Include(tp => tp.TenancyPersons)
-                                                        on paymentRow.IdProcess equals tpRow.IdProcess
-                                                    where (tpRow.RegistrationNum == null || !tpRow.RegistrationNum.EndsWith("н")) &&
-                                                      tpRow.TenancyPersons.Any()
-                                                    select paymentRow).ToList();
+            var tenancyPremisesAssoc = (from tpaRow in registryContext.TenancyPremisesAssoc
+                                       where ids.Contains(tpaRow.IdPremise)
+                                       select tpaRow).ToList();
 
-            foreach(var payment in payments)
+            var payments15172022Premises =
+                tenancyPayments.GetPremisesCoeffitients15172022(tenancyPremisesAssoc.AsQueryable(),
+                activeTenancies.AsQueryable()).ToList();
+
+            var tenancySubPremisesAssoc = (from tspaRow in registryContext.TenancySubPremisesAssoc
+                                           join spRow in registryContext.SubPremises
+                                           on tspaRow.IdSubPremise equals spRow.IdSubPremises
+                                           where ids.Contains(spRow.IdPremises)
+                                           select tspaRow).ToList();
+
+            var payments15172022SubPremises =
+                tenancyPayments.GetSubPremisesCoeffitionts15172022(tenancySubPremisesAssoc.AsQueryable(),
+                activeTenancies.AsQueryable()).ToList();
+
+            foreach(var payment in payments18272014)
             {
                 if (payment.IdPremises == null) continue;
                 var addreType = payment.IdSubPremises == null ? AddressTypes.Premise : AddressTypes.SubPremise;
                 var id = payment.IdSubPremises == null ? payment.IdPremises.Value : payment.IdSubPremises.Value;
-                if (!activeTenancies.Contains(payment.IdProcess)) continue;
+                if (!activeTenanciesIds.Contains(payment.IdProcess)) continue;
                 paymentsInfo.Add(new PaymentsInfo {
                     IdObject = id,
                     AddresType = addreType,
                     Payment = payment.Payment
                 });
             }
-            foreach (var payment in paymentsAfter28082019Premises)
+            foreach (var payment in payments15172022Premises)
             {
-                if (payment.IdPremises == null) continue;
-                var paymentItem = paymentsInfo.FirstOrDefault(p => p.IdObject == payment.IdPremises && p.AddresType == AddressTypes.Premise);
+                if (payment.IdObject == 0) continue;
+                var paymentItem = paymentsInfo.FirstOrDefault(p => p.IdObject == payment.IdObject && p.AddresType == AddressTypes.Premise);
                 if (paymentItem == null)
                 {
                     paymentItem = new PaymentsInfo {
-                        IdObject = payment.IdPremises.Value,
+                        IdObject = payment.IdObject,
                         AddresType = AddressTypes.Premise
                     };
                     paymentsInfo.Add(paymentItem);
@@ -486,17 +460,17 @@ namespace RegistryWeb.DataServices
                 paymentItem.K1 = payment.K1;
                 paymentItem.K2 = payment.K2;
                 paymentItem.K3 = payment.K3;
-                paymentItem.PaymentAfter28082019 += Math.Round((payment.K1 + payment.K2 + payment.K3) / 3 * payment.KC * payment.Hb * (decimal)payment.RentArea, 2);
+                paymentItem.PaymentAfter28082019 += Math.Round(payment.Payment, 2);
             }
-            foreach (var payment in paymentsAfter28082019SubPremises)
+            foreach (var payment in payments15172022SubPremises)
             {
-                if (payment.IdSubPremises == null) continue;
-                var paymentItem = paymentsInfo.FirstOrDefault(p => p.IdObject == payment.IdSubPremises && p.AddresType == AddressTypes.SubPremise);
+                if (payment.IdObject == 0) continue;
+                var paymentItem = paymentsInfo.FirstOrDefault(p => p.IdObject == payment.IdObject && p.AddresType == AddressTypes.SubPremise);
                 if (paymentItem == null)
                 {
                     paymentItem = new PaymentsInfo
                     {
-                        IdObject = payment.IdSubPremises.Value,
+                        IdObject = payment.IdObject,
                         AddresType = AddressTypes.SubPremise
                     };
                     paymentsInfo.Add(paymentItem);
@@ -506,7 +480,7 @@ namespace RegistryWeb.DataServices
                 paymentItem.K1 = payment.K1;
                 paymentItem.K2 = payment.K2;
                 paymentItem.K3 = payment.K3;
-                paymentItem.PaymentAfter28082019 += Math.Round((payment.K1 + payment.K2 + payment.K3) / 3 * payment.KC * payment.Hb * (decimal)payment.RentArea, 2);
+                paymentItem.PaymentAfter28082019 += Math.Round(payment.Payment, 2);
             }
             return paymentsInfo;
         }

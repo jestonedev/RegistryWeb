@@ -27,6 +27,7 @@ using RegistryWeb.DataServices.Claims;
 using RegistryWeb.DataServices.KumiAccounts;
 using RegistryServices.DataServices.Claims;
 using RegistryServices.DataServices.BksAccounts;
+using RegistryServices.DataServices.Tenancies;
 
 namespace RegistryWeb
 {
@@ -134,6 +135,7 @@ namespace RegistryWeb
             services.AddTransient<ZipArchiveDataService>();
             services.AddTransient<IDbConnectionSettings, DbConnectionSettings>();
             services.AddTransient(typeof(FilterServiceFactory<>));
+            services.AddTransient<TenancyPaymentsDataService>();
 
             services.AddHttpContextAccessor();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

@@ -152,6 +152,7 @@ namespace RegistryDb.Models
         public virtual DbSet<TenancyFile> TenancyFiles { get; set; }
         public virtual DbSet<TenancyProlongRentReason> TenancyProlongRentReasons { get; set; }
         public virtual DbSet<TenancyPaymentHistory> TenancyPaymentsHistory { get; set; }
+        public virtual DbSet<TenancyPaymentHistoryLastUpdate> TenancyPaymentsHistoryLastUpdate { get; set; }
 
         // Переселение
         public virtual DbSet<ResettleInfo> ResettleInfos { get; set; }
@@ -253,8 +254,8 @@ namespace RegistryDb.Models
         public virtual DbSet<KladrStreet> KladrStreets { get; set; }
         public virtual DbSet<KladrRegion> KladrRegions { get; set; }
         public virtual DbSet<TenancyActiveProcess> TenancyActiveProcesses { get; set; }
-        public virtual DbSet<TenancyPayment> TenancyPayments { get; set; }
-        public virtual DbSet<TenancyPaymentAfter28082019> TenancyPaymentsAfter28082019 { get; set; }
+        public virtual DbSet<TenancyPayment> _TenancyPayments { get; set; }
+        public virtual DbSet<TenancyPaymentAfter28082019> _TenancyPaymentsAfter28082019 { get; set; }
         public virtual DbSet<OwnerActiveProcess> OwnerActiveProcesses { get; set; }
         public virtual DbSet<BuildingOwnershipRightCurrent> BuildingsOwnershipRightCurrent { get; set; }
         public virtual DbSet<PremiseOwnershipRightCurrent> PremisesOwnershipRightCurrent { get; set; }
@@ -372,6 +373,7 @@ namespace RegistryDb.Models
             modelBuilder.ApplyConfiguration(new TenancyFileConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyProlongRentReasonTypeConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new TenancyPaymentHistoryConfiguration(nameDatebase));
+            modelBuilder.ApplyConfiguration(new TenancyPaymentHistoryLastUpdateConfiguration(nameDatebase));
             modelBuilder.ApplyConfiguration(new EmployerConfiguration(nameDatebase));
 
             modelBuilder.ApplyConfiguration(new ExecutorConfiguration(nameDatebase));
