@@ -12,6 +12,7 @@ using RegistryDb.Models.Entities.Payments;
 using InvoiceGenerator;
 using RegistryServices.DataServices.BksAccounts;
 using RegistryWeb.Filters;
+using RegistryServices.DataHelpers;
 
 namespace RegistryWeb.Controllers
 {
@@ -23,12 +24,6 @@ namespace RegistryWeb.Controllers
         private readonly PaymentAccountReportService reportService;
         private readonly PaymentAccountReportsDataService dataService;
         private readonly SecurityService securityService;
-        private const string zipMime = "application/zip";
-        private const string pdfMime = "application/pdf";
-        private const string odtMime = "application/vnd.oasis.opendocument.text";
-        private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
-        private const string xlsxMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-        private const string docxMime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
         public PaymentAccountReportsController(PaymentAccountReportService reportService, PaymentAccountReportsDataService dataService, SecurityService securityService)
         {
@@ -54,7 +49,7 @@ namespace RegistryWeb.Controllers
             }
 
             var file = reportService.RequestToBks(ids, idSigner, dateValue);
-            return File(file, odtMime, string.Format(@"Запрос в БКС{0}.odt", idAccount == 0 ? "" : string.Format(" (лицевой счет № {0})", idAccount)));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Запрос в БКС{0}.odt", idAccount == 0 ? "" : string.Format(" (лицевой счет № {0})", idAccount)));
         }
 
         public IActionResult GetCalDept(int idAccount, DateTime dateFrom, DateTime dateTo, int fileFormat)
@@ -65,7 +60,7 @@ namespace RegistryWeb.Controllers
                 return Error(string.Format("Отсутствуют начисления по лицевому счету № {0}", idAccount));
             }
             var file = reportService.CalDept(payment, dateFrom, dateTo, fileFormat);
-            return File(file, fileFormat == 1 ? xlsxMime : odsMime, 
+            return File(file, fileFormat == 1 ? MimeTypeHelper.XlsxMime : MimeTypeHelper.OdsMime, 
                 string.Format(@"Расчет суммы задолженности (лицевой счет № {0}).{1}", idAccount, fileFormat == 1 ? "xlsx" : "ods"));
         }
         
@@ -186,7 +181,7 @@ namespace RegistryWeb.Controllers
                 var fileInfo = new FileInfo(fileName);
                 var file = System.IO.File.ReadAllBytes(fileName);
                 Directory.Delete(destDirectory, true);
-                return File(file, pdfMime, fileInfo.Name);
+                return File(file, MimeTypeHelper.PdfMime, fileInfo.Name);
             }
             else
             {
@@ -196,7 +191,7 @@ namespace RegistryWeb.Controllers
                 Directory.Delete(destDirectory, true);
                 var file = System.IO.File.ReadAllBytes(destZipFile);
                 System.IO.File.Delete(destZipFile);
-                return File(file, zipMime, fileInfo.Name);
+                return File(file, MimeTypeHelper.ZipMime, fileInfo.Name);
             }
         }
 
@@ -254,7 +249,7 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
             
             var file = reportService.ExportPayments(ids);
-            return File(file, odsMime, "Экспорт данных.ods");
+            return File(file, MimeTypeHelper.OdsMime, "Экспорт данных.ods");
         }
     }
 }

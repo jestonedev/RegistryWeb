@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RegistryServices.DataHelpers;
 using RegistryWeb.Filters;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
@@ -15,8 +16,6 @@ namespace RegistryWeb.Controllers
     {
         private readonly KumiPaymentsReportService reportService;
         private readonly SecurityService securityService;
-        private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
-        private const string xlsxMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
         public KumiPaymentsReportsController(KumiPaymentsReportService reportService, SecurityService securityService)
         {
@@ -27,7 +26,7 @@ namespace RegistryWeb.Controllers
         public IActionResult GetPaymentOrder(int idPayment)
         {
             var file = reportService.GetPaymentOrder(idPayment);
-            return File(file, xlsxMime, string.Format(@"Платежное поручение № {0}.xlsx", idPayment));
+            return File(file, MimeTypeHelper.XlsxMime, string.Format(@"Платежное поручение № {0}.xlsx", idPayment));
         }
     }
 }

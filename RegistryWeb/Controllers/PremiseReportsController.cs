@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RegistryServices.DataHelpers;
 using RegistryWeb.DataServices;
 using RegistryWeb.Filters;
 using RegistryWeb.ReportServices;
@@ -20,8 +21,6 @@ namespace RegistryWeb.Controllers
         private readonly PremiseReportService reportService;
         private readonly PremiseReportsDataService dataService;
         private readonly SecurityService securityService;
-        private const string odtMime = "application/vnd.oasis.opendocument.text";
-        private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
 
         public PremiseReportsController(PremiseReportService reportService, PremiseReportsDataService dataService, SecurityService securityService)
         {
@@ -37,13 +36,13 @@ namespace RegistryWeb.Controllers
         public IActionResult GetExcerptPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
             var file = reportService.ExcerptPremise(idPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
-            return File(file, odtMime, string.Format(@"Выписка на помещение № {0}.odt", idPremise));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Выписка на помещение № {0}.odt", idPremise));
         }
 
         public IActionResult GetExcerptSubPremise(int idSubPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
         {
             var file = reportService.ExcerptSubPremise(idSubPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
-            return File(file, odtMime, string.Format(@"Выписка на комнату № {0}.odt", idSubPremise));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Выписка на комнату № {0}.odt", idSubPremise));
         }
 
         public IActionResult GetExcerptMunSubPremise(int idPremise, string excerptNumber, DateTime excerptDateFrom, int signer, int excerptHaveLiveSpace)
@@ -53,31 +52,31 @@ namespace RegistryWeb.Controllers
                 return Error(string.Format("В помещении № {0} отсутствуют муниципальные комнаты", idPremise));
             }
             var file = reportService.ExcerptMunSubPremises(idPremise, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
-            return File(file, odtMime, string.Format(@"Выписка на мун. комнаты помещения № {0}.odt", idPremise));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Выписка на мун. комнаты помещения № {0}.odt", idPremise));
         }
 
         public IActionResult GetPremiseNoticeToBks(int idPremise, string actionText, int paymentType, int signer)
         {
             var file = reportService.PremiseNoticeToBks(idPremise, actionText, paymentType, signer);
-            return File(file, odtMime, string.Format(@"Извещение в БКС на помещение № {0}.odt", idPremise));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Извещение в БКС на помещение № {0}.odt", idPremise));
         }
 
         public IActionResult GetPremiseNoticeToIes(int idPremise, string actionText, int signer)
         {
             var file = reportService.PremiseNoticeToIes(idPremise, actionText, signer);
-            return File(file, odtMime, string.Format(@"Извещение в ИЭСБК на помещение № {0}.odt", idPremise));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Извещение в ИЭСБК на помещение № {0}.odt", idPremise));
         }
 
         public IActionResult GetSubPremiseNoticeToIes(int idSubPremise, string actionText, int signer)
         {
             var file = reportService.SubPremiseNoticeToIes(idSubPremise, actionText, signer);
-            return File(file, odtMime, string.Format(@"Извещение в ИЭСБК на комнату № {0}.odt", idSubPremise));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Извещение в ИЭСБК на комнату № {0}.odt", idSubPremise));
         }
 
         public IActionResult GetSubPremiseNoticeToBks(int idSubPremise, string actionText, int paymentType, int signer)
         {
             var file = reportService.SubPremiseNoticeToBks(idSubPremise, actionText, paymentType, signer);
-            return File(file, odtMime, string.Format(@"Извещение в БКС на комнату № {0}.odt", idSubPremise));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Извещение в БКС на комнату № {0}.odt", idSubPremise));
         }
 
         public IActionResult GetPremisesArea()
@@ -91,13 +90,13 @@ namespace RegistryWeb.Controllers
                 return View("NotAccess");
 
             var file = reportService.PremisesArea(ids);
-            return File(file, odtMime, string.Format(@"Справка о площади помещений.odt"));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Справка о площади помещений.odt"));
         }
 
         public IActionResult GetPremiseArea(int idPremise)
         {
             var file = reportService.PremisesArea(new List<int> { idPremise });
-            return File(file, odtMime, string.Format(@"Справка о площади помещения № {0}.odt", idPremise));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Справка о площади помещения № {0}.odt", idPremise));
         }
 
         //_________________Для массовых____________________ 
@@ -109,7 +108,7 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             
             var file = reportService.ExcerptPremises(ids, excerptNumber, excerptDateFrom, signer, excerptHaveLiveSpace);
-            return File(file, odtMime, string.Format(@"Массовая выписка.odt"));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Массовая выписка.odt"));
         }
 
         public IActionResult GetPkBks(int signer, int? idPremise)
@@ -126,7 +125,7 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             
             var file = reportService.PkBksPremises(ids, signer);
-            return File(file, odtMime, string.Format(@"Запрос ПК в БКС.odt"));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Запрос ПК в БКС.odt"));
         }
 
         public IActionResult GetPremisesAct(DateTime actDate, string isNotResides, string commision, int clerk)
@@ -137,7 +136,7 @@ namespace RegistryWeb.Controllers
                 return NotFound();
 
             var file = reportService.MassActPremises(ids, actDate, isNotResides, commision, clerk);
-            return File(file, odtMime, string.Format(@"Акт о факте проживания.odt"));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Акт о факте проживания.odt"));
         }
 
         public IActionResult GetPremisesExport()
@@ -148,7 +147,7 @@ namespace RegistryWeb.Controllers
                 return NotFound();
             
             var file = reportService.ExportPremises(ids);
-            return File(file, odsMime, string.Format(@"Экспорт данных.ods"));
+            return File(file, MimeTypeHelper.OdsMime, string.Format(@"Экспорт данных.ods"));
         }
 
         [HasPrivileges(Privileges.RegistryRead, Privileges.TenancyRead)]
@@ -163,7 +162,7 @@ namespace RegistryWeb.Controllers
                 .Aggregate("", (current, id) => current + id.ToString(CultureInfo.InvariantCulture) + ",").TrimEnd(',');
 
             var file = reportService.TenancyHistoryPremises(ids);
-            return File(file, odsMime, string.Format(@"История найма помещений.ods"));
+            return File(file, MimeTypeHelper.OdsMime, string.Format(@"История найма помещений.ods"));
         }
     }
 }

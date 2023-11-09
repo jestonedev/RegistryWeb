@@ -8,6 +8,7 @@ using RegistryWeb.ReportServices;
 using RegistryWeb.DataServices;
 using RegistryServices.ViewModel.Owners;
 using RegistryWeb.Filters;
+using RegistryServices.DataHelpers;
 
 namespace RegistryWeb.Controllers
 {
@@ -48,7 +49,7 @@ namespace RegistryWeb.Controllers
                 return Error("id здания не указан.");
             var ids = new List<int> { idBuilding.Value };
             var file = reportService.Forma1(ids);
-            return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            return File(file, MimeTypeHelper.DocxMime,
                 @"Форма 1. Общие сведения об аварийном многоквартирном доме г. Братск.docx");
         }
 
@@ -62,7 +63,7 @@ namespace RegistryWeb.Controllers
             if (idPremise == null)
                 return Error("Помещение не выбрано.");
             var file = reportService.Forma2(new List<int>() { idPremise.Value });
-            return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            return File(file, MimeTypeHelper.DocxMime,
                 @"Форма 2. Сведения о жилых помещениях и собственниках (нанимателях) жилых помещений аварийного многоквартирного дома.docx");
         }
 
@@ -78,7 +79,7 @@ namespace RegistryWeb.Controllers
         public IActionResult GetMultiForma2(string fileNameReport)
         {
             var file = reportService.DownloadFile(fileNameReport);
-            return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            return File(file, MimeTypeHelper.DocxMime,
                 @"Форма 2. Сведения о жилых помещениях и собственниках (нанимателях) жилых помещений аварийного многоквартирного дома.docx");
         }
 
@@ -88,7 +89,7 @@ namespace RegistryWeb.Controllers
                 return Error("Помещение не выбрано.");
 
             var file = reportService.Forma3(new List<int>() { idPremise.Value });
-            return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            return File(file, MimeTypeHelper.DocxMime,
                 @"Форма 3. Сведения, необходимые для целей формирования программы переселения граждан  из аварийных многоквартирных домов.docx");
         }
 
@@ -103,35 +104,35 @@ namespace RegistryWeb.Controllers
         public IActionResult GetMultiForma3(string fileNameReport)
         {
             var file = reportService.DownloadFile(fileNameReport);
-            return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            return File(file, MimeTypeHelper.DocxMime,
                 @"Форма 3. Сведения, необходимые для целей формирования программы переселения граждан  из аварийных многоквартирных домов.docx");
         }
 
         public IActionResult GetAzfAreaAnalize()
         {
             var file = reportService.AzfAreaAnalize();
-            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            return File(file, MimeTypeHelper.XlsxMime,
                 @"Анализ АЖФ на текущую дату (краткий) по площади.xlsx");
         }
 
         public IActionResult GetAzfRoomsAnalize()
         {
             var file = reportService.AzfRoomsAnalize();
-            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            return File(file, MimeTypeHelper.XlsxMime,
                 @"Анализ АЖФ на текущую дату (краткий) по количеству комнат.xlsx");
         }
 
         public IActionResult GetAzfRegionsAnalize()
         {
             var file = reportService.AzfRegionsAnalize();
-            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            return File(file, MimeTypeHelper.XlsxMime,
                 @"Анализ АЖФ на текущую дату (краткий) по жилым районам.xlsx");
         }
 
         public IActionResult GetAzfWithoutPrivAnalize()
         {
             var file = reportService.AzfWithoutPrivAnalize();
-            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            return File(file, MimeTypeHelper.XlsxMime,
                 @"Анализ АЖФ на текущую дату по МКД без частных ЖП.xlsx");
         }
     }

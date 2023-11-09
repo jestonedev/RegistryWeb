@@ -14,6 +14,7 @@ using InvoiceGenerator;
 using Microsoft.Extensions.Configuration;
 using RegistryWeb.DataServices.KumiAccounts;
 using RegistryWeb.Filters;
+using RegistryServices.DataHelpers;
 
 namespace RegistryWeb.Controllers
 {
@@ -26,12 +27,6 @@ namespace RegistryWeb.Controllers
         private readonly KumiAccountReportsDataService dataService;
         private readonly SecurityService securityService;
         private readonly TenancyProcessesDataService processesDataService;
-        private const string zipMime = "application/zip";
-        private const string pdfMime = "application/pdf";
-        private const string odtMime = "application/vnd.oasis.opendocument.text";
-        private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
-        private const string xlsxMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-        private const string docxMime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
         public KumiAccountReportsController(KumiAccountReportService reportService, KumiAccountReportsDataService dataService, 
             SecurityService securityService, TenancyProcessesDataService processesDataService)
         {
@@ -54,7 +49,7 @@ namespace RegistryWeb.Controllers
                 }
 
                 var file = reportService.CalDept(payment, personInfo, dateFrom, dateTo, fileFormat);
-                return File(file, fileFormat == 1 ? xlsxMime : odsMime,
+                return File(file, fileFormat == 1 ? MimeTypeHelper.XlsxMime : MimeTypeHelper.OdsMime,
                     string.Format(@"Расчет суммы задолженности (лицевой счет № {0}).{1}", idAccount, fileFormat == 1 ? "xlsx" : "ods"));
         }
 
@@ -225,7 +220,7 @@ namespace RegistryWeb.Controllers
                 var fileInfo = new FileInfo(fileName);
                 var file = System.IO.File.ReadAllBytes(fileName);
                 Directory.Delete(destDirectory, true);
-                return File(file, pdfMime, fileInfo.Name);
+                return File(file, MimeTypeHelper.PdfMime, fileInfo.Name);
             }
             else
             {
@@ -235,7 +230,7 @@ namespace RegistryWeb.Controllers
                 Directory.Delete(destDirectory, true);
                 var file = System.IO.File.ReadAllBytes(destZipFile);
                 System.IO.File.Delete(destZipFile);
-                return File(file, zipMime, fileInfo.Name);
+                return File(file, MimeTypeHelper.ZipMime, fileInfo.Name);
             }
         }
 
@@ -276,7 +271,7 @@ namespace RegistryWeb.Controllers
             try
             {
                 var file = reportService.ExportAccounts(ids);
-                return File(file, odsMime, "Экспорт данных.ods");
+                return File(file, MimeTypeHelper.OdsMime, "Экспорт данных.ods");
             }
             catch (Exception ex)
             {

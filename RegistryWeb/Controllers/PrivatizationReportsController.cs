@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RegistryServices.DataHelpers;
 using RegistryWeb.DataServices;
 using RegistryWeb.Enums;
 using RegistryWeb.Filters;
@@ -19,11 +20,6 @@ namespace RegistryWeb.Controllers
         private readonly PrivatizationReportService reportService;
         private readonly PrivatizationReportsDataService dataService;
         private readonly SecurityService securityService;
-        private const string zipMime = "application/zip";
-        private const string odtMime = "application/vnd.oasis.opendocument.text";
-        private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
-        private const string xlsxMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-        private const string docxMime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
         public PrivatizationReportsController(PrivatizationReportService reportService, PrivatizationReportsDataService dataService, SecurityService securityService)
         {
@@ -47,25 +43,25 @@ namespace RegistryWeb.Controllers
             var file = reportService.GetMonthQuarterReport(settings);
 
             var nameReport = settings.Month.HasValue ? "Месячный отчет.odt" : "Квартальный отчет.odt";
-            return File(file, odtMime, nameReport);
+            return File(file, MimeTypeHelper.OdtMime, nameReport);
         }
 
         public IActionResult CommonReport(PrivCommonReportSettings settings)
         {
             var file = reportService.GetCommonReport(settings);
-            return File(file, odtMime, string.Format("{0}.odt", settings.ReportName));
+            return File(file, MimeTypeHelper.OdtMime, string.Format("{0}.odt", settings.ReportName));
         }
 
         public IActionResult GetContract(PrivContractReportSettings settings)
         {
             var file = reportService.GetContract(settings);
-            return File(file, odtMime, string.Format(@"Договор № {0}.odt", settings.IdContract));
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Договор № {0}.odt", settings.IdContract));
         }
 
         public IActionResult GetContractorWarrant(PrivContractorWarrantReportSettings settings)
         {
             var file = reportService.GetContractorWarrant(settings);
-            return File(file, odtMime, string.Format(@"Доверенность {1} № {0}.odt", 
+            return File(file, MimeTypeHelper.OdtMime, string.Format(@"Доверенность {1} № {0}.odt", 
                 settings.IdContractor, settings.WarrantType == PrivContractorWarrantTypeEnum.Realtor ? "(риелтор)" : "в УЮ"));
         }
     }

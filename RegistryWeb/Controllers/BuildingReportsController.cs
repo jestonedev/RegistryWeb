@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RegistryServices.DataHelpers;
 using RegistryWeb.Filters;
 using RegistryWeb.ReportServices;
 using RegistryWeb.SecurityServices;
@@ -14,8 +15,6 @@ namespace RegistryWeb.Controllers
     {
         private readonly BuildingReportService reportService;
         private readonly SecurityService securityService;
-        private const string odtMime = "application/vnd.oasis.opendocument.text";
-        private const string odsMime = "application/vnd.oasis.opendocument.spreadsheet";
 
         public BuildingReportsController(BuildingReportService reportService, SecurityService securityService)
         {
@@ -26,7 +25,7 @@ namespace RegistryWeb.Controllers
         public IActionResult GetExcerptBuilding(int idBuilding, string excerptNumber, DateTime excerptDateFrom, int signer)
         {
             var file = reportService.ExcerptBuilding(idBuilding, excerptNumber, excerptDateFrom, signer);
-            return File(file, odtMime, string.Format(@"Выписка на здание № {0}.odt", idBuilding));
+            return File(file, MimeTypeHelper.OdsMime, string.Format(@"Выписка на здание № {0}.odt", idBuilding));
         }
     }
 }
